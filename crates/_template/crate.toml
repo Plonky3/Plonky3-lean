@@ -1,0 +1,31 @@
+# Copy this directory to crates/<plonky3 directory name>/ and fill it in.
+
+# The module root hax emits for this crate, which is also the Lake library name.
+lean_lib = "p3_example"
+
+# "extracted": the library is extraction/<lean_lib>.lean, produced by hax.
+# "stub":      the library is stub/<lean_lib>.lean, written by hand.
+state = "stub"
+
+# Cargo features enabled for extraction. The target comes from toolchain.toml.
+features = []
+
+# Paths under plonky3/ whose change requires this crate to be re-extracted or its
+# stub to be re-read. Defaults to "<crate>/src" and "<crate>/Cargo.toml".
+watch = []
+
+# Constant tables compared between the real Rust crate and the Lean model.
+# tools/oracle evaluates `rust` against plonky3/, Lean evaluates `lean`, and CI
+# requires both to print the same canonical values.
+#
+# [[oracle]]
+# rust = "p3_example::Example::TABLE"
+# lean = "p3_example.example.Impl.TABLE_hoisted"
+
+# One entry per hand-written, non-opaque declaration in stub/. `hash` is the hash
+# of the Rust item's token stream, as printed by tools/mirror.
+#
+# [[mirror]]
+# lean = "p3_example.util.helper"
+# rust = "p3_example::util::helper"
+# hash = "sha256:<hash>"
