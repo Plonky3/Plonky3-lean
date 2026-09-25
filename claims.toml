@@ -1,0 +1,10 @@
+# The axioms each claim is allowed to depend on.
+#
+# One entry per theorem in `Plonky3Lean.Claims`. CI runs `#print axioms` on every
+# claim and requires the result to equal `axioms` exactly. A claim that starts to
+# depend on anything else fails the build, for example on `sorryAx`, or on the
+# `Lean.ofReduceBool` axiom that `native_decide` adds.
+#
+# [[claim]]
+# name   = "Plonky3Lean.Claims.BabyBear.modulus_prime"
+# axioms = ["propext", "Classical.choice", "Quot.sound"]

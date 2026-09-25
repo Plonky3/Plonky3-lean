@@ -1,0 +1,19 @@
+# Everything that turns Plonky3's Rust into Lean. One backend for the whole
+# repository: models from different backends use different monads and integer
+# types and do not compose in one Lake workspace, so a backend change is a branch.
+
+[extractor]
+backend = "hax-legacy-lean"
+
+# Must equal the `Hax` require's `rev` in lakefile.toml.
+hax_rev = "e116155418076d3ede11d7f4993e6602cdcaf2cd"
+
+# Container image (by digest) holding `cargo-hax` and the matching `hax-engine`.
+# Set when the first crate is extracted in CI.
+engine_image = ""
+
+# Rust toolchain and target that `cargo hax` compiles the crates with. The target
+# has no SIMD, so every AVX2, AVX-512 and NEON backend is `cfg`-excluded and the
+# models describe the portable scalar code paths only.
+rust_toolchain = "nightly-2025-11-08"
+target = "thumbv7em-none-eabi"

@@ -1,0 +1,42 @@
+name = "Plonky3Lean"
+version = "0.1.0"
+defaultTargets = ["HaxExt", "Plonky3Lean"]
+
+# The Hax proof library's own options. Generated Lean must be elaborated with the
+# settings the library was built with; `autoImplicit = false` changes elaboration.
+[leanOptions]
+autoImplicit = false
+relaxedAutoImplicit = false
+maxSynthPendingDepth = 3
+
+# The Lean model of Rust (`RustM`, `RustArray`, integer types, `core_models`).
+# `rev` must equal `hax_rev` in toolchain.toml: the generated files and the library
+# that interprets them come from one hax revision.
+[[require]]
+name = "Hax"
+git.url = "https://github.com/cryspen/hax"
+git.subDir = "hax-lib/proof-libs/legacy-lean"
+rev = "e116155418076d3ede11d7f4993e6602cdcaf2cd"
+
+# Mathematical specifications of the fields (and, through it, mathlib).
+# lake-manifest.json locks the exact commit.
+[[require]]
+name = "CompPoly"
+git = "https://github.com/Verified-zkEVM/CompPoly"
+rev = "v4.30.0"
+
+# Definitions the Hax library lacks. See HaxExt.lean.
+[[lean_lib]]
+name = "HaxExt"
+
+# Hand-written claims, specifications and proofs. See Plonky3Lean.lean.
+[[lean_lib]]
+name = "Plonky3Lean"
+
+# One library per crate under crates/, named after the module root hax emits and
+# rooted in the crate's `extraction/` or `stub/` directory, whichever its
+# crate.toml `state` selects. For example:
+#
+# [[lean_lib]]
+# name = "p3_baby_bear"
+# srcDir = "crates/baby-bear/extraction"
