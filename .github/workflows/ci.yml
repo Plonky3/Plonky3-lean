@@ -16,3 +16,5 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: leanprover/lean-action@v1
+      - name: Check the axioms of every claim
+        run: python3 tools/check-claims.py

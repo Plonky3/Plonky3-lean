@@ -1,5 +1,6 @@
 import Plonky3Lean.Lib
 import Plonky3Lean.Spec
+import Plonky3Lean.Proofs.Field.BabyBear
 
 /-!
 # Proofs

@@ -1,4 +1,5 @@
 import Plonky3Lean.Proofs
+import Plonky3Lean.Claims.BabyBear
 
 /-!
 # Claims
@@ -10,9 +11,9 @@ Each claim restates its theorem in full and takes its proof from
 `Plonky3Lean.Proofs`:
 
 ```
-theorem modulus_prime :
-    Nat.Prime (MontyParameters.PRIME BabyBearParameters).toNat :=
-  Proofs.BabyBear.monty_prime_is_prime
+theorem baby_bear.BabyBearParameters.PRIME.is_prime :
+    Nat.Prime PRIME.val :=
+  Proofs.BabyBear.baby_bear.BabyBearParameters.PRIME.is_prime
 ```
 
 A proof whose statement drifts no longer typechecks against its claim, so a

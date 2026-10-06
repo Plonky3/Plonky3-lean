@@ -9,6 +9,7 @@
 | `extract/new-patch.sh` | Captures a new pre- or post-extraction patch, with a header skeleton. |
 | `extract/test-pre-patches.py` | Runs Plonky3's tests with and without the pre-extraction patches and records every divergence in the patch headers. |
 | `extract/config.py` | Reads `toolchain.toml` and `crates/*/crate.toml` for the scripts above. |
+| `check-claims.py` | Checks the axioms of every claim against `claims.toml`. Run by CI. |
 
 The extraction scripts are ported from Plonky3/Plonky3#2154 and are the interim
 form of `xtask extract` and `xtask check`.

@@ -27,7 +27,12 @@ crate. The `[[mirror]]` entries have no hashes yet (`tools/mirror` is planned).
 
 ## Assumptions
 
-Every `opaque` constant, all hand-written. None is reached by a claim.
+Every `opaque` constant, all hand-written. An opaque constant is not an axiom:
+it adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about
+code that mentions one would go through for any value of it. Of these, only
+`baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` is in the dependencies of
+a claim: 16 of them reach it as the `Debug` supertrait field of the
+`MontyParameters` instance, whose constants they are about. No proof uses it.
 
 | Crate | Constant | Why |
 |---|---|---|
@@ -53,10 +58,35 @@ the pre-extraction patches (54 are `#[ignore]`d in both), with no divergences.
 
 ## Claims
 
+Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
+`tools/check-claims.py` checks each one's axioms against `claims.toml`.
+
 | Claim | Axioms |
 |---|---|
-
-No claims yet.
+| `BabyBear.baby_bear.BabyBear.new.montgomery_form` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.new_2d_array.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.new_array.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.MONTY_BITS.from_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.MONTY_BITS.val_eq_32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.MONTY_MU.from_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.MONTY_MU.inverse` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.PRIME.coprime_seven_pred` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.PRIME.eq_fieldSize` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.PRIME.from_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.PRIME.is_prime` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.TWO_ADICITY.eq_twoAdicity` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.TWO_ADICITY.factorization` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.TWO_ADICITY.from_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.TWO_ADICITY.maximal` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.poseidon1.const_check_1.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.poseidon2.const_check_1.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.poseidon2.const_check_2.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.poseidon2.const_check_3.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.poseidon2.const_check_4.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.poseidon2.const_check_5.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.poseidon2.const_check_6.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 
 ## Upstream warnings
 

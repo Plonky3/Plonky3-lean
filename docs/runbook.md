@@ -4,8 +4,8 @@
 figure in this repository is about that commit, and `STATUS.md` records it.
 
 The tracking workflow and `xtask` are not written yet. This page is their
-specification. Until then, `.github/workflows/ci.yml` runs `lake build` on
-every pull request, and
+specification. Until then, `.github/workflows/ci.yml` runs `lake build` and
+`tools/check-claims.py` on every pull request, and
 `tools/extract/extract.sh --check` ([`extracting.md`](extracting.md)) is the
 interim form of `xtask extract` and most of `xtask check`, run by hand.
 
@@ -52,6 +52,7 @@ Plonky3 itself runs nothing and holds no credentials for this repository.
 git submodule update --init
 lake exe cache get
 lake build
+tools/check-claims.py
 tools/extract/extract.sh --check   # needs the extraction tools; see extracting.md
 ```
 
