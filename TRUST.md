@@ -28,8 +28,13 @@ fills the gaps in them, and is trusted in the same way.
 `cargo hax into lean`, which runs [Charon](https://github.com/AeneasVerif/charon)
 and [Aeneas](https://github.com/AeneasVerif/aeneas), at the hax release and the
 charon and aeneas builds pinned in `toolchain.toml`. Trusted to translate Rust
-faithfully and not to drop items silently. This is the layer least open to
+faithfully and not to drop items silently. It does not always manage the
+second: [`docs/extractor-issues.md`](docs/extractor-issues.md) lists the cases
+found so far and how each is worked around. This is the layer least open to
 mechanical checking.
+
+The charon flags in `toolchain.toml`'s `charon_args` restrict what is extracted
+for every crate: `Debug` bodies become `opaque`, and serde is excluded.
 
 Extraction is target-scoped to `thumbv7em-none-eabi`. That target has no SIMD,
 so **nothing here describes the AVX2, AVX-512 or NEON code paths**, which are what

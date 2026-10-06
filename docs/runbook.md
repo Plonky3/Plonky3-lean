@@ -4,8 +4,10 @@
 figure in this repository is about that commit, and `STATUS.md` records it.
 
 The tracking workflow and `xtask` are not written yet. This page is their
-specification. Until then, only `.github/workflows/ci.yml` runs: `lake build` on
-every pull request.
+specification. Until then, `.github/workflows/ci.yml` runs `lake build` on
+every pull request, and
+`tools/extract/extract.sh --check` ([`extracting.md`](extracting.md)) is the
+interim form of `xtask extract` and most of `xtask check`, run by hand.
 
 ## Triggers
 
@@ -50,7 +52,14 @@ Plonky3 itself runs nothing and holds no credentials for this repository.
 git submodule update --init
 lake exe cache get
 lake build
+tools/extract/extract.sh --check   # needs the extraction tools; see extracting.md
 ```
+
+To move the pin by hand: check out the new commit in `plonky3/`, run
+`tools/extract/extract.sh`, reconcile what fails (patches that no longer apply,
+`Assumptions/` out of date with their templates, proofs that no longer check),
+review `git diff crates/`, and re-read every mirrored transcription whose Rust
+item changed in the range. Then update `STATUS.md`.
 
 Moving the hax, Lean or CompPoly pins is its own pull request. A hax release
 fixes the charon and aeneas builds, the `Aeneas` and `CoreModels` revisions and

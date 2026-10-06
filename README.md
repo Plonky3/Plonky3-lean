@@ -44,8 +44,8 @@ Plonky3Lean/
 claims.toml           the axioms each claim may depend on
 STATUS.md             generated: pin, crates, claims, assumptions, patch costs
 TRUST.md              the trust layers shared by every crate
-tools/                xtask, oracle, mirror
-docs/                 runbook, adding a crate, patches
+tools/                the extraction scripts; later xtask, oracle, mirror
+docs/                 runbook, extracting, adding a crate, patches, extractor issues
 ```
 
 - [`crates/README.md`](crates/README.md) describes the model: the stubbed and
@@ -62,6 +62,10 @@ cd Plonky3-lean
 lake exe cache get     # prebuilt mathlib; without it the first build takes hours
 lake build
 ```
+
+The generated Lean is committed, so this checks the models and the proofs
+without the extraction tools. To regenerate the models from `plonky3/`, see
+[`docs/extracting.md`](docs/extracting.md).
 
 ## License
 

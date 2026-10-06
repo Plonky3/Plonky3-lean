@@ -1,0 +1,30 @@
+# p3-poseidon1. A stub: a scoped extraction fails with an aeneas internal
+# error in core::iter.
+
+lean_lib = "P3Poseidon1"
+state = "stub"
+
+features = []
+
+watch = ["poseidon1/src", "poseidon1/Cargo.toml"]
+
+# Every non-opaque declaration in stub/P3Poseidon1.lean: a partial
+# transcription of the
+# Rust item, declaring only the members dependent crates project. Hashes are
+# pending tools/mirror.
+
+[[mirror]]
+lean = "p3_poseidon1.external.FullRoundLayerConstructor"
+rust = "p3_poseidon1::external::FullRoundLayerConstructor"
+
+[[mirror]]
+lean = "p3_poseidon1.internal.PartialRoundLayerConstructor"
+rust = "p3_poseidon1::internal::PartialRoundLayerConstructor"
+
+[[mirror]]
+lean = "p3_poseidon1.Poseidon1Constants"
+rust = "p3_poseidon1::Poseidon1Constants"
+
+[[mirror]]
+lean = "p3_poseidon1.Poseidon1"
+rust = "p3_poseidon1::Poseidon1"

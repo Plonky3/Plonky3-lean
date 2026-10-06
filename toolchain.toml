@@ -31,3 +31,25 @@ rust_components = ["rustc-dev", "llvm-tools", "rust-src"]
 # scalar code paths only. hax does not pass a target on to charon, so the
 # extraction passes it as charon's `--targets`.
 target = "thumbv7em-none-eabi"
+
+# Passed to charon on every run, for every crate. They restrict scope only:
+# nothing here edits code that is translated, and STATUS.md counts each one.
+#   Debug impls -> opaque: the impls stay (`MontyParameters: Debug` needs the
+#                  witness), but their `core::fmt` bodies, which `CoreModels`
+#                  does not model, become assumptions.
+#   serde       -> excluded: `Field: Serialize + DeserializeOwned` pulls in
+#                  serde's mutually recursive `Serializer` trait family.
+# Charon splits option values on ',', so a pattern cannot contain one.
+charon_args = [
+  "--opaque", "{impl core::fmt::Debug for _}",
+  "--exclude", "serde_core",
+  "--exclude", "serde",
+  "--exclude", "{impl serde_core::ser::Serialize for _}",
+  "--exclude", "{impl serde_core::de::Deserialize for _}",
+]
+
+# The cfg every pre-extraction patch gates its changes on, set for every crate
+# during extraction and never in a normal build. hax's Lean backend passes it to
+# the crate it extracts, but the gated items live in that crate's dependencies,
+# so it goes in RUSTFLAGS too.
+rustflags = "--cfg hax_backend_lean"

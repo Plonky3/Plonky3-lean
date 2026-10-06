@@ -1,6 +1,6 @@
 name = "Plonky3Lean"
 version = "0.1.0"
-defaultTargets = ["HaxExt", "Plonky3Lean"]
+defaultTargets = ["HaxExt", "P3BabyBear", "Plonky3Lean"]
 
 # The two Lean libraries the generated code imports. Both revs must equal what
 # the hax release in toolchain.toml resolves (`cargo hax tools show`): the
@@ -39,8 +39,30 @@ name = "Plonky3Lean"
 
 # One library per crate under crates/, named after the library hax emits for the
 # crate (`P3BabyBear` for p3-baby-bear) and rooted in the crate's `extraction/`
-# or `stub/` directory, whichever its crate.toml `state` selects. For example:
-#
-# [[lean_lib]]
-# name = "P3BabyBear"
-# srcDir = "crates/baby-bear/extraction"
+# or `stub/` directory, whichever its crate.toml `state` selects. Inside
+# `extraction/` the layout is hax's own, so the module names the generated code
+# imports resolve unchanged.
+
+[[lean_lib]]
+name = "P3BabyBear"
+srcDir = "crates/baby-bear/extraction"
+
+[[lean_lib]]
+name = "P3Field"
+srcDir = "crates/field/stub"
+
+[[lean_lib]]
+name = "P3Mds"
+srcDir = "crates/mds/extraction"
+
+[[lean_lib]]
+name = "P3Monty31"
+srcDir = "crates/monty-31/extraction"
+
+[[lean_lib]]
+name = "P3Poseidon1"
+srcDir = "crates/poseidon1/stub"
+
+[[lean_lib]]
+name = "P3Poseidon2"
+srcDir = "crates/poseidon2/stub"

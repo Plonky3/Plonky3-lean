@@ -1,14 +1,22 @@
 # Copy this directory to crates/<plonky3 directory name>/ and fill it in.
 
-# The module root hax emits for this crate, which is also the Lake library name.
-lean_lib = "p3_example"
+# The Lean library hax emits for this crate (`P3BabyBear` for p3-baby-bear),
+# which is also the Lake library name. Its declarations are in the crate's
+# namespace (`p3_baby_bear`).
+lean_lib = "P3Example"
 
-# "extracted": the library is extraction/<lean_lib>.lean, produced by hax.
+# "extracted": the library is extraction/, produced by hax from the whole crate.
+# "scoped":    the library is extraction/, produced by hax from the items
+#              reachable from `start_from`.
 # "stub":      the library is stub/<lean_lib>.lean, written by hand.
 state = "stub"
 
 # Cargo features enabled for extraction. The target comes from toolchain.toml.
 features = []
+
+# state = "scoped" only: the charon roots, one `--start-from` each. Charon
+# splits option values on ',', so a pattern cannot contain one.
+start_from = []
 
 # Paths under plonky3/ whose change requires this crate to be re-extracted or its
 # stub to be re-read. Defaults to "<crate>/src" and "<crate>/Cargo.toml".
@@ -20,10 +28,11 @@ watch = []
 #
 # [[oracle]]
 # rust = "p3_example::Example::TABLE"
-# lean = "p3_example.example.Impl.TABLE_hoisted"
+# lean = "p3_example.example.TABLE"
 
-# One entry per hand-written, non-opaque declaration in stub/. `hash` is the hash
-# of the Rust item's token stream, as printed by tools/mirror.
+# One entry per hand-written, non-opaque declaration in stub/ or in
+# extraction/<lean_lib>/Assumptions/. `hash` is the hash of the Rust item's
+# token stream, as printed by tools/mirror.
 #
 # [[mirror]]
 # lean = "p3_example.util.helper"
