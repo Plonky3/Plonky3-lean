@@ -19,7 +19,7 @@
 # them, so aeneas fills them with the trait's default method, but only if charon
 # translated it. hax adds the default methods as charon roots for exactly this
 # purpose. We extract with `--targets thumbv7em-none-eabi` (the only way to reach
-# charon's cargo with a target through hax 0.4.1), and in that mode charon
+# charon's cargo with a target through hax 0.4.1 or 0.4.2), and in that mode charon
 # drops them again (measured: 11 `clone_from` in the LLBC without `--targets`,
 # 2 with it). So every derived impl comes out missing the field, and Lean
 # rejects the structure literal.

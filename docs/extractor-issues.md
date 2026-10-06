@@ -4,7 +4,9 @@ Bugs and limitations in hax, charon and aeneas found while extracting Plonky3,
 with how each is worked around here. They are the reason for most patches and
 stubs, and each one is worth reporting upstream. Found with hax 0.4.1 (charon
 `nightly-2026.09.02`, aeneas `build-183e4f0`) on p3-baby-bear, in
-[Plonky3/Plonky3#2154](https://github.com/Plonky3/Plonky3/pull/2154).
+[Plonky3/Plonky3#2154](https://github.com/Plonky3/Plonky3/pull/2154). hax 0.4.2
+keeps the same charon and aeneas and produces byte-identical output, so every
+one of them is still present.
 
 1. **hax does not pass `--target` to charon** (`into lean`). Charon also ignores
    `CARGO_BUILD_TARGET`, since it always passes its own `--target <host>`. The

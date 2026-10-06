@@ -10,8 +10,8 @@ backend = "hax-lean"
 # The cargo-hax release, and the commit its tag `cargo-hax-v<version>` points to.
 # A crates.io build reports `version=<hax_version>`, a build from git at the tag
 # reports `commit=<hax_commit>`.
-hax_version = "0.4.1"
-hax_commit = "8d6a41802f32918fe7ebbaad0dfc86937ba3011d"
+hax_version = "0.4.2"
+hax_commit = "5ccf89dd2e996c9f88f2267eaa2a64739c4ca41a"
 
 # The charon and aeneas builds the hax release resolves by default
 # (`cargo hax tools show`). Pinning hax pins them; they are restated here because

@@ -7,7 +7,7 @@ hand. Until `xtask status` exists, it is written by hand from the output of
 
 **Plonky3:** [`24c27941`](https://github.com/Plonky3/Plonky3/commit/24c27941fc2b9a498d6bfdac99838183bac16662)
 
-**Extractor:** hax 0.4.1 (charon `nightly-2026.09.02`, aeneas `build-183e4f0`),
+**Extractor:** hax 0.4.2 (charon `nightly-2026.09.02`, aeneas `build-183e4f0`),
 target `thumbv7em-none-eabi`
 
 ## Crates

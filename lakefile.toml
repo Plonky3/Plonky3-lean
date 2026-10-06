@@ -19,7 +19,7 @@ subDir = "backends/lean"
 [[require]]
 name = "hax"
 git = "https://github.com/cryspen/hax-lean"
-rev = "v0.3.27"
+rev = "v0.3.30"
 
 # Mathematical specifications of the fields (and, through it, mathlib). Its
 # mathlib must be the one aeneas pins, so that the two share one mathlib.
