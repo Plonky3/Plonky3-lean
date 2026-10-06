@@ -12,18 +12,23 @@ checked by the kernel. Where a proof uses `native_decide`, the compiled evaluato
 is trusted as well, and the claim's axioms in `claims.toml` show
 `Lean.ofReduceBool`.
 
-## 2. The Hax proof library
+## 2. The Lean libraries the generated code imports
 
-`hax-lib/proof-libs/legacy-lean` at the `rev` pinned in `lakefile.toml`. It defines
-the Lean meaning of Rust: `RustM`, arrays and slices, the integer types, and the
-`core_models` of `core` and `alloc`. Every model is only as faithful as these
-definitions.
+`Aeneas` (`cryspen/aeneas`, `backends/lean`) and `CoreModels`
+(`cryspen/hax-lean`), at the `rev`s pinned in `lakefile.toml`. `Aeneas` defines
+the Lean meaning of Rust: `RustM`, the integer types, arrays and slices, and the
+`⦃ ⦄` specification logic. `CoreModels` defines the models of `core` and `alloc`.
+Every model is only as faithful as these definitions. Both are pinned to exactly
+what the hax release in `toolchain.toml` resolves, since the generated files and
+the libraries that interpret them must come from one aeneas build. `HaxExt.lean`
+fills the gaps in them, and is trusted in the same way.
 
 ## 3. The extractor
 
-`cargo hax` with the `hax-legacy-lean` backend, pinned in `toolchain.toml`. Trusted
-to translate Rust faithfully and not to drop items silently. The backend is
-labelled legacy and experimental upstream, and this is the layer least open to
+`cargo hax into lean`, which runs [Charon](https://github.com/AeneasVerif/charon)
+and [Aeneas](https://github.com/AeneasVerif/aeneas), at the hax release and the
+charon and aeneas builds pinned in `toolchain.toml`. Trusted to translate Rust
+faithfully and not to drop items silently. This is the layer least open to
 mechanical checking.
 
 Extraction is target-scoped to `thumbv7em-none-eabi`. That target has no SIMD,

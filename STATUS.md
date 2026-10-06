@@ -24,7 +24,4 @@ No claims yet.
 
 Warnings from pinned dependencies, not from this repository. CI allows exactly these.
 
-| Package | Location | Warning |
-|---|---|---|
-| Hax | `Hax/rust_primitives/USize64.lean:286` | `Lean.Grind.USize64.natCast` of class type must be marked `@[reducible]` or `@[implicit_reducible]` |
-| Hax | `Hax/rust_primitives/USize64.lean:290` | `Lean.Grind.USize64.intCast` of class type must be marked `@[reducible]` or `@[implicit_reducible]` |
+None.

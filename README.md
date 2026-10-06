@@ -4,7 +4,9 @@ Formal models and machine-checked proofs for
 [Plonky3](https://github.com/Plonky3/Plonky3), in Lean 4.
 
 Plonky3's Rust crates are extracted to Lean with
-[hax](https://github.com/cryspen/hax). The resulting models are specified
+[hax](https://github.com/cryspen/hax)'s `lean` backend, which runs
+[Charon](https://github.com/AeneasVerif/charon) and
+[Aeneas](https://github.com/AeneasVerif/aeneas). The resulting models are specified
 against [CompPoly](https://github.com/Verified-zkEVM/CompPoly) and mathlib. A
 nightly job moves the pinned Plonky3 commit along `main` whenever every check
 passes. [`docs/runbook.md`](docs/runbook.md) specifies it; it is not running yet.
@@ -24,13 +26,13 @@ assumptions in [`TRUST.md`](TRUST.md). In particular:
 
 ```
 plonky3/              submodule: the Plonky3 commit everything here is about
-toolchain.toml        extractor: backend, hax revision, Rust toolchain, target
+toolchain.toml        extractor: backend, hax release, Rust toolchain, target
 lakefile.toml         one Lake workspace: HaxExt, Plonky3Lean, one library per crate
 lean-toolchain  lake-manifest.json
 
 crates/               THE MODEL: one directory per Plonky3 crate, extracted or stubbed
   _template/          starting point for a new crate
-HaxExt.lean           gaps in the Hax Lean library, shared by every crate
+HaxExt.lean           gaps in the Aeneas and CoreModels libraries, shared by every crate
 
 Plonky3Lean.lean      THE CLAIMS: hand-written, organized by property
 Plonky3Lean/

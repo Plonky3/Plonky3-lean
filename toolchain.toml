@@ -3,17 +3,31 @@
 # types and do not compose in one Lake workspace, so a backend change is a branch.
 
 [extractor]
-backend = "hax-legacy-lean"
+# hax's `lean` backend: `cargo hax into lean` runs charon (Rust to LLBC) and
+# aeneas (LLBC to Lean). The generated code imports `Aeneas` and `CoreModels`.
+backend = "hax-lean"
 
-# Must equal the `Hax` require's `rev` in lakefile.toml.
-hax_rev = "e116155418076d3ede11d7f4993e6602cdcaf2cd"
+# The cargo-hax release, and the commit its tag `cargo-hax-v<version>` points to.
+# A crates.io build reports `version=<hax_version>`, a build from git at the tag
+# reports `commit=<hax_commit>`.
+hax_version = "0.4.1"
+hax_commit = "8d6a41802f32918fe7ebbaad0dfc86937ba3011d"
 
-# Container image (by digest) holding `cargo-hax` and the matching `hax-engine`.
-# Set when the first crate is extracted in CI.
-engine_image = ""
+# The charon and aeneas builds the hax release resolves by default
+# (`cargo hax tools show`). Pinning hax pins them; they are restated here because
+# a `hax.toml` anywhere above a crate would override them. `aeneas` must equal
+# the `aeneas` require's `rev` in lakefile.toml.
+charon = "nightly-2026.09.02"
+aeneas = "build-183e4f0"
 
-# Rust toolchain and target that `cargo hax` compiles the crates with. The target
-# has no SIMD, so every AVX2, AVX-512 and NEON backend is `cfg`-excluded and the
-# models describe the portable scalar code paths only.
-rust_toolchain = "nightly-2025-11-08"
+# The rust toolchain charon's driver links against (from charon's own
+# `rust-toolchain`), with the components it needs. `cargo check` of the
+# pre-patched tree runs under the same nightly.
+rust_toolchain = "nightly-2026-08-18"
+rust_components = ["rustc-dev", "llvm-tools", "rust-src"]
+
+# The target charon compiles the crates for. It has no SIMD, so every AVX2,
+# AVX-512 and NEON backend is `cfg`-excluded and the models describe the portable
+# scalar code paths only. hax does not pass a target on to charon, so the
+# extraction passes it as charon's `--targets`.
 target = "thumbv7em-none-eabi"

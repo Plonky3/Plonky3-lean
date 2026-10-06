@@ -52,7 +52,9 @@ lake exe cache get
 lake build
 ```
 
-Moving the Lean, Hax or CompPoly pins is its own pull request: update
-`lean-toolchain`, the `rev`s in `lakefile.toml` and `hax_rev` in
-`toolchain.toml` together, then run `lake update` and `lake exe cache get`.
-Do not run `lake update` otherwise.
+Moving the hax, Lean or CompPoly pins is its own pull request. A hax release
+fixes the charon and aeneas builds, the `Aeneas` and `CoreModels` revisions and
+the Lean version together (`cargo hax tools show` prints them), so update
+`toolchain.toml`, the `rev`s in `lakefile.toml` and `lean-toolchain` together,
+choose the CompPoly release with the same mathlib as aeneas, then run
+`lake update` and `lake exe cache get`. Do not run `lake update` otherwise.
