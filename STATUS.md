@@ -87,6 +87,9 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.poseidon2.const_check_6.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.new.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.new_2d_array.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.new_array.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 
 ## Upstream warnings
 

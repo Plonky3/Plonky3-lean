@@ -1,5 +1,6 @@
 import CompPoly.Fields.BabyBear
 import Plonky3Lean.Proofs.Field.BabyBear
+import Plonky3Lean.Proofs.Field.BabyBear.Element
 
 /-!
 # BabyBear: claims
@@ -156,6 +157,43 @@ theorem baby_bear.BabyBear.new_2d_array.never_panics {N M : Std.Usize}
     (input : Array (Array Std.U32 N) M) :
     ∃ r, p3_monty_31.monty_31.MontyField31.new_2d_array MontyParams input = .ok r :=
   Proofs.BabyBear.baby_bear.BabyBear.new_2d_array.never_panics input
+
+/-! ## The constructors, as field elements
+
+`Plonky3Lean.Spec.BabyBear.toField` reads a stored value as the field element it
+stands for, in CompPoly's `BabyBear.Field` (`ZMod p`), and `Canonical` says the
+stored value is fully reduced. Every constant in `baby-bear/src/baby_bear.rs`
+is built by one of these three constructors from literal `u32`s, so these
+claims are what the constant claims below rest on. -/
+
+/-- For every `u32` input `x`, `BabyBear::new x` returns the field element
+`x mod p`, stored canonically (`< p`). This is `new.montgomery_form` read
+through `toField`: the stored `x · 2^32 mod p` decodes to `x`. -/
+theorem baby_bear.BabyBear.new.toField (x : Std.U32) :
+    p3_monty_31.monty_31.MontyField31.new MontyParams x
+      ⦃ r => Canonical r ∧ toField r = (x.val : BabyBear.Field) ⦄ :=
+  Proofs.BabyBear.baby_bear.BabyBear.new.toField x
+
+/-- `BabyBear::new_array` returns, for each input `x`, the field element
+`x mod p`, in order and stored canonically. About the hand-written
+transcription of the Rust function (`crates/monty-31`,
+`Assumptions/Mirror.lean`). -/
+theorem baby_bear.BabyBear.new_array.toField {N : Std.Usize} (input : Array Std.U32 N) :
+    p3_monty_31.monty_31.MontyField31.new_array MontyParams input
+      ⦃ r => (∀ y ∈ r.val, Canonical y) ∧
+        r.val.map Spec.BabyBear.toField = input.val.map (fun x => (x.val : BabyBear.Field)) ⦄ :=
+  Proofs.BabyBear.baby_bear.BabyBear.new_array.toField input
+
+/-- `BabyBear::new_2d_array` returns, for each input `x`, the field element
+`x mod p`, row by row and stored canonically. About the hand-written
+transcription, like `new_array`. -/
+theorem baby_bear.BabyBear.new_2d_array.toField {N M : Std.Usize}
+    (input : Array (Array Std.U32 N) M) :
+    p3_monty_31.monty_31.MontyField31.new_2d_array MontyParams input
+      ⦃ r => (∀ row ∈ r.val, ∀ y ∈ row.val, Canonical y) ∧
+        r.val.map (fun row => row.val.map Spec.BabyBear.toField) =
+          input.val.map (fun row => row.val.map (fun x => (x.val : BabyBear.Field))) ⦄ :=
+  Proofs.BabyBear.baby_bear.BabyBear.new_2d_array.toField input
 
 /-! ## The Poseidon round-constant length assertions
 
