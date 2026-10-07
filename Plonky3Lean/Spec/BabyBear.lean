@@ -12,9 +12,11 @@ Two things the BabyBear claims are stated in.
   `a · 2^32 mod p`. `toField` decodes a stored value into CompPoly's
   `BabyBear.Field` (`ZMod p`), the specification every claim compares against,
   and `Canonical` is the invariant the Rust relies on, that the stored value is
-  fully reduced. These two definitions are the whole of the interpretation: a
-  claim about field arithmetic or a field constant says something about
-  `toField` of the model's values.
+  fully reduced. `toExt` reads an array of coefficients as an element of a
+  binomial extension `F[X] / (X ^ D - w)`, through `toField`. These three
+  definitions are the whole of the interpretation: a claim about field
+  arithmetic or a field constant says something about `toField` or `toExt` of
+  the model's values.
 * **Names for the model's constants.** `abbrev`s naming the trait constants and
   instances that aeneas generated for `BabyBearParameters`, so that claims
   about them read in Rust's terms. Each is an alias of a generated definition
