@@ -28,6 +28,13 @@ start_from = [
   "p3_monty_31::poseidon2::InternalLayerParameters",
   "p3_monty_31::monty_31::MontyField31::new",
   "{impl core::clone::Clone for p3_monty_31::monty_31::MontyField31<_>}",
+  # The scalar arithmetic on Montgomery-form u32s, which the `Add`, `Sub`,
+  # `Mul` and `Neg` impls and `halve` wrap (transcribed in Mirror.lean).
+  "p3_monty_31::utils::add",
+  "p3_monty_31::utils::sub",
+  "p3_monty_31::utils::monty_reduce",
+  "p3_monty_31::utils::from_monty",
+  "p3_monty_31::utils::halve_u32",
 ]
 
 watch = ["monty-31/src", "monty-31/Cargo.toml"]
