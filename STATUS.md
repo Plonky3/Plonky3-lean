@@ -107,6 +107,17 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.baby_bear.BabyBearParameters.exp_root_d.exponent` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.poseidon1._.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.poseidon2._.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData5.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData5.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData5.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
 
 ## Upstream warnings
 

@@ -2,6 +2,7 @@ import CompPoly.Fields.BabyBear
 import Plonky3Lean.Proofs.Field.BabyBear
 import Plonky3Lean.Proofs.Field.BabyBear.Constants
 import Plonky3Lean.Proofs.Field.BabyBear.Element
+import Plonky3Lean.Proofs.Field.BabyBear.Extension
 
 /-!
 # BabyBear: claims
@@ -13,8 +14,9 @@ extraction in `crates/monty-31`; `PRIME`, `MontyParams` and the other names are
 CompPoly's specification of the field.
 
 Not claimed: anything about field arithmetic (addition, multiplication,
-Montgomery reduction, inversion), the Poseidon1 and Poseidon2 permutations or
-the MDS layer, and the values of the round constants.
+Montgomery reduction, inversion), the extension fields' `EXT_GENERATOR`s, the
+Poseidon1 and Poseidon2 permutations or the MDS layer, and the values of the
+round constants.
 -/
 
 open Aeneas Aeneas.Std CoreModels
@@ -314,6 +316,112 @@ the function. -/
 theorem baby_bear.BabyBearParameters.exp_root_d.exponent (x : BabyBear.Field) :
     (x ^ 1725656503) ^ 7 = x :=
   Proofs.BabyBear.exp_root_seven x
+
+/-! ## `BinomialExtensionData<D>`: the binomial extensions
+
+BabyBear's extension fields of degree `D = 4, 5, 8` are `F[X] / (X ^ D - W)`.
+The trait requires `X ^ D - W` to be irreducible (otherwise the quotient is not a
+field), `DTH_ROOT` to be `W ^ ((p - 1) / D)`, `EXT_TWO_ADICITY` to be the
+two-adicity of `p ^ D - 1`, and the `i`-th entry of
+`TWO_ADIC_EXTENSION_GENERATORS` to be a primitive `2 ^ (TWO_ADICITY + 1 + i)`-th
+root of unity. Each extension element is read through
+`Plonky3Lean.Spec.BabyBear.toExt`.
+
+The degree-5 field has no two-adic extension generators: `p ^ 5 - 1` has the
+same two-adicity as `p - 1`, and its `TWO_ADIC_EXTENSION_GENERATORS` is empty.
+
+Not claimed: `EXT_GENERATOR`, a generator of each extension's multiplicative
+group. Proving that needs the factorisation of `p ^ D - 1`, which is a much
+larger computation than anything else here. -/
+
+/-- `W = 11` for the degree-4 extension, stored canonically, and `X ^ 4 - W` is
+irreducible over the BabyBear field, so `F[X] / (X ^ 4 - W)` is a field of order
+`p ^ 4`. -/
+theorem baby_bear.BabyBearParameters.BinomialExtensionData4.W.irreducible :
+    Ext4Params.W ⦃ w => Canonical w ∧ Spec.BabyBear.toField w = 11 ∧
+      Irreducible (Polynomial.X ^ 4 - Polynomial.C (Spec.BabyBear.toField w)) ⦄ :=
+  Proofs.BabyBear.Ext4Params.W.spec
+
+/-- `DTH_ROOT` for the degree-4 extension is `W ^ ((p - 1) / 4)`, stored
+canonically: the image of `X` under one application of Frobenius is
+`DTH_ROOT · X`. -/
+theorem baby_bear.BabyBearParameters.BinomialExtensionData4.DTH_ROOT.spec :
+    ∃ w r, Ext4Params.W = .ok w ∧ Ext4Params.DTH_ROOT = .ok r ∧ Canonical r ∧
+      Spec.BabyBear.toField r = Spec.BabyBear.toField w ^ ((BabyBear.fieldSize - 1) / 4) :=
+  Proofs.BabyBear.Ext4Params.DTH_ROOT.spec
+
+/-- `EXT_TWO_ADICITY` for the degree-4 extension is the two-adicity of
+`p ^ 4 - 1`: `2 ^ EXT_TWO_ADICITY` divides it and no higher power of `2` does. -/
+theorem baby_bear.BabyBearParameters.BinomialExtensionData4.EXT_TWO_ADICITY.spec :
+    Ext4Params.EXT_TWO_ADICITY ⦃ e => 2 ^ e.val ∣ PRIME.val ^ 4 - 1 ∧
+      ¬ 2 ^ (e.val + 1) ∣ PRIME.val ^ 4 - 1 ⦄ :=
+  Proofs.BabyBear.Ext4Params.EXT_TWO_ADICITY.spec
+
+/-- Entry `i` of `TWO_ADIC_EXTENSION_GENERATORS` for the degree-4 extension, read
+as an element of `F[X] / (X ^ 4 - W)`, has order exactly
+`2 ^ (TWO_ADICITY + 1 + i)`: it extends the base field's two-adic generators. -/
+theorem baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.order :
+    ∃ w t, Ext4Params.W = .ok w ∧ Ext4Params.TWO_ADIC_EXTENSION_GENERATORS = .ok t ∧
+      ∀ i (h : i < t.val.length),
+        orderOf (toExt 4 (Spec.BabyBear.toField w) t.val[i].val) =
+          2 ^ (TWO_ADICITY.val + 1 + i) :=
+  Proofs.BabyBear.Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.order
+
+/-- `W = 2` for the degree-5 extension, stored canonically, and `X ^ 5 - W` is
+irreducible over the BabyBear field, so `F[X] / (X ^ 5 - W)` is a field of order
+`p ^ 5`. -/
+theorem baby_bear.BabyBearParameters.BinomialExtensionData5.W.irreducible :
+    Ext5Params.W ⦃ w => Canonical w ∧ Spec.BabyBear.toField w = 2 ∧
+      Irreducible (Polynomial.X ^ 5 - Polynomial.C (Spec.BabyBear.toField w)) ⦄ :=
+  Proofs.BabyBear.Ext5Params.W.spec
+
+/-- `DTH_ROOT` for the degree-5 extension is `W ^ ((p - 1) / 5)`, stored
+canonically: the image of `X` under one application of Frobenius is
+`DTH_ROOT · X`. -/
+theorem baby_bear.BabyBearParameters.BinomialExtensionData5.DTH_ROOT.spec :
+    ∃ w r, Ext5Params.W = .ok w ∧ Ext5Params.DTH_ROOT = .ok r ∧ Canonical r ∧
+      Spec.BabyBear.toField r = Spec.BabyBear.toField w ^ ((BabyBear.fieldSize - 1) / 5) :=
+  Proofs.BabyBear.Ext5Params.DTH_ROOT.spec
+
+/-- `EXT_TWO_ADICITY` for the degree-5 extension is the two-adicity of
+`p ^ 5 - 1`: `2 ^ EXT_TWO_ADICITY` divides it and no higher power of `2` does. -/
+theorem baby_bear.BabyBearParameters.BinomialExtensionData5.EXT_TWO_ADICITY.spec :
+    Ext5Params.EXT_TWO_ADICITY ⦃ e => 2 ^ e.val ∣ PRIME.val ^ 5 - 1 ∧
+      ¬ 2 ^ (e.val + 1) ∣ PRIME.val ^ 5 - 1 ⦄ :=
+  Proofs.BabyBear.Ext5Params.EXT_TWO_ADICITY.spec
+
+/-- `W = 11` for the degree-8 extension, stored canonically, and `X ^ 8 - W` is
+irreducible over the BabyBear field, so `F[X] / (X ^ 8 - W)` is a field of order
+`p ^ 8`. -/
+theorem baby_bear.BabyBearParameters.BinomialExtensionData8.W.irreducible :
+    Ext8Params.W ⦃ w => Canonical w ∧ Spec.BabyBear.toField w = 11 ∧
+      Irreducible (Polynomial.X ^ 8 - Polynomial.C (Spec.BabyBear.toField w)) ⦄ :=
+  Proofs.BabyBear.Ext8Params.W.spec
+
+/-- `DTH_ROOT` for the degree-8 extension is `W ^ ((p - 1) / 8)`, stored
+canonically: the image of `X` under one application of Frobenius is
+`DTH_ROOT · X`. -/
+theorem baby_bear.BabyBearParameters.BinomialExtensionData8.DTH_ROOT.spec :
+    ∃ w r, Ext8Params.W = .ok w ∧ Ext8Params.DTH_ROOT = .ok r ∧ Canonical r ∧
+      Spec.BabyBear.toField r = Spec.BabyBear.toField w ^ ((BabyBear.fieldSize - 1) / 8) :=
+  Proofs.BabyBear.Ext8Params.DTH_ROOT.spec
+
+/-- `EXT_TWO_ADICITY` for the degree-8 extension is the two-adicity of
+`p ^ 8 - 1`: `2 ^ EXT_TWO_ADICITY` divides it and no higher power of `2` does. -/
+theorem baby_bear.BabyBearParameters.BinomialExtensionData8.EXT_TWO_ADICITY.spec :
+    Ext8Params.EXT_TWO_ADICITY ⦃ e => 2 ^ e.val ∣ PRIME.val ^ 8 - 1 ∧
+      ¬ 2 ^ (e.val + 1) ∣ PRIME.val ^ 8 - 1 ⦄ :=
+  Proofs.BabyBear.Ext8Params.EXT_TWO_ADICITY.spec
+
+/-- Entry `i` of `TWO_ADIC_EXTENSION_GENERATORS` for the degree-8 extension, read
+as an element of `F[X] / (X ^ 8 - W)`, has order exactly
+`2 ^ (TWO_ADICITY + 1 + i)`: it extends the base field's two-adic generators. -/
+theorem baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.order :
+    ∃ w t, Ext8Params.W = .ok w ∧ Ext8Params.TWO_ADIC_EXTENSION_GENERATORS = .ok t ∧
+      ∀ i (h : i < t.val.length),
+        orderOf (toExt 8 (Spec.BabyBear.toField w) t.val[i].val) =
+          2 ^ (TWO_ADICITY.val + 1 + i) :=
+  Proofs.BabyBear.Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.order
 
 /-! ## The Poseidon round-constant length assertions
 

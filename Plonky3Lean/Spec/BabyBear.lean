@@ -1,4 +1,5 @@
 import CompPoly.Fields.BabyBear
+import Mathlib.RingTheory.AdjoinRoot
 import P3BabyBear
 
 /-!
@@ -43,6 +44,18 @@ noncomputable abbrev TwoAdicParams :=
 noncomputable abbrev FieldParams :=
   baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsFieldParameters
 
+/-- The `BinomialExtensionData<4>` instance aeneas generated for `BabyBearParameters`. -/
+noncomputable abbrev Ext4Params :=
+  baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsBinomialExtensionDataArrayArrayMontyField31BabyBearParameters424
+
+/-- The `BinomialExtensionData<5>` instance aeneas generated for `BabyBearParameters`. -/
+noncomputable abbrev Ext5Params :=
+  baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsBinomialExtensionDataArrayArrayMontyField31BabyBearParameters505
+
+/-- The `BinomialExtensionData<8>` instance aeneas generated for `BabyBearParameters`. -/
+noncomputable abbrev Ext8Params :=
+  baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsBinomialExtensionDataArrayArrayMontyField31BabyBearParameters838
+
 /-- `BabyBearParameters::PRIME` (`baby-bear/src/baby_bear.rs`). -/
 abbrev PRIME : Std.U32 :=
   baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.PRIME
@@ -76,5 +89,17 @@ it, each field element has exactly one stored value, which the Rust relies on
 (for example, `PartialEq` compares stored values). -/
 def Canonical (x : Element) : Prop :=
   x.value.val < BabyBear.fieldSize
+
+/-! ## What an extension-field element means -/
+
+open Polynomial in
+/-- The element of the degree-`D` binomial extension `F[X] / (X ^ D - w)` that a
+coefficient array stands for, `Σ j, c_j · X ^ j`, with each coefficient read
+through `toField`. This is how Plonky3's `BinomialExtensionField<BabyBear, D>`
+represents an element: its `[BabyBear; D]` of coefficients in the basis
+`1, X, …, X ^ (D - 1)`, with `X ^ D = W`. -/
+noncomputable def toExt (D : ℕ) (w : BabyBear.Field) (coeffs : List Element) :
+    AdjoinRoot (X ^ D - C w) :=
+  AdjoinRoot.mk _ (((coeffs.map toField).mapIdx fun j a => C a * X ^ j).sum)
 
 end Plonky3Lean.Spec.BabyBear

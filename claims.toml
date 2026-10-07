@@ -183,3 +183,47 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 [[claim]]
 name   = "Plonky3Lean.Claims.BabyBear.poseidon2._.holds"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.DTH_ROOT.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.EXT_TWO_ADICITY.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.W.irreducible"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData5.DTH_ROOT.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData5.EXT_TWO_ADICITY.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData5.W.irreducible"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.DTH_ROOT.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.EXT_TWO_ADICITY.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.W.irreducible"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
