@@ -51,6 +51,30 @@ lean = "p3_monty_31.monty_31.MontyField31.new_2d_array"
 rust = "p3_monty_31::monty_31::MontyField31::new_2d_array"
 
 [[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.new_monty"
+rust = "p3_monty_31::monty_31::MontyField31::new_monty"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.add"
+rust = "{impl core::ops::arith::Add for p3_monty_31::monty_31::MontyField31<_>}::add"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.sub"
+rust = "{impl core::ops::arith::Sub for p3_monty_31::monty_31::MontyField31<_>}::sub"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.mul"
+rust = "{impl core::ops::arith::Mul for p3_monty_31::monty_31::MontyField31<_>}::mul"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.neg"
+rust = "{impl core::ops::arith::Neg for p3_monty_31::monty_31::MontyField31<_>}::neg"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.halve"
+rust = "{impl p3_field::field::Field for p3_monty_31::monty_31::MontyField31<_>}::halve"
+
+[[mirror]]
 lean = "p3_monty_31.no_packing.poseidon1.Poseidon1InternalLayerMonty31"
 rust = "p3_monty_31::no_packing::poseidon1::Poseidon1InternalLayerMonty31"
 
