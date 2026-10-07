@@ -10,6 +10,13 @@ impl). This file holds what that extraction does not produce:
   with bodies, but aeneas drops them without a diagnostic
   (docs/extractor-issues.md, 4). They are transcribed below: an elementwise
   `new`, left to right, as the Rust `while` loops are.
+* `MontyField31::new_monty` and the scalar arithmetic impls that wrap the
+  extracted `utils` functions: `Add`, `Sub`, `Mul`, `Neg` and `Field::halve`.
+  Like `new_array`, charon translates them (with bodies) but leaves them out
+  of the declaration order aeneas reads, so they are not emitted
+  (docs/extractor-issues.md, 4). Each body is one line and is transcribed
+  below; the arithmetic itself (`utils::add`, `sub`, `monty_reduce`,
+  `halve_u32`) is extracted.
 * the `no_packing` Poseidon layer types and their constructor impls. On a
   target with no SIMD these are the layers baby-bear's Poseidon instances use.
   The constructor bodies are one struct literal each and are transcribed.
@@ -45,6 +52,62 @@ def monty_31.MontyField31.new_2d_array {MP : Type}
     RustM (Array (Array (monty_31.MontyField31 MP) N) M) :=
   input.val.mapM (monty_31.MontyField31.new_array data_traitsMontyParametersInst) >>=
     fun l => if h : l.length = M.val then ok ⟨l, h⟩ else fail .panic
+
+/-! ## Scalar arithmetic (`monty-31/src/monty_31.rs`) -/
+
+/-- [p3_monty_31::monty_31::MontyField31::new_monty]. Upstream line 71:
+`Self { value, _phantom: PhantomData }`, with no reduction. -/
+def monty_31.MontyField31.new_monty {MP : Type}
+    (_data_traitsMontyParametersInst : data_traits.MontyParameters MP) (value : Std.U32) :
+    RustM (monty_31.MontyField31 MP) :=
+  ok { value := value, _phantom := () }
+
+/-- `<MontyField31<FP> as Add>::add`. Upstream line 733:
+`Self::new_monty(add::<FP>(self.value, rhs.value))`. -/
+def monty_31.MontyField31.add {MP : Type}
+    (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
+    (self rhs : monty_31.MontyField31 MP) : RustM (monty_31.MontyField31 MP) := do
+  let v ← utils.add data_traitsMontyParametersInst self.value rhs.value
+  monty_31.MontyField31.new_monty data_traitsMontyParametersInst v
+
+/-- `<MontyField31<FP> as Sub>::sub`. Upstream line 742:
+`Self::new_monty(sub::<FP>(self.value, rhs.value))`. -/
+def monty_31.MontyField31.sub {MP : Type}
+    (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
+    (self rhs : monty_31.MontyField31 MP) : RustM (monty_31.MontyField31 MP) := do
+  let v ← utils.sub data_traitsMontyParametersInst self.value rhs.value
+  monty_31.MontyField31.new_monty data_traitsMontyParametersInst v
+
+/-- `<MontyField31<FP> as Mul>::mul`. Upstream line 760:
+`let long_prod = self.value as u64 * rhs.value as u64;`
+`Self::new_monty(monty_reduce::<FP>(long_prod))`. The `*` is Rust's checked
+`u64` multiplication, as aeneas renders it. -/
+def monty_31.MontyField31.mul {MP : Type}
+    (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
+    (self rhs : monty_31.MontyField31 MP) : RustM (monty_31.MontyField31 MP) := do
+  let i ← lift (UScalar.cast .U64 self.value)
+  let i1 ← lift (UScalar.cast .U64 rhs.value)
+  let long_prod ← i * i1
+  let v ← utils.monty_reduce data_traitsMontyParametersInst long_prod
+  monty_31.MontyField31.new_monty data_traitsMontyParametersInst v
+
+/-- `<MontyField31<FP> as Neg>::neg`. Upstream line 751: `Self::ZERO - self`,
+where `ZERO` is `FP::MONTY_ZERO` (line 214). -/
+def monty_31.MontyField31.neg {FP : Type}
+    (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (self : monty_31.MontyField31 FP) : RustM (monty_31.MontyField31 FP) := do
+  let zero ← data_traitsFieldParametersInst.MONTY_ZERO
+  monty_31.MontyField31.sub
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst zero self
+
+/-- `<MontyField31<FP> as Field>::halve`. Upstream line 225:
+`Self::new_monty(halve_u32::<FP>(self.value))`. -/
+def monty_31.MontyField31.halve {FP : Type}
+    (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (self : monty_31.MontyField31 FP) : RustM (monty_31.MontyField31 FP) := do
+  let v ← utils.halve_u32 data_traitsFieldParametersInst self.value
+  monty_31.MontyField31.new_monty
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst v
 
 /-- `impl<FP: FieldParameters> PrimeField for MontyField31<FP>`
 (`monty-31/src/monty_31.rs:671`). `PrimeField` has no members here. -/
