@@ -1,0 +1,35 @@
+# p3-field: the field traits. A stub: aeneas rejects the trait hierarchy,
+# which is mutually recursive through its associated types
+# (docs/extractor-issues.md, 9).
+
+lean_lib = "P3Field"
+state = "stub"
+
+features = []
+
+watch = ["field/src", "field/Cargo.toml"]
+
+# Every non-opaque declaration in stub/P3Field.lean: a partial transcription
+# of the
+# Rust item, declaring only the members dependent crates project. Hashes are
+# pending tools/mirror.
+
+[[mirror]]
+lean = "p3_field.dup.Dup"
+rust = "p3_field::dup::Dup"
+
+[[mirror]]
+lean = "p3_field.field.PrimeCharacteristicRing"
+rust = "p3_field::field::PrimeCharacteristicRing"
+
+[[mirror]]
+lean = "p3_field.field.Field"
+rust = "p3_field::field::Field"
+
+[[mirror]]
+lean = "p3_field.field.PrimeField"
+rust = "p3_field::field::PrimeField"
+
+[[mirror]]
+lean = "p3_field.field.UniformSamplingField"
+rust = "p3_field::field::UniformSamplingField"

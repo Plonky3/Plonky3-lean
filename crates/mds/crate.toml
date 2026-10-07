@@ -1,0 +1,14 @@
+# p3-mds: MDS matrices. p3-baby-bear uses one helper from it.
+
+lean_lib = "P3Mds"
+
+# Only `first_row_to_first_col` is extracted. A whole-crate run fails on
+# p3-field's trait hierarchy and on 28 unsupported lifetime constraints of its
+# own (docs/extractor-issues.md, 9).
+state = "scoped"
+
+features = []
+
+start_from = ["p3_mds::util::first_row_to_first_col"]
+
+watch = ["mds/src", "mds/Cargo.toml"]

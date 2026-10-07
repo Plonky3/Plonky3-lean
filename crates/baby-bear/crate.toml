@@ -1,0 +1,22 @@
+# p3-baby-bear: the BabyBear field and its Poseidon1/Poseidon2 parameters.
+
+lean_lib = "P3BabyBear"
+state = "extracted"
+
+# Cargo features enabled for extraction. The target comes from toolchain.toml.
+features = []
+
+# The whole crate is extracted, so there are no charon roots.
+start_from = []
+
+# What can change this crate's model: its own sources, and the sources its
+# pre-extraction patches touch.
+watch = [
+  "baby-bear/src",
+  "baby-bear/Cargo.toml",
+  "field/src",
+  "symmetric/src",
+  "matrix/src",
+  "Cargo.toml",
+  "Cargo.lock",
+]

@@ -1,0 +1,45 @@
+# Patch:     010-restore-dropped-default-methods
+# Phase:     post
+# Target:    extraction/P3Monty31/Extraction/Funs.lean
+# Hunks:     1
+# Cost:      none. Each added field is the body of the CoreModels default
+#            method it stands for (`clone.Clone.clone_from.default`,
+#            `cmp.PartialEq.ne.default`), inlined.
+# Upstream:  charon multi-target mode (`--targets`) forces
+#            `--translate-all-methods`, then filters unused methods after the
+#            merge, and that drops the default-method roots hax adds with
+#            `--start-from core::clone::Clone::clone_from` and
+#            `core::cmp::PartialEq::ne`.
+# Drop when: charon keeps `--start-from` roots through the multi-target merge,
+#            or hax can pass `--target` to charon's cargo (then extract.sh
+#            can drop `--targets`).
+#
+# CoreModels' `core.clone.Clone` has a `clone_from` field and
+# `core.cmp.PartialEq` has `ne`. A derived `Clone`/`PartialEq` never defines
+# them, so aeneas fills them with the trait's default method, but only if charon
+# translated it. hax adds the default methods as charon roots for exactly this
+# purpose. We extract with `--targets thumbv7em-none-eabi` (the only way to reach
+# charon's cargo with a target through hax 0.4.1 or 0.4.2), and in that mode charon
+# drops them again (measured: 11 `clone_from` in the LLBC without `--targets`,
+# 2 with it). So every derived impl comes out missing the field, and Lean
+# rejects the structure literal.
+#
+# The alternative, `--translate-all-methods`, grows the extraction until it
+# fails with 276 errors. Adding the field by hand is the narrow fix:
+#   clone_from := fun _ source => <clone> source        (= clone_from.default)
+#   ne := fun self other => do let b ← <eq> self other; ok (b = false)
+#                                                       (= ne.default)
+# Five derived `Clone` impls (4 in p3-baby-bear, 1 in p3-monty-31) and one
+# derived `PartialEq`.
+#
+--- a/extraction/P3Monty31/Extraction/Funs.lean
++++ b/extraction/P3Monty31/Extraction/Funs.lean
+@@ -212,6 +212,8 @@
+   := {
+   clone := monty_31.MontyField31.Insts.CoreCloneClone.clone corecloneCloneInst
+     data_traitsMontyParametersInst
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => (monty_31.MontyField31.Insts.CoreCloneClone.clone corecloneCloneInst data_traitsMontyParametersInst) source
+ }
+ 
+ /-- [p3_monty_31::poseidon1::PartialRoundBaseParameters::USE_TEXTBOOK]

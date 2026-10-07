@@ -1,0 +1,16 @@
+# The last matching pattern takes precedence.
+
+# Default owners. The formal-verification maintainers are added here once they
+# have write access.
+*                       @Nashtare @tcoratger
+
+# What this repository asserts about Plonky3, and what could make it describe a
+# different Plonky3, stay with the Plonky3 maintainers.
+/Plonky3Lean/Claims/    @Nashtare @tcoratger
+/Plonky3Lean/Claims.lean @Nashtare @tcoratger
+/Plonky3Lean/Spec/      @Nashtare @tcoratger
+/Plonky3Lean/Spec.lean  @Nashtare @tcoratger
+/claims.toml            @Nashtare @tcoratger
+/crates/*/patches/pre/  @Nashtare @tcoratger
+/TRUST.md               @Nashtare @tcoratger
+/toolchain.toml         @Nashtare @tcoratger

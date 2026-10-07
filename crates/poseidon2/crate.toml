@@ -1,0 +1,30 @@
+# p3-poseidon2. A stub: a scoped extraction fails on the body of
+# Poseidon2::new; the structures are copied from aeneas's partial translation.
+
+lean_lib = "P3Poseidon2"
+state = "stub"
+
+features = []
+
+watch = ["poseidon2/src", "poseidon2/Cargo.toml"]
+
+# Every non-opaque declaration in stub/P3Poseidon2.lean: a partial
+# transcription of the
+# Rust item, declaring only the members dependent crates project. Hashes are
+# pending tools/mirror.
+
+[[mirror]]
+lean = "p3_poseidon2.external.ExternalLayerConstants"
+rust = "p3_poseidon2::external::ExternalLayerConstants"
+
+[[mirror]]
+lean = "p3_poseidon2.external.ExternalLayerConstructor"
+rust = "p3_poseidon2::external::ExternalLayerConstructor"
+
+[[mirror]]
+lean = "p3_poseidon2.internal.InternalLayerConstructor"
+rust = "p3_poseidon2::internal::InternalLayerConstructor"
+
+[[mirror]]
+lean = "p3_poseidon2.Poseidon2"
+rust = "p3_poseidon2::Poseidon2"

@@ -1,0 +1,76 @@
+# p3-monty-31: 31-bit Montgomery-form fields, the parameter traits p3-baby-bear
+# implements.
+
+lean_lib = "P3Monty31"
+
+# Only the items p3-baby-bear refers to are extracted, rooted at `start_from`.
+# Extracting the whole crate fails: it reaches p3-field's mutually recursive
+# trait hierarchy, which aeneas rejects (docs/extractor-issues.md, 9). What the
+# scoped run does not produce is in extraction/P3Monty31/Assumptions/.
+state = "scoped"
+
+features = []
+
+# Charon roots, one `--start-from` each. Charon splits option values on ',', so
+# an impl pattern cannot name two generic arguments (docs/extractor-issues.md, 8).
+start_from = [
+  "p3_monty_31::data_traits::MontyParameters",
+  "p3_monty_31::data_traits::PackedMontyParameters",
+  "p3_monty_31::data_traits::BarrettParameters",
+  "p3_monty_31::data_traits::FieldParameters",
+  "p3_monty_31::data_traits::RelativelyPrimePower",
+  "p3_monty_31::data_traits::TwoAdicData",
+  "p3_monty_31::data_traits::BinomialExtensionData",
+  "p3_monty_31::mds::MDSUtils",
+  "p3_monty_31::poseidon1::PartialRoundBaseParameters",
+  "p3_monty_31::poseidon1::PartialRoundParameters",
+  "p3_monty_31::poseidon2::InternalLayerBaseParameters",
+  "p3_monty_31::poseidon2::InternalLayerParameters",
+  "p3_monty_31::monty_31::MontyField31::new",
+  "{impl core::clone::Clone for p3_monty_31::monty_31::MontyField31<_>}",
+]
+
+watch = ["monty-31/src", "monty-31/Cargo.toml"]
+
+# The transcriptions in extraction/P3Monty31/Assumptions/Mirror.lean. Hashes
+# are pending tools/mirror; until it exists, the transcriptions are re-read by
+# hand when a commit in `watch` touches them.
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.new_array"
+rust = "p3_monty_31::monty_31::MontyField31::new_array"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.new_2d_array"
+rust = "p3_monty_31::monty_31::MontyField31::new_2d_array"
+
+[[mirror]]
+lean = "p3_monty_31.no_packing.poseidon1.Poseidon1InternalLayerMonty31"
+rust = "p3_monty_31::no_packing::poseidon1::Poseidon1InternalLayerMonty31"
+
+[[mirror]]
+lean = "p3_monty_31.no_packing.poseidon1.Poseidon1ExternalLayerMonty31"
+rust = "p3_monty_31::no_packing::poseidon1::Poseidon1ExternalLayerMonty31"
+
+[[mirror]]
+lean = "p3_monty_31.no_packing.poseidon2.Poseidon2InternalLayerMonty31"
+rust = "p3_monty_31::no_packing::poseidon2::Poseidon2InternalLayerMonty31"
+
+[[mirror]]
+lean = "p3_monty_31.no_packing.poseidon2.Poseidon2ExternalLayerMonty31"
+rust = "p3_monty_31::no_packing::poseidon2::Poseidon2ExternalLayerMonty31"
+
+[[mirror]]
+lean = "p3_monty_31.no_packing.poseidon1.Poseidon1InternalLayerMonty31.Insts.P3_poseidon1InternalPartialRoundLayerConstructorMontyField31WIDTH"
+rust = "{impl p3_poseidon1::internal::PartialRoundLayerConstructor for p3_monty_31::no_packing::poseidon1::Poseidon1InternalLayerMonty31}"
+
+[[mirror]]
+lean = "p3_monty_31.no_packing.poseidon1.Poseidon1ExternalLayerMonty31.Insts.P3_poseidon1ExternalFullRoundLayerConstructorMontyField31WIDTH"
+rust = "{impl p3_poseidon1::external::FullRoundLayerConstructor for p3_monty_31::no_packing::poseidon1::Poseidon1ExternalLayerMonty31}"
+
+[[mirror]]
+lean = "p3_monty_31.no_packing.poseidon2.Poseidon2InternalLayerMonty31.Insts.P3_poseidon2InternalInternalLayerConstructorMontyField31"
+rust = "{impl p3_poseidon2::internal::InternalLayerConstructor for p3_monty_31::no_packing::poseidon2::Poseidon2InternalLayerMonty31}"
+
+[[mirror]]
+lean = "p3_monty_31.no_packing.poseidon2.Poseidon2ExternalLayerMonty31.Insts.P3_poseidon2ExternalExternalLayerConstructorMontyField31WIDTH"
+rust = "{impl p3_poseidon2::external::ExternalLayerConstructor for p3_monty_31::no_packing::poseidon2::Poseidon2ExternalLayerMonty31}"
