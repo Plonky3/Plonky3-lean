@@ -26,8 +26,14 @@ import Plonky3Lean
 open Lean Elab Command in
 #eval show CommandElabM Unit from do
   let env ← getEnv
+  -- Lean's auxiliary declarations have a name component starting with `_`
+  -- (`_proof_1`, `_aux`, ...). `Name.isInternal` is not used because it also
+  -- drops a claim about an item aeneas names `_`, such as `poseidon1._`.
+  let aux (n : Name) : Bool := n.components.any fun
+    | .str _ s => s.startsWith "_" && s != "_"
+    | _ => true
   let claims := env.constants.toList.filter fun (n, ci) =>
-    (`Plonky3Lean.Claims).isPrefixOf n && !n.isInternal && ci matches .thmInfo _
+    (`Plonky3Lean.Claims).isPrefixOf n && !aux n && ci matches .thmInfo _
   for (n, _) in claims.toArray.qsort (fun a b => a.1.toString < b.1.toString) do
     let axs ← liftCoreM (Lean.collectAxioms n)
     let axs := axs.qsort (fun a b => a.toString < b.toString)
