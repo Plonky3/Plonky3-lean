@@ -1,5 +1,6 @@
 import CompPoly.Fields.BabyBear
 import Plonky3Lean.Proofs.Field.BabyBear
+import Plonky3Lean.Proofs.Field.BabyBear.Arith
 import Plonky3Lean.Proofs.Field.BabyBear.Constants
 import Plonky3Lean.Proofs.Field.BabyBear.Element
 import Plonky3Lean.Proofs.Field.BabyBear.Extension
@@ -13,10 +14,9 @@ extraction in `crates/monty-31`; `PRIME`, `MontyParams` and the other names are
 `Plonky3Lean.Spec.BabyBear`'s aliases for its constants, and `BabyBear.*` is
 CompPoly's specification of the field.
 
-Not claimed: anything about field arithmetic (addition, multiplication,
-Montgomery reduction, inversion), the extension fields' `EXT_GENERATOR`s, the
-Poseidon1 and Poseidon2 permutations or the MDS layer, and the values of the
-round constants.
+Not claimed: inversion, exponentiation and the packed (SIMD) and extension-field
+arithmetic, the extension fields' `EXT_GENERATOR`s, the Poseidon1 and Poseidon2
+permutations or the MDS layer, and the values of the round constants.
 -/
 
 open Aeneas Aeneas.Std CoreModels
@@ -316,6 +316,100 @@ the function. -/
 theorem baby_bear.BabyBearParameters.exp_root_d.exponent (x : BabyBear.Field) :
     (x ^ 1725656503) ^ 7 = x :=
   Proofs.BabyBear.exp_root_seven x
+
+/-! ## Scalar arithmetic
+
+The `u32` helpers of p3-monty-31's `utils`, which are extracted, at BabyBear's
+parameters; then the `MontyField31` operators that wrap them, read as field
+operations. The operators' one-line bodies (`Self::new_monty(add::<FP>(…))` and
+the like) are transcribed by hand in
+`crates/monty-31/extraction/P3Monty31/Assumptions/Mirror.lean`, because the
+extractor drops them (docs/extractor-issues.md, 4); the arithmetic they call is
+not. Every operator claim assumes canonical inputs, as the Rust does, and
+gives a canonical output, so the claims compose. -/
+
+/-- Montgomery reduction: for `x < 2^32 · p`, `monty_reduce(x)` is the canonical
+`r` with `r · 2^32 ≡ x (mod p)`. -/
+theorem p3_monty_31.utils.monty_reduce.spec (x : Std.U64)
+    (hx : x.val < 2 ^ 32 * BabyBear.fieldSize) :
+    p3_monty_31.utils.monty_reduce MontyParams x ⦃ r => r.val < BabyBear.fieldSize ∧
+      (r.val * 2 ^ 32) % BabyBear.fieldSize = x.val % BabyBear.fieldSize ⦄ := by
+  rw [Proofs.BabyBear.fieldSize_eq] at *
+  exact Proofs.BabyBear.utils.monty_reduce.spec x hx
+
+/-- `from_monty(x)` is the canonical `r` with `r · 2^32 ≡ x (mod p)`: it takes a
+value out of Montgomery form. -/
+theorem p3_monty_31.utils.from_monty.spec (x : Std.U32) :
+    p3_monty_31.utils.from_monty MontyParams x ⦃ r => r.val < BabyBear.fieldSize ∧
+      (r.val * 2 ^ 32) % BabyBear.fieldSize = x.val % BabyBear.fieldSize ⦄ := by
+  rw [Proofs.BabyBear.fieldSize_eq]
+  exact Proofs.BabyBear.utils.from_monty.spec x
+
+/-- For canonical `a` and `b`, `add(a, b)` is `(a + b) mod p`. -/
+theorem p3_monty_31.utils.add.spec (a b : Std.U32) (ha : a.val < BabyBear.fieldSize)
+    (hb : b.val < BabyBear.fieldSize) :
+    p3_monty_31.utils.add MontyParams a b ⦃ r => r.val = (a.val + b.val) % BabyBear.fieldSize ⦄ := by
+  rw [Proofs.BabyBear.fieldSize_eq] at *
+  exact Proofs.BabyBear.utils.add.spec a b ha hb
+
+/-- For canonical `a` and `b`, `sub(a, b)` is `(a - b) mod p`, computed as
+`(a + p - b) mod p`. -/
+theorem p3_monty_31.utils.sub.spec (a b : Std.U32) (ha : a.val < BabyBear.fieldSize)
+    (hb : b.val < BabyBear.fieldSize) :
+    p3_monty_31.utils.sub MontyParams a b
+      ⦃ r => r.val = (a.val + BabyBear.fieldSize - b.val) % BabyBear.fieldSize ⦄ := by
+  rw [Proofs.BabyBear.fieldSize_eq] at *
+  exact Proofs.BabyBear.utils.sub.spec a b ha hb
+
+/-- For canonical `a`, `halve_u32(a)` is the canonical `r` with `2r ≡ a (mod p)`. -/
+theorem p3_monty_31.utils.halve_u32.spec (a : Std.U32) (ha : a.val < BabyBear.fieldSize) :
+    p3_monty_31.utils.halve_u32 FieldParams a ⦃ r => r.val < BabyBear.fieldSize ∧
+      (r.val * 2) % BabyBear.fieldSize = a.val ⦄ := by
+  rw [Proofs.BabyBear.fieldSize_eq] at *
+  exact Proofs.BabyBear.utils.halve_u32.spec a ha
+
+/-- `a + b` on canonical BabyBear elements is canonical, and is the sum of the
+field elements they stand for. -/
+theorem baby_bear.BabyBear.add.toField (a b : Element) (ha : Canonical a) (hb : Canonical b) :
+    p3_monty_31.monty_31.MontyField31.add MontyParams a b
+      ⦃ c => Canonical c ∧ Spec.BabyBear.toField c = Spec.BabyBear.toField a + Spec.BabyBear.toField b ⦄ :=
+  Proofs.BabyBear.baby_bear.BabyBear.add.toField a b ha hb
+
+/-- `a - b` on canonical BabyBear elements is canonical, and is the difference
+of the field elements they stand for. -/
+theorem baby_bear.BabyBear.sub.toField (a b : Element) (ha : Canonical a) (hb : Canonical b) :
+    p3_monty_31.monty_31.MontyField31.sub MontyParams a b
+      ⦃ c => Canonical c ∧ Spec.BabyBear.toField c = Spec.BabyBear.toField a - Spec.BabyBear.toField b ⦄ :=
+  Proofs.BabyBear.baby_bear.BabyBear.sub.toField a b ha hb
+
+/-- `a * b` on canonical BabyBear elements is canonical, and is the product of
+the field elements they stand for: the `u64` product does not overflow, and
+Montgomery reduction removes the extra factor of `2^32`. -/
+theorem baby_bear.BabyBear.mul.toField (a b : Element) (ha : Canonical a) (hb : Canonical b) :
+    p3_monty_31.monty_31.MontyField31.mul MontyParams a b
+      ⦃ c => Canonical c ∧ Spec.BabyBear.toField c = Spec.BabyBear.toField a * Spec.BabyBear.toField b ⦄ :=
+  Proofs.BabyBear.baby_bear.BabyBear.mul.toField a b ha hb
+
+/-- `-a` on a canonical BabyBear element is canonical, and is the negation of
+the field element it stands for. -/
+theorem baby_bear.BabyBear.neg.toField (a : Element) (ha : Canonical a) :
+    p3_monty_31.monty_31.MontyField31.neg FieldParams a
+      ⦃ c => Canonical c ∧ Spec.BabyBear.toField c = -Spec.BabyBear.toField a ⦄ :=
+  Proofs.BabyBear.baby_bear.BabyBear.neg.toField a ha
+
+/-- `a.halve()` on a canonical BabyBear element is canonical, and is half the
+field element it stands for. -/
+theorem baby_bear.BabyBear.halve.toField (a : Element) (ha : Canonical a) :
+    p3_monty_31.monty_31.MontyField31.halve FieldParams a
+      ⦃ c => Canonical c ∧ Spec.BabyBear.toField c * 2 = Spec.BabyBear.toField a ⦄ :=
+  Proofs.BabyBear.baby_bear.BabyBear.halve.toField a ha
+
+/-- `from_monty(a.value)`, the body of `as_canonical_u32`, is the canonical
+`u32` representative of the field element `a` stands for, for any `a`. -/
+theorem baby_bear.BabyBear.from_monty.toField (a : Element) :
+    p3_monty_31.utils.from_monty MontyParams a.value
+      ⦃ r => r.val < BabyBear.fieldSize ∧ (r.val : BabyBear.Field) = Spec.BabyBear.toField a ⦄ :=
+  Proofs.BabyBear.baby_bear.BabyBear.from_monty.toField a
 
 /-! ## `BinomialExtensionData<D>`: the binomial extensions
 

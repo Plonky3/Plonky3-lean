@@ -227,3 +227,47 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 [[claim]]
 name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.W.irreducible"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBear.add.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBear.from_monty.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBear.halve.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBear.mul.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBear.neg.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBear.sub.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.p3_monty_31.utils.add.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.p3_monty_31.utils.from_monty.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.p3_monty_31.utils.halve_u32.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.p3_monty_31.utils.monty_reduce.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.p3_monty_31.utils.sub.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
