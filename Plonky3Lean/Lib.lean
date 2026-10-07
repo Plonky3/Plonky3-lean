@@ -1,3 +1,5 @@
+import Plonky3Lean.Lib.OrderOf
+import Plonky3Lean.Lib.PowMod
 import Plonky3Lean.Lib.RustM
 
 /-!

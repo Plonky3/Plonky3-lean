@@ -1,6 +1,7 @@
 import Plonky3Lean.Lib
 import Plonky3Lean.Spec
 import Plonky3Lean.Proofs.Field.BabyBear
+import Plonky3Lean.Proofs.Field.BabyBear.Constants
 import Plonky3Lean.Proofs.Field.BabyBear.Element
 
 /-!

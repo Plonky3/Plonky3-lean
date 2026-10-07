@@ -37,6 +37,12 @@ noncomputable abbrev MontyParams :=
 noncomputable abbrev TwoAdicParams :=
   baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsTwoAdicDataSharedStaticSliceMontyField31BabyBearParameters
 
+/-- The `FieldParameters` instance aeneas generated for `BabyBearParameters`:
+`MONTY_GEN`, with p3-monty-31's defaults for `MONTY_ZERO`, `MONTY_ONE`,
+`MONTY_TWO`, `MONTY_NEG_ONE` and `HALF_P_PLUS_1`. -/
+noncomputable abbrev FieldParams :=
+  baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsFieldParameters
+
 /-- `BabyBearParameters::PRIME` (`baby-bear/src/baby_bear.rs`). -/
 abbrev PRIME : Std.U32 :=
   baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.PRIME

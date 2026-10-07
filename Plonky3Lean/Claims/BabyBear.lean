@@ -1,5 +1,6 @@
 import CompPoly.Fields.BabyBear
 import Plonky3Lean.Proofs.Field.BabyBear
+import Plonky3Lean.Proofs.Field.BabyBear.Constants
 import Plonky3Lean.Proofs.Field.BabyBear.Element
 
 /-!
@@ -13,8 +14,7 @@ CompPoly's specification of the field.
 
 Not claimed: anything about field arithmetic (addition, multiplication,
 Montgomery reduction, inversion), the Poseidon1 and Poseidon2 permutations or
-the MDS layer, the values of the round constants, and the two round-constant
-length assertions that aeneas names `poseidon1._` and `poseidon2._`.
+the MDS layer, and the values of the round constants.
 -/
 
 open Aeneas Aeneas.Std CoreModels
@@ -195,6 +195,126 @@ theorem baby_bear.BabyBear.new_2d_array.toField {N M : Std.Usize}
           input.val.map (fun row => row.val.map (fun x => (x.val : BabyBear.Field))) ⦄ :=
   Proofs.BabyBear.baby_bear.BabyBear.new_2d_array.toField input
 
+/-! ## `FieldParameters`: the named field elements
+
+`MONTY_ZERO`, `MONTY_ONE`, `MONTY_TWO`, `MONTY_NEG_ONE` and `HALF_P_PLUS_1` are
+p3-monty-31's defaults, which BabyBear inherits; `MONTY_GEN` is BabyBear's own.
+Each is a `RustM` value, read through the `FieldParameters` instance as generic
+code sees it. -/
+
+/-- `MONTY_ZERO` is the field element `0`, stored canonically. -/
+theorem baby_bear.BabyBearParameters.MONTY_ZERO.toField :
+    FieldParams.MONTY_ZERO ⦃ r => Canonical r ∧ Spec.BabyBear.toField r = 0 ⦄ :=
+  Proofs.BabyBear.FieldParams.MONTY_ZERO.toField
+
+/-- `MONTY_ONE` is the field element `1`, stored canonically. -/
+theorem baby_bear.BabyBearParameters.MONTY_ONE.toField :
+    FieldParams.MONTY_ONE ⦃ r => Canonical r ∧ Spec.BabyBear.toField r = 1 ⦄ :=
+  Proofs.BabyBear.FieldParams.MONTY_ONE.toField
+
+/-- `MONTY_TWO` is the field element `2`, stored canonically. -/
+theorem baby_bear.BabyBearParameters.MONTY_TWO.toField :
+    FieldParams.MONTY_TWO ⦃ r => Canonical r ∧ Spec.BabyBear.toField r = 2 ⦄ :=
+  Proofs.BabyBear.FieldParams.MONTY_TWO.toField
+
+/-- `MONTY_NEG_ONE`, built as `new(PRIME - 1)`, is the field element `-1`,
+stored canonically; computing `PRIME - 1` does not underflow. -/
+theorem baby_bear.BabyBearParameters.MONTY_NEG_ONE.toField :
+    FieldParams.MONTY_NEG_ONE ⦃ r => Canonical r ∧ Spec.BabyBear.toField r = -1 ⦄ :=
+  Proofs.BabyBear.FieldParams.MONTY_NEG_ONE.toField
+
+/-- `HALF_P_PLUS_1` is the plain integer `(p + 1) / 2`, not a Montgomery form,
+computed without overflow. As an integer modulo `p` it is the inverse of `2`,
+which is what halving relies on. -/
+theorem baby_bear.BabyBearParameters.HALF_P_PLUS_1.spec :
+    FieldParams.HALF_P_PLUS_1 ⦃ h => h.val = (BabyBear.fieldSize + 1) / 2 ∧
+      (h.val : BabyBear.Field) * 2 = 1 ⦄ :=
+  Proofs.BabyBear.FieldParams.HALF_P_PLUS_1.spec
+
+/-- `MONTY_GEN` (`BabyBear::new(31)`) generates the multiplicative group of the
+field: it is stored canonically, and its order is `p - 1`. -/
+theorem baby_bear.BabyBearParameters.MONTY_GEN.generator :
+    FieldParams.MONTY_GEN ⦃ g => Canonical g ∧
+      orderOf (Spec.BabyBear.toField g) = BabyBear.fieldSize - 1 ⦄ :=
+  Proofs.BabyBear.FieldParams.MONTY_GEN.generator
+
+/-! ## `TwoAdicData`: the roots of unity
+
+The trait requires the `i`-th entry of `TWO_ADIC_GENERATORS` to be a `2^i`-th
+root of unity whose square is the `(i - 1)`-th entry, `ROOTS_8` and `ROOTS_16`
+to agree with it, and the `INV_` tables to hold the inverses. The table is
+compared with CompPoly's independently stated `BabyBear.twoAdicGenerators`. -/
+
+/-- `TWO_ADIC_GENERATORS` is, entry for entry, CompPoly's table of BabyBear
+two-adic generators, and every entry is stored canonically. -/
+theorem baby_bear.BabyBearParameters.TWO_ADIC_GENERATORS.eq_twoAdicGenerators :
+    TwoAdicParams.TWO_ADIC_GENERATORS ⦃ s => (∀ y ∈ s.val, Canonical y) ∧
+      s.val.map Spec.BabyBear.toField = BabyBear.twoAdicGenerators ⦄ :=
+  Proofs.BabyBear.TwoAdicParams.TWO_ADIC_GENERATORS.eq_twoAdicGenerators
+
+/-- `TWO_ADIC_GENERATORS` has `TWO_ADICITY + 1 = 28` entries, and entry `i` has
+order exactly `2^i`: it is a primitive `2^i`-th root of unity. -/
+theorem baby_bear.BabyBearParameters.TWO_ADIC_GENERATORS.order :
+    TwoAdicParams.TWO_ADIC_GENERATORS ⦃ s => s.val.length = TWO_ADICITY.val + 1 ∧
+      ∀ i (h : i < s.val.length), orderOf (Spec.BabyBear.toField s.val[i]) = 2 ^ i ⦄ :=
+  Proofs.BabyBear.TwoAdicParams.TWO_ADIC_GENERATORS.order
+
+/-- Each entry of `TWO_ADIC_GENERATORS` squares to the one before it. -/
+theorem baby_bear.BabyBearParameters.TWO_ADIC_GENERATORS.sq_succ :
+    TwoAdicParams.TWO_ADIC_GENERATORS ⦃ s => ∀ i (h : i + 1 < s.val.length),
+      Spec.BabyBear.toField s.val[i + 1] ^ 2 = Spec.BabyBear.toField s.val[i] ⦄ :=
+  Proofs.BabyBear.TwoAdicParams.TWO_ADIC_GENERATORS.sq_succ
+
+/-- `ROOTS_8` is `[1, ω, ω², ω³]` for `ω = TWO_ADIC_GENERATORS[3]`, the
+primitive 8th root of unity, stored canonically. -/
+theorem baby_bear.BabyBearParameters.ROOTS_8.eq :
+    TwoAdicParams.ROOTS_8 ⦃ s => (∀ y ∈ s.val, Canonical y) ∧
+      s.val.map Spec.BabyBear.toField =
+        (List.range 4).map (fun j => BabyBear.twoAdicGenerators[3]! ^ j) ⦄ :=
+  Proofs.BabyBear.TwoAdicParams.ROOTS_8.eq
+
+/-- `INV_ROOTS_8` holds the inverses of `ROOTS_8`, in the same order, stored
+canonically. -/
+theorem baby_bear.BabyBearParameters.INV_ROOTS_8.eq :
+    TwoAdicParams.INV_ROOTS_8 ⦃ s => (∀ y ∈ s.val, Canonical y) ∧
+      s.val.map Spec.BabyBear.toField =
+        (List.range 4).map (fun j => (BabyBear.twoAdicGenerators[3]! ^ j)⁻¹) ⦄ :=
+  Proofs.BabyBear.TwoAdicParams.INV_ROOTS_8.eq
+
+/-- `ROOTS_16` is `[1, ω, …, ω⁷]` for `ω = TWO_ADIC_GENERATORS[4]`, the
+primitive 16th root of unity, stored canonically. -/
+theorem baby_bear.BabyBearParameters.ROOTS_16.eq :
+    TwoAdicParams.ROOTS_16 ⦃ s => (∀ y ∈ s.val, Canonical y) ∧
+      s.val.map Spec.BabyBear.toField =
+        (List.range 8).map (fun j => BabyBear.twoAdicGenerators[4]! ^ j) ⦄ :=
+  Proofs.BabyBear.TwoAdicParams.ROOTS_16.eq
+
+/-- `INV_ROOTS_16` holds the inverses of `ROOTS_16`, in the same order, stored
+canonically. -/
+theorem baby_bear.BabyBearParameters.INV_ROOTS_16.eq :
+    TwoAdicParams.INV_ROOTS_16 ⦃ s => (∀ y ∈ s.val, Canonical y) ∧
+      s.val.map Spec.BabyBear.toField =
+        (List.range 8).map (fun j => (BabyBear.twoAdicGenerators[4]! ^ j)⁻¹) ⦄ :=
+  Proofs.BabyBear.TwoAdicParams.INV_ROOTS_16.eq
+
+/-- `ODD_FACTOR`, computed as `PRIME >> TWO_ADICITY`, is `15`, the odd `r` with
+`p = r · 2^TWO_ADICITY + 1`. -/
+theorem baby_bear.BabyBearParameters.ODD_FACTOR.spec :
+    TwoAdicParams.ODD_FACTOR ⦃ r => r.val = 15 ∧
+      (PRIME.val : ℤ) = r.val * 2 ^ TWO_ADICITY.val + 1 ⦄ :=
+  Proofs.BabyBear.TwoAdicParams.ODD_FACTOR.spec
+
+/-! ## `RelativelyPrimePower<7>` -/
+
+/-- Raising to the power `1725656503` inverts `x ↦ x^7` on the BabyBear field.
+`exp_root_d` computes `x^(1/7)` as `exp_1725656503(x)`; this is the
+number-theoretic fact it relies on (`7 · 1725656503 ≡ 1 mod p - 1`). The body of
+`exp_1725656503` is opaque in the model, so the claim is about the exponent, not
+the function. -/
+theorem baby_bear.BabyBearParameters.exp_root_d.exponent (x : BabyBear.Field) :
+    (x ^ 1725656503) ^ 7 = x :=
+  Proofs.BabyBear.exp_root_seven x
+
 /-! ## The Poseidon round-constant length assertions
 
 `baby-bear/src/poseidon{1,2}.rs` check the length of each round-constant table
@@ -205,9 +325,20 @@ with an anonymous `const _: () = assert!(..)`. Aeneas extracts each one as a
 table builds and the assertion holds. Nothing is said about the constants'
 values.
 
-Nine of the eleven assertions are claimed. The other two, which Aeneas names
-`poseidon1._` (on `BABYBEAR_POSEIDON1_RC_16`) and `poseidon2._` (on
-`BABYBEAR_POSEIDON2_RC_16_EXTERNAL_INITIAL`), are not. -/
+All eleven assertions are claimed. Aeneas names the first in each module `_`
+and the others `__N`, which post-patch 030 renames to `const_check_N`. -/
+
+/-- The Poseidon1 assertion at `baby-bear/src/poseidon1.rs:66` holds: the
+width-16 round-constant table `BABYBEAR_POSEIDON1_RC_16` has
+`2 · HALF_FULL_ROUNDS + PARTIAL_ROUNDS_16 = 2 · 4 + 13 = 21` rows. -/
+theorem poseidon1._.holds : poseidon1._ ⦃ _ => True ⦄ :=
+  Proofs.BabyBear.poseidon1._.holds
+
+/-- The Poseidon2 assertion at `baby-bear/src/poseidon2.rs:64` holds: the
+width-16 initial external round constants,
+`BABYBEAR_POSEIDON2_RC_16_EXTERNAL_INITIAL`, have `HALF_FULL_ROUNDS = 4` rows. -/
+theorem poseidon2._.holds : poseidon2._ ⦃ _ => True ⦄ :=
+  Proofs.BabyBear.poseidon2._.holds
 
 /-- The Poseidon1 assertion at `baby-bear/src/poseidon1.rs:70` holds: the
 width-24 round-constant table `BABYBEAR_POSEIDON1_RC_24` has
