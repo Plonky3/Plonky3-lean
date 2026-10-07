@@ -300,4 +300,81 @@ def
     InternalLayerBaseParametersInst p3_fieldfieldPrimeCharacteristicRingInst
 }
 
+/-- [p3_monty_31::utils::monty_reduce]:
+    Source: 'monty-31/src/utils.rs', lines 105:0-125:1 -/
+def utils.monty_reduce
+  {MP : Type} (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
+  (x : Std.U64) :
+  RustM Std.U32
+  := do
+  let i ← data_traitsMontyParametersInst.MONTY_MU
+  let i1 ← lift (UScalar.cast .U64 i)
+  let i2 ← core.num.U64.wrapping_mul x i1
+  let i3 ← data_traitsMontyParametersInst.MONTY_MASK
+  let i4 ← lift (UScalar.cast .U64 i3)
+  let t ← lift (i2 &&& i4)
+  let i5 ← data_traitsMontyParametersInst.PRIME
+  let i6 ← lift (UScalar.cast .U64 i5)
+  let u ← t * i6
+  let (x_sub_u, over) ← core.num.U64.overflowing_sub x u
+  let i7 ← data_traitsMontyParametersInst.MONTY_BITS
+  let i8 ← x_sub_u >>> i7
+  let x_sub_u_hi ← lift (UScalar.cast .U32 i8)
+  let corr ← if over
+               then ok i5
+               else ok 0#u32
+  core.num.U32.wrapping_add x_sub_u_hi corr
+
+/-- [p3_monty_31::utils::from_monty]:
+    Source: 'monty-31/src/utils.rs', lines 50:0-52:1 -/
+def utils.from_monty
+  {MP : Type} (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
+  (x : Std.U32) :
+  RustM Std.U32
+  := do
+  let i ← lift (UScalar.cast .U64 x)
+  utils.monty_reduce data_traitsMontyParametersInst i
+
+/-- [p3_monty_31::utils::add]:
+    Source: 'monty-31/src/utils.rs', lines 63:0-70:1 -/
+def utils.add
+  {MP : Type} (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
+  (lhs : Std.U32) (rhs : Std.U32) :
+  RustM Std.U32
+  := do
+  let sum ← lhs + rhs
+  let i ← data_traitsMontyParametersInst.PRIME
+  let (corr_sum, over) ← core.num.U32.overflowing_sub sum i
+  if over
+  then ok sum
+  else ok corr_sum
+
+/-- [p3_monty_31::utils::sub]:
+    Source: 'monty-31/src/utils.rs', lines 81:0-86:1 -/
+def utils.sub
+  {MP : Type} (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
+  (lhs : Std.U32) (rhs : Std.U32) :
+  RustM Std.U32
+  := do
+  let (diff, over) ← core.num.U32.overflowing_sub lhs rhs
+  let corr ← if over
+               then data_traitsMontyParametersInst.PRIME
+               else ok 0#u32
+  core.num.U32.wrapping_add diff corr
+
+/-- [p3_monty_31::utils::halve_u32]:
+    Source: 'monty-31/src/utils.rs', lines 92:0-97:1 -/
+def utils.halve_u32
+  {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+  (input : Std.U32) :
+  RustM Std.U32
+  := do
+  let shr ← input >>> 1#i32
+  let lo_bit ← lift (input &&& 1#u32)
+  let i ← data_traitsFieldParametersInst.HALF_P_PLUS_1
+  let shr_corr ← shr + i
+  if lo_bit = 0#u32
+  then ok shr
+  else ok shr_corr
+
 end p3_monty_31

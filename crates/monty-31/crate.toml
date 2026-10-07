@@ -28,6 +28,13 @@ start_from = [
   "p3_monty_31::poseidon2::InternalLayerParameters",
   "p3_monty_31::monty_31::MontyField31::new",
   "{impl core::clone::Clone for p3_monty_31::monty_31::MontyField31<_>}",
+  # The scalar arithmetic on Montgomery-form u32s, which the `Add`, `Sub`,
+  # `Mul` and `Neg` impls and `halve` wrap (transcribed in Mirror.lean).
+  "p3_monty_31::utils::add",
+  "p3_monty_31::utils::sub",
+  "p3_monty_31::utils::monty_reduce",
+  "p3_monty_31::utils::from_monty",
+  "p3_monty_31::utils::halve_u32",
 ]
 
 watch = ["monty-31/src", "monty-31/Cargo.toml"]
@@ -42,6 +49,30 @@ rust = "p3_monty_31::monty_31::MontyField31::new_array"
 [[mirror]]
 lean = "p3_monty_31.monty_31.MontyField31.new_2d_array"
 rust = "p3_monty_31::monty_31::MontyField31::new_2d_array"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.new_monty"
+rust = "p3_monty_31::monty_31::MontyField31::new_monty"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.add"
+rust = "{impl core::ops::arith::Add for p3_monty_31::monty_31::MontyField31<_>}::add"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.sub"
+rust = "{impl core::ops::arith::Sub for p3_monty_31::monty_31::MontyField31<_>}::sub"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.mul"
+rust = "{impl core::ops::arith::Mul for p3_monty_31::monty_31::MontyField31<_>}::mul"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.neg"
+rust = "{impl core::ops::arith::Neg for p3_monty_31::monty_31::MontyField31<_>}::neg"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.halve"
+rust = "{impl p3_field::field::Field for p3_monty_31::monty_31::MontyField31<_>}::halve"
 
 [[mirror]]
 lean = "p3_monty_31.no_packing.poseidon1.Poseidon1InternalLayerMonty31"

@@ -17,7 +17,7 @@ target `thumbv7em-none-eabi`
 | `baby-bear` | extracted | 2949 | 103 | 4 | 0 | 4 / 3 | pre `020`, `030`, `040` |
 | `field` | stub | | 67 | 1 | 5 | 0 / 0 | |
 | `mds` | scoped | 91 | 8 | 0 | 0 | 0 / 0 | |
-| `monty-31` | scoped | 479 | 212 | 0 | 10 | 0 / 1 | |
+| `monty-31` | scoped | 556 | 275 | 0 | 16 | 0 / 1 | |
 | `poseidon1` | stub | | 67 | 3 | 4 | 0 / 0 | |
 | `poseidon2` | stub | | 64 | 2 | 4 | 0 / 0 | |
 
@@ -87,6 +87,48 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.poseidon2.const_check_6.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.new.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.new_2d_array.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.new_array.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.HALF_P_PLUS_1.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.INV_ROOTS_16.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.INV_ROOTS_8.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.MONTY_GEN.generator` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.MONTY_NEG_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.MONTY_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.MONTY_TWO.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.MONTY_ZERO.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.ODD_FACTOR.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.ROOTS_16.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.ROOTS_8.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.TWO_ADIC_GENERATORS.eq_twoAdicGenerators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.TWO_ADIC_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.TWO_ADIC_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.exp_root_d.exponent` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.poseidon1._.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.poseidon2._.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData5.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData5.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData5.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.from_monty.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.halve.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.mul.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.neg.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.sub.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.p3_monty_31.utils.add.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.p3_monty_31.utils.from_monty.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.p3_monty_31.utils.halve_u32.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.p3_monty_31.utils.monty_reduce.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.p3_monty_31.utils.sub.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 
 ## Upstream warnings
 

@@ -1,13 +1,26 @@
+import CompPoly.Fields.BabyBear
+import Mathlib.RingTheory.AdjoinRoot
 import P3BabyBear
 
 /-!
-# BabyBear: names for the model's constants
+# BabyBear: what the model's values mean
 
-`abbrev`s naming the trait constants and instances that aeneas generated for
-`BabyBearParameters`, so that claims about them read in Rust's terms. Each is
-an alias of a generated definition and adds nothing to it. The specification
-the claims compare these constants against is CompPoly's
-`CompPoly.Fields.BabyBear`, not anything here.
+Two things the BabyBear claims are stated in.
+
+* **What an element means.** A Rust `BabyBear` is a `MontyField31` whose `u32`
+  holds the element in Montgomery form: the element `a` is stored as
+  `a · 2^32 mod p`. `toField` decodes a stored value into CompPoly's
+  `BabyBear.Field` (`ZMod p`), the specification every claim compares against,
+  and `Canonical` is the invariant the Rust relies on, that the stored value is
+  fully reduced. `toExt` reads an array of coefficients as an element of a
+  binomial extension `F[X] / (X ^ D - w)`, through `toField`. These three
+  definitions are the whole of the interpretation: a claim about field
+  arithmetic or a field constant says something about `toField` or `toExt` of
+  the model's values.
+* **Names for the model's constants.** `abbrev`s naming the trait constants and
+  instances that aeneas generated for `BabyBearParameters`, so that claims
+  about them read in Rust's terms. Each is an alias of a generated definition
+  and adds nothing to it.
 
 Each constant is read *through the trait instance* the extracted code builds,
 so a statement about it is about the value the code sees, not a free-standing
@@ -27,6 +40,24 @@ noncomputable abbrev MontyParams :=
 noncomputable abbrev TwoAdicParams :=
   baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsTwoAdicDataSharedStaticSliceMontyField31BabyBearParameters
 
+/-- The `FieldParameters` instance aeneas generated for `BabyBearParameters`:
+`MONTY_GEN`, with p3-monty-31's defaults for `MONTY_ZERO`, `MONTY_ONE`,
+`MONTY_TWO`, `MONTY_NEG_ONE` and `HALF_P_PLUS_1`. -/
+noncomputable abbrev FieldParams :=
+  baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsFieldParameters
+
+/-- The `BinomialExtensionData<4>` instance aeneas generated for `BabyBearParameters`. -/
+noncomputable abbrev Ext4Params :=
+  baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsBinomialExtensionDataArrayArrayMontyField31BabyBearParameters424
+
+/-- The `BinomialExtensionData<5>` instance aeneas generated for `BabyBearParameters`. -/
+noncomputable abbrev Ext5Params :=
+  baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsBinomialExtensionDataArrayArrayMontyField31BabyBearParameters505
+
+/-- The `BinomialExtensionData<8>` instance aeneas generated for `BabyBearParameters`. -/
+noncomputable abbrev Ext8Params :=
+  baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsBinomialExtensionDataArrayArrayMontyField31BabyBearParameters838
+
 /-- `BabyBearParameters::PRIME` (`baby-bear/src/baby_bear.rs`). -/
 abbrev PRIME : Std.U32 :=
   baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.PRIME
@@ -42,5 +73,35 @@ abbrev MONTY_BITS : Std.U32 :=
 /-- `BabyBearParameters::TWO_ADICITY`. -/
 abbrev TWO_ADICITY : Std.Usize :=
   baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsTwoAdicDataSharedStaticSliceMontyField31BabyBearParameters.TWO_ADICITY
+
+/-! ## What an element means -/
+
+/-- A BabyBear field element as the model has it: Rust's
+`BabyBear = MontyField31<BabyBearParameters>`, a `u32` in Montgomery form. -/
+abbrev Element := p3_monty_31.monty_31.MontyField31 baby_bear.BabyBearParameters
+
+/-- The field element an `Element` stands for. Its stored `u32` is `a · 2^32 mod p`
+for the element `a`, so `a` is the stored value times `2^-32`, in CompPoly's
+`BabyBear.Field` (`ZMod p`, `p = 2^31 - 2^27 + 1`). -/
+def toField (x : Element) : BabyBear.Field :=
+  (x.value.val : BabyBear.Field) * (2 ^ 32 : BabyBear.Field)⁻¹
+
+/-- The representation invariant: the stored value is fully reduced, `< p`. With
+it, each field element has exactly one stored value, which the Rust relies on
+(for example, `PartialEq` compares stored values). -/
+def Canonical (x : Element) : Prop :=
+  x.value.val < BabyBear.fieldSize
+
+/-! ## What an extension-field element means -/
+
+open Polynomial in
+/-- The element of the degree-`D` binomial extension `F[X] / (X ^ D - w)` that a
+coefficient array stands for, `Σ j, c_j · X ^ j`, with each coefficient read
+through `toField`. This is how Plonky3's `BinomialExtensionField<BabyBear, D>`
+represents an element: its `[BabyBear; D]` of coefficients in the basis
+`1, X, …, X ^ (D - 1)`, with `X ^ D = W`. -/
+noncomputable def toExt (D : ℕ) (w : BabyBear.Field) (coeffs : List Element) :
+    AdjoinRoot (X ^ D - C w) :=
+  AdjoinRoot.mk _ (((coeffs.map toField).mapIdx fun j a => C a * X ^ j).sum)
 
 end Plonky3Lean.Spec.BabyBear

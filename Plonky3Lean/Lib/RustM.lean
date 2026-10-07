@@ -22,4 +22,18 @@ theorem mapM_total {α β : Type} (f : α → RustM β) (hf : ∀ x, ∃ v, f x 
     simp [List.mapM_cons, hv, hl']
     rfl
 
+/-- A `mapM` over a function with a pointwise spec never fails, and returns a
+list related elementwise to its input by that spec. -/
+theorem mapM_forall₂ {α β : Type} (f : α → RustM β) (P : α → β → Prop)
+    (hf : ∀ x, f x ⦃ r => P x r ⦄) (l : List α) :
+    ∃ l', l.mapM f = .ok l' ∧ List.Forall₂ P l l' := by
+  induction l with
+  | nil => exact ⟨[], rfl, .nil⟩
+  | cons a l ih =>
+    obtain ⟨v, hv, hp⟩ := Aeneas.Std.WP.spec_imp_exists (hf a)
+    obtain ⟨l', hl', hall⟩ := ih
+    refine ⟨v :: l', ?_, .cons hp hall⟩
+    simp [List.mapM_cons, hv, hl']
+    rfl
+
 end Plonky3Lean.Lib
