@@ -272,4 +272,28 @@ theorem laneDigest_eq (B : List (BitVec 8)) (s len : ℕ) (hB : s + len ≤ B.le
     cvBytes_eq _ (by simp [compressOut, compress])]
   simp only [compressOut, Output.rootBytes, subtreeOutput_counter, List.take_take, Nat.min_self]
 
+/-- The hasher's `hash_many`: each digest is the BLAKE3 digest of its message. -/
+theorem hash_many_spec (self : p3_blake3.Blake3) (input : Slice Std.U8)
+    (out : Slice (Std.Array Std.U8 32#usize)) (len : ℕ) (hn : 0 < out.val.length)
+    (hlen : input.val.length = out.val.length * len) (h32 : input.val.length + 1024 < 2 ^ 32)
+    (hn32 : out.val.length < 2 ^ 32) :
+    ∃ r, p3_blake3.Blake3.Insts.P3_symmetricHasherCryptographicHasherU8ArrayU832.hash_many self input out = .ok r ∧
+      r.val.map (fun a => a.val.map UScalar.bv) = (List.range out.val.length).map fun i =>
+        digest (((input.val.map UScalar.bv).drop (i * len)).take len) := by
+  obtain ⟨r, e, hr⟩ := hash_many_eq input out len hn hlen h32 hn32
+  refine ⟨r, e, ?_⟩
+  rw [hr, List.map_map]
+  apply List.map_congr_left
+  intro i hi
+  have hi' := List.mem_range.1 hi
+  have hB : i * len + len ≤ (sbytes input).length := by
+    simp only [sbytes, List.length_map, hlen]
+    have := Nat.mul_le_mul_right len (show i + 1 ≤ out.val.length by omega)
+    rw [Nat.add_mul, one_mul] at this; exact this
+  simp only [Function.comp, digestArr]
+  rw [barr_val _ _ (by simp [laneDigest, cvBytes]), List.map_map]
+  have hid : (UScalar.bv ∘ fun b : BitVec 8 => (⟨b⟩ : Std.U8)) = id := rfl
+  rw [hid, List.map_id, laneDigest_eq _ _ _ hB]
+  rfl
+
 end Plonky3Lean.Proofs.Blake3
