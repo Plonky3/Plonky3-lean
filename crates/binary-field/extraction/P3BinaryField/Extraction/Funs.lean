@@ -26,8 +26,624 @@ noncomputable section
 
 namespace p3_binary_field
 
+/-- [p3_binary_field::clmul::basis::TAIL_64]
+    Source: 'binary-field/src/clmul/basis.rs', lines 34:0-34:42 -/
+@[global_simps, irreducible] def clmul.basis.TAIL_64 : Std.U128 := 27#u128
+
+/-- [p3_binary_field::clmul::basis::TAIL_128]
+    Source: 'binary-field/src/clmul/basis.rs', lines 37:0-37:46 -/
+@[global_simps, irreducible] def clmul.basis.TAIL_128 : Std.U128 := 135#u128
+
+/-- [p3_binary_field::clmul::basis::XI_64]
+    Source: 'binary-field/src/clmul/basis.rs', lines 40:0-47:2 -/
+@[global_simps, irreducible]
+def clmul.basis.XI_64 : Array Std.U128 6#usize :=
+  Array.make 6#usize [
+    1858076378458151939#u128, 18174738647891815069#u128,
+    12559051997470757144#u128, 17102642781386582985#u128,
+    16891630944132119415#u128, 4551587056962866125#u128
+    ]
+
+/-- [p3_binary_field::clmul::basis::XI_128]
+    Source: 'binary-field/src/clmul/basis.rs', lines 50:0-58:2 -/
+@[global_simps, irreducible]
+def clmul.basis.XI_128 : Array Std.U128 7#usize :=
+  Array.make 7#usize [
+    54969562866131847669016652494142573320#u128,
+    161303063649109504187482472818972682313#u128,
+    144876905108663552818751003389017742420#u128,
+    286159159602749849628745949577098677300#u128,
+    138387256917889643415792612917684809205#u128,
+    97598032134637955198560346855012759819#u128,
+    208671318730860902252544003037358866040#u128
+    ]
+
+/-- [p3_binary_field::clmul::basis::poly_mul]: loop body 0:
+    Source: 'binary-field/src/clmul/basis.rs', lines 70:4-81:5 -/
+@[rust_loop_body]
+def clmul.basis.poly_mul_loop.body
+  (a : Std.U128) (b : Std.U128) (tail : Std.U128) (mask : Std.U128)
+  (top : Std.U128) (acc : Std.U128) (i : Std.Usize) :
+  RustM (ControlFlow (Std.U128 × Std.Usize) Std.U128)
+  := do
+  if i > 0#usize
+  then
+    let i1 ← i - 1#usize
+    let i2 ← lift (acc &&& top)
+    let i3 ← acc <<< 1#i32
+    let acc1 ← lift (i3 &&& mask)
+    let acc2 ← if i2 != 0#u128
+                 then ok (acc1 ^^^ tail)
+                 else ok acc1
+    let i4 ← b >>> i1
+    let i5 ← lift (i4 &&& 1#u128)
+    if i5 = 1#u128
+    then let acc3 ← lift (acc2 ^^^ a)
+         ok (cont (acc3, i1))
+    else ok (cont (acc2, i1))
+  else ok (done acc)
+
+/-- [p3_binary_field::clmul::basis::poly_mul]: loop 0:
+    Source: 'binary-field/src/clmul/basis.rs', lines 70:4-81:5 -/
+@[rust_loop]
+def clmul.basis.poly_mul_loop
+  (a : Std.U128) (b : Std.U128) (tail : Std.U128) (mask : Std.U128)
+  (top : Std.U128) (acc : Std.U128) (i : Std.Usize) :
+  RustM Std.U128
+  := do
+  loop
+    (fun (acc1, i1) => clmul.basis.poly_mul_loop.body a b tail mask top acc1
+      i1)
+    (acc, i)
+
+/-- [p3_binary_field::clmul::basis::poly_mul]:
+    Source: 'binary-field/src/clmul/basis.rs', lines 65:0-83:1 -/
+def clmul.basis.poly_mul
+  (a : Std.U128) (b : Std.U128) (bits : Std.Usize) (tail : Std.U128) :
+  RustM Std.U128
+  := do
+  let i ← 128#usize - bits
+  let mask ← core.num.U128.MAX >>> i
+  let i1 ← bits - 1#usize
+  let top ← 1#u128 <<< i1
+  clmul.basis.poly_mul_loop a b tail mask top 0#u128 bits
+
+/-- [p3_binary_field::clmul::basis::columns]: loop body 0:
+    Source: 'binary-field/src/clmul/basis.rs', lines 125:4-129:5 -/
+@[rust_loop_body]
+def clmul.basis.columns_loop.body
+  (bits : Std.Usize) (tail : Std.U128) (xi : Slice Std.U128)
+  (cols : Array Std.U128 128#usize) (j : Std.Usize) :
+  RustM (ControlFlow ((Array Std.U128 128#usize) × Std.Usize) (Array Std.U128
+    128#usize))
+  := do
+  if j < bits
+  then
+    let i ← core.num.Usize.trailing_zeros j
+    let low ← lift (UScalar.cast .Usize i)
+    let i1 ← 1#usize <<< low
+    let i2 ← lift (j ^^^ i1)
+    let i3 ← Array.index_usize cols i2
+    let i4 ← Slice.index_usize xi low
+    let i5 ← clmul.basis.poly_mul i3 i4 bits tail
+    let a ← Array.update cols j i5
+    let j1 ← j + 1#usize
+    ok (cont (a, j1))
+  else ok (done cols)
+
+/-- [p3_binary_field::clmul::basis::columns]: loop 0:
+    Source: 'binary-field/src/clmul/basis.rs', lines 125:4-129:5 -/
+@[rust_loop]
+def clmul.basis.columns_loop
+  (bits : Std.Usize) (tail : Std.U128) (xi : Slice Std.U128)
+  (cols : Array Std.U128 128#usize) (j : Std.Usize) :
+  RustM (Array Std.U128 128#usize)
+  := do
+  loop
+    (fun (cols1, j1) => clmul.basis.columns_loop.body bits tail xi cols1 j1)
+    (cols, j)
+
+/-- [p3_binary_field::clmul::basis::columns]:
+    Source: 'binary-field/src/clmul/basis.rs', lines 120:0-131:1 -/
+def clmul.basis.columns
+  (bits : Std.Usize) (tail : Std.U128) (xi : Slice Std.U128) :
+  RustM (Array Std.U128 128#usize)
+  := do
+  let cols := Array.repeat 128#usize 0#u128
+  let a ← Array.update cols 0#usize 1#u128
+  clmul.basis.columns_loop bits tail xi a 1#usize
+
+/-- [p3_binary_field::clmul::basis::invert]: loop body 0:
+    Source: 'binary-field/src/clmul/basis.rs', lines 145:4-148:5 -/
+@[rust_loop_body]
+def clmul.basis.invert_loop0.body
+  (bits : Std.Usize) (inv : Array Std.U128 128#usize) (j : Std.Usize) :
+  RustM (ControlFlow ((Array Std.U128 128#usize) × Std.Usize) (Array Std.U128
+    128#usize))
+  := do
+  if j < bits
+  then
+    let i ← 1#u128 <<< j
+    let a ← Array.update inv j i
+    let j1 ← j + 1#usize
+    ok (cont (a, j1))
+  else ok (done inv)
+
+/-- [p3_binary_field::clmul::basis::invert]: loop 0:
+    Source: 'binary-field/src/clmul/basis.rs', lines 145:4-148:5 -/
+@[rust_loop]
+def clmul.basis.invert_loop0
+  (bits : Std.Usize) (inv : Array Std.U128 128#usize) (j : Std.Usize) :
+  RustM (Array Std.U128 128#usize)
+  := do
+  loop
+    (fun (inv1, j1) => clmul.basis.invert_loop0.body bits inv1 j1)
+    (inv, j)
+
+/-- [p3_binary_field::clmul::basis::invert]: loop body 2:
+    Source: 'binary-field/src/clmul/basis.rs', lines 153:8-155:9 -/
+@[rust_loop_body]
+def clmul.basis.invert_loop1_loop0.body
+  (bits : Std.Usize) (mat : Array Std.U128 128#usize) (pivot : Std.Usize)
+  (col : Std.Usize) :
+  RustM (ControlFlow Std.Usize Std.Usize)
+  := do
+  if col < bits
+  then
+    let i ← Array.index_usize mat col
+    let i1 ← i >>> pivot
+    let i2 ← lift (i1 &&& 1#u128)
+    if i2 = 0#u128
+    then let col1 ← col + 1#usize
+         ok (cont col1)
+    else ok (done col)
+  else ok (done col)
+
+/-- [p3_binary_field::clmul::basis::invert]: loop 2:
+    Source: 'binary-field/src/clmul/basis.rs', lines 153:8-155:9 -/
+@[rust_loop]
+def clmul.basis.invert_loop1_loop0
+  (bits : Std.Usize) (mat : Array Std.U128 128#usize) (pivot : Std.Usize)
+  (col : Std.Usize) :
+  RustM Std.Usize
+  := do
+  loop
+    (fun col1 => clmul.basis.invert_loop1_loop0.body bits mat pivot col1)
+    col
+
+/-- [p3_binary_field::clmul::basis::invert]: loop body 3:
+    Source: 'binary-field/src/clmul/basis.rs', lines 166:8-172:9 -/
+@[rust_loop_body]
+def clmul.basis.invert_loop1_loop1.body
+  (bits : Std.Usize) (pivot : Std.Usize) (mat : Array Std.U128 128#usize)
+  (inv : Array Std.U128 128#usize) (col : Std.Usize) :
+  RustM (ControlFlow ((Array Std.U128 128#usize) × (Array Std.U128 128#usize)
+    × Std.Usize) ((Array Std.U128 128#usize) × (Array Std.U128 128#usize)))
+  := do
+  if col < bits
+  then
+    if col != pivot
+    then
+      let i ← Array.index_usize mat col
+      let i1 ← i >>> pivot
+      let i2 ← lift (i1 &&& 1#u128)
+      if i2 = 1#u128
+      then
+        let i3 ← Array.index_usize mat pivot
+        let i4 ← lift (i ^^^ i3)
+        let a ← Array.update mat col i4
+        let i5 ← Array.index_usize inv pivot
+        let i6 ← Array.index_usize inv col
+        let i7 ← lift (i6 ^^^ i5)
+        let a1 ← Array.update inv col i7
+        let col1 ← col + 1#usize
+        ok (cont (a, a1, col1))
+      else let col1 ← col + 1#usize
+           ok (cont (mat, inv, col1))
+    else let col1 ← col + 1#usize
+         ok (cont (mat, inv, col1))
+  else ok (done (mat, inv))
+
+/-- [p3_binary_field::clmul::basis::invert]: loop 3:
+    Source: 'binary-field/src/clmul/basis.rs', lines 166:8-172:9 -/
+@[rust_loop]
+def clmul.basis.invert_loop1_loop1
+  (bits : Std.Usize) (mat : Array Std.U128 128#usize)
+  (inv : Array Std.U128 128#usize) (pivot : Std.Usize) (col : Std.Usize) :
+  RustM ((Array Std.U128 128#usize) × (Array Std.U128 128#usize))
+  := do
+  loop
+    (fun (mat1, inv1, col1) => clmul.basis.invert_loop1_loop1.body bits pivot
+      mat1 inv1 col1)
+    (mat, inv, col)
+
+/-- [p3_binary_field::clmul::basis::invert]: loop body 1:
+    Source: 'binary-field/src/clmul/basis.rs', lines 151:4-174:5 -/
+@[rust_loop_body]
+def clmul.basis.invert_loop1.body
+  (bits : Std.Usize) (mat : Array Std.U128 128#usize)
+  (inv : Array Std.U128 128#usize) (pivot : Std.Usize) :
+  RustM (ControlFlow ((Array Std.U128 128#usize) × (Array Std.U128 128#usize)
+    × Std.Usize) (Array Std.U128 128#usize))
+  := do
+  if pivot < bits
+  then
+    let col ← clmul.basis.invert_loop1_loop0 bits mat pivot pivot
+    massert (col < bits)
+    let swapped ← Array.index_usize mat pivot
+    let i ← Array.index_usize mat col
+    let mat1 ← Array.update mat pivot i
+    let a ← Array.update mat1 col swapped
+    let swapped1 ← Array.index_usize inv pivot
+    let i1 ← Array.index_usize inv col
+    let inv1 ← Array.update inv pivot i1
+    let a1 ← Array.update inv1 col swapped1
+    let (mat2, inv2) ← clmul.basis.invert_loop1_loop1 bits a a1 pivot 0#usize
+    let pivot1 ← pivot + 1#usize
+    ok (cont (mat2, inv2, pivot1))
+  else ok (done inv)
+
+/-- [p3_binary_field::clmul::basis::invert]: loop 1:
+    Source: 'binary-field/src/clmul/basis.rs', lines 151:4-174:5 -/
+@[rust_loop]
+def clmul.basis.invert_loop1
+  (bits : Std.Usize) (mat : Array Std.U128 128#usize)
+  (inv : Array Std.U128 128#usize) (pivot : Std.Usize) :
+  RustM (Array Std.U128 128#usize)
+  := do
+  loop
+    (fun (mat1, inv1, pivot1) => clmul.basis.invert_loop1.body bits mat1 inv1
+      pivot1)
+    (mat, inv, pivot)
+
+/-- [p3_binary_field::clmul::basis::invert]:
+    Source: 'binary-field/src/clmul/basis.rs', lines 141:0-176:1 -/
+def clmul.basis.invert
+  (cols : Array Std.U128 128#usize) (bits : Std.Usize) :
+  RustM (Array Std.U128 128#usize)
+  := do
+  let inv := Array.repeat 128#usize 0#u128
+  let inv1 ← clmul.basis.invert_loop0 bits inv 0#usize
+  clmul.basis.invert_loop1 bits cols inv1 0#usize
+
+/-- [p3_binary_field::clmul::basis::byte_tables]: loop body 1:
+    Source: 'binary-field/src/clmul/basis.rs', lines 192:8-196:9 -/
+@[rust_loop_body]
+def clmul.basis.byte_tables_loop0_loop0.body
+  (cols : Array Std.U128 128#usize) (byte : Std.Usize)
+  (tables1 : Array (Array Std.U128 256#usize) 16#usize) (value : Std.Usize) :
+  RustM (ControlFlow ((Array (Array Std.U128 256#usize) 16#usize) × Std.Usize)
+    (Array (Array Std.U128 256#usize) 16#usize))
+  := do
+  if value < 256#usize
+  then
+    let i ← core.num.Usize.trailing_zeros value
+    let low ← lift (UScalar.cast .Usize i)
+    let i1 ← 1#usize <<< low
+    let i2 ← lift (value ^^^ i1)
+    let a ← Array.index_usize tables1 byte
+    let i3 ← Array.index_usize a i2
+    let i4 ← byte * 8#usize
+    let i5 ← i4 + low
+    let i6 ← Array.index_usize cols i5
+    let (a1, index_mut_back) ← Array.index_mut_usize tables1 byte
+    let i7 ← lift (i3 ^^^ i6)
+    let a2 ← Array.update a1 value i7
+    let value1 ← value + 1#usize
+    let a3 := index_mut_back a2
+    ok (cont (a3, value1))
+  else ok (done tables1)
+
+/-- [p3_binary_field::clmul::basis::byte_tables]: loop 1:
+    Source: 'binary-field/src/clmul/basis.rs', lines 192:8-196:9 -/
+@[rust_loop]
+def clmul.basis.byte_tables_loop0_loop0
+  (cols : Array Std.U128 128#usize)
+  (tables1 : Array (Array Std.U128 256#usize) 16#usize) (byte : Std.Usize)
+  (value : Std.Usize) :
+  RustM (Array (Array Std.U128 256#usize) 16#usize)
+  := do
+  loop
+    (fun (tables2, value1) => clmul.basis.byte_tables_loop0_loop0.body cols
+      byte tables2 value1)
+    (tables1, value)
+
+/-- [p3_binary_field::clmul::basis::byte_tables]: loop body 0:
+    Source: 'binary-field/src/clmul/basis.rs', lines 190:4-198:5 -/
+@[rust_loop_body]
+def clmul.basis.byte_tables_loop0.body
+  (cols : Array Std.U128 128#usize) (bits : Std.Usize)
+  (tables1 : Array (Array Std.U128 256#usize) 16#usize) (byte : Std.Usize) :
+  RustM (ControlFlow ((Array (Array Std.U128 256#usize) 16#usize) × Std.Usize)
+    (Array (Array Std.U128 256#usize) 16#usize))
+  := do
+  let i ← bits / 8#usize
+  if byte < i
+  then
+    let tables2 ←
+      clmul.basis.byte_tables_loop0_loop0 cols tables1 byte 1#usize
+    let byte1 ← byte + 1#usize
+    ok (cont (tables2, byte1))
+  else ok (done tables1)
+
+/-- [p3_binary_field::clmul::basis::byte_tables]: loop 0:
+    Source: 'binary-field/src/clmul/basis.rs', lines 190:4-198:5 -/
+@[rust_loop]
+def clmul.basis.byte_tables_loop0
+  (cols : Array Std.U128 128#usize) (bits : Std.Usize)
+  (tables1 : Array (Array Std.U128 256#usize) 16#usize) (byte : Std.Usize) :
+  RustM (Array (Array Std.U128 256#usize) 16#usize)
+  := do
+  loop
+    (fun (tables2, byte1) => clmul.basis.byte_tables_loop0.body cols bits
+      tables2 byte1)
+    (tables1, byte)
+
+/-- [p3_binary_field::clmul::basis::byte_tables]:
+    Source: 'binary-field/src/clmul/basis.rs', lines 187:0-200:1 -/
+def clmul.basis.byte_tables
+  (cols : Array Std.U128 128#usize) (bits : Std.Usize) :
+  RustM (Array (Array Std.U128 256#usize) 16#usize)
+  := do
+  let a := Array.repeat 256#usize 0#u128
+  let tables1 := Array.repeat 16#usize a
+  clmul.basis.byte_tables_loop0 cols bits tables1 0#usize
+
+/-- [p3_binary_field::clmul::basis::narrow]: loop body 1:
+    Source: 'binary-field/src/clmul/basis.rs', lines 237:8-240:9 -/
+@[rust_loop_body]
+def clmul.basis.narrow_loop0_loop0.body
+  (tables1 : Array (Array Std.U128 256#usize) 16#usize) (byte : Std.Usize)
+  (narrowed : Array (Array Std.U64 256#usize) 8#usize) (value : Std.Usize) :
+  RustM (ControlFlow ((Array (Array Std.U64 256#usize) 8#usize) × Std.Usize)
+    (Array (Array Std.U64 256#usize) 8#usize))
+  := do
+  if value < 256#usize
+  then
+    let a ← Array.index_usize tables1 byte
+    let i ← Array.index_usize a value
+    let (a1, index_mut_back) ← Array.index_mut_usize narrowed byte
+    let i1 ← lift (UScalar.cast .U64 i)
+    let a2 ← Array.update a1 value i1
+    let value1 ← value + 1#usize
+    let a3 := index_mut_back a2
+    ok (cont (a3, value1))
+  else ok (done narrowed)
+
+/-- [p3_binary_field::clmul::basis::narrow]: loop 1:
+    Source: 'binary-field/src/clmul/basis.rs', lines 237:8-240:9 -/
+@[rust_loop]
+def clmul.basis.narrow_loop0_loop0
+  (tables1 : Array (Array Std.U128 256#usize) 16#usize)
+  (narrowed : Array (Array Std.U64 256#usize) 8#usize) (byte : Std.Usize)
+  (value : Std.Usize) :
+  RustM (Array (Array Std.U64 256#usize) 8#usize)
+  := do
+  loop
+    (fun (narrowed1, value1) => clmul.basis.narrow_loop0_loop0.body tables1
+      byte narrowed1 value1)
+    (narrowed, value)
+
+/-- [p3_binary_field::clmul::basis::narrow]: loop body 0:
+    Source: 'binary-field/src/clmul/basis.rs', lines 235:4-242:5 -/
+@[rust_loop_body]
+def clmul.basis.narrow_loop0.body
+  (tables1 : Array (Array Std.U128 256#usize) 16#usize)
+  (narrowed : Array (Array Std.U64 256#usize) 8#usize) (byte : Std.Usize) :
+  RustM (ControlFlow ((Array (Array Std.U64 256#usize) 8#usize) × Std.Usize)
+    (Array (Array Std.U64 256#usize) 8#usize))
+  := do
+  if byte < 8#usize
+  then
+    let narrowed1 ←
+      clmul.basis.narrow_loop0_loop0 tables1 narrowed byte 0#usize
+    let byte1 ← byte + 1#usize
+    ok (cont (narrowed1, byte1))
+  else ok (done narrowed)
+
+/-- [p3_binary_field::clmul::basis::narrow]: loop 0:
+    Source: 'binary-field/src/clmul/basis.rs', lines 235:4-242:5 -/
+@[rust_loop]
+def clmul.basis.narrow_loop0
+  (tables1 : Array (Array Std.U128 256#usize) 16#usize)
+  (narrowed : Array (Array Std.U64 256#usize) 8#usize) (byte : Std.Usize) :
+  RustM (Array (Array Std.U64 256#usize) 8#usize)
+  := do
+  loop
+    (fun (narrowed1, byte1) => clmul.basis.narrow_loop0.body tables1 narrowed1
+      byte1)
+    (narrowed, byte)
+
+/-- [p3_binary_field::clmul::basis::narrow]:
+    Source: 'binary-field/src/clmul/basis.rs', lines 232:0-244:1 -/
+def clmul.basis.narrow
+  (tables1 : Array (Array Std.U128 256#usize) 16#usize) :
+  RustM (Array (Array Std.U64 256#usize) 8#usize)
+  := do
+  let a := Array.repeat 256#usize 0#u64
+  let narrowed := Array.repeat 8#usize a
+  clmul.basis.narrow_loop0 tables1 narrowed 0#usize
+
+/-- [p3_binary_field::clmul::basis::COLUMNS_64]
+    Source: 'binary-field/src/clmul/basis.rs', lines 281:0-281:61 -/
+@[global_simps, irreducible]
+def clmul.basis.COLUMNS_64 : RustM (Array Std.U128 128#usize) := do
+  let s ← lift (Array.to_slice clmul.basis.XI_64)
+  clmul.basis.columns 64#usize clmul.basis.TAIL_64 s
+
+/-- [p3_binary_field::clmul::basis::COLUMNS_128]
+    Source: 'binary-field/src/clmul/basis.rs', lines 282:0-282:65 -/
+@[global_simps, irreducible]
+def clmul.basis.COLUMNS_128 : RustM (Array Std.U128 128#usize) := do
+  let s ← lift (Array.to_slice clmul.basis.XI_128)
+  clmul.basis.columns 128#usize clmul.basis.TAIL_128 s
+
+/-- [p3_binary_field::clmul::basis::TOWER_TO_POLY_64]
+    Source: 'binary-field/src/clmul/basis.rs', lines 284:0-284:81 -/
+@[global_simps, irreducible]
+def clmul.basis.TOWER_TO_POLY_64
+  : RustM (Array (Array Std.U64 256#usize) 8#usize) := do
+  let a ← clmul.basis.COLUMNS_64
+  let a1 ← clmul.basis.byte_tables a 64#usize
+  clmul.basis.narrow a1
+
+/-- [p3_binary_field::clmul::basis::POLY_TO_TOWER_64]
+    Source: 'binary-field/src/clmul/basis.rs', lines 285:0-285:94 -/
+@[global_simps, irreducible]
+def clmul.basis.POLY_TO_TOWER_64
+  : RustM (Array (Array Std.U64 256#usize) 8#usize) := do
+  let a ← clmul.basis.COLUMNS_64
+  let a1 ← clmul.basis.invert a 64#usize
+  let a2 ← clmul.basis.byte_tables a1 64#usize
+  clmul.basis.narrow a2
+
+/-- [p3_binary_field::clmul::basis::TOWER_TO_POLY_128]
+    Source: 'binary-field/src/clmul/basis.rs', lines 288:0-288:77 -/
+@[global_simps, irreducible]
+def clmul.basis.TOWER_TO_POLY_128
+  : RustM (Array (Array Std.U128 256#usize) 16#usize) := do
+  let a ← clmul.basis.COLUMNS_128
+  clmul.basis.byte_tables a 128#usize
+
+/-- [p3_binary_field::clmul::basis::POLY_TO_TOWER_128]
+    Source: 'binary-field/src/clmul/basis.rs', lines 289:0-289:91 -/
+@[global_simps, irreducible]
+def clmul.basis.POLY_TO_TOWER_128
+  : RustM (Array (Array Std.U128 256#usize) 16#usize) := do
+  let a ← clmul.basis.COLUMNS_128
+  let a1 ← clmul.basis.invert a 128#usize
+  clmul.basis.byte_tables a1 128#usize
+
+/-- [p3_binary_field::clmul::basis::apply_64]: loop body 0:
+    Source: 'binary-field/src/clmul/basis.rs', lines 324:4-326:5 -/
+@[rust_loop_body]
+def clmul.basis.apply_64_loop.body
+  (v : Std.U64)
+  (iter : core.iter.adapters.enumerate.Enumerate (core.slice.iter.Iter (Array
+  Std.U64 256#usize))) (acc : Std.U64) :
+  RustM (ControlFlow ((core.iter.adapters.enumerate.Enumerate
+    (core.slice.iter.Iter (Array Std.U64 256#usize))) × Std.U64) Std.U64)
+  := do
+  let (o, iter1) ←
+    core.iter.adapters.enumerate.Enumerate.Insts.CoreIterTraitsIteratorIteratorPairUsizeClause0_Item.next
+      (core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT (Array
+      Std.U64 256#usize)) iter
+  match o with
+  | core.option.Option.None => ok (done acc)
+  | core.option.Option.Some p =>
+    let (byte, table) := p
+    let i ← 8#usize * byte
+    let i1 ← v >>> i
+    let i2 ← lift (UScalar.cast .U8 i1)
+    let i3 ← lift (UScalar.cast .Usize i2)
+    let i4 ← Array.index_usize table i3
+    let acc1 ← lift (acc ^^^ i4)
+    ok (cont (iter1, acc1))
+
+/-- [p3_binary_field::clmul::basis::apply_64]: loop 0:
+    Source: 'binary-field/src/clmul/basis.rs', lines 324:4-326:5 -/
+@[rust_loop]
+def clmul.basis.apply_64_loop
+  (iter : core.iter.adapters.enumerate.Enumerate (core.slice.iter.Iter (Array
+  Std.U64 256#usize))) (v : Std.U64) (acc : Std.U64) :
+  RustM Std.U64
+  := do
+  loop
+    (fun (iter1, acc1) => clmul.basis.apply_64_loop.body v iter1 acc1)
+    (iter, acc)
+
+/-- [p3_binary_field::clmul::basis::apply_64]:
+    Source: 'binary-field/src/clmul/basis.rs', lines 322:0-328:1 -/
+def clmul.basis.apply_64
+  (tables1 : Array (Array Std.U64 256#usize) 8#usize) (v : Std.U64) :
+  RustM Std.U64
+  := do
+  let s ← lift (Array.to_slice tables1)
+  let i ← core.slice.Slice.iter s
+  let iter ←
+    core.iter.traits.iterator.Iterator.enumerate.default
+      (core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT (Array
+      Std.U64 256#usize)) i
+  clmul.basis.apply_64_loop iter v 0#u64
+
+/-- [p3_binary_field::clmul::basis::apply_128]: loop body 0:
+    Source: 'binary-field/src/clmul/basis.rs', lines 374:8-376:9 -/
+@[rust_loop_body]
+def clmul.basis.apply_128_loop.body
+  (v : Std.U128)
+  (iter : core.iter.adapters.enumerate.Enumerate (core.slice.iter.Iter (Array
+  Std.U128 256#usize))) (acc : Std.U128) :
+  RustM (ControlFlow ((core.iter.adapters.enumerate.Enumerate
+    (core.slice.iter.Iter (Array Std.U128 256#usize))) × Std.U128) Std.U128)
+  := do
+  let (o, iter1) ←
+    core.iter.adapters.enumerate.Enumerate.Insts.CoreIterTraitsIteratorIteratorPairUsizeClause0_Item.next
+      (core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT (Array
+      Std.U128 256#usize)) iter
+  match o with
+  | core.option.Option.None => ok (done acc)
+  | core.option.Option.Some p =>
+    let (byte, table) := p
+    let i ← 8#usize * byte
+    let i1 ← v >>> i
+    let i2 ← lift (UScalar.cast .U8 i1)
+    let i3 ← lift (UScalar.cast .Usize i2)
+    let i4 ← Array.index_usize table i3
+    let acc1 ← lift (acc ^^^ i4)
+    ok (cont (iter1, acc1))
+
+/-- [p3_binary_field::clmul::basis::apply_128]: loop 0:
+    Source: 'binary-field/src/clmul/basis.rs', lines 374:8-376:9 -/
+@[rust_loop]
+def clmul.basis.apply_128_loop
+  (iter : core.iter.adapters.enumerate.Enumerate (core.slice.iter.Iter (Array
+  Std.U128 256#usize))) (v : Std.U128) (acc : Std.U128) :
+  RustM Std.U128
+  := do
+  loop
+    (fun (iter1, acc1) => clmul.basis.apply_128_loop.body v iter1 acc1)
+    (iter, acc)
+
+/-- [p3_binary_field::clmul::basis::apply_128]:
+    Source: 'binary-field/src/clmul/basis.rs', lines 332:0-379:1 -/
+def clmul.basis.apply_128
+  (tables1 : Array (Array Std.U128 256#usize) 16#usize) (v : Std.U128) :
+  RustM Std.U128
+  := do
+  let s ← lift (Array.to_slice tables1)
+  let i ← core.slice.Slice.iter s
+  let iter ←
+    core.iter.traits.iterator.Iterator.enumerate.default
+      (core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT (Array
+      Std.U128 256#usize)) i
+  clmul.basis.apply_128_loop iter v 0#u128
+
+/-- [p3_binary_field::clmul::basis::tower_to_poly_64]:
+    Source: 'binary-field/src/clmul/basis.rs', lines 827:0-829:1 -/
+def clmul.basis.tower_to_poly_64 (v : Std.U64) : RustM Std.U64 := do
+  let a ← clmul.basis.TOWER_TO_POLY_64
+  clmul.basis.apply_64 a v
+
+/-- [p3_binary_field::clmul::basis::poly_to_tower_64]:
+    Source: 'binary-field/src/clmul/basis.rs', lines 833:0-835:1 -/
+def clmul.basis.poly_to_tower_64 (v : Std.U64) : RustM Std.U64 := do
+  let a ← clmul.basis.POLY_TO_TOWER_64
+  clmul.basis.apply_64 a v
+
+/-- [p3_binary_field::clmul::basis::tower_to_poly_128]:
+    Source: 'binary-field/src/clmul/basis.rs', lines 845:0-847:1 -/
+def clmul.basis.tower_to_poly_128 (v : Std.U128) : RustM Std.U128 := do
+  let a ← clmul.basis.TOWER_TO_POLY_128
+  clmul.basis.apply_128 a v
+
+/-- [p3_binary_field::clmul::basis::poly_to_tower_128]:
+    Source: 'binary-field/src/clmul/basis.rs', lines 851:0-853:1 -/
+def clmul.basis.poly_to_tower_128 (v : Std.U128) : RustM Std.U128 := do
+  let a ← clmul.basis.POLY_TO_TOWER_128
+  clmul.basis.apply_128 a v
+
 /-- [p3_binary_field::clmul::reduce_64]:
-    Source: 'binary-field/src/clmul/mod.rs', lines 200:0-211:1 -/
+    Source: 'binary-field/src/clmul/mod.rs', lines 202:0-213:1 -/
 def clmul.reduce_64 (product : Std.U128) : RustM Std.U64 := do
   let low ← lift (UScalar.cast .U64 product)
   let i ← product >>> 64#i32
@@ -47,7 +663,7 @@ def clmul.reduce_64 (product : Std.U128) : RustM Std.U64 := do
   ok (i10 ^^^ i11)
 
 /-- [p3_binary_field::clmul::{impl core::ops::function::FnMut<(u128,), u64> for p3_binary_field::clmul::reduce_64}::call_mut]:
-    Source: 'binary-field/src/clmul/mod.rs', lines 200:0-211:1 -/
+    Source: 'binary-field/src/clmul/mod.rs', lines 202:0-213:1 -/
 def P.Insts.CoreOpsFunctionFnMutTupleU128U64.call_mut
   (state : Std.U128 → RustM Std.U64) (args : Std.U128) :
   RustM (Std.U64 × (Std.U128 → RustM Std.U64))
@@ -56,13 +672,13 @@ def P.Insts.CoreOpsFunctionFnMutTupleU128U64.call_mut
   ok (i, state)
 
 /-- [p3_binary_field::clmul::{impl core::ops::function::FnOnce<(u128,), u64> for p3_binary_field::clmul::reduce_64}::call_once]:
-    Source: 'binary-field/src/clmul/mod.rs', lines 200:0-211:1 -/
+    Source: 'binary-field/src/clmul/mod.rs', lines 202:0-213:1 -/
 def P.Insts.CoreOpsFunctionFnOnceTupleU128U64.call_once
   (state : Std.U128 → RustM Std.U64) (args : Std.U128) : RustM Std.U64 := do
   clmul.reduce_64 args
 
 /-- Trait implementation: [p3_binary_field::clmul::{impl core::ops::function::FnOnce<(u128,), u64> for p3_binary_field::clmul::reduce_64}]
-    Source: 'binary-field/src/clmul/mod.rs', lines 200:0-211:1 -/
+    Source: 'binary-field/src/clmul/mod.rs', lines 202:0-213:1 -/
 @[reducible]
 def P.Insts.CoreOpsFunctionFnOnceTupleU128U64 : core.ops.function.FnOnce
   (Std.U128 → RustM Std.U64) Std.U128 Std.U64 := {
@@ -70,7 +686,7 @@ def P.Insts.CoreOpsFunctionFnOnceTupleU128U64 : core.ops.function.FnOnce
 }
 
 /-- Trait implementation: [p3_binary_field::clmul::{impl core::ops::function::FnMut<(u128,), u64> for p3_binary_field::clmul::reduce_64}]
-    Source: 'binary-field/src/clmul/mod.rs', lines 200:0-211:1 -/
+    Source: 'binary-field/src/clmul/mod.rs', lines 202:0-213:1 -/
 @[reducible]
 def P.Insts.CoreOpsFunctionFnMutTupleU128U64 : core.ops.function.FnMut
   (Std.U128 → RustM Std.U64) Std.U128 Std.U64 := {
@@ -444,8 +1060,33 @@ def clmul.gf64.poly_inverse_64 (x : Std.U64) : RustM Std.U64 := do
   let b63 ← clmul.gf64.poly_mul_64 i7 b3
   clmul.gf64.poly_square_64 b63
 
+/-- [p3_binary_field::clmul::HAS_HARDWARE_CLMUL]
+    Source: 'binary-field/src/clmul/mod.rs', lines 124:0-131:3 -/
+@[global_simps, irreducible] def clmul.HAS_HARDWARE_CLMUL : Bool := false
+
+/-- [p3_binary_field::clmul::clmul_128x128]:
+    Source: 'binary-field/src/clmul/mod.rs', lines 181:0-188:1 -/
+def clmul.clmul_128x128
+  (a : Std.U128) (b : Std.U128) : RustM (Std.U128 × Std.U128) := do
+  let a0 ← lift (UScalar.cast .U64 a)
+  let i ← a >>> 64#i32
+  let a1 ← lift (UScalar.cast .U64 i)
+  let b0 ← lift (UScalar.cast .U64 b)
+  let i1 ← b >>> 64#i32
+  let b1 ← lift (UScalar.cast .U64 i1)
+  let low ← clmul.portable.clmul_64x64 a0 b0
+  let high ← clmul.portable.clmul_64x64 a1 b1
+  let i2 ← clmul.portable.clmul_64x64 a0 b1
+  let i3 ← clmul.portable.clmul_64x64 a1 b0
+  let middle ← lift (i2 ^^^ i3)
+  let i4 ← middle <<< 64#i32
+  let i5 ← lift (low ^^^ i4)
+  let i6 ← middle >>> 64#i32
+  let i7 ← lift (high ^^^ i6)
+  ok (i5, i7)
+
 /-- [p3_binary_field::clmul::reduce_128]:
-    Source: 'binary-field/src/clmul/mod.rs', lines 218:0-223:1 -/
+    Source: 'binary-field/src/clmul/mod.rs', lines 220:0-225:1 -/
 def clmul.reduce_128 (low : Std.U128) (high : Std.U128) : RustM Std.U128 := do
   let i ← high <<< 7#i32
   let i1 ← high <<< 2#i32
@@ -466,6 +1107,30 @@ def clmul.reduce_128 (low : Std.U128) (high : Std.U128) : RustM Std.U128 := do
   let i14 ← lift (i12 ^^^ i13)
   let i15 ← lift (i14 ^^^ spill)
   ok (i9 ^^^ i15)
+
+/-- [p3_binary_field::clmul::mul_64]:
+    Source: 'binary-field/src/clmul/mod.rs', lines 229:0-232:1 -/
+def clmul.mul_64 (a : Std.U64) (b : Std.U64) : RustM Std.U64 := do
+  let i ← clmul.basis.tower_to_poly_64 a
+  let i1 ← clmul.basis.tower_to_poly_64 b
+  let product ← clmul.portable.clmul_64x64 i i1
+  let i2 ← clmul.reduce_64 product
+  clmul.basis.poly_to_tower_64 i2
+
+/-- [p3_binary_field::clmul::composed_poly_mul_128]:
+    Source: 'binary-field/src/clmul/mod.rs', lines 251:0-254:1 -/
+def clmul.composed_poly_mul_128
+  (a : Std.U128) (b : Std.U128) : RustM Std.U128 := do
+  let (low, high) ← clmul.clmul_128x128 a b
+  clmul.reduce_128 low high
+
+/-- [p3_binary_field::clmul::mul_128]:
+    Source: 'binary-field/src/clmul/mod.rs', lines 325:0-328:1 -/
+def clmul.mul_128 (a : Std.U128) (b : Std.U128) : RustM Std.U128 := do
+  let i ← clmul.basis.tower_to_poly_128 a
+  let i1 ← clmul.basis.tower_to_poly_128 b
+  let product ← clmul.composed_poly_mul_128 i i1
+  clmul.basis.poly_to_tower_128 product
 
 /-- [p3_binary_field::clmul::portable::wide_mul_128]:
     Source: 'binary-field/src/clmul/portable.rs', lines 122:0-142:1 -/
@@ -583,39 +1248,491 @@ def clmul.sqrt.poly_sqrt_128 (a : Std.U128) : RustM Std.U128 := do
   let i1 ← clmul.portable.poly_mul_128_by_64 clmul.sqrt.ROOT_X odd
   ok (i ^^^ i1)
 
-/-- [p3_binary_field::tables::LOG]
-    Source: 'binary-field/src/tables.rs', lines 20:0-37:2 -/
+/-- [p3_binary_field::gf2::{impl core::ops::arith::Mul<p3_binary_field::gf2::Gf2, p3_binary_field::gf2::Gf2> for p3_binary_field::gf2::Gf2}::mul]:
+    Source: 'binary-field/src/gf2.rs', lines 415:4-418:5
+    Visibility: public -/
+def gf2.Gf2.Insts.CoreOpsArithMulGf2Gf2.mul
+  (self : gf2.Gf2) (rhs : gf2.Gf2) : RustM gf2.Gf2 := do
+  let i ← lift (self &&& rhs)
+  ok i
+
+/-- [p3_binary_field::gf2::{p3_binary_field::gf2::Gf2}::reference_mul]:
+    Source: 'binary-field/src/gf2.rs', lines 113:4-115:5
+    Visibility: public -/
+def gf2.Gf2.reference_mul
+  (self : gf2.Gf2) (rhs : gf2.Gf2) : RustM gf2.Gf2 := do
+  gf2.Gf2.Insts.CoreOpsArithMulGf2Gf2.mul self rhs
+
+/-- [p3_binary_field::gf2::{p3_binary_field::gf2::Gf2}::raw_from_repr]:
+    Source: 'binary-field/src/gf2.rs', lines 122:4-124:5 -/
+def gf2.Gf2.raw_from_repr (r : Std.U8) : RustM gf2.Gf2 := do
+  let i ← lift (r &&& 1#u8)
+  ok i
+
+/-- [p3_binary_field::gf2::{p3_binary_field::gf2::Gf2}::raw_to_repr]:
+    Source: 'binary-field/src/gf2.rs', lines 128:4-130:5 -/
+def gf2.Gf2.raw_to_repr (self : gf2.Gf2) : RustM Std.U8 := do
+  ok (UScalar.cast_fromBool .U8 (self = 1#u8))
+
+/-- [p3_binary_field::gf2::{p3_binary_field::gf2::Gf2}::raw_mul_alpha]:
+    Source: 'binary-field/src/gf2.rs', lines 134:4-136:5 -/
+def gf2.Gf2.raw_mul_alpha (self : gf2.Gf2) : RustM gf2.Gf2 := do
+  ok self
+
+/-- [p3_binary_field::gf2::{p3_binary_field::gf2::Gf2}::from_repr]:
+    Source: 'binary-field/src/gf2.rs', lines 142:4-144:5 -/
+def gf2.Gf2.from_repr (r : Std.U8) : RustM gf2.Gf2 := do
+  gf2.Gf2.raw_from_repr r
+
+/-- [p3_binary_field::gf2::{p3_binary_field::gf2::Gf2}::to_repr]:
+    Source: 'binary-field/src/gf2.rs', lines 150:4-152:5 -/
+def gf2.Gf2.to_repr (self : gf2.Gf2) : RustM Std.U8 := do
+  gf2.Gf2.raw_to_repr self
+
+/-- [p3_binary_field::gf2::{p3_binary_field::gf2::Gf2}::mul_alpha]:
+    Source: 'binary-field/src/gf2.rs', lines 158:4-160:5 -/
+def gf2.Gf2.mul_alpha (self : gf2.Gf2) : RustM gf2.Gf2 := do
+  gf2.Gf2.raw_mul_alpha self
+
+/-- [p3_binary_field::gf2::{impl core::ops::arith::Add<p3_binary_field::gf2::Gf2, p3_binary_field::gf2::Gf2> for p3_binary_field::gf2::Gf2}::add]:
+    Source: 'binary-field/src/gf2.rs', lines 383:4-386:5
+    Visibility: public -/
+def gf2.Gf2.Insts.CoreOpsArithAddGf2Gf2.add
+  (self : gf2.Gf2) (rhs : gf2.Gf2) : RustM gf2.Gf2 := do
+  let i ← lift (self ^^^ rhs)
+  ok i
+
+/-- [p3_binary_field::gf2::{impl core::ops::arith::Sub<p3_binary_field::gf2::Gf2, p3_binary_field::gf2::Gf2> for p3_binary_field::gf2::Gf2}::sub]:
+    Source: 'binary-field/src/gf2.rs', lines 394:4-397:5
+    Visibility: public -/
+def gf2.Gf2.Insts.CoreOpsArithSubGf2Gf2.sub
+  (self : gf2.Gf2) (rhs : gf2.Gf2) : RustM gf2.Gf2 := do
+  gf2.Gf2.Insts.CoreOpsArithAddGf2Gf2.add self rhs
+
+/-- [p3_binary_field::gf2::{impl core::ops::arith::Neg<p3_binary_field::gf2::Gf2> for p3_binary_field::gf2::Gf2}::neg]:
+    Source: 'binary-field/src/gf2.rs', lines 404:4-407:5
+    Visibility: public -/
+def gf2.Gf2.Insts.CoreOpsArithNegGf2.neg (self : gf2.Gf2) : RustM gf2.Gf2 := do
+  ok self
+
+/-- [p3_binary_field::ghash::{impl core::ops::arith::Add<p3_binary_field::ghash::Ghash128, p3_binary_field::ghash::Ghash128> for p3_binary_field::ghash::Ghash128}::add]:
+    Source: 'binary-field/src/ghash.rs', lines 511:4-531:5
+    Visibility: public -/
+def ghash.Ghash128.Insts.CoreOpsArithAddGhash128Ghash128.add
+  (self : ghash.Ghash128) (rhs : ghash.Ghash128) : RustM ghash.Ghash128 := do
+  let i ← lift (self ^^^ rhs)
+  ok i
+
+/-- [p3_binary_field::ghash::{impl core::ops::arith::Sub<p3_binary_field::ghash::Ghash128, p3_binary_field::ghash::Ghash128> for p3_binary_field::ghash::Ghash128}::sub]:
+    Source: 'binary-field/src/ghash.rs', lines 539:4-542:5
+    Visibility: public -/
+def ghash.Ghash128.Insts.CoreOpsArithSubGhash128Ghash128.sub
+  (self : ghash.Ghash128) (rhs : ghash.Ghash128) : RustM ghash.Ghash128 := do
+  ghash.Ghash128.Insts.CoreOpsArithAddGhash128Ghash128.add self rhs
+
+/-- [p3_binary_field::ghash::{impl core::ops::arith::Neg<p3_binary_field::ghash::Ghash128> for p3_binary_field::ghash::Ghash128}::neg]:
+    Source: 'binary-field/src/ghash.rs', lines 549:4-552:5
+    Visibility: public -/
+def ghash.Ghash128.Insts.CoreOpsArithNegGhash128.neg
+  (self : ghash.Ghash128) : RustM ghash.Ghash128 := do
+  ok self
+
+/-- [p3_binary_field::ghash::{impl core::ops::arith::Mul<p3_binary_field::ghash::Ghash128, p3_binary_field::ghash::Ghash128> for p3_binary_field::ghash::Ghash128}::mul]:
+    Source: 'binary-field/src/ghash.rs', lines 559:4-561:5
+    Visibility: public -/
+def ghash.Ghash128.Insts.CoreOpsArithMulGhash128Ghash128.mul
+  (self : ghash.Ghash128) (rhs : ghash.Ghash128) : RustM ghash.Ghash128 := do
+  let i ← clmul.portable.poly_mul_128 self rhs
+  ok i
+
+/-- [p3_binary_field::hax_roots::gf2_add]:
+    Source: 'binary-field/src/hax_roots.rs', lines 15:0-17:1
+    Visibility: public -/
+def hax_roots.gf2_add (a : gf2.Gf2) (b : gf2.Gf2) : RustM gf2.Gf2 := do
+  gf2.Gf2.Insts.CoreOpsArithAddGf2Gf2.add a b
+
+/-- [p3_binary_field::hax_roots::gf2_sub]:
+    Source: 'binary-field/src/hax_roots.rs', lines 19:0-21:1
+    Visibility: public -/
+def hax_roots.gf2_sub (a : gf2.Gf2) (b : gf2.Gf2) : RustM gf2.Gf2 := do
+  gf2.Gf2.Insts.CoreOpsArithSubGf2Gf2.sub a b
+
+/-- [p3_binary_field::hax_roots::gf2_neg]:
+    Source: 'binary-field/src/hax_roots.rs', lines 23:0-25:1
+    Visibility: public -/
+def hax_roots.gf2_neg (a : gf2.Gf2) : RustM gf2.Gf2 := do
+  gf2.Gf2.Insts.CoreOpsArithNegGf2.neg a
+
+/-- [p3_binary_field::hax_roots::gf2_mul]:
+    Source: 'binary-field/src/hax_roots.rs', lines 27:0-29:1
+    Visibility: public -/
+def hax_roots.gf2_mul (a : gf2.Gf2) (b : gf2.Gf2) : RustM gf2.Gf2 := do
+  gf2.Gf2.Insts.CoreOpsArithMulGf2Gf2.mul a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Add<p3_binary_field::tower::BinaryField2, p3_binary_field::tower::BinaryField2> for p3_binary_field::tower::BinaryField2}::add]:
+    Source: 'binary-field/src/tower.rs', lines 601:12-604:13
+    Visibility: public -/
+def tower.BinaryField2.Insts.CoreOpsArithAddBinaryField2BinaryField2.add
+  (self : tower.BinaryField2) (rhs : tower.BinaryField2) :
+  RustM tower.BinaryField2
+  := do
+  let i ← lift (self ^^^ rhs)
+  ok i
+
+/-- [p3_binary_field::hax_roots::bf2_add]:
+    Source: 'binary-field/src/hax_roots.rs', lines 33:0-35:1
+    Visibility: public -/
+def hax_roots.bf2_add
+  (a : tower.BinaryField2) (b : tower.BinaryField2) :
+  RustM tower.BinaryField2
+  := do
+  tower.BinaryField2.Insts.CoreOpsArithAddBinaryField2BinaryField2.add a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Sub<p3_binary_field::tower::BinaryField2, p3_binary_field::tower::BinaryField2> for p3_binary_field::tower::BinaryField2}::sub]:
+    Source: 'binary-field/src/tower.rs', lines 612:12-615:13
+    Visibility: public -/
+def tower.BinaryField2.Insts.CoreOpsArithSubBinaryField2BinaryField2.sub
+  (self : tower.BinaryField2) (rhs : tower.BinaryField2) :
+  RustM tower.BinaryField2
+  := do
+  tower.BinaryField2.Insts.CoreOpsArithAddBinaryField2BinaryField2.add self rhs
+
+/-- [p3_binary_field::hax_roots::bf2_sub]:
+    Source: 'binary-field/src/hax_roots.rs', lines 37:0-39:1
+    Visibility: public -/
+def hax_roots.bf2_sub
+  (a : tower.BinaryField2) (b : tower.BinaryField2) :
+  RustM tower.BinaryField2
+  := do
+  tower.BinaryField2.Insts.CoreOpsArithSubBinaryField2BinaryField2.sub a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Neg<p3_binary_field::tower::BinaryField2> for p3_binary_field::tower::BinaryField2}::neg]:
+    Source: 'binary-field/src/tower.rs', lines 622:12-625:13
+    Visibility: public -/
+def tower.BinaryField2.Insts.CoreOpsArithNegBinaryField2.neg
+  (self : tower.BinaryField2) : RustM tower.BinaryField2 := do
+  ok self
+
+/-- [p3_binary_field::hax_roots::bf2_neg]:
+    Source: 'binary-field/src/hax_roots.rs', lines 41:0-43:1
+    Visibility: public -/
+def hax_roots.bf2_neg (a : tower.BinaryField2) : RustM tower.BinaryField2 := do
+  tower.BinaryField2.Insts.CoreOpsArithNegBinaryField2.neg a
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField2}::HALF_BITS]
+    Source: 'binary-field/src/tower.rs', lines 148:12-148:47 -/
 @[global_simps, irreducible]
-def tables.LOG : Array Std.U8 256#usize :=
-  Array.make 256#usize [
-    0#u8, 0#u8, 170#u8, 85#u8, 204#u8, 187#u8, 51#u8, 238#u8, 119#u8, 153#u8,
-    102#u8, 221#u8, 34#u8, 136#u8, 68#u8, 17#u8, 210#u8, 207#u8, 141#u8, 1#u8,
-    45#u8, 252#u8, 216#u8, 16#u8, 157#u8, 83#u8, 110#u8, 78#u8, 217#u8, 53#u8,
-    230#u8, 228#u8, 125#u8, 171#u8, 122#u8, 56#u8, 132#u8, 143#u8, 223#u8,
-    145#u8, 215#u8, 186#u8, 167#u8, 131#u8, 72#u8, 248#u8, 253#u8, 25#u8,
-    40#u8, 226#u8, 86#u8, 37#u8, 242#u8, 195#u8, 163#u8, 168#u8, 47#u8, 60#u8,
-    58#u8, 138#u8, 130#u8, 46#u8, 101#u8, 82#u8, 159#u8, 165#u8, 27#u8, 2#u8,
-    156#u8, 220#u8, 59#u8, 166#u8, 90#u8, 249#u8, 32#u8, 177#u8, 205#u8,
-    201#u8, 106#u8, 179#u8, 142#u8, 162#u8, 203#u8, 15#u8, 160#u8, 139#u8,
-    89#u8, 148#u8, 184#u8, 10#u8, 73#u8, 149#u8, 42#u8, 232#u8, 240#u8, 188#u8,
-    6#u8, 96#u8, 208#u8, 13#u8, 134#u8, 104#u8, 3#u8, 48#u8, 26#u8, 161#u8,
-    12#u8, 192#u8, 67#u8, 52#u8, 24#u8, 129#u8, 193#u8, 211#u8, 235#u8, 93#u8,
-    61#u8, 28#u8, 213#u8, 190#u8, 36#u8, 124#u8, 140#u8, 254#u8, 199#u8, 66#u8,
-    239#u8, 200#u8, 74#u8, 172#u8, 80#u8, 197#u8, 120#u8, 94#u8, 116#u8, 21#u8,
-    71#u8, 81#u8, 135#u8, 229#u8, 5#u8, 92#u8, 164#u8, 202#u8, 108#u8, 8#u8,
-    126#u8, 150#u8, 114#u8, 115#u8, 236#u8, 154#u8, 231#u8, 105#u8, 198#u8,
-    128#u8, 206#u8, 169#u8, 39#u8, 55#u8, 57#u8, 185#u8, 77#u8, 118#u8, 212#u8,
-    103#u8, 147#u8, 155#u8, 75#u8, 63#u8, 54#u8, 4#u8, 99#u8, 64#u8, 180#u8,
-    243#u8, 176#u8, 183#u8, 11#u8, 123#u8, 237#u8, 44#u8, 222#u8, 194#u8,
-    49#u8, 218#u8, 19#u8, 173#u8, 196#u8, 107#u8, 76#u8, 182#u8, 244#u8,
-    112#u8, 87#u8, 250#u8, 175#u8, 117#u8, 7#u8, 79#u8, 35#u8, 191#u8, 9#u8,
-    31#u8, 241#u8, 144#u8, 251#u8, 50#u8, 91#u8, 38#u8, 98#u8, 181#u8, 111#u8,
-    97#u8, 22#u8, 246#u8, 152#u8, 109#u8, 214#u8, 137#u8, 219#u8, 88#u8,
-    133#u8, 189#u8, 23#u8, 65#u8, 178#u8, 41#u8, 121#u8, 225#u8, 84#u8, 209#u8,
-    29#u8, 69#u8, 30#u8, 151#u8, 146#u8, 43#u8, 20#u8, 113#u8, 227#u8, 33#u8,
-    100#u8, 247#u8, 14#u8, 158#u8, 234#u8, 95#u8, 127#u8, 70#u8, 18#u8, 62#u8,
-    245#u8, 174#u8, 233#u8, 224#u8
-    ]
+def tower.BinaryField2.HALF_BITS : RustM Std.Usize := 2#usize / 2#usize
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField2}::join]:
+    Source: 'binary-field/src/tower.rs', lines 222:12-224:13 -/
+def tower.BinaryField2.join
+  (a0 : gf2.Gf2) (a1 : gf2.Gf2) : RustM tower.BinaryField2 := do
+  let i ← gf2.Gf2.to_repr a0
+  let i1 ← gf2.Gf2.to_repr a1
+  let i2 ← tower.BinaryField2.HALF_BITS
+  let i3 ← i1 <<< i2
+  let i4 ← lift (i ||| i3)
+  ok i4
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField2}::MASK]
+    Source: 'binary-field/src/tower.rs', lines 145:12-145:81 -/
+@[global_simps, irreducible]
+def tower.BinaryField2.MASK : RustM Std.U8 := do
+  let i ← lift (UScalar.cast .Usize core.num.U8.BITS)
+  let i1 ← i - 2#usize
+  core.num.U8.MAX >>> i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField2}::HALF_MASK]
+    Source: 'binary-field/src/tower.rs', lines 151:12-151:67 -/
+@[global_simps, irreducible]
+def tower.BinaryField2.HALF_MASK : RustM Std.U8 := do
+  let i ← tower.BinaryField2.MASK
+  let i1 ← tower.BinaryField2.HALF_BITS
+  i >>> i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField2}::split]:
+    Source: 'binary-field/src/tower.rs', lines 214:12-218:13 -/
+def tower.BinaryField2.split
+  (self : tower.BinaryField2) : RustM (gf2.Gf2 × gf2.Gf2) := do
+  let i ← tower.BinaryField2.HALF_MASK
+  let a0 ← lift (self &&& i)
+  let i1 ← tower.BinaryField2.HALF_BITS
+  let a1 ← self >>> i1
+  let g ← gf2.Gf2.from_repr a0
+  let g1 ← gf2.Gf2.from_repr a1
+  ok (g, g1)
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField2}::reference_mul]:
+    Source: 'binary-field/src/tower.rs', lines 236:12-243:13
+    Visibility: public -/
+def tower.BinaryField2.reference_mul
+  (self : tower.BinaryField2) (rhs : tower.BinaryField2) :
+  RustM tower.BinaryField2
+  := do
+  let (a0, a1) ← tower.BinaryField2.split self
+  let (b0, b1) ← tower.BinaryField2.split rhs
+  let z0 ← gf2.Gf2.reference_mul a0 b0
+  let z2 ← gf2.Gf2.reference_mul a1 b1
+  let g ← gf2.Gf2.Insts.CoreOpsArithAddGf2Gf2.add a0 a1
+  let g1 ← gf2.Gf2.Insts.CoreOpsArithAddGf2Gf2.add b0 b1
+  let g2 ← gf2.Gf2.reference_mul g g1
+  let g3 ← gf2.Gf2.Insts.CoreOpsArithAddGf2Gf2.add g2 z0
+  let z1 ← gf2.Gf2.Insts.CoreOpsArithAddGf2Gf2.add g3 z2
+  let g4 ← gf2.Gf2.Insts.CoreOpsArithAddGf2Gf2.add z0 z2
+  let g5 ← gf2.Gf2.mul_alpha z2
+  let g6 ← gf2.Gf2.Insts.CoreOpsArithAddGf2Gf2.add z1 g5
+  tower.BinaryField2.join g4 g6
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField2, p3_binary_field::tower::BinaryField2> for p3_binary_field::tower::BinaryField2}::mul]:
+    Source: 'binary-field/src/tower.rs', lines 632:12-634:13
+    Visibility: public -/
+def tower.BinaryField2.Insts.CoreOpsArithMulBinaryField2BinaryField2.mul
+  (self : tower.BinaryField2) (rhs : tower.BinaryField2) :
+  RustM tower.BinaryField2
+  := do
+  tower.BinaryField2.reference_mul self rhs
+
+/-- [p3_binary_field::hax_roots::bf2_mul]:
+    Source: 'binary-field/src/hax_roots.rs', lines 45:0-47:1
+    Visibility: public -/
+def hax_roots.bf2_mul
+  (a : tower.BinaryField2) (b : tower.BinaryField2) :
+  RustM tower.BinaryField2
+  := do
+  tower.BinaryField2.Insts.CoreOpsArithMulBinaryField2BinaryField2.mul a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Add<p3_binary_field::tower::BinaryField4, p3_binary_field::tower::BinaryField4> for p3_binary_field::tower::BinaryField4}::add]:
+    Source: 'binary-field/src/tower.rs', lines 601:12-604:13
+    Visibility: public -/
+def tower.BinaryField4.Insts.CoreOpsArithAddBinaryField4BinaryField4.add
+  (self : tower.BinaryField4) (rhs : tower.BinaryField4) :
+  RustM tower.BinaryField4
+  := do
+  let i ← lift (self ^^^ rhs)
+  ok i
+
+/-- [p3_binary_field::hax_roots::bf4_add]:
+    Source: 'binary-field/src/hax_roots.rs', lines 51:0-53:1
+    Visibility: public -/
+def hax_roots.bf4_add
+  (a : tower.BinaryField4) (b : tower.BinaryField4) :
+  RustM tower.BinaryField4
+  := do
+  tower.BinaryField4.Insts.CoreOpsArithAddBinaryField4BinaryField4.add a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Sub<p3_binary_field::tower::BinaryField4, p3_binary_field::tower::BinaryField4> for p3_binary_field::tower::BinaryField4}::sub]:
+    Source: 'binary-field/src/tower.rs', lines 612:12-615:13
+    Visibility: public -/
+def tower.BinaryField4.Insts.CoreOpsArithSubBinaryField4BinaryField4.sub
+  (self : tower.BinaryField4) (rhs : tower.BinaryField4) :
+  RustM tower.BinaryField4
+  := do
+  tower.BinaryField4.Insts.CoreOpsArithAddBinaryField4BinaryField4.add self rhs
+
+/-- [p3_binary_field::hax_roots::bf4_sub]:
+    Source: 'binary-field/src/hax_roots.rs', lines 55:0-57:1
+    Visibility: public -/
+def hax_roots.bf4_sub
+  (a : tower.BinaryField4) (b : tower.BinaryField4) :
+  RustM tower.BinaryField4
+  := do
+  tower.BinaryField4.Insts.CoreOpsArithSubBinaryField4BinaryField4.sub a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Neg<p3_binary_field::tower::BinaryField4> for p3_binary_field::tower::BinaryField4}::neg]:
+    Source: 'binary-field/src/tower.rs', lines 622:12-625:13
+    Visibility: public -/
+def tower.BinaryField4.Insts.CoreOpsArithNegBinaryField4.neg
+  (self : tower.BinaryField4) : RustM tower.BinaryField4 := do
+  ok self
+
+/-- [p3_binary_field::hax_roots::bf4_neg]:
+    Source: 'binary-field/src/hax_roots.rs', lines 59:0-61:1
+    Visibility: public -/
+def hax_roots.bf4_neg (a : tower.BinaryField4) : RustM tower.BinaryField4 := do
+  tower.BinaryField4.Insts.CoreOpsArithNegBinaryField4.neg a
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField2}::raw_to_repr]:
+    Source: 'binary-field/src/tower.rs', lines 177:12-179:13 -/
+def tower.BinaryField2.raw_to_repr
+  (self : tower.BinaryField2) : RustM Std.U8 := do
+  ok self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField2}::to_repr]:
+    Source: 'binary-field/src/tower.rs', lines 200:12-202:13 -/
+def tower.BinaryField2.to_repr (self : tower.BinaryField2) : RustM Std.U8 := do
+  tower.BinaryField2.raw_to_repr self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField4}::HALF_BITS]
+    Source: 'binary-field/src/tower.rs', lines 148:12-148:47 -/
+@[global_simps, irreducible]
+def tower.BinaryField4.HALF_BITS : RustM Std.Usize := 4#usize / 2#usize
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField4}::join]:
+    Source: 'binary-field/src/tower.rs', lines 222:12-224:13 -/
+def tower.BinaryField4.join
+  (a0 : tower.BinaryField2) (a1 : tower.BinaryField2) :
+  RustM tower.BinaryField4
+  := do
+  let i ← tower.BinaryField2.to_repr a0
+  let i1 ← tower.BinaryField2.to_repr a1
+  let i2 ← tower.BinaryField4.HALF_BITS
+  let i3 ← i1 <<< i2
+  let i4 ← lift (i ||| i3)
+  ok i4
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField2}::raw_from_repr]:
+    Source: 'binary-field/src/tower.rs', lines 171:12-173:13 -/
+def tower.BinaryField2.raw_from_repr
+  (r : Std.U8) : RustM tower.BinaryField2 := do
+  let i ← tower.BinaryField2.MASK
+  let i1 ← lift (r &&& i)
+  ok i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField2}::from_repr]:
+    Source: 'binary-field/src/tower.rs', lines 192:12-194:13 -/
+def tower.BinaryField2.from_repr (r : Std.U8) : RustM tower.BinaryField2 := do
+  tower.BinaryField2.raw_from_repr r
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField4}::MASK]
+    Source: 'binary-field/src/tower.rs', lines 145:12-145:81 -/
+@[global_simps, irreducible]
+def tower.BinaryField4.MASK : RustM Std.U8 := do
+  let i ← lift (UScalar.cast .Usize core.num.U8.BITS)
+  let i1 ← i - 4#usize
+  core.num.U8.MAX >>> i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField4}::HALF_MASK]
+    Source: 'binary-field/src/tower.rs', lines 151:12-151:67 -/
+@[global_simps, irreducible]
+def tower.BinaryField4.HALF_MASK : RustM Std.U8 := do
+  let i ← tower.BinaryField4.MASK
+  let i1 ← tower.BinaryField4.HALF_BITS
+  i >>> i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField4}::split]:
+    Source: 'binary-field/src/tower.rs', lines 214:12-218:13 -/
+def tower.BinaryField4.split
+  (self : tower.BinaryField4) :
+  RustM (tower.BinaryField2 × tower.BinaryField2)
+  := do
+  let i ← tower.BinaryField4.HALF_MASK
+  let a0 ← lift (self &&& i)
+  let i1 ← tower.BinaryField4.HALF_BITS
+  let a1 ← self >>> i1
+  let bf ← tower.BinaryField2.from_repr a0
+  let bf1 ← tower.BinaryField2.from_repr a1
+  ok (bf, bf1)
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField2}::raw_mul_alpha]:
+    Source: 'binary-field/src/tower.rs', lines 183:12-186:13 -/
+def tower.BinaryField2.raw_mul_alpha
+  (self : tower.BinaryField2) : RustM tower.BinaryField2 := do
+  let (c0, c1) ← tower.BinaryField2.split self
+  let g ← gf2.Gf2.raw_mul_alpha c1
+  let g1 ← gf2.Gf2.Insts.CoreOpsArithAddGf2Gf2.add c0 g
+  tower.BinaryField2.join c1 g1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField2}::mul_alpha]:
+    Source: 'binary-field/src/tower.rs', lines 208:12-210:13 -/
+def tower.BinaryField2.mul_alpha
+  (self : tower.BinaryField2) : RustM tower.BinaryField2 := do
+  tower.BinaryField2.raw_mul_alpha self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField4}::reference_mul]:
+    Source: 'binary-field/src/tower.rs', lines 236:12-243:13
+    Visibility: public -/
+def tower.BinaryField4.reference_mul
+  (self : tower.BinaryField4) (rhs : tower.BinaryField4) :
+  RustM tower.BinaryField4
+  := do
+  let (a0, a1) ← tower.BinaryField4.split self
+  let (b0, b1) ← tower.BinaryField4.split rhs
+  let z0 ← tower.BinaryField2.reference_mul a0 b0
+  let z2 ← tower.BinaryField2.reference_mul a1 b1
+  let bf ←
+    tower.BinaryField2.Insts.CoreOpsArithAddBinaryField2BinaryField2.add a0 a1
+  let bf1 ←
+    tower.BinaryField2.Insts.CoreOpsArithAddBinaryField2BinaryField2.add b0 b1
+  let bf2 ← tower.BinaryField2.reference_mul bf bf1
+  let bf3 ←
+    tower.BinaryField2.Insts.CoreOpsArithAddBinaryField2BinaryField2.add bf2 z0
+  let z1 ←
+    tower.BinaryField2.Insts.CoreOpsArithAddBinaryField2BinaryField2.add bf3 z2
+  let bf4 ←
+    tower.BinaryField2.Insts.CoreOpsArithAddBinaryField2BinaryField2.add z0 z2
+  let bf5 ← tower.BinaryField2.mul_alpha z2
+  let bf6 ←
+    tower.BinaryField2.Insts.CoreOpsArithAddBinaryField2BinaryField2.add z1 bf5
+  tower.BinaryField4.join bf4 bf6
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField4, p3_binary_field::tower::BinaryField4> for p3_binary_field::tower::BinaryField4}::mul]:
+    Source: 'binary-field/src/tower.rs', lines 632:12-634:13
+    Visibility: public -/
+def tower.BinaryField4.Insts.CoreOpsArithMulBinaryField4BinaryField4.mul
+  (self : tower.BinaryField4) (rhs : tower.BinaryField4) :
+  RustM tower.BinaryField4
+  := do
+  tower.BinaryField4.reference_mul self rhs
+
+/-- [p3_binary_field::hax_roots::bf4_mul]:
+    Source: 'binary-field/src/hax_roots.rs', lines 63:0-65:1
+    Visibility: public -/
+def hax_roots.bf4_mul
+  (a : tower.BinaryField4) (b : tower.BinaryField4) :
+  RustM tower.BinaryField4
+  := do
+  tower.BinaryField4.Insts.CoreOpsArithMulBinaryField4BinaryField4.mul a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Add<p3_binary_field::tower::BinaryField8, p3_binary_field::tower::BinaryField8> for p3_binary_field::tower::BinaryField8}::add]:
+    Source: 'binary-field/src/tower.rs', lines 601:12-604:13
+    Visibility: public -/
+def tower.BinaryField8.Insts.CoreOpsArithAddBinaryField8BinaryField8.add
+  (self : tower.BinaryField8) (rhs : tower.BinaryField8) :
+  RustM tower.BinaryField8
+  := do
+  let i ← lift (self ^^^ rhs)
+  ok i
+
+/-- [p3_binary_field::hax_roots::bf8_add]:
+    Source: 'binary-field/src/hax_roots.rs', lines 69:0-71:1
+    Visibility: public -/
+def hax_roots.bf8_add
+  (a : tower.BinaryField8) (b : tower.BinaryField8) :
+  RustM tower.BinaryField8
+  := do
+  tower.BinaryField8.Insts.CoreOpsArithAddBinaryField8BinaryField8.add a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Sub<p3_binary_field::tower::BinaryField8, p3_binary_field::tower::BinaryField8> for p3_binary_field::tower::BinaryField8}::sub]:
+    Source: 'binary-field/src/tower.rs', lines 612:12-615:13
+    Visibility: public -/
+def tower.BinaryField8.Insts.CoreOpsArithSubBinaryField8BinaryField8.sub
+  (self : tower.BinaryField8) (rhs : tower.BinaryField8) :
+  RustM tower.BinaryField8
+  := do
+  tower.BinaryField8.Insts.CoreOpsArithAddBinaryField8BinaryField8.add self rhs
+
+/-- [p3_binary_field::hax_roots::bf8_sub]:
+    Source: 'binary-field/src/hax_roots.rs', lines 73:0-75:1
+    Visibility: public -/
+def hax_roots.bf8_sub
+  (a : tower.BinaryField8) (b : tower.BinaryField8) :
+  RustM tower.BinaryField8
+  := do
+  tower.BinaryField8.Insts.CoreOpsArithSubBinaryField8BinaryField8.sub a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Neg<p3_binary_field::tower::BinaryField8> for p3_binary_field::tower::BinaryField8}::neg]:
+    Source: 'binary-field/src/tower.rs', lines 622:12-625:13
+    Visibility: public -/
+def tower.BinaryField8.Insts.CoreOpsArithNegBinaryField8.neg
+  (self : tower.BinaryField8) : RustM tower.BinaryField8 := do
+  ok self
+
+/-- [p3_binary_field::hax_roots::bf8_neg]:
+    Source: 'binary-field/src/hax_roots.rs', lines 77:0-79:1
+    Visibility: public -/
+def hax_roots.bf8_neg (a : tower.BinaryField8) : RustM tower.BinaryField8 := do
+  tower.BinaryField8.Insts.CoreOpsArithNegBinaryField8.neg a
 
 /-- [p3_binary_field::tables::EXP]
     Source: 'binary-field/src/tables.rs', lines 45:0-78:2 -/
@@ -676,6 +1793,1228 @@ def tables.EXP : Array Std.U8 511#usize :=
     150#u8, 180#u8, 7#u8, 126#u8, 94#u8, 204#u8, 52#u8, 175#u8, 192#u8, 252#u8,
     215#u8, 243#u8, 45#u8, 73#u8, 195#u8, 206#u8, 21#u8, 46#u8, 123#u8, 1#u8
     ]
+
+/-- [p3_binary_field::tables::LOG]
+    Source: 'binary-field/src/tables.rs', lines 20:0-37:2 -/
+@[global_simps, irreducible]
+def tables.LOG : Array Std.U8 256#usize :=
+  Array.make 256#usize [
+    0#u8, 0#u8, 170#u8, 85#u8, 204#u8, 187#u8, 51#u8, 238#u8, 119#u8, 153#u8,
+    102#u8, 221#u8, 34#u8, 136#u8, 68#u8, 17#u8, 210#u8, 207#u8, 141#u8, 1#u8,
+    45#u8, 252#u8, 216#u8, 16#u8, 157#u8, 83#u8, 110#u8, 78#u8, 217#u8, 53#u8,
+    230#u8, 228#u8, 125#u8, 171#u8, 122#u8, 56#u8, 132#u8, 143#u8, 223#u8,
+    145#u8, 215#u8, 186#u8, 167#u8, 131#u8, 72#u8, 248#u8, 253#u8, 25#u8,
+    40#u8, 226#u8, 86#u8, 37#u8, 242#u8, 195#u8, 163#u8, 168#u8, 47#u8, 60#u8,
+    58#u8, 138#u8, 130#u8, 46#u8, 101#u8, 82#u8, 159#u8, 165#u8, 27#u8, 2#u8,
+    156#u8, 220#u8, 59#u8, 166#u8, 90#u8, 249#u8, 32#u8, 177#u8, 205#u8,
+    201#u8, 106#u8, 179#u8, 142#u8, 162#u8, 203#u8, 15#u8, 160#u8, 139#u8,
+    89#u8, 148#u8, 184#u8, 10#u8, 73#u8, 149#u8, 42#u8, 232#u8, 240#u8, 188#u8,
+    6#u8, 96#u8, 208#u8, 13#u8, 134#u8, 104#u8, 3#u8, 48#u8, 26#u8, 161#u8,
+    12#u8, 192#u8, 67#u8, 52#u8, 24#u8, 129#u8, 193#u8, 211#u8, 235#u8, 93#u8,
+    61#u8, 28#u8, 213#u8, 190#u8, 36#u8, 124#u8, 140#u8, 254#u8, 199#u8, 66#u8,
+    239#u8, 200#u8, 74#u8, 172#u8, 80#u8, 197#u8, 120#u8, 94#u8, 116#u8, 21#u8,
+    71#u8, 81#u8, 135#u8, 229#u8, 5#u8, 92#u8, 164#u8, 202#u8, 108#u8, 8#u8,
+    126#u8, 150#u8, 114#u8, 115#u8, 236#u8, 154#u8, 231#u8, 105#u8, 198#u8,
+    128#u8, 206#u8, 169#u8, 39#u8, 55#u8, 57#u8, 185#u8, 77#u8, 118#u8, 212#u8,
+    103#u8, 147#u8, 155#u8, 75#u8, 63#u8, 54#u8, 4#u8, 99#u8, 64#u8, 180#u8,
+    243#u8, 176#u8, 183#u8, 11#u8, 123#u8, 237#u8, 44#u8, 222#u8, 194#u8,
+    49#u8, 218#u8, 19#u8, 173#u8, 196#u8, 107#u8, 76#u8, 182#u8, 244#u8,
+    112#u8, 87#u8, 250#u8, 175#u8, 117#u8, 7#u8, 79#u8, 35#u8, 191#u8, 9#u8,
+    31#u8, 241#u8, 144#u8, 251#u8, 50#u8, 91#u8, 38#u8, 98#u8, 181#u8, 111#u8,
+    97#u8, 22#u8, 246#u8, 152#u8, 109#u8, 214#u8, 137#u8, 219#u8, 88#u8,
+    133#u8, 189#u8, 23#u8, 65#u8, 178#u8, 41#u8, 121#u8, 225#u8, 84#u8, 209#u8,
+    29#u8, 69#u8, 30#u8, 151#u8, 146#u8, 43#u8, 20#u8, 113#u8, 227#u8, 33#u8,
+    100#u8, 247#u8, 14#u8, 158#u8, 234#u8, 95#u8, 127#u8, 70#u8, 18#u8, 62#u8,
+    245#u8, 174#u8, 233#u8, 224#u8
+    ]
+
+/-- [p3_binary_field::tables::mul]:
+    Source: 'binary-field/src/tables.rs', lines 103:0-110:1 -/
+def tables.mul (a : Std.U8) (b : Std.U8) : RustM Std.U8 := do
+  let i ← lift (UScalar.cast .Usize a)
+  let i1 ← Array.index_usize tables.LOG i
+  let i2 ← lift (UScalar.cast .Usize i1)
+  let i3 ← lift (UScalar.cast .Usize b)
+  let i4 ← Array.index_usize tables.LOG i3
+  let i5 ← lift (UScalar.cast .Usize i4)
+  let exponent ← i2 + i5
+  let i6 ← lift (UScalar.cast_fromBool .U8 (a != 0#u8))
+  let i7 ← lift (UScalar.cast_fromBool .U8 (b != 0#u8))
+  let i8 ← lift (i6 &&& i7)
+  let both_nonzero ← core.num.U8.wrapping_sub 0#u8 i8
+  let i9 ← Array.index_usize tables.EXP exponent
+  ok (i9 &&& both_nonzero)
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField8}::table_mul]:
+    Source: 'binary-field/src/tower.rs', lines 793:4-795:5 -/
+def tower.BinaryField8.table_mul
+  (self : tower.BinaryField8) (rhs : tower.BinaryField8) :
+  RustM tower.BinaryField8
+  := do
+  let i ← tables.mul self rhs
+  ok i
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField8, p3_binary_field::tower::BinaryField8> for p3_binary_field::tower::BinaryField8}::mul]:
+    Source: 'binary-field/src/tower.rs', lines 632:12-634:13
+    Visibility: public -/
+def tower.BinaryField8.Insts.CoreOpsArithMulBinaryField8BinaryField8.mul
+  (self : tower.BinaryField8) (rhs : tower.BinaryField8) :
+  RustM tower.BinaryField8
+  := do
+  tower.BinaryField8.table_mul self rhs
+
+/-- [p3_binary_field::hax_roots::bf8_mul]:
+    Source: 'binary-field/src/hax_roots.rs', lines 81:0-83:1
+    Visibility: public -/
+def hax_roots.bf8_mul
+  (a : tower.BinaryField8) (b : tower.BinaryField8) :
+  RustM tower.BinaryField8
+  := do
+  tower.BinaryField8.Insts.CoreOpsArithMulBinaryField8BinaryField8.mul a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Add<p3_binary_field::tower::BinaryField16, p3_binary_field::tower::BinaryField16> for p3_binary_field::tower::BinaryField16}::add]:
+    Source: 'binary-field/src/tower.rs', lines 601:12-604:13
+    Visibility: public -/
+def tower.BinaryField16.Insts.CoreOpsArithAddBinaryField16BinaryField16.add
+  (self : tower.BinaryField16) (rhs : tower.BinaryField16) :
+  RustM tower.BinaryField16
+  := do
+  let i ← lift (self ^^^ rhs)
+  ok i
+
+/-- [p3_binary_field::hax_roots::bf16_add]:
+    Source: 'binary-field/src/hax_roots.rs', lines 87:0-89:1
+    Visibility: public -/
+def hax_roots.bf16_add
+  (a : tower.BinaryField16) (b : tower.BinaryField16) :
+  RustM tower.BinaryField16
+  := do
+  tower.BinaryField16.Insts.CoreOpsArithAddBinaryField16BinaryField16.add a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Sub<p3_binary_field::tower::BinaryField16, p3_binary_field::tower::BinaryField16> for p3_binary_field::tower::BinaryField16}::sub]:
+    Source: 'binary-field/src/tower.rs', lines 612:12-615:13
+    Visibility: public -/
+def tower.BinaryField16.Insts.CoreOpsArithSubBinaryField16BinaryField16.sub
+  (self : tower.BinaryField16) (rhs : tower.BinaryField16) :
+  RustM tower.BinaryField16
+  := do
+  tower.BinaryField16.Insts.CoreOpsArithAddBinaryField16BinaryField16.add self
+    rhs
+
+/-- [p3_binary_field::hax_roots::bf16_sub]:
+    Source: 'binary-field/src/hax_roots.rs', lines 91:0-93:1
+    Visibility: public -/
+def hax_roots.bf16_sub
+  (a : tower.BinaryField16) (b : tower.BinaryField16) :
+  RustM tower.BinaryField16
+  := do
+  tower.BinaryField16.Insts.CoreOpsArithSubBinaryField16BinaryField16.sub a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Neg<p3_binary_field::tower::BinaryField16> for p3_binary_field::tower::BinaryField16}::neg]:
+    Source: 'binary-field/src/tower.rs', lines 622:12-625:13
+    Visibility: public -/
+def tower.BinaryField16.Insts.CoreOpsArithNegBinaryField16.neg
+  (self : tower.BinaryField16) : RustM tower.BinaryField16 := do
+  ok self
+
+/-- [p3_binary_field::hax_roots::bf16_neg]:
+    Source: 'binary-field/src/hax_roots.rs', lines 95:0-97:1
+    Visibility: public -/
+def hax_roots.bf16_neg
+  (a : tower.BinaryField16) : RustM tower.BinaryField16 := do
+  tower.BinaryField16.Insts.CoreOpsArithNegBinaryField16.neg a
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField8}::raw_to_repr]:
+    Source: 'binary-field/src/tower.rs', lines 177:12-179:13 -/
+def tower.BinaryField8.raw_to_repr
+  (self : tower.BinaryField8) : RustM Std.U8 := do
+  ok self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField8}::to_repr]:
+    Source: 'binary-field/src/tower.rs', lines 200:12-202:13 -/
+def tower.BinaryField8.to_repr (self : tower.BinaryField8) : RustM Std.U8 := do
+  tower.BinaryField8.raw_to_repr self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField16}::HALF_BITS]
+    Source: 'binary-field/src/tower.rs', lines 148:12-148:47 -/
+@[global_simps, irreducible]
+def tower.BinaryField16.HALF_BITS : RustM Std.Usize := 16#usize / 2#usize
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField16}::join]:
+    Source: 'binary-field/src/tower.rs', lines 222:12-224:13 -/
+def tower.BinaryField16.join
+  (a0 : tower.BinaryField8) (a1 : tower.BinaryField8) :
+  RustM tower.BinaryField16
+  := do
+  let i ← tower.BinaryField8.to_repr a0
+  let i1 ← lift (UScalar.cast .U16 i)
+  let i2 ← tower.BinaryField8.to_repr a1
+  let i3 ← lift (UScalar.cast .U16 i2)
+  let i4 ← tower.BinaryField16.HALF_BITS
+  let i5 ← i3 <<< i4
+  let i6 ← lift (i1 ||| i5)
+  ok i6
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField8}::MASK]
+    Source: 'binary-field/src/tower.rs', lines 145:12-145:81 -/
+@[global_simps, irreducible]
+def tower.BinaryField8.MASK : RustM Std.U8 := do
+  let i ← lift (UScalar.cast .Usize core.num.U8.BITS)
+  let i1 ← i - 8#usize
+  core.num.U8.MAX >>> i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField8}::raw_from_repr]:
+    Source: 'binary-field/src/tower.rs', lines 171:12-173:13 -/
+def tower.BinaryField8.raw_from_repr
+  (r : Std.U8) : RustM tower.BinaryField8 := do
+  let i ← tower.BinaryField8.MASK
+  let i1 ← lift (r &&& i)
+  ok i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField8}::from_repr]:
+    Source: 'binary-field/src/tower.rs', lines 192:12-194:13 -/
+def tower.BinaryField8.from_repr (r : Std.U8) : RustM tower.BinaryField8 := do
+  tower.BinaryField8.raw_from_repr r
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField16}::MASK]
+    Source: 'binary-field/src/tower.rs', lines 145:12-145:81 -/
+@[global_simps, irreducible]
+def tower.BinaryField16.MASK : RustM Std.U16 := do
+  let i ← lift (UScalar.cast .Usize core.num.U16.BITS)
+  let i1 ← i - 16#usize
+  core.num.U16.MAX >>> i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField16}::HALF_MASK]
+    Source: 'binary-field/src/tower.rs', lines 151:12-151:67 -/
+@[global_simps, irreducible]
+def tower.BinaryField16.HALF_MASK : RustM Std.U16 := do
+  let i ← tower.BinaryField16.MASK
+  let i1 ← tower.BinaryField16.HALF_BITS
+  i >>> i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField16}::split]:
+    Source: 'binary-field/src/tower.rs', lines 214:12-218:13 -/
+def tower.BinaryField16.split
+  (self : tower.BinaryField16) :
+  RustM (tower.BinaryField8 × tower.BinaryField8)
+  := do
+  let i ← tower.BinaryField16.HALF_MASK
+  let i1 ← lift (self &&& i)
+  let a0 ← lift (UScalar.cast .U8 i1)
+  let i2 ← tower.BinaryField16.HALF_BITS
+  let i3 ← self >>> i2
+  let a1 ← lift (UScalar.cast .U8 i3)
+  let bf ← tower.BinaryField8.from_repr a0
+  let bf1 ← tower.BinaryField8.from_repr a1
+  ok (bf, bf1)
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField4}::raw_to_repr]:
+    Source: 'binary-field/src/tower.rs', lines 177:12-179:13 -/
+def tower.BinaryField4.raw_to_repr
+  (self : tower.BinaryField4) : RustM Std.U8 := do
+  ok self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField4}::to_repr]:
+    Source: 'binary-field/src/tower.rs', lines 200:12-202:13 -/
+def tower.BinaryField4.to_repr (self : tower.BinaryField4) : RustM Std.U8 := do
+  tower.BinaryField4.raw_to_repr self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField8}::HALF_BITS]
+    Source: 'binary-field/src/tower.rs', lines 148:12-148:47 -/
+@[global_simps, irreducible]
+def tower.BinaryField8.HALF_BITS : RustM Std.Usize := 8#usize / 2#usize
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField8}::join]:
+    Source: 'binary-field/src/tower.rs', lines 222:12-224:13 -/
+def tower.BinaryField8.join
+  (a0 : tower.BinaryField4) (a1 : tower.BinaryField4) :
+  RustM tower.BinaryField8
+  := do
+  let i ← tower.BinaryField4.to_repr a0
+  let i1 ← tower.BinaryField4.to_repr a1
+  let i2 ← tower.BinaryField8.HALF_BITS
+  let i3 ← i1 <<< i2
+  let i4 ← lift (i ||| i3)
+  ok i4
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField4}::raw_from_repr]:
+    Source: 'binary-field/src/tower.rs', lines 171:12-173:13 -/
+def tower.BinaryField4.raw_from_repr
+  (r : Std.U8) : RustM tower.BinaryField4 := do
+  let i ← tower.BinaryField4.MASK
+  let i1 ← lift (r &&& i)
+  ok i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField4}::from_repr]:
+    Source: 'binary-field/src/tower.rs', lines 192:12-194:13 -/
+def tower.BinaryField4.from_repr (r : Std.U8) : RustM tower.BinaryField4 := do
+  tower.BinaryField4.raw_from_repr r
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField8}::HALF_MASK]
+    Source: 'binary-field/src/tower.rs', lines 151:12-151:67 -/
+@[global_simps, irreducible]
+def tower.BinaryField8.HALF_MASK : RustM Std.U8 := do
+  let i ← tower.BinaryField8.MASK
+  let i1 ← tower.BinaryField8.HALF_BITS
+  i >>> i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField8}::split]:
+    Source: 'binary-field/src/tower.rs', lines 214:12-218:13 -/
+def tower.BinaryField8.split
+  (self : tower.BinaryField8) :
+  RustM (tower.BinaryField4 × tower.BinaryField4)
+  := do
+  let i ← tower.BinaryField8.HALF_MASK
+  let a0 ← lift (self &&& i)
+  let i1 ← tower.BinaryField8.HALF_BITS
+  let a1 ← self >>> i1
+  let bf ← tower.BinaryField4.from_repr a0
+  let bf1 ← tower.BinaryField4.from_repr a1
+  ok (bf, bf1)
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField4}::raw_mul_alpha]:
+    Source: 'binary-field/src/tower.rs', lines 183:12-186:13 -/
+def tower.BinaryField4.raw_mul_alpha
+  (self : tower.BinaryField4) : RustM tower.BinaryField4 := do
+  let (c0, c1) ← tower.BinaryField4.split self
+  let bf ← tower.BinaryField2.raw_mul_alpha c1
+  let bf1 ←
+    tower.BinaryField2.Insts.CoreOpsArithAddBinaryField2BinaryField2.add c0 bf
+  tower.BinaryField4.join c1 bf1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField8}::raw_mul_alpha]:
+    Source: 'binary-field/src/tower.rs', lines 183:12-186:13 -/
+def tower.BinaryField8.raw_mul_alpha
+  (self : tower.BinaryField8) : RustM tower.BinaryField8 := do
+  let (c0, c1) ← tower.BinaryField8.split self
+  let bf ← tower.BinaryField4.raw_mul_alpha c1
+  let bf1 ←
+    tower.BinaryField4.Insts.CoreOpsArithAddBinaryField4BinaryField4.add c0 bf
+  tower.BinaryField8.join c1 bf1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField8}::mul_alpha]:
+    Source: 'binary-field/src/tower.rs', lines 208:12-210:13 -/
+def tower.BinaryField8.mul_alpha
+  (self : tower.BinaryField8) : RustM tower.BinaryField8 := do
+  tower.BinaryField8.raw_mul_alpha self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField16}::karatsuba_mul]:
+    Source: 'binary-field/src/tower.rs', lines 837:12-844:13 -/
+def tower.BinaryField16.karatsuba_mul
+  (self : tower.BinaryField16) (rhs : tower.BinaryField16) :
+  RustM tower.BinaryField16
+  := do
+  let (a0, a1) ← tower.BinaryField16.split self
+  let (b0, b1) ← tower.BinaryField16.split rhs
+  let z0 ←
+    tower.BinaryField8.Insts.CoreOpsArithMulBinaryField8BinaryField8.mul a0 b0
+  let z2 ←
+    tower.BinaryField8.Insts.CoreOpsArithMulBinaryField8BinaryField8.mul a1 b1
+  let bf ←
+    tower.BinaryField8.Insts.CoreOpsArithAddBinaryField8BinaryField8.add a0 a1
+  let bf1 ←
+    tower.BinaryField8.Insts.CoreOpsArithAddBinaryField8BinaryField8.add b0 b1
+  let bf2 ←
+    tower.BinaryField8.Insts.CoreOpsArithMulBinaryField8BinaryField8.mul bf bf1
+  let bf3 ←
+    tower.BinaryField8.Insts.CoreOpsArithAddBinaryField8BinaryField8.add bf2 z0
+  let z1 ←
+    tower.BinaryField8.Insts.CoreOpsArithAddBinaryField8BinaryField8.add bf3 z2
+  let bf4 ←
+    tower.BinaryField8.Insts.CoreOpsArithAddBinaryField8BinaryField8.add z0 z2
+  let bf5 ← tower.BinaryField8.mul_alpha z2
+  let bf6 ←
+    tower.BinaryField8.Insts.CoreOpsArithAddBinaryField8BinaryField8.add z1 bf5
+  tower.BinaryField16.join bf4 bf6
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField16, p3_binary_field::tower::BinaryField16> for p3_binary_field::tower::BinaryField16}::mul]:
+    Source: 'binary-field/src/tower.rs', lines 632:12-634:13
+    Visibility: public -/
+def tower.BinaryField16.Insts.CoreOpsArithMulBinaryField16BinaryField16.mul
+  (self : tower.BinaryField16) (rhs : tower.BinaryField16) :
+  RustM tower.BinaryField16
+  := do
+  tower.BinaryField16.karatsuba_mul self rhs
+
+/-- [p3_binary_field::hax_roots::bf16_mul]:
+    Source: 'binary-field/src/hax_roots.rs', lines 99:0-101:1
+    Visibility: public -/
+def hax_roots.bf16_mul
+  (a : tower.BinaryField16) (b : tower.BinaryField16) :
+  RustM tower.BinaryField16
+  := do
+  tower.BinaryField16.Insts.CoreOpsArithMulBinaryField16BinaryField16.mul a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Add<p3_binary_field::tower::BinaryField32, p3_binary_field::tower::BinaryField32> for p3_binary_field::tower::BinaryField32}::add]:
+    Source: 'binary-field/src/tower.rs', lines 601:12-604:13
+    Visibility: public -/
+def tower.BinaryField32.Insts.CoreOpsArithAddBinaryField32BinaryField32.add
+  (self : tower.BinaryField32) (rhs : tower.BinaryField32) :
+  RustM tower.BinaryField32
+  := do
+  let i ← lift (self ^^^ rhs)
+  ok i
+
+/-- [p3_binary_field::hax_roots::bf32_add]:
+    Source: 'binary-field/src/hax_roots.rs', lines 105:0-107:1
+    Visibility: public -/
+def hax_roots.bf32_add
+  (a : tower.BinaryField32) (b : tower.BinaryField32) :
+  RustM tower.BinaryField32
+  := do
+  tower.BinaryField32.Insts.CoreOpsArithAddBinaryField32BinaryField32.add a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Sub<p3_binary_field::tower::BinaryField32, p3_binary_field::tower::BinaryField32> for p3_binary_field::tower::BinaryField32}::sub]:
+    Source: 'binary-field/src/tower.rs', lines 612:12-615:13
+    Visibility: public -/
+def tower.BinaryField32.Insts.CoreOpsArithSubBinaryField32BinaryField32.sub
+  (self : tower.BinaryField32) (rhs : tower.BinaryField32) :
+  RustM tower.BinaryField32
+  := do
+  tower.BinaryField32.Insts.CoreOpsArithAddBinaryField32BinaryField32.add self
+    rhs
+
+/-- [p3_binary_field::hax_roots::bf32_sub]:
+    Source: 'binary-field/src/hax_roots.rs', lines 109:0-111:1
+    Visibility: public -/
+def hax_roots.bf32_sub
+  (a : tower.BinaryField32) (b : tower.BinaryField32) :
+  RustM tower.BinaryField32
+  := do
+  tower.BinaryField32.Insts.CoreOpsArithSubBinaryField32BinaryField32.sub a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Neg<p3_binary_field::tower::BinaryField32> for p3_binary_field::tower::BinaryField32}::neg]:
+    Source: 'binary-field/src/tower.rs', lines 622:12-625:13
+    Visibility: public -/
+def tower.BinaryField32.Insts.CoreOpsArithNegBinaryField32.neg
+  (self : tower.BinaryField32) : RustM tower.BinaryField32 := do
+  ok self
+
+/-- [p3_binary_field::hax_roots::bf32_neg]:
+    Source: 'binary-field/src/hax_roots.rs', lines 113:0-115:1
+    Visibility: public -/
+def hax_roots.bf32_neg
+  (a : tower.BinaryField32) : RustM tower.BinaryField32 := do
+  tower.BinaryField32.Insts.CoreOpsArithNegBinaryField32.neg a
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField16}::raw_to_repr]:
+    Source: 'binary-field/src/tower.rs', lines 177:12-179:13 -/
+def tower.BinaryField16.raw_to_repr
+  (self : tower.BinaryField16) : RustM Std.U16 := do
+  ok self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField16}::to_repr]:
+    Source: 'binary-field/src/tower.rs', lines 200:12-202:13 -/
+def tower.BinaryField16.to_repr
+  (self : tower.BinaryField16) : RustM Std.U16 := do
+  tower.BinaryField16.raw_to_repr self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField32}::HALF_BITS]
+    Source: 'binary-field/src/tower.rs', lines 148:12-148:47 -/
+@[global_simps, irreducible]
+def tower.BinaryField32.HALF_BITS : RustM Std.Usize := 32#usize / 2#usize
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField32}::join]:
+    Source: 'binary-field/src/tower.rs', lines 222:12-224:13 -/
+def tower.BinaryField32.join
+  (a0 : tower.BinaryField16) (a1 : tower.BinaryField16) :
+  RustM tower.BinaryField32
+  := do
+  let i ← tower.BinaryField16.to_repr a0
+  let i1 ← lift (UScalar.cast .U32 i)
+  let i2 ← tower.BinaryField16.to_repr a1
+  let i3 ← lift (UScalar.cast .U32 i2)
+  let i4 ← tower.BinaryField32.HALF_BITS
+  let i5 ← i3 <<< i4
+  let i6 ← lift (i1 ||| i5)
+  ok i6
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField16}::raw_from_repr]:
+    Source: 'binary-field/src/tower.rs', lines 171:12-173:13 -/
+def tower.BinaryField16.raw_from_repr
+  (r : Std.U16) : RustM tower.BinaryField16 := do
+  let i ← tower.BinaryField16.MASK
+  let i1 ← lift (r &&& i)
+  ok i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField16}::from_repr]:
+    Source: 'binary-field/src/tower.rs', lines 192:12-194:13 -/
+def tower.BinaryField16.from_repr
+  (r : Std.U16) : RustM tower.BinaryField16 := do
+  tower.BinaryField16.raw_from_repr r
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField32}::MASK]
+    Source: 'binary-field/src/tower.rs', lines 145:12-145:81 -/
+@[global_simps, irreducible]
+def tower.BinaryField32.MASK : RustM Std.U32 := do
+  let i ← lift (UScalar.cast .Usize core.num.U32.BITS)
+  let i1 ← i - 32#usize
+  core.num.U32.MAX >>> i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField32}::HALF_MASK]
+    Source: 'binary-field/src/tower.rs', lines 151:12-151:67 -/
+@[global_simps, irreducible]
+def tower.BinaryField32.HALF_MASK : RustM Std.U32 := do
+  let i ← tower.BinaryField32.MASK
+  let i1 ← tower.BinaryField32.HALF_BITS
+  i >>> i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField32}::split]:
+    Source: 'binary-field/src/tower.rs', lines 214:12-218:13 -/
+def tower.BinaryField32.split
+  (self : tower.BinaryField32) :
+  RustM (tower.BinaryField16 × tower.BinaryField16)
+  := do
+  let i ← tower.BinaryField32.HALF_MASK
+  let i1 ← lift (self &&& i)
+  let a0 ← lift (UScalar.cast .U16 i1)
+  let i2 ← tower.BinaryField32.HALF_BITS
+  let i3 ← self >>> i2
+  let a1 ← lift (UScalar.cast .U16 i3)
+  let bf ← tower.BinaryField16.from_repr a0
+  let bf1 ← tower.BinaryField16.from_repr a1
+  ok (bf, bf1)
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField16}::raw_mul_alpha]:
+    Source: 'binary-field/src/tower.rs', lines 183:12-186:13 -/
+def tower.BinaryField16.raw_mul_alpha
+  (self : tower.BinaryField16) : RustM tower.BinaryField16 := do
+  let (c0, c1) ← tower.BinaryField16.split self
+  let bf ← tower.BinaryField8.raw_mul_alpha c1
+  let bf1 ←
+    tower.BinaryField8.Insts.CoreOpsArithAddBinaryField8BinaryField8.add c0 bf
+  tower.BinaryField16.join c1 bf1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField16}::mul_alpha]:
+    Source: 'binary-field/src/tower.rs', lines 208:12-210:13 -/
+def tower.BinaryField16.mul_alpha
+  (self : tower.BinaryField16) : RustM tower.BinaryField16 := do
+  tower.BinaryField16.raw_mul_alpha self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField32}::karatsuba_mul]:
+    Source: 'binary-field/src/tower.rs', lines 837:12-844:13 -/
+def tower.BinaryField32.karatsuba_mul
+  (self : tower.BinaryField32) (rhs : tower.BinaryField32) :
+  RustM tower.BinaryField32
+  := do
+  let (a0, a1) ← tower.BinaryField32.split self
+  let (b0, b1) ← tower.BinaryField32.split rhs
+  let z0 ←
+    tower.BinaryField16.Insts.CoreOpsArithMulBinaryField16BinaryField16.mul a0
+      b0
+  let z2 ←
+    tower.BinaryField16.Insts.CoreOpsArithMulBinaryField16BinaryField16.mul a1
+      b1
+  let bf ←
+    tower.BinaryField16.Insts.CoreOpsArithAddBinaryField16BinaryField16.add a0
+      a1
+  let bf1 ←
+    tower.BinaryField16.Insts.CoreOpsArithAddBinaryField16BinaryField16.add b0
+      b1
+  let bf2 ←
+    tower.BinaryField16.Insts.CoreOpsArithMulBinaryField16BinaryField16.mul bf
+      bf1
+  let bf3 ←
+    tower.BinaryField16.Insts.CoreOpsArithAddBinaryField16BinaryField16.add bf2
+      z0
+  let z1 ←
+    tower.BinaryField16.Insts.CoreOpsArithAddBinaryField16BinaryField16.add bf3
+      z2
+  let bf4 ←
+    tower.BinaryField16.Insts.CoreOpsArithAddBinaryField16BinaryField16.add z0
+      z2
+  let bf5 ← tower.BinaryField16.mul_alpha z2
+  let bf6 ←
+    tower.BinaryField16.Insts.CoreOpsArithAddBinaryField16BinaryField16.add z1
+      bf5
+  tower.BinaryField32.join bf4 bf6
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField32, p3_binary_field::tower::BinaryField32> for p3_binary_field::tower::BinaryField32}::mul]:
+    Source: 'binary-field/src/tower.rs', lines 632:12-634:13
+    Visibility: public -/
+def tower.BinaryField32.Insts.CoreOpsArithMulBinaryField32BinaryField32.mul
+  (self : tower.BinaryField32) (rhs : tower.BinaryField32) :
+  RustM tower.BinaryField32
+  := do
+  tower.BinaryField32.karatsuba_mul self rhs
+
+/-- [p3_binary_field::hax_roots::bf32_mul]:
+    Source: 'binary-field/src/hax_roots.rs', lines 117:0-119:1
+    Visibility: public -/
+def hax_roots.bf32_mul
+  (a : tower.BinaryField32) (b : tower.BinaryField32) :
+  RustM tower.BinaryField32
+  := do
+  tower.BinaryField32.Insts.CoreOpsArithMulBinaryField32BinaryField32.mul a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Add<p3_binary_field::tower::BinaryField64, p3_binary_field::tower::BinaryField64> for p3_binary_field::tower::BinaryField64}::add]:
+    Source: 'binary-field/src/tower.rs', lines 601:12-604:13
+    Visibility: public -/
+def tower.BinaryField64.Insts.CoreOpsArithAddBinaryField64BinaryField64.add
+  (self : tower.BinaryField64) (rhs : tower.BinaryField64) :
+  RustM tower.BinaryField64
+  := do
+  let i ← lift (self ^^^ rhs)
+  ok i
+
+/-- [p3_binary_field::hax_roots::bf64_add]:
+    Source: 'binary-field/src/hax_roots.rs', lines 123:0-125:1
+    Visibility: public -/
+def hax_roots.bf64_add
+  (a : tower.BinaryField64) (b : tower.BinaryField64) :
+  RustM tower.BinaryField64
+  := do
+  tower.BinaryField64.Insts.CoreOpsArithAddBinaryField64BinaryField64.add a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Sub<p3_binary_field::tower::BinaryField64, p3_binary_field::tower::BinaryField64> for p3_binary_field::tower::BinaryField64}::sub]:
+    Source: 'binary-field/src/tower.rs', lines 612:12-615:13
+    Visibility: public -/
+def tower.BinaryField64.Insts.CoreOpsArithSubBinaryField64BinaryField64.sub
+  (self : tower.BinaryField64) (rhs : tower.BinaryField64) :
+  RustM tower.BinaryField64
+  := do
+  tower.BinaryField64.Insts.CoreOpsArithAddBinaryField64BinaryField64.add self
+    rhs
+
+/-- [p3_binary_field::hax_roots::bf64_sub]:
+    Source: 'binary-field/src/hax_roots.rs', lines 127:0-129:1
+    Visibility: public -/
+def hax_roots.bf64_sub
+  (a : tower.BinaryField64) (b : tower.BinaryField64) :
+  RustM tower.BinaryField64
+  := do
+  tower.BinaryField64.Insts.CoreOpsArithSubBinaryField64BinaryField64.sub a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Neg<p3_binary_field::tower::BinaryField64> for p3_binary_field::tower::BinaryField64}::neg]:
+    Source: 'binary-field/src/tower.rs', lines 622:12-625:13
+    Visibility: public -/
+def tower.BinaryField64.Insts.CoreOpsArithNegBinaryField64.neg
+  (self : tower.BinaryField64) : RustM tower.BinaryField64 := do
+  ok self
+
+/-- [p3_binary_field::hax_roots::bf64_neg]:
+    Source: 'binary-field/src/hax_roots.rs', lines 131:0-133:1
+    Visibility: public -/
+def hax_roots.bf64_neg
+  (a : tower.BinaryField64) : RustM tower.BinaryField64 := do
+  tower.BinaryField64.Insts.CoreOpsArithNegBinaryField64.neg a
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField32}::raw_to_repr]:
+    Source: 'binary-field/src/tower.rs', lines 177:12-179:13 -/
+def tower.BinaryField32.raw_to_repr
+  (self : tower.BinaryField32) : RustM Std.U32 := do
+  ok self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField32}::to_repr]:
+    Source: 'binary-field/src/tower.rs', lines 200:12-202:13 -/
+def tower.BinaryField32.to_repr
+  (self : tower.BinaryField32) : RustM Std.U32 := do
+  tower.BinaryField32.raw_to_repr self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField64}::HALF_BITS]
+    Source: 'binary-field/src/tower.rs', lines 148:12-148:47 -/
+@[global_simps, irreducible]
+def tower.BinaryField64.HALF_BITS : RustM Std.Usize := 64#usize / 2#usize
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField64}::join]:
+    Source: 'binary-field/src/tower.rs', lines 222:12-224:13 -/
+def tower.BinaryField64.join
+  (a0 : tower.BinaryField32) (a1 : tower.BinaryField32) :
+  RustM tower.BinaryField64
+  := do
+  let i ← tower.BinaryField32.to_repr a0
+  let i1 ← lift (UScalar.cast .U64 i)
+  let i2 ← tower.BinaryField32.to_repr a1
+  let i3 ← lift (UScalar.cast .U64 i2)
+  let i4 ← tower.BinaryField64.HALF_BITS
+  let i5 ← i3 <<< i4
+  let i6 ← lift (i1 ||| i5)
+  ok i6
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField32}::raw_from_repr]:
+    Source: 'binary-field/src/tower.rs', lines 171:12-173:13 -/
+def tower.BinaryField32.raw_from_repr
+  (r : Std.U32) : RustM tower.BinaryField32 := do
+  let i ← tower.BinaryField32.MASK
+  let i1 ← lift (r &&& i)
+  ok i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField32}::from_repr]:
+    Source: 'binary-field/src/tower.rs', lines 192:12-194:13 -/
+def tower.BinaryField32.from_repr
+  (r : Std.U32) : RustM tower.BinaryField32 := do
+  tower.BinaryField32.raw_from_repr r
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField64}::MASK]
+    Source: 'binary-field/src/tower.rs', lines 145:12-145:81 -/
+@[global_simps, irreducible]
+def tower.BinaryField64.MASK : RustM Std.U64 := do
+  let i ← lift (UScalar.cast .Usize core.num.U64.BITS)
+  let i1 ← i - 64#usize
+  core.num.U64.MAX >>> i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField64}::HALF_MASK]
+    Source: 'binary-field/src/tower.rs', lines 151:12-151:67 -/
+@[global_simps, irreducible]
+def tower.BinaryField64.HALF_MASK : RustM Std.U64 := do
+  let i ← tower.BinaryField64.MASK
+  let i1 ← tower.BinaryField64.HALF_BITS
+  i >>> i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField64}::split]:
+    Source: 'binary-field/src/tower.rs', lines 214:12-218:13 -/
+def tower.BinaryField64.split
+  (self : tower.BinaryField64) :
+  RustM (tower.BinaryField32 × tower.BinaryField32)
+  := do
+  let i ← tower.BinaryField64.HALF_MASK
+  let i1 ← lift (self &&& i)
+  let a0 ← lift (UScalar.cast .U32 i1)
+  let i2 ← tower.BinaryField64.HALF_BITS
+  let i3 ← self >>> i2
+  let a1 ← lift (UScalar.cast .U32 i3)
+  let bf ← tower.BinaryField32.from_repr a0
+  let bf1 ← tower.BinaryField32.from_repr a1
+  ok (bf, bf1)
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField32}::raw_mul_alpha]:
+    Source: 'binary-field/src/tower.rs', lines 183:12-186:13 -/
+def tower.BinaryField32.raw_mul_alpha
+  (self : tower.BinaryField32) : RustM tower.BinaryField32 := do
+  let (c0, c1) ← tower.BinaryField32.split self
+  let bf ← tower.BinaryField16.raw_mul_alpha c1
+  let bf1 ←
+    tower.BinaryField16.Insts.CoreOpsArithAddBinaryField16BinaryField16.add c0
+      bf
+  tower.BinaryField32.join c1 bf1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField32}::mul_alpha]:
+    Source: 'binary-field/src/tower.rs', lines 208:12-210:13 -/
+def tower.BinaryField32.mul_alpha
+  (self : tower.BinaryField32) : RustM tower.BinaryField32 := do
+  tower.BinaryField32.raw_mul_alpha self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField64}::karatsuba_mul]:
+    Source: 'binary-field/src/tower.rs', lines 837:12-844:13 -/
+def tower.BinaryField64.karatsuba_mul
+  (self : tower.BinaryField64) (rhs : tower.BinaryField64) :
+  RustM tower.BinaryField64
+  := do
+  let (a0, a1) ← tower.BinaryField64.split self
+  let (b0, b1) ← tower.BinaryField64.split rhs
+  let z0 ←
+    tower.BinaryField32.Insts.CoreOpsArithMulBinaryField32BinaryField32.mul a0
+      b0
+  let z2 ←
+    tower.BinaryField32.Insts.CoreOpsArithMulBinaryField32BinaryField32.mul a1
+      b1
+  let bf ←
+    tower.BinaryField32.Insts.CoreOpsArithAddBinaryField32BinaryField32.add a0
+      a1
+  let bf1 ←
+    tower.BinaryField32.Insts.CoreOpsArithAddBinaryField32BinaryField32.add b0
+      b1
+  let bf2 ←
+    tower.BinaryField32.Insts.CoreOpsArithMulBinaryField32BinaryField32.mul bf
+      bf1
+  let bf3 ←
+    tower.BinaryField32.Insts.CoreOpsArithAddBinaryField32BinaryField32.add bf2
+      z0
+  let z1 ←
+    tower.BinaryField32.Insts.CoreOpsArithAddBinaryField32BinaryField32.add bf3
+      z2
+  let bf4 ←
+    tower.BinaryField32.Insts.CoreOpsArithAddBinaryField32BinaryField32.add z0
+      z2
+  let bf5 ← tower.BinaryField32.mul_alpha z2
+  let bf6 ←
+    tower.BinaryField32.Insts.CoreOpsArithAddBinaryField32BinaryField32.add z1
+      bf5
+  tower.BinaryField64.join bf4 bf6
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField64}::dispatched_mul]:
+    Source: 'binary-field/src/tower.rs', lines 860:4-866:5 -/
+def tower.BinaryField64.dispatched_mul
+  (self : tower.BinaryField64) (rhs : tower.BinaryField64) :
+  RustM tower.BinaryField64
+  := do
+  if clmul.HAS_HARDWARE_CLMUL
+  then let i ← clmul.mul_64 self rhs
+       ok i
+  else tower.BinaryField64.karatsuba_mul self rhs
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField64, p3_binary_field::tower::BinaryField64> for p3_binary_field::tower::BinaryField64}::mul]:
+    Source: 'binary-field/src/tower.rs', lines 632:12-634:13
+    Visibility: public -/
+def tower.BinaryField64.Insts.CoreOpsArithMulBinaryField64BinaryField64.mul
+  (self : tower.BinaryField64) (rhs : tower.BinaryField64) :
+  RustM tower.BinaryField64
+  := do
+  tower.BinaryField64.dispatched_mul self rhs
+
+/-- [p3_binary_field::hax_roots::bf64_mul]:
+    Source: 'binary-field/src/hax_roots.rs', lines 135:0-137:1
+    Visibility: public -/
+def hax_roots.bf64_mul
+  (a : tower.BinaryField64) (b : tower.BinaryField64) :
+  RustM tower.BinaryField64
+  := do
+  tower.BinaryField64.Insts.CoreOpsArithMulBinaryField64BinaryField64.mul a b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Add<p3_binary_field::tower::BinaryField128, p3_binary_field::tower::BinaryField128> for p3_binary_field::tower::BinaryField128}::add]:
+    Source: 'binary-field/src/tower.rs', lines 601:12-604:13
+    Visibility: public -/
+def tower.BinaryField128.Insts.CoreOpsArithAddBinaryField128BinaryField128.add
+  (self : tower.BinaryField128) (rhs : tower.BinaryField128) :
+  RustM tower.BinaryField128
+  := do
+  let i ← lift (self ^^^ rhs)
+  ok i
+
+/-- [p3_binary_field::hax_roots::bf128_add]:
+    Source: 'binary-field/src/hax_roots.rs', lines 141:0-143:1
+    Visibility: public -/
+def hax_roots.bf128_add
+  (a : tower.BinaryField128) (b : tower.BinaryField128) :
+  RustM tower.BinaryField128
+  := do
+  tower.BinaryField128.Insts.CoreOpsArithAddBinaryField128BinaryField128.add a
+    b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Sub<p3_binary_field::tower::BinaryField128, p3_binary_field::tower::BinaryField128> for p3_binary_field::tower::BinaryField128}::sub]:
+    Source: 'binary-field/src/tower.rs', lines 612:12-615:13
+    Visibility: public -/
+def tower.BinaryField128.Insts.CoreOpsArithSubBinaryField128BinaryField128.sub
+  (self : tower.BinaryField128) (rhs : tower.BinaryField128) :
+  RustM tower.BinaryField128
+  := do
+  tower.BinaryField128.Insts.CoreOpsArithAddBinaryField128BinaryField128.add
+    self rhs
+
+/-- [p3_binary_field::hax_roots::bf128_sub]:
+    Source: 'binary-field/src/hax_roots.rs', lines 145:0-147:1
+    Visibility: public -/
+def hax_roots.bf128_sub
+  (a : tower.BinaryField128) (b : tower.BinaryField128) :
+  RustM tower.BinaryField128
+  := do
+  tower.BinaryField128.Insts.CoreOpsArithSubBinaryField128BinaryField128.sub a
+    b
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Neg<p3_binary_field::tower::BinaryField128> for p3_binary_field::tower::BinaryField128}::neg]:
+    Source: 'binary-field/src/tower.rs', lines 622:12-625:13
+    Visibility: public -/
+def tower.BinaryField128.Insts.CoreOpsArithNegBinaryField128.neg
+  (self : tower.BinaryField128) : RustM tower.BinaryField128 := do
+  ok self
+
+/-- [p3_binary_field::hax_roots::bf128_neg]:
+    Source: 'binary-field/src/hax_roots.rs', lines 149:0-151:1
+    Visibility: public -/
+def hax_roots.bf128_neg
+  (a : tower.BinaryField128) : RustM tower.BinaryField128 := do
+  tower.BinaryField128.Insts.CoreOpsArithNegBinaryField128.neg a
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField64}::raw_to_repr]:
+    Source: 'binary-field/src/tower.rs', lines 177:12-179:13 -/
+def tower.BinaryField64.raw_to_repr
+  (self : tower.BinaryField64) : RustM Std.U64 := do
+  ok self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField64}::to_repr]:
+    Source: 'binary-field/src/tower.rs', lines 200:12-202:13 -/
+def tower.BinaryField64.to_repr
+  (self : tower.BinaryField64) : RustM Std.U64 := do
+  tower.BinaryField64.raw_to_repr self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField128}::HALF_BITS]
+    Source: 'binary-field/src/tower.rs', lines 148:12-148:47 -/
+@[global_simps, irreducible]
+def tower.BinaryField128.HALF_BITS : RustM Std.Usize := 128#usize / 2#usize
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField128}::join]:
+    Source: 'binary-field/src/tower.rs', lines 222:12-224:13 -/
+def tower.BinaryField128.join
+  (a0 : tower.BinaryField64) (a1 : tower.BinaryField64) :
+  RustM tower.BinaryField128
+  := do
+  let i ← tower.BinaryField64.to_repr a0
+  let i1 ← lift (UScalar.cast .U128 i)
+  let i2 ← tower.BinaryField64.to_repr a1
+  let i3 ← lift (UScalar.cast .U128 i2)
+  let i4 ← tower.BinaryField128.HALF_BITS
+  let i5 ← i3 <<< i4
+  let i6 ← lift (i1 ||| i5)
+  ok i6
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField64}::raw_from_repr]:
+    Source: 'binary-field/src/tower.rs', lines 171:12-173:13 -/
+def tower.BinaryField64.raw_from_repr
+  (r : Std.U64) : RustM tower.BinaryField64 := do
+  let i ← tower.BinaryField64.MASK
+  let i1 ← lift (r &&& i)
+  ok i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField64}::from_repr]:
+    Source: 'binary-field/src/tower.rs', lines 192:12-194:13 -/
+def tower.BinaryField64.from_repr
+  (r : Std.U64) : RustM tower.BinaryField64 := do
+  tower.BinaryField64.raw_from_repr r
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField128}::MASK]
+    Source: 'binary-field/src/tower.rs', lines 145:12-145:81 -/
+@[global_simps, irreducible]
+def tower.BinaryField128.MASK : RustM Std.U128 := do
+  let i ← lift (UScalar.cast .Usize core.num.U128.BITS)
+  let i1 ← i - 128#usize
+  core.num.U128.MAX >>> i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField128}::HALF_MASK]
+    Source: 'binary-field/src/tower.rs', lines 151:12-151:67 -/
+@[global_simps, irreducible]
+def tower.BinaryField128.HALF_MASK : RustM Std.U128 := do
+  let i ← tower.BinaryField128.MASK
+  let i1 ← tower.BinaryField128.HALF_BITS
+  i >>> i1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField128}::split]:
+    Source: 'binary-field/src/tower.rs', lines 214:12-218:13 -/
+def tower.BinaryField128.split
+  (self : tower.BinaryField128) :
+  RustM (tower.BinaryField64 × tower.BinaryField64)
+  := do
+  let i ← tower.BinaryField128.HALF_MASK
+  let i1 ← lift (self &&& i)
+  let a0 ← lift (UScalar.cast .U64 i1)
+  let i2 ← tower.BinaryField128.HALF_BITS
+  let i3 ← self >>> i2
+  let a1 ← lift (UScalar.cast .U64 i3)
+  let bf ← tower.BinaryField64.from_repr a0
+  let bf1 ← tower.BinaryField64.from_repr a1
+  ok (bf, bf1)
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField64}::raw_mul_alpha]:
+    Source: 'binary-field/src/tower.rs', lines 183:12-186:13 -/
+def tower.BinaryField64.raw_mul_alpha
+  (self : tower.BinaryField64) : RustM tower.BinaryField64 := do
+  let (c0, c1) ← tower.BinaryField64.split self
+  let bf ← tower.BinaryField32.raw_mul_alpha c1
+  let bf1 ←
+    tower.BinaryField32.Insts.CoreOpsArithAddBinaryField32BinaryField32.add c0
+      bf
+  tower.BinaryField64.join c1 bf1
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField64}::mul_alpha]:
+    Source: 'binary-field/src/tower.rs', lines 208:12-210:13 -/
+def tower.BinaryField64.mul_alpha
+  (self : tower.BinaryField64) : RustM tower.BinaryField64 := do
+  tower.BinaryField64.raw_mul_alpha self
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField128}::karatsuba_mul]:
+    Source: 'binary-field/src/tower.rs', lines 837:12-844:13 -/
+def tower.BinaryField128.karatsuba_mul
+  (self : tower.BinaryField128) (rhs : tower.BinaryField128) :
+  RustM tower.BinaryField128
+  := do
+  let (a0, a1) ← tower.BinaryField128.split self
+  let (b0, b1) ← tower.BinaryField128.split rhs
+  let z0 ←
+    tower.BinaryField64.Insts.CoreOpsArithMulBinaryField64BinaryField64.mul a0
+      b0
+  let z2 ←
+    tower.BinaryField64.Insts.CoreOpsArithMulBinaryField64BinaryField64.mul a1
+      b1
+  let bf ←
+    tower.BinaryField64.Insts.CoreOpsArithAddBinaryField64BinaryField64.add a0
+      a1
+  let bf1 ←
+    tower.BinaryField64.Insts.CoreOpsArithAddBinaryField64BinaryField64.add b0
+      b1
+  let bf2 ←
+    tower.BinaryField64.Insts.CoreOpsArithMulBinaryField64BinaryField64.mul bf
+      bf1
+  let bf3 ←
+    tower.BinaryField64.Insts.CoreOpsArithAddBinaryField64BinaryField64.add bf2
+      z0
+  let z1 ←
+    tower.BinaryField64.Insts.CoreOpsArithAddBinaryField64BinaryField64.add bf3
+      z2
+  let bf4 ←
+    tower.BinaryField64.Insts.CoreOpsArithAddBinaryField64BinaryField64.add z0
+      z2
+  let bf5 ← tower.BinaryField64.mul_alpha z2
+  let bf6 ←
+    tower.BinaryField64.Insts.CoreOpsArithAddBinaryField64BinaryField64.add z1
+      bf5
+  tower.BinaryField128.join bf4 bf6
+
+/-- [p3_binary_field::tower::{p3_binary_field::tower::BinaryField128}::dispatched_mul]:
+    Source: 'binary-field/src/tower.rs', lines 881:4-887:5 -/
+def tower.BinaryField128.dispatched_mul
+  (self : tower.BinaryField128) (rhs : tower.BinaryField128) :
+  RustM tower.BinaryField128
+  := do
+  if clmul.HAS_HARDWARE_CLMUL
+  then let i ← clmul.mul_128 self rhs
+       ok i
+  else tower.BinaryField128.karatsuba_mul self rhs
+
+/-- [p3_binary_field::tower::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField128, p3_binary_field::tower::BinaryField128> for p3_binary_field::tower::BinaryField128}::mul]:
+    Source: 'binary-field/src/tower.rs', lines 632:12-634:13
+    Visibility: public -/
+def tower.BinaryField128.Insts.CoreOpsArithMulBinaryField128BinaryField128.mul
+  (self : tower.BinaryField128) (rhs : tower.BinaryField128) :
+  RustM tower.BinaryField128
+  := do
+  tower.BinaryField128.dispatched_mul self rhs
+
+/-- [p3_binary_field::hax_roots::bf128_mul]:
+    Source: 'binary-field/src/hax_roots.rs', lines 153:0-155:1
+    Visibility: public -/
+def hax_roots.bf128_mul
+  (a : tower.BinaryField128) (b : tower.BinaryField128) :
+  RustM tower.BinaryField128
+  := do
+  tower.BinaryField128.Insts.CoreOpsArithMulBinaryField128BinaryField128.mul a
+    b
+
+/-- [p3_binary_field::poly64::{impl core::ops::arith::Add<p3_binary_field::poly64::Poly64, p3_binary_field::poly64::Poly64> for p3_binary_field::poly64::Poly64}::add]:
+    Source: 'binary-field/src/poly64.rs', lines 370:4-373:5
+    Visibility: public -/
+def poly64.Poly64.Insts.CoreOpsArithAddPoly64Poly64.add
+  (self : poly64.Poly64) (rhs : poly64.Poly64) : RustM poly64.Poly64 := do
+  let i ← lift (self ^^^ rhs)
+  ok i
+
+/-- [p3_binary_field::hax_roots::poly64_add]:
+    Source: 'binary-field/src/hax_roots.rs', lines 159:0-161:1
+    Visibility: public -/
+def hax_roots.poly64_add
+  (a : poly64.Poly64) (b : poly64.Poly64) : RustM poly64.Poly64 := do
+  poly64.Poly64.Insts.CoreOpsArithAddPoly64Poly64.add a b
+
+/-- [p3_binary_field::poly64::{impl core::ops::arith::Sub<p3_binary_field::poly64::Poly64, p3_binary_field::poly64::Poly64> for p3_binary_field::poly64::Poly64}::sub]:
+    Source: 'binary-field/src/poly64.rs', lines 381:4-384:5
+    Visibility: public -/
+def poly64.Poly64.Insts.CoreOpsArithSubPoly64Poly64.sub
+  (self : poly64.Poly64) (rhs : poly64.Poly64) : RustM poly64.Poly64 := do
+  poly64.Poly64.Insts.CoreOpsArithAddPoly64Poly64.add self rhs
+
+/-- [p3_binary_field::hax_roots::poly64_sub]:
+    Source: 'binary-field/src/hax_roots.rs', lines 163:0-165:1
+    Visibility: public -/
+def hax_roots.poly64_sub
+  (a : poly64.Poly64) (b : poly64.Poly64) : RustM poly64.Poly64 := do
+  poly64.Poly64.Insts.CoreOpsArithSubPoly64Poly64.sub a b
+
+/-- [p3_binary_field::poly64::{impl core::ops::arith::Neg<p3_binary_field::poly64::Poly64> for p3_binary_field::poly64::Poly64}::neg]:
+    Source: 'binary-field/src/poly64.rs', lines 391:4-394:5
+    Visibility: public -/
+def poly64.Poly64.Insts.CoreOpsArithNegPoly64.neg
+  (self : poly64.Poly64) : RustM poly64.Poly64 := do
+  ok self
+
+/-- [p3_binary_field::hax_roots::poly64_neg]:
+    Source: 'binary-field/src/hax_roots.rs', lines 167:0-169:1
+    Visibility: public -/
+def hax_roots.poly64_neg (a : poly64.Poly64) : RustM poly64.Poly64 := do
+  poly64.Poly64.Insts.CoreOpsArithNegPoly64.neg a
+
+/-- [p3_binary_field::poly64::{impl core::ops::arith::Mul<p3_binary_field::poly64::Poly64, p3_binary_field::poly64::Poly64> for p3_binary_field::poly64::Poly64}::mul]:
+    Source: 'binary-field/src/poly64.rs', lines 401:4-403:5
+    Visibility: public -/
+def poly64.Poly64.Insts.CoreOpsArithMulPoly64Poly64.mul
+  (self : poly64.Poly64) (rhs : poly64.Poly64) : RustM poly64.Poly64 := do
+  let i ← clmul.gf64.poly_mul_64 self rhs
+  ok i
+
+/-- [p3_binary_field::hax_roots::poly64_mul]:
+    Source: 'binary-field/src/hax_roots.rs', lines 171:0-173:1
+    Visibility: public -/
+def hax_roots.poly64_mul
+  (a : poly64.Poly64) (b : poly64.Poly64) : RustM poly64.Poly64 := do
+  poly64.Poly64.Insts.CoreOpsArithMulPoly64Poly64.mul a b
+
+/-- [p3_binary_field::poly192::{impl core::ops::arith::Add<p3_binary_field::poly192::Poly192, p3_binary_field::poly192::Poly192> for p3_binary_field::poly192::Poly192}::add::{impl core::ops::function::FnMut<(usize,), p3_binary_field::poly64::Poly64> for p3_binary_field::poly192::{impl core::ops::arith::Add<p3_binary_field::poly192::Poly192, p3_binary_field::poly192::Poly192> for p3_binary_field::poly192::Poly192}::add::closure<'_0, '_1>}::call_mut]:
+    Source: 'binary-field/src/poly192.rs', lines 163:34-163:58 -/
+def
+  poly192.AddPoly192Poly192Poly192.add.closure.Insts.CoreOpsFunctionFnMutTupleUsizePoly64.call_mut
+  (c : poly192.AddPoly192Poly192Poly192.add.closure) (tupled_args : Std.Usize)
+  :
+  RustM (poly64.Poly64 × poly192.AddPoly192Poly192Poly192.add.closure)
+  := do
+  let (a, a1) := c
+  let p ← Array.index_usize a tupled_args
+  let p1 ← Array.index_usize a1 tupled_args
+  let p2 ← poly64.Poly64.Insts.CoreOpsArithAddPoly64Poly64.add p p1
+  ok (p2, c)
+
+/-- [p3_binary_field::poly192::{impl core::ops::arith::Add<p3_binary_field::poly192::Poly192, p3_binary_field::poly192::Poly192> for p3_binary_field::poly192::Poly192}::add::{impl core::ops::function::FnOnce<(usize,), p3_binary_field::poly64::Poly64> for p3_binary_field::poly192::{impl core::ops::arith::Add<p3_binary_field::poly192::Poly192, p3_binary_field::poly192::Poly192> for p3_binary_field::poly192::Poly192}::add::closure<'_0, '_1>}::call_once]:
+    Source: 'binary-field/src/poly192.rs', lines 163:34-163:58 -/
+def
+  poly192.AddPoly192Poly192Poly192.add.closure.Insts.CoreOpsFunctionFnOnceTupleUsizePoly64.call_once
+  (c : poly192.AddPoly192Poly192Poly192.add.closure) (i : Std.Usize) :
+  RustM poly64.Poly64
+  := do
+  let (p, _) ←
+    poly192.AddPoly192Poly192Poly192.add.closure.Insts.CoreOpsFunctionFnMutTupleUsizePoly64.call_mut
+      c i
+  ok p
+
+/-- Trait implementation: [p3_binary_field::poly192::{impl core::ops::arith::Add<p3_binary_field::poly192::Poly192, p3_binary_field::poly192::Poly192> for p3_binary_field::poly192::Poly192}::add::{impl core::ops::function::FnOnce<(usize,), p3_binary_field::poly64::Poly64> for p3_binary_field::poly192::{impl core::ops::arith::Add<p3_binary_field::poly192::Poly192, p3_binary_field::poly192::Poly192> for p3_binary_field::poly192::Poly192}::add::closure<'_0, '_1>}]
+    Source: 'binary-field/src/poly192.rs', lines 163:34-163:58 -/
+@[reducible]
+def
+  poly192.AddPoly192Poly192Poly192.add.closure.Insts.CoreOpsFunctionFnOnceTupleUsizePoly64
+  : core.ops.function.FnOnce poly192.AddPoly192Poly192Poly192.add.closure
+  Std.Usize poly64.Poly64 := {
+  call_once :=
+    poly192.AddPoly192Poly192Poly192.add.closure.Insts.CoreOpsFunctionFnOnceTupleUsizePoly64.call_once
+}
+
+/-- Trait implementation: [p3_binary_field::poly192::{impl core::ops::arith::Add<p3_binary_field::poly192::Poly192, p3_binary_field::poly192::Poly192> for p3_binary_field::poly192::Poly192}::add::{impl core::ops::function::FnMut<(usize,), p3_binary_field::poly64::Poly64> for p3_binary_field::poly192::{impl core::ops::arith::Add<p3_binary_field::poly192::Poly192, p3_binary_field::poly192::Poly192> for p3_binary_field::poly192::Poly192}::add::closure<'_0, '_1>}]
+    Source: 'binary-field/src/poly192.rs', lines 163:34-163:58 -/
+@[reducible]
+def
+  poly192.AddPoly192Poly192Poly192.add.closure.Insts.CoreOpsFunctionFnMutTupleUsizePoly64
+  : core.ops.function.FnMut poly192.AddPoly192Poly192Poly192.add.closure
+  Std.Usize poly64.Poly64 := {
+  FnOnceInst :=
+    poly192.AddPoly192Poly192Poly192.add.closure.Insts.CoreOpsFunctionFnOnceTupleUsizePoly64
+  call_mut :=
+    poly192.AddPoly192Poly192Poly192.add.closure.Insts.CoreOpsFunctionFnMutTupleUsizePoly64.call_mut
+}
+
+/-- [p3_binary_field::poly192::{impl core::ops::arith::Add<p3_binary_field::poly192::Poly192, p3_binary_field::poly192::Poly192> for p3_binary_field::poly192::Poly192}::add]:
+    Source: 'binary-field/src/poly192.rs', lines 161:4-164:5
+    Visibility: public -/
+def poly192.Poly192.Insts.CoreOpsArithAddPoly192Poly192.add
+  (self : poly192.Poly192) (rhs : poly192.Poly192) :
+  RustM poly192.Poly192
+  := do
+  let a ←
+    core.array.from_fn 3#usize
+      poly192.AddPoly192Poly192Poly192.add.closure.Insts.CoreOpsFunctionFnMutTupleUsizePoly64
+      (self, rhs)
+  ok a
+
+/-- [p3_binary_field::hax_roots::poly192_add]:
+    Source: 'binary-field/src/hax_roots.rs', lines 177:0-179:1
+    Visibility: public -/
+def hax_roots.poly192_add
+  (a : poly192.Poly192) (b : poly192.Poly192) : RustM poly192.Poly192 := do
+  poly192.Poly192.Insts.CoreOpsArithAddPoly192Poly192.add a b
+
+/-- [p3_binary_field::poly192::{impl core::ops::arith::Sub<p3_binary_field::poly192::Poly192, p3_binary_field::poly192::Poly192> for p3_binary_field::poly192::Poly192}::sub]:
+    Source: 'binary-field/src/poly192.rs', lines 172:4-175:5
+    Visibility: public -/
+def poly192.Poly192.Insts.CoreOpsArithSubPoly192Poly192.sub
+  (self : poly192.Poly192) (rhs : poly192.Poly192) :
+  RustM poly192.Poly192
+  := do
+  poly192.Poly192.Insts.CoreOpsArithAddPoly192Poly192.add self rhs
+
+/-- [p3_binary_field::hax_roots::poly192_sub]:
+    Source: 'binary-field/src/hax_roots.rs', lines 181:0-183:1
+    Visibility: public -/
+def hax_roots.poly192_sub
+  (a : poly192.Poly192) (b : poly192.Poly192) : RustM poly192.Poly192 := do
+  poly192.Poly192.Insts.CoreOpsArithSubPoly192Poly192.sub a b
+
+/-- [p3_binary_field::poly192::{impl core::ops::arith::Neg<p3_binary_field::poly192::Poly192> for p3_binary_field::poly192::Poly192}::neg]:
+    Source: 'binary-field/src/poly192.rs', lines 182:4-185:5
+    Visibility: public -/
+def poly192.Poly192.Insts.CoreOpsArithNegPoly192.neg
+  (self : poly192.Poly192) : RustM poly192.Poly192 := do
+  ok self
+
+/-- [p3_binary_field::hax_roots::poly192_neg]:
+    Source: 'binary-field/src/hax_roots.rs', lines 185:0-187:1
+    Visibility: public -/
+def hax_roots.poly192_neg (a : poly192.Poly192) : RustM poly192.Poly192 := do
+  poly192.Poly192.Insts.CoreOpsArithNegPoly192.neg a
+
+/-- [p3_binary_field::poly64::{p3_binary_field::poly64::Poly64}::new]:
+    Source: 'binary-field/src/poly64.rs', lines 98:4-100:5
+    Visibility: public -/
+def poly64.Poly64.new (coordinates : Std.U64) : RustM poly64.Poly64 := do
+  ok coordinates
+
+/-- [p3_binary_field::poly192::{p3_binary_field::poly192::Poly192}::from_limbs]:
+    Source: 'binary-field/src/poly192.rs', lines 121:4-124:5 -/
+def poly192.Poly192.from_limbs
+  (a : Array Std.U64 3#usize) : RustM poly192.Poly192 := do
+  let a0 ← Array.index_usize a 0#usize
+  let a1 ← Array.index_usize a 1#usize
+  let a2 ← Array.index_usize a 2#usize
+  let p ← poly64.Poly64.new a0
+  let p1 ← poly64.Poly64.new a1
+  let p2 ← poly64.Poly64.new a2
+  ok (Array.make 3#usize [ p, p1, p2 ])
+
+/-- [p3_binary_field::poly64::{p3_binary_field::poly64::Poly64}::to_bits]:
+    Source: 'binary-field/src/poly64.rs', lines 105:4-107:5
+    Visibility: public -/
+def poly64.Poly64.to_bits (self : poly64.Poly64) : RustM Std.U64 := do
+  ok self
+
+/-- [p3_binary_field::poly192::{p3_binary_field::poly192::Poly192}::limbs_owned]:
+    Source: 'binary-field/src/poly192.rs', lines 115:4-117:5 -/
+def poly192.Poly192.limbs_owned
+  (self : poly192.Poly192) : RustM (Array Std.U64 3#usize) := do
+  let p ← Array.index_usize self 0#usize
+  let i ← poly64.Poly64.to_bits p
+  let p1 ← Array.index_usize self 1#usize
+  let i1 ← poly64.Poly64.to_bits p1
+  let p2 ← Array.index_usize self 2#usize
+  let i2 ← poly64.Poly64.to_bits p2
+  ok (Array.make 3#usize [ i, i1, i2 ])
+
+/-- [p3_binary_field::poly192::{impl core::ops::arith::Mul<p3_binary_field::poly192::Poly192, p3_binary_field::poly192::Poly192> for p3_binary_field::poly192::Poly192}::mul]:
+    Source: 'binary-field/src/poly192.rs', lines 212:4-220:5
+    Visibility: public -/
+def poly192.Poly192.Insts.CoreOpsArithMulPoly192Poly192.mul
+  (self : poly192.Poly192) (rhs : poly192.Poly192) :
+  RustM poly192.Poly192
+  := do
+  let a ← poly192.Poly192.limbs_owned self
+  let b ← poly192.Poly192.limbs_owned rhs
+  let a1 ← clmul.gf192.poly_mul_192 a b
+  poly192.Poly192.from_limbs a1
+
+/-- [p3_binary_field::hax_roots::poly192_mul]:
+    Source: 'binary-field/src/hax_roots.rs', lines 189:0-191:1
+    Visibility: public -/
+def hax_roots.poly192_mul
+  (a : poly192.Poly192) (b : poly192.Poly192) : RustM poly192.Poly192 := do
+  poly192.Poly192.Insts.CoreOpsArithMulPoly192Poly192.mul a b
+
+/-- [p3_binary_field::hax_roots::ghash_add]:
+    Source: 'binary-field/src/hax_roots.rs', lines 195:0-197:1
+    Visibility: public -/
+def hax_roots.ghash_add
+  (a : ghash.Ghash128) (b : ghash.Ghash128) : RustM ghash.Ghash128 := do
+  ghash.Ghash128.Insts.CoreOpsArithAddGhash128Ghash128.add a b
+
+/-- [p3_binary_field::hax_roots::ghash_sub]:
+    Source: 'binary-field/src/hax_roots.rs', lines 199:0-201:1
+    Visibility: public -/
+def hax_roots.ghash_sub
+  (a : ghash.Ghash128) (b : ghash.Ghash128) : RustM ghash.Ghash128 := do
+  ghash.Ghash128.Insts.CoreOpsArithSubGhash128Ghash128.sub a b
+
+/-- [p3_binary_field::hax_roots::ghash_neg]:
+    Source: 'binary-field/src/hax_roots.rs', lines 203:0-205:1
+    Visibility: public -/
+def hax_roots.ghash_neg (a : ghash.Ghash128) : RustM ghash.Ghash128 := do
+  ghash.Ghash128.Insts.CoreOpsArithNegGhash128.neg a
+
+/-- [p3_binary_field::hax_roots::ghash_mul]:
+    Source: 'binary-field/src/hax_roots.rs', lines 207:0-209:1
+    Visibility: public -/
+def hax_roots.ghash_mul
+  (a : ghash.Ghash128) (b : ghash.Ghash128) : RustM ghash.Ghash128 := do
+  ghash.Ghash128.Insts.CoreOpsArithMulGhash128Ghash128.mul a b
 
 /-- [p3_binary_field::tables::SQUARE]: loop body 0:
     Source: 'binary-field/src/tables.rs', lines 84:4-87:5 -/
@@ -750,23 +3089,6 @@ def tables.INVERSE_loop
 def tables.INVERSE : RustM (Array Std.U8 256#usize) :=
   let table := Array.repeat 256#usize 0#u8
   tables.INVERSE_loop table 1#usize
-
-/-- [p3_binary_field::tables::mul]:
-    Source: 'binary-field/src/tables.rs', lines 103:0-110:1 -/
-def tables.mul (a : Std.U8) (b : Std.U8) : RustM Std.U8 := do
-  let i ← lift (UScalar.cast .Usize a)
-  let i1 ← Array.index_usize tables.LOG i
-  let i2 ← lift (UScalar.cast .Usize i1)
-  let i3 ← lift (UScalar.cast .Usize b)
-  let i4 ← Array.index_usize tables.LOG i3
-  let i5 ← lift (UScalar.cast .Usize i4)
-  let exponent ← i2 + i5
-  let i6 ← lift (UScalar.cast_fromBool .U8 (a != 0#u8))
-  let i7 ← lift (UScalar.cast_fromBool .U8 (b != 0#u8))
-  let i8 ← lift (i6 &&& i7)
-  let both_nonzero ← core.num.U8.wrapping_sub 0#u8 i8
-  let i9 ← Array.index_usize tables.EXP exponent
-  ok (i9 &&& both_nonzero)
 
 /-- [p3_binary_field::tables::square]:
     Source: 'binary-field/src/tables.rs', lines 114:0-116:1 -/

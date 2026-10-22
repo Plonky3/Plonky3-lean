@@ -1,0 +1,251 @@
+# Patch:        030-extraction-roots
+# Phase:        pre
+# Target:       binary-field/src/lib.rs, binary-field/src/hax_roots.rs
+# Hunks:        2
+# Class:        bound
+# Gap:          docs/extractor-issues.md 4 (charon leaves methods that no free
+#               function calls out of `ordered_decls`, and aeneas drops them).
+# Cost:         none in a normal build: the module exists only under
+#               cfg(hax_backend_lean). In the extracted variant it adds free
+#               functions, each of which calls one method of a field type.
+#               No existing body changes.
+# Upstreamable: no: the module exists only for the extractor.
+# Drop when:    charon orders `--start-from` methods, so that the methods
+#               themselves can be roots.
+# Test:         lint p3-binary-field unexpected_cfgs
+# Mutation:     the module is gated on a misspelled cfg, so a normal
+#               `cargo check` reports `unexpected_cfgs`.
+#
+# EXPERIMENT: which field-type methods can be extracted.
+#
+diff --git a/binary-field/src/hax_roots.rs b/binary-field/src/hax_roots.rs
+new file mode 100644
+index 00000000..17e21bd6
+--- /dev/null
++++ b/binary-field/src/hax_roots.rs
+@@ -0,0 +1,211 @@
++//! PATCHED: extraction roots for hax's Lean backend, compiled only under
++//! `cfg(hax_backend_lean)`.
++//!
++//! Charon translates the methods of the field types but leaves every method that no
++//! free function calls out of the declaration order aeneas reads, so aeneas drops
++//! them without a diagnostic (Plonky3-lean, docs/extractor-issues.md, 4).
++//! Each function here calls exactly one such method and does nothing else, so that
++//! the method's own body is extracted.
++
++use crate::{
++    BinaryField2, BinaryField4, BinaryField8, BinaryField16, BinaryField32, BinaryField64,
++    BinaryField128, Gf2, Ghash128, Poly64, Poly192,
++};
++
++pub fn gf2_add(a: Gf2, b: Gf2) -> Gf2 {
++    a + b
++}
++
++pub fn gf2_sub(a: Gf2, b: Gf2) -> Gf2 {
++    a - b
++}
++
++pub fn gf2_neg(a: Gf2) -> Gf2 {
++    -a
++}
++
++pub fn gf2_mul(a: Gf2, b: Gf2) -> Gf2 {
++    a * b
++}
++
++
++
++pub fn bf2_add(a: BinaryField2, b: BinaryField2) -> BinaryField2 {
++    a + b
++}
++
++pub fn bf2_sub(a: BinaryField2, b: BinaryField2) -> BinaryField2 {
++    a - b
++}
++
++pub fn bf2_neg(a: BinaryField2) -> BinaryField2 {
++    -a
++}
++
++pub fn bf2_mul(a: BinaryField2, b: BinaryField2) -> BinaryField2 {
++    a * b
++}
++
++
++
++pub fn bf4_add(a: BinaryField4, b: BinaryField4) -> BinaryField4 {
++    a + b
++}
++
++pub fn bf4_sub(a: BinaryField4, b: BinaryField4) -> BinaryField4 {
++    a - b
++}
++
++pub fn bf4_neg(a: BinaryField4) -> BinaryField4 {
++    -a
++}
++
++pub fn bf4_mul(a: BinaryField4, b: BinaryField4) -> BinaryField4 {
++    a * b
++}
++
++
++
++pub fn bf8_add(a: BinaryField8, b: BinaryField8) -> BinaryField8 {
++    a + b
++}
++
++pub fn bf8_sub(a: BinaryField8, b: BinaryField8) -> BinaryField8 {
++    a - b
++}
++
++pub fn bf8_neg(a: BinaryField8) -> BinaryField8 {
++    -a
++}
++
++pub fn bf8_mul(a: BinaryField8, b: BinaryField8) -> BinaryField8 {
++    a * b
++}
++
++
++
++pub fn bf16_add(a: BinaryField16, b: BinaryField16) -> BinaryField16 {
++    a + b
++}
++
++pub fn bf16_sub(a: BinaryField16, b: BinaryField16) -> BinaryField16 {
++    a - b
++}
++
++pub fn bf16_neg(a: BinaryField16) -> BinaryField16 {
++    -a
++}
++
++pub fn bf16_mul(a: BinaryField16, b: BinaryField16) -> BinaryField16 {
++    a * b
++}
++
++
++
++pub fn bf32_add(a: BinaryField32, b: BinaryField32) -> BinaryField32 {
++    a + b
++}
++
++pub fn bf32_sub(a: BinaryField32, b: BinaryField32) -> BinaryField32 {
++    a - b
++}
++
++pub fn bf32_neg(a: BinaryField32) -> BinaryField32 {
++    -a
++}
++
++pub fn bf32_mul(a: BinaryField32, b: BinaryField32) -> BinaryField32 {
++    a * b
++}
++
++
++
++pub fn bf64_add(a: BinaryField64, b: BinaryField64) -> BinaryField64 {
++    a + b
++}
++
++pub fn bf64_sub(a: BinaryField64, b: BinaryField64) -> BinaryField64 {
++    a - b
++}
++
++pub fn bf64_neg(a: BinaryField64) -> BinaryField64 {
++    -a
++}
++
++pub fn bf64_mul(a: BinaryField64, b: BinaryField64) -> BinaryField64 {
++    a * b
++}
++
++
++
++pub fn bf128_add(a: BinaryField128, b: BinaryField128) -> BinaryField128 {
++    a + b
++}
++
++pub fn bf128_sub(a: BinaryField128, b: BinaryField128) -> BinaryField128 {
++    a - b
++}
++
++pub fn bf128_neg(a: BinaryField128) -> BinaryField128 {
++    -a
++}
++
++pub fn bf128_mul(a: BinaryField128, b: BinaryField128) -> BinaryField128 {
++    a * b
++}
++
++
++
++pub fn poly64_add(a: Poly64, b: Poly64) -> Poly64 {
++    a + b
++}
++
++pub fn poly64_sub(a: Poly64, b: Poly64) -> Poly64 {
++    a - b
++}
++
++pub fn poly64_neg(a: Poly64) -> Poly64 {
++    -a
++}
++
++pub fn poly64_mul(a: Poly64, b: Poly64) -> Poly64 {
++    a * b
++}
++
++
++
++pub fn poly192_add(a: Poly192, b: Poly192) -> Poly192 {
++    a + b
++}
++
++pub fn poly192_sub(a: Poly192, b: Poly192) -> Poly192 {
++    a - b
++}
++
++pub fn poly192_neg(a: Poly192) -> Poly192 {
++    -a
++}
++
++pub fn poly192_mul(a: Poly192, b: Poly192) -> Poly192 {
++    a * b
++}
++
++
++
++pub fn ghash_add(a: Ghash128, b: Ghash128) -> Ghash128 {
++    a + b
++}
++
++pub fn ghash_sub(a: Ghash128, b: Ghash128) -> Ghash128 {
++    a - b
++}
++
++pub fn ghash_neg(a: Ghash128) -> Ghash128 {
++    -a
++}
++
++pub fn ghash_mul(a: Ghash128, b: Ghash128) -> Ghash128 {
++    a * b
++}
++
++
+diff --git a/binary-field/src/lib.rs b/binary-field/src/lib.rs
+index 640cf490..e14ab89e 100644
+--- a/binary-field/src/lib.rs
++++ b/binary-field/src/lib.rs
+@@ -12,6 +12,9 @@ mod coordinates;
+ mod extension;
+ mod gf2;
+ mod ghash;
++// PATCHED: extraction roots, only under hax's Lean backend.
++#[cfg(hax_backend_lean)]
++pub mod hax_roots;
+ mod linear;
+ mod packed;
+ mod poly192;

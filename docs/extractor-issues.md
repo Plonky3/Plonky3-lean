@@ -63,7 +63,11 @@ one of them is still present.
    mutually recursive definitions"). `--opaque p3_field` does not help, because
    it hides bodies, not trait declarations. p3-mds also hits 28 unsupported
    lifetime constraints of its own. Hence the `scoped` state of both crates,
-   and the `field` stub.
+   and the `field` stub. In p3-binary-field the group is reached through any
+   tower arithmetic, since `TowerLevel: Field` and each level calls the level
+   below through `TowerLevel` methods; pre-patch `binary-field/040` gives the
+   arithmetic inherent copies of those methods. A trait method of the group
+   (`square`, `try_inverse`, …) still cannot be a root.
 10. **charon and aeneas cannot lift `-> impl Trait` in trait methods**
     ([charon#1266](https://github.com/AeneasVerif/charon/issues/1266)). rustc
     desugars each into a hidden generic associated type, and p3-field has many.
@@ -72,3 +76,7 @@ one of them is still present.
 11. **A scoped extraction of p3-poseidon1 fails** with an aeneas internal error
     in `core::iter`, and one of p3-poseidon2 fails on the body of
     `Poseidon2::new`. Both crates are stubs.
+12. **aeneas does not support dereferencing a raw pointer** ("Aeneas does not
+    yet support dereferencing raw pointers"). p3-binary-field's `Poly192::limbs`
+    reborrows `[Poly64; 3]` as `&[u64; 3]` through one; pre-patch
+    `binary-field/050` gives the products a copy instead.

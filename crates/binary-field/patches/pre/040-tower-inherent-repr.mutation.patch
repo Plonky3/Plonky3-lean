@@ -1,0 +1,14 @@
+# Mutation of: 040-tower-inherent-repr
+# Breaks:      `raw_mul_alpha` swaps the coefficients it joins.
+#
+--- a/binary-field/src/tower.rs
++++ b/binary-field/src/tower.rs
+@@ -182,7 +182,7 @@
+             #[inline]
+             pub(crate) fn raw_mul_alpha(self) -> Self {
+                 let (c0, c1) = self.split();
+-                Self::join(c1, c0 + c1.raw_mul_alpha())
++                Self::join(c0 + c1.raw_mul_alpha(), c1)
+             }
+ 
+             // PATCHED: the selection, only under hax's Lean backend.

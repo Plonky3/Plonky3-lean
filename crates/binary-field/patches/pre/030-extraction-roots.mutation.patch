@@ -1,0 +1,15 @@
+# Mutation of: 030-extraction-roots
+# Breaks:      the module is gated on a misspelled cfg.
+#
+diff --git a/binary-field/src/lib.rs b/binary-field/src/lib.rs
+--- a/binary-field/src/lib.rs
++++ b/binary-field/src/lib.rs
+@@ -13,7 +13,7 @@ mod extension;
+ mod gf2;
+ mod ghash;
+ // PATCHED: extraction roots, only under hax's Lean backend.
+-#[cfg(hax_backend_lean)]
++#[cfg(hax_backend_lea)]
+ pub mod hax_roots;
+ mod linear;
+ mod packed;

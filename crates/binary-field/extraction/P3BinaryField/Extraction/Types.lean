@@ -2,6 +2,7 @@
 -- [p3_binary_field]: type definitions
 import Aeneas
 import CoreModels
+import P3BinaryField.Extraction.TypesExternal
 open CoreModels Aeneas
 open Aeneas.Std hiding namespace core alloc
 open RustM ControlFlow Error
@@ -30,5 +31,76 @@ def clmul.gf192.composed_mul_192_by_64.closure := Std.U64
     Source: 'binary-field/src/clmul/gf64.rs', lines 120:23-120:47 -/
 @[reducible]
 def clmul.gf64.square_times.closure (K : Std.Usize) := Unit
+
+/-- [p3_binary_field::gf2::Gf2]
+    Source: 'binary-field/src/gf2.rs', lines 81:0-81:19
+    Visibility: public -/
+@[reducible]
+def gf2.Gf2 := Std.U8
+
+/-- [p3_binary_field::ghash::Ghash128]
+    Source: 'binary-field/src/ghash.rs', lines 92:0-92:26
+    Visibility: public -/
+@[reducible]
+def ghash.Ghash128 := Std.U128
+
+/-- [p3_binary_field::tower::BinaryField2]
+    Source: 'binary-field/src/tower.rs', lines 138:8-138:32
+    Visibility: public -/
+@[reducible]
+def tower.BinaryField2 := Std.U8
+
+/-- [p3_binary_field::tower::BinaryField4]
+    Source: 'binary-field/src/tower.rs', lines 138:8-138:32
+    Visibility: public -/
+@[reducible]
+def tower.BinaryField4 := Std.U8
+
+/-- [p3_binary_field::tower::BinaryField8]
+    Source: 'binary-field/src/tower.rs', lines 138:8-138:32
+    Visibility: public -/
+@[reducible]
+def tower.BinaryField8 := Std.U8
+
+/-- [p3_binary_field::tower::BinaryField16]
+    Source: 'binary-field/src/tower.rs', lines 138:8-138:32
+    Visibility: public -/
+@[reducible]
+def tower.BinaryField16 := Std.U16
+
+/-- [p3_binary_field::tower::BinaryField32]
+    Source: 'binary-field/src/tower.rs', lines 138:8-138:32
+    Visibility: public -/
+@[reducible]
+def tower.BinaryField32 := Std.U32
+
+/-- [p3_binary_field::tower::BinaryField64]
+    Source: 'binary-field/src/tower.rs', lines 138:8-138:32
+    Visibility: public -/
+@[reducible]
+def tower.BinaryField64 := Std.U64
+
+/-- [p3_binary_field::tower::BinaryField128]
+    Source: 'binary-field/src/tower.rs', lines 138:8-138:32
+    Visibility: public -/
+@[reducible]
+def tower.BinaryField128 := Std.U128
+
+/-- [p3_binary_field::poly64::Poly64]
+    Source: 'binary-field/src/poly64.rs', lines 67:0-67:23
+    Visibility: public -/
+@[reducible]
+def poly64.Poly64 := Std.U64
+
+/-- [p3_binary_field::poly192::{impl core::ops::arith::Add<p3_binary_field::poly192::Poly192, p3_binary_field::poly192::Poly192> for p3_binary_field::poly192::Poly192}::add::closure]
+    Source: 'binary-field/src/poly192.rs', lines 163:34-163:58 -/
+def poly192.AddPoly192Poly192Poly192.add.closure :=
+  Array poly64.Poly64 3#usize × Array poly64.Poly64 3#usize
+
+/-- [p3_binary_field::poly192::Poly192]
+    Source: 'binary-field/src/poly192.rs', lines 53:0-53:37
+    Visibility: public -/
+@[reducible]
+def poly192.Poly192 := Array poly64.Poly64 3#usize
 
 end p3_binary_field

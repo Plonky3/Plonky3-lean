@@ -15,7 +15,7 @@ target `thumbv7em-none-eabi`
 | Crate | State | Generated lines | Hand-written lines | `opaque` | Mirrored | Dropped by the extractor | Patches (pre / post) | Patches with a cost |
 |---|---|---:|---:|---:|---:|---:|---|---|
 | `baby-bear` | extracted | 2947 | 107 | 4 | 0 | 0 | 4 / 3 | pre `020`, pre `030`, pre `040` |
-| `binary-field` | scoped | 823 | 35 | 0 | 0 | 0 | 2 / 0 | pre `010`, pre `020` |
+| `binary-field` | scoped | 3217 | 52 | 0 | 0 | 0 | 5 / 0 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050` |
 | `field` | stub |  | 87 | 2 | 6 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 563 | 409 | 0 | 19 | 37 | 1 / 0 |  |
 | `koala-bear` | extracted | 3018 | 107 | 4 | 0 | 0 | 0 / 3 |  |
@@ -45,7 +45,7 @@ Nothing translated is dropped.
 
 ### `binary-field`
 
-charon errors: 0.
+charon errors: 5, at `library/core/src/iter/adapters/enumerate.rs:62:1`, `library/core/src/slice/iter/macros.rs:153:9`.
 Nothing translated is dropped.
 
 ### `goldilocks`
@@ -342,6 +342,9 @@ counts the claims (of 293) whose dependencies include the declaration.
 | `baby-bear/pre/040-field-cfg-rpitit-bit-plane-expansion` | none in a normal build: the change is behind cfg(hax_backend_lean). In the extracted variant, `Field::prepare_bit_plane_expansion` is absent. |
 | `binary-field/pre/010-cfg-raw-data-serializable-bounds` | none: each added bound is implied by `TowerLevel: Field` in a normal build. |
 | `binary-field/pre/020-cfg-hide-ghash-bit-plane-expansion` | none in a normal build: the change is behind cfg(hax_backend_lean). In the extracted variant, `Ghash128::prepare_bit_plane_expansion` is absent. |
+| `binary-field/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of a field type. No existing body changes. |
+| `binary-field/pre/040-tower-inherent-repr` | none in a normal build: the copies are compiled but unused there. In the extracted variant, inherent `from_repr`, `to_repr` and `mul_alpha` shadow the `TowerLevel` methods at every call site on a concrete level, and call copies with the trait methods' bodies. `Gf2`'s copies build the value directly: `from_bool((r & 1) == 1)` is `Self(r & 1)`, and `u8::from(self.is_one())` is `(self.0 == 1) as u8`. |
+| `binary-field/pre/050-poly192-copied-limbs` | none in a normal build: the copy is compiled but unused there. In the extracted variant, `Mul` and `Mul<Poly64>` read the coordinates through `limbs_owned`, which copies each coordinate's bits, instead of borrowing them in place. |
 | `mersenne-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of `Mersenne31`. No existing body changes. |
 
 Upstream tests (`test-pre-patches.py`): 6715 of Plonky3's 6769 pass as shipped and 6715 with the pre-extraction patches, with 0 divergence(s).

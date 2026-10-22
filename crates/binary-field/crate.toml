@@ -29,6 +29,8 @@ start_from = [
   "p3_binary_field::tables::mul",
   "p3_binary_field::tables::square",
   "p3_binary_field::tables::try_inverse",
+  # The field types' methods, through pre-patch 030's one-line wrappers.
+  "p3_binary_field::hax_roots",
 ]
 
 watch = ["binary-field/src", "binary-field/Cargo.toml"]
