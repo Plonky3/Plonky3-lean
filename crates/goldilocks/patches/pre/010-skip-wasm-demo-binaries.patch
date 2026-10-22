@@ -1,0 +1,30 @@
+# Patch:     010-skip-wasm-demo-binaries
+# Phase:     pre
+# Target:    goldilocks/Cargo.toml
+# Hunks:     1
+# Cost:      none. The library is untouched; only the two demo binaries are not built.
+# Upstream:  hax's `into lean` cannot restrict charon's cargo build to `--lib`.
+# Drop when: hax forwards cargo target selection to charon, or the binaries leave src/bin.
+#
+# p3-goldilocks has two auto-discovered binaries, `src/bin/wasm_smoke.rs` and
+# `src/bin/wasm_bench.rs`, that are wasm32 demos and no-ops elsewhere.
+# Both need `std`, which `thumbv7em-none-eabi` does not have, so charon's cargo
+# build of the package fails on them before it reaches the library.
+# hax appends its own `--` to the charon command line, so `--lib` cannot be
+# passed through `--charon-args`.
+# `autobins = false` stops cargo from discovering the binaries.
+# They have no tests, so no upstream test can diverge.
+#
+diff --git a/goldilocks/Cargo.toml b/goldilocks/Cargo.toml
+index f2b8b02d..ed1de255 100644
+--- a/goldilocks/Cargo.toml
++++ b/goldilocks/Cargo.toml
+@@ -8,6 +8,8 @@ repository.workspace = true
+ homepage.workspace = true
+ keywords.workspace = true
+ categories.workspace = true
++# PATCHED: the wasm32 demo binaries in src/bin need std, which the extraction target lacks.
++autobins = false
+ 
+ # criterion pulls rayon transitively and rayon does not build on wasi.
+ [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
