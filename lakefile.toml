@@ -96,6 +96,7 @@ srcDir = "crates/util/extraction"
 name = "P3BinaryField"
 srcDir = "crates/binary-field/extraction"
 
+[[lean_lib]]
 name = "P3Sha256"
 srcDir = "crates/sha256/extraction"
 
@@ -103,3 +104,7 @@ srcDir = "crates/sha256/extraction"
 [[lean_lib]]
 name = "Sha2"
 srcDir = "crates/sha2/extraction"
+
+[[lean_lib]]
+name = "P3Blake2s"
+srcDir = "crates/blake2s/extraction"

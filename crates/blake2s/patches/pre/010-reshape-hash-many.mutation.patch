@@ -1,0 +1,15 @@
+# Mutation of: 010-reshape-hash-many
+# Breaks:      the reshaped body hashes the first message into every digest,
+#              so it no longer equals the original.
+#
+--- a/blake2s/src/hax_reshaped.rs
++++ b/blake2s/src/hax_reshaped.rs
+@@ -22,7 +22,7 @@
+ 
+     // Message i is the i-th run of that length.
+     for i in 0..out.len() {
+-        out[i] = crate::Blake2s256::hash(&input[i * len..][..len]);
++        out[i] = crate::Blake2s256::hash(&input[..len]);
+     }
+ }
+ 

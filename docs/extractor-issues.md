@@ -77,13 +77,22 @@ keeps its number and says so.
     unfolds it, which fails on p3-binary-field's 511-entry `tables::EXP` (either
     attribute alone elaborates). Post-patch `binary-field/010` keeps only
     `irreducible` there.
-14. **The models lack `transmute`, `slice::from_ref`, `as_chunks_mut` and a zip
-    over `IterMut`.** aeneas emits calls to them, which do not elaborate.
-    p3-sha256's `Sha256Compress::compress` uses all four; pre-patch
-    `sha256/010` gives the extracted variant the same body with a copied block
-    and indexed writes.
+14. **The models lack `transmute`, `slice::from_ref`, `as_chunks_mut` and the
+    mutable slice iterator `IterMut`** (so `iter_mut().zip(..)` and
+    `iter_mut().enumerate()`). aeneas emits calls to them, which do not
+    elaborate. Pre-patch `sha256/010` gives `Sha256Compress::compress` the same
+    body with a copied block and indexed writes, and pre-patch `blake2s/010`
+    gives the scalar `hash_many` indexed writes.
 15. **aeneas runs out of memory on sha2's unrolled SHA-256 backend**, the one a
     default build for the extraction target compiles: 64 inlined rounds exceed
-    20 GB. Its round constants are also read through raw pointers. The sha2
+    20 GB. Its round constants are also read through raw pointers (12). The sha2
     run selects the compact backend with sha2's own cfg
     (`crates/sha2/crate.toml`), so the model is that backend.
+16. **aeneas rejects hybrid-array's `Array` and `ArraySize`**, a type and a
+    trait mutually recursive through an associated type ("mixed mutually
+    recursive definitions"), as for 9. Every RustCrypto `Digest` (sha2's
+    `Sha256`, blake2's `Blake2s`) stores its buffer in one, so the incremental
+    hashers do not extract. charon's `--monomorphize` would remove the trait,
+    but hax's lean backend passes `--no-gen-tuple-structs`, which charon
+    refuses alongside it. p3-blake2s assumes `Blake2s256::hash`; p3-sha256's
+    `hash_iter` and `hash_iter_slices` are not extracted.

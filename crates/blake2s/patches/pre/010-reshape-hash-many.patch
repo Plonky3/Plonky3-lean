@@ -1,0 +1,144 @@
+# Patch:        010-reshape-hash-many
+# Phase:        pre
+# Target:       blake2s/src/hax_reshaped.rs, blake2s/src/lib.rs, blake2s/src/scalar.rs
+# Hunks:        4
+# Class:        equiv-rewrite
+# Gap:          docs/extractor-issues.md 14 (no model of a mutable slice
+#               iterator, here `iter_mut().enumerate()`).
+# Cost:         none in a normal build: only the selection is behind
+#               cfg(hax_backend_lean). In the extracted variant, the scalar
+#               `hash_many` calls the reshaped body, which a differential test
+#               equates with the original.
+# Upstreamable: no: the original is the clearer code; an extractor model of
+#               mutable slice iterators makes the patch unnecessary.
+# Drop when:    the extractor translates `iter_mut().enumerate()` over a slice.
+# Test:         test p3-blake2s --lib hax_reshaped
+# Mutation:     the reshaped body hashes the first message into every digest,
+#               so it disagrees with the original whenever two messages differ.
+#
+# The original body writes each digest through `iter_mut().enumerate()`.
+# The reshaped body writes digest `i` by index, with the same assertion and the same message slice.
+# The scalar file is compiled only for targets without a vector backend, so the test includes it a second time, under `cfg(test)`, to run the shipped body beside the reshaped one on any host.
+#
+diff --git a/blake2s/src/hax_reshaped.rs b/blake2s/src/hax_reshaped.rs
+new file mode 100644
+index 00000000..d4f6680f
+--- /dev/null
++++ b/blake2s/src/hax_reshaped.rs
+@@ -0,0 +1,83 @@
++//! PATCHED: the body of the scalar `hash_many` in a shape hax's Lean backend translates.
++//!
++//! The extractor has no model of a mutable slice iterator.
++//! Plonky3-lean, docs/extractor-issues.md, 14.
++
++use crate::DIGEST_BYTES;
++
++/// Hash `out.len()` equal-length messages laid end to end in `input`: what the scalar `hash_many` does.
++#[cfg_attr(not(hax_backend_lean), allow(dead_code))]
++pub(crate) fn hash_many(input: &[u8], out: &mut [[u8; DIGEST_BYTES]]) {
++    if out.is_empty() {
++        return;
++    }
++
++    assert!(
++        input.len().is_multiple_of(out.len()),
++        "input length ({}) must be a whole multiple of the digest count ({})",
++        input.len(),
++        out.len()
++    );
++    let len = input.len() / out.len();
++
++    // Message i is the i-th run of that length.
++    for i in 0..out.len() {
++        out[i] = crate::Blake2s256::hash(&input[i * len..][..len]);
++    }
++}
++
++/// The scalar `hash_many` as shipped, which a vector target does not otherwise compile.
++#[cfg(test)]
++#[allow(dead_code, unreachable_pub)]
++#[path = "scalar.rs"]
++mod original;
++
++#[cfg(test)]
++mod tests {
++    extern crate std;
++
++    use alloc::vec;
++    use alloc::vec::Vec;
++
++    use proptest::prelude::*;
++
++    use crate::DIGEST_BYTES;
++
++    use super::original;
++
++    fn check(input: &[u8], count: usize) {
++        let mut expected = vec![[0u8; DIGEST_BYTES]; count];
++        let mut reshaped = vec![[1u8; DIGEST_BYTES]; count];
++        original::hash_many(input, &mut expected);
++        super::hash_many(input, &mut reshaped);
++        assert_eq!(reshaped, expected);
++    }
++
++    #[test]
++    fn reshaped_hash_many_matches_on_edge_inputs() {
++        check(&[], 0);
++        check(&[], 1);
++        check(&[], 3);
++        check(&[7; 64], 1);
++        check(&[7; 64], 2);
++        check(&(0..=255).collect::<Vec<u8>>(), 4);
++        check(&(0..=255).collect::<Vec<u8>>(), 256);
++    }
++
++    #[test]
++    fn reshaped_hash_many_panics_like_the_original() {
++        let ragged = |f: fn(&[u8], &mut [[u8; DIGEST_BYTES]])| {
++            std::panic::catch_unwind(|| f(&[0; 5], &mut [[0; DIGEST_BYTES]; 2])).is_err()
++        };
++        assert!(ragged(original::hash_many));
++        assert!(ragged(super::hash_many));
++    }
++
++    proptest! {
++        #[test]
++        fn reshaped_hash_many_matches(len in 0usize..200, count in 0usize..6, seed: u8) {
++            let input: Vec<u8> = (0..len * count).map(|i| (i as u8).wrapping_mul(31) ^ seed).collect();
++            check(&input, count);
++        }
++    }
++}
+diff --git a/blake2s/src/lib.rs b/blake2s/src/lib.rs
+index f787386e..786335d5 100644
+--- a/blake2s/src/lib.rs
++++ b/blake2s/src/lib.rs
+@@ -90,3 +90,6 @@ impl CryptographicHasher<u8, [u8; DIGEST_BYTES]> for Blake2s256 {
+         batch::hash_many(input, out);
+     }
+ }
++
++// PATCHED
++mod hax_reshaped;
+diff --git a/blake2s/src/scalar.rs b/blake2s/src/scalar.rs
+index 3d7eecde..bd709933 100644
+--- a/blake2s/src/scalar.rs
++++ b/blake2s/src/scalar.rs
+@@ -10,6 +10,7 @@ pub(crate) const LANES: usize = 1;
+ /// # Panics
+ ///
+ /// Panics if the input length is not a whole multiple of the digest count.
++#[cfg(not(hax_backend_lean))] // PATCHED
+ pub(crate) fn hash_many(input: &[u8], out: &mut [[u8; DIGEST_BYTES]]) {
+     // No digests requested means there is nothing to read from the input.
+     if out.is_empty() {
+@@ -30,3 +31,9 @@ pub(crate) fn hash_many(input: &[u8], out: &mut [[u8; DIGEST_BYTES]]) {
+         *digest = crate::Blake2s256::hash(&input[i * len..][..len]);
+     }
+ }
++
++// PATCHED: the extracted variant takes the same body, reshaped for the extractor.
++#[cfg(hax_backend_lean)]
++pub(crate) fn hash_many(input: &[u8], out: &mut [[u8; DIGEST_BYTES]]) {
++    crate::hax_reshaped::hash_many(input, out);
++}
