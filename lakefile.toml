@@ -1,6 +1,6 @@
 name = "Plonky3Lean"
 version = "0.1.0"
-defaultTargets = ["HaxExt", "P3BabyBear", "ToCompPoly", "Plonky3Lean"]
+defaultTargets = ["HaxExt", "P3BabyBear", "P3Util", "ToCompPoly", "Plonky3Lean"]
 
 # The two Lean libraries the generated code imports. Both revs must equal what
 # the hax release in toolchain.toml resolves (`cargo hax tools show`): the
@@ -75,3 +75,7 @@ srcDir = "crates/poseidon1/stub"
 [[lean_lib]]
 name = "P3Poseidon2"
 srcDir = "crates/poseidon2/stub"
+
+[[lean_lib]]
+name = "P3Util"
+srcDir = "crates/util/extraction"
