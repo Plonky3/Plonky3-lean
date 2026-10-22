@@ -221,4 +221,74 @@ theorem load_parts_eq (batch : Slice Std.U8) (s last off : ℕ) (hl : last + off
   unfold p3_blake3.batch.load_parts_loop0
   exact lane_loop _ _ _ _ (load_outer_body batch s off hB h32 _) (load_outer_done batch s off _)
 
+theorem spill_body (batch : Slice Std.U8) (s off b K : ℕ) (hb : b < K) (hK : K ≤ 64)
+    (hB : s + off + K ≤ batch.val.length) (h32 : batch.val.length < 2 ^ 32) :
+    p3_blake3.batch.spill_parts_loop0_loop0_loop0.body batch (usz off) (usz 0) (usz s)
+      { start := usz b, «end» := usz K } (rgrp (window (sbytes batch) (s + off) b)) =
+      .ok (.cont ({ start := usz (b + 1), «end» := usz K },
+        rgrp (window (sbytes batch) (s + off) (b + 1)))) := by
+  have hl : (window (sbytes batch) (s + off) b).length = (64#usize).val := length_window ..
+  unfold p3_blake3.batch.spill_parts_loop0_loop0_loop0.body
+  simp only [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
+    range_step b (usz K) (by rw [usz_val (by omega)]; exact hb), bind_ok, Aeneas.Std.uncurry_apply_pair,
+    usz_add (show s + off < 2 ^ 32 by omega), usz_add (show s + off + b < 2 ^ 32 by omega),
+    slice_index_bytes batch (s + off + b) (by omega) h32, index_mut_rgrp,
+    update_barr _ _ hl b (by simp; omega), window_succ _ (s + off) b (by omega), set_rgrp]
+
+theorem spill_done (batch : Slice Std.U8) (o l x : Std.Usize) (K : Std.Usize)
+    (r : Std.Array (Std.Array Std.U8 64#usize) 1#usize) :
+    p3_blake3.batch.spill_parts_loop0_loop0_loop0.body batch o l x { start := K, «end» := K } r =
+      .ok (.done r) := by
+  unfold p3_blake3.batch.spill_parts_loop0_loop0_loop0.body
+  simp only [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next, range_stop,
+    bind_ok, Aeneas.Std.uncurry_apply_pair]
+
+theorem spill_loop (batch : Slice Std.U8) (s off K : ℕ) (hK : K ≤ 64) (hB : s + off + K ≤ batch.val.length)
+    (h32 : batch.val.length < 2 ^ 32) :
+    p3_blake3.batch.spill_parts_loop0_loop0_loop0 { start := 0#usize, «end» := usz K } batch (usz off)
+      (rgrp (window (sbytes batch) (s + off) 0)) (usz 0) (usz s) =
+      .ok (rgrp (window (sbytes batch) (s + off) K)) := by
+  unfold p3_blake3.batch.spill_parts_loop0_loop0_loop0
+  rw [lit0]
+  exact loop_of_steps (fun x : CoreModels.core.ops.range.Range Std.Usize ×
+        Std.Array (Std.Array Std.U8 64#usize) 1#usize =>
+      p3_blake3.batch.spill_parts_loop0_loop0_loop0.body batch (usz off) (usz 0) (usz s) x.1 x.2)
+    (fun b => (({ start := usz b, «end» := usz K } : CoreModels.core.ops.range.Range Std.Usize),
+      rgrp (window (sbytes batch) (s + off) b))) K _
+    (fun b hb => spill_body batch s off b K hb hK hB h32) (spill_done _ _ _ _ _ _)
+
+theorem spill_rows (batch : Slice Std.U8) (s off K : ℕ) (hK : K ≤ 64) (hB : s + off + K ≤ batch.val.length)
+    (h32 : batch.val.length < 2 ^ 32) :
+    p3_blake3.batch.spill_parts_loop0_loop0 { start := 0#usize, «end» := 1#usize } batch (sts s)
+      (usz off) (usz K) (usz 0) (rgrp (window (sbytes batch) (s + off) 0)) =
+      .ok (rgrp (window (sbytes batch) (s + off) K)) := by
+  unfold p3_blake3.batch.spill_parts_loop0_loop0
+  refine lane_loop _ _ _ (rgrp (window (sbytes batch) (s + off) K)) ?_ ?_
+  · unfold p3_blake3.batch.spill_parts_loop0_loop0.body
+    simp only [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
+      range_first, bind_ok, Aeneas.Std.uncurry_apply_pair, index_sts, index_one,
+      spill_loop batch s off K hK hB h32]
+  · unfold p3_blake3.batch.spill_parts_loop0_loop0.body
+    simp only [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
+      range_last, bind_ok, Aeneas.Std.uncurry_apply_pair]
+
+theorem spill_parts_eq (batch : Slice Std.U8) (s off K : ℕ) (hK : K ≤ 64)
+    (hB : s + off + K ≤ batch.val.length) (h32 : batch.val.length < 2 ^ 32) :
+    p3_blake3.batch.spill_parts p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1 batch (sts s) (usz off)
+      (usz K) = .ok (wblock batch (s + off) K) := by
+  unfold p3_blake3.batch.spill_parts
+  rw [show p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1.WordInst.splat 0#u32 = .ok 0#u32 from rfl, bind_ok,
+    repeat_eq _ _ _ (fun _ => rfl) (by decide), bind_ok,
+    repeat_eq _ _ _ (array_clone_eq _ (fun _ => rfl)) (by decide), bind_ok]
+  unfold p3_blake3.batch.spill_parts_loop0
+  refine lane_loop _ _ _ (wblock batch (s + off) K) ?_ ?_
+  · unfold p3_blake3.batch.spill_parts_loop0.body
+    simp only [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
+      range_first, bind_ok, Aeneas.Std.uncurry_apply_pair, zero_row, zero_rows,
+      ← window_zero (sbytes batch) (s + off), spill_rows batch s off K hK hB h32, each_ref_rgrp]
+    rw [rgrp, load_block_eq _ (length_window ..), bind_ok, update_one, bind_ok, make_grp]
+  · unfold p3_blake3.batch.spill_parts_loop0.body
+    simp only [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
+      range_last, bind_ok, Aeneas.Std.uncurry_apply_pair]
+
 end Plonky3Lean.Proofs.Blake3
