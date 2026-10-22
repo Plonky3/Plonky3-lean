@@ -26,14 +26,28 @@ import Plonky3Lean
 open Lean Elab Command in
 #eval show CommandElabM Unit from do
   let env ← getEnv
-  -- Lean's auxiliary declarations have a name component starting with `_`
-  -- (`_proof_1`, `_aux`, ...). `Name.isInternal` is not used because it also
-  -- drops a claim about an item aeneas names `_`, such as `poseidon1._`.
-  let aux (n : Name) : Bool := n.components.any fun
+  let theorems := env.constants.toList.filter fun (_, ci) => ci matches .thmInfo _
+  -- A `private` theorem is named `_private.<module>.0.<name>`. One in
+  -- `Plonky3Lean.Claims` reads as a claim, so it is reported, and rejected.
+  for (n, _) in theorems do
+    if let some u := privateToUserName? n then
+      if (`Plonky3Lean.Claims).isPrefixOf u then
+        IO.println s!"PRIVATE\\t{u}"
+  let inClaims := theorems.filter fun (n, _) => (`Plonky3Lean.Claims).isPrefixOf n
+  let names : NameSet := inClaims.foldl (fun s (n, _) => s.insert n) {}
+  -- Fail closed: a theorem is skipped as auxiliary only when its name has an
+  -- internal component (`_proof_1`, a number, ...) and a proper prefix of it is
+  -- itself a claim, as for `X.holds._proof_1`. Every other theorem in
+  -- `Plonky3Lean.Claims` is a claim, including one about an item aeneas names
+  -- `_` or `__1`.
+  let internal (n : Name) : Bool := n.components.any fun
     | .str _ s => s.startsWith "_" && s != "_"
     | _ => true
-  let claims := env.constants.toList.filter fun (n, ci) =>
-    (`Plonky3Lean.Claims).isPrefixOf n && !aux n && ci matches .thmInfo _
+  let rec underClaim : Name → Bool
+    | .anonymous => false
+    | p@(.str q _) | p@(.num q _) => names.contains p || underClaim q
+  let aux (n : Name) : Bool := internal n && underClaim n.getPrefix
+  let claims := inClaims.filter fun (n, _) => !aux n
   for (n, _) in claims.toArray.qsort (fun a b => a.1.toString < b.1.toString) do
     let axs ← liftCoreM (Lean.collectAxioms n)
     let axs := axs.qsort (fun a b => a.toString < b.toString)
@@ -51,15 +65,18 @@ def actual():
         Path(f.name).unlink()
     if r.returncode != 0:
         sys.exit(f"error: listing the claims failed (run `lake build` first?):\n{r.stdout}{r.stderr}")
-    out = {}
+    out, private = {}, []
     for line in r.stdout.splitlines():
         name, _, axs = line.partition("\t")
+        if name == "PRIVATE":
+            private.append(axs)
+            continue
         out[name] = sorted(a for a in axs.split(",") if a)
-    return out
+    return out, private
 
 
 def main(argv):
-    claims = actual()
+    claims, private = actual()
     if argv == ["--print"]:
         for name, axs in claims.items():
             print("[[claim]]")
@@ -72,6 +89,9 @@ def main(argv):
     allowed = {c["name"]: sorted(c["axioms"])
                for c in tomllib.loads((ROOT / "claims.toml").read_text()).get("claim", [])}
     fail = False
+    for name in private:
+        print(f"FAIL: {name} is a private theorem in Plonky3Lean.Claims; a claim must be public")
+        fail = True
     for name, axs in claims.items():
         if name not in allowed:
             print(f"FAIL: {name} is a claim with no claims.toml entry (axioms: {axs})")
