@@ -14,9 +14,16 @@ extraction in `crates/monty-31`; `PRIME`, `MontyParams` and the other names are
 `Plonky3Lean.Spec.BabyBear`'s aliases for its constants, and `BabyBear.*` is
 CompPoly's specification of the field.
 
-Not claimed: inversion, exponentiation and the packed (SIMD) and extension-field
-arithmetic, the extension fields' `EXT_GENERATOR`s, the Poseidon1 and Poseidon2
-permutations or the MDS layer, and the values of the round constants.
+Not claimed: the scalar arithmetic that does not go through the five claimed
+operators, which is inversion, exponentiation, the other
+`PrimeCharacteristicRing` methods BabyBear overrides (`mul_2exp_u64` and
+`div_2exp_u64` with their `MONTY_POWERS_OF_TWO` table, `sum_array`,
+`dot_product`), `Sum::sum`, the integer conversions (`QuotientMap`'s
+`from_int` and its variants) and deserialization; the packed (SIMD) and
+extension-field arithmetic; the extension fields' `EXT_GENERATOR`s; the
+Poseidon1 and Poseidon2 permutations or the MDS layer; and the values of the
+round constants. Poseidon and the DFTs call `dot_product` and `sum` directly,
+so those calls are not covered.
 -/
 
 open Aeneas Aeneas.Std CoreModels
