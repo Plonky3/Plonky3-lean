@@ -128,4 +128,20 @@ theorem block_getD (B : List (BitVec 8)) (s len idx i p : ℕ) :
   by_cases h1 : p < 64 <;> by_cases h2 : 64 * i + p < 1024 <;>
     by_cases h3 : 1024 * idx + (64 * i + p) < len <;> simp [h1, h2, h3]
 
+theorem window_block (B : List (BitVec 8)) (s len idx i k : ℕ) (hk : k ≤ 64)
+    (hlo : 64 * i + k ≤ 1024) (hhi : idx * 1024 + 64 * i + k ≤ len)
+    (hfull : k < 64 → idx * 1024 + 64 * i + k = len ∨ 64 * i + k = 1024) :
+    blockWords (window B (s + (idx * 1024 + 64 * i)) k) =
+      blockWords (((chunkAt B s len idx).drop (64 * i)).take 64) := by
+  apply blockWords_congr
+  intro p hp
+  rw [window_getD _ _ _ _ hp, block_getD]
+  by_cases h : p < k
+  · rw [ite_eq_left_of_eq_true _ _ (eq_true h), ite_eq_left_of_eq_true _ _ (eq_true ⟨hp, by omega, by omega⟩)]
+    congr 1; ring
+  · rw [ite_eq_right_of_eq_false _ _ (eq_false h), ite_eq_right_of_eq_false _ _ (eq_false (by
+      rintro ⟨-, h2, h3⟩
+      have := hfull (by omega)
+      omega))]
+
 end Plonky3Lean.Proofs.Blake3
