@@ -1,6 +1,7 @@
 import ToCompPoly.Data.Nat.PowMod
 import ToCompPoly.Fields.BabyBear
 import ToCompPoly.Fields.BabyBear.Extension
+import ToCompPoly.Fields.Goldilocks
 import ToCompPoly.Fields.KoalaBear
 import ToCompPoly.Fields.KoalaBear.Extension
 import ToCompPoly.Fields.KoalaBear.Quintic

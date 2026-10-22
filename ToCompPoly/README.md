@@ -34,6 +34,7 @@ of the claims stays CompPoly's, not this repository's.
 | `Fields/KoalaBear/Quintic.lean` | new file | `X ^ 5 + X ^ 2 - 1` is irreducible; `X + 2` generates its quotient's multiplicative group; the Frobenius coefficients `X ^ ((k + 1) p)` |
 | `ToMathlib/Polynomial/CoeffList.lean` | new file (mathlib candidate) | Products and powers in `R[X] / (f)` on coefficient lists, which the kernel evaluates; orders of elements from a factorisation |
 | `ToMathlib/Polynomial/IrreducibleOfOrder.lean` | new file (mathlib candidate) | A monic `f` over `F_q` is irreducible if `F_q[X] / (f)` has an element of order `q ^ deg f - 1` |
+| `Fields/Goldilocks.lean` | appended to `CompPoly/Fields/Goldilocks.lean` | two-adicity `32`; `generator = 7` and its order; a primitive `2 ^ 32`-th root of unity; `x ↦ x ^ 10540996611094048183` inverts `x ↦ x ^ 7` |
 | `Fields/KoalaBear.lean` | appended to `CompPoly/Fields/KoalaBear/Basic.lean` | `x ↦ x ^ 1420470955` inverts `x ↦ x ^ 3`; a kernel-checkable `x ^ e ≠ 1` test |
 | `Fields/KoalaBear/Extension.lean` | new file | `ofCoeffs`; the extensions `Ext4`, `Ext8` (`X ^ D - 3` irreducible); the two-adicity of `p ^ D - 1` for `D = 4, 5, 8`; the two-adic generators of `Ext4` and `Ext8` with their orders and squaring chain |
 
