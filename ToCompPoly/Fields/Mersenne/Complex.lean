@@ -187,12 +187,18 @@ theorem twoAdicGenerators_order (k : ℕ) (hk : k < twoAdicGenerators.length) :
     | succ k ih =>
       exact orderOf_eq_two_pow_succ_of_sq (twoAdicGenerators_sq_succ (k + 1) hk) (ih (by omega))
 
-/-- Entries `0` to `31` lie on the circle `a ^ 2 + b ^ 2 = 1`, the norm-one subgroup of order `p + 1 = 2 ^ 31`. -/
-theorem twoAdicGeneratorCoeffs_norm (k : ℕ) (hk : k < complexTwoAdicity) :
-    (twoAdicGeneratorCoeffs[k]'(by simp [twoAdicGeneratorCoeffs, complexTwoAdicity] at hk ⊢; omega)).1 ^ 2 +
-      (twoAdicGeneratorCoeffs[k]'(by simp [twoAdicGeneratorCoeffs, complexTwoAdicity] at hk ⊢; omega)).2 ^ 2
-      = 1 := by
-  simp only [complexTwoAdicity] at hk
-  interval_cases k <;> decide
+/-- Entries `0` to `31` lie on the circle `a ^ 2 + b ^ 2 = 1`, of order `p + 1 = 2 ^ 31`. -/
+theorem twoAdicGeneratorCoeffs_norm :
+    ∀ c ∈ twoAdicGeneratorCoeffs.take complexTwoAdicity, c.1 * c.1 + c.2 * c.2 = 1 := by
+  have : (twoAdicGeneratorCoeffs.take complexTwoAdicity).all
+      (fun c => decide (c.1 * c.1 + c.2 * c.2 = 1)) = true := by decide
+  simpa using this
+
+/-- The last entry, of order `2 ^ 32`, has norm `-1`, so it is off the circle. -/
+theorem twoAdicGeneratorCoeffs_norm_last :
+    ∀ c ∈ twoAdicGeneratorCoeffs.drop complexTwoAdicity, c.1 * c.1 + c.2 * c.2 = -1 := by
+  have : (twoAdicGeneratorCoeffs.drop complexTwoAdicity).all
+      (fun c => decide (c.1 * c.1 + c.2 * c.2 = -1)) = true := by decide
+  simpa using this
 
 end Mersenne31

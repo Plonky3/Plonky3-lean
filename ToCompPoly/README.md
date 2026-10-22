@@ -37,6 +37,9 @@ of the claims stays CompPoly's, not this repository's.
 | `Fields/Goldilocks.lean` | appended to `CompPoly/Fields/Goldilocks.lean` | two-adicity `32`; `generator = 7` and its order; a primitive `2 ^ 32`-th root of unity; `x ↦ x ^ 10540996611094048183` inverts `x ↦ x ^ 7` |
 | `Fields/KoalaBear.lean` | appended to `CompPoly/Fields/KoalaBear/Basic.lean` | `x ↦ x ^ 1420470955` inverts `x ↦ x ^ 3`; a kernel-checkable `x ^ e ≠ 1` test |
 | `Fields/KoalaBear/Extension.lean` | new file | `ofCoeffs`; the extensions `Ext4`, `Ext8` (`X ^ D - 3` irreducible); the two-adicity of `p ^ D - 1` for `D = 4, 5, 8`; the two-adic generators of `Ext4` and `Ext8` with their orders and squaring chain |
+| `Fields/Mersenne.lean` | appended to `CompPoly/Fields/Mersenne.lean` | the `Field` instance; `generator = 7` and its order; `x ↦ x ^ 1717986917` inverts `x ↦ x ^ 5`; `-1` and `5` are not squares, `5` is not a cube |
+| `Fields/Mersenne/Complex.lean` | new file | `Complex = F[X] / (X ^ 2 + 1)`; Frobenius is conjugation; the two-adic generators of `Complex` with their orders, squaring chain and norms |
+| `Fields/Mersenne/Extension.lean` | new file | `X ^ 3 - 5`, `Y ^ 2 - (2 + i)` and `Y ^ 3 - 5i` are irreducible; their `DTH_ROOT`s; `12 + i` generates `Complex`; an element of order `2 ^ 33` in QM31 |
 
 When a file lands upstream, delete it here, bump the CompPoly `rev` in
 `lakefile.toml`, and change the imports that named it.
