@@ -249,23 +249,3 @@ source = "monty-31/src/monty_31.rs:71"
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl}::to_u32"
 source = "monty-31/src/monty_31.rs:80"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::utils::large_monty_reduce"
-source = "monty-31/src/utils.rs:134"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::utils::monty_reduce_u128"
-source = "monty-31/src/utils.rs:168"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::utils::to_monty_64"
-source = "monty-31/src/utils.rs:28"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::utils::to_monty_64_signed"
-source = "monty-31/src/utils.rs:36"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::utils::to_monty_signed"
-source = "monty-31/src/utils.rs:15"

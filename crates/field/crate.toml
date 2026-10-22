@@ -33,3 +33,7 @@ rust = "p3_field::field::PrimeField"
 [[mirror]]
 lean = "p3_field.field.UniformSamplingField"
 rust = "p3_field::field::UniformSamplingField"
+
+[[mirror]]
+lean = "p3_field.helpers.halve_u32"
+rust = "p3_field::helpers::halve_u32"

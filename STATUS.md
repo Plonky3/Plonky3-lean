@@ -15,11 +15,15 @@ target `thumbv7em-none-eabi`
 | Crate | State | Generated lines | Hand-written lines | `opaque` | Mirrored | Dropped by the extractor | Patches (pre / post) | Patches with a cost |
 |---|---|---:|---:|---:|---:|---:|---|---|
 | `baby-bear` | extracted | 2947 | 107 | 4 | 0 | 0 | 4 / 3 | pre `020`, pre `030`, pre `040` |
-| `field` | stub |  | 67 | 1 | 5 |  | 0 / 0 |  |
+| `field` | stub |  | 87 | 2 | 6 |  | 0 / 0 |  |
+| `goldilocks` | scoped | 563 | 409 | 0 | 19 | 37 | 1 / 0 |  |
+| `koala-bear` | extracted | 3018 | 107 | 4 | 0 | 0 | 0 / 3 |  |
 | `mds` | scoped | 91 | 8 | 0 | 0 | 0 | 0 / 0 |  |
-| `monty-31` | scoped | 554 | 277 | 0 | 17 | 66 | 0 / 1 |  |
+| `mersenne-31` | scoped | 1421 | 241 | 0 | 12 | 32 | 1 / 0 | pre `010` |
+| `monty-31` | scoped | 676 | 592 | 0 | 34 | 61 | 0 / 1 |  |
 | `poseidon1` | stub |  | 68 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 64 | 2 | 4 |  | 0 / 0 |  |
+| `util` | scoped | 176 | 42 | 0 | 1 | 0 | 0 / 0 |  |
 
 Generated lines are `extraction/<Lib>/Extraction/{Types,Funs}.lean`. Hand-written
 lines are every other `.lean` file of the crate. *Dropped by the extractor* counts
@@ -38,15 +42,105 @@ charon's output and `--check` requires to reproduce. An item is *mirrored* when 
 charon errors: 0.
 Nothing translated is dropped.
 
+### `goldilocks`
+
+charon errors: 5, at `library/core/src/iter/adapters/zip.rs:74:1`, `library/core/src/slice/iter/macros.rs:153:9`.
+37 item(s) dropped, 18 of them mirrored.
+
+| Item | Source | Mirrored |
+|---|---|---|
+| `p3_goldilocks::goldilocks::exp_2_31_minus_1` | `goldilocks/src/goldilocks.rs:445` |  |
+| `p3_goldilocks::goldilocks::{impl core::clone::Clone}::clone` | `goldilocks/src/goldilocks.rs:33` |  |
+| `p3_goldilocks::goldilocks::{impl core::cmp::PartialEq}::eq` | `goldilocks/src/goldilocks.rs:200` | yes |
+| `p3_goldilocks::goldilocks::{impl core::cmp::PartialOrd}::partial_cmp` | `goldilocks/src/goldilocks.rs:222` |  |
+| `p3_goldilocks::goldilocks::{impl core::default::Default}::default` | `goldilocks/src/goldilocks.rs:33` |  |
+| `p3_goldilocks::goldilocks::{impl core::fmt::Debug}::fmt` | `goldilocks/src/goldilocks.rs:234` |  |
+| `p3_goldilocks::goldilocks::{impl core::fmt::Display}::fmt` | `goldilocks/src/goldilocks.rs:228` |  |
+| `p3_goldilocks::goldilocks::{impl core::hash::Hash}::hash` | `goldilocks/src/goldilocks.rs:210` |  |
+| `p3_goldilocks::goldilocks::{impl core::iter::traits::accum::Product}::product` | `field/src/op_assign_macros.rs:91` |  |
+| `p3_goldilocks::goldilocks::{impl core::iter::traits::accum::Sum}::sum` | `goldilocks/src/goldilocks.rs:814` | yes |
+| `p3_goldilocks::goldilocks::{impl core::ops::arith::AddAssign}::add_assign` | `field/src/op_assign_macros.rs:28` |  |
+| `p3_goldilocks::goldilocks::{impl core::ops::arith::DivAssign}::div_assign` | `field/src/op_assign_macros.rs:214` |  |
+| `p3_goldilocks::goldilocks::{impl core::ops::arith::Div}::div` | `field/src/op_assign_macros.rs:206` |  |
+| `p3_goldilocks::goldilocks::{impl core::ops::arith::MulAssign}::mul_assign` | `field/src/op_assign_macros.rs:84` |  |
+| `p3_goldilocks::goldilocks::{impl core::ops::arith::SubAssign}::sub_assign` | `field/src/op_assign_macros.rs:64` |  |
+| `p3_goldilocks::goldilocks::{impl core::ops::arith::Sub}::sub` | `goldilocks/src/goldilocks.rs:723` | yes |
+| `p3_goldilocks::goldilocks::{impl p3_field::field::Field}::BENEFITS_FROM_LOCKSTEP_EVALUATION` | `goldilocks/src/goldilocks.rs:488` |  |
+| `p3_goldilocks::goldilocks::{impl p3_field::field::Field}::order` | `goldilocks/src/goldilocks.rs:503` |  |
+| `p3_goldilocks::goldilocks::{impl p3_field::field::PrimeCharacteristicRing}::from_prime_subfield` | `goldilocks/src/goldilocks.rs:280` |  |
+| `p3_goldilocks::goldilocks::{impl p3_field::field::PrimeField}::as_canonical_biguint` | `goldilocks/src/goldilocks.rs:652` |  |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_canonical_checked` | `field/src/integers.rs:105` | yes |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_canonical_checked` | `field/src/integers.rs:389` | yes |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_canonical_checked` | `goldilocks/src/goldilocks.rs:570` | yes |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_canonical_checked` | `goldilocks/src/goldilocks.rs:598` | yes |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_canonical_checked` | `goldilocks/src/goldilocks.rs:630` | yes |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_canonical_checked::NEG_BOUND` | `goldilocks/src/goldilocks.rs:632` |  |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_canonical_checked::POS_BOUND` | `goldilocks/src/goldilocks.rs:631` |  |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `field/src/integers.rs:116` | yes |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `field/src/integers.rs:403` | yes |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `goldilocks/src/goldilocks.rs:579` | yes |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `goldilocks/src/goldilocks.rs:608` | yes |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `goldilocks/src/goldilocks.rs:646` | yes |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_int` | `field/src/integers.rs:377` | yes |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_int` | `field/src/integers.rs:94` | yes |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_int` | `goldilocks/src/goldilocks.rs:562` | yes |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_int` | `goldilocks/src/goldilocks.rs:590` | yes |
+| `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_int` | `goldilocks/src/goldilocks.rs:618` | yes |
+
+### `koala-bear`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ### `mds`
 
 charon errors: 0.
 Nothing translated is dropped.
 
+### `mersenne-31`
+
+charon errors: 2, at `library/core/src/slice/iter/macros.rs:153:9`.
+32 item(s) dropped, 4 of them mirrored.
+
+| Item | Source | Mirrored |
+|---|---|---|
+| `p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::CIRCLE_TWO_ADICITY` | `mersenne-31/src/complex.rs:53` |  |
+| `p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::COMPLEX_GENERATOR` | `mersenne-31/src/complex.rs:61` | yes |
+| `p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::circle_two_adic_generator` | `mersenne-31/src/complex.rs:63` | yes |
+| `p3_mersenne_31::complex::{impl}::CIRCLE_TWO_ADIC_GENERATORS` | `mersenne-31/src/complex.rs:16` | yes |
+| `p3_mersenne_31::extension::{impl p3_field::extension::BinomiallyExtendable}::binomial_algebra_id` | `mersenne-31/src/extension.rs:22` |  |
+| `p3_mersenne_31::extension::{impl p3_field::extension::ExtensionAlgebra}::ext_mul` | `mersenne-31/src/extension.rs:11` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::clone::Clone}::clone` | `mersenne-31/src/mersenne_31.rs:33` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::cmp::PartialOrd}::partial_cmp` | `mersenne-31/src/mersenne_31.rs:151` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::default::Default}::default` | `mersenne-31/src/mersenne_31.rs:33` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::fmt::Debug}::fmt` | `mersenne-31/src/mersenne_31.rs:164` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::fmt::Display}::fmt` | `mersenne-31/src/mersenne_31.rs:157` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::hash::Hash}::hash` | `mersenne-31/src/mersenne_31.rs:137` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::iter::traits::accum::Product}::product` | `field/src/op_assign_macros.rs:91` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::iter::traits::accum::Sum}::sum` | `mersenne-31/src/mersenne_31.rs:620` | yes |
+| `p3_mersenne_31::mersenne_31::{impl core::ops::arith::AddAssign}::add_assign` | `field/src/op_assign_macros.rs:28` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::ops::arith::DivAssign}::div_assign` | `field/src/op_assign_macros.rs:214` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::ops::arith::Div}::div` | `field/src/op_assign_macros.rs:206` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::ops::arith::MulAssign}::mul_assign` | `field/src/op_assign_macros.rs:84` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::ops::arith::SubAssign}::sub_assign` | `field/src/op_assign_macros.rs:64` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::field::Field}::BENEFITS_FROM_LOCKSTEP_EVALUATION` | `mersenne-31/src/mersenne_31.rs:386` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::field::Field}::order` | `mersenne-31/src/mersenne_31.rs:407` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::field::Field}::try_inverse::NUM_PRIME_BITS` | `mersenne-31/src/mersenne_31.rs:399` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::field::PrimeCharacteristicRing}::from_prime_subfield` | `mersenne-31/src/mersenne_31.rs:229` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::field::PrimeField64}::ORDER_U64` | `mersenne-31/src/mersenne_31.rs:548` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::field::PrimeField64}::as_canonical_u64` | `mersenne-31/src/mersenne_31.rs:551` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::field::PrimeField}::as_canonical_biguint` | `mersenne-31/src/mersenne_31.rs:527` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::integers::QuotientMap}::from_canonical_checked` | `field/src/integers.rs:105` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::integers::QuotientMap}::from_canonical_checked::NEG_TWO_EXP_30_PLUS_1` | `mersenne-31/src/mersenne_31.rs:502` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::integers::QuotientMap}::from_canonical_checked::TWO_EXP_30` | `mersenne-31/src/mersenne_31.rs:501` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `field/src/integers.rs:116` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `field/src/integers.rs:304` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `field/src/integers.rs:403` |  |
+
 ### `monty-31`
 
 charon errors: 7, at `library/core/src/iter/adapters/zip.rs:74:1`, `library/core/src/slice/iter.rs:1499:1`, `library/core/src/slice/iter/macros.rs:153:9`.
-66 item(s) dropped, 8 of them mirrored.
+61 item(s) dropped, 11 of them mirrored.
 
 | Item | Source | Mirrored |
 |---|---|---|
@@ -71,14 +165,14 @@ charon errors: 7, at `library/core/src/iter/adapters/zip.rs:74:1`, `library/core
 | `p3_monty_31::monty_31::{impl p3_field::field::Field}::BENEFITS_FROM_LOCKSTEP_EVALUATION` | `monty-31/src/monty_31.rs:456` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::Field}::GENERATOR` | `monty-31/src/monty_31.rs:454` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::Field}::order` | `monty-31/src/monty_31.rs:492` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::Field}::try_inverse` | `monty-31/src/monty_31.rs:458` |  |
+| `p3_monty_31::monty_31::{impl p3_field::field::Field}::try_inverse` | `monty-31/src/monty_31.rs:458` | yes |
 | `p3_monty_31::monty_31::{impl p3_field::field::Field}::try_inverse::NUM_PRIME_BITS` | `monty-31/src/monty_31.rs:464` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::NEG_ONE` | `monty-31/src/monty_31.rs:217` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::ONE` | `monty-31/src/monty_31.rs:215` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::TWO` | `monty-31/src/monty_31.rs:216` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::ZERO` | `monty-31/src/monty_31.rs:214` | yes |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::from_prime_subfield` | `monty-31/src/monty_31.rs:220` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::mul_2exp_u64` | `monty-31/src/monty_31.rs:230` |  |
+| `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::mul_2exp_u64` | `monty-31/src/monty_31.rs:230` | yes |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeField32}::ORDER_U32` | `monty-31/src/monty_31.rs:694` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeField32}::as_canonical_u32` | `monty-31/src/monty_31.rs:697` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeField64}::ORDER_U64` | `monty-31/src/monty_31.rs:678` |  |
@@ -106,31 +200,36 @@ charon errors: 7, at `library/core/src/iter/adapters/zip.rs:74:1`, `library/core
 | `p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_int` | `monty-31/src/monty_31.rs:624` |  |
 | `p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_int` | `monty-31/src/monty_31.rs:646` |  |
 | `p3_monty_31::monty_31::{impl}::HALF` | `monty-31/src/monty_31.rs:125` |  |
-| `p3_monty_31::monty_31::{impl}::MONTY_POWERS_OF_TWO` | `monty-31/src/monty_31.rs:115` |  |
+| `p3_monty_31::monty_31::{impl}::MONTY_POWERS_OF_TWO` | `monty-31/src/monty_31.rs:115` | yes |
 | `p3_monty_31::monty_31::{impl}::new_2d_array` | `monty-31/src/monty_31.rs:101` | yes |
 | `p3_monty_31::monty_31::{impl}::new_array` | `monty-31/src/monty_31.rs:88` | yes |
 | `p3_monty_31::monty_31::{impl}::new_monty` | `monty-31/src/monty_31.rs:71` | yes |
 | `p3_monty_31::monty_31::{impl}::to_u32` | `monty-31/src/monty_31.rs:80` |  |
-| `p3_monty_31::utils::large_monty_reduce` | `monty-31/src/utils.rs:134` |  |
-| `p3_monty_31::utils::monty_reduce_u128` | `monty-31/src/utils.rs:168` |  |
-| `p3_monty_31::utils::to_monty_64` | `monty-31/src/utils.rs:28` |  |
-| `p3_monty_31::utils::to_monty_64_signed` | `monty-31/src/utils.rs:36` |  |
-| `p3_monty_31::utils::to_monty_signed` | `monty-31/src/utils.rs:15` |  |
+
+### `util`
+
+charon errors: 0.
+Nothing translated is dropped.
 
 ## Assumptions
 
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 70) whose dependencies include it; reaching one is not using it.
+(of 274) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
-| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 61 |
+| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 66 |
 | `baby-bear` | `mds.MDSBabyBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon2.BabyBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `field` | `p3_field.exponentiation.exp_1420470955` | its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here | 1 |
 | `field` | `p3_field.exponentiation.exp_1725656503` | its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here | 1 |
+| `koala-bear` | `koala_bear.KoalaBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 68 |
+| `koala-bear` | `mds.MDSKoalaBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `koala-bear` | `poseidon1.KoalaBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `koala-bear` | `poseidon2.KoalaBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `poseidon1` | `p3_poseidon1.Poseidon1.new` | the sparse-matrix decomposition in its body is not modelled | 0 |
 | `poseidon1` | `p3_poseidon1.external.FullRoundConstants` | p3-poseidon1 is a stub, and the extraction never observes this type's layout | 0 |
 | `poseidon1` | `p3_poseidon1.internal.PartialRoundConstants` | p3-poseidon1 is a stub, and the extraction never observes this type's layout | 0 |
@@ -143,24 +242,56 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 70) whose dependencies include the declaration.
+counts the claims (of 274) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
 | `field` | `p3_field.dup.Dup` | `p3_field::dup::Dup` | stub | 0 |
-| `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 1 |
+| `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 2 |
 | `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 0 |
 | `field` | `p3_field.field.PrimeField` | `p3_field::field::PrimeField` | stub | 0 |
 | `field` | `p3_field.field.UniformSamplingField` | `p3_field::field::UniformSamplingField` | stub | 0 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_array` | `p3_monty_31::monty_31::MontyField31::new_array` | dropped | 39 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_2d_array` | `p3_monty_31::monty_31::MontyField31::new_2d_array` | dropped | 22 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_monty` | `p3_monty_31::monty_31::MontyField31::new_monty` | dropped | 5 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.add` | `{impl core::ops::arith::Add for p3_monty_31::monty_31::MontyField31<_>}::add` | dropped | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.sub` | `{impl core::ops::arith::Sub for p3_monty_31::monty_31::MontyField31<_>}::sub` | dropped | 2 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.mul` | `{impl core::ops::arith::Mul for p3_monty_31::monty_31::MontyField31<_>}::mul` | dropped | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.neg` | `{impl core::ops::arith::Neg for p3_monty_31::monty_31::MontyField31<_>}::neg` | dropped | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.neg` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::ZERO` | dropped | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.halve` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::halve` | not translated | 1 |
+| `field` | `p3_field.helpers.halve_u32` | `p3_field::helpers::halve_u32` | stub | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreOpsArithSubGoldilocksGoldilocks.sub` | `{impl core::ops::arith::Sub for p3_goldilocks::goldilocks::Goldilocks}::sub` | dropped | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreCmpPartialEqGoldilocks.eq` | `{impl core::cmp::PartialEq for p3_goldilocks::goldilocks::Goldilocks}::eq` | dropped | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.halve` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::halve` | not translated | 2 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.div_2exp_u64` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::div_2exp_u64` | not translated | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreIterTraitsAccumSumGoldilocks.sum` | `{impl core::iter::traits::accum::Sum for p3_goldilocks::goldilocks::Goldilocks}::sum` | dropped | 2 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.sum_array` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::sum_array` | not translated | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.PrimeCharacteristicRingGoldilocks.dot_product.fold_step` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::dot_product` | not translated | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::dot_product` | not translated | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU64.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU128.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 2 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_unchecked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked` | dropped | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI64.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 4 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 2 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_unchecked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked` | dropped | 3 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_unchecked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked` | dropped | 2 |
+| `mersenne-31` | `p3_mersenne_31.mersenne_31.Mersenne31.Insts.CoreIterTraitsAccumSumMersenne31.sum` | `{impl core::iter::traits::accum::Sum for p3_mersenne_31::mersenne_31::Mersenne31}::sum` | dropped | 2 |
+| `mersenne-31` | `p3_mersenne_31.mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.sum_array` | `{impl p3_field::field::PrimeCharacteristicRing for p3_mersenne_31::mersenne_31::Mersenne31}::sum_array` | not translated | 0 |
+| `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS` | `p3_mersenne_31::complex::{impl}::CIRCLE_TWO_ADIC_GENERATORS` | dropped | 2 |
+| `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.COMPLEX_GENERATOR` | `p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::COMPLEX_GENERATOR` | dropped | 1 |
+| `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.circle_two_adic_generator` | `p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::circle_two_adic_generator` | dropped | 1 |
+| `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.QUADRATIC_W` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::W` | not translated | 2 |
+| `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.QUADRATIC_DTH_ROOT` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::DTH_ROOT` | not translated | 1 |
+| `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.mul_by_w` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::mul_by_w` | not translated | 1 |
+| `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.QUADRATIC_EXT_TWO_ADIC_GENERATOR_33` | `{impl p3_field::extension::complex::HasTwoAdicComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::complex_ext_two_adic_generator` | not translated | 1 |
+| `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.CUBIC_W` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<3> for p3_mersenne_31::mersenne_31::Mersenne31}::W` | not translated | 1 |
+| `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.CUBIC_DTH_ROOT` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<3> for p3_mersenne_31::mersenne_31::Mersenne31}::DTH_ROOT` | not translated | 1 |
+| `mersenne-31` | `p3_mersenne_31.complex.new_complex_new` | `p3_field::extension::complex::Complex::new_complex` | not translated | 2 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_array` | `p3_monty_31::monty_31::MontyField31::new_array` | dropped | 80 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_2d_array` | `p3_monty_31::monty_31::MontyField31::new_2d_array` | dropped | 49 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_monty` | `p3_monty_31::monty_31::MontyField31::new_monty` | dropped | 23 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.add` | `{impl core::ops::arith::Add for p3_monty_31::monty_31::MontyField31<_>}::add` | dropped | 6 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.sub` | `{impl core::ops::arith::Sub for p3_monty_31::monty_31::MontyField31<_>}::sub` | dropped | 4 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.mul` | `{impl core::ops::arith::Mul for p3_monty_31::monty_31::MontyField31<_>}::mul` | dropped | 7 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.neg` | `{impl core::ops::arith::Neg for p3_monty_31::monty_31::MontyField31<_>}::neg` | dropped | 2 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.neg` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::ZERO` | dropped | 2 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.halve` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::halve` | not translated | 2 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1InternalLayerMonty31` | `p3_monty_31::no_packing::poseidon1::Poseidon1InternalLayerMonty31` | not translated | 0 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1ExternalLayerMonty31` | `p3_monty_31::no_packing::poseidon1::Poseidon1ExternalLayerMonty31` | not translated | 0 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon2.Poseidon2InternalLayerMonty31` | `p3_monty_31::no_packing::poseidon2::Poseidon2InternalLayerMonty31` | not translated | 0 |
@@ -169,6 +300,23 @@ counts the claims (of 70) whose dependencies include the declaration.
 | `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1ExternalLayerMonty31.Insts.P3_poseidon1ExternalFullRoundLayerConstructorMontyField31WIDTH` | `{impl p3_poseidon1::external::FullRoundLayerConstructor for p3_monty_31::no_packing::poseidon1::Poseidon1ExternalLayerMonty31}` | not translated | 0 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon2.Poseidon2InternalLayerMonty31.Insts.P3_poseidon2InternalInternalLayerConstructorMontyField31` | `{impl p3_poseidon2::internal::InternalLayerConstructor for p3_monty_31::no_packing::poseidon2::Poseidon2InternalLayerMonty31}` | not translated | 0 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon2.Poseidon2ExternalLayerMonty31.Insts.P3_poseidon2ExternalExternalLayerConstructorMontyField31WIDTH` | `{impl p3_poseidon2::external::ExternalLayerConstructor for p3_monty_31::no_packing::poseidon2::Poseidon2ExternalLayerMonty31}` | not translated | 0 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.square` | `p3_field::field::PrimeCharacteristicRing::square` | not translated | 4 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.exp_u64` | `p3_field::field::PrimeCharacteristicRing::exp_u64` | not translated | 4 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.exp_u64.step` | `p3_field::field::PrimeCharacteristicRing::exp_u64` | not translated | 4 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.MONTY_POWERS_OF_TWO` | `p3_monty_31::monty_31::MontyField31::MONTY_POWERS_OF_TWO` | dropped | 4 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.mul_2exp_u64` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::mul_2exp_u64` | dropped | 4 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.try_inverse` | `{impl p3_field::field::Field for p3_monty_31::monty_31::MontyField31<_>}::try_inverse` | dropped | 3 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU32.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<u32> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_int` | `{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_int` | `{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_int` | `{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_int` | `{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_int` | `{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
 | `poseidon1` | `p3_poseidon1.external.FullRoundLayerConstructor` | `p3_poseidon1::external::FullRoundLayerConstructor` | stub | 0 |
 | `poseidon1` | `p3_poseidon1.internal.PartialRoundLayerConstructor` | `p3_poseidon1::internal::PartialRoundLayerConstructor` | stub | 0 |
 | `poseidon1` | `p3_poseidon1.Poseidon1Constants` | `p3_poseidon1::Poseidon1Constants` | stub | 0 |
@@ -177,6 +325,7 @@ counts the claims (of 70) whose dependencies include the declaration.
 | `poseidon2` | `p3_poseidon2.external.ExternalLayerConstructor` | `p3_poseidon2::external::ExternalLayerConstructor` | stub | 0 |
 | `poseidon2` | `p3_poseidon2.internal.InternalLayerConstructor` | `p3_poseidon2::internal::InternalLayerConstructor` | stub | 0 |
 | `poseidon2` | `p3_poseidon2.Poseidon2` | `p3_poseidon2::Poseidon2` | stub | 0 |
+| `util` | `p3_util.branch_hint` | `p3_util::branch_hint` | not translated | 12 |
 
 ## Patches with a cost
 
@@ -185,6 +334,7 @@ counts the claims (of 70) whose dependencies include the declaration.
 | `baby-bear/pre/020-field-cfg-raw-data-serializable-supertrait` | none in a normal build (see below). In the extracted variant, `Field` no longer implies `RawDataSerializable`. |
 | `baby-bear/pre/030-field-cfg-rpitit-packed-methods` | none in a normal build: every change is behind cfg(hax_backend_lean). In the extracted variant, four default methods are absent and `to_ext_iter` sits on an extension trait. |
 | `baby-bear/pre/040-field-cfg-rpitit-bit-plane-expansion` | none in a normal build: the change is behind cfg(hax_backend_lean). In the extracted variant, `Field::prepare_bit_plane_expansion` is absent. |
+| `mersenne-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of `Mersenne31`. No existing body changes. |
 
 Upstream tests (`test-pre-patches.py`): 6715 of Plonky3's 6769 pass as shipped and 6715 with the pre-extraction patches, with 0 divergence(s).
 
@@ -207,6 +357,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.baby_bear.BabyBear.new_array.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBear.new_array.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBear.sub.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.try_inverse.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.eq_ext4TwoAdicGenerators` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -249,6 +400,9 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.baby_bear.BabyBearParameters.TWO_ADIC_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.TWO_ADIC_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.exp_root_d.exponent` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.fieldDefaults` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.fieldValid` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.valid` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.p3_monty_31.utils.add.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.p3_monty_31.utils.from_monty.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.p3_monty_31.utils.halve_u32.spec` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -265,6 +419,206 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.poseidon2.const_check_6.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.GENERATOR.generates` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.NEG_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.ORDER_U64.eq_fieldSize` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.POWERS_OF_TWO.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.TWO_ADIC_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.as_canonical_u64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.cmp.canonical` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.div_2exp_u64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.dot_product.const_check_truncates` | `propext` |
+| `Goldilocks.goldilocks.Goldilocks.dot_product.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.eq.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_canonical_checked_i128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_canonical_checked_i64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_canonical_checked_u128.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_canonical_checked_u64.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_canonical_unchecked_i128.doc_range_counterexample` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_canonical_unchecked_i128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_canonical_unchecked_i64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_canonical_unchecked_u128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_int_i128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_int_i64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_int_u128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_int_u64.value` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.halve.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.is_zero.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.mul.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.mul_2exp_u64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.neg.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.sub.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.sum.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.sum_array.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.try_inverse.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.two_adic_generator.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.two_adic_generator.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.reduce128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.from_monty.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.halve.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.mul.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.neg.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new.montgomery_form` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new_2d_array.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new_2d_array.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new_array.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new_array.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.sub.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.try_inverse.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.EXT_GENERATOR.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.eq_ext4TwoAdicGenerators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.EXT_GENERATOR.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.eq_ext8TwoAdicGenerators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.HALF_P_PLUS_1.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.INV_ROOTS_16.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.INV_ROOTS_8.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_BITS.from_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_BITS.val_eq_32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_GEN.generator` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_MU.from_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_MU.inverse` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_NEG_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_TWO.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_ZERO.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.ODD_FACTOR.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.PRIME.coprime_three_pred` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.PRIME.eq_fieldSize` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.PRIME.from_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.PRIME.is_prime` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.ROOTS_16.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.ROOTS_8.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.eq_twoAdicity` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.factorization` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.from_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.maximal` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADIC_GENERATORS.eq_twoAdicGenerators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADIC_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADIC_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TrinomialQuinticData.EXT_GENERATOR.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TrinomialQuinticData.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TrinomialQuinticData.FROBENIUS_COEFFS.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TrinomialQuinticData.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.exp_root_d.exponent` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.fieldDefaults` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.fieldValid` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.valid` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.add.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.from_monty.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.halve_u32.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.monty_reduce.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.sub.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.to_monty.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon1._.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon1.const_check_1.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2._.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_1.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_2.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_3.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_4.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_5.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_6.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.complex.Mersenne31.COMPLEX_GENERATOR.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.complex.Mersenne31.circle_two_adic_generator.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.extension.Mersenne31.CUBIC_DTH_ROOT.toComplex` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.extension.Mersenne31.CUBIC_W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.extension.Mersenne31.QUADRATIC_DTH_ROOT.toComplex` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.extension.Mersenne31.QUADRATIC_EXT_TWO_ADIC_GENERATOR_33.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.extension.Mersenne31.QUADRATIC_W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.extension.Mersenne31.mul_by_w.toComplex` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.CUBIC_DTH_ROOT.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.CUBIC_EXT_GENERATOR.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.CUBIC_W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.EXT_TWO_ADIC_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.GENERATOR.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.NEG_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.as_canonical_u32.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.div_2exp_u64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.dot_product.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.eq.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.ext_two_adic_generator.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_bool.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_canonical_checked_i64.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_canonical_unchecked_u32.panics_at_p` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_canonical_unchecked_u32.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_int_i128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_int_i32.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_int_i64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_int_u128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_int_u32.toField` | `Classical.choice`, `Plonky3Lean.Proofs.Mersenne31.clear_msb_toNat._native.bv_decide.ax_1_5`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_int_u64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.halve.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.injective_exp_root_n.exponent` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.is_zero.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.mul.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.mul_2exp_u64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.neg.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.new.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.new_array.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.new_checked.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.sub.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.sum.length_bound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.sum.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.sum.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.try_inverse.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.P.eq_fieldSize` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.from_u62.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.partial_reduce.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.reduce_64.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.QuotientMap.from_canonical_checked_i128` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.QuotientMap.from_canonical_checked_i32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.QuotientMap.from_canonical_checked_i64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.QuotientMap.from_canonical_checked_u128` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.QuotientMap.from_canonical_checked_u32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.QuotientMap.from_canonical_checked_u64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.QuotientMap.from_int_i128` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.QuotientMap.from_int_i32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.QuotientMap.from_int_i64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.QuotientMap.from_int_u128` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.QuotientMap.from_int_u64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.monty_31.MontyField31.mul.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.monty_31.MontyField31.mul_2exp_u64.spec_lt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.monty_31.MontyField31.new.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.monty_31.MontyField31.try_inverse.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.thirty_bit_prime.low_limb_out_of_range` | `propext` |
+| `Monty31.thirty_bit_prime.valid` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.utils.add.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.utils.from_monty.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.utils.halve_u32.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.utils.large_monty_reduce.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.utils.monty_reduce.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.utils.monty_reduce_u128.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.utils.sub.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.utils.to_monty.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.utils.to_monty_64.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.utils.to_monty_64_signed.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Monty31.utils.to_monty_signed.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Util.gcd_inversion_prime_field_32.cong` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Util.gcd_inversion_prime_field_32.inverse` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Util.gcd_inversion_prime_field_32.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Util.gcd_inversion_prime_field_32.one` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Util.gcd_inversion_prime_field_32.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Util.gcd_inversion_prime_field_32.pos_inverse` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Util.gcd_inversion_prime_field_32.pos_inverse_small_prime` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Util.gcd_inversion_prime_field_32.wrong_of_large_a` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Util.gcd_inversion_prime_field_32.zero` | `Classical.choice`, `Quot.sound`, `propext` |
 
 ## Upstream warnings
 

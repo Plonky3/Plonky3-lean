@@ -1,0 +1,15 @@
+# Mutation of: 010-extraction-roots
+# Breaks:      the module is gated on a misspelled cfg.
+#
+diff --git a/mersenne-31/src/lib.rs b/mersenne-31/src/lib.rs
+--- a/mersenne-31/src/lib.rs
++++ b/mersenne-31/src/lib.rs
+@@ -8,7 +8,7 @@ mod complex;
+ mod dft;
+ mod extension;
+ // PATCHED: extraction roots, only under hax's Lean backend.
+-#[cfg(hax_backend_lean)]
++#[cfg(hax_backend_lea)]
+ pub mod hax_roots;
+ mod mds;
+ mod mersenne_31;

@@ -1,0 +1,251 @@
+# Patch:        010-extraction-roots
+# Phase:        pre
+# Target:       mersenne-31/src/lib.rs, mersenne-31/src/hax_roots.rs
+# Hunks:        2
+# Class:        bound
+# Gap:          docs/extractor-issues.md 4 (charon leaves methods that no free
+#               function calls out of `ordered_decls`, and aeneas drops them).
+# Cost:         none in a normal build: the module exists only under
+#               cfg(hax_backend_lean). In the extracted variant it adds free
+#               functions, each of which calls one method of `Mersenne31`.
+#               No existing body changes.
+# Upstreamable: no: the module exists only for the extractor. Charon ordering
+#               `--start-from` methods would make it unnecessary.
+# Drop when:    charon orders `--start-from` methods, so that the methods
+#               themselves can be roots.
+# Test:         lint p3-mersenne-31 unexpected_cfgs
+# Mutation:     the module is gated on a misspelled cfg, so a normal
+#               `cargo check` reports `unexpected_cfgs`.
+#
+# Charon translates every method of `Mersenne31` with its body.
+# aeneas emits only the ones a free function reaches.
+# Rooted at the methods themselves, `Sub`, `Mul`, `Neg`, `new`, `from_int` and the rest are silently dropped.
+# `Add` survives only because `from_u62` calls it.
+# Rooted at a module of one-line wrappers, every wrapped method is reachable, so its own body is extracted instead of transcribed.
+#
+# Methods that need a whole trait-impl dictionary (`to_unique_u32`, anything on `Complex<Mersenne31>`) are not wrapped.
+# Nor are those that reach `core::iter` (`sum_array`, `Sum`).
+# aeneas rejects p3-field's trait hierarchy (issue 9) and fails on `core::iter` (issue 11).
+#
+diff --git a/mersenne-31/src/hax_roots.rs b/mersenne-31/src/hax_roots.rs
+new file mode 100644
+index 00000000..e2dfdf66
+--- /dev/null
++++ b/mersenne-31/src/hax_roots.rs
+@@ -0,0 +1,202 @@
++//! PATCHED: extraction roots for hax's Lean backend, compiled only under
++//! `cfg(hax_backend_lean)`.
++//!
++//! Charon translates the methods of `Mersenne31` but leaves every method that no
++//! free function calls out of the declaration order aeneas reads, so aeneas drops
++//! them without a diagnostic (Plonky3-lean, docs/extractor-issues.md, 4).
++//! Each function here calls exactly one such method or constant and does nothing
++//! else, so that the method's own body is extracted.
++
++use p3_field::extension::{BinomiallyExtendable, HasTwoAdicBinomialExtension};
++use p3_field::integers::QuotientMap;
++use p3_field::{Field, PrimeCharacteristicRing, PrimeField32};
++
++use crate::Mersenne31;
++
++pub fn new(value: u32) -> Mersenne31 {
++    Mersenne31::new(value)
++}
++
++pub fn new_checked(value: u32) -> Option<Mersenne31> {
++    Mersenne31::new_checked(value)
++}
++
++pub fn new_array<const N: usize>(input: [u32; N]) -> [Mersenne31; N] {
++    Mersenne31::new_array(input)
++}
++
++pub fn add(lhs: Mersenne31, rhs: Mersenne31) -> Mersenne31 {
++    lhs + rhs
++}
++
++pub fn sub(lhs: Mersenne31, rhs: Mersenne31) -> Mersenne31 {
++    lhs - rhs
++}
++
++pub fn neg(x: Mersenne31) -> Mersenne31 {
++    -x
++}
++
++pub fn mul(lhs: Mersenne31, rhs: Mersenne31) -> Mersenne31 {
++    lhs * rhs
++}
++
++pub fn eq(lhs: Mersenne31, rhs: Mersenne31) -> bool {
++    lhs == rhs
++}
++
++pub fn cmp(lhs: Mersenne31, rhs: Mersenne31) -> core::cmp::Ordering {
++    lhs.cmp(&rhs)
++}
++
++pub fn as_canonical_u32(x: Mersenne31) -> u32 {
++    x.as_canonical_u32()
++}
++
++pub fn is_zero(x: Mersenne31) -> bool {
++    x.is_zero()
++}
++
++pub fn zero() -> Mersenne31 {
++    Mersenne31::ZERO
++}
++
++pub fn one() -> Mersenne31 {
++    Mersenne31::ONE
++}
++
++pub fn two() -> Mersenne31 {
++    Mersenne31::TWO
++}
++
++pub fn neg_one() -> Mersenne31 {
++    Mersenne31::NEG_ONE
++}
++
++pub fn generator() -> Mersenne31 {
++    Mersenne31::GENERATOR
++}
++
++pub fn from_bool(b: bool) -> Mersenne31 {
++    Mersenne31::from_bool(b)
++}
++
++pub fn halve(x: Mersenne31) -> Mersenne31 {
++    x.halve()
++}
++
++pub fn mul_2exp_u64(x: Mersenne31, exp: u64) -> Mersenne31 {
++    x.mul_2exp_u64(exp)
++}
++
++pub fn div_2exp_u64(x: Mersenne31, exp: u64) -> Mersenne31 {
++    x.div_2exp_u64(exp)
++}
++
++pub fn dot_product<const N: usize>(lhs: &[Mersenne31; N], rhs: &[Mersenne31; N]) -> Mersenne31 {
++    Mersenne31::dot_product(lhs, rhs)
++}
++
++pub fn try_inverse(x: Mersenne31) -> Option<Mersenne31> {
++    x.try_inverse()
++}
++
++pub fn from_u8(int: u8) -> Mersenne31 {
++    Mersenne31::from_int(int)
++}
++
++pub fn from_u16(int: u16) -> Mersenne31 {
++    Mersenne31::from_int(int)
++}
++
++pub fn from_u32(int: u32) -> Mersenne31 {
++    Mersenne31::from_int(int)
++}
++
++pub fn from_u64(int: u64) -> Mersenne31 {
++    Mersenne31::from_int(int)
++}
++
++pub fn from_u128(int: u128) -> Mersenne31 {
++    Mersenne31::from_int(int)
++}
++
++pub fn from_i8(int: i8) -> Mersenne31 {
++    Mersenne31::from_int(int)
++}
++
++pub fn from_i16(int: i16) -> Mersenne31 {
++    Mersenne31::from_int(int)
++}
++
++pub fn from_i32(int: i32) -> Mersenne31 {
++    Mersenne31::from_int(int)
++}
++
++pub fn from_i64(int: i64) -> Mersenne31 {
++    Mersenne31::from_int(int)
++}
++
++pub fn from_i128(int: i128) -> Mersenne31 {
++    Mersenne31::from_int(int)
++}
++
++pub fn from_canonical_checked_u32(int: u32) -> Option<Mersenne31> {
++    <Mersenne31 as QuotientMap<u32>>::from_canonical_checked(int)
++}
++
++pub fn from_canonical_checked_u64(int: u64) -> Option<Mersenne31> {
++    <Mersenne31 as QuotientMap<u64>>::from_canonical_checked(int)
++}
++
++pub fn from_canonical_checked_u128(int: u128) -> Option<Mersenne31> {
++    <Mersenne31 as QuotientMap<u128>>::from_canonical_checked(int)
++}
++
++pub fn from_canonical_checked_i32(int: i32) -> Option<Mersenne31> {
++    <Mersenne31 as QuotientMap<i32>>::from_canonical_checked(int)
++}
++
++pub fn from_canonical_checked_i64(int: i64) -> Option<Mersenne31> {
++    <Mersenne31 as QuotientMap<i64>>::from_canonical_checked(int)
++}
++
++pub fn from_canonical_checked_i128(int: i128) -> Option<Mersenne31> {
++    <Mersenne31 as QuotientMap<i128>>::from_canonical_checked(int)
++}
++
++pub fn from_canonical_unchecked_u32(int: u32) -> Mersenne31 {
++    unsafe { <Mersenne31 as QuotientMap<u32>>::from_canonical_unchecked(int) }
++}
++
++pub fn from_canonical_unchecked_u64(int: u64) -> Mersenne31 {
++    unsafe { <Mersenne31 as QuotientMap<u64>>::from_canonical_unchecked(int) }
++}
++
++pub fn from_canonical_unchecked_i32(int: i32) -> Mersenne31 {
++    unsafe { <Mersenne31 as QuotientMap<i32>>::from_canonical_unchecked(int) }
++}
++
++pub fn from_canonical_unchecked_i64(int: i64) -> Mersenne31 {
++    unsafe { <Mersenne31 as QuotientMap<i64>>::from_canonical_unchecked(int) }
++}
++
++pub fn ext_two_adic_generators() -> [[Mersenne31; 2]; 33] {
++    Mersenne31::EXT_TWO_ADIC_GENERATORS
++}
++
++pub fn ext_two_adic_generator(bits: usize) -> [Mersenne31; 2] {
++    <Mersenne31 as HasTwoAdicBinomialExtension<2>>::ext_two_adic_generator(bits)
++}
++
++pub fn cubic_w() -> Mersenne31 {
++    <Mersenne31 as BinomiallyExtendable<3>>::W
++}
++
++pub fn cubic_dth_root() -> Mersenne31 {
++    <Mersenne31 as BinomiallyExtendable<3>>::DTH_ROOT
++}
++
++pub fn cubic_ext_generator() -> [Mersenne31; 3] {
++    <Mersenne31 as BinomiallyExtendable<3>>::EXT_GENERATOR
++}
+diff --git a/mersenne-31/src/lib.rs b/mersenne-31/src/lib.rs
+index 00f665ab..e60c5e31 100644
+--- a/mersenne-31/src/lib.rs
++++ b/mersenne-31/src/lib.rs
+@@ -7,6 +7,9 @@ extern crate alloc;
+ mod complex;
+ mod dft;
+ mod extension;
++// PATCHED: extraction roots, only under hax's Lean backend.
++#[cfg(hax_backend_lean)]
++pub mod hax_roots;
+ mod mds;
+ mod mersenne_31;
+ mod poseidon1;

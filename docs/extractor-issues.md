@@ -39,6 +39,11 @@ one of them is still present.
    matches; no diagnostic). With `--translate-all-methods` charon translates
    *and* orders it, but that flag also pulls in p3-field's trait hierarchy,
    which aeneas rejects (9). It is transcribed in the same file.
+   For p3-mersenne-31, pre-patch `010-extraction-roots` roots the run at a
+   `cfg(hax_backend_lean)` module of one-line free functions, one per needed
+   method. Each method is then reachable from a free function, so charon
+   orders it and aeneas emits its own body, `halve` and the trait-impl
+   `from_int`s included.
 5. **aeneas's `__N` names for anonymous consts** trip mathlib's `nameCheck`
    linter. Post-patch `baby-bear/030-name-anonymous-const-assertions`.
 6. **The seeded `Debug::fmt` signatures do not match `CoreModels`**: aeneas

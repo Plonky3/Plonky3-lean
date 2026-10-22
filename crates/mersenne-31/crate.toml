@@ -1,0 +1,69 @@
+# p3-mersenne-31: the prime field F_p, p = 2^31 - 1, and its extensions.
+
+lean_lib = "P3Mersenne31"
+
+# Only the scalar field is extracted. The whole crate reaches p3-field's mutually
+# recursive trait hierarchy, which aeneas rejects (docs/extractor-issues.md, 9).
+state = "scoped"
+
+features = []
+
+# One root: the `hax_roots` module that pre-patch 010 adds under
+# cfg(hax_backend_lean). Rooted at the methods themselves, aeneas drops every
+# method that no free function calls (docs/extractor-issues.md, 4); each
+# function of that module calls one method, so its body is extracted.
+start_from = ["p3_mersenne_31::hax_roots"]
+
+watch = ["mersenne-31/src", "mersenne-31/Cargo.toml", "field/src/integers.rs", "field/src/helpers.rs"]
+
+# The transcriptions in extraction/P3Mersenne31/Assumptions/Mirror.lean.
+# Hashes are pending tools/mirror.
+# Items in `extraction/gaps.toml` are named as it names them, so the cross-check finds them.
+
+[[mirror]]
+lean = "p3_mersenne_31.mersenne_31.Mersenne31.Insts.CoreIterTraitsAccumSumMersenne31.sum"
+rust = "{impl core::iter::traits::accum::Sum for p3_mersenne_31::mersenne_31::Mersenne31}::sum"
+
+[[mirror]]
+lean = "p3_mersenne_31.mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.sum_array"
+rust = "{impl p3_field::field::PrimeCharacteristicRing for p3_mersenne_31::mersenne_31::Mersenne31}::sum_array"
+
+[[mirror]]
+lean = "p3_mersenne_31.complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS"
+rust = "p3_mersenne_31::complex::{impl}::CIRCLE_TWO_ADIC_GENERATORS"
+
+[[mirror]]
+lean = "p3_mersenne_31.complex.Mersenne31.COMPLEX_GENERATOR"
+rust = "p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::COMPLEX_GENERATOR"
+
+[[mirror]]
+lean = "p3_mersenne_31.complex.Mersenne31.circle_two_adic_generator"
+rust = "p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::circle_two_adic_generator"
+
+[[mirror]]
+lean = "p3_mersenne_31.extension.Mersenne31.QUADRATIC_W"
+rust = "{impl p3_field::extension::complex::HasComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::W"
+
+[[mirror]]
+lean = "p3_mersenne_31.extension.Mersenne31.QUADRATIC_DTH_ROOT"
+rust = "{impl p3_field::extension::complex::HasComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::DTH_ROOT"
+
+[[mirror]]
+lean = "p3_mersenne_31.extension.Mersenne31.mul_by_w"
+rust = "{impl p3_field::extension::complex::HasComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::mul_by_w"
+
+[[mirror]]
+lean = "p3_mersenne_31.extension.Mersenne31.QUADRATIC_EXT_TWO_ADIC_GENERATOR_33"
+rust = "{impl p3_field::extension::complex::HasTwoAdicComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::complex_ext_two_adic_generator"
+
+[[mirror]]
+lean = "p3_mersenne_31.extension.Mersenne31.CUBIC_W"
+rust = "{impl p3_field::extension::complex::HasComplexBinomialExtension<3> for p3_mersenne_31::mersenne_31::Mersenne31}::W"
+
+[[mirror]]
+lean = "p3_mersenne_31.extension.Mersenne31.CUBIC_DTH_ROOT"
+rust = "{impl p3_field::extension::complex::HasComplexBinomialExtension<3> for p3_mersenne_31::mersenne_31::Mersenne31}::DTH_ROOT"
+
+[[mirror]]
+lean = "p3_mersenne_31.complex.new_complex_new"
+rust = "p3_field::extension::complex::Complex::new_complex"
