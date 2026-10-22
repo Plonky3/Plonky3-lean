@@ -226,4 +226,66 @@ theorem many_body (input : Slice Std.U8) (out : Slice (Std.Array Std.U8 32#usize
   erw [hash_group_any input (k * len) len (by nlinarith) h32]
   rw [bind_ok, write_lane out _ k hk hn _ rfl, bind_ok]
 
+theorem usz_div_one (n : ℕ) (hn : n < 2 ^ 32) : (usz n / 1#usize : RustM Std.Usize) = .ok (usz n) := by
+  rw [lit1, usz_div hn (by norm_num) (by norm_num), Nat.div_one]
+
+theorem usz_rem_one (n : ℕ) (hn : n < 2 ^ 32) : (usz n % 1#usize : RustM Std.Usize) = .ok (usz 0) := by
+  rw [lit1, usz_rem hn (by norm_num) (by norm_num), Nat.mod_one]
+
+theorem many_done (input : Slice Std.U8) (len n : Std.Usize) (o : Slice (Std.Array Std.U8 32#usize)) :
+    p3_blake3.batch.hash_many_with_loop0.body 1#usize p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1
+      p3_blake3.batch.Mode.HASH input len { start := n, «end» := n } o = .ok (.done o) := by
+  unfold p3_blake3.batch.hash_many_with_loop0.body
+  simp only [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next, range_stop,
+    bind_ok, Aeneas.Std.uncurry_apply_pair]
+
+theorem outsAt_full (out : Slice (Std.Array Std.U8 32#usize)) (d : ℕ → Std.Array Std.U8 32#usize) :
+    (outsAt out d out.val.length).val = (List.range out.val.length).map d := by
+  rw [outsAt_val]
+  apply List.map_congr_left
+  intro j hj
+  rw [ite_eq_left_of_eq_true _ _ (eq_true (List.mem_range.1 hj))]
+
+theorem outsAt_zero (out : Slice (Std.Array Std.U8 32#usize)) (d : ℕ → Std.Array Std.U8 32#usize) :
+    outsAt out d 0 = out := by
+  apply Slice.ext
+  rw [outsAt_val]
+  apply List.ext_getElem (by simp)
+  intro j h1 h2
+  simp [List.getElem?_eq_getElem h2]
+
+theorem loop1_empty (input : Slice Std.U8) (len : Std.Usize) (o : Slice (Std.Array Std.U8 32#usize))
+    (f : Std.Usize) :
+    p3_blake3.batch.hash_many_with_loop1 1#usize p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1
+      { start := usz 0, «end» := usz 0 } p3_blake3.batch.Mode.HASH input len o f = .ok (o, f) := by
+  unfold p3_blake3.batch.hash_many_with_loop1
+  rw [loop]
+  unfold p3_blake3.batch.hash_many_with_loop1.body
+  simp only [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next, range_stop,
+    bind_ok, Aeneas.Std.uncurry_apply_pair]
+
+theorem hash_many_with_eq (input : Slice Std.U8) (out : Slice (Std.Array Std.U8 32#usize)) (len : ℕ)
+    (hlen : input.val.length = out.val.length * len) (h32 : input.val.length + 1024 < 2 ^ 32)
+    (hn : out.val.length < 2 ^ 32) :
+    p3_blake3.batch.hash_many_with 1#usize p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1
+      p3_blake3.batch.Mode.HASH input (usz len) out =
+      .ok (outsAt out (digestArr (sbytes input) len) out.val.length) := by
+  unfold p3_blake3.batch.hash_many_with
+  rw [show CoreModels.core.slice.Slice.len out = .ok (usz out.val.length) from
+      congrArg _ (eq_usz hn rfl), bind_ok, usz_div_one _ hn, bind_ok, usz_div_one _ hn, bind_ok]
+  unfold p3_blake3.batch.hash_many_with_loop0
+  have key := loop_of_steps (fun x : CoreModels.core.ops.range.Range Std.Usize × Slice (Std.Array Std.U8 32#usize) =>
+      p3_blake3.batch.hash_many_with_loop0.body 1#usize p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1
+        p3_blake3.batch.Mode.HASH input (usz len) x.1 x.2)
+    (fun k => (({ start := usz k, «end» := usz out.val.length } : CoreModels.core.ops.range.Range Std.Usize),
+      outsAt out (digestArr (sbytes input) len) k)) out.val.length _
+    (fun k hk => many_body input out len hlen h32 hn k hk) (many_done _ _ _ _)
+  rw [outsAt_zero] at key
+  rw [lit0]
+  erw [key]
+  rw [bind_ok, usz_mul_one _ hn, bind_ok, usz_mul_one _ hn, bind_ok, usz_rem_one _ hn, bind_ok, loop1_empty,
+    bind_ok]
+  simp only [Aeneas.Std.uncurry_apply_pair]
+  exact (bind_ok _ _).trans (ite_eq_right_of_eq_false _ _ (eq_false (by simp)))
+
 end Plonky3Lean.Proofs.Blake3
