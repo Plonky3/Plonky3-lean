@@ -1,8 +1,10 @@
 module
 
-public import ToCompPoly.Data.Nat.PowMod
 public import ToCompPoly.Fields.BabyBear
 public import ToCompPoly.Fields.BabyBear.Extension
+public import ToCompPoly.Fields.Binary.BF64Ext3
+public import ToCompPoly.Fields.Binary.NatPoly
+public import ToCompPoly.Fields.Binary.Tower.NatMul
 public import ToCompPoly.Fields.Goldilocks
 public import ToCompPoly.Fields.KoalaBear
 public import ToCompPoly.Fields.KoalaBear.Extension

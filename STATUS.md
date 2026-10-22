@@ -15,6 +15,7 @@ target `thumbv7em-none-eabi`
 | Crate | State | Generated lines | Hand-written lines | `opaque` | Mirrored | Dropped by the extractor | Patches (pre / post) | Patches with a cost |
 |---|---|---:|---:|---:|---:|---:|---|---|
 | `baby-bear` | extracted | 2953 | 121 | 4 | 0 | 0 | 4 / 3 | pre `020`, pre `030`, pre `040` |
+| `binary-field` | scoped | 3228 | 66 | 0 | 0 | 0 | 5 / 1 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050` |
 | `field` | stub |  | 91 | 2 | 6 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
 | `koala-bear` | extracted | 3024 | 121 | 4 | 0 | 0 | 0 / 3 |  |
@@ -38,6 +39,11 @@ charon's output and `--check` requires to reproduce. An item is *mirrored* when 
 `[[mirror]]` entry transcribes it by hand.
 
 ### `baby-bear`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `binary-field`
 
 charon errors: 0.
 Nothing translated is dropped.
@@ -180,7 +186,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 274) whose dependencies include it; reaching one is not using it.
+(of 348) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -206,7 +212,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 274) whose dependencies include the declaration.
+counts the claims (of 348) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -289,6 +295,11 @@ counts the claims (of 274) whose dependencies include the declaration.
 | `baby-bear/pre/020-field-cfg-raw-data-serializable-supertrait` | none in a normal build (see below). In the extracted variant, `Field` no longer implies `RawDataSerializable`. |
 | `baby-bear/pre/030-field-cfg-rpitit-packed-methods` | none in a normal build: every change is behind cfg(hax_backend_lean). In the extracted variant, four default methods are absent and `to_ext_iter` sits on an extension trait. |
 | `baby-bear/pre/040-field-cfg-rpitit-bit-plane-expansion` | none in a normal build: the change is behind cfg(hax_backend_lean). In the extracted variant, `Field::prepare_bit_plane_expansion` is absent. |
+| `binary-field/pre/010-cfg-raw-data-serializable-bounds` | none: each added bound is implied by `TowerLevel: Field` in a normal build. |
+| `binary-field/pre/020-cfg-hide-ghash-bit-plane-expansion` | none in a normal build: the change is behind cfg(hax_backend_lean). In the extracted variant, `Ghash128::prepare_bit_plane_expansion` is absent. |
+| `binary-field/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of a field type. No existing body changes. |
+| `binary-field/pre/040-tower-inherent-repr` | none in a normal build: the copies are compiled but unused there. In the extracted variant, inherent `from_repr`, `to_repr` and `mul_alpha` shadow the `TowerLevel` methods at every call site on a concrete level, and call copies with the trait methods' bodies. `Gf2`'s copies build the value directly: `from_bool((r & 1) == 1)` is `Self(r & 1)`, and `u8::from(self.is_one())` is `(self.0 == 1) as u8`. |
+| `binary-field/pre/050-poly192-copied-limbs` | none in a normal build: the copy is compiled but unused there. In the extracted variant, `Mul` and `Mul<Poly64>` read the coordinates through `limbs_owned`, which copies each coordinate's bits, instead of borrowing them in place. |
 | `mersenne-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of `Mersenne31`. No existing body changes. |
 
 Upstream tests (`test-pre-patches.py`): 6715 of Plonky3's 6769 pass as shipped and 6715 with the pre-extraction patches, with 0 divergence(s).
@@ -402,6 +413,80 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3BabyBear.poseidon2.const_check_6.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.clmul.gf192.poly_mul_192.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.clmul.gf192.poly_mul_192_by_64.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.clmul.gf192.poly_square_192.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.clmul.gf64.poly_inverse_64.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.clmul.gf64.poly_mul_64.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.clmul.gf64.poly_sqrt_64.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.clmul.gf64.poly_square_64.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.clmul.portable.clmul_64x64.poly` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.clmul.portable.poly_mul_128.ghash` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.clmul.portable.poly_mul_128_by_64.ghash` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.clmul.portable.poly_square_128.ghash` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.clmul.reduce_128.toQuot` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.clmul.reduce_64.toQuot64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.clmul.sqrt.poly_sqrt_128.ghash` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.gf2.Gf2.Insts.CoreOpsArithAddGf2Gf2.add.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.gf2.Gf2.Insts.CoreOpsArithMulGf2Gf2.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.gf2.Gf2.Insts.CoreOpsArithNegGf2.neg.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.gf2.Gf2.Insts.CoreOpsArithSubGf2Gf2.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.gf2.Gf2.from_repr.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.gf2.Gf2.mul_alpha.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithAddGhash128Ghash128.add.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithMulGhash128Ghash128.mul.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithNegGhash128.neg.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithSubGhash128Ghash128.sub.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.poly192.Poly192.Insts.CoreOpsArithAddPoly192Poly192.add.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.poly192.Poly192.Insts.CoreOpsArithMulPoly192Poly192.mul.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.poly192.Poly192.Insts.CoreOpsArithNegPoly192.neg.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.poly192.Poly192.Insts.CoreOpsArithSubPoly192Poly192.sub.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.poly64.Poly64.Insts.CoreOpsArithAddPoly64Poly64.add.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.poly64.Poly64.Insts.CoreOpsArithMulPoly64Poly64.mul.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.poly64.Poly64.Insts.CoreOpsArithNegPoly64.neg.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.poly64.Poly64.Insts.CoreOpsArithSubPoly64Poly64.sub.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tables.mul.tower8` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tables.square.tower8` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tables.try_inverse.tower8` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithAddBinaryField128BinaryField128.add.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithMulBinaryField128BinaryField128.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithNegBinaryField128.neg.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithSubBinaryField128BinaryField128.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithAddBinaryField16BinaryField16.add.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithMulBinaryField16BinaryField16.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithNegBinaryField16.neg.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithSubBinaryField16BinaryField16.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField16.from_repr.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField16.mul_alpha.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField2.Insts.CoreOpsArithAddBinaryField2BinaryField2.add.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField2.Insts.CoreOpsArithMulBinaryField2BinaryField2.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField2.Insts.CoreOpsArithNegBinaryField2.neg.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField2.Insts.CoreOpsArithSubBinaryField2BinaryField2.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField2.from_repr.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField2.mul_alpha.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithAddBinaryField32BinaryField32.add.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithMulBinaryField32BinaryField32.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithNegBinaryField32.neg.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithSubBinaryField32BinaryField32.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField32.from_repr.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField32.mul_alpha.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField4.Insts.CoreOpsArithAddBinaryField4BinaryField4.add.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField4.Insts.CoreOpsArithMulBinaryField4BinaryField4.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField4.Insts.CoreOpsArithNegBinaryField4.neg.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField4.Insts.CoreOpsArithSubBinaryField4BinaryField4.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField4.from_repr.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithAddBinaryField64BinaryField64.add.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithMulBinaryField64BinaryField64.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithNegBinaryField64.neg.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithSubBinaryField64BinaryField64.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField64.from_repr.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField64.mul_alpha.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithAddBinaryField8BinaryField8.add.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithMulBinaryField8BinaryField8.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithNegBinaryField8.neg.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithSubBinaryField8BinaryField8.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField8.from_repr.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BinaryField.tower.BinaryField8.mul_alpha.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Goldilocks.goldilocks.Goldilocks.GENERATOR.generates` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Goldilocks.goldilocks.Goldilocks.NEG_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Goldilocks.goldilocks.Goldilocks.ORDER_U64.eq_fieldSize` | `Classical.choice`, `Quot.sound`, `propext` |

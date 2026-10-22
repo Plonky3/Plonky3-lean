@@ -1,6 +1,7 @@
 module
 
 public import Plonky3Lean.Spec.BabyBear
+public import Plonky3Lean.Spec.BinaryField
 public import Plonky3Lean.Spec.Goldilocks
 public import Plonky3Lean.Spec.KoalaBear
 public import Plonky3Lean.Spec.Mersenne31

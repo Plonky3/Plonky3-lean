@@ -37,6 +37,22 @@ def core.Shared0T.Insts.CoreConvertAsRef {T U : Type}
     (convertAsRefInst : core.convert.AsRef T U) : core.convert.AsRef T U :=
   { as_ref := convertAsRefInst.as_ref }
 
+/-- `u64::reverse_bits` (`library/core/src/num/uint_macros.rs`).
+
+Bit `i` of the result is bit `63 - i` of the operand.
+
+p3-binary-field's portable carry-less multiply calls it. -/
+def core.num.U64.reverse_bits (x : Std.U64) : RustM Std.U64 :=
+  ok ⟨x.bv.reverse⟩
+
+/-- `usize::trailing_zeros` (`library/core/src/num/uint_macros.rs`): the index of the
+lowest set bit, or the width for zero.
+
+p3-binary-field's basis tables call it, at build time in Rust. -/
+def core.num.Usize.trailing_zeros (x : Std.Usize) : RustM Std.U32 :=
+  ok ⟨BitVec.ofNat 32 (((List.range UScalarTy.Usize.numBits).find? fun i => x.val.testBit i).getD
+    UScalarTy.Usize.numBits)⟩
+
 /-- `Ord::min`, the provided method (`library/core/src/cmp.rs`).
 
 It returns `other` exactly when `other < self`, as `core::cmp::min(self, other)` does, whose model is reused.

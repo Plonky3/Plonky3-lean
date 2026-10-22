@@ -1,0 +1,14 @@
+# Mutation of: 050-poly192-copied-limbs
+# Breaks:      `limbs_owned` swaps the first two coordinates.
+#
+--- a/binary-field/src/poly192.rs
++++ b/binary-field/src/poly192.rs
+@@ -113,7 +113,7 @@
+     #[allow(dead_code)]
+     #[inline]
+     const fn limbs_owned(&self) -> [u64; DEGREE] {
+-        [self.0[0].to_bits(), self.0[1].to_bits(), self.0[2].to_bits()]
++        [self.0[1].to_bits(), self.0[0].to_bits(), self.0[2].to_bits()]
+     }
+ 
+     /// The element with the given raw coordinates.

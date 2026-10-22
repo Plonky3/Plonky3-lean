@@ -1,0 +1,144 @@
+# Patch:        010-cfg-raw-data-serializable-bounds
+# Phase:        pre
+# Target:       binary-field/src/challenger.rs, binary-field/src/coordinates.rs, binary-field/tests/pre_patch_010.rs
+# Hunks:        7
+# Class:        bound
+# Gap:          docs/extractor-issues.md 10 (charon#1266, as for baby-bear's
+#               pre 020).
+# Cost:         none: each added bound is implied by `TowerLevel: Field` in a
+#               normal build.
+# Upstreamable: no: the bounds are redundant upstream. Dropping baby-bear's
+#               pre 020 makes them unnecessary.
+# Drop when:    baby-bear's pre 020 is dropped.
+# Test:         test p3-binary-field --test pre_patch_010
+# Mutation:     one added bound asks for `LowerHex`, which `TowerLevel` does
+#               not imply, so the generic test no longer compiles.
+#
+# Baby-bear's pre 020 cuts the `RawDataSerializable` supertrait out of `Field` under the cfg.
+#
+# `BitCoordinates` and four `BinaryChallenger` impls use its items on an `F: TowerLevel`.
+#
+# Under the cfg they no longer compile, so each states the bound itself.
+#
+# In a normal build `TowerLevel: Field` implies it, so nothing changes there.
+#
+diff --git a/binary-field/src/challenger.rs b/binary-field/src/challenger.rs
+index a020ba60..9671e60f 100644
+--- a/binary-field/src/challenger.rs
++++ b/binary-field/src/challenger.rs
+@@ -8,7 +8,7 @@ use p3_challenger::{
+     CanObserve, CanSample, CanSampleBits, CanSampleUniformBits, FieldChallenger,
+     GrindingChallenger, HashChallenger, ResamplingError,
+ };
+-use p3_field::BasedVectorSpace;
++use p3_field::{BasedVectorSpace, RawDataSerializable};
+ use p3_maybe_rayon::prelude::*;
+ use p3_symmetric::{CryptographicHasher, Hash, MerkleCap};
+ use tracing::instrument;
+@@ -86,7 +86,10 @@ where
+     }
+ }
+ 
+-impl<F: TowerLevel, Inner: CanObserve<u8>> CanObserve<F> for BinaryChallenger<F, Inner> {
++// PATCHED: the bound on `F` was `TowerLevel`
++impl<F: TowerLevel + RawDataSerializable, Inner: CanObserve<u8>> CanObserve<F>
++    for BinaryChallenger<F, Inner>
++{
+     fn observe(&mut self, value: F) {
+         let mut bytes = [0; 16];
+         for (slot, byte) in bytes.iter_mut().zip(value.into_bytes()) {
+@@ -158,7 +161,7 @@ impl<F, G, const N: usize, Inner: CanObserve<u8>> CanObserve<MerkleCap<G, [u64;
+ 
+ impl<F, EF, Inner> CanSample<EF> for BinaryChallenger<F, Inner>
+ where
+-    F: TowerLevel,
++    F: TowerLevel + RawDataSerializable, // PATCHED: was `TowerLevel`
+     EF: BasedVectorSpace<F>,
+     Inner: CanSample<u8>,
+ {
+@@ -238,7 +241,7 @@ fn candidate<F: TowerLevel>(index: u64) -> F {
+ 
+ impl<F, Inner> GrindingChallenger for BinaryChallenger<F, Inner>
+ where
+-    F: TowerLevel,
++    F: TowerLevel + RawDataSerializable, // PATCHED: was `TowerLevel`
+     Inner: CanSample<u8> + CanObserve<u8> + Clone + Send + Sync,
+ {
+     type Witness = F;
+@@ -286,7 +289,7 @@ where
+ 
+ impl<F, Inner> FieldChallenger<F> for BinaryChallenger<F, Inner>
+ where
+-    F: TowerLevel,
++    F: TowerLevel + RawDataSerializable, // PATCHED: was `TowerLevel`
+     Inner: CanSample<u8> + CanObserve<u8> + Clone + Send + Sync,
+ {
+ }
+diff --git a/binary-field/src/coordinates.rs b/binary-field/src/coordinates.rs
+index c5d6bf18..16f8dc9b 100644
+--- a/binary-field/src/coordinates.rs
++++ b/binary-field/src/coordinates.rs
+@@ -32,7 +32,8 @@ pub trait BitCoordinates: Field + RawDataSerializable {
+     fn from_coordinate_bytes(bytes: impl Iterator<Item = u8>) -> Self;
+ }
+ 
+-impl<F: TowerLevel> BitCoordinates for F {
++impl<F: TowerLevel + RawDataSerializable> BitCoordinates for F {
++    // PATCHED: the bound was `TowerLevel`
+     const DIMENSION: usize = 1 << F::LOG_BITS;
+ 
+     #[inline]
+diff --git a/binary-field/tests/pre_patch_010.rs b/binary-field/tests/pre_patch_010.rs
+new file mode 100644
+index 00000000..51cabd73
+--- /dev/null
++++ b/binary-field/tests/pre_patch_010.rs
+@@ -0,0 +1,48 @@
++//! PATCHED: added by Plonky3-lean pre-patch 010 (`cfg-raw-data-serializable-bounds`).
++//!
++//! The patch adds `F: RawDataSerializable` to five impls over `F: TowerLevel`.
++//!
++//! In a normal build `TowerLevel: Field` implies that bound.
++//!
++//! So each impl must still apply to a generic `F: TowerLevel`, with no other bound.
++
++use p3_binary_field::{BinaryChallenger, BinaryField8, BinaryField128, BitCoordinates, TowerLevel};
++use p3_challenger::{CanObserve, CanSample, FieldChallenger, GrindingChallenger, HashChallenger};
++use p3_field::PrimeCharacteristicRing;
++use p3_keccak::Keccak256Hash;
++
++type Challenger<F> = BinaryChallenger<F, HashChallenger<u8, Keccak256Hash, 32>>;
++
++fn dimension<F: TowerLevel>() -> usize {
++    <F as BitCoordinates>::DIMENSION
++}
++
++fn observe<F: TowerLevel>(challenger: &mut Challenger<F>, value: F) {
++    challenger.observe(value);
++}
++
++fn sample<F: TowerLevel>(challenger: &mut Challenger<F>) -> F {
++    challenger.sample()
++}
++
++const fn is_field_challenger<F: TowerLevel, C: FieldChallenger<F> + GrindingChallenger>() {}
++
++fn challengers_are_field_challengers<F: TowerLevel>() {
++    is_field_challenger::<F, Challenger<F>>();
++}
++
++#[test]
++fn the_bounded_impls_apply_to_every_tower_level() {
++    assert_eq!(dimension::<BinaryField8>(), 8);
++    assert_eq!(dimension::<BinaryField128>(), 128);
++
++    let mut challenger = Challenger::<BinaryField128>::from_hasher(vec![], Keccak256Hash);
++    observe(&mut challenger, BinaryField128::ONE);
++    let first: BinaryField128 = sample(&mut challenger);
++
++    let mut again = Challenger::<BinaryField128>::from_hasher(vec![], Keccak256Hash);
++    observe(&mut again, BinaryField128::ONE);
++    assert_eq!(sample(&mut again), first);
++
++    challengers_are_field_challengers::<BinaryField128>();
++}

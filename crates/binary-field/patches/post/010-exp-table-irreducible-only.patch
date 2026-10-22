@@ -1,0 +1,28 @@
+# Patch:        010-exp-table-irreducible-only
+# Phase:        post
+# Target:       extraction/P3BinaryField/Extraction/Funs.lean
+# Hunks:        1
+# Class:        reshape
+# Gap:          docs/extractor-issues.md 13: registering `global_simps` on an
+#               irreducible constant unfolds it, which reaches the maximum
+#               recursion depth on the 511-entry `tables::EXP`.
+# Cost:         none. The constant and its value are unchanged; it is no longer
+#               a `global_simps` lemma, which only Aeneas's proof automation
+#               reads, and no proof here relies on it.
+# Upstreamable: yes: aeneas could leave the attribute off large constants.
+# Drop when:    the attribute elaborates on a literal of this size.
+#
+# `tables::EXP` has 511 entries. Every other array literal in the extractions
+# has at most 256, which elaborates with both attributes.
+#
+--- a/extraction/P3BinaryField/Extraction/Funs.lean
++++ b/extraction/P3BinaryField/Extraction/Funs.lean
+@@ -1744,7 +1744,7 @@
+ 
+ /-- [p3_binary_field::tables::EXP]
+     Source: 'binary-field/src/tables.rs', lines 45:0-78:2 -/
+-@[global_simps, irreducible]
++@[irreducible] -- PATCHED: aeneas emitted `@[global_simps, irreducible]`
+ def tables.EXP : Array Std.U8 511#usize :=
+   Array.make 511#usize [
+     1#u8, 19#u8, 67#u8, 102#u8, 171#u8, 140#u8, 96#u8, 198#u8, 145#u8, 202#u8,

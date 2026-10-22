@@ -1,0 +1,37 @@
+# p3-binary-field: characteristic-2 fields.
+
+lean_lib = "P3BinaryField"
+
+# The portable integer kernels, and the field types' operators (`+`, `-`, `*`,
+# negation) through pre-patch 030's wrappers.
+# The field types' trait methods are not: p3-field's trait hierarchy is what
+# aeneas rejects (docs/extractor-issues.md, 9).
+state = "scoped"
+
+features = []
+
+start_from = [
+  "p3_binary_field::clmul::portable::bmul64",
+  "p3_binary_field::clmul::portable::clmul_64x64",
+  "p3_binary_field::clmul::portable::poly_mul_128",
+  "p3_binary_field::clmul::portable::poly_square_128",
+  "p3_binary_field::clmul::portable::poly_mul_128_by_64",
+  "p3_binary_field::clmul::reduce_64",
+  "p3_binary_field::clmul::reduce_128",
+  "p3_binary_field::clmul::gf64::poly_mul_64",
+  "p3_binary_field::clmul::gf64::poly_square_64",
+  "p3_binary_field::clmul::gf64::poly_sqrt_64",
+  "p3_binary_field::clmul::gf64::poly_inverse_64",
+  "p3_binary_field::clmul::gf192::mul_unreduced",
+  "p3_binary_field::clmul::gf192::poly_mul_192",
+  "p3_binary_field::clmul::gf192::poly_square_192",
+  "p3_binary_field::clmul::gf192::poly_mul_192_by_64",
+  "p3_binary_field::clmul::sqrt::poly_sqrt_128",
+  "p3_binary_field::tables::mul",
+  "p3_binary_field::tables::square",
+  "p3_binary_field::tables::try_inverse",
+  # The field types' methods, through pre-patch 030's one-line wrappers.
+  "p3_binary_field::hax_roots",
+]
+
+watch = ["binary-field/src", "binary-field/Cargo.toml"]

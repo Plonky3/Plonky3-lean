@@ -1,13 +1,26 @@
 module
 
 public import Plonky3Lean.Lib
-public import Plonky3Lean.Spec
 public import Plonky3Lean.Proofs.Field.BabyBear
 public import Plonky3Lean.Proofs.Field.BabyBear.Arith
 public import Plonky3Lean.Proofs.Field.BabyBear.Constants
 public import Plonky3Lean.Proofs.Field.BabyBear.Element
 public import Plonky3Lean.Proofs.Field.BabyBear.Extension
 public import Plonky3Lean.Proofs.Field.BabyBear.Generic
+public import Plonky3Lean.Proofs.Field.Binary.Clmul
+public import Plonky3Lean.Proofs.Field.Binary.Compact
+public import Plonky3Lean.Proofs.Field.Binary.Ghash
+public import Plonky3Lean.Proofs.Field.Binary.MaskedMul
+public import Plonky3Lean.Proofs.Field.Binary.Operators
+public import Plonky3Lean.Proofs.Field.Binary.Poly192
+public import Plonky3Lean.Proofs.Field.Binary.Poly64
+public import Plonky3Lean.Proofs.Field.Binary.Poly64Field
+public import Plonky3Lean.Proofs.Field.Binary.Poly64Halves
+public import Plonky3Lean.Proofs.Field.Binary.Poly64Sqrt
+public import Plonky3Lean.Proofs.Field.Binary.Statements
+public import Plonky3Lean.Proofs.Field.Binary.Tables
+public import Plonky3Lean.Proofs.Field.Binary.Tower
+public import Plonky3Lean.Proofs.Field.Binary.TowerField
 public import Plonky3Lean.Proofs.Field.Goldilocks.Arith
 public import Plonky3Lean.Proofs.Field.Goldilocks.Basic
 public import Plonky3Lean.Proofs.Field.Goldilocks.Constants
@@ -42,6 +55,7 @@ public import Plonky3Lean.Proofs.Field.Monty31.QuotientMap
 public import Plonky3Lean.Proofs.Field.Monty31.Reduce
 public import Plonky3Lean.Proofs.Field.Monty31.Utils
 public import Plonky3Lean.Proofs.Util.GcdInversion
+public import Plonky3Lean.Spec
 
 @[expose] public section
 

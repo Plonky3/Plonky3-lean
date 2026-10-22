@@ -1,0 +1,73 @@
+# Patch:        020-cfg-hide-ghash-bit-plane-expansion
+# Phase:        pre
+# Target:       binary-field/src/ghash.rs, binary-field/tests/pre_patch_020.rs
+# Hunks:        2
+# Class:        cfg-hide
+# Gap:          docs/extractor-issues.md 10 (charon#1266, as for baby-bear's
+#               pre 040).
+# Cost:         none in a normal build: the change is behind
+#               cfg(hax_backend_lean). In the extracted variant,
+#               `Ghash128::prepare_bit_plane_expansion` is absent.
+# Upstreamable: yes: one `cfg` attribute, inert in a normal build.
+# Drop when:    baby-bear's pre 040 is dropped.
+# Test:         test p3-binary-field --test pre_patch_020; lint p3-binary-field unexpected_cfgs
+# Mutation:     the override is gated on a misspelled cfg, so a normal
+#               `cargo check` reports `unexpected_cfgs`.
+#
+# Baby-bear's pre 040 removes `Field::prepare_bit_plane_expansion` under the cfg.
+#
+# `Ghash128` overrides it, so under the cfg the override names no trait method.
+#
+# The override is absent under the cfg, as the trait method is.
+#
+diff --git a/binary-field/src/ghash.rs b/binary-field/src/ghash.rs
+index 9c0cc77f..e7fdf315 100644
+--- a/binary-field/src/ghash.rs
++++ b/binary-field/src/ghash.rs
+@@ -303,6 +303,7 @@ impl Field for Ghash128 {
+ 
+     const GENERATOR: Self = Self(clmul::tower_image_128(TOWER_GENERATOR));
+ 
++    #[cfg(not(hax_backend_lean))] // PATCHED: `-> Option<impl Fn>`, absent from `Field` under the cfg
+     #[inline]
+     fn prepare_bit_plane_expansion(
+         weights: &[Self; 64],
+diff --git a/binary-field/tests/pre_patch_020.rs b/binary-field/tests/pre_patch_020.rs
+new file mode 100644
+index 00000000..dee3e52d
+--- /dev/null
++++ b/binary-field/tests/pre_patch_020.rs
+@@ -0,0 +1,33 @@
++//! PATCHED: added by Plonky3-lean pre-patch 020 (`cfg-hide-ghash-bit-plane-expansion`).
++//!
++//! The patch removes `Ghash128`'s override of `Field::prepare_bit_plane_expansion` from the extracted variant only.
++//!
++//! In a normal build the override must still be there.
++//!
++//! It is the one that returns a correct expansion on targets with the required features.
++
++use p3_binary_field::Ghash128;
++use p3_field::{Field, PrimeCharacteristicRing};
++
++const HAS_EXPANSION: bool = cfg!(all(
++    target_arch = "x86_64",
++    target_feature = "gfni",
++    target_feature = "avx512f",
++    target_feature = "avx512bw",
++    target_feature = "avx512vbmi"
++));
++
++#[test]
++fn the_override_is_present_in_a_normal_build() {
++    let weights: [Ghash128; 64] = core::array::from_fn(|i| Ghash128::from_u64(i as u64 + 1));
++    let expansion = Ghash128::prepare_bit_plane_expansion(&weights);
++    assert_eq!(expansion.is_some(), HAS_EXPANSION);
++    if let Some(expand) = expansion {
++        // Lane 0 of the word for corner 5 is set, so lane 0 sums weight 5 alone.
++        let mut words = [0u64; 64];
++        words[5] = 1;
++        let mut output = Vec::new();
++        expand(&words, &mut output);
++        assert_eq!(output[0], weights[5]);
++    }
++}
