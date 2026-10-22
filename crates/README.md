@@ -58,6 +58,9 @@ A declaration in `stub/` or in `extraction/<Lib>/Assumptions/` is one of:
   entry in `crate.toml` giving the Lean name and the Rust path, and a hash of
   the Rust item's token stream. When upstream changes the item, the hash changes
   and CI fails until someone re-reads the transcription and updates the hash.
+  A transcription is the fallback: where a reviewed pre patch can reshape the
+  Rust so that the extractor translates the item itself, that is preferred
+  ([`docs/patches.md`](../docs/patches.md#pre-patch-or-transcription)).
 
 CI rejects a hand-written declaration that is neither. Until `tools/mirror`
 exists, the entries have no `hash`, and the transcriptions are re-read by hand
@@ -84,6 +87,8 @@ crates/<crate>/
   extraction/                  state = extracted or scoped (see above)
   stub/<lean_lib>.lean         state = stub
   patches/pre/NNN-slug.patch   Rust-side, applied to plonky3/ before hax and reverted after
+  patches/pre/NNN-slug.mutation.patch
+                               its recorded mutation, which its tests must catch
   patches/post/NNN-slug.patch  Lean-side, applied to extraction/ after hax
 ```
 
