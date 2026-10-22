@@ -9,6 +9,7 @@ import Plonky3Lean.Proofs.Field.Goldilocks.Arith
 import Plonky3Lean.Proofs.Field.Goldilocks.Basic
 import Plonky3Lean.Proofs.Field.Goldilocks.Constants
 import Plonky3Lean.Proofs.Field.Goldilocks.Convert
+import Plonky3Lean.Proofs.Field.Goldilocks.Field
 import Plonky3Lean.Proofs.Field.Goldilocks.Inverse
 import Plonky3Lean.Proofs.Field.Goldilocks.PowersOfTwo
 import Plonky3Lean.Proofs.Field.Goldilocks.Sum

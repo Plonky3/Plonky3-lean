@@ -175,7 +175,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 189) whose dependencies include it; reaching one is not using it.
+(of 225) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -201,7 +201,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 189) whose dependencies include the declaration.
+counts the claims (of 225) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -210,25 +210,25 @@ counts the claims (of 189) whose dependencies include the declaration.
 | `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 0 |
 | `field` | `p3_field.field.PrimeField` | `p3_field::field::PrimeField` | stub | 0 |
 | `field` | `p3_field.field.UniformSamplingField` | `p3_field::field::UniformSamplingField` | stub | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreOpsArithSubGoldilocksGoldilocks.sub` | `{impl core::ops::arith::Sub for p3_goldilocks::goldilocks::Goldilocks}::sub` | dropped | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreCmpPartialEqGoldilocks.eq` | `{impl core::cmp::PartialEq for p3_goldilocks::goldilocks::Goldilocks}::eq` | dropped | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.halve` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::halve` | not translated | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.div_2exp_u64` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::div_2exp_u64` | not translated | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreIterTraitsAccumSumGoldilocks.sum` | `{impl core::iter::traits::accum::Sum for p3_goldilocks::goldilocks::Goldilocks}::sum` | dropped | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.sum_array` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::sum_array` | not translated | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.PrimeCharacteristicRingGoldilocks.dot_product.fold_step` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::dot_product` | not translated | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::dot_product` | not translated | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU64.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU128.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_unchecked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked` | dropped | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI64.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_unchecked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked` | dropped | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 0 |
-| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_unchecked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked` | dropped | 0 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreOpsArithSubGoldilocksGoldilocks.sub` | `{impl core::ops::arith::Sub for p3_goldilocks::goldilocks::Goldilocks}::sub` | dropped | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreCmpPartialEqGoldilocks.eq` | `{impl core::cmp::PartialEq for p3_goldilocks::goldilocks::Goldilocks}::eq` | dropped | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.halve` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::halve` | not translated | 2 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.div_2exp_u64` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::div_2exp_u64` | not translated | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreIterTraitsAccumSumGoldilocks.sum` | `{impl core::iter::traits::accum::Sum for p3_goldilocks::goldilocks::Goldilocks}::sum` | dropped | 2 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.sum_array` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::sum_array` | not translated | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.PrimeCharacteristicRingGoldilocks.dot_product.fold_step` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::dot_product` | not translated | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::dot_product` | not translated | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU64.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU128.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 2 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_unchecked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked` | dropped | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI64.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 4 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 2 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_unchecked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked` | dropped | 3 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 1 |
+| `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_unchecked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked` | dropped | 2 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.new_array` | `p3_monty_31::monty_31::MontyField31::new_array` | dropped | 80 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.new_2d_array` | `p3_monty_31::monty_31::MontyField31::new_2d_array` | dropped | 49 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.new_monty` | `p3_monty_31::monty_31::MontyField31::new_monty` | dropped | 23 |
@@ -271,7 +271,7 @@ counts the claims (of 189) whose dependencies include the declaration.
 | `poseidon2` | `p3_poseidon2.external.ExternalLayerConstructor` | `p3_poseidon2::external::ExternalLayerConstructor` | stub | 0 |
 | `poseidon2` | `p3_poseidon2.internal.InternalLayerConstructor` | `p3_poseidon2::internal::InternalLayerConstructor` | stub | 0 |
 | `poseidon2` | `p3_poseidon2.Poseidon2` | `p3_poseidon2::Poseidon2` | stub | 0 |
-| `util` | `p3_util.branch_hint` | `p3_util::branch_hint` | not translated | 0 |
+| `util` | `p3_util.branch_hint` | `p3_util::branch_hint` | not translated | 12 |
 
 ## Patches with a cost
 
@@ -364,6 +364,42 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.poseidon2.const_check_6.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.GENERATOR.generates` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.NEG_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.ORDER_U64.eq_fieldSize` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.POWERS_OF_TWO.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.TWO_ADIC_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.as_canonical_u64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.cmp.canonical` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.div_2exp_u64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.dot_product.const_check_truncates` | `propext` |
+| `Goldilocks.goldilocks.Goldilocks.dot_product.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.eq.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_canonical_checked_i128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_canonical_checked_i64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_canonical_checked_u128.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_canonical_checked_u64.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_canonical_unchecked_i128.doc_range_counterexample` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_canonical_unchecked_i128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_canonical_unchecked_i64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_canonical_unchecked_u128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_int_i128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_int_i64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_int_u128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.from_int_u64.value` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.halve.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.is_zero.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.mul.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.mul_2exp_u64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.neg.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.sub.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.sum.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.sum_array.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.try_inverse.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.two_adic_generator.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.Goldilocks.two_adic_generator.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Goldilocks.goldilocks.reduce128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `KoalaBear.koala_bear.KoalaBear.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `KoalaBear.koala_bear.KoalaBear.from_monty.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `KoalaBear.koala_bear.KoalaBear.halve.toField` | `Classical.choice`, `Quot.sound`, `propext` |
