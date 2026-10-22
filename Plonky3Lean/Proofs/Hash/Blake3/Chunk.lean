@@ -107,4 +107,93 @@ theorem compress_plain_eq (batch : Slice Std.U8) (s start plain : ℕ) (counter 
       grp 8#usize (plainCv (sbytes batch) (s + start) counter.val k))) plain _
     (fun k hk => plain_body batch s start k plain counter hk hB h32) (plain_done _ _ _ _ _ _)
 
+theorem usz_min (a b : ℕ) (ha : a < 2 ^ 32) (hb : b < 2 ^ 32) :
+    CoreModels.core.Usize.Insts.CoreCmpOrd.min (usz a) (usz b) = .ok (usz (min a b)) := by
+  simp only [CoreModels.core.Usize.Insts.CoreCmpOrd.min, CoreModels.core.cmp.Ord.min.default,
+    CoreModels.core.cmp.min, CoreModels.core.Usize.Insts.CoreCmpOrd, CoreModels.core.mkUOrd,
+    usz_val ha, usz_val hb]
+  rcases Nat.lt_trichotomy a b with h | h | h
+  · simp [compare_lt_iff_lt.mpr h, Nat.min_eq_left h.le]
+  · subst h; simp
+  · simp [compare_gt_iff_gt.mpr h, Nat.min_eq_right h.le]
+
+theorem CHUNK_LEN_eq : blake3.CHUNK_LEN = .ok (usz 1024) := by
+  unfold blake3.CHUNK_LEN; exact congrArg _ (eq_usz (by norm_num) rfl)
+
+theorem cast_u64 (j : ℕ) (h : j < 2 ^ 32) : UScalar.cast .U64 (usz j) = (⟨BitVec.ofNat 64 j⟩ : Std.U64) :=
+  UScalar.eq_of_val_eq (by
+    rw [UScalar.cast_val_eq, usz_val h]
+    show j % 2 ^ 64 = (BitVec.ofNat 64 j).toNat
+    rw [BitVec.toNat_ofNat])
+
+/-- The chaining value of chunk `idx` of the `len`-byte message at byte `s` of `B`, its last
+compression flagged with `root` as well. -/
+def chunkCv (B : List (BitVec 8)) (s len idx : ℕ) (root : Word) : List Word :=
+  let start := idx * 1024
+  let e := min len (start + 1024)
+  let plain := (e - start - 1) / 64
+  let tail := e - (start + plain * 64)
+  (compress (plainCv B (s + start) idx plain) (blockWords (window B (s + (start + plain * 64)) tail)) idx
+    (BitVec.ofNat 32 tail) ((if plain = 0 then CHUNK_START else 0) ||| CHUNK_END ||| root)).take 8
+
+theorem usz_sat_sub_one (a : ℕ) (ha : a < 2 ^ 32) :
+    CoreModels.core.num.Usize.saturating_sub (usz a) 1#usize = .ok (usz (a - 1)) := by
+  rw [lit1]; exact usz_sat_sub a 1 ha (by norm_num)
+
+theorem length_blockWords (x : List (BitVec 8)) : (blockWords x).length = 16 := by simp [blockWords]
+
+theorem u32_or (x y : Std.U32) : (x ||| y) = ⟨x.bv ||| y.bv⟩ := rfl
+
+theorem chunk_eq (batch : Slice Std.U8) (s len idx : ℕ) (root : Std.U32) (hidx : idx * 1024 ≤ len)
+    (hB : s + len ≤ batch.val.length) (h32 : batch.val.length + 1024 < 2 ^ 32) :
+    p3_blake3.batch.chunk p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1 p3_blake3.batch.Mode.HASH
+      (lane1 batch s) (usz len) (usz idx) root =
+      .ok (grp 8#usize (chunkCv (sbytes batch) s len idx root.bv)) := by
+  unfold p3_blake3.batch.chunk
+  have hidx' : idx < 2 ^ 32 := by omega
+  rw [CHUNK_LEN_eq, bind_ok, usz_mul (by omega) hidx' (by norm_num), bind_ok, usz_add (by omega), bind_ok,
+    usz_min _ _ (by omega) (by omega), bind_ok, usz_sub (by omega) (by omega), bind_ok,
+    usz_sat_sub_one _ (by omega), bind_ok,
+    BLOCK_LEN_eq, bind_ok, usz_div (by omega) (by norm_num) (by norm_num), bind_ok, lift_eq, bind_ok,
+    cast_u64 idx hidx', state_eq, bind_ok]
+  unfold chunkCv
+  generalize hst : idx * 1024 = st at hidx ⊢
+  generalize he : min len (st + 1024) = e
+  have he1 : e ≤ len := by omega
+  have he2 : st ≤ e := by omega
+  have he3 : e ≤ st + 1024 := by omega
+  generalize hP : (e - st - 1) / 64 = P
+  have hd := Nat.div_mul_le_self (e - st - 1) 64
+  have hm := Nat.lt_div_mul_add (a := e - st - 1) (b := 64) (by norm_num)
+  rw [hP] at hd hm
+  have hP1 : st + P * 64 ≤ e := by omega
+  have hP2 : e - (st + P * 64) ≤ 64 := by omega
+  erw [compress_plain_eq batch s st P _ (by omega) (by omega)]
+  rw [bind_ok, usz_mul (by omega) (by omega) (by norm_num), bind_ok, usz_add (by omega), bind_ok,
+    usz_sub hP1 (by omega), bind_ok,
+    last_block_eq batch s (st + P * 64) (e - (st + P * 64)) hP2 (by omega) (by omega),
+    bind_ok]
+  dsimp only
+  rw [he, hP]
+  have hc : (⟨BitVec.ofNat 64 idx⟩ : Std.U64).val = idx := by
+    show (BitVec.ofNat 64 idx).toNat = idx
+    rw [BitVec.toNat_ofNat]; exact Nat.mod_eq_of_lt (by omega)
+  rw [hc]
+  by_cases hP0 : P = 0
+  · subst hP0
+    rw [ite_eq_left_of_eq_true _ _ (eq_true lit0.symm)]
+    simp only [CHUNK_START_eq, CHUNK_END_eq, bind_ok, lift_eq, HASH_flags,
+      cast_usz_u32 _ (show e - (st + 0 * 64) < 2 ^ 32 by omega), wblock,
+      compress_eq _ _ (length_plainCv ..) (length_blockWords _), u32_or, ite_true]
+    rw [hc]
+    rfl
+  · rw [ite_eq_right_of_eq_false _ _ (eq_false (fun h => hP0 (by
+      have := congrArg UScalar.val h
+      rwa [usz_val (by omega)] at this)))]
+    simp only [CHUNK_END_eq, bind_ok, lift_eq, HASH_flags,
+      cast_usz_u32 _ (show e - (st + P * 64) < 2 ^ 32 by omega), wblock,
+      compress_eq _ _ (length_plainCv ..) (length_blockWords _), u32_or, hP0, ite_false]
+    rw [hc]
+    rfl
+
 end Plonky3Lean.Proofs.Blake3
