@@ -2,7 +2,10 @@ module
 
 public import ToCompPoly.Data.Nat.PowMod
 public import ToCompPoly.Fields.BabyBear
-public import ToCompPoly.Fields.BabyBear.Extension
+public import ToCompPoly.Fields.BabyBear.Ext5
+public import ToCompPoly.Fields.BabyBear.Ext8
+public import ToCompPoly.Fields.BabyBear.ExtTwoAdic
+public import ToCompPoly.Fields.Extension.Monomial
 public import ToCompPoly.Fields.Goldilocks
 public import ToCompPoly.Fields.KoalaBear
 public import ToCompPoly.Fields.KoalaBear.Extension
