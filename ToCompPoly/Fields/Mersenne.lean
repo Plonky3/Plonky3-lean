@@ -12,9 +12,9 @@ import ToCompPoly.Data.Nat.PowMod
   # Mersenne31: the field, a multiplicative generator, fifth roots, non-residues
 
   Additions to `CompPoly.Fields.Mersenne`:
-  - the `Field` instance on `Mersenne31.Field`;
-  - `generator = 7` generates the multiplicative group;
-  - `x ↦ x ^ 1717986917` inverts `x ↦ x ^ 5`, since `5 · 1717986917 ≡ 1 (mod p - 1)`;
+  - the `Field` instance on `Mersenne31.Field`.
+  - `generator = 7` generates the multiplicative group.
+  - `x ↦ x ^ 1717986917` inverts `x ↦ x ^ 5`, since `5 · 1717986917 ≡ 1 (mod p - 1)`.
   - `-1` and `5` are not squares, and `5` is not a cube.
 
   Everything is kernel-checked, without `native_decide`.
@@ -57,8 +57,7 @@ theorem prime_dvd_fieldSize_sub_one {q : ℕ} (hq : q.Prime) (h : q ∣ fieldSiz
     · exact .inr (.inr (.inr (.inr (.inr (.inl (hp 151 (by norm_num) h))))))
   · exact .inr (.inr (.inr (.inr (.inr (.inr (hp 331 (by norm_num) h))))))
 
-/-- An element of order `p - 1` generates the multiplicative group: it suffices to check
-`x ^ ((p - 1) / q) ≠ 1` for the seven primes `q` dividing `p - 1`. -/
+/-- A natural number has order `p - 1` in the field when `x ^ ((p - 1) / q) ≠ 1` for the seven primes `q` of `p - 1`. -/
 theorem orderOf_eq_of_powMod (b : ℕ) (hb : (b : Field) ≠ 0)
     (h : ∀ q ∈ [2, 3, 7, 11, 31, 151, 331],
       (Nat.powMod b ((fieldSize - 1) / q) fieldSize : Field) ≠ 1) :

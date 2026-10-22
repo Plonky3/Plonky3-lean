@@ -10,12 +10,13 @@ import ToCompPoly.ToMathlib.Order.OrderOfSq
 /-!
   # Mersenne31: the complex extension `F[i] = F[X] / (X ^ 2 + 1)`
 
-  Since `p ≡ 3 (mod 4)`, `-1` is not a square and `X ^ 2 + 1` is irreducible, so
-  `Complex = F[i]` is a field with `p ^ 2` elements.
-  - `Complex.mk a b` is `a + b · i`;
-  - the Frobenius map is complex conjugation, so `z ^ (p + 1)` is the norm `a ^ 2 + b ^ 2`;
-  - `twoAdicGenerators` lists an element of order `2 ^ k` for each `k ≤ 32`, each the square
-    root of the one before; entries `0` to `31` lie on the circle `a ^ 2 + b ^ 2 = 1`.
+  Since `p ≡ 3 (mod 4)`, `-1` is not a square.
+
+  So `X ^ 2 + 1` is irreducible, and `Complex = F[i]` is a field with `p ^ 2` elements.
+  - `Complex.mk a b` is `a + b · i`.
+  - The Frobenius map is complex conjugation, so `z ^ (p + 1)` is the norm `a ^ 2 + b ^ 2`.
+  - `twoAdicGenerators` lists an element of order `2 ^ k` for each `k ≤ 32`, each a square root of the one before.
+  - Entries `0` to `31` lie on the circle `a ^ 2 + b ^ 2 = 1`.
 
   Everything is kernel-checked, without `native_decide`.
 -/

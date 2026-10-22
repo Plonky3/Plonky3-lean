@@ -216,7 +216,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 273) whose dependencies include it; reaching one is not using it.
+(of 274) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -242,7 +242,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 273) whose dependencies include the declaration.
+counts the claims (of 274) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -571,6 +571,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Mersenne31.mersenne_31.Mersenne31.mul_2exp_u64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Mersenne31.mersenne_31.Mersenne31.neg.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Mersenne31.mersenne_31.Mersenne31.new.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.new_array.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Mersenne31.mersenne_31.Mersenne31.new_checked.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Mersenne31.mersenne_31.Mersenne31.sub.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Mersenne31.mersenne_31.Mersenne31.sum.length_bound` | `Classical.choice`, `Quot.sound`, `propext` |

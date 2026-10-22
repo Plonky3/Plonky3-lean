@@ -1099,3 +1099,7 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 [[claim]]
 name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.reduce_64.spec"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.new_array.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]

@@ -33,9 +33,11 @@ def core.Shared0T.Insts.CoreConvertAsRef {T U : Type}
     (convertAsRefInst : core.convert.AsRef T U) : core.convert.AsRef T U :=
   { as_ref := convertAsRefInst.as_ref }
 
-/-- `Ord::min`, the provided method (`library/core/src/cmp.rs`), which returns
-`other` exactly when `other < self`. It is `core::cmp::min(self, other)`, whose
-model is reused. Referenced by p3-mersenne-31's `reduce_64`. -/
+/-- `Ord::min`, the provided method (`library/core/src/cmp.rs`).
+
+It returns `other` exactly when `other < self`, as `core::cmp::min(self, other)` does, whose model is reused.
+
+p3-mersenne-31's `reduce_64` calls it. -/
 def core.cmp.Ord.min.default {Self : Type} (OrdInst : core.cmp.Ord Self)
     (self other : Self) : RustM Self :=
   core.cmp.min OrdInst self other
