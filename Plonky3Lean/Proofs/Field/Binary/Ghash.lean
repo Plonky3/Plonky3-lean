@@ -467,13 +467,12 @@ theorem natPoly_even_odd {a : ℕ} (ha : a < 2 ^ 128) :
     rw [coeff_expand (by norm_num), coeff_natPoly, testBit_oddNat ha]
     simp [h1]
 
-set_option maxRecDepth 4000 in
 /-- The square root of `X` modulo the GHASH polynomial, as `sqrt.rs` pins it. -/
 theorem root_x_sq :
     AdjoinRoot.mk ghashPoly (natPoly clmul.sqrt.ROOT_X.val) ^ 2 = AdjoinRoot.mk ghashPoly X := by
   have h := verify_square_step_correct clmul.sqrt.ROOT_X.bv
     (BitVec.ofNat 128 0x4104104104104104104104104104106) (BitVec.ofNat 128 2)
-    (by unfold clmul.sqrt.ROOT_X; rfl)
+    (by decide +kernel)
   rw [← ghashPoly_eq_P_val] at h
   simp only [toPoly_eq_natPoly] at h
   rw [← map_pow, show clmul.sqrt.ROOT_X.val = clmul.sqrt.ROOT_X.bv.toNat from rfl, h,

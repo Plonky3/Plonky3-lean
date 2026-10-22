@@ -222,7 +222,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 290) whose dependencies include it; reaching one is not using it.
+(of 293) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -248,7 +248,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 290) whose dependencies include the declaration.
+counts the claims (of 293) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -443,6 +443,9 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BinaryField.clmul.reduce_128.toQuot` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryField.clmul.reduce_64.toQuot64` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryField.clmul.sqrt.poly_sqrt_128.toQuot` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.tables.mul.tower8` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.tables.square.tower8` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.tables.try_inverse.tower8` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Goldilocks.goldilocks.Goldilocks.GENERATOR.generates` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Goldilocks.goldilocks.Goldilocks.NEG_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Goldilocks.goldilocks.Goldilocks.ORDER_U64.eq_fieldSize` | `Classical.choice`, `Quot.sound`, `propext` |

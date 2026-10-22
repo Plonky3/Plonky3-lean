@@ -1167,3 +1167,15 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 [[claim]]
 name   = "Plonky3Lean.Claims.BinaryField.clmul.sqrt.poly_sqrt_128.toQuot"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryField.tables.mul.tower8"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryField.tables.square.tower8"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryField.tables.try_inverse.tower8"
+axioms = ["Classical.choice", "Quot.sound", "propext"]

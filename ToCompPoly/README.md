@@ -43,6 +43,7 @@ of the claims stays CompPoly's, not this repository's.
 | `Fields/Binary/NatPoly.lean` | appended to `CompPoly/Fields/Binary/Common.lean` | `natPoly n`, the polynomial over `GF(2)` whose coefficients are the bits of `n`; how xor, shifts, splits and bounds act on it |
 | `Fields/Binary/Poly64/Basic.lean` | new file | the modulus `X ^ 64 + X ^ 4 + X ^ 3 + X + 1` and its quotient `GF(2 ^ 64)` |
 | `Fields/Binary/Poly192/Basic.lean` | new file | the modulus `Y ^ 3 + Y + 1` over `GF(2 ^ 64)` and its quotient `GF(2 ^ 192)` |
+| `Fields/Binary/Tower/NatMul.lean` | appended to `CompPoly/Fields/Binary/Tower/Concrete/Core.lean` | `towerMul`, the tower product by structural recursion on `Nat`, which the kernel evaluates; it agrees with `concrete_mul` at every level |
 | `ToMathlib/Polynomial/Rabin.lean` | new file (mathlib candidate) | Rabin's irreducibility test over `GF(2)` for degree `2 ^ (k + 1)`, also stated in `GF(2)[X] / (P)` |
 
 When a file lands upstream, delete it here, bump the CompPoly `rev` in

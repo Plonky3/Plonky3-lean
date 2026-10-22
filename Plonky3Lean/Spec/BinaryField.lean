@@ -1,6 +1,7 @@
 import Aeneas
 import CompPoly.Fields.Binary.Common
 import ToCompPoly.Fields.Binary.Poly192.Basic
+import CompPoly.Fields.Binary.Tower.Impl
 
 /-!
 # Binary fields: what the model's integers mean
@@ -16,6 +17,7 @@ A carry-less product is then a product of polynomials, and a reduction is a rema
 - Three 64-bit limbs `[a_0, a_1, a_2]` stand for `a_0 + a_1 Y + a_2 Y^2` in
   `GF(2^64)[Y] / (Y^3 + Y + 1)`.
 - A 128-bit integer stands for an element of the GHASH field, through CompPoly's `toQuot`.
+- An 8-bit integer stands for an element of CompPoly's tower field `GF(2^8)`, bit for bit.
 -/
 
 open Aeneas Aeneas.Std Polynomial
@@ -35,5 +37,9 @@ stand for. -/
 noncomputable def toQuot192 (a : Std.Array Std.U64 3#usize) : Poly192.Quot :=
   Poly192.ofCoeffs (toQuot64 (a.val.getD 0 0#u64)) (toQuot64 (a.val.getD 1 0#u64))
     (toQuot64 (a.val.getD 2 0#u64))
+
+/-- The element of the tower's `GF(2^8)`, CompPoly's `ConcreteBTField 3`, an 8-bit integer stands
+for: its bits are the element's bits. -/
+def tower8 (x : Std.U8) : ConcreteBinaryTower.ConcreteBTField 3 := x.bv
 
 end Plonky3Lean.Spec.BinaryField

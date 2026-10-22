@@ -16,6 +16,7 @@ import Plonky3Lean.Proofs.Field.Binary.Poly64Field
 import Plonky3Lean.Proofs.Field.Binary.Poly64Irreducible
 import Plonky3Lean.Proofs.Field.Binary.Poly64Sqrt
 import Plonky3Lean.Proofs.Field.Binary.Statements
+import Plonky3Lean.Proofs.Field.Binary.Tables
 import Plonky3Lean.Proofs.Field.Goldilocks.Arith
 import Plonky3Lean.Proofs.Field.Goldilocks.Basic
 import Plonky3Lean.Proofs.Field.Goldilocks.Constants

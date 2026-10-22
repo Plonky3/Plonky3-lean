@@ -1,5 +1,6 @@
 import Plonky3Lean.Proofs.Field.Binary.Poly64Field
 import Plonky3Lean.Proofs.Field.Binary.Poly192Irreducible
+import Plonky3Lean.Proofs.Field.Binary.Tables
 
 /-!
 # Binary fields: the statements the claims make

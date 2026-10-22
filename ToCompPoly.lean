@@ -3,6 +3,7 @@ import ToCompPoly.Fields.BabyBear
 import ToCompPoly.Fields.BabyBear.Extension
 import ToCompPoly.Fields.Binary.NatPoly
 import ToCompPoly.Fields.Binary.Poly192.Basic
+import ToCompPoly.Fields.Binary.Tower.NatMul
 import ToCompPoly.Fields.Binary.Poly64.Basic
 import ToCompPoly.Fields.Goldilocks
 import ToCompPoly.Fields.KoalaBear

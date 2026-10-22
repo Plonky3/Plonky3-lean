@@ -12,6 +12,7 @@ commit pinned in `plonky3/`.
   CompPoly's `toQuot`.
 - `GF(2^64)` is `GF(2)[X] / (X^64 + X^4 + X^3 + X + 1)`, read through `toQuot64`.
 - `GF(2^192)` is `GF(2^64)[Y] / (Y^3 + Y + 1)`, three limbs read through `toQuot192`.
+- The tower's `GF(2^8)` is CompPoly's `ConcreteBTField 3`, a byte read bit for bit (`tower8`).
 
 Both moduli staged here are claimed irreducible, so both quotients are fields.
 
@@ -20,7 +21,7 @@ Every claim holds for every input.
 `m ⦃ r => P r ⦄` states that `m` returns a value `r`, so it does not panic, and that `P r` holds.
 
 Not claimed:
-- the `GF(2^8)` lookup tables and the tower fields built on them;
+- the tower fields above `GF(2^8)`;
 - the field types themselves (`BinaryField8`, `Poly64`, `Poly192`, ...), whose trait hierarchy is
   not extracted;
 - the dot products, the AES and bit-plane code, and the packed (SIMD) arithmetic;
@@ -28,7 +29,7 @@ Not claimed:
 -/
 
 open Aeneas Aeneas.Std CoreModels Polynomial
-open p3_binary_field BinaryField BF128Ghash
+open p3_binary_field BinaryField BF128Ghash ConcreteBinaryTower
 open Plonky3Lean.Spec.BinaryField
 
 namespace Plonky3Lean.Claims.BinaryField
@@ -121,5 +122,23 @@ theorem clmul.gf192.poly_mul_192_by_64.toQuot192 (a : Std.Array Std.U64 3#usize)
     clmul.gf192.poly_mul_192_by_64 a k ⦃ r =>
       toQuot192 r = toQuot192 a * AdjoinRoot.of Poly192.modulus (toQuot64 k) ⦄ :=
   Proofs.Binary.poly_mul_192_by_64_toQuot a k
+
+/-! ## The tower's `GF(2^8)`, through lookup tables -/
+
+/-- `tables::mul` is multiplication in the tower's `GF(2^8)`. -/
+theorem tables.mul.tower8 (a b : Std.U8) :
+    tables.mul a b ⦃ r => tower8 r = tower8 a * tower8 b ⦄ :=
+  Proofs.Binary.tables_mul_spec a b
+
+/-- `tables::square` is squaring in the tower's `GF(2^8)`. -/
+theorem tables.square.tower8 (a : Std.U8) :
+    tables.square a ⦃ r => tower8 r = tower8 a * tower8 a ⦄ :=
+  Proofs.Binary.tables_square_spec a
+
+/-- `tables::try_inverse` is `None` for `0`, and otherwise the inverse in the tower's `GF(2^8)`. -/
+theorem tables.try_inverse.tower8 (a : Std.U8) :
+    tables.try_inverse a ⦃ r => (tower8 a = 0 → r = none) ∧
+      (tower8 a ≠ 0 → ∃ c, r = some c ∧ tower8 c * tower8 a = 1) ⦄ :=
+  Proofs.Binary.tables_try_inverse_spec a
 
 end Plonky3Lean.Claims.BinaryField
