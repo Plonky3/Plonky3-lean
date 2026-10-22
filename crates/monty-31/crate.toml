@@ -35,6 +35,17 @@ start_from = [
   "p3_monty_31::utils::monty_reduce",
   "p3_monty_31::utils::from_monty",
   "p3_monty_31::utils::halve_u32",
+  # Every item transcribed in Mirror.lean is also a root, so that
+  # extraction/gaps.toml shows what charon does with it (translated and dropped,
+  # or not translated), and a fix upstream shows up there first.
+  "p3_monty_31::monty_31::MontyField31::new_monty",
+  "p3_monty_31::monty_31::MontyField31::new_array",
+  "p3_monty_31::monty_31::MontyField31::new_2d_array",
+  "{impl core::ops::arith::Add for p3_monty_31::monty_31::MontyField31<_>}::add",
+  "{impl core::ops::arith::Sub for p3_monty_31::monty_31::MontyField31<_>}::sub",
+  "{impl core::ops::arith::Mul for p3_monty_31::monty_31::MontyField31<_>}::mul",
+  "{impl core::ops::arith::Neg for p3_monty_31::monty_31::MontyField31<_>}::neg",
+  "{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::halve",
 ]
 
 watch = ["monty-31/src", "monty-31/Cargo.toml"]

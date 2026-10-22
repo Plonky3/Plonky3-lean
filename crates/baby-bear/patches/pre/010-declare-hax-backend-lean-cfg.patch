@@ -1,11 +1,19 @@
-# Patch:     010-declare-hax-backend-lean-cfg
-# Phase:     pre
-# Target:    Cargo.toml
-# Hunks:     1
-# Cost:      none. Declares a cfg name to rustc's check-cfg; no code changes.
-# Drop when: 020 and 030 are both dropped.
+# Patch:        010-declare-hax-backend-lean-cfg
+# Phase:        pre
+# Target:       Cargo.toml
+# Hunks:        1
+# Class:        bound
+# Gap:          none of its own: it declares the cfg that 020, 030 and 040 gate
+#               on (docs/extractor-issues.md 10).
+# Cost:         none. Declares a cfg name to rustc's check-cfg; no code changes.
+# Upstreamable: yes: together with 020-040, one inert line in the workspace lint
+#               table, worth carrying only if they are carried.
+# Drop when:    020, 030 and 040 are all dropped.
+# Test:         lint p3-field unexpected_cfgs; lint p3-matrix unexpected_cfgs
+# Mutation:     the declaration is removed, so a normal `cargo check` reports
+#               `unexpected_cfgs` for every `hax_backend_lean` cfg 020-040 add.
 #
-# Patches 020 and 030 gate items on `hax_backend_lean`, the cfg that hax's
+# Patches 020, 030 and 040 gate items on `hax_backend_lean`, the cfg that hax's
 # Lean backend compiles with. extract.sh sets it for every crate through
 # RUSTFLAGS, because hax itself passes it only to the crate being extracted.
 # Normal builds do not set it, and rustc's `unexpected_cfgs` lint warns about
