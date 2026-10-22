@@ -96,4 +96,36 @@ theorem pieces_spec (k : ℕ) (hk : 0 < k) (l : List (BitVec 8)) :
     simp only [List.isEmpty_iff, hl, ite_false, h1]
     exact ⟨trivial, h2⟩
 
+theorem getD_drop' {α : Type} (l : List α) (a p : ℕ) (d : α) : (l.drop a).getD p d = l.getD (a + p) d := by
+  simp [List.getD_eq_getElem?_getD]
+
+theorem getD_take' {α : Type} (l : List α) (n p : ℕ) (d : α) :
+    (l.take n).getD p d = if p < n then l.getD p d else d := by
+  simp only [List.getD_eq_getElem?_getD, List.getElem?_take]
+  split_ifs <;> rfl
+
+theorem blockWords_congr (x y : List (BitVec 8)) (h : ∀ p < 64, x.getD p 0 = y.getD p 0) :
+    blockWords x = blockWords y := by
+  unfold blockWords
+  apply List.map_congr_left
+  intro i hi
+  have hi' := List.mem_range.1 hi
+  rw [h _ (by omega), h _ (by omega), h _ (by omega), h _ (by omega)]
+
+/-- The bytes of chunk `idx` of the `len`-byte message at byte `s` of `B`. -/
+def chunkAt (B : List (BitVec 8)) (s len idx : ℕ) : List (BitVec 8) :=
+  ((((B.drop s).take len).drop (1024 * idx)).take 1024)
+
+theorem length_chunkAt (B : List (BitVec 8)) (s len idx : ℕ) (hB : s + len ≤ B.length) :
+    (chunkAt B s len idx).length = min len (idx * 1024 + 1024) - idx * 1024 := by
+  simp [chunkAt]; omega
+
+theorem block_getD (B : List (BitVec 8)) (s len idx i p : ℕ) :
+    (((chunkAt B s len idx).drop (64 * i)).take 64).getD p 0 =
+      if p < 64 ∧ 64 * i + p < 1024 ∧ 1024 * idx + (64 * i + p) < len then
+        B.getD (s + (1024 * idx + (64 * i + p))) 0 else 0 := by
+  simp only [chunkAt, getD_take', getD_drop']
+  by_cases h1 : p < 64 <;> by_cases h2 : 64 * i + p < 1024 <;>
+    by_cases h3 : 1024 * idx + (64 * i + p) < len <;> simp [h1, h2, h3]
+
 end Plonky3Lean.Proofs.Blake3
