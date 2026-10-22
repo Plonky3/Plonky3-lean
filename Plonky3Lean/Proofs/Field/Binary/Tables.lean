@@ -183,8 +183,8 @@ theorem getD_map_set {i j : ℕ} {l : List Std.U8} (x : Std.U8) (hi : i < l.leng
   rw [List.map_set]
   by_cases h : i = j
   · subst h
-    rw [if_pos rfl, List.getD_eq_getElem _ _ (by simpa using hi), List.getElem_set_self]
-  · rw [if_neg h, List.getD_eq_getElem?_getD, List.getD_eq_getElem?_getD, List.getElem?_set_ne h]
+    rw [ite_eq_left rfl, List.getD_eq_getElem _ _ (by simpa using hi), List.getElem_set_self]
+  · rw [ite_eq_right h, List.getD_eq_getElem?_getD, List.getD_eq_getElem?_getD, List.getElem?_set_ne h]
 
 theorem SQUARE_loop_spec (t : Std.Array Std.U8 256#usize) (i : Std.Usize)
     (h : TableInv (fun e => 2 * e) t i.val) :
@@ -200,15 +200,15 @@ theorem SQUARE_loop_spec (t : Std.Array Std.U8 256#usize) (i : Std.Usize)
     have hk : k.val < 256 := by scalar_tac
     have hlen : k.val < tb.val.length := by simp; omega
     refine ⟨⟨by omega, by omega, ?_, ?_⟩, by omega⟩
-    · rw [Array.set_val_eq, getD_map_set _ hlen, if_neg (by omega), h0]
+    · rw [Array.set_val_eq, getD_map_set _ hlen, ite_eq_right (by omega), h0]
     · intro j hj1 hj2
       rw [Array.set_val_eq, getD_map_set _ hlen]
       by_cases hjk : k.val = j
       · subst hjk
-        rw [if_pos rfl]
+        rw [ite_eq_left rfl]
         simp only [val_getElem, i3_post, cast_usize_val]
         rfl
-      · rw [if_neg hjk]
+      · rw [ite_eq_right hjk]
         exact hinv j hj1 (by omega)
   · simp only at h1 h2 h0 hinv
     have hk : k.val = 256 := by scalar_tac
@@ -229,15 +229,15 @@ theorem INVERSE_loop_spec (t : Std.Array Std.U8 256#usize) (i : Std.Usize)
     have hk : k.val < 256 := by scalar_tac
     have hlen : k.val < tb.val.length := by simp; omega
     refine ⟨⟨by omega, by omega, ?_, ?_⟩, by omega⟩
-    · rw [Array.set_val_eq, getD_map_set _ hlen, if_neg (by omega), h0]
+    · rw [Array.set_val_eq, getD_map_set _ hlen, ite_eq_right (by omega), h0]
     · intro j hj1 hj2
       rw [Array.set_val_eq, getD_map_set _ hlen]
       by_cases hjk : k.val = j
       · subst hjk
-        rw [if_pos rfl]
+        rw [ite_eq_left rfl]
         simp only [val_getElem, i3_post1, cast_usize_val]
         rfl
-      · rw [if_neg hjk]
+      · rw [ite_eq_right hjk]
         exact hinv j hj1 (by omega)
   · simp only at h1 h2 h0 hinv
     have hk : k.val = 256 := by scalar_tac
@@ -283,9 +283,9 @@ theorem tables_try_inverse_spec (a : Std.U8) :
       (tower8 a ≠ 0 → ∃ c, r = some c ∧ tower8 c * tower8 a = 1) ⦄ := by
   unfold tables.try_inverse
   by_cases ha0 : a = 0#u8
-  · rw [if_pos ha0, WP.spec_ok]
+  · rw [ite_eq_left ha0, WP.spec_ok]
     exact ⟨fun _ => rfl, fun h => absurd ((tower8_eq_zero_iff a).mpr ha0) h⟩
-  rw [if_neg ha0]
+  rw [ite_eq_right ha0]
   refine WP.spec_bind INVERSE_spec fun t ⟨_, _, _, hinv⟩ => ?_
   step*
   subst_vars

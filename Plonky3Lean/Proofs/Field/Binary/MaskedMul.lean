@@ -107,7 +107,7 @@ theorem coeff_digits (x r i : ℕ) :
     · simp [hi]
     · intro j _ hj; simp [Ne.symm hj]
     · intro h; exact absurd (Finset.mem_range.mpr hi) h
-  · rw [if_neg hi]
+  · rw [ite_eq_right hi]
     apply Finset.sum_eq_zero
     intro j hj
     have : i ≠ j := by have := Finset.mem_range.mp hj; omega
@@ -146,12 +146,12 @@ theorem natPoly_and_nibbleMask {x : ℕ} (hx : x < 2 ^ 64) {r : ℕ} (hr : r < 4
   by_cases hp : p < 64
   · rw [testBit_nibbleMask hr hp]
     by_cases hrp : r ≤ p
-    · rw [if_pos hrp, coeff_expand (by norm_num), coeff_map, coeff_digits]
+    · rw [ite_eq_left hrp, coeff_expand (by norm_num), coeff_map, coeff_digits]
       by_cases hd : 4 ∣ p - r
       · have h1 : (p - r) / 4 < 16 := by omega
         have h2 : 4 * ((p - r) / 4) + r = p := by omega
         have h3 : p % 4 = r := by omega
-        simp only [hd, h1, h2, h3, if_true, decide_true, Bool.and_true]
+        simp only [hd, h1, h2, h3, ite_true, decide_true, Bool.and_true]
         cases x.testBit p <;> simp
       · have h3 : ¬ p % 4 = r := by omega
         simp [hd, h3]
@@ -159,11 +159,11 @@ theorem natPoly_and_nibbleMask {x : ℕ} (hx : x < 2 ^ 64) {r : ℕ} (hr : r < 4
       simp [hrp, h3]
   · have hb : x.testBit p = false :=
       Nat.testBit_lt_two_pow (lt_of_lt_of_le hx (Nat.pow_le_pow_right (by norm_num) (by omega)))
-    rw [hb, Bool.false_and, if_neg Bool.false_ne_true]
+    rw [hb, Bool.false_and, ite_eq_right Bool.false_ne_true]
     split_ifs with hrp
     · rw [coeff_expand (by norm_num)]
       split_ifs with hd
-      · rw [coeff_map, coeff_digits, if_neg (by omega)]
+      · rw [coeff_map, coeff_digits, ite_eq_right (by omega)]
         simp
       · rfl
     · rfl
@@ -219,8 +219,8 @@ theorem coeff_digits_mul_of_ge (x y r s m : ℕ) (hm : 31 ≤ m) :
   rw [Finset.mem_antidiagonal] at hij
   rw [coeff_digits, coeff_digits]
   by_cases h : ij.1 < 16
-  · rw [if_neg (show ¬ ij.2 < 16 by omega)]; simp
-  · rw [if_neg h]; simp
+  · rw [ite_eq_right (show ¬ ij.2 < 16 by omega)]; simp
+  · rw [ite_eq_right h]; simp
 
 /-- A product of masked operands is `2 ^ (r + s)` times a base-16 number. -/
 theorem masked_mul_eq {x y : ℕ} (hx : x < 2 ^ 64) (hy : y < 2 ^ 64) {r s : ℕ}
@@ -280,7 +280,7 @@ noncomputable def term (x y r s p : ℕ) : ZMod 2 :=
 
 theorem term_eq_zero {x y r s p : ℕ} (h : (r + s) % 4 ≠ p % 4) : term x y r s p = 0 := by
   unfold term
-  rw [if_neg]
+  rw [ite_eq_right]
   omega
 
 theorem natCast_zmod_two (n : ℕ) : (n : ZMod 2) = if n % 2 = 1 then 1 else 0 := by
@@ -321,12 +321,12 @@ theorem coeff_natPoly_mul {x y : ℕ} (hx : x < 2 ^ 64) (hy : y < 2 ^ 64) (p : �
     simp only [mod2, Polynomial.map_mul, map_mul, pow_add]; ring]
   rw [coeff_X_pow_mul', term]
   by_cases hrs : r + s ≤ p
-  · rw [if_pos hrs, coeff_expand (by norm_num), coeff_map]
+  · rw [ite_eq_left hrs, coeff_expand (by norm_num), coeff_map]
     by_cases hd : 4 ∣ p - (r + s)
-    · rw [if_pos hd, if_pos ⟨hrs, by omega⟩]
+    · rw [ite_eq_left hd, ite_eq_left ⟨hrs, by omega⟩]
       rfl
-    · rw [if_neg hd, if_neg (by omega)]
-  · rw [if_neg hrs, if_neg (by omega)]
+    · rw [ite_eq_right hd, ite_eq_right (by omega)]
+  · rw [ite_eq_right hrs, ite_eq_right (by omega)]
 
 theorem bmulNat_lt (x y : ℕ) : bmulNat x y < 2 ^ 64 := by
   have hm : ∀ r < 4, nibbleMask r < 2 ^ 64 := by

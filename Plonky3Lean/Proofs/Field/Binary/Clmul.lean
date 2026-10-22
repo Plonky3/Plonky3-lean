@@ -69,7 +69,7 @@ theorem natPoly_reverse (v : BitVec 64) :
     BitVec.getMsbD]
   by_cases hi : i ≤ 63
   · rw [revAt_le hi, BitVec.testBit_toNat, decide_eq_true (by omega), Bool.true_and]
-  · rw [revAt, Function.Embedding.coeFn_mk, if_neg hi, decide_eq_false (by omega),
+  · rw [revAt, Function.Embedding.coeFn_mk, ite_eq_right hi, decide_eq_false (by omega),
       Bool.false_and, BitVec.testBit_toNat, BitVec.getLsbD_of_ge _ _ (by omega)]
 
 /-- The coefficients of a product of two polynomials of degree below `64` stop at `126`. -/
@@ -114,8 +114,8 @@ theorem natPoly_halves (a b : BitVec 64) :
   ext p
   rw [coeff_add, coeff_X_pow_mul']
   by_cases hp : p < 64
-  · rw [coeff_natPoly_bmulNat (BitVec.isLt _) (BitVec.isLt _) hp, if_neg (by omega), add_zero]
-  · rw [coeff_natPoly_of_lt (bmulNat_lt _ _) (by omega), if_pos (by omega),
+  · rw [coeff_natPoly_bmulNat (BitVec.isLt _) (BitVec.isLt _) hp, ite_eq_right (by omega), add_zero]
+  · rw [coeff_natPoly_of_lt (bmulNat_lt _ _) (by omega), ite_eq_left (by omega),
       coeff_natPoly_highNat, zero_add]
     congr 1
     omega

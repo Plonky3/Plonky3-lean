@@ -146,7 +146,7 @@ theorem toPoly_eq_natPoly {w : ℕ} (v : BitVec w) : toPoly v = natPoly v.toNat 
   rw [toPoly_coeff, coeff_natPoly]
   by_cases h : i < w
   · simp [h, BitVec.getLsb, BitVec.testBit_toNat]
-  · rw [dif_neg h, Nat.testBit_lt_two_pow
+  · rw [dite_eq_right h, Nat.testBit_lt_two_pow
       (lt_of_lt_of_le v.isLt (Nat.pow_le_pow_right (by norm_num) (by omega)))]
     rfl
 

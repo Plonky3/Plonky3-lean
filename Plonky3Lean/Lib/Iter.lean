@@ -30,7 +30,7 @@ theorem range_next_lt (i K : Std.Usize) (h : i.val < K.val) :
     simp only [UScalar.max] at hK ⊢
     have : (1#usize : Std.Usize).val = 1 := rfl
     omega
-  rw [if_neg hmax] at e
+  rw [ite_eq_right hmax] at e
   obtain ⟨e1, e2⟩ := e
   refine ⟨(UScalar.overflowing_add i 1#usize).1, ?_, by rw [e1]; rfl⟩
   simp only [CoreModels.core.num.Usize.overflowing_add,

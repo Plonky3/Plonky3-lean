@@ -43,10 +43,7 @@ of the claims stays CompPoly's, not this repository's.
 | `Fields/Mersenne/Extension.lean` | new file | `X ^ 3 - 5`, `Y ^ 2 - (2 + i)` and `Y ^ 3 - 5i` are irreducible; their `DTH_ROOT`s; `12 + i` generates `Complex`; an element of order `2 ^ 33` in QM31 |
 | `Data/Nat/PowMod.lean` | appended to `Mathlib/Data/ZMod/Basic.lean` (mathlib candidate) | A power in `ZMod m` as core's `Nat.powMod`, which the kernel evaluates in `O(log e)` steps |
 | `Fields/Binary/NatPoly.lean` | appended to `CompPoly/Fields/Binary/Common.lean` | `natPoly n`, the polynomial over `GF(2)` whose coefficients are the bits of `n`; how xor, shifts, splits and bounds act on it |
-| `Fields/Binary/Poly64/Basic.lean` | new file | the modulus `X ^ 64 + X ^ 4 + X ^ 3 + X + 1` and its quotient `GF(2 ^ 64)` |
-| `Fields/Binary/Poly192/Basic.lean` | new file | the modulus `Y ^ 3 + Y + 1` over `GF(2 ^ 64)` and its quotient `GF(2 ^ 192)` |
 | `Fields/Binary/Tower/NatMul.lean` | appended to `CompPoly/Fields/Binary/Tower/Concrete/Core.lean` | `towerMul`, the tower product by structural recursion on `Nat`, which the kernel evaluates; it agrees with `concrete_mul` at every level |
-| `ToMathlib/Polynomial/Rabin.lean` | new file (mathlib candidate) | Rabin's irreducibility test over `GF(2)` for degree `2 ^ (k + 1)`, also stated in `GF(2)[X] / (P)` |
 
 When a file lands upstream, delete it here, bump the CompPoly `rev` in
 `lakefile.toml`, and change the imports that named it.

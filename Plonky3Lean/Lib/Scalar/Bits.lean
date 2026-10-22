@@ -37,14 +37,14 @@ theorem spec_bind_pair_of_eq {α β γ : Type} {m : RustM (α × β)} {a : α} {
 theorem shiftLeft_i32_eq {ty} (x : UScalar ty) (s : Std.I32) (h0 : 0 ≤ s.val)
     (h : s.toNat < ty.numBits) : (x <<< s : RustM (UScalar ty)) = .ok ⟨x.bv <<< s.toNat⟩ := by
   show UScalar.shiftLeft_IScalar x s = _
-  simp only [UScalar.shiftLeft_IScalar, UScalar.shiftLeft, if_pos h0, if_pos h]
+  simp only [UScalar.shiftLeft_IScalar, UScalar.shiftLeft, ite_eq_left h0, ite_eq_left h]
   rfl
 
 /-- A logical right shift by a nonnegative `i32` below the width. -/
 theorem shiftRight_i32_eq {ty} (x : UScalar ty) (s : Std.I32) (h0 : 0 ≤ s.val)
     (h : s.toNat < ty.numBits) : (x >>> s : RustM (UScalar ty)) = .ok ⟨x.bv >>> s.toNat⟩ := by
   show UScalar.shiftRight_IScalar x s = _
-  simp only [UScalar.shiftRight_IScalar, UScalar.shiftRight, if_pos h0, if_pos h]
+  simp only [UScalar.shiftRight_IScalar, UScalar.shiftRight, ite_eq_left h0, ite_eq_left h]
   rfl
 
 theorem wrapping_mul_u64_eq (x y : Std.U64) :

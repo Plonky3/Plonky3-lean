@@ -39,16 +39,14 @@ def towerMul : ℕ → ℕ → ℕ → ℕ
     let hi := (towerMul k (a₁ ^^^ a₀) (b₁ ^^^ b₀) ^^^ lo) ^^^ towerMul k z₂ (zNat k)
     hi <<< 2 ^ k ||| lo
 
-theorem toNat_fromNat {k : ℕ} (n : ℕ) : (fromNat (k := k) n).toNat = n % 2 ^ (2 ^ k) :=
-  BitVec.toNat_ofNat _ _
-
 theorem toNat_add {k : ℕ} (x y : ConcreteBTField k) : (x + y).toNat = x.toNat ^^^ y.toNat :=
-  BitVec.toNat_xor x y
+  BitVec.toNat_xor x.toBitVec y.toBitVec
 
 theorem toNat_join {k : ℕ} (h : k > 0) (hi lo : ConcreteBTField (k - 1)) :
     (join h hi lo).toNat = hi.toNat <<< 2 ^ (k - 1) ||| lo.toNat := by
+  show (join h hi lo).toBitVec.toNat = _
   rw [join_eq_dcast_append, ← BitVec.dcast_bitvec_toNat_eq]
-  exact BitVec.toNat_append hi lo
+  exact BitVec.toNat_append hi.toBitVec lo.toBitVec
 
 theorem toNat_Z (k : ℕ) : (Z k).toNat = zNat k := by
   unfold Z zNat
@@ -56,8 +54,8 @@ theorem toNat_Z (k : ℕ) : (Z k).toNat = zNat k := by
   · exact one_bitvec_toNat (by positivity)
   · obtain ⟨j, rfl⟩ : ∃ j, k = j + 1 := ⟨k - 1, by omega⟩
     rw [toNat_join]
-    show (1#(2 ^ (j + 1 - 1))).toNat <<< 2 ^ (j + 1 - 1) ||| (0#(2 ^ (j + 1 - 1))).toNat = _
-    rw [one_bitvec_toNat (by positivity), BitVec.toNat_zero, Nat.or_zero, Nat.one_shiftLeft]
+    show (1#(2 ^ (j + 1 - 1))).toNat <<< 2 ^ (j + 1 - 1) ||| (BitVec.zero (2 ^ (j + 1 - 1))).toNat = _
+    rw [one_bitvec_toNat (by positivity), BitVec.zero_eq, BitVec.toNat_zero, Nat.or_zero, Nat.one_shiftLeft]
 
 theorem split_eq {k : ℕ} (a : ConcreteBTField (k + 1)) :
     split (k := k + 1) (by omega) a =
@@ -69,33 +67,29 @@ theorem split_eq {k : ℕ} (a : ConcreteBTField (k + 1)) :
 theorem toNat_concrete_mul : ∀ (k : ℕ) (a b : ConcreteBTField k),
     (concrete_mul a b).toNat = towerMul k a.toNat b.toNat
   | 0, a, b => by
-    have ha : a.toNat < 2 := a.isLt
-    have hb : b.toNat < 2 := b.isLt
-    have hz : (zero (k := 0)).toNat = 0 := rfl
-    have ho : (one (k := 0)).toNat = 1 := rfl
-    rw [concrete_mul.eq_def]
-    simp only [dif_pos]
-    rw [towerMul]
-    rcases (by omega : a.toNat = 0 ∨ a.toNat = 1) with h1 | h1 <;>
-    rcases (by omega : b.toNat = 0 ∨ b.toNat = 1) with h2 | h2 <;>
-    · have ea : (a : BitVec (2 ^ 0)) = BitVec.ofNat (2 ^ 0) a.toNat := by
-        rw [BitVec.ofNat_toNat, BitVec.setWidth_eq]
-      have eb : (b : BitVec (2 ^ 0)) = BitVec.ofNat (2 ^ 0) b.toNat := by
-        rw [BitVec.ofNat_toNat, BitVec.setWidth_eq]
-      rw [h1] at ea; rw [h2] at eb
-      subst ea eb
-      decide
+    have ha := a.toNat_lt
+    have hb := b.toNat_lt
+    have ea : a = fromNat a.toNat := (ConcreteBTField.fromNat_toNat a).symm
+    have eb : b = fromNat b.toNat := (ConcreteBTField.fromNat_toNat b).symm
+    have h0 : (fromNat (k := 0) 0 : ConcreteBTField 0) = zero := rfl
+    have h1 : (fromNat (k := 0) 1 : ConcreteBTField 0) = one := rfl
+    rcases (by norm_num at ha; omega : a.toNat = 0 ∨ a.toNat = 1) with e1 | e1 <;>
+    rcases (by norm_num at hb; omega : b.toNat = 0 ∨ b.toNat = 1) with e2 | e2 <;>
+    · rw [e1] at ea; rw [e2] at eb
+      rw [ea, eb]
+      simp only [h0, h1, concrete_mul_zero0, concrete_mul_one0]
+      rfl
   | k + 1, a, b => by
     have ih : ∀ x y : ConcreteBTField (k + 1 - 1),
         (concrete_mul x y).toNat = towerMul k x.toNat y.toNat := toNat_concrete_mul k
     rw [concrete_mul.eq_def]
-    simp only [dif_neg (Nat.succ_ne_zero k)]
+    simp only [dite_eq_right (Nat.succ_ne_zero k)]
     rw [split_eq a, split_eq b]
     simp only
     rw [toNat_join]
-    generalize BitVec.toNat a = A
-    generalize BitVec.toNat b = B
-    simp only [toNat_add, ih, toNat_Z, toNat_fromNat]
+    generalize a.toNat = A
+    generalize b.toNat = B
+    simp only [toNat_add, ih, toNat_Z, ConcreteBTField.toNat_fromNat]
     rw [towerMul]
     rfl
 

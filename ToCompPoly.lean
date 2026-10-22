@@ -3,8 +3,6 @@ module
 public import ToCompPoly.Fields.BabyBear
 public import ToCompPoly.Fields.BabyBear.Extension
 public import ToCompPoly.Fields.Binary.NatPoly
-public import ToCompPoly.Fields.Binary.Poly192.Basic
-public import ToCompPoly.Fields.Binary.Poly64.Basic
 public import ToCompPoly.Fields.Binary.Tower.NatMul
 public import ToCompPoly.Fields.Goldilocks
 public import ToCompPoly.Fields.KoalaBear
@@ -16,7 +14,6 @@ public import ToCompPoly.Fields.Mersenne.Extension
 public import ToCompPoly.ToMathlib.Order.OrderOfSq
 public import ToCompPoly.ToMathlib.Polynomial.CoeffList
 public import ToCompPoly.ToMathlib.Polynomial.IrreducibleOfOrder
-public import ToCompPoly.ToMathlib.Polynomial.Rabin
 public import ToCompPoly.ToMathlib.Polynomial.XPowSubC
 
 /-!
