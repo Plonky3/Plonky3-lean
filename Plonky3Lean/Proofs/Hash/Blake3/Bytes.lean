@@ -135,4 +135,162 @@ theorem le_byte (x : Std.U32) (j : ℕ) (hj : j < 4) :
     congr 1
   rw [e]
 
+theorem to_le_bytes_eq (x : Std.U32) :
+    CoreModels.core.num.U32.to_le_bytes x = .ok (barr 4#usize (bytesOfWord x.bv)) := by
+  unfold CoreModels.core.num.U32.to_le_bytes
+  rw [array_from_fn_eq 4#usize _ _ _ (fun j hj => le_byte x j hj)]
+  apply congrArg RustM.ok
+  apply Std.Array.ext
+  rw [Std.Array.from_val, barr_val _ _ (by simp [bytesOfWord])]
+  simp [bytesOfWord, List.range_succ]
+
+/-- The little-endian bytes of the first eight words of `cv`. -/
+def cvBytes (cv : List Word) : List (BitVec 8) :=
+  (List.range 32).map fun p => (bytesOfWord (cv.getD (p / 4) 0)).getD (p % 4) 0
+
+/-- The digest `old` with its first `k` bytes overwritten by those of `cv`. -/
+def bytesUpTo (cv : List Word) (old : List (BitVec 8)) (k : ℕ) : List (BitVec 8) :=
+  (List.range 32).map fun p => if p < k then (cvBytes cv).getD p 0 else old.getD p 0
+
+theorem length_bytesUpTo (cv : List Word) (old : List (BitVec 8)) (k : ℕ) :
+    (bytesUpTo cv old k).length = 32 := by simp [bytesUpTo]
+
+theorem bytesUpTo_zero (cv : List Word) (old : List (BitVec 8)) (h : old.length = 32) :
+    bytesUpTo cv old 0 = old := by
+  apply List.ext_getElem (by simp [bytesUpTo, h])
+  intro i h1 h2
+  simp [bytesUpTo, List.getElem?_eq_getElem h2]
+
+theorem bytesUpTo_full (cv : List Word) (old : List (BitVec 8)) :
+    bytesUpTo cv old 32 = cvBytes cv := by
+  apply List.ext_getElem (by simp [bytesUpTo, cvBytes])
+  intro i h1 h2
+  have hi : i < 32 := by simpa [bytesUpTo] using h1
+  simp [bytesUpTo, hi, List.getElem?_eq_getElem h2]
+
+theorem bytesUpTo_succ (cv : List Word) (old : List (BitVec 8)) (i j : ℕ) (hi : i < 8) (hj : j < 4) :
+    (bytesUpTo cv old (4 * i + j)).set (4 * i + j) ((bytesOfWord (cv.getD i 0)).getD j 0) =
+      bytesUpTo cv old (4 * i + j + 1) := by
+  apply List.ext_getElem (by simp [bytesUpTo])
+  intro p h1 h2
+  simp only [bytesUpTo, List.getElem_set, List.getElem_map, List.getElem_range]
+  by_cases hp : 4 * i + j = p
+  · subst hp
+    have hq : (4 * i + j) / 4 = i := by omega
+    have hr : (4 * i + j) % 4 = j := by omega
+    simp [cvBytes, hq, hr, show 4 * i + j < 32 by omega]
+  · simp only [hp, ite_false]
+    split_ifs <;> first | omega | rfl
+
+theorem store_inner_body (cv : List Word) (old : List (BitVec 8)) (i j : ℕ) (hi : i < 8) (hj : j < 4) :
+    p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0_loop0.body (usz i)
+      (barr 4#usize (bytesOfWord (cv.getD i 0))) { start := usz j, «end» := usz 4 }
+      (barr 32#usize (bytesUpTo cv old (4 * i + j))) =
+      .ok (.cont ({ start := usz (j + 1), «end» := usz 4 },
+        barr 32#usize (bytesUpTo cv old (4 * i + j + 1)))) := by
+  have hb : (bytesOfWord (cv.getD i 0)).length = (4#usize).val := by simp [bytesOfWord]
+  have hu : (bytesUpTo cv old (4 * i + j)).length = (32#usize).val := length_bytesUpTo ..
+  unfold p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0_loop0.body
+  simp (disch := norm_num) only [ofNatCore_eq_usz]
+  simp only [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
+    range_step j (usz 4) (by rw [usz_val (by norm_num)]; exact hj), bind_ok, Aeneas.Std.uncurry_apply_pair,
+    index_barr _ _ hb j (by simp; omega), usz_mul (show 4 * i < 2 ^ 32 by omega) (by norm_num) (by omega),
+    usz_add (show 4 * i + j < 2 ^ 32 by omega), update_barr _ _ hu (4 * i + j) (by simp; omega),
+    bytesUpTo_succ cv old i j hi hj]
+
+theorem store_inner_done (i : Std.Usize) (bytes : Std.Array Std.U8 4#usize) (x : Std.Array Std.U8 32#usize) :
+    p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0_loop0.body i bytes
+      { start := usz 4, «end» := usz 4 } x = .ok (.done x) := by
+  unfold p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0_loop0.body
+  simp only [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next, range_stop,
+    bind_ok, Aeneas.Std.uncurry_apply_pair]
+
+theorem store_inner (cv : List Word) (old : List (BitVec 8)) (i : ℕ) (hi : i < 8) :
+    p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0_loop0
+      { start := 0#usize, «end» := 4#usize } (barr 32#usize (bytesUpTo cv old (4 * i))) (usz i)
+      (barr 4#usize (bytesOfWord (cv.getD i 0))) =
+      .ok (barr 32#usize (bytesUpTo cv old (4 * (i + 1)))) := by
+  unfold p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0_loop0
+  simp only [lit0, show (4#usize : Std.Usize) = usz 4 from eq_usz (by norm_num) rfl]
+  rw [show 4 * (i + 1) = 4 * i + 4 by ring]
+  exact loop_of_steps (fun x : CoreModels.core.ops.range.Range Std.Usize × Std.Array Std.U8 32#usize =>
+      p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0_loop0.body (usz i)
+        (barr 4#usize (bytesOfWord (cv.getD i 0))) x.1 x.2)
+    (fun j => (({ start := usz j, «end» := usz 4 } : CoreModels.core.ops.range.Range Std.Usize),
+      barr 32#usize (bytesUpTo cv old (4 * i + j)))) 4 _
+    (fun j hj => store_inner_body cv old i j hi hj) (store_inner_done _ _ _)
+
+theorem store_outer_body (cv : List Word) (hcv : cv.length = 8) (old : List (BitVec 8)) (i : ℕ)
+    (hi : i < 8) :
+    p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0.body (arr 8#usize cv)
+      { start := usz i, «end» := usz 8 } (barr 32#usize (bytesUpTo cv old (4 * i))) =
+      .ok (.cont ({ start := usz (i + 1), «end» := usz 8 },
+        barr 32#usize (bytesUpTo cv old (4 * (i + 1))))) := by
+  have hcv' : cv.length = (8#usize).val := hcv
+  unfold p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0.body
+  simp only [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
+    range_step i (usz 8) (by rw [usz_val (by norm_num)]; exact hi), bind_ok, Aeneas.Std.uncurry_apply_pair,
+    index_arr _ _ hcv' i (by simp; omega), to_le_bytes_eq, u32_bv_mk, store_inner cv old i hi]
+
+theorem store_outer_done (st : Std.Array Std.U32 8#usize) (x : Std.Array Std.U8 32#usize) :
+    p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0.body st
+      { start := usz 8, «end» := usz 8 } x = .ok (.done x) := by
+  unfold p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0.body
+  simp only [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next, range_stop,
+    bind_ok, Aeneas.Std.uncurry_apply_pair]
+
+/-- One lane of digests: the bytes of `d` as the only digest. -/
+def dgrp (d : List (BitVec 8)) : Std.Array (Std.Array Std.U8 32#usize) 1#usize :=
+  Std.Array.make 1#usize [barr 32#usize d] (by rfl)
+
+theorem dgrp_val (d : List (BitVec 8)) : (dgrp d).val = [barr 32#usize d] := by simp [dgrp]
+
+theorem index_dgrp (d : List (BitVec 8)) :
+    Std.Array.index_usize (dgrp d) (usz 0) = .ok (barr 32#usize d) := by
+  rw [index_usize_eq _ _ (by rw [dgrp_val, usz_val (by norm_num)]; simp)]
+  simp [dgrp_val, usz_val (show 0 < 2 ^ 32 by norm_num)]
+
+theorem index_mut_dgrp (d : List (BitVec 8)) :
+    Std.Array.index_mut_usize (dgrp d) (usz 0) =
+      .ok (barr 32#usize d, fun a => Std.Array.set (dgrp d) (usz 0) a) := by
+  simp only [Std.Array.index_mut_usize, index_dgrp]
+  rw [bind_tc_ok]
+
+theorem set_dgrp (d e : List (BitVec 8)) :
+    Std.Array.set (dgrp d) (usz 0) (barr 32#usize e) = dgrp e := by
+  apply Std.Array.ext
+  simp [Std.Array.set_val_eq, dgrp_val, usz_val (show 0 < 2 ^ 32 by norm_num)]
+
+theorem store_digests_eq (cv : List Word) (hcv : cv.length = 8) (old : List (BitVec 8))
+    (hold : old.length = 32) :
+    p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1.store_digests (arr 8#usize cv) (dgrp old) =
+      .ok (dgrp (cvBytes cv)) := by
+  unfold p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1.store_digests
+  rw [lit0, index_mut_dgrp, bind_ok]
+  simp only [Aeneas.Std.uncurry_apply_pair, STATE_WORDS_eq]
+  unfold p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0
+  conv => lhs; rw [← bytesUpTo_zero cv old hold]
+  erw [loop_of_steps (fun x : CoreModels.core.ops.range.Range Std.Usize × Std.Array Std.U8 32#usize =>
+      p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0.body (arr 8#usize cv) x.1 x.2)
+    (fun i => (({ start := usz i, «end» := usz 8 } : CoreModels.core.ops.range.Range Std.Usize),
+      barr 32#usize (bytesUpTo cv old (4 * i)))) 8 _
+    (fun i hi => store_outer_body cv hcv old i hi) (store_outer_done _ _), bind_ok, bytesUpTo_full,
+    set_dgrp]
+
+theorem state_word (i : ℕ) (hi : i < 8) :
+    p3_blake3.batch.Mode.state.closure.Insts.CoreOpsFunctionFnMutTupleUsizeV.call_mut (G := 1#usize) WI
+      (arr 8#usize IV) (usz i) = .ok (⟨IV.getD i 0⟩, arr 8#usize IV) := by
+  unfold p3_blake3.batch.Mode.state.closure.Insts.CoreOpsFunctionFnMutTupleUsizeV.call_mut
+  rw [index_arr 8#usize IV rfl i hi, bind_ok]
+  exact bind_ok _ _
+
+theorem state_eq : p3_blake3.batch.Mode.state 1#usize WI p3_blake3.batch.Mode.HASH = .ok (grp 8#usize IV) := by
+  unfold p3_blake3.batch.Mode.state p3_blake3.batch.Mode.HASH
+  simp only [IV_eq, CoreModels.core.array.from_fn]
+  rw [array_from_fn_eq 8#usize _ _ _ (fun i hi => state_word i hi), bind_ok,
+    from_getD _ _ rfl, repeat_eq _ _ _ (array_clone_eq _ (fun _ => rfl)) (by decide)]
+  apply congrArg RustM.ok
+  apply Std.Array.ext
+  simp [grp_val]
+
 end Plonky3Lean.Proofs.Blake3
