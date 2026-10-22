@@ -1,4 +1,5 @@
 import Plonky3Lean.Spec.BabyBear
+import Plonky3Lean.Spec.Mersenne31
 import Plonky3Lean.Spec.Monty31
 
 /-!
