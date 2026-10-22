@@ -117,4 +117,18 @@ theorem usz_rem {a b : ℕ} (ha : a < 2 ^ 32) (hb : b < 2 ^ 32) (h0 : b ≠ 0) :
 theorem usz_lt_iff {a b : ℕ} (ha : a < 2 ^ 32) (hb : b < 2 ^ 32) : usz a < usz b ↔ a < b := by
   rw [UScalar.lt_equiv, usz_val ha, usz_val hb]
 
+/-- One step of a range from `k`, below its end. -/
+theorem range_step (k : ℕ) (K : Std.Usize) (hk : k < K.val) :
+    core.IteratorRange.next core.Usize.Insts.CoreIterRangeStep { start := usz k, «end» := K } =
+      .ok (core.option.Option.Some (usz k), { start := usz (k + 1), «end» := K }) := by
+  obtain ⟨i', e, hi'⟩ := range_next_some (usz k) K (by rw [usz_val_le K hk.le]; exact hk)
+  rw [show i' = usz (k + 1) from eq_usz_le K hk (by rw [hi', usz_val_le K hk.le])] at e
+  exact e
+
+/-- A range at its end. -/
+theorem range_stop (K : Std.Usize) :
+    core.IteratorRange.next core.Usize.Insts.CoreIterRangeStep { start := K, «end» := K } =
+      .ok (core.option.Option.None, { start := K, «end» := K }) :=
+  range_next_none _ _ le_rfl
+
 end Plonky3Lean.Lib
