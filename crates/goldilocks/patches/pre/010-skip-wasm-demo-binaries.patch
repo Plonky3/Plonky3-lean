@@ -25,6 +25,9 @@
 #
 # The library and its tests build exactly as shipped.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/goldilocks/Cargo.toml b/goldilocks/Cargo.toml
 index f2b8b02d..ed1de255 100644
 --- a/goldilocks/Cargo.toml

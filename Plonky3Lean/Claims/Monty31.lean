@@ -1,6 +1,10 @@
-import Plonky3Lean.Proofs.Field.Monty31.Findings
-import Plonky3Lean.Proofs.Field.Monty31.Inverse
-import Plonky3Lean.Proofs.Field.Monty31.QuotientMap
+module
+
+public import Plonky3Lean.Proofs.Field.Monty31.Findings
+public import Plonky3Lean.Proofs.Field.Monty31.Inverse
+public import Plonky3Lean.Proofs.Field.Monty31.QuotientMap
+
+@[expose] public section
 
 /-!
 # p3-monty-31: claims, for every prime
@@ -236,7 +240,7 @@ theorem monty_31.MontyField31.new.spec (hv : Valid inst p mu) (x : Std.U32) :
 That is the product of the field elements they stand for. -/
 theorem monty_31.MontyField31.mul.spec (hv : Valid inst p mu) (a b : monty_31.MontyField31 MP)
     (ha : a.value.val < p.val) (hb : b.value.val < p.val) :
-    monty_31.MontyField31.mul inst a b ⦃ c => c.value.val < p.val ∧
+    monty_31.MontyField31.Insts.CoreOpsArithMulMontyField31MontyField31.mul inst a b ⦃ c => c.value.val < p.val ∧
       c.value.val * 2 ^ 32 % p.val = a.value.val * b.value.val % p.val ⦄ :=
   Proofs.Monty31.monty_31.MontyField31.mul.spec hv a b ha hb
 

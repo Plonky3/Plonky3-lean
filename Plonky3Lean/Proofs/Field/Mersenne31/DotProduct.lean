@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.Mersenne31.Basic
+module
+
+public import Plonky3Lean.Proofs.Field.Mersenne31.Basic
+
+@[expose] public section
 
 /-!
 # Mersenne31: delayed reduction and `dot_product`
@@ -8,7 +12,7 @@ open Aeneas Aeneas.Std CoreModels
 open p3_mersenne_31
 open Plonky3Lean.Spec.Mersenne31 Plonky3Lean.Lib
 
-namespace Plonky3Lean.Proofs.Mersenne31
+namespace Plonky3Lean.Proofs.P3Mersenne31
 
 /-- The arithmetic of `reduce_64`: two folds of the top bits onto the low 31, then one conditional subtraction of `p`. -/
 theorem reduce_64_nat (x : ℕ) (hx : x < 2 ^ 64) :
@@ -40,12 +44,11 @@ theorem partial_reduce.spec (x : Std.U64) :
   all_goals
     have hx := u64_lt x
     have hlo : lo.val = x.val % 2 ^ 31 := by
-      rw [lo_post, cast_u64_u32_val, i2_post1, and_mask31_u64 x i1 (by rw [i1_post]; rfl)]; omega
-    have hhi : hi.val = x.val / 2 ^ 31 := by rw [hi_post1, Nat.shiftRight_eq_div_pow]
+      rw [lo_post, cast_u64_u32_val, i2_post, and_mask31_u64 x i1 (by rw [i1_post]; rfl)]; omega
+    have hhi : hi.val = x.val / 2 ^ 31 := by rw [hi_post, Nat.shiftRight_eq_div_pow]
     have hi3 : i3.val = x.val % 2 ^ 31 := by rw [i3_post, cast_u32_u64_val, hlo]
-  · scalar_tac
-  · rw [r_post, hi3, hhi]
-    omega
+  rw [r_post, hi3, hhi]
+  omega
 
 @[step]
 theorem reduce_64.spec (x : Std.U64) :
@@ -56,18 +59,17 @@ theorem reduce_64.spec (x : Std.U64) :
   all_goals
     have hx := u64_lt x
     have hlo : lo.val = x.val % 2 ^ 31 := by
-      rw [lo_post, cast_u64_u32_val, i2_post1, and_mask31_u64 x i1 (by rw [i1_post]; rfl)]; omega
-    have hhi : hi.val = x.val / 2 ^ 31 := by rw [hi_post1, Nat.shiftRight_eq_div_pow]
+      rw [lo_post, cast_u64_u32_val, i2_post, and_mask31_u64 x i1 (by rw [i1_post]; rfl)]; omega
+    have hhi : hi.val = x.val / 2 ^ 31 := by rw [hi_post, Nat.shiftRight_eq_div_pow]
     have hi3 : i3.val = x.val % 2 ^ 31 := by rw [i3_post, cast_u32_u64_val, hlo]
-  · scalar_tac
   all_goals
     have hs1 : sum1.val = x.val % 2 ^ 31 + x.val / 2 ^ 31 := by rw [sum1_post, hi3, hhi]
     have hlo2 : lo2.val = sum1.val % 2 ^ 31 := by
-      rw [lo2_post, cast_u64_u32_val, i5_post1, and_mask31_u64 sum1 i4 (by rw [i4_post]; rfl)]; omega
+      rw [lo2_post, cast_u64_u32_val, i5_post, and_mask31_u64 sum1 i4 (by rw [i4_post]; rfl)]; omega
     have hhi2 : hi2.val = sum1.val / 2 ^ 31 := by
-      rw [hi2_post, cast_u64_u32_val, i6_post1, Nat.shiftRight_eq_div_pow]; omega
+      rw [hi2_post, cast_u64_u32_val, i6_post, Nat.shiftRight_eq_div_pow]; omega
   · scalar_tac
   · rw [r_post, i7_post, sum2_post, hlo2, hhi2, hs1]
     exact reduce_64_nat x.val hx
 
-end Plonky3Lean.Proofs.Mersenne31
+end Plonky3Lean.Proofs.P3Mersenne31

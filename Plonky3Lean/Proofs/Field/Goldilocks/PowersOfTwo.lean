@@ -1,5 +1,10 @@
-import Mathlib.Tactic.LinearCombination
-import Plonky3Lean.Proofs.Field.Goldilocks.Arith
+module
+
+public import Mathlib.Tactic.LinearCombination
+public import Plonky3Lean.Lib.Array
+public import Plonky3Lean.Proofs.Field.Goldilocks.Arith
+
+@[expose] public section
 
 /-!
 # Goldilocks: multiplying and dividing by powers of two
@@ -12,7 +17,7 @@ They rest on `2^96 = -1` and `2^192 = 1` in the field.
 open Aeneas Aeneas.Std CoreModels p3_goldilocks Plonky3Lean.Lib
 open Plonky3Lean.Spec.Goldilocks
 
-namespace Plonky3Lean.Proofs.Goldilocks
+namespace Plonky3Lean.Proofs.P3Goldilocks
 
 
 /-- `const_add` subtracts `p` once when the sum wraps. -/
@@ -28,16 +33,16 @@ theorem const_add.spec (a b : goldilocks.Goldilocks)
   step*
   all_goals
     by_cases hs : 2 ^ 64 ≤ a.value.val + b.value.val <;>
-      simp only [hs, decide_true, decide_false] at sum_post1 <;> subst sum_post1 <;>
+      simp only [hs, decide_true, decide_false] at over_post <;> subst over_post <;>
       simp only [Bool.toNat_true, Bool.toNat_false] at i_post
   · simp only [i_post, U64.max_eq]; decide
   · simp only [i_post, U64.max_eq]; decide
   all_goals
     have hs1 : ¬ 2 ^ 64 ≤ sum.val + i2.val := by
-      rw [sum_post2, i2_post, i_post]; omega
-    simp only [hs1, decide_false] at sum1_post1
-    subst sum1_post1
-    simp only [Bool.false_eq_true, if_false, hs, if_true]
+      rw [sum_post, i2_post, i_post]; omega
+    simp only [hs1, decide_false] at over1_post
+    subst over1_post
+    simp only [Bool.false_eq_true, ite_false, hs, ite_true]
     step*
 
 /-- Entries below `i` are `2^j mod p`. -/
@@ -54,7 +59,7 @@ theorem Pow2Prefix.set {arr : Array goldilocks.Goldilocks 96#usize} {i : Std.Usi
   simp only [Array.set_val_eq, List.getElem?_set]
   by_cases hji : i.val = j
   · subst hji; exact ⟨x, by simp [hlen, hi], hx⟩
-  · rw [if_neg hji]; exact h j (by omega)
+  · rw [ite_eq_right hji]; exact h j (by omega)
 
 /-- The first loop fills entries `1` to `63` with `1 << i`. -/
 theorem POWERS_OF_TWO_loop0.spec (arr : Array goldilocks.Goldilocks 96#usize) (i : Std.Usize)
@@ -68,12 +73,13 @@ theorem POWERS_OF_TWO_loop0.spec (arr : Array goldilocks.Goldilocks 96#usize) (i
     simp only at hk1 hk64 hk ⊢
     split
     · step*
+      rename g.value = i1 => g_post
       have hk' : i2.val = k.val + 1 := i2_post
       refine ⟨by omega, by omega, ?_, by omega⟩
       rw [a_post, hk']
       refine hk.set g (by omega) ?_
-      rw [g_post, i1_post1, Nat.one_shiftLeft, show U64.size = 2 ^ 64 by simp [U64.size, U64.numBits],
-        Nat.mod_eq_of_lt (Nat.pow_lt_pow_right (by norm_num) i1_post3),
+      rw [g_post, i1_post, Nat.one_shiftLeft, show U64.size = 2 ^ 64 by simp [U64.size, U64.numBits],
+        Nat.mod_eq_of_lt (Nat.pow_lt_pow_right (by norm_num) i1_post2),
         Nat.mod_eq_of_lt (lt_of_le_of_lt (Nat.pow_le_pow_right (by norm_num) (by omega : k.val ≤ 63))
           (by norm_num))]
     · rename_i hge
@@ -127,16 +133,22 @@ theorem POWERS_OF_TWO.spec : goldilocks.Goldilocks.POWERS_OF_TWO ⦃ r => Pow2Pr
   unfold goldilocks.Goldilocks.POWERS_OF_TWO
     goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.ONE
   step*
-  have h1 : Pow2Prefix (Array.repeat 96#usize g) (1#usize).val := by
+  obtain ⟨arr, harr, hall⟩ :=
+    array_repeat_eq 96#usize goldilocks.Goldilocks.Insts.CoreCloneClone (fun _ => rfl) g
+  rw [harr, bind_ok]
+  have h1 : Pow2Prefix arr (1#usize).val := by
     intro j hj
     have : j = 0 := by simp at hj; omega
     subst this
-    exact ⟨g, by simp [Array.repeat_val], by rw [g_post]; rfl⟩
+    have hlen : arr.val.length = 96 := arr.property
+    refine ⟨g, ?_, by rw [g_post]; rfl⟩
+    rw [List.getElem?_eq_getElem (by omega), hall _ (List.getElem_mem _)]
   step with POWERS_OF_TWO_loop0.spec _ _ (by simp) (by simp) h1
   step*
+  rename var.value = i1 => var_post
   apply POWERS_OF_TWO_loop1.spec _ _ _ (by omega) (by omega)
-    (by rw [powers_of_two1_post1]; exact powers_of_two1_post2)
-  rw [var_post, i1_post1, powers_of_two1_post1]
+    (by rw [powers_of_two1_post]; exact powers_of_two1_post1)
+  rw [var_post, i1_post, powers_of_two1_post]
   simp [U64.size, U64.numBits]
 
 /-- A `u64` below `2^32` survives the cast to `usize`. -/
@@ -204,7 +216,7 @@ theorem mul_2exp_u64.spec_lt (a : goldilocks.Goldilocks) (e : Std.U64) (he : e.v
       rw [UScalar.lt_equiv] at hlt
       have hlt' : e.val < 96 := by simpa using hlt
       rw [harr]
-      simp only [bind_tc_ok, lift]
+      simp only [bind_ok, lift]
       have hc := cast_usize_val e (by omega)
       apply WP.spec_bind (Pow2Prefix.index hP _ (by rw [hc]; exact hlt'))
       intro g hg
@@ -213,18 +225,18 @@ theorem mul_2exp_u64.spec_lt (a : goldilocks.Goldilocks) (e : Std.U64) (he : e.v
     · rename_i hge
       rw [UScalar.lt_equiv] at hge
       have hge' : 96 ≤ e.val := by simp at hge; omega
-      rw [if_pos (by rw [UScalar.lt_equiv]; simpa using he)]
+      rw [ite_eq_left (by rw [UScalar.lt_equiv]; simpa using he)]
       apply WP.spec_bind (neg.field a)
       intro g hg
       rw [harr]
-      simp only [bind_tc_ok, lift]
+      simp only [bind_ok, lift]
       step
       have hc := cast_usize_val i (by omega)
       apply WP.spec_bind (Pow2Prefix.index hP _ (by rw [hc]; omega))
       intro g1 hg1
       apply WP.spec_mono (mul.field g g1)
       intro r hr
-      rw [hr, hg, hg1, hc, i_post1]
+      rw [hr, hg, hg1, hc, i_post]
       have : e.val = 96 + (e.val - 96) := by omega
       conv_rhs => rw [this, pow_add, two_pow_96]
       ring
@@ -239,7 +251,7 @@ theorem mul_2exp_u64.spec (a : goldilocks.Goldilocks) (e : Std.U64) :
   split
   · exact absurd (by decide) he
   · exact absurd (by decide) he
-  · rw [if_neg (by rw [UScalar.lt_equiv]; simp; omega), if_neg (by rw [UScalar.lt_equiv]; simp; omega)]
+  · rw [ite_eq_right (by rw [UScalar.lt_equiv]; simp; omega), ite_eq_right (by rw [UScalar.lt_equiv]; simp; omega)]
     step
     apply WP.spec_mono (mul_2exp_u64.spec_lt a i (by rw [i_post]; omega))
     intro r hr
@@ -298,25 +310,25 @@ theorem div_2exp_u64.spec (a : goldilocks.Goldilocks) (e : Std.U64) :
           _ ≤ 2 ^ exp1.val := Nat.pow_le_pow_right (by norm_num) hr2
       step
       have hiv : i.val = 2 ^ exp1.val := by
-        rw [i_post1, Nat.one_shiftLeft, hsz, Nat.mod_eq_of_lt (by omega)]
-      clear i_post1 i_post2
+        rw [i_post, Nat.one_shiftLeft, hsz, Nat.mod_eq_of_lt (by omega)]
+      clear i_post i_post1
       step
-      have hi1 : i1.val = 2 ^ exp1.val - 1 := by rw [i1_post1, hiv]
-      clear i1_post1 i1_post2
+      have hi1 : i1.val = 2 ^ exp1.val - 1 := by rw [i1_post, hiv]
+      clear i1_post i1_post1
       step
       have hlo : lo.val = a.value.val % 2 ^ exp1.val := by
-        rw [lo_post1, UScalar.val_and, hi1, Nat.and_two_pow_sub_one_eq_mod]
+        rw [lo_post, UScalar.val_and, hi1, Nat.and_two_pow_sub_one_eq_mod]
       have hlo' : lo.val < 2 ^ exp1.val := by rw [hlo]; exact Nat.mod_lt _ (by positivity)
-      clear lo_post1 lo_post2
+      clear lo_post lo_post1
       step
       have hhi : hi.val = a.value.val / 2 ^ exp1.val := by
-        rw [hi_post1, Nat.shiftRight_eq_div_pow]
+        rw [hi_post, Nat.shiftRight_eq_div_pow]
       have hhi' : hi.val < 2 ^ 62 := by
         rw [hhi, Nat.div_lt_iff_lt_mul (by positivity)]
         calc a.value.val < 2 ^ 64 := ha
           _ = 2 ^ 62 * 4 := by norm_num
           _ ≤ 2 ^ 62 * 2 ^ exp1.val := Nat.mul_le_mul_left _ hpe2
-      clear hi_post1 hi_post2
+      clear hi_post hi_post1
       step
       step
       have hlo2 : lo.val * 2 ^ (32 - exp1.val) < 2 ^ 32 := by
@@ -324,8 +336,8 @@ theorem div_2exp_u64.spec (a : goldilocks.Goldilocks) (e : Std.U64) :
               Nat.mul_lt_mul_of_pos_right hlo' (by positivity)
           _ = 2 ^ 32 := by rw [← pow_add, Nat.add_sub_cancel' hr32]
       have hi3 : i3.val = lo.val * 2 ^ (32 - exp1.val) := by
-        rw [i3_post1, i2_post1, Nat.shiftLeft_eq, hsz, Nat.mod_eq_of_lt (by omega)]
-      clear i3_post1 i3_post2
+        rw [i3_post, i2_post, Nat.shiftLeft_eq, hsz, Nat.mod_eq_of_lt (by omega)]
+      clear i3_post i3_post1
       have hX : 2 ^ exp1.val * 2 ^ (64 - exp1.val) = 2 ^ 64 := by
         rw [← pow_add, Nat.add_sub_cancel' (by omega)]
       have hY : 2 ^ exp1.val * 2 ^ (32 - exp1.val) = 2 ^ 32 := by
@@ -339,8 +351,8 @@ theorem div_2exp_u64.spec (a : goldilocks.Goldilocks) (e : Std.U64) :
       step
       step
       have hb : b.val = lo.val * 2 ^ (64 - exp1.val) := by
-        rw [b_post1, i4_post1, Nat.shiftLeft_eq, hsz, Nat.mod_eq_of_lt hloX]
-      clear b_post1 b_post2
+        rw [b_post, i4_post, Nat.shiftLeft_eq, hsz, Nat.mod_eq_of_lt hloX]
+      clear b_post b_post1
       -- The subtraction falls short by less than `p`.
       have hgap : b.val ≤ aa.val + 18446744069414584320 := by
         rw [hb, ha']
@@ -353,22 +365,23 @@ theorem div_2exp_u64.spec (a : goldilocks.Goldilocks) (e : Std.U64) :
       step*
       · rw [show (4294967295#u64).val = 4294967295 from rfl, i6_post]
         split <;> simp [U64.max_eq]
+      rename r.value = i8 => r_post
       have hi8 : (i8.val : Goldilocks.Field) = (aa.val : Goldilocks.Field) - (b.val : Goldilocks.Field) := by
         by_cases hbr : aa.val < b.val
-        · simp only [hbr, decide_true] at result_post1
-          subst result_post1
-          simp only [if_true] at i6_post
+        · simp only [hbr, decide_true] at borrow_post
+          subst borrow_post
+          simp only [ite_true] at i6_post
           have : i8.val = aa.val + 18446744069414584321 - b.val := by
-            rw [i8_post, i7_post, i6_post, result_post2]; omega
+            rw [i8_post, i7_post, i6_post, result_post]; omega
           rw [this, Nat.cast_sub (by omega)]
           push_cast
           rw [p_eq_zero]
           ring
-        · simp only [hbr, decide_false] at result_post1
-          subst result_post1
-          simp only [Bool.false_eq_true, if_false] at i6_post
+        · simp only [hbr, decide_false] at borrow_post
+          subst borrow_post
+          simp only [Bool.false_eq_true, ite_false] at i6_post
           have : i8.val = aa.val - b.val := by
-            rw [i8_post, i7_post, i6_post, result_post2]; omega
+            rw [i8_post, i7_post, i6_post, result_post]; omega
           rw [this, Nat.cast_sub (by omega)]
       have hsplit : (a.value.val : Goldilocks.Field) =
           2 ^ exp1.val * (hi.val : Goldilocks.Field) + lo.val := by
@@ -392,6 +405,6 @@ theorem div_2exp_u64.spec (a : goldilocks.Goldilocks) (e : Std.U64) :
       step
       apply WP.spec_mono (mul_2exp_u64.spec a i)
       intro r hr
-      rw [hr, mul_assoc, ← pow_add, i_post1, Nat.sub_add_cancel i_post2, two_pow_192, mul_one]
+      rw [hr, mul_assoc, ← pow_add, i_post, Nat.sub_add_cancel i_post1, two_pow_192, mul_one]
 
-end Plonky3Lean.Proofs.Goldilocks
+end Plonky3Lean.Proofs.P3Goldilocks

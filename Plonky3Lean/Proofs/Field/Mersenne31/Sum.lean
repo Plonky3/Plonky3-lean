@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.Mersenne31.Field
+module
+
+public import Plonky3Lean.Proofs.Field.Mersenne31.Field
+
+@[expose] public section
 
 /-!
 # Mersenne31: `Sum::sum` and `sum_array`
@@ -12,7 +16,7 @@ open Aeneas Aeneas.Std CoreModels
 open p3_mersenne_31
 open Plonky3Lean.Spec.Mersenne31 Plonky3Lean.Lib
 
-namespace Plonky3Lean.Proofs.Mersenne31
+namespace Plonky3Lean.Proofs.P3Mersenne31
 
 /-- The sum of the stored values. -/
 def valSum (l : List Element) : ℕ := (l.map fun x => x.value.val).sum
@@ -21,7 +25,7 @@ theorem foldl_add_spec (l : List Element) (acc : Std.U64) (h : acc.val + valSum 
     l.foldlM (fun acc x => acc + UScalar.cast .U64 x.value) acc ⦃ r =>
       r.val = acc.val + valSum l ⦄ := by
   induction l generalizing acc with
-  | nil => simp only [valSum, List.map_nil, List.sum_nil, add_zero, List.foldlM_nil]; exact rfl
+  | nil => simp only [valSum, List.map_nil, List.sum_nil, add_zero, List.foldlM_nil]; exact (WP.spec_ok _).mpr rfl
   | cons x l ih =>
     simp only [valSum, List.map_cons, List.sum_cons] at h ⊢
     simp only [List.foldlM_cons]
@@ -52,7 +56,7 @@ theorem valSum_lt (l : List Element) (hl : ∀ x ∈ l, Valid x) (hn : l.length 
     valSum l < 2 ^ 62 := by
   have : valSum l ≤ l.length * (2 ^ 31 - 1) := by
     unfold valSum
-    have := List.sum_le_card_nsmul (l.map fun x => x.value.val) (2 ^ 31 - 1) (by
+    have := List.sum_le_length_nsmul (l.map fun x => x.value.val) (2 ^ 31 - 1) (by
       intro v hv
       obtain ⟨x, hx, rfl⟩ := List.mem_map.mp hv
       have := hl x hx; unfold Valid at this; omega)
@@ -68,8 +72,7 @@ theorem from_u62.panics (x : Std.U64) (hx : 2 ^ 62 ≤ x.val) :
   have h1 : (1#u64 <<< 62#i32 : RustM Std.U64) = .ok 4611686018427387904#u64 := by rfl
   have : ¬ x < 4611686018427387904#u64 := by scalar_tac
   rw [h1]
-  simp only [bind_tc_ok, massert, this]
-  rfl
+  simp only [bind_ok, massert, this, ite_false, bind_fail]
 
 /-- `Sum::sum` panics, in a debug build, once the stored values add up to `2^62`. -/
 theorem sum.panics (l : List Element) (hs : 2 ^ 62 ≤ valSum l) (hs' : valSum l < 2 ^ 64) :
@@ -78,7 +81,7 @@ theorem sum.panics (l : List Element) (hs : 2 ^ 62 ≤ valSum l) (hs' : valSum l
   obtain ⟨s, h1, h2⟩ := WP.spec_imp_exists (foldl_add_spec l 0#u64 (by simp; omega))
   rw [h1]
   simp only [show (0#u64).val = 0 from rfl, zero_add] at h2
-  simp only [bind_tc_ok]
+  simp only [bind_ok]
   exact from_u62.panics s (by omega)
 
-end Plonky3Lean.Proofs.Mersenne31
+end Plonky3Lean.Proofs.P3Mersenne31

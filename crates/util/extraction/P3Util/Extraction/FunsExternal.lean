@@ -1,1 +1,3 @@
-import P3Util.Assumptions.FunsExternal
+module
+
+public import P3Util.Assumptions.FunsExternal

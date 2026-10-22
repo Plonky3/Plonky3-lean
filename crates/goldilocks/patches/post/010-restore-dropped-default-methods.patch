@@ -1,0 +1,38 @@
+# Patch:        010-restore-dropped-default-methods
+# Phase:        post
+# Target:       extraction/P3Goldilocks/Extraction/Funs.lean
+# Hunks:        1
+# Class:        restore
+# Gap:          docs/extractor-issues.md 2: charon's multi-target mode
+#               (`--targets`) forces `--translate-all-methods`, then filters
+#               unused methods after the merge, which drops the default-method
+#               roots hax adds (`--start-from core::clone::Clone::clone_from`).
+#               `--targets` is needed because of 1.
+# Cost:         none. The added field is the body of the CoreModels default
+#               method it stands for (`clone.Clone.clone_from.default`),
+#               inlined.
+# Upstreamable: yes: charon could keep `--start-from` roots through the
+#               multi-target merge, or hax could pass `--target` to charon's
+#               cargo (issue 1).
+# Drop when:    charon keeps `--start-from` roots through the multi-target
+#               merge, or hax can pass `--target` to charon's cargo (then
+#               extract.sh can drop `--targets`).
+#
+# CoreModels' `core.clone.Clone` has a `clone_from` field with no default. A
+# derived `Clone` never defines it, so aeneas fills it with the trait's default
+# method, but only if charon translated it, and in `--targets` mode charon
+# drops that root. p3-goldilocks's one derived `Clone` comes out missing the field,
+# and Lean rejects the structure literal. The narrow fix adds it by hand:
+#   clone_from := fun _ source => <clone> source        (= clone_from.default)
+#
+--- a/extraction/P3Goldilocks/Extraction/Funs.lean
++++ b/extraction/P3Goldilocks/Extraction/Funs.lean
+@@ -47,6 +47,8 @@
+ def goldilocks.Goldilocks.Insts.CoreCloneClone : core.clone.Clone
+   goldilocks.Goldilocks := {
+   clone := goldilocks.Goldilocks.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => goldilocks.Goldilocks.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- [p3_goldilocks::goldilocks::{p3_goldilocks::goldilocks::Goldilocks}::new]:

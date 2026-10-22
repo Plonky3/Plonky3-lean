@@ -6,7 +6,11 @@ but fails on the body of `Poseidon2::new` (docs/extractor-issues.md, 11). The
 structures are copied from that partial translation, so field names and order
 are aeneas's own; `new` and `ExternalLayerConstants::new` are assumed.
 -/
-import P3Field
+module
+
+public import P3Field
+
+@[expose] public section
 open CoreModels Aeneas
 open Aeneas.Std hiding namespace core alloc
 open RustM ControlFlow Error

@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.Goldilocks.Constants
+module
+
+public import Plonky3Lean.Proofs.Field.Goldilocks.Constants
+
+@[expose] public section
 
 /-!
 # Goldilocks: sums and dot products
@@ -13,7 +17,7 @@ The check casts `N` to `u32`, so it also passes for some `N >= 2^32`.
 open Aeneas Aeneas.Std CoreModels p3_goldilocks Plonky3Lean.Lib
 open Plonky3Lean.Spec.Goldilocks
 
-namespace Plonky3Lean.Proofs.Goldilocks
+namespace Plonky3Lean.Proofs.P3Goldilocks
 
 
 /-- The fold of `Sum::sum` from any accumulator whose total stays below `2^128`. -/
@@ -48,7 +52,7 @@ theorem sum.spec (xs : List goldilocks.Goldilocks)
 theorem sum_lt_of_length (xs : List goldilocks.Goldilocks) (h : xs.length < 2 ^ 64) :
     (xs.map (fun x => x.value.val)).sum < 2 ^ 128 := by
   have : (xs.map (fun x => x.value.val)).sum ≤ xs.length * (2 ^ 64 - 1) := by
-    have := List.sum_le_card_nsmul (xs.map (fun x => x.value.val)) (2 ^ 64 - 1)
+    have := List.sum_le_length_nsmul (xs.map (fun x => x.value.val)) (2 ^ 64 - 1)
       (fun y hy => by
         obtain ⟨x, -, rfl⟩ := List.mem_map.mp hy
         have := u64_lt x.value; omega)
@@ -72,7 +76,7 @@ theorem sum_array.spec (N : Std.Usize) (input : Slice goldilocks.Goldilocks)
       toField r = (input.val.map toField).sum ⦄ := by
   unfold goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.sum_array
   have hlen : N.val = input.length := hN
-  simp only [massert, hlen, if_true, bind_tc_ok]
+  simp only [massert, hlen, ite_true, bind_ok]
   have hidx : ∀ (i : Std.Usize) (x : goldilocks.Goldilocks), input.val[i.val]? = some x →
       input.index_usize i = .ok x := by
     intro i x h; unfold Slice.index_usize; rw [show input[i]? = some x from h]
@@ -86,16 +90,16 @@ theorem sum_array.spec (N : Std.Usize) (input : Slice goldilocks.Goldilocks)
     simp [hx]
   · obtain ⟨x0, x1, hx⟩ := List.length_eq_two.mp (by rw [← hN, h2]; rfl : input.val.length = 2)
     rw [hidx 0#usize x0 (by rw [hx]; rfl), hidx 1#usize x1 (by rw [hx]; rfl)]
-    simp only [bind_tc_ok]
+    simp only [bind_ok]
     apply WP.spec_mono (add.field x0 x1)
     intro r hr; unfold toField; rw [hr, hx]; simp
   · obtain ⟨x0, x1, x2, hx⟩ := List.length_eq_three.mp (by rw [← hN, h3]; rfl : input.val.length = 3)
     rw [hidx 0#usize x0 (by rw [hx]; rfl), hidx 1#usize x1 (by rw [hx]; rfl)]
-    simp only [bind_tc_ok]
+    simp only [bind_ok]
     apply WP.spec_bind (add.field x0 x1)
     intro s hs
     rw [hidx 2#usize x2 (by rw [hx]; rfl)]
-    simp only [bind_tc_ok]
+    simp only [bind_ok]
     apply WP.spec_mono (add.field s x2)
     intro r hr; unfold toField; rw [hr, hs, hx]; simp; ring
   · exact sum.spec _ (sum_lt_of_length _ (slice_len_lt input))
@@ -126,7 +130,7 @@ theorem fold_step.spec (lo : Std.U128) (hi : Std.U64) (xy : goldilocks.Goldilock
   step as ⟨i, hi1, hi2, hi3⟩
   have hiv : i.val = prodVal xy / 2 ^ 96 := by
     rw [hi1, hval, Nat.shiftRight_eq_div_pow]; rfl
-  simp only [lift, bind_tc_ok]
+  simp only [lift, bind_ok]
   have hc : (UScalar.cast .U64 i).val = prodVal xy / 2 ^ 96 := by
     rw [cast_u128_u64_val, hiv, Nat.mod_eq_of_lt (by omega)]
   step*
@@ -168,7 +172,7 @@ theorem sum_split (L : List (goldilocks.Goldilocks × goldilocks.Goldilocks)) :
 /-- The low parts sum to at most `n (2^96 - 1)`. -/
 theorem sum_low_lt (L : List (goldilocks.Goldilocks × goldilocks.Goldilocks)) :
     (L.map (fun xy => prodVal xy % 2 ^ 96)).sum ≤ L.length * (2 ^ 96 - 1) := by
-  have := List.sum_le_card_nsmul (L.map (fun xy => prodVal xy % 2 ^ 96)) (2 ^ 96 - 1)
+  have := List.sum_le_length_nsmul (L.map (fun xy => prodVal xy % 2 ^ 96)) (2 ^ 96 - 1)
     (fun y hy => by
       obtain ⟨x, -, rfl⟩ := List.mem_map.mp hy
       have := Nat.mod_lt (prodVal x) (show 0 < 2 ^ 96 by norm_num); omega)
@@ -177,7 +181,7 @@ theorem sum_low_lt (L : List (goldilocks.Goldilocks × goldilocks.Goldilocks)) :
 /-- The top parts sum to at most `n (2^32 - 1)`. -/
 theorem sum_high_le (L : List (goldilocks.Goldilocks × goldilocks.Goldilocks)) :
     (L.map (fun xy => prodVal xy / 2 ^ 96)).sum ≤ L.length * (2 ^ 32 - 1) := by
-  have := List.sum_le_card_nsmul (L.map (fun xy => prodVal xy / 2 ^ 96)) (2 ^ 32 - 1)
+  have := List.sum_le_length_nsmul (L.map (fun xy => prodVal xy / 2 ^ 96)) (2 ^ 32 - 1)
     (fun y hy => by
       obtain ⟨x, -, rfl⟩ := List.mem_map.mp hy
       exact prodVal_hi x)
@@ -215,11 +219,11 @@ theorem dot_product.spec {N : Std.Usize} (lhs rhs : Array goldilocks.Goldilocks 
   have hr : rhs.val.length = N.val := rhs.property
   have hc : (UScalar.cast .U32 N).val = N.val := by
     rw [UScalar.cast_val_eq, UScalarTy.U32_numBits_eq]; omega
-  simp only [lift, bind_tc_ok]
+  simp only [lift, bind_ok]
   step
-  simp only [massert, UScalar.le_equiv, hc, i1_post1, Nat.one_shiftLeft]
-  rw [if_pos (by simp [U32.size, U32.numBits]; omega)]
-  simp only [bind_tc_ok]
+  simp only [massert, UScalar.le_equiv, hc, i1_post, Nat.one_shiftLeft]
+  rw [ite_eq_left (by simp [U32.size, U32.numBits]; omega)]
+  simp only [bind_ok]
   have hidx : ∀ (A : Array goldilocks.Goldilocks N) (i : Std.Usize) (x : goldilocks.Goldilocks),
       A.val[i.val]? = some x → A.index_usize i = .ok x := by
     intro A i x h; unfold Array.index_usize; rw [show A[i]? = some x from h]
@@ -231,14 +235,14 @@ theorem dot_product.spec {N : Std.Usize} (lhs rhs : Array goldilocks.Goldilocks 
   · obtain ⟨x, hx⟩ := List.length_eq_one_iff.mp (by rw [hl, h1]; rfl : lhs.val.length = 1)
     obtain ⟨y, hy⟩ := List.length_eq_one_iff.mp (by rw [hr, h1]; rfl : rhs.val.length = 1)
     rw [hidx lhs 0#usize x (by rw [hx]; rfl), hidx rhs 0#usize y (by rw [hy]; rfl)]
-    simp only [bind_tc_ok]
+    simp only [bind_ok]
     apply WP.spec_mono (mul.field x y)
     intro r h; unfold toField; rw [h, hx, hy]; simp [dotField, toField]
   · obtain ⟨x0, x1, hx⟩ := List.length_eq_two.mp (by rw [hl, h2]; rfl : lhs.val.length = 2)
     obtain ⟨y0, y1, hy⟩ := List.length_eq_two.mp (by rw [hr, h2]; rfl : rhs.val.length = 2)
     rw [hidx lhs 0#usize x0 (by rw [hx]; rfl), hidx rhs 0#usize y0 (by rw [hy]; rfl),
       hidx lhs 1#usize x1 (by rw [hx]; rfl), hidx rhs 1#usize y1 (by rw [hy]; rfl)]
-    simp only [bind_tc_ok]
+    simp only [bind_ok]
     have hp0 := prodVal_lt (x0, y0)
     have hp1 := prodVal_lt (x1, y1)
     simp only [prodVal] at hp0 hp1
@@ -252,11 +256,11 @@ theorem dot_product.spec {N : Std.Usize} (lhs rhs : Array goldilocks.Goldilocks 
     step*
     · rename_i hov
       subst hov
-      have hge := of_decide_eq_true sum_post1.symm
-      clear sum_post1
+      have hge := of_decide_eq_true over_post.symm
+      clear over_post
       unfold toField
       apply natCast_eq_of_mod
-      rw [r_post, sum_corr_post, sum_post2, hoff, long_prod_0_post, long_prod_1_post]
+      rw [r_post, sum_corr_post, sum_post, hoff, long_prod_0_post, long_prod_1_post]
       rw [long_prod_0_post, long_prod_1_post] at hge
       have hA : x0.value.val * y0.value.val ≤ (2 ^ 64 - 1) * (2 ^ 64 - 1) :=
         Nat.mul_le_mul (by have := u64_lt x0.value; omega) (by have := u64_lt y0.value; omega)
@@ -275,12 +279,12 @@ theorem dot_product.spec {N : Std.Usize} (lhs rhs : Array goldilocks.Goldilocks 
     · rename_i hov
       simp only [Bool.not_eq_true] at hov
       subst hov
-      have hlt := of_decide_eq_false sum_post1.symm
-      clear sum_post1
+      have hlt := of_decide_eq_false over_post.symm
+      clear over_post
       rw [long_prod_0_post, long_prod_1_post, not_le] at hlt
       unfold toField
       apply natCast_eq_of_mod
-      rw [r_post, sum_post2, long_prod_0_post, long_prod_1_post, Nat.mod_eq_of_lt hlt]
+      rw [r_post, sum_post, long_prod_0_post, long_prod_1_post, Nat.mod_eq_of_lt hlt]
   · have hL : (List.zip lhs.val rhs.val).length = N.val := by simp [hl, hr]
     have hH := sum_high_le (List.zip lhs.val rhs.val)
     have hA := sum_low_lt (List.zip lhs.val rhs.val)
@@ -299,10 +303,10 @@ theorem dot_product.spec {N : Std.Usize} (lhs rhs : Array goldilocks.Goldilocks 
     all_goals
       have hsz : U128.size = 2 ^ 128 := by simp [U128.size, U128.numBits]
       have hi2 : i2.val = (Hs * 2 ^ 96) % 2 ^ 128 := by
-        rw [i2_post1, cast_u64_u128_val, h2, Nat.shiftLeft_eq, hsz]
+        rw [i2_post, cast_u64_u128_val, h2, Nat.shiftLeft_eq, hsz]
       have hlo : lo.val = Al := by rw [lo_post, h1, hi2, hS]; omega
       have hi3 : (UScalar.cast .U128 i3).val = 18446744069414584321 - Hs := by
-        rw [cast_u64_u128_val, i3_post1, h2]
+        rw [cast_u64_u128_val, i3_post, h2]
     · rw [hlo, hi3]; simp only [U128.max_eq]; omega
     · unfold toField
       rw [natCast_eq_of_mod r_post, sum_post, hlo, hi3, hS]
@@ -322,4 +326,4 @@ theorem dot_product.const_check_truncates (N : Std.Usize) (h : N.val = 2 ^ 32 + 
   rw [UScalar.cast_val_eq, UScalarTy.U32_numBits_eq, h]
   decide
 
-end Plonky3Lean.Proofs.Goldilocks
+end Plonky3Lean.Proofs.P3Goldilocks

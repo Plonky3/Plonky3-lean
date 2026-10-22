@@ -1,24 +1,21 @@
 /-
-# `p3-monty-31`: what p3-baby-bear uses from it that aeneas does not supply
+# `p3-monty-31`: what p3-baby-bear and p3-koala-bear use from it that aeneas does not supply
 
 Most of p3-monty-31 comes from its scoped extraction, `P3Monty31/Extraction/`
 (the `data_traits`, `mds`, `poseidon1`/`poseidon2` parameter traits,
-`MontyField31` itself, `MontyField31::new`, `utils::to_monty`, the `Clone`
-impl). This file holds what that extraction does not produce:
+`MontyField31` itself, `MontyField31::new`, `new_monty`, `new_array`,
+`new_2d_array`, the `Add`/`Sub`/`Mul`/`Neg` impls, the `utils` reductions and
+conversions, the `Clone` impl). This file holds what that extraction does not
+produce:
 
-* `MontyField31::new_array`, `MontyField31::new_2d_array`. They are in the LLBC
-  with bodies, but aeneas drops them without a diagnostic
-  (docs/extractor-issues.md, 4). They are transcribed below: an elementwise
-  `new`, left to right, as the Rust `while` loops are.
-* `MontyField31::new_monty` and the scalar arithmetic impls that wrap the
-  extracted `utils` functions: `Add`, `Sub`, `Mul`, `Neg` and
-  `PrimeCharacteristicRing::halve`. Like `new_array`, charon translates the
-  first five (with bodies) but leaves them out of the declaration order aeneas
-  reads, so they are not emitted (docs/extractor-issues.md, 4). `halve` is
-  not translated at all: it is a provided method of `PrimeCharacteristicRing`
-  that nothing calls, which charon skips even as a root. Each body is one line
-  and is transcribed below; the arithmetic itself (`utils::add`, `sub`,
-  `monty_reduce`, `halve_u32`) is extracted.
+* `PrimeCharacteristicRing::halve`, which wraps the extracted `utils::halve_u32`.
+  charon does not translate it at all: it is a provided method of
+  `PrimeCharacteristicRing` that MontyField31 overrides and nothing calls, which
+  charon skips even as a root (docs/extractor-issues.md, 4). Its body is one line
+  and is transcribed below.
+* squaring, exponentiation, multiplication by powers of two, inversion and the
+  integer conversions (`QuotientMap`), which reach p3-field's trait hierarchy
+  (docs/extractor-issues.md, 9) or implement a generic trait charon cannot root.
 * the `no_packing` Poseidon layer types and their constructor impls. On a
   target with no SIMD these are the layers baby-bear's Poseidon instances use.
   The constructor bodies are one struct literal each and are transcribed.
@@ -26,82 +23,21 @@ impl). This file holds what that extraction does not produce:
   traits are memberless in `P3Monty31.Assumptions.P3Field`, so the witnesses carry no
   content.
 -/
-import P3Monty31.Extraction
-import P3Util
-import P3Poseidon1
-import P3Poseidon2
+module
+
+public import P3Monty31.Extraction
+public import P3Util
+public import P3Poseidon1
+public import P3Poseidon2
+
+@[expose] public section
 open CoreModels Aeneas
 open Aeneas.Std hiding namespace core alloc
 open RustM ControlFlow Error
 
 namespace p3_monty_31
 
-/-- [p3_monty_31::monty_31::MontyField31::new_array]. Upstream:
-`monty-31/src/monty_31.rs:88`, `while i < N { output[i] = Self::new(input[i]) }`.
-The `else` branch is unreachable (`mapM` preserves length); it is a `panic`
-rather than a proof only to keep this a plain transcription. -/
-def monty_31.MontyField31.new_array {MP : Type}
-    (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
-    {N : Std.Usize} (input : Array Std.U32 N) :
-    RustM (Array (monty_31.MontyField31 MP) N) :=
-  input.val.mapM (monty_31.MontyField31.new data_traitsMontyParametersInst) >>=
-    fun l => if h : l.length = N.val then ok ⟨l, h⟩ else fail .panic
-
-/-- [p3_monty_31::monty_31::MontyField31::new_2d_array]. Upstream:
-`monty-31/src/monty_31.rs:101`, `new_array` on each row, left to right. -/
-def monty_31.MontyField31.new_2d_array {MP : Type}
-    (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
-    {N M : Std.Usize} (input : Array (Array Std.U32 N) M) :
-    RustM (Array (Array (monty_31.MontyField31 MP) N) M) :=
-  input.val.mapM (monty_31.MontyField31.new_array data_traitsMontyParametersInst) >>=
-    fun l => if h : l.length = M.val then ok ⟨l, h⟩ else fail .panic
-
 /-! ## Scalar arithmetic (`monty-31/src/monty_31.rs`) -/
-
-/-- [p3_monty_31::monty_31::MontyField31::new_monty]. Upstream line 71:
-`Self { value, _phantom: PhantomData }`, with no reduction. -/
-def monty_31.MontyField31.new_monty {MP : Type}
-    (_data_traitsMontyParametersInst : data_traits.MontyParameters MP) (value : Std.U32) :
-    RustM (monty_31.MontyField31 MP) :=
-  ok { value := value, _phantom := () }
-
-/-- `<MontyField31<FP> as Add>::add`. Upstream line 733:
-`Self::new_monty(add::<FP>(self.value, rhs.value))`. -/
-def monty_31.MontyField31.add {MP : Type}
-    (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
-    (self rhs : monty_31.MontyField31 MP) : RustM (monty_31.MontyField31 MP) := do
-  let v ← utils.add data_traitsMontyParametersInst self.value rhs.value
-  monty_31.MontyField31.new_monty data_traitsMontyParametersInst v
-
-/-- `<MontyField31<FP> as Sub>::sub`. Upstream line 742:
-`Self::new_monty(sub::<FP>(self.value, rhs.value))`. -/
-def monty_31.MontyField31.sub {MP : Type}
-    (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
-    (self rhs : monty_31.MontyField31 MP) : RustM (monty_31.MontyField31 MP) := do
-  let v ← utils.sub data_traitsMontyParametersInst self.value rhs.value
-  monty_31.MontyField31.new_monty data_traitsMontyParametersInst v
-
-/-- `<MontyField31<FP> as Mul>::mul`. Upstream line 760:
-`let long_prod = self.value as u64 * rhs.value as u64;`
-`Self::new_monty(monty_reduce::<FP>(long_prod))`. The `*` is Rust's checked
-`u64` multiplication, as aeneas renders it. -/
-def monty_31.MontyField31.mul {MP : Type}
-    (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
-    (self rhs : monty_31.MontyField31 MP) : RustM (monty_31.MontyField31 MP) := do
-  let i ← lift (UScalar.cast .U64 self.value)
-  let i1 ← lift (UScalar.cast .U64 rhs.value)
-  let long_prod ← i * i1
-  let v ← utils.monty_reduce data_traitsMontyParametersInst long_prod
-  monty_31.MontyField31.new_monty data_traitsMontyParametersInst v
-
-/-- `<MontyField31<FP> as Neg>::neg`. Upstream line 751: `Self::ZERO - self`,
-where `ZERO` is `FP::MONTY_ZERO` (line 214). -/
-def monty_31.MontyField31.neg {FP : Type}
-    (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
-    (self : monty_31.MontyField31 FP) : RustM (monty_31.MontyField31 FP) := do
-  let zero ← data_traitsFieldParametersInst.MONTY_ZERO
-  monty_31.MontyField31.sub
-    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst zero self
 
 /-- `<MontyField31<FP> as PrimeCharacteristicRing>::halve`. Upstream line 225:
 `Self::new_monty(halve_u32::<FP>(self.value))`. -/
@@ -123,7 +59,7 @@ self.dup() * self.dup()
 def monty_31.MontyField31.square {FP : Type}
     (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
     (self : monty_31.MontyField31 FP) : RustM (monty_31.MontyField31 FP) :=
-  monty_31.MontyField31.mul
+  monty_31.MontyField31.Insts.CoreOpsArithMulMontyField31MontyField31.mul
     data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst self self
 
 /-- One iteration of the exponentiation loop, at bit `j` of the exponent.
@@ -137,7 +73,7 @@ def monty_31.MontyField31.exp_u64.step {FP : Type}
     RustM (monty_31.MontyField31 FP × monty_31.MontyField31 FP) := do
   let product ←
     if power.val.testBit j then
-      monty_31.MontyField31.mul
+      monty_31.MontyField31.Insts.CoreOpsArithMulMontyField31MontyField31.mul
         data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
         acc.2 acc.1
     else ok acc.2
@@ -168,22 +104,6 @@ def monty_31.MontyField31.exp_u64 {FP : Type}
     (monty_31.MontyField31.exp_u64.step data_traitsFieldParametersInst power) (self, product)
   ok acc.2
 
-/-- The table of powers of two, in Montgomery form (`monty-31/src/monty_31.rs:115`).
-
-- Entry `0` is the field's one.
-- Entry `i`, for `1 <= i < 64`, is `new_monty(to_monty_64(1 << i))`.
--/
-def monty_31.MontyField31.MONTY_POWERS_OF_TWO {FP : Type}
-    (data_traitsFieldParametersInst : data_traits.FieldParameters FP) :
-    RustM (Array (monty_31.MontyField31 FP) 64#usize) := do
-  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
-  let one ← data_traitsFieldParametersInst.MONTY_ONE
-  let rest ← (List.range' 1 63).mapM fun i => do
-    let v ← utils.to_monty_64 mp ⟨BitVec.ofNat 64 (2 ^ i)⟩
-    monty_31.MontyField31.new_monty mp v
-  (if h : (one :: rest).length = 64 then ok ⟨one :: rest, h⟩ else fail .panic :
-    RustM (Array (monty_31.MontyField31 FP) 64#usize))
-
 /-- Multiplication by `2^exp` (`monty-31/src/monty_31.rs:230`).
 
 - `exp = 0`: the element itself.
@@ -196,15 +116,15 @@ def monty_31.MontyField31.mul_2exp_u64 {FP : Type}
     (self : monty_31.MontyField31 FP) (exp : Std.U64) : RustM (monty_31.MontyField31 FP) := do
   let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
   if exp = 0#u64 then ok self
-  else if exp = 1#u64 then monty_31.MontyField31.add mp self self
+  else if exp = 1#u64 then monty_31.MontyField31.Insts.CoreOpsArithAddMontyField31MontyField31.add mp self self
   else if exp < 64#u64 then do
     let table ← monty_31.MontyField31.MONTY_POWERS_OF_TWO data_traitsFieldParametersInst
     let e ← Array.index_usize table (UScalar.cast .Usize exp)
-    monty_31.MontyField31.mul mp self e
+    monty_31.MontyField31.Insts.CoreOpsArithMulMontyField31MontyField31.mul mp self e
   else do
     let two ← data_traitsFieldParametersInst.MONTY_TWO
     let e ← monty_31.MontyField31.exp_u64 data_traitsFieldParametersInst two exp
-    monty_31.MontyField31.mul mp self e
+    monty_31.MontyField31.Insts.CoreOpsArithMulMontyField31MontyField31.mul mp self e
 
 /-- Inversion (`monty-31/src/monty_31.rs:458`).
 

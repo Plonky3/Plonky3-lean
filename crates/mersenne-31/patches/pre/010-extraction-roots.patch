@@ -27,6 +27,9 @@
 # Nor are those that reach `core::iter` (`sum_array`, `Sum`).
 # aeneas rejects p3-field's trait hierarchy (issue 9) and fails on `core::iter` (issue 11).
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/mersenne-31/src/hax_roots.rs b/mersenne-31/src/hax_roots.rs
 new file mode 100644
 index 00000000..e2dfdf66

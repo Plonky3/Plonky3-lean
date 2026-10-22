@@ -27,12 +27,6 @@ open Lean Elab Command in
 #eval show CommandElabM Unit from do
   let env ← getEnv
   let theorems := env.constants.toList.filter fun (_, ci) => ci matches .thmInfo _
-  -- A `private` theorem is named `_private.<module>.0.<name>`. One in
-  -- `Plonky3Lean.Claims` reads as a claim, so it is reported, and rejected.
-  for (n, _) in theorems do
-    if let some u := privateToUserName? n then
-      if (`Plonky3Lean.Claims).isPrefixOf u then
-        IO.println s!"PRIVATE\\t{u}"
   let inClaims := theorems.filter fun (n, _) => (`Plonky3Lean.Claims).isPrefixOf n
   let names : NameSet := inClaims.foldl (fun s (n, _) => s.insert n) {}
   -- Fail closed: a theorem is skipped as auxiliary only when its name has an
@@ -47,6 +41,14 @@ open Lean Elab Command in
     | .anonymous => false
     | p@(.str q _) | p@(.num q _) => names.contains p || underClaim q
   let aux (n : Name) : Bool := internal n && underClaim n.getPrefix
+  -- A `private` theorem is named `_private.<module>.0.<name>`. One in
+  -- `Plonky3Lean.Claims` reads as a claim, so it is reported, and rejected,
+  -- unless it is auxiliary to a claim by the rule above: in a module, Lean makes
+  -- a claim's `_proof_1` private.
+  for (n, _) in theorems do
+    if let some u := privateToUserName? n then
+      if (`Plonky3Lean.Claims).isPrefixOf u && !aux u then
+        IO.println s!"PRIVATE\\t{u}"
   let claims := inClaims.filter fun (n, _) => !aux n
   for (n, _) in claims.toArray.qsort (fun a b => a.1.toString < b.1.toString) do
     let axs ← liftCoreM (Lean.collectAxioms n)

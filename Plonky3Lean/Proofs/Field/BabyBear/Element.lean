@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.BabyBear
+module
+
+public import Plonky3Lean.Proofs.Field.BabyBear
+
+@[expose] public section
 
 /-!
 # BabyBear: what the constructors produce, as field elements
@@ -14,7 +18,7 @@ open p3_baby_bear
 open Plonky3Lean.Spec.BabyBear
 open Plonky3Lean.Lib
 
-namespace Plonky3Lean.Proofs.BabyBear
+namespace Plonky3Lean.Proofs.P3BabyBear
 
 theorem two_pow_32_ne_zero : (2 ^ 32 : BabyBear.Field) ≠ 0 := by decide
 
@@ -58,18 +62,14 @@ theorem forall₂_newRel {l : List Std.U32} {l' : List Element}
     · simp [hxy.2, ih.2]
 
 /-- `BabyBear::new_array` applies `new` elementwise: every output is canonical,
-and the outputs stand for the inputs mod `p`. About the hand-written
-transcription of `new_array`. -/
+and the outputs stand for the inputs mod `p`. -/
 theorem baby_bear.BabyBear.new_array.toField {N : Std.Usize} (input : Array Std.U32 N) :
     p3_monty_31.monty_31.MontyField31.new_array MontyParams input
       ⦃ r => (∀ y ∈ r.val, Canonical y) ∧
-        r.val.map Spec.BabyBear.toField = input.val.map (fun x => (x.val : BabyBear.Field)) ⦄ := by
-  obtain ⟨l', hl', hall⟩ := mapM_forall₂ _ NewRel baby_bear.BabyBear.new.toField input.val
-  have hlen : l'.length = N.val := by rw [← hall.length_eq]; exact input.property
-  unfold p3_monty_31.monty_31.MontyField31.new_array
-  rw [hl']
-  simp only [bind_tc_ok, hlen, _root_.dite_true]
-  exact (Aeneas.Std.WP.spec_ok _).mpr (forall₂_newRel hall)
+        r.val.map Spec.BabyBear.toField = input.val.map (fun x => (x.val : BabyBear.Field)) ⦄ :=
+  Aeneas.Std.WP.spec_mono (baby_bear.BabyBear.new_array.montgomery_form input)
+    (fun _ h => forall₂_newRel
+      (h.imp fun _ _ hm => ⟨canonical_of_value hm, toField_eq_of_value hm⟩))
 
 /-- What `new_array` does to one row, as a relation between input and output. -/
 def NewArrayRel {N : Std.Usize} (x : Array Std.U32 N) (r : Array Element N) : Prop :=
@@ -92,20 +92,15 @@ theorem forall₂_newArrayRel {N : Std.Usize} {l : List (Array Std.U32 N)}
     · simp [hxy.2, ih.2]
 
 /-- `BabyBear::new_2d_array` applies `new_array` to each row: every output is
-canonical, and the outputs stand for the inputs mod `p`. About the hand-written
-transcription of `new_2d_array`. -/
+canonical, and the outputs stand for the inputs mod `p`. -/
 theorem baby_bear.BabyBear.new_2d_array.toField {N M : Std.Usize}
     (input : Array (Array Std.U32 N) M) :
     p3_monty_31.monty_31.MontyField31.new_2d_array MontyParams input
       ⦃ r => (∀ row ∈ r.val, ∀ y ∈ row.val, Canonical y) ∧
         r.val.map (fun row => row.val.map Spec.BabyBear.toField) =
-          input.val.map (fun row => row.val.map (fun x => (x.val : BabyBear.Field))) ⦄ := by
-  obtain ⟨l', hl', hall⟩ :=
-    mapM_forall₂ _ NewArrayRel baby_bear.BabyBear.new_array.toField input.val
-  have hlen : l'.length = M.val := by rw [← hall.length_eq]; exact input.property
-  unfold p3_monty_31.monty_31.MontyField31.new_2d_array
-  rw [hl']
-  simp only [bind_tc_ok, hlen, _root_.dite_true]
-  exact (Aeneas.Std.WP.spec_ok _).mpr (forall₂_newArrayRel hall)
+          input.val.map (fun row => row.val.map (fun x => (x.val : BabyBear.Field))) ⦄ :=
+  Aeneas.Std.WP.spec_mono (baby_bear.BabyBear.new_2d_array.montgomery_form input)
+    (fun _ h => forall₂_newArrayRel (h.imp fun _ _ hrow => forall₂_newRel
+      (hrow.imp fun _ _ hm => ⟨canonical_of_value hm, toField_eq_of_value hm⟩)))
 
-end Plonky3Lean.Proofs.BabyBear
+end Plonky3Lean.Proofs.P3BabyBear

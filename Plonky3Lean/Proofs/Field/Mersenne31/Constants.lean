@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.Mersenne31.Field
+module
+
+public import Plonky3Lean.Proofs.Field.Mersenne31.Field
+
+@[expose] public section
 
 /-!
 # Mersenne31: the constants, as field elements
@@ -9,19 +13,31 @@ open p3_mersenne_31
 open Plonky3Lean.Spec.Mersenne31 Plonky3Lean.Lib
 open Polynomial
 
-namespace Plonky3Lean.Proofs.Mersenne31
+namespace Plonky3Lean.Proofs.P3Mersenne31
 
 /-- A stored value, for writing tables. -/
 def e (v : Std.U32) : Element := ⟨v⟩
 
 /-! ## Base-field constants -/
 
+/-- `new v` on a literal below `p` stores it unchanged. -/
+theorem new_eq (v : Std.U32) (h : v.val < 2147483647) : mersenne_31.Mersenne31.new v = .ok (e v) :=
+  eq_ok_of_spec (WP.spec_mono (new.spec v) fun r hr => by
+    obtain ⟨w⟩ := r
+    unfold e; congr 1; apply UScalar.eq_of_val_eq; rw [show w.val = _ from hr, Nat.mod_eq_of_lt h])
+
+/-- `new_reduced v` on a literal below `2^31` stores it unchanged. -/
+theorem new_reduced_eq (v : Std.U32) (h : v.val < 2 ^ 31) :
+    mersenne_31.Mersenne31.new_reduced v = .ok (e v) :=
+  eq_ok_of_spec (WP.spec_mono (new_reduced.spec v h) fun r hr => by unfold e; rw [← hr])
+
+
 theorem ORDER_U32.eq_fieldSize : (2147483647#u32).val = Mersenne31.fieldSize := rfl
 
 theorem GENERATOR.eq :
     mersenne_31.Mersenne31.Insts.P3_fieldFieldField.GENERATOR = .ok (e 7#u32) := by
-  unfold mersenne_31.Mersenne31.Insts.P3_fieldFieldField.GENERATOR mersenne_31.Mersenne31.new
-  rw [mersenne_31.P.eq]; rfl
+  unfold mersenne_31.Mersenne31.Insts.P3_fieldFieldField.GENERATOR
+  simp (config := { decide := true }) only [new_eq]
 
 theorem GENERATOR.toField :
     mersenne_31.Mersenne31.Insts.P3_fieldFieldField.GENERATOR ⦃ g =>
@@ -146,17 +162,17 @@ def circleTable : Array (Array Element 2#usize) 32#usize :=
 
 theorem EXT_TWO_ADIC_GENERATORS.eq :
     mersenne_31.Mersenne31.EXT_TWO_ADIC_GENERATORS = .ok extTable := by
-  unfold mersenne_31.Mersenne31.EXT_TWO_ADIC_GENERATORS mersenne_31.Mersenne31.new
+  unfold mersenne_31.Mersenne31.EXT_TWO_ADIC_GENERATORS
     mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.ONE
     mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.ZERO
-  rw [mersenne_31.P.eq]
+  simp (config := { decide := true }) only [new_eq, bind_ok]
   rfl
 
 theorem CIRCLE_TWO_ADIC_GENERATORS.eq :
     complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS = .ok circleTable := by
   unfold complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS complex.new_complex_new
-    mersenne_31.Mersenne31.new
-  rw [mersenne_31.P.eq]
+  simp (config := { decide := true }) only [new_eq, bind_ok, bind_tc_ok, pure_tc_eq,
+    List.mapM_cons, List.mapM_nil]
   rfl
 
 theorem extTable_vals :
@@ -221,10 +237,10 @@ theorem ext_two_adic_generator.order (bits : Std.Usize) :
   by_cases h : bits.val ≤ 32
   · left
     have hb : bits ≤ 32#usize := by scalar_tac
-    simp only [hb, massert, if_true, bind_tc_ok]
+    simp only [hb, massert, ite_true, bind_ok]
     step*
     refine ⟨h, ?_⟩
-    rw [c_post2]
+    rw [c_post1]
     exact extTable_order bits.val (by omega)
   · right
     refine ⟨by omega, ?_⟩
@@ -250,10 +266,10 @@ theorem circle_two_adic_generator.order (bits : Std.Usize) :
   by_cases h : bits.val ≤ 31
   · left
     have hb : bits ≤ 31#usize := by scalar_tac
-    simp only [hb, massert, if_true, bind_tc_ok]
+    simp only [hb, massert, ite_true, bind_ok]
     step*
     refine ⟨h, ?_⟩
-    rw [c_post2]
+    rw [c_post1]
     exact circleTable_order bits.val (by omega)
   · right
     refine ⟨by omega, ?_⟩
@@ -266,9 +282,10 @@ theorem toComplex_pair (a b : Std.U32) :
 
 theorem COMPLEX_GENERATOR.eq :
     complex.Mersenne31.COMPLEX_GENERATOR = .ok (Array.make 2#usize [e 12#u32, e 1#u32]) := by
-  unfold complex.Mersenne31.COMPLEX_GENERATOR mersenne_31.Mersenne31.new
+  unfold complex.Mersenne31.COMPLEX_GENERATOR
     mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.ONE
-  rw [mersenne_31.P.eq]; rfl
+  simp (config := { decide := true }) only [new_eq, bind_ok]
+  all_goals rfl
 
 /-- `COMPLEX_GENERATOR` is `12 + i`, which generates the multiplicative group of `F[i]`. -/
 theorem COMPLEX_GENERATOR.order :
@@ -298,18 +315,20 @@ theorem QUADRATIC_DTH_ROOT.toComplex :
         ((Mersenne31.fieldSize ^ 2 - 1) / 2) ⦄ := by
   have h : extension.Mersenne31.QUADRATIC_DTH_ROOT =
       .ok (Array.make 2#usize [e 2147483646#u32, e 0#u32]) := by
-    unfold extension.Mersenne31.QUADRATIC_DTH_ROOT mersenne_31.Mersenne31.new
+    unfold extension.Mersenne31.QUADRATIC_DTH_ROOT
       mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.ZERO
-    rw [mersenne_31.P.eq]; rfl
+    simp (config := { decide := true }) only [new_eq, bind_ok]
+    all_goals rfl
   rw [h, WP.spec_ok, toComplex_pair, QUADRATIC_W.toComplex, Mersenne31.mk_two_one_pow_dth,
     ← Mersenne31.Complex.mk_neg_one]
   congr 1
 
 theorem CUBIC_W.eq :
     extension.Mersenne31.CUBIC_W = .ok (Array.make 2#usize [e 0#u32, e 5#u32]) := by
-  unfold extension.Mersenne31.CUBIC_W mersenne_31.Mersenne31.new
+  unfold extension.Mersenne31.CUBIC_W
     mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.ZERO
-  rw [mersenne_31.P.eq]; rfl
+  simp (config := { decide := true }) only [new_eq, bind_ok]
+  all_goals rfl
 
 /-- `W = 5i` of the cubic extension of `F[i]` is not a cube, so `Y^3 - W` is irreducible. -/
 theorem CUBIC_W.irreducible :
@@ -323,9 +342,10 @@ theorem CUBIC_DTH_ROOT.toComplex :
       Mersenne31.Complex.mk 0 5 ^ ((Mersenne31.fieldSize ^ 2 - 1) / 3) ⦄ := by
   have h : extension.Mersenne31.CUBIC_DTH_ROOT =
       .ok (Array.make 2#usize [e 634005911#u32, e 0#u32]) := by
-    unfold extension.Mersenne31.CUBIC_DTH_ROOT mersenne_31.Mersenne31.new
+    unfold extension.Mersenne31.CUBIC_DTH_ROOT
       mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.ZERO
-    rw [mersenne_31.P.eq]; rfl
+    simp (config := { decide := true }) only [new_eq, bind_ok]
+    all_goals rfl
   rw [h, WP.spec_ok, toComplex_pair, Mersenne31.mk_zero_five_pow_dth, Mersenne31.Complex.of_eq_mk]
   rfl
 
@@ -337,9 +357,9 @@ theorem QUADRATIC_EXT_TWO_ADIC_GENERATOR_33.order :
       .ok (Array.make 2#usize [Array.make 2#usize [e 0#u32, e 0#u32],
         Array.make 2#usize [e 1437746044#u32, e 946469285#u32]]) := by
     unfold extension.Mersenne31.QUADRATIC_EXT_TWO_ADIC_GENERATOR_33
-      mersenne_31.Mersenne31.new_reduced
       mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.ZERO
-    rfl
+    simp (config := { decide := true }) only [new_reduced_eq, bind_ok]
+    all_goals rfl
   rw [h, WP.spec_ok]
   have hq : toQM31 (Array.make 2#usize [Array.make 2#usize [e 0#u32, e 0#u32],
       Array.make 2#usize [e 1437746044#u32, e 946469285#u32]]) = Mersenne31.qm31TwoAdicGenerator := by
@@ -365,8 +385,7 @@ theorem CUBIC_BASE_W.irreducible :
         Irreducible (X ^ 3 - C (Spec.Mersenne31.toField w)) ⦄ := by
   have h : mersenne_31.Mersenne31.Insts.P3_fieldExtensionBinomiallyExtendable3.W = .ok (e 5#u32) := by
     unfold mersenne_31.Mersenne31.Insts.P3_fieldExtensionBinomiallyExtendable3.W
-      mersenne_31.Mersenne31.new
-    rw [mersenne_31.P.eq]; rfl
+    simp (config := { decide := true }) only [new_eq]
   rw [h, WP.spec_ok]
   have h5 : Spec.Mersenne31.toField (e 5#u32) = 5 := by unfold Spec.Mersenne31.toField e; decide
   exact ⟨by unfold Canonical e; decide, h5, h5 ▸ Mersenne31.irreducible_ext3⟩
@@ -379,8 +398,7 @@ theorem CUBIC_BASE_DTH_ROOT.toField :
   have h : mersenne_31.Mersenne31.Insts.P3_fieldExtensionBinomiallyExtendable3.DTH_ROOT =
       .ok (e 1513477735#u32) := by
     unfold mersenne_31.Mersenne31.Insts.P3_fieldExtensionBinomiallyExtendable3.DTH_ROOT
-      mersenne_31.Mersenne31.new
-    rw [mersenne_31.P.eq]; rfl
+    simp (config := { decide := true }) only [new_eq]
   rw [h, WP.spec_ok, Mersenne31.five_pow_div_three]
   have hd : Spec.Mersenne31.toField (e 1513477735#u32) = 1513477735 := by
     unfold Spec.Mersenne31.toField e; decide
@@ -394,9 +412,10 @@ theorem CUBIC_BASE_EXT_GENERATOR.order :
   have h : mersenne_31.Mersenne31.Insts.P3_fieldExtensionBinomiallyExtendable3.EXT_GENERATOR =
       .ok (Array.make 3#usize [e 10#u32, e 1#u32, e 0#u32]) := by
     unfold mersenne_31.Mersenne31.Insts.P3_fieldExtensionBinomiallyExtendable3.EXT_GENERATOR
-      mersenne_31.Mersenne31.new mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.ONE
+      mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.ONE
       mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.ZERO
-    rw [mersenne_31.P.eq]; rfl
+    simp (config := { decide := true }) only [new_eq, bind_ok]
+    all_goals rfl
   rw [h, WP.spec_ok]
   have hc : toCubic (Array.make 3#usize [e 10#u32, e 1#u32, e 0#u32]) =
       AdjoinRoot.mk (X ^ 3 - C (5 : Mersenne31.Field)) (CoeffList.toPoly [10, 1, 0]) := by
@@ -404,4 +423,4 @@ theorem CUBIC_BASE_EXT_GENERATOR.order :
     congr 2
   rw [hc]; exact Mersenne31.orderOf_ext3Generator
 
-end Plonky3Lean.Proofs.Mersenne31
+end Plonky3Lean.Proofs.P3Mersenne31

@@ -1,57 +1,61 @@
-import Plonky3Lean.Lib
-import Plonky3Lean.Proofs.Field.BabyBear
-import Plonky3Lean.Proofs.Field.BabyBear.Arith
-import Plonky3Lean.Proofs.Field.BabyBear.Constants
-import Plonky3Lean.Proofs.Field.BabyBear.Element
-import Plonky3Lean.Proofs.Field.BabyBear.Extension
-import Plonky3Lean.Proofs.Field.BabyBear.Generic
-import Plonky3Lean.Proofs.Field.Binary.Clmul
-import Plonky3Lean.Proofs.Field.Binary.Compact
-import Plonky3Lean.Proofs.Field.Binary.Ghash
-import Plonky3Lean.Proofs.Field.Binary.MaskedMul
-import Plonky3Lean.Proofs.Field.Binary.Poly192
-import Plonky3Lean.Proofs.Field.Binary.Poly192Irreducible
-import Plonky3Lean.Proofs.Field.Binary.Poly64
-import Plonky3Lean.Proofs.Field.Binary.Poly64Field
-import Plonky3Lean.Proofs.Field.Binary.Poly64Irreducible
-import Plonky3Lean.Proofs.Field.Binary.Poly64Sqrt
-import Plonky3Lean.Proofs.Field.Binary.Statements
-import Plonky3Lean.Proofs.Field.Binary.Tables
-import Plonky3Lean.Proofs.Field.Goldilocks.Arith
-import Plonky3Lean.Proofs.Field.Goldilocks.Basic
-import Plonky3Lean.Proofs.Field.Goldilocks.Constants
-import Plonky3Lean.Proofs.Field.Goldilocks.Convert
-import Plonky3Lean.Proofs.Field.Goldilocks.Field
-import Plonky3Lean.Proofs.Field.Goldilocks.Inverse
-import Plonky3Lean.Proofs.Field.Goldilocks.PowersOfTwo
-import Plonky3Lean.Proofs.Field.Goldilocks.Sum
-import Plonky3Lean.Proofs.Field.KoalaBear
-import Plonky3Lean.Proofs.Field.KoalaBear.Arith
-import Plonky3Lean.Proofs.Field.KoalaBear.Constants
-import Plonky3Lean.Proofs.Field.KoalaBear.Extension
-import Plonky3Lean.Proofs.Field.KoalaBear.Generic
-import Plonky3Lean.Proofs.Field.KoalaBear.Poseidon
-import Plonky3Lean.Proofs.Field.Mersenne31.Basic
-import Plonky3Lean.Proofs.Field.Mersenne31.Complex
-import Plonky3Lean.Proofs.Field.Mersenne31.Constants
-import Plonky3Lean.Proofs.Field.Mersenne31.Conversions
-import Plonky3Lean.Proofs.Field.Mersenne31.DotProduct
-import Plonky3Lean.Proofs.Field.Mersenne31.DotProductLoop
-import Plonky3Lean.Proofs.Field.Mersenne31.Field
-import Plonky3Lean.Proofs.Field.Mersenne31.Inverse
-import Plonky3Lean.Proofs.Field.Mersenne31.NewArray
-import Plonky3Lean.Proofs.Field.Mersenne31.Sum
-import Plonky3Lean.Proofs.Field.Monty31.Arith
-import Plonky3Lean.Proofs.Field.Monty31.Convert
-import Plonky3Lean.Proofs.Field.Monty31.Element
-import Plonky3Lean.Proofs.Field.Monty31.Findings
-import Plonky3Lean.Proofs.Field.Monty31.Inverse
-import Plonky3Lean.Proofs.Field.Monty31.PowersOfTwo
-import Plonky3Lean.Proofs.Field.Monty31.QuotientMap
-import Plonky3Lean.Proofs.Field.Monty31.Reduce
-import Plonky3Lean.Proofs.Field.Monty31.Utils
-import Plonky3Lean.Proofs.Util.GcdInversion
-import Plonky3Lean.Spec
+module
+
+public import Plonky3Lean.Lib
+public import Plonky3Lean.Proofs.Field.BabyBear
+public import Plonky3Lean.Proofs.Field.BabyBear.Arith
+public import Plonky3Lean.Proofs.Field.BabyBear.Constants
+public import Plonky3Lean.Proofs.Field.BabyBear.Element
+public import Plonky3Lean.Proofs.Field.BabyBear.Extension
+public import Plonky3Lean.Proofs.Field.BabyBear.Generic
+public import Plonky3Lean.Proofs.Field.Binary.Clmul
+public import Plonky3Lean.Proofs.Field.Binary.Compact
+public import Plonky3Lean.Proofs.Field.Binary.Ghash
+public import Plonky3Lean.Proofs.Field.Binary.MaskedMul
+public import Plonky3Lean.Proofs.Field.Binary.Poly192
+public import Plonky3Lean.Proofs.Field.Binary.Poly192Irreducible
+public import Plonky3Lean.Proofs.Field.Binary.Poly64
+public import Plonky3Lean.Proofs.Field.Binary.Poly64Field
+public import Plonky3Lean.Proofs.Field.Binary.Poly64Irreducible
+public import Plonky3Lean.Proofs.Field.Binary.Poly64Sqrt
+public import Plonky3Lean.Proofs.Field.Binary.Statements
+public import Plonky3Lean.Proofs.Field.Binary.Tables
+public import Plonky3Lean.Proofs.Field.Goldilocks.Arith
+public import Plonky3Lean.Proofs.Field.Goldilocks.Basic
+public import Plonky3Lean.Proofs.Field.Goldilocks.Constants
+public import Plonky3Lean.Proofs.Field.Goldilocks.Convert
+public import Plonky3Lean.Proofs.Field.Goldilocks.Field
+public import Plonky3Lean.Proofs.Field.Goldilocks.Inverse
+public import Plonky3Lean.Proofs.Field.Goldilocks.PowersOfTwo
+public import Plonky3Lean.Proofs.Field.Goldilocks.Sum
+public import Plonky3Lean.Proofs.Field.KoalaBear
+public import Plonky3Lean.Proofs.Field.KoalaBear.Arith
+public import Plonky3Lean.Proofs.Field.KoalaBear.Constants
+public import Plonky3Lean.Proofs.Field.KoalaBear.Extension
+public import Plonky3Lean.Proofs.Field.KoalaBear.Generic
+public import Plonky3Lean.Proofs.Field.KoalaBear.Poseidon
+public import Plonky3Lean.Proofs.Field.Mersenne31.Basic
+public import Plonky3Lean.Proofs.Field.Mersenne31.Complex
+public import Plonky3Lean.Proofs.Field.Mersenne31.Constants
+public import Plonky3Lean.Proofs.Field.Mersenne31.Conversions
+public import Plonky3Lean.Proofs.Field.Mersenne31.DotProduct
+public import Plonky3Lean.Proofs.Field.Mersenne31.DotProductLoop
+public import Plonky3Lean.Proofs.Field.Mersenne31.Field
+public import Plonky3Lean.Proofs.Field.Mersenne31.Inverse
+public import Plonky3Lean.Proofs.Field.Mersenne31.NewArray
+public import Plonky3Lean.Proofs.Field.Mersenne31.Sum
+public import Plonky3Lean.Proofs.Field.Monty31.Arith
+public import Plonky3Lean.Proofs.Field.Monty31.Convert
+public import Plonky3Lean.Proofs.Field.Monty31.Element
+public import Plonky3Lean.Proofs.Field.Monty31.Findings
+public import Plonky3Lean.Proofs.Field.Monty31.Inverse
+public import Plonky3Lean.Proofs.Field.Monty31.PowersOfTwo
+public import Plonky3Lean.Proofs.Field.Monty31.QuotientMap
+public import Plonky3Lean.Proofs.Field.Monty31.Reduce
+public import Plonky3Lean.Proofs.Field.Monty31.Utils
+public import Plonky3Lean.Proofs.Util.GcdInversion
+public import Plonky3Lean.Spec
+
+@[expose] public section
 
 /-!
 # Proofs

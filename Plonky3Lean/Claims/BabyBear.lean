@@ -1,11 +1,15 @@
-import CompPoly.Fields.BabyBear
-import Plonky3Lean.Proofs.Field.BabyBear
-import Plonky3Lean.Proofs.Field.BabyBear.Arith
-import Plonky3Lean.Proofs.Field.BabyBear.Constants
-import Plonky3Lean.Proofs.Field.BabyBear.Element
-import Plonky3Lean.Proofs.Field.BabyBear.Extension
-import Plonky3Lean.Proofs.Field.BabyBear.Generic
-import ToCompPoly.Fields.BabyBear.Extension
+module
+
+public import CompPoly.Fields.BabyBear
+public import Plonky3Lean.Proofs.Field.BabyBear
+public import Plonky3Lean.Proofs.Field.BabyBear.Arith
+public import Plonky3Lean.Proofs.Field.BabyBear.Constants
+public import Plonky3Lean.Proofs.Field.BabyBear.Element
+public import Plonky3Lean.Proofs.Field.BabyBear.Extension
+public import Plonky3Lean.Proofs.Field.BabyBear.Generic
+public import ToCompPoly.Fields.BabyBear.Extension
+
+@[expose] public section
 
 /-!
 # BabyBear: claims
@@ -34,7 +38,7 @@ open Aeneas Aeneas.Std CoreModels
 open p3_baby_bear
 open Plonky3Lean.Spec.BabyBear
 
-namespace Plonky3Lean.Claims.BabyBear
+namespace Plonky3Lean.Claims.P3BabyBear
 
 /-! ## `BabyBearParameters`: the trait instances return these constants
 
@@ -49,25 +53,25 @@ values that generic code sees. -/
 generated `MontyParameters` instance returns `PRIME`, without failing. -/
 theorem baby_bear.BabyBearParameters.PRIME.from_instance :
     MontyParams.PRIME = .ok PRIME :=
-  Proofs.BabyBear.baby_bear.BabyBearParameters.PRIME.from_instance
+  Proofs.P3BabyBear.baby_bear.BabyBearParameters.PRIME.from_instance
 
 /-- Reading `<BabyBearParameters as MontyParameters>::MONTY_MU` through the
 generated `MontyParameters` instance returns `MONTY_MU`, without failing. -/
 theorem baby_bear.BabyBearParameters.MONTY_MU.from_instance :
     MontyParams.MONTY_MU = .ok MONTY_MU :=
-  Proofs.BabyBear.baby_bear.BabyBearParameters.MONTY_MU.from_instance
+  Proofs.P3BabyBear.baby_bear.BabyBearParameters.MONTY_MU.from_instance
 
 /-- Reading `<BabyBearParameters as MontyParameters>::MONTY_BITS` through the
 generated `MontyParameters` instance returns `MONTY_BITS`, without failing. -/
 theorem baby_bear.BabyBearParameters.MONTY_BITS.from_instance :
     MontyParams.MONTY_BITS = .ok MONTY_BITS :=
-  Proofs.BabyBear.baby_bear.BabyBearParameters.MONTY_BITS.from_instance
+  Proofs.P3BabyBear.baby_bear.BabyBearParameters.MONTY_BITS.from_instance
 
 /-- Reading `TWO_ADICITY` through the generated `TwoAdicData` instance of
 `BabyBearParameters` returns `TWO_ADICITY`, without failing. -/
 theorem baby_bear.BabyBearParameters.TWO_ADICITY.from_instance :
     TwoAdicParams.TWO_ADICITY = .ok TWO_ADICITY :=
-  Proofs.BabyBear.baby_bear.BabyBearParameters.TWO_ADICITY.from_instance
+  Proofs.P3BabyBear.baby_bear.BabyBearParameters.TWO_ADICITY.from_instance
 
 /-! ## `BabyBearParameters`: the constants against the specification
 
@@ -80,13 +84,13 @@ CompPoly's `BabyBear.fieldSize`, `2^31 - 2^27 + 1 = 2013265921`: the extracted
 field and the specified one have the same order. -/
 theorem baby_bear.BabyBearParameters.PRIME.eq_fieldSize :
     PRIME.val = BabyBear.fieldSize :=
-  Proofs.BabyBear.baby_bear.BabyBearParameters.PRIME.eq_fieldSize
+  Proofs.P3BabyBear.baby_bear.BabyBearParameters.PRIME.eq_fieldSize
 
 /-- The modulus `PRIME` is a prime number, so the integers modulo it form a
 field. The proof uses CompPoly's Pratt certificate for `BabyBear.fieldSize`. -/
 theorem baby_bear.BabyBearParameters.PRIME.is_prime :
     Nat.Prime PRIME.val :=
-  Proofs.BabyBear.baby_bear.BabyBearParameters.PRIME.is_prime
+  Proofs.P3BabyBear.baby_bear.BabyBearParameters.PRIME.is_prime
 
 /-- `gcd(7, p - 1) = 1` for the modulus `p = PRIME`. This is the fact behind
 BabyBear's `RelativelyPrimePower<7>` impl, which Poseidon's S-box relies on:
@@ -94,7 +98,7 @@ it makes `x ↦ x^7` a permutation of the field. (`3` does not work for
 BabyBear, since `p - 1 = 2^27 · 3 · 5`.) -/
 theorem baby_bear.BabyBearParameters.PRIME.coprime_seven_pred :
     Nat.Coprime 7 (PRIME.val - 1) :=
-  Proofs.BabyBear.baby_bear.BabyBearParameters.PRIME.coprime_seven_pred
+  Proofs.P3BabyBear.baby_bear.BabyBearParameters.PRIME.coprime_seven_pred
 
 /-- `MONTY_BITS` is `32`: Montgomery form uses the radix `R = 2^32`, which is
 what `MontyField31::new` asserts. Both sides come from the extraction, so this
@@ -102,20 +106,20 @@ checks that the constant was extracted correctly, not anything about the
 field. -/
 theorem baby_bear.BabyBearParameters.MONTY_BITS.val_eq_32 :
     MONTY_BITS.val = 32 :=
-  Proofs.BabyBear.baby_bear.BabyBearParameters.MONTY_BITS.val_eq_32
+  Proofs.P3BabyBear.baby_bear.BabyBearParameters.MONTY_BITS.val_eq_32
 
 /-- `MONTY_MU` (`0x88000001`) is the inverse of `PRIME` modulo `2^32`:
 `PRIME · MONTY_MU ≡ 1 (mod 2^32)`. This is the precondition of Montgomery
 reduction, and one of the four assertions in `MontyField31::new`. -/
 theorem baby_bear.BabyBearParameters.MONTY_MU.inverse :
     (PRIME.val * MONTY_MU.val) % (2 ^ 32) = 1 :=
-  Proofs.BabyBear.baby_bear.BabyBearParameters.MONTY_MU.inverse
+  Proofs.P3BabyBear.baby_bear.BabyBearParameters.MONTY_MU.inverse
 
 /-- `TWO_ADICITY` is CompPoly's `BabyBear.twoAdicity`, `27`: the extracted and
 the specified two-adicity agree. -/
 theorem baby_bear.BabyBearParameters.TWO_ADICITY.eq_twoAdicity :
     TWO_ADICITY.val = BabyBear.twoAdicity :=
-  Proofs.BabyBear.baby_bear.BabyBearParameters.TWO_ADICITY.eq_twoAdicity
+  Proofs.P3BabyBear.baby_bear.BabyBearParameters.TWO_ADICITY.eq_twoAdicity
 
 /-- `p - 1 = 2^TWO_ADICITY · 15` for the modulus `p = PRIME`. So the field's
 multiplicative group has a subgroup of order `2^TWO_ADICITY`, which is the
@@ -124,14 +128,14 @@ this on its own does not say that `TWO_ADICITY` is the largest such exponent;
 `TWO_ADICITY.maximal` does. -/
 theorem baby_bear.BabyBearParameters.TWO_ADICITY.factorization :
     PRIME.val - 1 = 2 ^ TWO_ADICITY.val * 15 :=
-  Proofs.BabyBear.baby_bear.BabyBearParameters.TWO_ADICITY.factorization
+  Proofs.P3BabyBear.baby_bear.BabyBearParameters.TWO_ADICITY.factorization
 
 /-- `2^(TWO_ADICITY + 1)` does not divide `p - 1`, so `2^TWO_ADICITY` is the
 largest power of two that divides `p - 1`: `TWO_ADICITY` is exactly the field's
 two-adicity, not merely a lower bound for it. -/
 theorem baby_bear.BabyBearParameters.TWO_ADICITY.maximal :
     ¬ 2 ^ (TWO_ADICITY.val + 1) ∣ PRIME.val - 1 :=
-  Proofs.BabyBear.baby_bear.BabyBearParameters.TWO_ADICITY.maximal
+  Proofs.P3BabyBear.baby_bear.BabyBearParameters.TWO_ADICITY.maximal
 
 /-! ## The `BabyBear` constructors
 
@@ -151,25 +155,21 @@ for BabyBear. -/
 theorem baby_bear.BabyBear.new.montgomery_form (x : Std.U32) :
     p3_monty_31.monty_31.MontyField31.new MontyParams x
       ⦃ r => r.value.val = x.val * 2 ^ 32 % BabyBear.fieldSize ⦄ :=
-  Proofs.BabyBear.baby_bear.BabyBear.new.montgomery_form x
+  Proofs.P3BabyBear.baby_bear.BabyBear.new.montgomery_form x
 
 /-- For every array of `N` `u32`s, `BabyBear::new_array` does not panic: it
-returns an array of `N` field elements. It says nothing about the values.
-Aeneas drops this Rust function, so the claim is about its hand-written
-transcription, an elementwise `new` (`crates/monty-31`,
-`Assumptions/Mirror.lean`). -/
+returns an array of `N` field elements. It says nothing about the values. -/
 theorem baby_bear.BabyBear.new_array.never_panics {N : Std.Usize} (input : Array Std.U32 N) :
     ∃ r, p3_monty_31.monty_31.MontyField31.new_array MontyParams input = .ok r :=
-  Proofs.BabyBear.baby_bear.BabyBear.new_array.never_panics input
+  Proofs.P3BabyBear.baby_bear.BabyBear.new_array.never_panics input
 
 /-- For every `M × N` array of `u32`s, `BabyBear::new_2d_array` does not panic:
 it returns an `M × N` array of field elements. It says nothing about the
-values. Like `new_array`, the claim is about the hand-written transcription,
-`new_array` applied to each row. -/
+values. -/
 theorem baby_bear.BabyBear.new_2d_array.never_panics {N M : Std.Usize}
     (input : Array (Array Std.U32 N) M) :
     ∃ r, p3_monty_31.monty_31.MontyField31.new_2d_array MontyParams input = .ok r :=
-  Proofs.BabyBear.baby_bear.BabyBear.new_2d_array.never_panics input
+  Proofs.P3BabyBear.baby_bear.BabyBear.new_2d_array.never_panics input
 
 /-! ## The constructors, as field elements
 
@@ -185,28 +185,25 @@ through `toField`: the stored `x · 2^32 mod p` decodes to `x`. -/
 theorem baby_bear.BabyBear.new.toField (x : Std.U32) :
     p3_monty_31.monty_31.MontyField31.new MontyParams x
       ⦃ r => Canonical r ∧ toField r = (x.val : BabyBear.Field) ⦄ :=
-  Proofs.BabyBear.baby_bear.BabyBear.new.toField x
+  Proofs.P3BabyBear.baby_bear.BabyBear.new.toField x
 
 /-- `BabyBear::new_array` returns, for each input `x`, the field element
-`x mod p`, in order and stored canonically. About the hand-written
-transcription of the Rust function (`crates/monty-31`,
-`Assumptions/Mirror.lean`). -/
+`x mod p`, in order and stored canonically. -/
 theorem baby_bear.BabyBear.new_array.toField {N : Std.Usize} (input : Array Std.U32 N) :
     p3_monty_31.monty_31.MontyField31.new_array MontyParams input
       ⦃ r => (∀ y ∈ r.val, Canonical y) ∧
         r.val.map Spec.BabyBear.toField = input.val.map (fun x => (x.val : BabyBear.Field)) ⦄ :=
-  Proofs.BabyBear.baby_bear.BabyBear.new_array.toField input
+  Proofs.P3BabyBear.baby_bear.BabyBear.new_array.toField input
 
 /-- `BabyBear::new_2d_array` returns, for each input `x`, the field element
-`x mod p`, row by row and stored canonically. About the hand-written
-transcription, like `new_array`. -/
+`x mod p`, row by row and stored canonically. -/
 theorem baby_bear.BabyBear.new_2d_array.toField {N M : Std.Usize}
     (input : Array (Array Std.U32 N) M) :
     p3_monty_31.monty_31.MontyField31.new_2d_array MontyParams input
       ⦃ r => (∀ row ∈ r.val, ∀ y ∈ row.val, Canonical y) ∧
         r.val.map (fun row => row.val.map Spec.BabyBear.toField) =
           input.val.map (fun row => row.val.map (fun x => (x.val : BabyBear.Field))) ⦄ :=
-  Proofs.BabyBear.baby_bear.BabyBear.new_2d_array.toField input
+  Proofs.P3BabyBear.baby_bear.BabyBear.new_2d_array.toField input
 
 /-! ## `FieldParameters`: the named field elements
 
@@ -218,23 +215,23 @@ code sees it. -/
 /-- `MONTY_ZERO` is the field element `0`, stored canonically. -/
 theorem baby_bear.BabyBearParameters.MONTY_ZERO.toField :
     FieldParams.MONTY_ZERO ⦃ r => Canonical r ∧ Spec.BabyBear.toField r = 0 ⦄ :=
-  Proofs.BabyBear.FieldParams.MONTY_ZERO.toField
+  Proofs.P3BabyBear.FieldParams.MONTY_ZERO.toField
 
 /-- `MONTY_ONE` is the field element `1`, stored canonically. -/
 theorem baby_bear.BabyBearParameters.MONTY_ONE.toField :
     FieldParams.MONTY_ONE ⦃ r => Canonical r ∧ Spec.BabyBear.toField r = 1 ⦄ :=
-  Proofs.BabyBear.FieldParams.MONTY_ONE.toField
+  Proofs.P3BabyBear.FieldParams.MONTY_ONE.toField
 
 /-- `MONTY_TWO` is the field element `2`, stored canonically. -/
 theorem baby_bear.BabyBearParameters.MONTY_TWO.toField :
     FieldParams.MONTY_TWO ⦃ r => Canonical r ∧ Spec.BabyBear.toField r = 2 ⦄ :=
-  Proofs.BabyBear.FieldParams.MONTY_TWO.toField
+  Proofs.P3BabyBear.FieldParams.MONTY_TWO.toField
 
 /-- `MONTY_NEG_ONE`, built as `new(PRIME - 1)`, is the field element `-1`,
 stored canonically; computing `PRIME - 1` does not underflow. -/
 theorem baby_bear.BabyBearParameters.MONTY_NEG_ONE.toField :
     FieldParams.MONTY_NEG_ONE ⦃ r => Canonical r ∧ Spec.BabyBear.toField r = -1 ⦄ :=
-  Proofs.BabyBear.FieldParams.MONTY_NEG_ONE.toField
+  Proofs.P3BabyBear.FieldParams.MONTY_NEG_ONE.toField
 
 /-- `HALF_P_PLUS_1` is the plain integer `(p + 1) / 2`, not a Montgomery form,
 computed without overflow. As an integer modulo `p` it is the inverse of `2`,
@@ -242,14 +239,14 @@ which is what halving relies on. -/
 theorem baby_bear.BabyBearParameters.HALF_P_PLUS_1.spec :
     FieldParams.HALF_P_PLUS_1 ⦃ h => h.val = (BabyBear.fieldSize + 1) / 2 ∧
       (h.val : BabyBear.Field) * 2 = 1 ⦄ :=
-  Proofs.BabyBear.FieldParams.HALF_P_PLUS_1.spec
+  Proofs.P3BabyBear.FieldParams.HALF_P_PLUS_1.spec
 
 /-- `MONTY_GEN` (`BabyBear::new(31)`) generates the multiplicative group of the
 field: it is stored canonically, and its order is `p - 1`. -/
 theorem baby_bear.BabyBearParameters.MONTY_GEN.generator :
     FieldParams.MONTY_GEN ⦃ g => Canonical g ∧
       orderOf (Spec.BabyBear.toField g) = BabyBear.fieldSize - 1 ⦄ :=
-  Proofs.BabyBear.FieldParams.MONTY_GEN.generator
+  Proofs.P3BabyBear.FieldParams.MONTY_GEN.generator
 
 /-! ## `TwoAdicData`: the roots of unity
 
@@ -263,20 +260,20 @@ two-adic generators, and every entry is stored canonically. -/
 theorem baby_bear.BabyBearParameters.TWO_ADIC_GENERATORS.eq_twoAdicGenerators :
     TwoAdicParams.TWO_ADIC_GENERATORS ⦃ s => (∀ y ∈ s.val, Canonical y) ∧
       s.val.map Spec.BabyBear.toField = BabyBear.twoAdicGenerators ⦄ :=
-  Proofs.BabyBear.TwoAdicParams.TWO_ADIC_GENERATORS.eq_twoAdicGenerators
+  Proofs.P3BabyBear.TwoAdicParams.TWO_ADIC_GENERATORS.eq_twoAdicGenerators
 
 /-- `TWO_ADIC_GENERATORS` has `TWO_ADICITY + 1 = 28` entries, and entry `i` has
 order exactly `2^i`: it is a primitive `2^i`-th root of unity. -/
 theorem baby_bear.BabyBearParameters.TWO_ADIC_GENERATORS.order :
     TwoAdicParams.TWO_ADIC_GENERATORS ⦃ s => s.val.length = TWO_ADICITY.val + 1 ∧
       ∀ i (h : i < s.val.length), orderOf (Spec.BabyBear.toField s.val[i]) = 2 ^ i ⦄ :=
-  Proofs.BabyBear.TwoAdicParams.TWO_ADIC_GENERATORS.order
+  Proofs.P3BabyBear.TwoAdicParams.TWO_ADIC_GENERATORS.order
 
 /-- Each entry of `TWO_ADIC_GENERATORS` squares to the one before it. -/
 theorem baby_bear.BabyBearParameters.TWO_ADIC_GENERATORS.sq_succ :
     TwoAdicParams.TWO_ADIC_GENERATORS ⦃ s => ∀ i (h : i + 1 < s.val.length),
       Spec.BabyBear.toField s.val[i + 1] ^ 2 = Spec.BabyBear.toField s.val[i] ⦄ :=
-  Proofs.BabyBear.TwoAdicParams.TWO_ADIC_GENERATORS.sq_succ
+  Proofs.P3BabyBear.TwoAdicParams.TWO_ADIC_GENERATORS.sq_succ
 
 /-- `ROOTS_8` is `[1, ω, ω², ω³]` for `ω = TWO_ADIC_GENERATORS[3]`, the
 primitive 8th root of unity, stored canonically. -/
@@ -284,7 +281,7 @@ theorem baby_bear.BabyBearParameters.ROOTS_8.eq :
     TwoAdicParams.ROOTS_8 ⦃ s => (∀ y ∈ s.val, Canonical y) ∧
       s.val.map Spec.BabyBear.toField =
         (List.range 4).map (fun j => BabyBear.twoAdicGenerators[3]! ^ j) ⦄ :=
-  Proofs.BabyBear.TwoAdicParams.ROOTS_8.eq
+  Proofs.P3BabyBear.TwoAdicParams.ROOTS_8.eq
 
 /-- `INV_ROOTS_8` holds the inverses of `ROOTS_8`, in the same order, stored
 canonically. -/
@@ -292,7 +289,7 @@ theorem baby_bear.BabyBearParameters.INV_ROOTS_8.eq :
     TwoAdicParams.INV_ROOTS_8 ⦃ s => (∀ y ∈ s.val, Canonical y) ∧
       s.val.map Spec.BabyBear.toField =
         (List.range 4).map (fun j => (BabyBear.twoAdicGenerators[3]! ^ j)⁻¹) ⦄ :=
-  Proofs.BabyBear.TwoAdicParams.INV_ROOTS_8.eq
+  Proofs.P3BabyBear.TwoAdicParams.INV_ROOTS_8.eq
 
 /-- `ROOTS_16` is `[1, ω, …, ω⁷]` for `ω = TWO_ADIC_GENERATORS[4]`, the
 primitive 16th root of unity, stored canonically. -/
@@ -300,7 +297,7 @@ theorem baby_bear.BabyBearParameters.ROOTS_16.eq :
     TwoAdicParams.ROOTS_16 ⦃ s => (∀ y ∈ s.val, Canonical y) ∧
       s.val.map Spec.BabyBear.toField =
         (List.range 8).map (fun j => BabyBear.twoAdicGenerators[4]! ^ j) ⦄ :=
-  Proofs.BabyBear.TwoAdicParams.ROOTS_16.eq
+  Proofs.P3BabyBear.TwoAdicParams.ROOTS_16.eq
 
 /-- `INV_ROOTS_16` holds the inverses of `ROOTS_16`, in the same order, stored
 canonically. -/
@@ -308,14 +305,14 @@ theorem baby_bear.BabyBearParameters.INV_ROOTS_16.eq :
     TwoAdicParams.INV_ROOTS_16 ⦃ s => (∀ y ∈ s.val, Canonical y) ∧
       s.val.map Spec.BabyBear.toField =
         (List.range 8).map (fun j => (BabyBear.twoAdicGenerators[4]! ^ j)⁻¹) ⦄ :=
-  Proofs.BabyBear.TwoAdicParams.INV_ROOTS_16.eq
+  Proofs.P3BabyBear.TwoAdicParams.INV_ROOTS_16.eq
 
 /-- `ODD_FACTOR`, computed as `PRIME >> TWO_ADICITY`, is `15`, the odd `r` with
 `p = r · 2^TWO_ADICITY + 1`. -/
 theorem baby_bear.BabyBearParameters.ODD_FACTOR.spec :
     TwoAdicParams.ODD_FACTOR ⦃ r => r.val = 15 ∧
       (PRIME.val : ℤ) = r.val * 2 ^ TWO_ADICITY.val + 1 ⦄ :=
-  Proofs.BabyBear.TwoAdicParams.ODD_FACTOR.spec
+  Proofs.P3BabyBear.TwoAdicParams.ODD_FACTOR.spec
 
 /-! ## `RelativelyPrimePower<7>` -/
 
@@ -337,12 +334,12 @@ theorem baby_bear.BabyBearParameters.exp_root_d.exponent :
 
 The `u32` helpers of p3-monty-31's `utils`, which are extracted, at BabyBear's
 parameters; then the `MontyField31` operators that wrap them, read as field
-operations. The operators' one-line bodies (`Self::new_monty(add::<FP>(…))` and
-the like) are transcribed by hand in
-`crates/monty-31/extraction/P3Monty31/Assumptions/Mirror.lean`, because the
-extractor drops them (docs/extractor-issues.md, 4); the arithmetic they call is
-not. Every operator claim assumes canonical inputs, as the Rust does, and
-gives a canonical output, so the claims compose. -/
+operations. `Add`, `Sub`, `Mul` and `Neg` are the extracted impl methods
+(`MontyField31.Insts.CoreOpsArith…`); `halve`, which the extractor does not
+translate (docs/extractor-issues.md, 4), is transcribed by hand in
+`crates/monty-31/extraction/P3Monty31/Assumptions/Mirror.lean`. Every operator
+claim assumes canonical inputs, as the Rust does, and gives a canonical output,
+so the claims compose. -/
 
 /-- Montgomery reduction: for `x < 2^32 · p`, `monty_reduce(x)` is the canonical
 `r` with `r · 2^32 ≡ x (mod p)`. -/
@@ -350,23 +347,23 @@ theorem p3_monty_31.utils.monty_reduce.spec (x : Std.U64)
     (hx : x.val < 2 ^ 32 * BabyBear.fieldSize) :
     p3_monty_31.utils.monty_reduce MontyParams x ⦃ r => r.val < BabyBear.fieldSize ∧
       (r.val * 2 ^ 32) % BabyBear.fieldSize = x.val % BabyBear.fieldSize ⦄ := by
-  rw [Proofs.BabyBear.fieldSize_eq] at *
-  exact Proofs.BabyBear.utils.monty_reduce.spec x hx
+  rw [Proofs.P3BabyBear.fieldSize_eq] at *
+  exact Proofs.P3BabyBear.utils.monty_reduce.spec x hx
 
 /-- `from_monty(x)` is the canonical `r` with `r · 2^32 ≡ x (mod p)`: it takes a
 value out of Montgomery form. -/
 theorem p3_monty_31.utils.from_monty.spec (x : Std.U32) :
     p3_monty_31.utils.from_monty MontyParams x ⦃ r => r.val < BabyBear.fieldSize ∧
       (r.val * 2 ^ 32) % BabyBear.fieldSize = x.val % BabyBear.fieldSize ⦄ := by
-  rw [Proofs.BabyBear.fieldSize_eq]
-  exact Proofs.BabyBear.utils.from_monty.spec x
+  rw [Proofs.P3BabyBear.fieldSize_eq]
+  exact Proofs.P3BabyBear.utils.from_monty.spec x
 
 /-- For canonical `a` and `b`, `add(a, b)` is `(a + b) mod p`. -/
 theorem p3_monty_31.utils.add.spec (a b : Std.U32) (ha : a.val < BabyBear.fieldSize)
     (hb : b.val < BabyBear.fieldSize) :
     p3_monty_31.utils.add MontyParams a b ⦃ r => r.val = (a.val + b.val) % BabyBear.fieldSize ⦄ := by
-  rw [Proofs.BabyBear.fieldSize_eq] at *
-  exact Proofs.BabyBear.utils.add.spec a b ha hb
+  rw [Proofs.P3BabyBear.fieldSize_eq] at *
+  exact Proofs.P3BabyBear.utils.add.spec a b ha hb
 
 /-- For canonical `a` and `b`, `sub(a, b)` is `(a - b) mod p`, computed as
 `(a + p - b) mod p`. -/
@@ -374,58 +371,58 @@ theorem p3_monty_31.utils.sub.spec (a b : Std.U32) (ha : a.val < BabyBear.fieldS
     (hb : b.val < BabyBear.fieldSize) :
     p3_monty_31.utils.sub MontyParams a b
       ⦃ r => r.val = (a.val + BabyBear.fieldSize - b.val) % BabyBear.fieldSize ⦄ := by
-  rw [Proofs.BabyBear.fieldSize_eq] at *
-  exact Proofs.BabyBear.utils.sub.spec a b ha hb
+  rw [Proofs.P3BabyBear.fieldSize_eq] at *
+  exact Proofs.P3BabyBear.utils.sub.spec a b ha hb
 
 /-- For canonical `a`, `halve_u32(a)` is the canonical `r` with `2r ≡ a (mod p)`. -/
 theorem p3_monty_31.utils.halve_u32.spec (a : Std.U32) (ha : a.val < BabyBear.fieldSize) :
     p3_monty_31.utils.halve_u32 FieldParams a ⦃ r => r.val < BabyBear.fieldSize ∧
       (r.val * 2) % BabyBear.fieldSize = a.val ⦄ := by
-  rw [Proofs.BabyBear.fieldSize_eq] at *
-  exact Proofs.BabyBear.utils.halve_u32.spec a ha
+  rw [Proofs.P3BabyBear.fieldSize_eq] at *
+  exact Proofs.P3BabyBear.utils.halve_u32.spec a ha
 
 /-- `a + b` on canonical BabyBear elements is canonical, and is the sum of the
 field elements they stand for. -/
 theorem baby_bear.BabyBear.add.toField (a b : Element) (ha : Canonical a) (hb : Canonical b) :
-    p3_monty_31.monty_31.MontyField31.add MontyParams a b
+    p3_monty_31.monty_31.MontyField31.Insts.CoreOpsArithAddMontyField31MontyField31.add MontyParams a b
       ⦃ c => Canonical c ∧ Spec.BabyBear.toField c = Spec.BabyBear.toField a + Spec.BabyBear.toField b ⦄ :=
-  Proofs.BabyBear.baby_bear.BabyBear.add.toField a b ha hb
+  Proofs.P3BabyBear.baby_bear.BabyBear.add.toField a b ha hb
 
 /-- `a - b` on canonical BabyBear elements is canonical, and is the difference
 of the field elements they stand for. -/
 theorem baby_bear.BabyBear.sub.toField (a b : Element) (ha : Canonical a) (hb : Canonical b) :
-    p3_monty_31.monty_31.MontyField31.sub MontyParams a b
+    p3_monty_31.monty_31.MontyField31.Insts.CoreOpsArithSubMontyField31MontyField31.sub MontyParams a b
       ⦃ c => Canonical c ∧ Spec.BabyBear.toField c = Spec.BabyBear.toField a - Spec.BabyBear.toField b ⦄ :=
-  Proofs.BabyBear.baby_bear.BabyBear.sub.toField a b ha hb
+  Proofs.P3BabyBear.baby_bear.BabyBear.sub.toField a b ha hb
 
 /-- `a * b` on canonical BabyBear elements is canonical, and is the product of
 the field elements they stand for: the `u64` product does not overflow, and
 Montgomery reduction removes the extra factor of `2^32`. -/
 theorem baby_bear.BabyBear.mul.toField (a b : Element) (ha : Canonical a) (hb : Canonical b) :
-    p3_monty_31.monty_31.MontyField31.mul MontyParams a b
+    p3_monty_31.monty_31.MontyField31.Insts.CoreOpsArithMulMontyField31MontyField31.mul MontyParams a b
       ⦃ c => Canonical c ∧ Spec.BabyBear.toField c = Spec.BabyBear.toField a * Spec.BabyBear.toField b ⦄ :=
-  Proofs.BabyBear.baby_bear.BabyBear.mul.toField a b ha hb
+  Proofs.P3BabyBear.baby_bear.BabyBear.mul.toField a b ha hb
 
 /-- `-a` on a canonical BabyBear element is canonical, and is the negation of
 the field element it stands for. -/
 theorem baby_bear.BabyBear.neg.toField (a : Element) (ha : Canonical a) :
-    p3_monty_31.monty_31.MontyField31.neg FieldParams a
+    p3_monty_31.monty_31.MontyField31.Insts.CoreOpsArithNegMontyField31.neg FieldParams a
       ⦃ c => Canonical c ∧ Spec.BabyBear.toField c = -Spec.BabyBear.toField a ⦄ :=
-  Proofs.BabyBear.baby_bear.BabyBear.neg.toField a ha
+  Proofs.P3BabyBear.baby_bear.BabyBear.neg.toField a ha
 
 /-- `a.halve()` on a canonical BabyBear element is canonical, and is half the
 field element it stands for. -/
 theorem baby_bear.BabyBear.halve.toField (a : Element) (ha : Canonical a) :
     p3_monty_31.monty_31.MontyField31.halve FieldParams a
       ⦃ c => Canonical c ∧ Spec.BabyBear.toField c * 2 = Spec.BabyBear.toField a ⦄ :=
-  Proofs.BabyBear.baby_bear.BabyBear.halve.toField a ha
+  Proofs.P3BabyBear.baby_bear.BabyBear.halve.toField a ha
 
 /-- `from_monty(a.value)`, the body of `as_canonical_u32`, is the canonical
 `u32` representative of the field element `a` stands for, for any `a`. -/
 theorem baby_bear.BabyBear.from_monty.toField (a : Element) :
     p3_monty_31.utils.from_monty MontyParams a.value
       ⦃ r => r.val < BabyBear.fieldSize ∧ (r.val : BabyBear.Field) = Spec.BabyBear.toField a ⦄ :=
-  Proofs.BabyBear.baby_bear.BabyBear.from_monty.toField a
+  Proofs.P3BabyBear.baby_bear.BabyBear.from_monty.toField a
 
 /-! ## `BinomialExtensionData<D>`: the binomial extensions
 
@@ -455,7 +452,7 @@ irreducible over the BabyBear field, so `F[X] / (X ^ 4 - W)` is a field of order
 theorem baby_bear.BabyBearParameters.BinomialExtensionData4.W.irreducible :
     Ext4Params.W ⦃ w => Canonical w ∧ Spec.BabyBear.toField w = 11 ∧
       Irreducible (Polynomial.X ^ 4 - Polynomial.C (Spec.BabyBear.toField w)) ⦄ :=
-  Proofs.BabyBear.Ext4Params.W.spec
+  Proofs.P3BabyBear.Ext4Params.W.spec
 
 /-- `DTH_ROOT` for the degree-4 extension is `W ^ ((p - 1) / 4)`, stored
 canonically: the image of `X` under one application of Frobenius is
@@ -463,14 +460,14 @@ canonically: the image of `X` under one application of Frobenius is
 theorem baby_bear.BabyBearParameters.BinomialExtensionData4.DTH_ROOT.spec :
     ∃ w r, Ext4Params.W = .ok w ∧ Ext4Params.DTH_ROOT = .ok r ∧ Canonical r ∧
       Spec.BabyBear.toField r = Spec.BabyBear.toField w ^ ((BabyBear.fieldSize - 1) / 4) :=
-  Proofs.BabyBear.Ext4Params.DTH_ROOT.spec
+  Proofs.P3BabyBear.Ext4Params.DTH_ROOT.spec
 
 /-- `EXT_TWO_ADICITY` for the degree-4 extension is the two-adicity of
 `p ^ 4 - 1`: `2 ^ EXT_TWO_ADICITY` divides it and no higher power of `2` does. -/
 theorem baby_bear.BabyBearParameters.BinomialExtensionData4.EXT_TWO_ADICITY.spec :
     Ext4Params.EXT_TWO_ADICITY ⦃ e => 2 ^ e.val ∣ PRIME.val ^ 4 - 1 ∧
       ¬ 2 ^ (e.val + 1) ∣ PRIME.val ^ 4 - 1 ⦄ :=
-  Proofs.BabyBear.Ext4Params.EXT_TWO_ADICITY.spec
+  Proofs.P3BabyBear.Ext4Params.EXT_TWO_ADICITY.spec
 
 /-- `TWO_ADIC_EXTENSION_GENERATORS` for the degree-4 extension has
 `EXT_TWO_ADICITY - TWO_ADICITY` entries, the number `ext_two_adic_generator`
@@ -482,7 +479,7 @@ theorem baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_G
       ∀ i (h : i < t.val.length),
         orderOf (toExt (Spec.BabyBear.toField w) t.val[i]) =
           2 ^ (TWO_ADICITY.val + 1 + i) :=
-  Proofs.BabyBear.Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.order
+  Proofs.P3BabyBear.Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.order
 
 /-- `TWO_ADIC_EXTENSION_GENERATORS` for the degree-4 extension is, entry for entry
 and coefficient for coefficient, `BabyBear.ext4TwoAdicGeneratorCoeffs`: read in
@@ -492,7 +489,7 @@ theorem baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_G
     Ext4Params.TWO_ADIC_EXTENSION_GENERATORS ⦃ t =>
       t.val.map (fun row => row.val.map Spec.BabyBear.toField) =
         BabyBear.ext4TwoAdicGeneratorCoeffs ⦄ :=
-  Proofs.BabyBear.Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.eq
+  Proofs.P3BabyBear.Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.eq
 
 /-- `TWO_ADIC_EXTENSION_GENERATORS` for the degree-4 extension continues the base
 field's two-adic generators: in `F[X] / (X ^ 4 - W)`, entry `0` squares to
@@ -505,7 +502,7 @@ theorem baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_G
       let chain := AdjoinRoot.of _ BabyBear.twoAdicGenerators[TWO_ADICITY.val]! ::
         t.val.map (toExt (Spec.BabyBear.toField w))
       ∀ i (h : i + 1 < chain.length), chain[i + 1] ^ 2 = chain[i] :=
-  Proofs.BabyBear.Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.sq_succ
+  Proofs.P3BabyBear.Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.sq_succ
 
 /-- `W = 2` for the degree-5 extension, stored canonically, and `X ^ 5 - W` is
 irreducible over the BabyBear field, so `F[X] / (X ^ 5 - W)` is a field of order
@@ -513,7 +510,7 @@ irreducible over the BabyBear field, so `F[X] / (X ^ 5 - W)` is a field of order
 theorem baby_bear.BabyBearParameters.BinomialExtensionData5.W.irreducible :
     Ext5Params.W ⦃ w => Canonical w ∧ Spec.BabyBear.toField w = 2 ∧
       Irreducible (Polynomial.X ^ 5 - Polynomial.C (Spec.BabyBear.toField w)) ⦄ :=
-  Proofs.BabyBear.Ext5Params.W.spec
+  Proofs.P3BabyBear.Ext5Params.W.spec
 
 /-- `DTH_ROOT` for the degree-5 extension is `W ^ ((p - 1) / 5)`, stored
 canonically: the image of `X` under one application of Frobenius is
@@ -521,14 +518,14 @@ canonically: the image of `X` under one application of Frobenius is
 theorem baby_bear.BabyBearParameters.BinomialExtensionData5.DTH_ROOT.spec :
     ∃ w r, Ext5Params.W = .ok w ∧ Ext5Params.DTH_ROOT = .ok r ∧ Canonical r ∧
       Spec.BabyBear.toField r = Spec.BabyBear.toField w ^ ((BabyBear.fieldSize - 1) / 5) :=
-  Proofs.BabyBear.Ext5Params.DTH_ROOT.spec
+  Proofs.P3BabyBear.Ext5Params.DTH_ROOT.spec
 
 /-- `EXT_TWO_ADICITY` for the degree-5 extension is the two-adicity of
 `p ^ 5 - 1`: `2 ^ EXT_TWO_ADICITY` divides it and no higher power of `2` does. -/
 theorem baby_bear.BabyBearParameters.BinomialExtensionData5.EXT_TWO_ADICITY.spec :
     Ext5Params.EXT_TWO_ADICITY ⦃ e => 2 ^ e.val ∣ PRIME.val ^ 5 - 1 ∧
       ¬ 2 ^ (e.val + 1) ∣ PRIME.val ^ 5 - 1 ⦄ :=
-  Proofs.BabyBear.Ext5Params.EXT_TWO_ADICITY.spec
+  Proofs.P3BabyBear.Ext5Params.EXT_TWO_ADICITY.spec
 
 /-- `W = 11` for the degree-8 extension, stored canonically, and `X ^ 8 - W` is
 irreducible over the BabyBear field, so `F[X] / (X ^ 8 - W)` is a field of order
@@ -536,7 +533,7 @@ irreducible over the BabyBear field, so `F[X] / (X ^ 8 - W)` is a field of order
 theorem baby_bear.BabyBearParameters.BinomialExtensionData8.W.irreducible :
     Ext8Params.W ⦃ w => Canonical w ∧ Spec.BabyBear.toField w = 11 ∧
       Irreducible (Polynomial.X ^ 8 - Polynomial.C (Spec.BabyBear.toField w)) ⦄ :=
-  Proofs.BabyBear.Ext8Params.W.spec
+  Proofs.P3BabyBear.Ext8Params.W.spec
 
 /-- `DTH_ROOT` for the degree-8 extension is `W ^ ((p - 1) / 8)`, stored
 canonically: the image of `X` under one application of Frobenius is
@@ -544,14 +541,14 @@ canonically: the image of `X` under one application of Frobenius is
 theorem baby_bear.BabyBearParameters.BinomialExtensionData8.DTH_ROOT.spec :
     ∃ w r, Ext8Params.W = .ok w ∧ Ext8Params.DTH_ROOT = .ok r ∧ Canonical r ∧
       Spec.BabyBear.toField r = Spec.BabyBear.toField w ^ ((BabyBear.fieldSize - 1) / 8) :=
-  Proofs.BabyBear.Ext8Params.DTH_ROOT.spec
+  Proofs.P3BabyBear.Ext8Params.DTH_ROOT.spec
 
 /-- `EXT_TWO_ADICITY` for the degree-8 extension is the two-adicity of
 `p ^ 8 - 1`: `2 ^ EXT_TWO_ADICITY` divides it and no higher power of `2` does. -/
 theorem baby_bear.BabyBearParameters.BinomialExtensionData8.EXT_TWO_ADICITY.spec :
     Ext8Params.EXT_TWO_ADICITY ⦃ e => 2 ^ e.val ∣ PRIME.val ^ 8 - 1 ∧
       ¬ 2 ^ (e.val + 1) ∣ PRIME.val ^ 8 - 1 ⦄ :=
-  Proofs.BabyBear.Ext8Params.EXT_TWO_ADICITY.spec
+  Proofs.P3BabyBear.Ext8Params.EXT_TWO_ADICITY.spec
 
 /-- `TWO_ADIC_EXTENSION_GENERATORS` for the degree-8 extension has
 `EXT_TWO_ADICITY - TWO_ADICITY` entries, the number `ext_two_adic_generator`
@@ -563,7 +560,7 @@ theorem baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_G
       ∀ i (h : i < t.val.length),
         orderOf (toExt (Spec.BabyBear.toField w) t.val[i]) =
           2 ^ (TWO_ADICITY.val + 1 + i) :=
-  Proofs.BabyBear.Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.order
+  Proofs.P3BabyBear.Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.order
 
 /-- `TWO_ADIC_EXTENSION_GENERATORS` for the degree-8 extension is, entry for entry
 and coefficient for coefficient, `BabyBear.ext8TwoAdicGeneratorCoeffs`: read in
@@ -573,7 +570,7 @@ theorem baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_G
     Ext8Params.TWO_ADIC_EXTENSION_GENERATORS ⦃ t =>
       t.val.map (fun row => row.val.map Spec.BabyBear.toField) =
         BabyBear.ext8TwoAdicGeneratorCoeffs ⦄ :=
-  Proofs.BabyBear.Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.eq
+  Proofs.P3BabyBear.Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.eq
 
 /-- `TWO_ADIC_EXTENSION_GENERATORS` for the degree-8 extension continues the base
 field's two-adic generators: in `F[X] / (X ^ 8 - W)`, entry `0` squares to
@@ -586,7 +583,7 @@ theorem baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_G
       let chain := AdjoinRoot.of _ BabyBear.twoAdicGenerators[TWO_ADICITY.val]! ::
         t.val.map (toExt (Spec.BabyBear.toField w))
       ∀ i (h : i + 1 < chain.length), chain[i + 1] ^ 2 = chain[i] :=
-  Proofs.BabyBear.Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.sq_succ
+  Proofs.P3BabyBear.Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.sq_succ
 
 /-! ## The Poseidon round-constant length assertions
 
@@ -605,69 +602,69 @@ and the others `__N`, which post-patch 030 renames to `const_check_N`. -/
 width-16 round-constant table `BABYBEAR_POSEIDON1_RC_16` has
 `2 · HALF_FULL_ROUNDS + PARTIAL_ROUNDS_16 = 2 · 4 + 13 = 21` rows. -/
 theorem poseidon1._.holds : poseidon1._ ⦃ _ => True ⦄ :=
-  Proofs.BabyBear.poseidon1._.holds
+  Proofs.P3BabyBear.poseidon1._.holds
 
 /-- The Poseidon2 assertion at `baby-bear/src/poseidon2.rs:64` holds: the
 width-16 initial external round constants,
 `BABYBEAR_POSEIDON2_RC_16_EXTERNAL_INITIAL`, have `HALF_FULL_ROUNDS = 4` rows. -/
 theorem poseidon2._.holds : poseidon2._ ⦃ _ => True ⦄ :=
-  Proofs.BabyBear.poseidon2._.holds
+  Proofs.P3BabyBear.poseidon2._.holds
 
 /-- The Poseidon1 assertion at `baby-bear/src/poseidon1.rs:70` holds: the
 width-24 round-constant table `BABYBEAR_POSEIDON1_RC_24` has
 `2 · HALF_FULL_ROUNDS + PARTIAL_ROUNDS_24 = 2 · 4 + 21 = 29` rows. -/
 theorem poseidon1.const_check_1.holds : poseidon1.const_check_1 ⦃ _ => True ⦄ :=
-  Proofs.BabyBear.poseidon1.const_check_1.holds
+  Proofs.P3BabyBear.poseidon1.const_check_1.holds
 
 /-- The Poseidon2 assertion at `baby-bear/src/poseidon2.rs:66` holds: the
 width-16 final external round constants,
 `BABYBEAR_POSEIDON2_RC_16_EXTERNAL_FINAL`, have `HALF_FULL_ROUNDS = 4` rows. -/
 theorem poseidon2.const_check_1.holds : poseidon2.const_check_1 ⦃ _ => True ⦄ :=
-  Proofs.BabyBear.poseidon2.const_check_1.holds
+  Proofs.P3BabyBear.poseidon2.const_check_1.holds
 
 /-- The Poseidon2 assertion at `baby-bear/src/poseidon2.rs:68` holds: the
 width-16 internal round constants, `BABYBEAR_POSEIDON2_RC_16_INTERNAL`, number
 `PARTIAL_ROUNDS_16 = 13`, one per partial round. -/
 theorem poseidon2.const_check_2.holds : poseidon2.const_check_2 ⦃ _ => True ⦄ :=
-  Proofs.BabyBear.poseidon2.const_check_2.holds
+  Proofs.P3BabyBear.poseidon2.const_check_2.holds
 
 /-- The Poseidon2 assertion at `baby-bear/src/poseidon2.rs:70` holds: the
 width-24 initial external round constants,
 `BABYBEAR_POSEIDON2_RC_24_EXTERNAL_INITIAL`, have `HALF_FULL_ROUNDS = 4`
 rows. -/
 theorem poseidon2.const_check_3.holds : poseidon2.const_check_3 ⦃ _ => True ⦄ :=
-  Proofs.BabyBear.poseidon2.const_check_3.holds
+  Proofs.P3BabyBear.poseidon2.const_check_3.holds
 
 /-- The Poseidon2 assertion at `baby-bear/src/poseidon2.rs:72` holds: the
 width-24 final external round constants,
 `BABYBEAR_POSEIDON2_RC_24_EXTERNAL_FINAL`, have `HALF_FULL_ROUNDS = 4` rows. -/
 theorem poseidon2.const_check_4.holds : poseidon2.const_check_4 ⦃ _ => True ⦄ :=
-  Proofs.BabyBear.poseidon2.const_check_4.holds
+  Proofs.P3BabyBear.poseidon2.const_check_4.holds
 
 /-- The Poseidon2 assertion at `baby-bear/src/poseidon2.rs:74` holds: the
 width-24 internal round constants, `BABYBEAR_POSEIDON2_RC_24_INTERNAL`, number
 `PARTIAL_ROUNDS_24 = 21`, one per partial round. -/
 theorem poseidon2.const_check_5.holds : poseidon2.const_check_5 ⦃ _ => True ⦄ :=
-  Proofs.BabyBear.poseidon2.const_check_5.holds
+  Proofs.P3BabyBear.poseidon2.const_check_5.holds
 
 /-- The Poseidon2 assertion at `baby-bear/src/poseidon2.rs:76` holds: the
 width-32 initial external round constants,
 `BABYBEAR_POSEIDON2_RC_32_EXTERNAL_INITIAL`, have `HALF_FULL_ROUNDS = 4`
 rows. -/
 theorem poseidon2.const_check_6.holds : poseidon2.const_check_6 ⦃ _ => True ⦄ :=
-  Proofs.BabyBear.poseidon2.const_check_6.holds
+  Proofs.P3BabyBear.poseidon2.const_check_6.holds
 
 /-- The Poseidon2 assertion at `baby-bear/src/poseidon2.rs:78` holds: the
 width-32 final external round constants,
 `BABYBEAR_POSEIDON2_RC_32_EXTERNAL_FINAL`, have `HALF_FULL_ROUNDS = 4` rows. -/
 theorem poseidon2.const_check_7.holds : poseidon2.const_check_7 ⦃ _ => True ⦄ :=
-  Proofs.BabyBear.poseidon2.const_check_7.holds
+  Proofs.P3BabyBear.poseidon2.const_check_7.holds
 
 /-- The Poseidon2 assertion at `baby-bear/src/poseidon2.rs:80` holds: the
 width-32 internal round constants, `BABYBEAR_POSEIDON2_RC_32_INTERNAL`, number
 `PARTIAL_ROUNDS_32 = 30`, one per partial round. -/
 theorem poseidon2.const_check_8.holds : poseidon2.const_check_8 ⦃ _ => True ⦄ :=
-  Proofs.BabyBear.poseidon2.const_check_8.holds
+  Proofs.P3BabyBear.poseidon2.const_check_8.holds
 
 /-! ## The generic Monty31 claims apply
 
@@ -678,17 +675,17 @@ These three claims say BabyBear's do, so every claim there applies at BabyBear. 
 /-- BabyBear's `MontyParameters` pass every check of `MontyField31::new`. -/
 theorem baby_bear.BabyBearParameters.valid :
     Plonky3Lean.Spec.Monty31.Valid MontyParams 2013265921#u32 2281701377#u32 :=
-  Proofs.BabyBear.valid
+  Proofs.P3BabyBear.valid
 
 /-- BabyBear's `FieldParameters` keep `HALF_P_PLUS_1` at its default `(p + 1) / 2`. -/
 theorem baby_bear.BabyBearParameters.fieldValid :
     Plonky3Lean.Spec.Monty31.FieldValid FieldParams 2013265921#u32 2281701377#u32 :=
-  Proofs.BabyBear.fieldValid
+  Proofs.P3BabyBear.fieldValid
 
 /-- BabyBear's `FieldParameters` keep `MONTY_ZERO`, `MONTY_ONE` and `MONTY_TWO` at their defaults. -/
 theorem baby_bear.BabyBearParameters.fieldDefaults :
     Plonky3Lean.Spec.Monty31.FieldDefaults FieldParams :=
-  Proofs.BabyBear.fieldDefaults
+  Proofs.P3BabyBear.fieldDefaults
 
 /-! ## Inversion -/
 
@@ -702,6 +699,6 @@ theorem baby_bear.BabyBear.try_inverse.toField (a : Element) (ha : Canonical a) 
       (Spec.BabyBear.toField a = 0 → r = none) ∧
       (Spec.BabyBear.toField a ≠ 0 → ∃ c, r = some c ∧ Canonical c ∧
         Spec.BabyBear.toField c * Spec.BabyBear.toField a = 1) ⦄ :=
-  Proofs.BabyBear.baby_bear.BabyBear.try_inverse.toField a ha
+  Proofs.P3BabyBear.baby_bear.BabyBear.try_inverse.toField a ha
 
-end Plonky3Lean.Claims.BabyBear
+end Plonky3Lean.Claims.P3BabyBear

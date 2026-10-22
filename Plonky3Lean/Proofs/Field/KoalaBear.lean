@@ -1,12 +1,16 @@
-import CompPoly.Fields.KoalaBear
-import Plonky3Lean.Proofs.Field.Monty31.Arith
-import Plonky3Lean.Spec.KoalaBear
-import ToCompPoly.Fields.KoalaBear
+module
+
+public import CompPoly.Fields.KoalaBear
+public import Plonky3Lean.Proofs.Field.Monty31.Arith
+public import Plonky3Lean.Spec.KoalaBear
+public import ToCompPoly.Fields.KoalaBear
+
+@[expose] public section
 
 /-!
 # KoalaBear: the parameters
 
-Proofs of the KoalaBear claims in `Plonky3Lean.Claims.KoalaBear` about `KoalaBearParameters`, its constructors and its `u32` arithmetic.
+Proofs of the KoalaBear claims in `Plonky3Lean.Claims.P3KoalaBear` about `KoalaBearParameters`, its constructors and its `u32` arithmetic.
 
 KoalaBear's parameters pass `MontyField31::new`'s checks (`MontyParams.valid`), so every generic Monty31 theorem applies at them.
 
@@ -18,7 +22,7 @@ open p3_koala_bear
 open Plonky3Lean.Spec.KoalaBear
 open Plonky3Lean.Lib
 
-namespace Plonky3Lean.Proofs.KoalaBear
+namespace Plonky3Lean.Proofs.P3KoalaBear
 
 /-! ## Wiring: the instances return these constants -/
 
@@ -86,9 +90,10 @@ theorem koala_bear.KoalaBearParameters.TWO_ADICITY.maximal :
 
 /-- `MONTY_MASK` keeps its default, `(1 << MONTY_BITS) - 1 = 2^32 - 1`. -/
 theorem MontyParams.MONTY_MASK.eq : MontyParams.MONTY_MASK = .ok 4294967295#u32 := by
+  apply Plonky3Lean.Lib.eq_ok_of_spec
   dsimp only
   unfold koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.MONTY_BITS
-  rfl
+  step*
 
 /-- KoalaBear's `MontyParameters` are valid: `PRIME` is odd and below `2^31`, `MONTY_BITS = 32`, and `MONTY_MU` inverts `PRIME` modulo `2^32`. -/
 theorem MontyParams.valid : Spec.Monty31.Valid MontyParams PRIME MONTY_MU where
@@ -113,9 +118,10 @@ theorem FieldParams.valid : Spec.Monty31.FieldValid FieldParams PRIME MONTY_MU w
   monty := MontyParams.valid
   half := by
     refine ⟨1065353217#u32, ?_, ?_⟩
-    · dsimp only
+    · apply Plonky3Lean.Lib.eq_ok_of_spec
+      dsimp only
       unfold koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.PRIME
-      rfl
+      step*
     · unfold PRIME koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.PRIME
       decide
 
@@ -210,4 +216,4 @@ theorem koala_bear.KoalaBear.new_2d_array.never_panics {N M : Std.Usize}
     ∃ r, p3_monty_31.monty_31.MontyField31.new_2d_array MontyParams input = .ok r :=
   Monty31.monty_31.MontyField31.new_2d_array.ok MontyParams.valid input
 
-end Plonky3Lean.Proofs.KoalaBear
+end Plonky3Lean.Proofs.P3KoalaBear

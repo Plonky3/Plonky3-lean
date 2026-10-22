@@ -1,9 +1,14 @@
-import Plonky3Lean.Lib.Iter
-import Plonky3Lean.Lib.RustM
-import Plonky3Lean.Lib.Scalar
-import Plonky3Lean.Lib.Scalar.Bits
-import Plonky3Lean.Lib.Scalar.Signed
-import Plonky3Lean.Lib.Scalar.U64
+module
+
+public import Plonky3Lean.Lib.Array
+public import Plonky3Lean.Lib.Iter
+public import Plonky3Lean.Lib.RustM
+public import Plonky3Lean.Lib.Scalar
+public import Plonky3Lean.Lib.Scalar.Bits
+public import Plonky3Lean.Lib.Scalar.Signed
+public import Plonky3Lean.Lib.Scalar.U64
+
+@[expose] public section
 
 /-!
 # Library

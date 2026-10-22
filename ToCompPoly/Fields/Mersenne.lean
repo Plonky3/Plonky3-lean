@@ -3,16 +3,17 @@ Copyright (c) 2026 CompPoly. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Thomas Coratger
 -/
-import CompPoly.Fields.Mersenne
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.Tactic.NormNum.Prime
-import ToCompPoly.Data.Nat.PowMod
+module
+
+public import CompPoly.Fields.Mersenne31
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.Tactic.NormNum.Prime
+public import ToCompPoly.Data.Nat.PowMod
 
 /-!
   # Mersenne31: the field, a multiplicative generator, fifth roots, non-residues
 
-  Additions to `CompPoly.Fields.Mersenne`:
-  - the `Field` instance on `Mersenne31.Field`.
+  Additions to `CompPoly.Fields.Mersenne31`:
   - `generator = 7` generates the multiplicative group.
   - `x ↦ x ^ 1717986917` inverts `x ↦ x ^ 5`, since `5 · 1717986917 ≡ 1 (mod p - 1)`.
   - `-1` and `5` are not squares, and `5` is not a cube.
@@ -20,22 +21,20 @@ import ToCompPoly.Data.Nat.PowMod
   Everything is kernel-checked, without `native_decide`.
 -/
 
+@[expose] public section
+
 namespace Mersenne31
 
-instance : Fact (Nat.Prime fieldSize) := ⟨is_prime⟩
-
-instance : _root_.Field Field := ZMod.instField fieldSize
-
 /-- A power of a natural number in the field, checked through `Nat.powMod`. -/
-theorem natCast_pow_eq {e : ℕ} (b c : ℕ) (he : e < 2 ^ 64) (h : Nat.powMod b e fieldSize = c) :
+theorem natCast_pow_eq {e : ℕ} (b c : ℕ) (h : Nat.powMod b e fieldSize = c) :
     (b : Field) ^ e = c := by
-  rw [ZMod.natCast_pow_eq_powMod b e he, h]
+  rw [ZMod.natCast_pow_eq_powMod b e, h]
 
 /-- A nonzero power of a natural number in the field, checked through `Nat.powMod`. -/
-theorem natCast_pow_ne_one {e : ℕ} (b : ℕ) (he : e < 2 ^ 64)
+theorem natCast_pow_ne_one {e : ℕ} (b : ℕ)
     (h : (Nat.powMod b e fieldSize : Field) ≠ 1) :
     (b : Field) ^ e ≠ 1 := by
-  rwa [ZMod.natCast_pow_eq_powMod b e he]
+  rwa [ZMod.natCast_pow_eq_powMod b e]
 
 /-- The primes dividing `p - 1 = 2 · 3^2 · 7 · 11 · 31 · 151 · 331`. -/
 theorem prime_dvd_fieldSize_sub_one {q : ℕ} (hq : q.Prime) (h : q ∣ fieldSize - 1) :
@@ -65,9 +64,7 @@ theorem orderOf_eq_of_powMod (b : ℕ) (hb : (b : Field) ≠ 0)
   apply orderOf_eq_of_pow_and_pow_div_prime (by decide)
   · exact ZMod.pow_card_sub_one_eq_one hb
   · intro q hq hdvd
-    have he : (fieldSize - 1) / q < 2 ^ 64 :=
-      lt_of_le_of_lt (Nat.div_le_self _ _) (by decide)
-    refine natCast_pow_ne_one b he (h q ?_)
+    refine natCast_pow_ne_one b (h q ?_)
     rcases prime_dvd_fieldSize_sub_one hq hdvd with rfl | rfl | rfl | rfl | rfl | rfl | rfl <;>
       simp
 
@@ -108,7 +105,7 @@ theorem five_ne_sq (b : Field) : b ^ 2 ≠ 5 := by
   intro h
   have := pow_div_eq_one_of_pow_eq (n := 2) (by decide) (by decide) h
   rw [show (5 : Field) = ((5 : ℕ) : Field) by norm_num,
-    natCast_pow_eq 5 2147483646 (by decide) (by decide)] at this
+    natCast_pow_eq 5 2147483646 (by decide)] at this
   revert this; decide
 
 /-- `5` is not a cube. -/
@@ -116,7 +113,7 @@ theorem five_ne_cube (b : Field) : b ^ 3 ≠ 5 := by
   intro h
   have := pow_div_eq_one_of_pow_eq (n := 3) (by decide) (by decide) h
   rw [show (5 : Field) = ((5 : ℕ) : Field) by norm_num,
-    natCast_pow_eq 5 1513477735 (by decide) (by decide)] at this
+    natCast_pow_eq 5 1513477735 (by decide)] at this
   revert this; decide
 
 end Mersenne31

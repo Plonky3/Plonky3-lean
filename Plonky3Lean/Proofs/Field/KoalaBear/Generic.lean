@@ -1,5 +1,9 @@
-import Plonky3Lean.Proofs.Field.KoalaBear.Arith
-import Plonky3Lean.Proofs.Field.Monty31.Inverse
+module
+
+public import Plonky3Lean.Proofs.Field.KoalaBear.Arith
+public import Plonky3Lean.Proofs.Field.Monty31.Inverse
+
+@[expose] public section
 
 /-!
 # KoalaBear: the generic Monty31 results, at KoalaBear's parameters
@@ -11,7 +15,7 @@ open Aeneas Aeneas.Std CoreModels
 open p3_koala_bear
 open Plonky3Lean.Spec.KoalaBear
 
-namespace Plonky3Lean.Proofs.KoalaBear
+namespace Plonky3Lean.Proofs.P3KoalaBear
 
 /-- KoalaBear's `FieldParameters` keep `MONTY_ZERO`, `MONTY_ONE` and `MONTY_TWO` at their defaults. -/
 theorem FieldParams.defaults : Spec.Monty31.FieldDefaults FieldParams where
@@ -54,4 +58,4 @@ theorem koala_bear.KoalaBear.try_inverse.toField (a : Element) (ha : Canonical a
     _ = 2 ^ 64 * ((2 ^ 32)⁻¹ * (2 ^ 32)⁻¹) := by rw [hca']
     _ = 1 := by rw [show (2 : KoalaBear.Field) ^ 64 = 2 ^ 32 * 2 ^ 32 by ring]; field_simp
 
-end Plonky3Lean.Proofs.KoalaBear
+end Plonky3Lean.Proofs.P3KoalaBear

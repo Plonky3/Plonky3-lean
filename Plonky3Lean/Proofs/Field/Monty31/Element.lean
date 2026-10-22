@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.Monty31.Reduce
+module
+
+public import Plonky3Lean.Proofs.Field.Monty31.Reduce
+
+@[expose] public section
 
 /-!
 # Monty31: field elements, for any valid parameters
@@ -46,9 +50,9 @@ The `u64` product cannot overflow, and is below `2^32 · p` as `monty_reduce` re
 @[step]
 theorem monty_31.MontyField31.mul.spec (hv : Valid inst p mu) (a b : monty_31.MontyField31 MP)
     (ha : a.value.val < p.val) (hb : b.value.val < p.val) :
-    monty_31.MontyField31.mul inst a b ⦃ c => c.value.val < p.val ∧
+    monty_31.MontyField31.Insts.CoreOpsArithMulMontyField31MontyField31.mul inst a b ⦃ c => c.value.val < p.val ∧
       c.value.val * 2 ^ 32 % p.val = a.value.val * b.value.val % p.val ⦄ := by
-  unfold monty_31.MontyField31.mul
+  unfold monty_31.MontyField31.Insts.CoreOpsArithMulMontyField31MontyField31.mul
   have hp := hv.lt
   have hab : a.value.val * b.value.val < 2 ^ 32 * p.val := by
     calc a.value.val * b.value.val < p.val * p.val := Nat.mul_lt_mul'' ha hb

@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.Goldilocks.PowersOfTwo
+module
+
+public import Plonky3Lean.Proofs.Field.Goldilocks.PowersOfTwo
+
+@[expose] public section
 
 /-!
 # Goldilocks: the `QuotientMap` integer conversions
@@ -13,7 +17,7 @@ The `i128` unchecked conversion truncates to an `i64`, which its documented rang
 open Aeneas Aeneas.Std CoreModels p3_goldilocks Plonky3Lean.Lib
 open Plonky3Lean.Spec.Goldilocks
 
-namespace Plonky3Lean.Proofs.Goldilocks
+namespace Plonky3Lean.Proofs.P3Goldilocks
 
 
 /-- `from_int` on a `u64` stores the integer unchanged. -/
@@ -43,6 +47,7 @@ theorem I64.from_int.spec (int : Std.I64) :
   · rename_i h
     simp only [ge_iff_le, IScalar.le_equiv] at h
     step*
+    rename r.value = _ => r_post
     have hc : i.val = int.val.toNat := by
       rw [i_post, IScalar.hcast_val_eq, UScalarTy.U64_numBits_eq, Int.emod_eq_of_lt (by simpa using h) (by omega)]
     rw [r_post, hc]
@@ -52,6 +57,7 @@ theorem I64.from_int.spec (int : Std.I64) :
   · rename_i h
     simp only [ge_iff_le, IScalar.le_equiv, not_le, show (0#i64).val = 0 from rfl] at h
     step*
+    rename r.value = _ => r_post
     have hv : (i.val : ℤ) = 18446744069414584321 + int.val := by
       rw [i_post]; push_cast; rw [Int.emod_eq_of_lt (by omega) (by omega)]
     rw [r_post]
@@ -76,7 +82,7 @@ theorem I128.from_int.spec (int : Std.I128) :
   split
   · rename_i h
     simp only [ge_iff_le, IScalar.le_equiv, show (0#i128).val = 0 from rfl] at h
-    simp only [lift, bind_tc_ok]
+    simp only [lift, bind_ok]
     apply WP.spec_mono (U128.from_int.field _)
     intro r ⟨hr, _⟩
     rw [hr, IScalar.hcast_val_eq, UScalarTy.U128_numBits_eq,
@@ -103,7 +109,7 @@ theorem U64.from_canonical_checked.spec (int : Std.U64) :
   unfold goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked
   rw [ORDER_U64.eq]
   split <;> rename_i h <;> simp only [UScalar.lt_equiv, show (18446744069414584321#u64).val = 18446744069414584321 from rfl] at h
-  · step*; rw [if_pos h, ← g_post]
+  · step*; rw [ite_eq_left h, ← int_post]
   · simp [h]
 
 /-- `from_canonical_checked` on a `u128` accepts exactly the integers below `p`. -/
@@ -114,9 +120,11 @@ theorem U128.from_canonical_checked.spec (int : Std.U128) :
   rw [ORDER_U64.eq]
   have hc : (UScalar.cast .U128 18446744069414584321#u64).val = 18446744069414584321 := by
     rw [cast_u64_u128_val]; rfl
-  simp only [lift, bind_tc_ok]
+  simp only [lift, bind_ok]
   split <;> rename_i h <;> simp only [UScalar.lt_equiv, hc] at h
-  · step*; simp [h, ← g_post]
+  · step*
+    rename _ = UScalar.cast .U64 int => hg
+    simp [h, ← hg]
   · simp [h]
 
 /-- `from_canonical_unchecked` on a `u128` below `2^64` stands for the integer. -/
@@ -144,7 +152,7 @@ theorem I64.from_canonical_checked.spec (int : Std.I64) :
   split
   · rename_i h
     simp only [IScalar.le_equiv, e0, e1] at h
-    simp only [lift, bind_tc_ok]
+    simp only [lift, bind_ok]
     step*
     refine ⟨by omega, h.2, ?_⟩
     rw [g_post, IScalar.hcast_val_eq, UScalarTy.U64_numBits_eq, Int.emod_eq_of_lt h.1 (by omega)]
@@ -156,6 +164,7 @@ theorem I64.from_canonical_checked.spec (int : Std.I64) :
     · rename_i h'
       simp only [IScalar.le_equiv, IScalar.lt_equiv, e0, e2] at h'
       step*
+      rename g.value = _ => g_post
       refine ⟨h'.1, by omega, ?_⟩
       have hv : (i.val : ℤ) = 18446744069414584321 + int.val := by
         rw [i_post]; push_cast; rw [Int.emod_eq_of_lt (by omega) (by omega)]
@@ -182,22 +191,22 @@ theorem I128.from_canonical_checked.spec (int : Std.I128) :
     rw [IScalar.cast_val_eq]; rfl
   have hmin : (IScalar.cast .I128 CoreModels.core.num.I64.MIN).val = -9223372036854775808 := by
     rw [IScalar.cast_val_eq]; rfl
-  simp only [lift, bind_tc_ok]
+  simp only [lift, bind_ok]
   split
   · rename_i h
     simp only [IScalar.lt_equiv, hmax] at h
-    simp only [bind_tc_ok, WP.spec_ok]
+    simp only [bind_ok, WP.spec_ok]
     omega
   · rename_i h
     simp only [IScalar.lt_equiv, hmax, not_lt] at h
     split
     · rename_i h'
       simp only [IScalar.lt_equiv, hmin] at h'
-      simp only [bind_tc_ok, WP.spec_ok]
+      simp only [bind_ok, WP.spec_ok]
       omega
     · rename_i h'
       simp only [IScalar.lt_equiv, hmin, not_lt] at h'
-      simp only [bind_tc_ok]
+      simp only [bind_ok]
       have hc : (IScalar.cast .I64 int).val = int.val := by
         rw [IScalar.cast_val_eq, IScalarTy.I64_numBits_eq, IScalarTy.I128_numBits_eq,
           show min 64 128 = 63 + 1 from rfl]
@@ -219,7 +228,7 @@ theorem I128.from_canonical_unchecked.truncates (int : Std.I128) :
     goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_unchecked int ⦃ r =>
       (r.value.val : Goldilocks.Field) = (Int.bmod int.val (2 ^ 64) : Goldilocks.Field) ⦄ := by
   unfold goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_unchecked
-  simp only [lift, bind_tc_ok]
+  simp only [lift, bind_ok]
   apply WP.spec_mono (I64.from_canonical_unchecked.spec _)
   intro r hr
   rw [hr, IScalar.cast_val_eq, IScalarTy.I64_numBits_eq, IScalarTy.I128_numBits_eq]
@@ -252,4 +261,4 @@ theorem I128.from_canonical_unchecked.doc_range_counterexample :
   rw [hv, show Int.bmod 18446744073709551615 (2 ^ 64) = -1 by decide]
   refine ⟨by push_cast; rfl, by push_cast; decide⟩
 
-end Plonky3Lean.Proofs.Goldilocks
+end Plonky3Lean.Proofs.P3Goldilocks

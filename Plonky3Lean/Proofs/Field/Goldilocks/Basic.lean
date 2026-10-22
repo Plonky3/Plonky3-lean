@@ -1,5 +1,9 @@
-import Plonky3Lean.Lib.Scalar.U64
-import Plonky3Lean.Spec.Goldilocks
+module
+
+public import Plonky3Lean.Lib.Scalar.U64
+public import Plonky3Lean.Spec.Goldilocks
+
+@[expose] public section
 
 /-!
 # Goldilocks: the constants the arithmetic reads, and reading values as field elements
@@ -10,7 +14,7 @@ The literal `18446744069414584321` is `p = 2^64 - 2^32 + 1`.
 open Aeneas Aeneas.Std CoreModels p3_goldilocks Plonky3Lean.Lib
 open Plonky3Lean.Spec.Goldilocks
 
-namespace Plonky3Lean.Proofs.Goldilocks
+namespace Plonky3Lean.Proofs.P3Goldilocks
 
 theorem fieldSize_eq : Goldilocks.fieldSize = 18446744069414584321 := rfl
 
@@ -55,4 +59,4 @@ theorem natCast_eq_of_mod {x y : ℕ} (h : x % 18446744069414584321 = y % 184467
     (x : Goldilocks.Field) = y :=
   (ZMod.natCast_eq_natCast_iff' _ _ _).mpr h
 
-end Plonky3Lean.Proofs.Goldilocks
+end Plonky3Lean.Proofs.P3Goldilocks

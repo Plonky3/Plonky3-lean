@@ -30,9 +30,6 @@ sys.dont_write_bytecode = True  # importing check-claims.py must not leave __pyc
 ROOT = Path(__file__).resolve().parents[1]
 CLAIMS_PREFIX = "Plonky3Lean.Claims."
 
-# Warnings from pinned dependencies that the build tolerates. None today; if one
-# appears, it is listed here with its reason, and so in STATUS.md.
-UPSTREAM_WARNINGS = []
 
 
 def load_check_claims():
@@ -229,7 +226,9 @@ def generate():
     w("(`crates/*/extraction/gaps.toml`), the patch headers, `claims.toml` and the Lean")
     w("build. Do not edit by hand: run `tools/status.py`. CI fails if it is out of date.\n")
     w(f"**Plonky3:** [`{pin[:8]}`](https://github.com/Plonky3/Plonky3/commit/{pin})\n")
-    w(f"**Extractor:** hax {tc['hax_version']} (charon `{tc['charon']}`, aeneas `{tc['aeneas']}`),")
+    hax = (f"hax {tc['hax_release']}" if tc.get("hax_release")
+           else f"hax at [`{tc['hax_commit'][:7]}`](https://github.com/cryspen/hax/commit/{tc['hax_commit']})")
+    w(f"**Extractor:** {hax} (charon `{tc['charon']}`, aeneas `{tc['aeneas']}`),")
     w(f"target `{tc['target']}`\n")
 
     # Crates
@@ -338,9 +337,12 @@ def generate():
         w(f"| `{cl.removeprefix(CLAIMS_PREFIX)}` | " + ", ".join(f"`{a}`" for a in axs) + " |")
     w("")
 
-    w("## Upstream warnings\n")
-    w("Warnings from pinned dependencies, not from this repository. CI allows exactly these.\n")
-    w("\n".join(f"- {x}" for x in UPSTREAM_WARNINGS) if UPSTREAM_WARNINGS else "None.")
+    known = [l for l in (ROOT / "known-warnings.txt").read_text().splitlines()
+             if l.strip() and not l.startswith("#")]
+    w("## Known warnings\n")
+    w("The build warnings `known-warnings.txt` accepts; `extract.sh` fails on any other,")
+    w("and on a listed one the build no longer prints.\n")
+    w("\n".join(f"- `` {x} ``" for x in known) if known else "None.")
     return "\n".join(out) + "\n"
 
 

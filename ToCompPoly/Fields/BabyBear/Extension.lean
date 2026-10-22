@@ -3,13 +3,13 @@ Copyright (c) 2026 CompPoly. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Derek Sorensen
 -/
-import CompPoly.Fields.BabyBear
-import Mathlib.RingTheory.AdjoinRoot
-import ToCompPoly.Data.Nat.PowMod
-import ToCompPoly.Fields.BabyBear
-import ToCompPoly.ToMathlib.Order.OrderOfSq
-import ToCompPoly.ToMathlib.Polynomial.XPowSubC
+module
 
+public import CompPoly.Fields.BabyBear
+public import Mathlib.RingTheory.AdjoinRoot
+public import ToCompPoly.Fields.BabyBear
+public import ToCompPoly.ToMathlib.Order.OrderOfSq
+public import ToCompPoly.ToMathlib.Polynomial.XPowSubC
 /-!
   # BabyBear: binomial extension fields
 
@@ -26,6 +26,8 @@ import ToCompPoly.ToMathlib.Polynomial.XPowSubC
 
   Everything is kernel-checked, without `native_decide`.
 -/
+
+@[expose] public section
 
 open Polynomial
 
@@ -53,7 +55,7 @@ theorem orderOf_of_twoAdicGenerator_27 {D : ℕ} (hD : 0 < D) (W : Field) :
       (by rw [degree_X_pow_sub_C hD]; exact_mod_cast hD.ne')
   have h1 := orderOf_injective (AdjoinRoot.of (X ^ D - C W)).toMonoidHom hinj
     (0x1A427A41 : Field)
-  simp only [RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe] at h1
+  simp only [RingHom.toMonoidHom_eq_coe, MonoidHom.coe_ofClass] at h1
   rw [h1]
   have := twoAdicGenerators_order ⟨27, by decide⟩
   simpa [twoAdicGenerators] using this
@@ -70,7 +72,7 @@ def ext4W : Field := 11
 theorem irreducible_ext4 : Irreducible (X ^ 4 - C ext4W) := by
   show Irreducible (X ^ 4 - C (11 : Field))
   refine X_pow_sub_C_irreducible_of_gcd (ℓ := 2) (by norm_num) (by decide) ?_ ?_
-  · exact_mod_cast natCast_pow_ne_one 11 (by unfold fieldSize; norm_num) (by decide)
+  · exact_mod_cast natCast_pow_ne_one 11 (by decide)
   · unfold fieldSize; decide
 
 instance : Fact (Irreducible (X ^ 4 - C ext4W)) := ⟨irreducible_ext4⟩
@@ -153,7 +155,7 @@ def ext5W : Field := 2
 theorem irreducible_ext5 : Irreducible (X ^ 5 - C ext5W) := by
   show Irreducible (X ^ 5 - C (2 : Field))
   refine X_pow_sub_C_irreducible_of_gcd (ℓ := 5) (by norm_num) (by decide) ?_ ?_
-  · exact_mod_cast natCast_pow_ne_one 2 (by unfold fieldSize; norm_num) (by decide)
+  · exact_mod_cast natCast_pow_ne_one 2 (by decide)
   · unfold fieldSize; decide
 
 instance : Fact (Irreducible (X ^ 5 - C ext5W)) := ⟨irreducible_ext5⟩
@@ -178,7 +180,7 @@ def ext8W : Field := 11
 theorem irreducible_ext8 : Irreducible (X ^ 8 - C ext8W) := by
   show Irreducible (X ^ 8 - C (11 : Field))
   refine X_pow_sub_C_irreducible_of_gcd (ℓ := 2) (by norm_num) (by decide) ?_ ?_
-  · exact_mod_cast natCast_pow_ne_one 11 (by unfold fieldSize; norm_num) (by decide)
+  · exact_mod_cast natCast_pow_ne_one 11 (by decide)
   · unfold fieldSize; decide
 
 instance : Fact (Irreducible (X ^ 8 - C ext8W)) := ⟨irreducible_ext8⟩

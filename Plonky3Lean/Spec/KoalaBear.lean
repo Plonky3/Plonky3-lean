@@ -1,8 +1,12 @@
-import CompPoly.Fields.KoalaBear
-import P3KoalaBear
-import Plonky3Lean.Spec.Monty31
-import ToCompPoly.Fields.KoalaBear.Extension
-import ToCompPoly.Fields.KoalaBear.Quintic
+module
+
+public import CompPoly.Fields.KoalaBear
+public import P3KoalaBear
+public import Plonky3Lean.Spec.Monty31
+public import ToCompPoly.Fields.KoalaBear.Extension
+public import ToCompPoly.Fields.KoalaBear.Quintic
+
+@[expose] public section
 
 /-!
 # KoalaBear: what the model's values mean

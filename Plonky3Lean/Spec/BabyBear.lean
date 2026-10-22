@@ -1,6 +1,10 @@
-import CompPoly.Fields.BabyBear
-import P3BabyBear
-import ToCompPoly.Fields.BabyBear.Extension
+module
+
+public import CompPoly.Fields.BabyBear
+public import P3BabyBear
+public import ToCompPoly.Fields.BabyBear.Extension
+
+@[expose] public section
 
 /-!
 # BabyBear: what the model's values mean

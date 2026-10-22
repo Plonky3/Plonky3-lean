@@ -1,5 +1,10 @@
-import Plonky3Lean.Proofs.Field.Goldilocks.Inverse
-import ToCompPoly.Fields.Goldilocks
+module
+
+public import Plonky3Lean.Lib.Array
+public import Plonky3Lean.Proofs.Field.Goldilocks.Inverse
+public import ToCompPoly.Fields.Goldilocks
+
+@[expose] public section
 
 /-!
 # Goldilocks: constructors and constants
@@ -12,7 +17,7 @@ The table is checked against CompPoly's primitive `2^32`-th root of unity.
 open Aeneas Aeneas.Std CoreModels p3_goldilocks Plonky3Lean.Lib
 open Plonky3Lean.Spec.Goldilocks
 
-namespace Plonky3Lean.Proofs.Goldilocks
+namespace Plonky3Lean.Proofs.P3Goldilocks
 
 
 /-- `new_array` stores each input unchanged. -/
@@ -23,6 +28,9 @@ theorem new_array.spec {N : Std.Usize} (input : Array Std.U64 N) :
     goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.ZERO
   have hin : input.val.length = N.val := input.property
   step*
+  obtain ⟨arr, harr⟩ := array_repeat_ok N goldilocks.Goldilocks.Insts.CoreCloneClone
+    (fun x => ⟨x, rfl⟩) g
+  rw [harr, bind_ok]
   apply loop.spec_decr_nat (fun (x : Array goldilocks.Goldilocks N × Std.Usize) => N.val - x.2.val)
     (fun x => x.2.val ≤ N.val ∧ ∀ j < x.2.val,
       x.1.val[j]? = (input.val[j]?).map (fun v => ({ value := v } : goldilocks.Goldilocks)))
@@ -39,9 +47,9 @@ theorem new_array.spec {N : Std.Usize} (input : Array Std.U64 N) :
       rw [a_post, Array.set_val_eq, List.getElem?_set]
       by_cases hjk : k.val = j
       · subst hjk
-        rw [if_pos rfl, if_pos (by omega), List.getElem?_eq_getElem (by omega)]
-        rw [i1_post2]; rfl
-      · rw [if_neg hjk]; exact hinv j (by omega)
+        rw [ite_eq_left rfl, ite_eq_left (by omega), List.getElem?_eq_getElem (by omega)]
+        rw [i1_post1]; rfl
+      · rw [ite_eq_right hjk]; exact hinv j (by omega)
     · rename_i hge
       have hk' : k.val = N.val := by simp at hge; omega
       simp only [WP.spec_ok]
@@ -93,10 +101,7 @@ theorem TWO_ADIC_GENERATORS.spec :
   have hpow : (Goldilocks.twoAdicGenerator) ^ (2 ^ (32 - i)) =
       ((Nat.powMod 0x185629dcda58878c (2 ^ (32 - i)) 18446744069414584321 : ℕ) : Goldilocks.Field) := by
     show ((0x185629dcda58878c : ℕ) : Goldilocks.Field) ^ (2 ^ (32 - i)) = _
-    rw [ZMod.natCast_pow_eq_powMod _ _ (by
-      calc 2 ^ (32 - i) ≤ 2 ^ 32 := Nat.pow_le_pow_right (by norm_num) (by omega)
-        _ < 2 ^ 64 := by norm_num)]
-    rfl
+    rw [ZMod.natCast_pow_eq_powMod]; rfl
   rw [hpow]
   congr 1
   have := congrArg (fun l => l[i]?) twoAdicTable_eq
@@ -136,7 +141,7 @@ theorem two_adic_generator.spec (bits : Std.Usize) (h : bits.val ≤ 32) :
   have ht : goldilocks.Goldilocks.Insts.P3_fieldFieldTwoAdicField.TWO_ADICITY = 32#usize := by
     unfold goldilocks.Goldilocks.Insts.P3_fieldFieldTwoAdicField.TWO_ADICITY; rfl
   rw [ht]
-  simp only [massert, UScalar.le_equiv, show (32#usize).val = 32 from rfl, h, if_true, bind_tc_ok]
+  simp only [massert, UScalar.le_equiv, show (32#usize).val = 32 from rfl, h, ite_true, bind_ok]
   apply WP.spec_bind TWO_ADIC_GENERATORS.order
   rintro a ⟨hlen, hord, -⟩
   unfold Array.index_usize
@@ -153,7 +158,7 @@ theorem two_adic_generator.panics (bits : Std.Usize) (h : 32 < bits.val) :
     unfold goldilocks.Goldilocks.Insts.P3_fieldFieldTwoAdicField.TWO_ADICITY; rfl
   rw [ht]
   simp only [massert, UScalar.le_equiv, show (32#usize).val = 32 from rfl]
-  rw [if_neg (by omega)]; rfl
+  rw [ite_eq_right (by omega), bind_fail]
 
 /-- `GENERATOR` is CompPoly's `generator`, `7`. -/
 theorem GENERATOR.spec :
@@ -170,10 +175,11 @@ theorem NEG_ONE.spec :
   unfold goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.NEG_ONE
   rw [ORDER_U64.eq]
   step*
+  rename r.value = _ => r_post
   unfold toField Canonical
-  rw [r_post, i_post1]
+  rw [r_post, i_post]
   refine ⟨?_, by decide⟩
   rw [eq_neg_iff_add_eq_zero]
   exact_mod_cast p_eq_zero
 
-end Plonky3Lean.Proofs.Goldilocks
+end Plonky3Lean.Proofs.P3Goldilocks

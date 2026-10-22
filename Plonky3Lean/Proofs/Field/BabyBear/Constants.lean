@@ -1,5 +1,9 @@
-import Plonky3Lean.Proofs.Field.BabyBear.Element
-import ToCompPoly.Fields.BabyBear
+module
+
+public import Plonky3Lean.Proofs.Field.BabyBear.Element
+public import ToCompPoly.Fields.BabyBear
+
+@[expose] public section
 
 /-!
 # BabyBear: the base-field constants
@@ -13,7 +17,7 @@ open p3_baby_bear
 open Plonky3Lean.Spec.BabyBear
 open Plonky3Lean.Lib
 
-namespace Plonky3Lean.Proofs.BabyBear
+namespace Plonky3Lean.Proofs.P3BabyBear
 
 /-! ## `FieldParameters` -/
 
@@ -37,7 +41,7 @@ theorem FieldParams.MONTY_NEG_ONE.toField :
   refine Aeneas.Std.WP.spec_mono (baby_bear.BabyBear.new.toField i1) ?_
   rintro r ⟨hc, hr⟩
   refine ⟨hc, ?_⟩
-  rw [hr, i1_post1]
+  rw [hr, i1_post]
   decide
 
 theorem FieldParams.HALF_P_PLUS_1.spec :
@@ -47,7 +51,7 @@ theorem FieldParams.HALF_P_PLUS_1.spec :
   unfold baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.PRIME
   step*
   have hh : h.val = (BabyBear.fieldSize + 1) / 2 := by
-    rw [h_post1, i1_post, Nat.shiftRight_eq_div_pow]; rfl
+    rw [h_post, i1_post, Nat.shiftRight_eq_div_pow]; rfl
   refine ⟨hh, ?_⟩
   rw [hh]
   decide
@@ -75,7 +79,8 @@ theorem slice_of_new_array {N : Std.Usize} (input : Array Std.U32 N) {L : List B
       ⦃ s => (∀ y ∈ s.val, Canonical y) ∧ s.val.map Spec.BabyBear.toField = L ⦄ := by
   apply Aeneas.Std.WP.spec_bind (baby_bear.BabyBear.new_array.toField input)
   rintro a ⟨hc, hm⟩
-  exact (Aeneas.Std.WP.spec_ok _).mpr ⟨hc, by rw [← hL]; exact hm⟩
+  exact (Aeneas.Std.WP.spec_ok _).mpr
+    ⟨by rw [Array.val_to_slice]; exact hc, by rw [Array.val_to_slice, ← hL]; exact hm⟩
 
 /-- `TWO_ADIC_GENERATORS` is CompPoly's `BabyBear.twoAdicGenerators`. -/
 theorem TwoAdicParams.TWO_ADIC_GENERATORS.eq_twoAdicGenerators :
@@ -167,7 +172,7 @@ theorem TwoAdicParams.ODD_FACTOR.spec :
     baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsTwoAdicDataSharedStaticSliceMontyField31BabyBearParameters.TWO_ADICITY
   step*
   have h15 : (UScalar.hcast IScalarTy.I32 i2).val = 15 := by
-    rw [UScalar.hcast_val_eq, i2_post1]; decide
+    rw [UScalar.hcast_val_eq, i2_post]; decide
   refine ⟨h15, ?_⟩
   rw [h15, baby_bear.BabyBearParameters.PRIME.eq_fieldSize,
     baby_bear.BabyBearParameters.TWO_ADICITY.eq_twoAdicity]
@@ -180,25 +185,19 @@ theorem poseidon1._.holds : poseidon1._ ⦃ _ => True ⦄ := by
     unfold poseidon1.BABYBEAR_POSEIDON1_RC_16; exact baby_bear.BabyBear.new_2d_array.never_panics _
   unfold poseidon1._
     poseidon1.BABYBEAR_POSEIDON1_HALF_FULL_ROUNDS poseidon1.BABYBEAR_POSEIDON1_PARTIAL_ROUNDS_16
-  simp only [ht, bind_tc_ok, CoreModels.core.slice.Slice.len,
-    CoreModels.rust_primitives.slice.slice_length]
+  rw [ht, bind_ok]
+  simp only [CoreModels.core.array.Array.as_slice, CoreModels.rust_primitives.slice.array_as_slice,
+    CoreModels.core.slice.Slice.len, CoreModels.rust_primitives.slice.slice_length, bind_ok]
   step*
-  all_goals
-    simp only [not_not]
-    apply UScalar.eq_of_val_eq
-    simp_all
 
 theorem poseidon2._.holds : poseidon2._ ⦃ _ => True ⦄ := by
   obtain ⟨t, ht⟩ : ∃ t, poseidon2.BABYBEAR_POSEIDON2_RC_16_EXTERNAL_INITIAL = .ok t := by
     unfold poseidon2.BABYBEAR_POSEIDON2_RC_16_EXTERNAL_INITIAL
     exact baby_bear.BabyBear.new_2d_array.never_panics _
   unfold poseidon2._ poseidon2.BABYBEAR_POSEIDON2_HALF_FULL_ROUNDS
-  simp only [ht, bind_tc_ok, CoreModels.core.slice.Slice.len,
-    CoreModels.rust_primitives.slice.slice_length]
+  rw [ht, bind_ok]
+  simp only [CoreModels.core.array.Array.as_slice, CoreModels.rust_primitives.slice.array_as_slice,
+    CoreModels.core.slice.Slice.len, CoreModels.rust_primitives.slice.slice_length, bind_ok]
   step*
-  all_goals
-    simp only [not_not]
-    apply UScalar.eq_of_val_eq
-    simp_all
 
-end Plonky3Lean.Proofs.BabyBear
+end Plonky3Lean.Proofs.P3BabyBear
