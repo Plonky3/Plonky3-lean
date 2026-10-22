@@ -9,7 +9,12 @@ What this repository asserts about `MontyField31` and its `u32` helpers.
 
 Each claim holds for every `MontyParameters` impl that passes `MontyField31::new`'s checks.
 
-`Valid inst p mu` is exactly those checks: `p` odd, `p < 2^31`, `MONTY_BITS = 32`, `p · mu ≡ 1 (mod 2^32)`.
+`Valid inst p mu` is exactly those checks:
+
+- `p` is odd,
+- `p < 2^31`,
+- `MONTY_BITS = 32`,
+- `p · mu ≡ 1 (mod 2^32)`.
 
 A claim that needs more says so, and why.
 
@@ -35,7 +40,7 @@ theorem utils.monty_reduce.spec (hv : Valid inst p mu) (x : Std.U64)
       r.val * 2 ^ 32 % p.val = x.val % p.val ⦄ :=
   Proofs.Monty31.utils.monty_reduce.spec hv x hx
 
-/-- `large_monty_reduce(x)`, for `x < 2 · 2^32 · p`, is the canonical `r` with `r · 2^32 ≡ x (mod p)`. -/
+/-- `large_monty_reduce(x)`, for `x < 2 · 2^32 · p`, gives the canonical `r` with `r · 2^32 ≡ x`. -/
 theorem utils.large_monty_reduce.spec (hv : Valid inst p mu) (x : Std.U64)
     (hx : x.val < 2 * 2 ^ 32 * p.val) :
     utils.large_monty_reduce inst x ⦃ r => r.val < p.val ∧
@@ -46,14 +51,18 @@ theorem utils.large_monty_reduce.spec (hv : Valid inst p mu) (x : Std.U64)
 
 It needs `p >= 2^30`, which `MontyField31::new` does not check.
 
-Below it, one subtraction does not bring the low limb into range: see the last claim of this file. -/
+Below it, one subtraction does not bring the low limb into range.
+
+The last claim of this file shows a prime where that happens. -/
 theorem utils.monty_reduce_u128.spec (hv : Valid inst p mu) (hp30 : 2 ^ 30 ≤ p.val)
     (x : Std.U128) (hx : x.val < 2 ^ 96) :
     utils.monty_reduce_u128 inst x ⦃ r => r.val < p.val ∧
       r.val * 2 ^ 32 % p.val = x.val % p.val ⦄ :=
   Proofs.Monty31.utils.monty_reduce_u128.spec hv hp30 x hx
 
-/-- `from_monty(x)` takes any `u32` out of Montgomery form: the canonical `r` with `r · 2^32 ≡ x (mod p)`. -/
+/-- `from_monty(x)` takes any `u32` out of Montgomery form.
+
+It gives the canonical `r` with `r · 2^32 ≡ x`. -/
 theorem utils.from_monty.spec (hv : Valid inst p mu) (x : Std.U32) :
     utils.from_monty inst x ⦃ r => r.val < p.val ∧
       r.val * 2 ^ 32 % p.val = x.val % p.val ⦄ :=
@@ -157,7 +166,9 @@ theorem QuotientMap.from_canonical_checked_u32 {FP : Type} {inst : data_traits.F
   Proofs.Monty31.from_canonical_checked_u32.spec hv x
 
 open monty_31.MontyField31.Insts in
-/-- `from_canonical_checked` on an `i32` is `Some(x mod p)` for `|x| <= (p - 1)/2`, and `None` otherwise. -/
+/-- `from_canonical_checked` on an `i32` is `Some(x mod p)` for `|x| <= (p - 1)/2`.
+
+Outside that range it is `None`. -/
 theorem QuotientMap.from_canonical_checked_i32 {FP : Type} {inst : data_traits.FieldParameters FP}
     (hv : FieldValid inst p mu) (x : Std.I32) :
     P3_fieldIntegersQuotientMapI32.from_canonical_checked inst x ⦃ r =>
@@ -186,7 +197,9 @@ theorem QuotientMap.from_canonical_checked_u128 {FP : Type} {inst : data_traits.
   Proofs.Monty31.from_canonical_checked_u128.spec hv x
 
 open monty_31.MontyField31.Insts in
-/-- `from_canonical_checked` on an `i64` is `Some(x mod p)` for `|x| <= (p - 1)/2`, and `None` otherwise. -/
+/-- `from_canonical_checked` on an `i64` is `Some(x mod p)` for `|x| <= (p - 1)/2`.
+
+Outside that range it is `None`. -/
 theorem QuotientMap.from_canonical_checked_i64 {FP : Type} {inst : data_traits.FieldParameters FP}
     (hv : FieldValid inst p mu) (x : Std.I64) :
     P3_fieldIntegersQuotientMapI64.from_canonical_checked inst x ⦃ r =>
@@ -197,7 +210,9 @@ theorem QuotientMap.from_canonical_checked_i64 {FP : Type} {inst : data_traits.F
   Proofs.Monty31.from_canonical_checked_i64.spec hv x
 
 open monty_31.MontyField31.Insts in
-/-- `from_canonical_checked` on an `i128` is `Some(x mod p)` for `|x| <= (p - 1)/2`, and `None` otherwise. -/
+/-- `from_canonical_checked` on an `i128` is `Some(x mod p)` for `|x| <= (p - 1)/2`.
+
+Outside that range it is `None`. -/
 theorem QuotientMap.from_canonical_checked_i128 {FP : Type} {inst : data_traits.FieldParameters FP}
     (hv : FieldValid inst p mu) (x : Std.I128) :
     P3_fieldIntegersQuotientMapI128.from_canonical_checked inst x ⦃ r =>
@@ -209,7 +224,9 @@ theorem QuotientMap.from_canonical_checked_i128 {FP : Type} {inst : data_traits.
 
 /-! ## Field elements -/
 
-/-- `MontyField31::new(x)` passes its parameter checks and stores `x · 2^32 mod p`, for every `u32`. -/
+/-- `MontyField31::new(x)` passes its parameter checks.
+
+It stores `x · 2^32 mod p`, for every `u32`. -/
 theorem monty_31.MontyField31.new.spec (hv : Valid inst p mu) (x : Std.U32) :
     monty_31.MontyField31.new inst x ⦃ r => r.value.val = x.val * 2 ^ 32 % p.val ⦄ :=
   Proofs.Monty31.monty_31.MontyField31.new.spec hv x
@@ -241,7 +258,9 @@ theorem monty_31.MontyField31.mul_2exp_u64.spec_lt {FP : Type}
 
 The second congruence says the field elements multiply to `1`.
 
-The bound `p >= 2^30` is not checked by `MontyField31::new`, and is needed: see the GCD claims in `Claims/Util.lean`. -/
+`MontyField31::new` does not check `p >= 2^30`.
+
+The bound is needed: the GCD claims show a smaller prime where inversion goes wrong. -/
 theorem monty_31.MontyField31.try_inverse.spec {FP : Type}
     {inst : data_traits.FieldParameters FP} (hv : FieldValid inst p mu) (hd : FieldDefaults inst)
     (hprime : Nat.Prime p.val) (hp30 : 2 ^ 30 ≤ p.val) (a : monty_31.MontyField31 FP)
@@ -254,14 +273,20 @@ theorem monty_31.MontyField31.try_inverse.spec {FP : Type}
 
 /-! ## A valid prime below `2^30` -/
 
-/-- The prime `2^29 - 3`, with `MONTY_MU = 894784853`, passes every check `MontyField31::new` makes. -/
+/-- The prime `2^29 - 3` passes every check `MontyField31::new` makes.
+
+Its `MONTY_MU` is `894784853`. -/
 theorem thirty_bit_prime.valid :
     Valid Proofs.Monty31.Findings.thirtyBit 536870909#u32 894784853#u32 :=
   Proofs.Monty31.Findings.thirtyBit_valid
 
-/-- For that prime and `x = 2^64 - 1`, the 96-bit reduction's low limb stays at least `2 · 2^32 · p`.
+/-- For that prime and `x = 2^64 - 1`, one subtraction leaves the low limb too large.
 
-One subtraction of `2 · 2^32 · p` is not enough, and the inner reduction is applied outside its proved domain. -/
+```text
+  lo                  = 2^64 - 1
+  lo - 2 · 2^32 · p  >= 2 · 2^32 · p    (outside the inner reduction's domain)
+```
+-/
 theorem thirty_bit_prime.low_limb_out_of_range :
     2 * 2 ^ 32 * 536870909 ≤ 2 ^ 64 - 1 ∧
       2 * 2 ^ 32 * 536870909 ≤ (2 ^ 64 - 1) - 2 * 2 ^ 32 * 536870909 :=

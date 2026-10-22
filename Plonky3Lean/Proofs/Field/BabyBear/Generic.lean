@@ -36,7 +36,7 @@ theorem fieldValid : FieldValid FieldParams 2013265921#u32 2281701377#u32 where
     obtain ⟨h, hh, hv, -⟩ := WP.spec_imp_exists FieldParams.HALF_P_PLUS_1.spec
     exact ⟨h, hh, by rw [hv]; rfl⟩
 
-/-- BabyBear's `FieldParameters` keep `MONTY_ZERO`, `MONTY_ONE` and `MONTY_TWO` at their defaults. -/
+/-- BabyBear's named elements zero, one and two keep their defaults. -/
 theorem fieldDefaults : FieldDefaults FieldParams where
   zero := by
     simp
