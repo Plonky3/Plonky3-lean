@@ -308,14 +308,19 @@ theorem baby_bear.BabyBearParameters.ODD_FACTOR.spec :
 
 /-! ## `RelativelyPrimePower<7>` -/
 
-/-- Raising to the power `1725656503` inverts `x ↦ x^7` on the BabyBear field.
-`exp_root_d` computes `x^(1/7)` as `exp_1725656503(x)`; this is the
-number-theoretic fact it relies on (`7 · 1725656503 ≡ 1 mod p - 1`). The body of
-`exp_1725656503` is opaque in the model, so the claim is about the exponent, not
-the function. -/
-theorem baby_bear.BabyBearParameters.exp_root_d.exponent (x : BabyBear.Field) :
-    (x ^ 1725656503) ^ 7 = x :=
-  Proofs.BabyBear.exp_root_seven x
+/-- `exp_root_d` computes `x^(1/7)` as `exp_1725656503(x)`, and raising to the
+power `1725656503` inverts `x ↦ x^7` on the BabyBear field
+(`7 · 1725656503 ≡ 1 mod p - 1`). The first half is read off the model, so a
+change of exponent upstream breaks this claim. The body of `exp_1725656503` is
+opaque in the model, so the second half is about the exponent, not the
+function. -/
+theorem baby_bear.BabyBearParameters.exp_root_d.exponent :
+    (∀ {R : Type} (inst : p3_field.field.PrimeCharacteristicRing R) (x : R),
+      baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsRelativelyPrimePower7.exp_root_d
+          inst x =
+        p3_field.exponentiation.exp_1725656503 inst x) ∧
+    ∀ x : BabyBear.Field, (x ^ 1725656503) ^ 7 = x :=
+  ⟨fun _ _ => rfl, Proofs.BabyBear.exp_root_seven⟩
 
 /-! ## `BinomialExtensionData<D>`: the binomial extensions
 
