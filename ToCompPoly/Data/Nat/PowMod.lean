@@ -1,17 +1,25 @@
+/-
+Copyright (c) 2026 CompPoly. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Derek Sorensen
+-/
 import Mathlib.Data.ZMod.Basic
 
 /-!
 # Modular exponentiation the kernel can evaluate
 
-Claims about field constants need facts like `31 ^ ((p - 1) / 2) ≠ 1 (mod p)`.
-`decide` cannot evaluate `a ^ e` in `ZMod p` for exponents near `2^31`, and
-`native_decide` would add `Lean.ofReduceBool` to the claim's axioms, which
-`claims.toml` does not allow. `powMod` is square-and-multiply, structurally
-recursive on a bit budget, so the kernel evaluates it in about `log₂ e` steps;
-`zmod_pow_eq_powMod` moves a power in `ZMod m` onto it.
+Facts about concrete field elements, such as `31 ^ ((p - 1) / 2) ≠ 1` in
+`ZMod p`, need `a ^ e` evaluated for exponents near `2 ^ 31`. `decide` cannot
+unfold `Monoid.npow` that far, and `native_decide` adds `Lean.ofReduceBool` to a
+proof's axioms. `Nat.powModAux` is square-and-multiply, structurally recursive
+on a bit budget, so the kernel evaluates it in about `log₂ e` steps;
+`ZMod.natCast_pow_eq_powMod` moves a power in `ZMod m` onto it.
+
+`powMod` in `CompPoly.Fields.PrattCertificate` is a `while` loop, which the
+kernel does not reduce, and has no correctness lemma; this one is for proofs.
 -/
 
-namespace Plonky3Lean.Lib
+namespace Nat
 
 /-- `powModAux fuel b e m = b ^ e % m` once `e < 2 ^ fuel`. -/
 def powModAux : ℕ → ℕ → ℕ → ℕ → ℕ
@@ -51,9 +59,9 @@ theorem powModAux_eq (fuel b e m : ℕ) (he : e < 2 ^ fuel) :
 theorem powMod_eq (b e m : ℕ) (he : e < 2 ^ 64) : powMod b e m = b ^ e % m :=
   powModAux_eq 64 b e m he
 
-/-- A power in `ZMod m`, as `powMod`. -/
-theorem zmod_pow_eq_powMod {m : ℕ} (b e : ℕ) (he : e < 2 ^ 64) :
-    (b : ZMod m) ^ e = (powMod b e m : ZMod m) := by
-  rw [powMod_eq b e m he, ZMod.natCast_mod]; push_cast; rfl
+end Nat
 
-end Plonky3Lean.Lib
+/-- A power in `ZMod m`, as `Nat.powMod`. -/
+theorem ZMod.natCast_pow_eq_powMod {m : ℕ} (b e : ℕ) (he : e < 2 ^ 64) :
+    (b : ZMod m) ^ e = (Nat.powMod b e m : ZMod m) := by
+  rw [Nat.powMod_eq b e m he, ZMod.natCast_mod]; push_cast; rfl

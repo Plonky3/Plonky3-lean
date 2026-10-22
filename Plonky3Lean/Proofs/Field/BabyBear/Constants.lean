@@ -1,7 +1,5 @@
-import Mathlib.FieldTheory.Finite.Basic
-import Plonky3Lean.Lib.OrderOf
-import Plonky3Lean.Lib.PowMod
 import Plonky3Lean.Proofs.Field.BabyBear.Element
+import ToCompPoly.Fields.BabyBear
 
 /-!
 # BabyBear: the base-field constants
@@ -54,30 +52,6 @@ theorem FieldParams.HALF_P_PLUS_1.spec :
   rw [hh]
   decide
 
-/-- `b ^ e ≠ 1` in `BabyBear.Field`, from a `powMod` the kernel can evaluate. -/
-theorem pow_ne_one_of_powMod {e : ℕ} (b : ℕ) (he : e < 2 ^ 64)
-    (h : (Lib.powMod b e BabyBear.fieldSize : BabyBear.Field) ≠ 1) :
-    (b : BabyBear.Field) ^ e ≠ 1 := by
-  rwa [zmod_pow_eq_powMod b e he]
-
-/-- The primes dividing `p - 1 = 2^27 · 3 · 5`. -/
-theorem prime_dvd_fieldSize_sub_one {q : ℕ} (hq : q.Prime) (h : q ∣ BabyBear.fieldSize - 1) :
-    q = 2 ∨ q = 3 ∨ q = 5 := by
-  rw [show BabyBear.fieldSize - 1 = 2 ^ 27 * 3 * 5 by decide] at h
-  rcases (Nat.Prime.dvd_mul hq).mp h with h | h
-  · rcases (Nat.Prime.dvd_mul hq).mp h with h | h
-    · exact .inl ((Nat.prime_dvd_prime_iff_eq hq Nat.prime_two).mp (hq.dvd_of_dvd_pow h))
-    · exact .inr (.inl ((Nat.prime_dvd_prime_iff_eq hq Nat.prime_three).mp h))
-  · exact .inr (.inr ((Nat.prime_dvd_prime_iff_eq hq Nat.prime_five).mp h))
-
-/-- `31` generates the multiplicative group of the BabyBear field. -/
-theorem orderOf_thirtyOne : orderOf (31 : BabyBear.Field) = BabyBear.fieldSize - 1 := by
-  apply orderOf_eq_of_pow_and_pow_div_prime (by decide)
-  · exact ZMod.pow_card_sub_one_eq_one (by decide)
-  · intro q hq hdvd
-    rcases prime_dvd_fieldSize_sub_one hq hdvd with rfl | rfl | rfl <;>
-    · exact_mod_cast pow_ne_one_of_powMod 31 (by unfold BabyBear.fieldSize; norm_num) (by decide)
-
 theorem FieldParams.MONTY_GEN.generator :
     FieldParams.MONTY_GEN ⦃ g => Canonical g ∧
       orderOf (Spec.BabyBear.toField g) = BabyBear.fieldSize - 1 ⦄ := by
@@ -87,7 +61,7 @@ theorem FieldParams.MONTY_GEN.generator :
   rintro g ⟨hc, hg⟩
   refine ⟨hc, ?_⟩
   rw [hg]
-  exact_mod_cast orderOf_thirtyOne
+  exact_mod_cast BabyBear.orderOf_generator
 
 /-! ## `TwoAdicData` -/
 
@@ -198,16 +172,6 @@ theorem TwoAdicParams.ODD_FACTOR.spec :
   rw [h15, baby_bear.BabyBearParameters.PRIME.eq_fieldSize,
     baby_bear.BabyBearParameters.TWO_ADICITY.eq_twoAdicity]
   decide
-
-/-! ## `RelativelyPrimePower<7>` -/
-
-/-- `x ↦ x^1725656503` inverts `x ↦ x^7` on the BabyBear field, since
-`7 · 1725656503 = 6 · (p - 1) + 1`. -/
-theorem exp_root_seven (x : BabyBear.Field) : (x ^ 1725656503) ^ 7 = x := by
-  rcases eq_or_ne x 0 with rfl | hx
-  · simp
-  · rw [← pow_mul, show 1725656503 * 7 = 6 * (BabyBear.fieldSize - 1) + 1 by decide,
-      pow_succ, pow_mul', ZMod.pow_card_sub_one_eq_one hx, one_pow, one_mul]
 
 /-! ## The two remaining Poseidon length assertions -/
 

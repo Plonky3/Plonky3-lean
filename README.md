@@ -41,6 +41,9 @@ Plonky3Lean/
   Proofs.lean Proofs/ why they hold
   Lib.lean    Lib/    shared lemmas and tactics
 
+ToCompPoly.lean       FIELD SPECS STAGED FOR COMPPOLY: written as CompPoly code,
+ToCompPoly/             upstreamed, then deleted here
+
 claims.toml           the axioms each claim may depend on
 STATUS.md             generated: pin, crates, claims, assumptions, patch costs
 TRUST.md              the trust layers shared by every crate

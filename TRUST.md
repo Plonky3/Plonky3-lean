@@ -47,8 +47,12 @@ paths.
 
 CompPoly and mathlib (later ArkLib) at the commits locked in
 `lake-manifest.json`. Claims compare the models against these specifications,
-and a wrong specification yields a wrong claim. `Plonky3Lean.Spec` is in the same
-position: CODEOWNERS assigns it to the Plonky3 maintainers.
+and a wrong specification yields a wrong claim. Every field specification comes
+from CompPoly; one CompPoly lacks is staged in [`ToCompPoly/`](ToCompPoly/README.md),
+written as CompPoly code and upstreamed, and is trusted in the same way until
+then. `Plonky3Lean.Spec`, which says how a model's values are read as elements
+of those specifications, is in the same position. CODEOWNERS assigns both to the
+Plonky3 maintainers.
 
 ## 5. The build cache
 
