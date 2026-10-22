@@ -44,4 +44,56 @@ theorem leftChunks_eq (c : ℕ) (hc : 2 ≤ c) : leftChunks c = pow2Below c c :=
   · rfl
   · have := Nat.log_le_self 2 (c - 1); omega
 
+theorem ceil_step (m k : ℕ) (hk : 0 < k) (hm : 0 < m) :
+    (m + k - 1) / k = (m - k + k - 1) / k + 1 := by
+  by_cases h : k ≤ m
+  · rw [show m + k - 1 = (m - k + k - 1) + k by omega, Nat.add_div_right _ hk]
+  · rw [show m - k = 0 by omega, Nat.zero_add, Nat.div_eq_of_lt (show k - 1 < k by omega)]
+    have h1 : (m + k - 1) / k < 2 := (Nat.div_lt_iff_lt_mul hk).2 (by omega)
+    have h2 : 1 ≤ (m + k - 1) / k := (Nat.le_div_iff_mul_le hk).2 (by omega)
+    omega
+
+theorem piecesAux_spec (k : ℕ) (hk : 0 < k) (n : ℕ) (l : List (BitVec 8)) (hn : (l.length + k - 1) / k ≤ n) :
+    (piecesAux k n l).length = (l.length + k - 1) / k ∧
+      ∀ i < (l.length + k - 1) / k, (piecesAux k n l).getD i [] = (l.drop (k * i)).take k := by
+  induction n generalizing l with
+  | zero =>
+    have h0 : (l.length + k - 1) / k = 0 := Nat.le_zero.mp hn
+    have hl : l.length = 0 := by
+      rcases Nat.div_eq_zero_iff.1 h0 with h | h <;> omega
+    rw [h0]; simp [piecesAux]
+  | succ n ih =>
+    by_cases hl : l = []
+    · subst hl
+      simp [piecesAux, hk]
+    · have hm : 0 < l.length := List.length_pos_iff.2 hl
+      have hs := ceil_step l.length k hk hm
+      have hd : (l.drop k).length = l.length - k := List.length_drop ..
+      obtain ⟨ih1, ih2⟩ := ih (l.drop k) (by rw [hd]; omega)
+      rw [hd] at ih1 ih2
+      simp only [piecesAux, List.isEmpty_iff, hl, ite_false, List.length_cons, ih1, hs, true_and]
+      intro i hi
+      rcases i with _ | i
+      · simp
+      · simp only [List.getD_cons_succ, ih2 i (by omega), List.drop_drop]
+        congr 2
+        ring
+
+theorem pieces_spec (k : ℕ) (hk : 0 < k) (l : List (BitVec 8)) :
+    (pieces k l).length = (if l = [] then 1 else (l.length + k - 1) / k) ∧
+      ∀ i < (pieces k l).length, (pieces k l).getD i [] = (l.drop (k * i)).take k := by
+  unfold pieces
+  by_cases hl : l = []
+  · subst hl; simp
+  · have hm : 0 < l.length := List.length_pos_iff.2 hl
+    have hle : (l.length + k - 1) / k ≤ l.length := by
+      have e1 : l.length - 1 ≤ (l.length - 1) * k := Nat.le_mul_of_pos_right _ hk
+      have e2 : l.length * k = (l.length - 1) * k + k := by
+        rw [Nat.sub_one_mul, Nat.sub_add_cancel (Nat.le_mul_of_pos_left _ hm)]
+      apply Nat.div_le_of_le_mul
+      rw [Nat.mul_comm]; omega
+    obtain ⟨h1, h2⟩ := piecesAux_spec k hk l.length l hle
+    simp only [List.isEmpty_iff, hl, ite_false, h1]
+    exact ⟨trivial, h2⟩
+
 end Plonky3Lean.Proofs.Blake3
