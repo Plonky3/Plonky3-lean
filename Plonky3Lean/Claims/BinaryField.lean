@@ -2,6 +2,7 @@ module
 
 public import Plonky3Lean.Proofs.Field.Binary.Aes
 public import Plonky3Lean.Proofs.Field.Binary.Operators
+public import Plonky3Lean.Proofs.Field.Binary.TowerSquare
 
 @[expose] public section
 
@@ -423,5 +424,55 @@ theorem tower.BinaryField128.Insts.CoreOpsArithNegBinaryField128.neg.towerOf (a 
     tower.BinaryField128.Insts.CoreOpsArithNegBinaryField128.neg a ⦃ r => towerOf 7 r = -towerOf 7 a ⦄ :=
   WP.spec_mono (Proofs.Binary.bf128_neg_spec a) fun _ h => Proofs.Binary.towerOf_neg h
 
+
+/-! ### Squaring at every level -/
+
+/-- `square` is squaring in level `0` of the tower. -/
+theorem gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.square.towerOf (a : gf2.Gf2) :
+    gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.square a ⦃ r =>
+      towerOf 0 r = towerOf 0 a * towerOf 0 a ⦄ :=
+  WP.spec_mono (Proofs.Binary.gf2_square_spec a) fun _ h => Proofs.Binary.towerOf_mul h
+
+/-- `square` is squaring in level `1` of the tower. -/
+theorem tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.square.towerOf (a : tower.BinaryField2) :
+    tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.square a ⦃ r =>
+      towerOf 1 r = towerOf 1 a * towerOf 1 a ⦄ :=
+  WP.spec_mono (Proofs.Binary.bf2_square_spec a) fun _ h => Proofs.Binary.towerOf_mul h
+
+/-- `square` is squaring in level `2` of the tower. -/
+theorem tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.square.towerOf (a : tower.BinaryField4) :
+    tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.square a ⦃ r =>
+      towerOf 2 r = towerOf 2 a * towerOf 2 a ⦄ :=
+  WP.spec_mono (Proofs.Binary.bf4_square_spec a) fun _ h => Proofs.Binary.towerOf_mul h
+
+/-- `square` is squaring in level `3` of the tower. -/
+theorem tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.square.towerOf (a : tower.BinaryField8) :
+    tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.square a ⦃ r =>
+      towerOf 3 r = towerOf 3 a * towerOf 3 a ⦄ :=
+  WP.spec_mono (Proofs.Binary.bf8_square_spec a) fun _ h => Proofs.Binary.towerOf_mul h
+
+/-- `square` is squaring in level `4` of the tower. -/
+theorem tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.square.towerOf (a : tower.BinaryField16) :
+    tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.square a ⦃ r =>
+      towerOf 4 r = towerOf 4 a * towerOf 4 a ⦄ :=
+  WP.spec_mono (Proofs.Binary.bf16_square_spec a) fun _ h => Proofs.Binary.towerOf_mul h
+
+/-- `square` is squaring in level `5` of the tower. -/
+theorem tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.square.towerOf (a : tower.BinaryField32) :
+    tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.square a ⦃ r =>
+      towerOf 5 r = towerOf 5 a * towerOf 5 a ⦄ :=
+  WP.spec_mono (Proofs.Binary.bf32_square_spec a) fun _ h => Proofs.Binary.towerOf_mul h
+
+/-- `square` is squaring in level `6` of the tower. -/
+theorem tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.square.towerOf (a : tower.BinaryField64) :
+    tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.square a ⦃ r =>
+      towerOf 6 r = towerOf 6 a * towerOf 6 a ⦄ :=
+  WP.spec_mono (Proofs.Binary.bf64_square_spec a) fun _ h => Proofs.Binary.towerOf_mul h
+
+/-- `square` is squaring in level `7` of the tower. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.square.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.square a ⦃ r =>
+      towerOf 7 r = towerOf 7 a * towerOf 7 a ⦄ :=
+  WP.spec_mono (Proofs.Binary.bf128_square_spec a) fun _ h => Proofs.Binary.towerOf_mul h
 
 end Plonky3Lean.Claims.P3BinaryField
