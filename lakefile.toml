@@ -34,8 +34,11 @@ rev = "v4.31.0"
 name = "HaxExt"
 
 # Hand-written claims, specifications and proofs. See Plonky3Lean.lean.
+# Warnings are errors here, so a `sorry` fails the build whatever
+# tools/check-claims.py lists. The generated libraries are left alone.
 [[lean_lib]]
 name = "Plonky3Lean"
+leanOptions = { warningAsError = true }
 
 # One library per crate under crates/, named after the library hax emits for the
 # crate (`P3BabyBear` for p3-baby-bear) and rooted in the crate's `extraction/`
