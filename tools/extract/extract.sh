@@ -32,7 +32,12 @@
 # With --check, the run must also leave crates/*/extraction/ exactly as
 # committed: re-extraction is byte-identical, or the run fails.
 #
-# Usage:  tools/extract/extract.sh [--tools-only] [--check]
+# --skip-tests skips step 2, and --without <crate>/<phase>/<NNN> (repeatable)
+# leaves one patch out of steps 3 and 7. Together they are how
+# patch-necessity.py re-justifies each patch; neither belongs in a real run.
+#
+# Usage:  tools/extract/extract.sh [--tools-only] [--check] [--skip-tests]
+#                                  [--without <crate>/<phase>/<NNN>]...
 #
 # Environment:
 #   HAX_BIN      the cargo-hax to use (default: `cargo-hax` on PATH)
@@ -51,14 +56,49 @@ export EXTRACT_DIR="$WORK"
 
 TOOLS_ONLY=0
 CHECK=0
-for arg in "$@"; do
-    case "$arg" in
+SKIP_TESTS=0
+WITHOUT=""   # one `<crate>/patches/<phase>/<NNN>-` prefix per line
+while [ "$#" -gt 0 ]; do
+    case "$1" in
         --tools-only) TOOLS_ONLY=1 ;;
         --check) CHECK=1 ;;
+        --skip-tests) SKIP_TESTS=1 ;;
+        --without)
+            [ "$#" -ge 2 ] || { echo "error: --without needs <crate>/<phase>/<NNN>" >&2; exit 2; }
+            case "$2" in
+                */pre/[0-9][0-9][0-9]|*/post/[0-9][0-9][0-9]) ;;
+                *) echo "error: --without takes <crate>/<phase>/<NNN>, not '$2'" >&2; exit 2 ;;
+            esac
+            w_crate="${2%%/*}"; w_rest="${2#*/}"
+            ls "$ROOT/crates/$w_crate/patches/${w_rest%%/*}/${w_rest##*/}-"*.patch >/dev/null 2>&1 \
+                || { echo "error: --without $2: no such patch" >&2; exit 2; }
+            WITHOUT="$WITHOUT$w_crate/patches/${w_rest%%/*}/${w_rest##*/}-
+"
+            shift ;;
         -h|--help) sed -n '2,/^set -eu/p' "$0" | sed '$d; s/^# \{0,1\}//'; exit 0 ;;
-        *) echo "error: unknown argument '$arg' (try --help)" >&2; exit 2 ;;
+        *) echo "error: unknown argument '$1' (try --help)" >&2; exit 2 ;;
     esac
+    shift
 done
+# drop_without <list>: remove the patches named by --without from a list file.
+drop_without() {
+    [ -n "$WITHOUT" ] || return 0
+    local keep pf w skip
+    keep="$(mktemp)"
+    while read -r pf; do
+        skip=0
+        while read -r w; do
+            [ -n "$w" ] || continue
+            case "$pf" in *"/crates/$w"*) skip=1 ;; esac
+        done <<< "$WITHOUT"
+        if [ "$skip" = "1" ]; then
+            echo "    left out: ${pf#"$ROOT"/crates/}"
+        else
+            echo "$pf" >> "$keep"
+        fi
+    done < "$1"
+    mv "$keep" "$1"
+}
 
 tc() { "$CONFIG" toolchain "$1"; }
 HAX_RELEASE="$(tc hax_release)"
@@ -226,12 +266,17 @@ echo "==> 1/8 checking patch conventions"
 "$HERE/check-patches.sh"
 
 echo "==> 2/8 upstream tests, with and without the pre-extraction patches"
-"$HERE/test-pre-patches.py"
-echo "    -- each pre-patch's tests, and its recorded mutation"
-"$HERE/check-mutations.py"
+if [ "$SKIP_TESTS" = "1" ]; then
+    echo "    skipped (--skip-tests)"
+else
+    "$HERE/test-pre-patches.py"
+    echo "    -- each pre-patch's tests, and its recorded mutation"
+    "$HERE/check-mutations.py"
+fi
 
 echo "==> 3/8 pre-extraction patches (plonky3/) and cargo check ($HAX_TARGET, $EXTRACT_RUSTFLAGS)"
 "$CONFIG" pre-patches > "$PRE_LIST"
+drop_without "$PRE_LIST"
 if [ -s "$PRE_LIST" ]; then
     echo "    WARNING: patching Rust source changes the artifact under" >&2
     echo "             verification. See docs/patches.md." >&2
@@ -371,7 +416,9 @@ echo "    ok; pristine output in ${PRISTINE#"$ROOT"/}/"
 echo "==> 7/8 applying post-extraction patches (generated Lean)"
 while IFS='|' read -r crate lib state; do
     list="$(mktemp)"
-    ls "$ROOT/crates/$crate/patches/post/"[0-9]*.patch > "$list" 2>/dev/null || true
+    ls "$ROOT/crates/$crate/patches/post/"[0-9]*.patch 2>/dev/null \
+        | grep -v '\.mutation\.patch$' > "$list" || true
+    drop_without "$list"
     [ -s "$list" ] && apply_set "$list" "$ROOT/crates/$crate" ""
     rm -f "$list"
 done <<< "$CRATES"
