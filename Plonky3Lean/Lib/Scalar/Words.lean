@@ -99,4 +99,16 @@ theorem fromBEBytes_four (b₀ b₁ b₂ b₃ : BitVec 8) :
       BitVec.getLsbD_append]
     split_ifs <;> first | omega | (congr 1; omega)
 
+/-- The big-endian bytes of a word. -/
+theorem toBEBytes_word (w : BitVec 32) :
+    w.toBEBytes = [w.extractLsb' 24 8, w.extractLsb' 16 8, w.extractLsb' 8 8, w.extractLsb' 0 8] := by
+  rw [BitVec.toBEBytes, BitVec.toLEBytes, BitVec.toLEBytes, BitVec.toLEBytes, BitVec.toLEBytes,
+    BitVec.toLEBytes]
+  simp only [Nat.reduceSub, gt_iff_lt, Nat.ofNat_pos, ite_true, Nat.lt_irrefl, ite_false,
+    List.reverse_cons, List.reverse_nil, List.nil_append, List.cons_append, List.cons.injEq,
+    and_true]
+  refine ⟨?_, ?_, ?_, ?_⟩ <;> ext i hi <;> simp
+  · simp [show 8 + i < 16 by omega, show 8 + (8 + i) < 24 by omega]; congr 1; omega
+  · simp [show 8 + i < 24 by omega]; congr 1; omega
+
 end Plonky3Lean.Lib

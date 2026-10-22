@@ -98,4 +98,60 @@ theorem index_rangeTo_eq {T : Type} (sl : Slice T) (e : Std.Usize) (h : e.val �
   simp only [hle, ite_true]
   simp [Slice.subslice, h]
 
+theorem mapM_ok {α : Type} (f : α → RustM α) (hf : ∀ x, f x = .ok x) (l : List α) :
+    l.mapM f = .ok l := by
+  induction l with
+  | nil => rfl
+  | cons a l ih => simp only [List.mapM_cons, hf, ih, bind_tc_ok]; rfl
+
+/-- Removing the head of a nonempty sequence. -/
+theorem seq_remove_head {T : Type} (s : Slice T) (a : T) (rest : List T) (hs : s.val = a :: rest) :
+    ∃ s' : Slice T, CoreModels.rust_primitives.sequence.seq_remove s 0#usize = .ok (a, s') ∧
+      s'.val = rest := by
+  simp only [CoreModels.rust_primitives.sequence.seq_remove]
+  rw [dite_eq_left_of_eq_true (eq_true (by simp [hs]))]
+  exact ⟨_, by congr 2; simp [hs], by simp [hs]⟩
+
+/-- The closure of `core::array::repeat` hands out the next clone and keeps the rest. -/
+theorem repeat_go_eq {T : Type} {N : Std.Usize} (cl : CoreModels.core.clone.Clone T) (v : T)
+    (m : ℕ) (c : CoreModels.core.array.repeat.closure T N)
+    (hc : Slice.val (α := T) c = List.replicate m v) :
+    ∀ n ≤ m, ∃ c' : CoreModels.core.array.repeat.closure T N,
+      CoreModels.rust_primitives.slice.array_from_fn_go
+      (CoreModels.core.array.repeat.closure.Insts.CoreOpsFunctionFnMutTupleUsizeT N cl) c n =
+      .ok (List.replicate n v, c') ∧ Slice.val (α := T) c' = List.replicate (m - n) v := by
+  intro n
+  induction n with
+  | zero => intro _; exact ⟨c, rfl, by simpa using hc⟩
+  | succ n ih =>
+    intro hn
+    obtain ⟨c', e, hc'⟩ := ih (by omega)
+    obtain ⟨c'', e', hc''⟩ := seq_remove_head c' v (List.replicate (m - (n + 1)) v)
+      (by rw [hc', show m - n = (m - (n + 1)) + 1 by omega, List.replicate_succ])
+    refine ⟨c'', ?_, hc''⟩
+    rw [CoreModels.rust_primitives.slice.array_from_fn_go, e, bind_ok]
+    simp only [CoreModels.core.array.repeat.closure.Insts.CoreOpsFunctionFnMutTupleUsizeT.call_mut]
+    rw [List.replicate_succ', e', bind_ok]
+    exact bind_ok _ _
+
+/-- `[v; N]`, for a type whose clone is the value itself. -/
+theorem repeat_eq {T : Type} (N : Std.Usize) (cl : CoreModels.core.clone.Clone T) (v : T)
+    (hcl : ∀ x, cl.clone x = .ok x) (hN : 0 < N.val) :
+    CoreModels.core.array.repeat N cl v = .ok (Std.Array.from (List.replicate N.val v) (by simp)) := by
+  unfold CoreModels.core.array.repeat CoreModels.rust_primitives.sequence.seq_create
+  erw [ite_eq_right_of_eq_false _ _ (eq_false (by omega))]
+  rw [mapM_ok _ hcl]
+  have hmax : (List.replicate (N.val - 1) v ++ [v]).length ≤ Usize.max := by
+    simp only [List.length_append, List.length_replicate, List.length_singleton]
+    scalar_tac
+  rw [show (RustM.ok (List.replicate (N.val - 1) v)).match = MatchResult.ok _ from rfl]
+  dsimp only
+  rw [dite_eq_left_of_eq_true (eq_true hmax)]
+  erw [bind_ok]
+  obtain ⟨c', e, -⟩ := repeat_go_eq (N := N) cl v N.val (Slice.from _ hmax)
+    (by simp only [Slice.from_val]; rw [← List.replicate_succ', show N.val - 1 + 1 = N.val by omega])
+    N.val le_rfl
+  unfold CoreModels.rust_primitives.slice.array_from_fn
+  rw [e, bind_ok, dite_eq_left_of_eq_true (eq_true (by simp))]
+
 end Plonky3Lean.Lib
