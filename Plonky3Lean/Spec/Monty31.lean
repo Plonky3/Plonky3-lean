@@ -52,6 +52,18 @@ structure FieldValid {FP : Type} (inst : data_traits.FieldParameters FP) (p mu :
   monty : Valid inst.PackedMontyParametersInst.MontyParametersInst p mu
   half : ∃ h : Std.U32, inst.HALF_P_PLUS_1 = .ok h ∧ h.val = (p.val + 1) / 2
 
+/-- The named elements of a `FieldParameters` impl keep their defaults: `MONTY_ZERO`,
+`MONTY_ONE` and `MONTY_TWO` are `new(0)`, `new(1)` and `new(2)`.
+
+An impl may override them, and nothing checks an override. -/
+structure FieldDefaults {FP : Type} (inst : data_traits.FieldParameters FP) : Prop where
+  zero : inst.MONTY_ZERO =
+    monty_31.MontyField31.new inst.PackedMontyParametersInst.MontyParametersInst 0#u32
+  one : inst.MONTY_ONE =
+    monty_31.MontyField31.new inst.PackedMontyParametersInst.MontyParametersInst 1#u32
+  two : inst.MONTY_TWO =
+    monty_31.MontyField31.new inst.PackedMontyParametersInst.MontyParametersInst 2#u32
+
 /-- A field element as the model has it: Rust's `MontyField31<MP>`. -/
 abbrev Element (MP : Type) := monty_31.MontyField31 MP
 

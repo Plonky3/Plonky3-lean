@@ -23,6 +23,7 @@ The shift is done in `i64`, where `|x| · 2^32 <= 2^63`.
 
 The remainder truncates toward zero, so a negative input gives a negative
 remainder, which is shifted back into `[0, p)` by adding `p`. -/
+@[step]
 theorem utils.to_monty_signed.spec (hv : Valid inst p mu) (x : Std.I32) :
     utils.to_monty_signed inst x ⦃ r => r.val < p.val ∧
       (r.val : ℤ) % p.val = x.val * 2 ^ 32 % p.val ⦄ := by
@@ -77,6 +78,7 @@ theorem utils.to_monty_signed.spec (hv : Valid inst p mu) (x : Std.I32) :
 /-- `to_monty_64(x)` puts any `u64` into Montgomery form: `x · 2^32 mod p`.
 
 The shift is done in `u128`, where `x · 2^32 < 2^96`. -/
+@[step]
 theorem utils.to_monty_64.spec (hv : Valid inst p mu) (x : Std.U64) :
     utils.to_monty_64 inst x ⦃ r => r.val = x.val * 2 ^ 32 % p.val ⦄ := by
   unfold utils.to_monty_64
@@ -91,6 +93,7 @@ representative of `x · 2^32 mod p`.
 
 The shift is done in `i128`, and the remainder is shifted back into `[0, p)`
 when it is negative, as for `i32`. -/
+@[step]
 theorem utils.to_monty_64_signed.spec (hv : Valid inst p mu) (x : Std.I64) :
     utils.to_monty_64_signed inst x ⦃ r => r.val < p.val ∧
       (r.val : ℤ) % p.val = x.val * 2 ^ 32 % p.val ⦄ := by

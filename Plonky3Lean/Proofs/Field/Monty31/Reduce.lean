@@ -20,6 +20,7 @@ variable {MP : Type} {inst : data_traits.MontyParameters MP} {p mu : Std.U32}
 `r · 2^32 ≡ x (mod p)`.
 
 It first subtracts `p · 2^32` when `x` is at least that, then reduces as `monty_reduce` does. -/
+@[step]
 theorem utils.large_monty_reduce.spec (hv : Valid inst p mu) (x : Std.U64)
     (hx : x.val < 2 * 2 ^ 32 * p.val) :
     utils.large_monty_reduce inst x ⦃ r => r.val < p.val ∧
@@ -84,8 +85,6 @@ theorem utils.large_monty_reduce.spec (hv : Valid inst p mu) (x : Std.U64)
     · simp only [hlt2, decide_false, Bool.false_eq_true, if_false, bind_tc_ok]
       step*
 
-attribute [local step] utils.large_monty_reduce.spec utils.to_monty.spec utils.add.spec
-
 /-- `monty_reduce_u128(x)`, for `x < 2^96`, is the canonical `r` with
 `r · 2^32 ≡ x (mod p)`, when `p >= 2^30`.
 
@@ -98,6 +97,7 @@ One subtraction suffices only when `2^64 <= 4 · 2^32 · p`, that is `p >= 2^30`
 `MontyField31::new` checks `p < 2^31` and not this lower bound.
 
 For a smaller prime, some `lo` stays out of range and the result is wrong. -/
+@[step]
 theorem utils.monty_reduce_u128.spec (hv : Valid inst p mu) (hp30 : 2 ^ 30 ≤ p.val)
     (x : Std.U128) (hx : x.val < 2 ^ 96) :
     utils.monty_reduce_u128 inst x ⦃ r => r.val < p.val ∧
