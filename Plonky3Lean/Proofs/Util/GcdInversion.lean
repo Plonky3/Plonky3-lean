@@ -1,7 +1,12 @@
-import Mathlib.Data.Int.GCD
-import Mathlib.Tactic.NormNum.Prime
-import P3Util
-import Plonky3Lean.Lib.Scalar
+module
+
+public import Mathlib.Data.Int.GCD
+public import CompPoly.Fields.PrattCertificate
+public import Mathlib.Tactic.NormNum.Prime
+public import P3Util
+public import Plonky3Lean.Lib.Scalar
+
+@[expose] public section
 
 /-!
 # p3-util: the 32-bit GCD inversion
@@ -235,32 +240,31 @@ theorem body_spec (F a b : Std.U32) (u v : Std.I64) (i : Std.U32) (hF1 : 1 ≤ F
   unfold gcd_inversion_prime_field_32_loop.body
   step*
   have hi3 : i3.val = a.val % 2 := by
-    rw [i3_post1, UScalar.val_and]; exact Nat.and_one_is_mod _
+    rw [i3_post, UScalar.val_and]; exact Nat.and_one_is_mod _
   have hiN : i.val < 2 * F.val - 2 := by scalar_tac
   obtain ⟨hu1, hu2, hv1, hv2⟩ := huv hiN
   by_cases hodd : a.val % 2 = 1
   · have hne : (i3 != 0#u32) = true := by
       simp only [bne_iff_ne, ne_eq]; intro h; rw [h] at hi3; simp at hi3; omega
-    simp only [hne, if_true]
+    simp only [hne, ↓reduceIte]
     by_cases hlt : a < b
-    · simp only [hlt, if_true]
+    · simp only [hlt, ↓reduceIte]
       step*
       have hlt' : a.val < b.val := by scalar_tac
       refine ⟨hiN, i4_post, ?_⟩
-      simp only [step, hodd, if_true, hlt', a2_post1, x_post1, Nat.shiftRight_eq_div_pow,
-        pow_one, x_post, v2_post1, shl_one_bmod hu1 hu2]
-    · simp only [hlt, if_false]
+      simp only [step, ite_true, Nat.shiftRight_eq_div_pow, pow_one, shl_one_bmod hu1 hu2, *]
+    · simp only [hlt, ↓reduceIte]
       step*
       have hlt' : ¬ a.val < b.val := by scalar_tac
       refine ⟨hiN, i4_post, ?_⟩
-      simp only [step, hodd, if_true, hlt', if_false, a2_post1, x_post1,
-        Nat.shiftRight_eq_div_pow, pow_one, x_post, v2_post1, shl_one_bmod hv1 hv2]
+      simp only [step, ite_true, ite_false, Nat.shiftRight_eq_div_pow, pow_one,
+        shl_one_bmod hv1 hv2, *]
   · have hne : (i3 != 0#u32) = false := by
       simp only [bne_eq_false_iff_eq]; scalar_tac
-    simp only [hne, Bool.false_eq_true, if_false]
+    simp only [hne, Bool.false_eq_true, ↓reduceIte]
     step*
     refine ⟨hiN, i4_post, ?_⟩
-    simp only [step, hodd, if_false, a2_post1, Nat.shiftRight_eq_div_pow, pow_one, v2_post1,
+    simp only [step, hodd, ite_false, a2_post, Nat.shiftRight_eq_div_pow, pow_one, v2_post,
       shl_one_bmod hv1 hv2]
 
 /-- Up to `i = 61`, `|u|, |v| < 2^62`, so the next iteration fits in an `i64`. -/
@@ -374,10 +378,10 @@ theorem gcd_inversion_prime_field_32.panics (F a b : Std.U32) (hF : F.val ≤ 32
     gcd_inversion_prime_field_32 F a b = .fail .panic := by
   unfold gcd_inversion_prime_field_32
   have h1 : F ≤ 32#u32 := by scalar_tac
-  simp only [massert, h1, if_true, bind_tc_ok]
+  simp only [massert, h1, ite_true, bind_ok]
   simp only [HShiftLeft.hShiftLeft, UScalar.shiftLeft_UScalar, UScalar.shiftLeft]
   have h2 : F.val < UScalarTy.U64.numBits := by simp; omega
-  simp only [h2, if_true, bind_tc_ok]
+  simp only [h2, ite_true, bind_ok]
   set x : Std.U64 := UScalar.mk (1#u64.bv.shiftLeft F.val) with hxdef
   have hx : x.val = 2 ^ F.val := by
     have : F.val < 64 := by omega
@@ -388,10 +392,9 @@ theorem gcd_inversion_prime_field_32.panics (F a b : Std.U32) (hF : F.val ≤ 32
   have hs := UScalar.sub_equiv x 1#u64
   split at hs
   · rename_i z hz
-    rw [hz]
     have hcast : (UScalar.cast UScalarTy.U64 b).val = b.val := cast_u32_u64_val b
     have hn : ¬ z ≥ UScalar.cast UScalarTy.U64 b := by scalar_tac
-    simp only [bind_tc_ok, lift, hn, if_false, bind_tc_fail]
+    simp only [bind_ok, RustM.match.isOk.mp hz, lift, hn, ite_false, bind_fail]
   · obtain ⟨-, hlt⟩ := hs
     rw [hx] at hlt
     have : 1 ≤ 2 ^ F.val := Nat.one_le_two_pow
@@ -478,7 +481,7 @@ theorem gcd_inversion_prime_field_32.pos_inverse (a b : Std.U32) (hb1 : 2 ^ 30 �
 /-! ## Concrete inputs, evaluated by the kernel -/
 
 /-- `536870909 = 2^29 - 3` is prime. -/
-theorem small_prime_is_prime : Nat.Prime 536870909 := by norm_num
+theorem small_prime_is_prime : Nat.Prime 536870909 := by pratt
 
 set_option maxRecDepth 10000 in
 open p3_util in

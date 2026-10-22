@@ -1,7 +1,11 @@
-import Plonky3Lean.Lib
-import Plonky3Lean.Spec
-import Plonky3Lean.Proofs
-import Plonky3Lean.Claims
+module
+
+public import Plonky3Lean.Lib
+public import Plonky3Lean.Spec
+public import Plonky3Lean.Proofs
+public import Plonky3Lean.Claims
+
+@[expose] public section
 
 /-!
 # Plonky3Lean

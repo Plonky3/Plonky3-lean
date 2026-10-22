@@ -1,5 +1,9 @@
-import CompPoly.Fields.Goldilocks
-import P3Goldilocks
+module
+
+public import CompPoly.Fields.Goldilocks
+public import P3Goldilocks
+
+@[expose] public section
 
 /-!
 # Goldilocks: what the model's values mean

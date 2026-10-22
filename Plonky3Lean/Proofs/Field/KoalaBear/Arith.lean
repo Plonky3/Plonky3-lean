@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.KoalaBear.Constants
+module
+
+public import Plonky3Lean.Proofs.Field.KoalaBear.Constants
+
+@[expose] public section
 
 /-!
 # KoalaBear: scalar arithmetic
@@ -12,32 +16,32 @@ open Aeneas Aeneas.Std CoreModels
 open p3_koala_bear
 open Plonky3Lean.Spec.KoalaBear
 
-namespace Plonky3Lean.Proofs.KoalaBear
+namespace Plonky3Lean.Proofs.P3KoalaBear
 
 /-- `a + b`, for canonical `a` and `b`, is canonical and stands for `toField a + toField b`. -/
 theorem koala_bear.KoalaBear.add.toField (a b : Element) (ha : Canonical a) (hb : Canonical b) :
-    p3_monty_31.monty_31.MontyField31.add MontyParams a b
+    p3_monty_31.monty_31.MontyField31.Insts.CoreOpsArithAddMontyField31MontyField31.add MontyParams a b
       ⦃ c => Canonical c ∧ toField c = toField a + toField b ⦄ :=
   Monty31.monty_31.MontyField31.add.toField MontyParams.valid
     koala_bear.KoalaBearParameters.PRIME.eq_fieldSize a b ha hb
 
 /-- `a - b`, for canonical `a` and `b`, is canonical and stands for `toField a - toField b`. -/
 theorem koala_bear.KoalaBear.sub.toField (a b : Element) (ha : Canonical a) (hb : Canonical b) :
-    p3_monty_31.monty_31.MontyField31.sub MontyParams a b
+    p3_monty_31.monty_31.MontyField31.Insts.CoreOpsArithSubMontyField31MontyField31.sub MontyParams a b
       ⦃ c => Canonical c ∧ toField c = toField a - toField b ⦄ :=
   Monty31.monty_31.MontyField31.sub.toField MontyParams.valid
     koala_bear.KoalaBearParameters.PRIME.eq_fieldSize a b ha hb
 
 /-- `a · b`, for canonical `a` and `b`, is canonical and stands for `toField a · toField b`. -/
 theorem koala_bear.KoalaBear.mul.toField (a b : Element) (ha : Canonical a) (hb : Canonical b) :
-    p3_monty_31.monty_31.MontyField31.mul MontyParams a b
+    p3_monty_31.monty_31.MontyField31.Insts.CoreOpsArithMulMontyField31MontyField31.mul MontyParams a b
       ⦃ c => Canonical c ∧ toField c = toField a * toField b ⦄ :=
   Monty31.monty_31.MontyField31.mul.toField MontyParams.valid
     koala_bear.KoalaBearParameters.PRIME.eq_fieldSize a b ha hb
 
 /-- `-a`, for canonical `a`, is canonical and stands for `-toField a`. -/
 theorem koala_bear.KoalaBear.neg.toField (a : Element) (ha : Canonical a) :
-    p3_monty_31.monty_31.MontyField31.neg FieldParams a
+    p3_monty_31.monty_31.MontyField31.Insts.CoreOpsArithNegMontyField31.neg FieldParams a
       ⦃ c => Canonical c ∧ toField c = -toField a ⦄ :=
   Monty31.monty_31.MontyField31.neg.toField FieldParams.valid
     koala_bear.KoalaBearParameters.PRIME.eq_fieldSize FieldParams.MONTY_ZERO.toField a ha
@@ -67,4 +71,4 @@ theorem koala_bear.KoalaBearParameters.exp_root_d.exponent :
     ∀ x : KoalaBear.Field, (x ^ 1420470955) ^ 3 = x :=
   ⟨fun _ _ => rfl, KoalaBear.pow_1420470955_pow_three⟩
 
-end Plonky3Lean.Proofs.KoalaBear
+end Plonky3Lean.Proofs.P3KoalaBear

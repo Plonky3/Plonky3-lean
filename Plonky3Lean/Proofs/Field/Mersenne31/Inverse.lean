@@ -1,6 +1,10 @@
-import CompPoly.Fields.Mersenne
-import Plonky3Lean.Proofs.Field.Mersenne31.Conversions
-import Plonky3Lean.Proofs.Util.GcdInversion
+module
+
+public import CompPoly.Fields.Mersenne31
+public import Plonky3Lean.Proofs.Field.Mersenne31.Conversions
+public import Plonky3Lean.Proofs.Util.GcdInversion
+
+@[expose] public section
 
 /-!
 # Mersenne31: `try_inverse`
@@ -14,7 +18,7 @@ open Aeneas Aeneas.Std CoreModels
 open p3_mersenne_31
 open Plonky3Lean.Spec.Mersenne31 Plonky3Lean.Lib
 
-namespace Plonky3Lean.Proofs.Mersenne31
+namespace Plonky3Lean.Proofs.P3Mersenne31
 
 /-- The documented output of `gcd_inversion_prime_field_32::<31>(a, p)` for `0 < a < p`: an `i64` congruent to `2^60 a^{-1}` modulo `p`. -/
 def GcdInversionContract : Prop :=
@@ -39,15 +43,15 @@ theorem try_inverse.spec (hg : GcdInversionContract) (a : Element) (ha : Valid a
   have hv := hg a.value (by omega) (by omega)
   step with hv as ⟨v, hv'⟩
   step*
-  refine ⟨m1_post1, ?_⟩
+  refine ⟨m1_post, ?_⟩
   have hpr : Nat.Prime 2147483647 := Mersenne31.is_prime
-  haveI : Fact (Nat.Prime 2147483647) := ⟨hpr⟩
+  have : Fact (Nat.Prime 2147483647) := ⟨hpr⟩
   have e1 : ((m1.value.val : ℤ) : ZMod 2147483647) * 2 ^ 60 = (m.value.val : ℤ) := by
     have := (ZMod.intCast_eq_intCast_iff' ((m1.value.val : ℤ) * 2 ^ 60) (m.value.val : ℤ)
-      2147483647).mpr (by exact_mod_cast m1_post2)
+      2147483647).mpr (by exact_mod_cast m1_post1)
     push_cast at this ⊢; exact this
   have e2 : ((m.value.val : ℤ) : ZMod 2147483647) = (v.val : ZMod 2147483647) :=
-    (ZMod.intCast_eq_intCast_iff' _ _ 2147483647).mpr m_post2
+    (ZMod.intCast_eq_intCast_iff' _ _ 2147483647).mpr m_post1
   have e3 : ((v.val : ℤ) : ZMod 2147483647) * (a.value.val : ℤ) = 2 ^ 60 := by
     have := (ZMod.intCast_eq_intCast_iff' (v.val * a.value.val) (2 ^ 60) 2147483647).mpr hv'
     push_cast at this ⊢; exact this
@@ -68,4 +72,4 @@ theorem gcdInversionContract : GcdInversionContract := by
   rintro v ⟨-, hv⟩
   exact hv
 
-end Plonky3Lean.Proofs.Mersenne31
+end Plonky3Lean.Proofs.P3Mersenne31

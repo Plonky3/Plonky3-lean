@@ -1,5 +1,9 @@
-import Mathlib.Tactic.LinearCombination
-import Plonky3Lean.Proofs.Field.Goldilocks.PowersOfTwo
+module
+
+public import Mathlib.Tactic.LinearCombination
+public import Plonky3Lean.Proofs.Field.Goldilocks.PowersOfTwo
+
+@[expose] public section
 
 /-!
 # Goldilocks: inversion
@@ -13,7 +17,7 @@ The update factors then give `2^126 = c * x mod p`, and the result is `c * 2^66`
 The input `x` may be any `u64` not divisible by `p`, including those above `p`.
 -/
 
-namespace Plonky3Lean.Proofs.Goldilocks
+namespace Plonky3Lean.Proofs.P3Goldilocks
 
 /-- The integer an `i64` update factor stands for: `i64::MIN` is read as `2^63`. -/
 def unwrapFactor (v : ℤ) : ℤ := if v = -2 ^ 63 then 2 ^ 63 else v
@@ -181,46 +185,46 @@ theorem gcd_inner_loop.body.spec (A0 B0 S : ℕ) (x : GcdState) (hx : GcdSt A0 B
     have hb := hx.odd
     step
     have hi : i.val = a.val % 2 := by
-      rw [i_post1, UScalar.val_and, show (1#u64).val = 1 from rfl, Nat.and_one_is_mod]
-    clear i_post1 i_post2
+      rw [i_post, UScalar.val_and, show (1#u64).val = 1 from rfl, Nat.and_one_is_mod]
+    clear i_post i_post1
     by_cases hi0 : i = 0#u64
     · have he : a.val % 2 = 0 := by rw [← hi, hi0]; rfl
-      simp only [hi0, if_true]
-      step as ⟨a2, a2_post1, _, _⟩
+      simp only [hi0, ite_true]
+      step as ⟨a2, a2_post, _, _⟩
       step*
       refine gcdSt_of_round A0 B0 S _ _ _ _ _ _ _ _ _ _ hk' (by omega) (by omega) ?_
-        f12_post1 g12_post1 round1_post
-      rw [a2_post1, Nat.shiftRight_eq_div_pow, pow_one]
+        f12_post g12_post round1_post
+      rw [a2_post, Nat.shiftRight_eq_div_pow, pow_one]
       exact hx.even hk' he
     · have ho : a.val % 2 = 1 := by
         have : i.val ≠ 0 := fun h => hi0 (UScalar.eq_of_val_eq h)
         omega
-      simp only [hi0, if_false]
+      simp only [hi0, ite_false]
       by_cases hab : a < b
       · have hab' : a.val < b.val := hab
         have hs := hx.swap ho
         have := hs.odd
-        simp only [hab, if_true, CoreModels.core.mem.swap, Aeneas.Std.core.mem.swap, bind_tc_ok]
+        simp only [hab, ite_true, CoreModels.core.mem.swap, Aeneas.Std.core.mem.swap]
         step as ⟨a3, ha3, _⟩
         step as ⟨a4, ha4, _, _⟩
         step as ⟨f03, hf03⟩
         step as ⟨g03, hg03⟩
         step*
         refine gcdSt_of_round A0 B0 S _ _ _ _ _ _ _ _ _ _ hk' (by omega) (by omega) ?_
-          f12_post1 g12_post1 round1_post
+          f12_post g12_post round1_post
         rw [ha4, Nat.shiftRight_eq_div_pow, pow_one, ha3, hf03, hg03]
         exact hs.odd_ge hk' hb hab'.le
       · have hab' : b.val ≤ a.val := by
           have : ¬ a.val < b.val := hab
           omega
-        simp only [hab, if_false, bind_tc_ok]
+        simp only [hab, ite_false]
         step as ⟨a3, ha3, _⟩
         step as ⟨a4, ha4, _, _⟩
         step as ⟨f03, hf03⟩
         step as ⟨g03, hg03⟩
         step*
         refine gcdSt_of_round A0 B0 S _ _ _ _ _ _ _ _ _ _ hk' (by omega) (by omega) ?_
-          f12_post1 g12_post1 round1_post
+          f12_post g12_post round1_post
         rw [ha4, Nat.shiftRight_eq_div_pow, pow_one, ha3, hf03, hg03]
         exact hx.odd_ge hk' ho hab'
   · rename_i hk
@@ -276,28 +280,29 @@ theorem from_unusual_int.spec (int : Std.I64) :
   split
   · rename_i h
     simp only [ge_iff_le, IScalar.le_equiv, show (0#i64).val = 0 from rfl] at h
-    simp only [lift, bind_tc_ok]
+    simp only [lift]
     step*
     rw [r_post, IScalar.hcast_val_eq, UScalarTy.U64_numBits_eq, Int.emod_eq_of_lt h (by omega)]
     have : ((int.val.toNat : ℕ) : ℤ) = int.val := Int.toNat_of_nonneg h
-    rw [unwrapFactor, if_neg (by omega), ← this]; push_cast; rfl
+    rw [unwrapFactor, ite_eq_right (by omega), ← this]; push_cast; rfl
   · rename_i h
     simp only [ge_iff_le, IScalar.le_equiv, not_le, show (0#i64).val = 0 from rfl] at h
     split
     · rename_i hm
       have hv : int.val = -2 ^ 63 := by rw [hm, hmin]
-      simp only [lift, bind_tc_ok]
+      simp only [lift]
       step*
-      rw [r_post, IScalar.hcast_val_eq, UScalarTy.U64_numBits_eq, hv, unwrapFactor, if_pos rfl]
+      rw [r_post, IScalar.hcast_val_eq, UScalarTy.U64_numBits_eq, hv, unwrapFactor, ite_eq_left rfl]
       rfl
     · rename_i hm
       have hv : int.val ≠ -2 ^ 63 := fun h' => hm (IScalar.eq_of_val_eq (by rw [h', hmin]))
       step*
+      rename r.value = _ => r_post
       have hv' : (i.val : ℤ) = 18446744069414584321 + int.val := by
         rw [i_post]; push_cast; rw [Int.emod_eq_of_lt (by omega) (by omega)]
       have : ((i.val : ℕ) : Goldilocks.Field) = (((i.val : ℕ) : ℤ) : Goldilocks.Field) :=
         (Int.cast_natCast _).symm
-      rw [r_post, this, hv', unwrapFactor, if_neg hv]; push_cast; rw [p_eq_zero, zero_add]
+      rw [r_post, this, hv', unwrapFactor, ite_eq_right hv]; push_cast; rw [p_eq_zero, zero_add]
 
 /-- After both rounds of 63 the remaining `b` is `1`. -/
 theorem gcd_final_b {a b S : ℕ} {f0 g0 f1 g1 : ℤ} (A0 B0 : ℕ)
@@ -390,14 +395,14 @@ theorem try_inverse.spec (x : goldilocks.Goldilocks) :
   intro b hb
   rw [hb]
   by_cases h : x.value.val % 18446744069414584321 = 0
-  · simp only [h, decide_true, if_true, WP.spec_ok]
+  · simp only [h, decide_true, ite_true, WP.spec_ok]
     unfold toField
     have := natCast_eq_of_mod (x := x.value.val) (y := 0) (by rw [h])
     simpa using this
-  · simp only [h, decide_false, Bool.false_eq_true, if_false]
+  · simp only [h, decide_false, Bool.false_eq_true, ite_false]
     apply WP.spec_bind (gcd_inversion.spec x h)
     intro y hy
     simp only [WP.spec_ok]
     exact hy
 
-end Plonky3Lean.Proofs.Goldilocks
+end Plonky3Lean.Proofs.P3Goldilocks

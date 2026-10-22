@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Util.GcdInversion
+module
+
+public import Plonky3Lean.Proofs.Util.GcdInversion
+
+@[expose] public section
 
 /-!
 # p3-util: claims

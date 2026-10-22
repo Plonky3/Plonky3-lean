@@ -1,5 +1,10 @@
-import Plonky3Lean.Lib.Scalar.Signed
-import Plonky3Lean.Spec.Mersenne31
+module
+
+public import Plonky3Lean.Lib.RustM
+public import Plonky3Lean.Lib.Scalar.Signed
+public import Plonky3Lean.Spec.Mersenne31
+
+@[expose] public section
 
 /-!
 # Mersenne31: constructors and scalar arithmetic
@@ -9,12 +14,16 @@ open Aeneas Aeneas.Std CoreModels
 open p3_mersenne_31
 open Plonky3Lean.Spec.Mersenne31 Plonky3Lean.Lib
 
-namespace Plonky3Lean.Proofs.Mersenne31
+namespace Plonky3Lean.Proofs.P3Mersenne31
 
 /-! ## The modulus -/
 
 theorem mersenne_31.P.eq : mersenne_31.P = .ok 2147483647#u32 := by
-  unfold mersenne_31.P; rfl
+  have h : mersenne_31.P ⦃ m => m = 2147483647#u32 ⦄ := by
+    unfold mersenne_31.P
+    step*
+  obtain ⟨v, hv, rfl⟩ := Plonky3Lean.Lib.spec_imp_exists h
+  exact hv
 
 theorem ORDER_U32.eq :
     mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeField32.ORDER_U32 = .ok 2147483647#u32 := by
@@ -85,11 +94,6 @@ theorem new_reduced.spec (v : Std.U32) (h : v.val < 2 ^ 31) :
     mersenne_31.Mersenne31.new_reduced v ⦃ r => r.value = v ⦄ := by
   unfold mersenne_31.Mersenne31.new_reduced
   step*
-  rw [not_not]
-  apply UScalar.eq_of_val_eq
-  rw [i_post1, Nat.shiftRight_eq_div_pow]
-  show _ = 0
-  omega
 
 /-! ## `Add` -/
 
@@ -101,7 +105,7 @@ theorem add.spec (a b : Element) (ha : Valid a) (hb : Valid b) :
   unfold mersenne_31.Mersenne31.Insts.CoreOpsArithAddMersenne31Mersenne31.add
   rw [ORDER_U32.eq]
   obtain ⟨h1, h2⟩ := i32_overflowing_add_of_u32 a.value b.value ha hb
-  simp only [lift, bind_tc_ok, CoreModels.core.num.I32.overflowing_add,
+  simp only [lift, bind_ok, CoreModels.core.num.I32.overflowing_add,
     CoreModels.rust_primitives.arithmetic.overflowing_add_i32]
   generalize hr : IScalar.overflowing_add (UScalar.hcast .I32 a.value) (UScalar.hcast .I32 b.value) = r at h1 h2
   obtain ⟨s, ov⟩ := r
@@ -111,15 +115,16 @@ theorem add.spec (a b : Element) (ha : Valid a) (hb : Valid b) :
   have ha' : a.value.val < 2 ^ 31 := ha
   have hb' : b.value.val < 2 ^ 31 := hb
   by_cases hc : 2 ^ 31 ≤ a.value.val + b.value.val
-  · simp only [hc, decide_true, if_true, bind_tc_ok]
+  · simp only [hc, decide_true, ite_true]
     have : sum_corr.val = a.value.val + b.value.val - 2147483647 := by
       rw [sum_corr_post, h1]; omega
     step*
-    simp only [Valid, r_post, this, if_neg (Nat.not_lt.mpr hc)]
+    rename r.value = _ => r_post
+    simp only [Valid, r_post, this, ite_eq_right (Nat.not_lt.mpr hc)]
     exact ⟨by omega, trivial⟩
-  · simp only [hc, decide_false, Bool.false_eq_true, if_false, bind_tc_ok]
+  · simp only [hc, decide_false, Bool.false_eq_true, ite_false]
     step*
-    simp only [Valid, r_post, h1, if_pos (Nat.lt_of_not_le hc)]
+    simp only [Valid, r_post, h1, ite_eq_left (Nat.lt_of_not_le hc)]
     exact ⟨by omega, trivial⟩
 
 /-! ## `Sub` and `Neg` -/
@@ -134,17 +139,18 @@ theorem sub.spec (a b : Element) (ha : Valid a) (hb : Valid b) :
   have ha' : a.value.val < 2 ^ 31 := ha
   have hb' : b.value.val < 2 ^ 31 := hb
   step*
-  · rw [i_post, sub_post1]
+  · rw [i_post, over_post]
     by_cases h : a.value.val < b.value.val
     · simp only [h, decide_true, Bool.toNat_true]; omega
     · simp only [h, decide_false, Bool.toNat_false]; omega
-  · rw [i2_post1, and_mask31_u32]; omega
-  · have hi2 := i2_post1
+  · rw [i2_post, and_mask31_u32]; omega
+  · rename r.value = i2 => r_post
+    have hi2 := i2_post
     rw [and_mask31_u32] at hi2
-    simp only [Valid, r_post, hi2, sub1_post1, i_post, sub_post2, sub_post1]
+    simp only [Valid, r_post, hi2, sub1_post, i_post, sub_post, over_post]
     by_cases h : a.value.val < b.value.val
-    · simp only [h, decide_true, Bool.toNat_true, if_neg (Nat.not_le.mpr h)]; omega
-    · simp only [h, decide_false, Bool.toNat_false, if_pos (Nat.le_of_not_lt h)]; omega
+    · simp only [h, decide_true, Bool.toNat_true, ite_eq_right (Nat.not_le.mpr h)]; omega
+    · simp only [h, decide_false, Bool.toNat_false, ite_eq_left (Nat.le_of_not_lt h)]; omega
 
 theorem neg.spec (a : Element) (ha : Valid a) :
     mersenne_31.Mersenne31.Insts.CoreOpsArithNegMersenne31.neg a
@@ -153,7 +159,8 @@ theorem neg.spec (a : Element) (ha : Valid a) :
   rw [ORDER_U32.eq]
   have ha' : a.value.val < 2 ^ 31 := ha
   step*
-  simp only [Valid, r_post, i1_post1]
+  rename r.value = _ => r_post
+  simp only [Valid, r_post, i1_post]
   exact ⟨by omega, trivial⟩
 
 /-! ## `from_u62` and `Mul` -/
@@ -163,14 +170,17 @@ theorem from_u62.spec (x : Std.U64) (hx : x.val < 2 ^ 62) :
   unfold mersenne_31.from_u62
   step*
   all_goals
-    have hi1 : i1.val = 2 ^ 31 := by rw [i1_post1]; exact one_shl_u64 31 (by norm_num)
+    have hi1 : i1.val = 2 ^ 31 := by rw [i1_post]; exact one_shl_u64 31 (by norm_num)
     have hlo : input_lo.val = x.val % 2 ^ 31 := by
-      rw [input_lo_post, cast_u64_u32_val, i3_post1, and_mask31_u64 x i2 (by omega)]; omega
+      rw [‹input_lo = UScalar.cast UScalarTy.U32 i3›, cast_u64_u32_val, i3_post,
+        and_mask31_u64 x i2 (by omega)]; omega
     have hhi : input_high.val = x.val / 2 ^ 31 := by
-      rw [input_high_post, cast_u64_u32_val, i4_post1, Nat.shiftRight_eq_div_pow]; omega
+      rw [‹input_high = UScalar.cast UScalarTy.U32 i4›, cast_u64_u32_val, i4_post,
+        Nat.shiftRight_eq_div_pow]; omega
   · omega
-  · omega
-  · have hm : Valid m := by simp only [Valid, m_post, hlo]; omega
+  · rename m.value = input_lo => m_post
+    rename m1.value = input_high => m1_post
+    have hm : Valid m := by simp only [Valid, m_post, hlo]; omega
     have hm1 : Valid m1 := by simp only [Valid, m1_post, hhi]; omega
     refine WP.spec_mono (add.spec m m1 hm hm1) ?_
     rintro r ⟨hv, hr⟩
@@ -210,11 +220,11 @@ theorem new_checked.spec (x : Std.U32) :
   unfold mersenne_31.Mersenne31.new_checked
   step*
   · have : i.val = 0 := by simp [*]
-    rw [i_post1, Nat.shiftRight_eq_div_pow] at this
-    rw [if_pos (by omega)]
+    rw [i_post, Nat.shiftRight_eq_div_pow] at this
+    rw [ite_eq_left (by omega)]
   · have : i.val ≠ 0 := fun h => by apply ‹¬i = 0#u32›; exact UScalar.eq_of_val_eq h
-    rw [i_post1, Nat.shiftRight_eq_div_pow] at this
-    rw [if_neg (by omega)]
+    rw [i_post, Nat.shiftRight_eq_div_pow] at this
+    rw [ite_eq_right (by omega)]
 
 /-! ## Reading an element -/
 
@@ -253,15 +263,21 @@ theorem cmp.spec (a b : Element) :
   unfold mersenne_31.Mersenne31.Insts.CoreCmpOrd.cmp
   step*
   rw [core.U32.Insts.CoreCmpOrd.cmp.eq, ← i_post, ← i1_post]
-  rfl
+  exact (WP.spec_ok _).mpr rfl
 
 /-! ## Constants -/
 
 theorem NEG_ONE.eq :
     mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.NEG_ONE =
       .ok { value := 2147483646#u32 } := by
-  unfold mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.NEG_ONE
-  rw [ORDER_U32.eq]; rfl
+  have h : mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.NEG_ONE
+      ⦃ m => m = { value := 2147483646#u32 } ⦄ := by
+    unfold mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.NEG_ONE
+    rw [ORDER_U32.eq]
+    step*
+    exact congrArg _ (UScalar.eq_of_val_eq (by rw [i1_post]; rfl))
+  obtain ⟨v, hv, rfl⟩ := Plonky3Lean.Lib.spec_imp_exists h
+  exact hv
 
 /-! ## `PrimeCharacteristicRing` methods -/
 
@@ -274,15 +290,14 @@ theorem halve_u32.spec (P x : Std.U32) (hP : P.val < 2 ^ 31) (hx : x.val ≤ P.v
   step*
   all_goals
     have hlo : i1.val = x.val % 2 := by
-      rw [i1_post1, UScalar.val_and, show (1#u32).val = 1 from rfl, Nat.and_one_is_mod]
+      rw [i1_post, UScalar.val_and, show (1#u32).val = 1 from rfl, Nat.and_one_is_mod]
     have hsh : shift.val = (P.val + 1) / 2 := by
-      rw [shift_post1, Nat.shiftRight_eq_div_pow, i_post]
-    have hh : half.val = x.val / 2 := by rw [half_post1, Nat.shiftRight_eq_div_pow]
+      rw [shift_post, Nat.shiftRight_eq_div_pow, i_post]
+    have hh : half.val = x.val / 2 := by rw [half_post, Nat.shiftRight_eq_div_pow]
   · have : i1.val = 0 := by simp [*]
-    rw [if_pos (by omega), hh]
-  · scalar_tac
+    rw [ite_eq_left (by omega), hh]
   · have : i1.val ≠ 0 := fun h => ‹¬i1 = 0#u32› (UScalar.eq_of_val_eq h)
-    rw [if_neg (by omega), r_post, hh, hsh]
+    rw [ite_eq_right (by omega), r_post, hh, hsh]
 
 @[step]
 theorem from_bool.spec (b : Bool) :
@@ -300,7 +315,8 @@ theorem halve.spec (a : Element) (ha : Valid a) :
   have ha' : a.value.val < 2 ^ 31 := ha
   step*
   · split_ifs at i_post <;> omega
-  · simp only [Valid, r_post]
+  · rename r.value = _ => r_post
+    simp only [Valid, r_post]
     split_ifs at i_post <;> exact ⟨by omega, by omega⟩
 
 @[step]
@@ -312,15 +328,16 @@ theorem mul_2exp_u64.spec (a : Element) (ha : Valid a) (e : Std.U64) :
   step*
   all_goals
     have hk : exp1.val ≤ 30 := by omega
-    have hi2 : i2.val = 2 ^ 31 - 1 := by rw [i2_post1, i1_post1, one_shl_u32 31 (by norm_num)]
+    have hi2 : i2.val = 2 ^ 31 - 1 := by rw [i2_post, i1_post, one_shl_u32 31 (by norm_num)]
     have hrot : rotated.val =
         (a.value.val * 2 ^ exp1.val % 2 ^ 32 % 2 ^ 31 ||| a.value.val / 2 ^ (31 - exp1.val)) := by
-      rw [rotated_post1, UScalar.val_or, left_post1, UScalar.val_and, hi2,
-        Nat.and_two_pow_sub_one_eq_mod, i_post1, Nat.shiftLeft_eq, U32.size_def, U32.numBits_def,
-        UScalarTy.U32_numBits_eq, right_post1, Nat.shiftRight_eq_div_pow, i3_post1]
+      rw [‹rotated.val = (left ||| right).val›, UScalar.val_or, left_post, UScalar.val_and, hi2,
+        Nat.and_two_pow_sub_one_eq_mod, i_post, Nat.shiftLeft_eq, U32.size_def, U32.numBits_def,
+        UScalarTy.U32_numBits_eq, right_post, Nat.shiftRight_eq_div_pow, i3_post]
     have hr := rotl31 a.value.val exp1.val ha' (by omega)
   · rw [hrot]; exact hr.1
-  · simp only [Valid, r_post]
+  · rename r.value = _ => r_post
+    simp only [Valid, r_post]
     rw [hrot]
     refine ⟨hr.1, ?_⟩
     have h2 : 2 ^ exp1.val % 2147483647 = 2 ^ e.val % 2147483647 := by
@@ -337,21 +354,22 @@ theorem div_2exp_u64.spec (a : Element) (ha : Valid a) (e : Std.U64) :
   all_goals
     have he : exp1.val = e.val % 31 := by
       rw [exp1_post, UScalar.cast_val_eq, UScalarTy.U8_numBits_eq, i_post]; omega
-    have hi4 : i4.val = 2 ^ 31 - 1 := by rw [i4_post1, i3_post1, one_shl_u32 31 (by norm_num)]
+    have hi4 : i4.val = 2 ^ 31 - 1 := by rw [i4_post, i3_post, one_shl_u32 31 (by norm_num)]
     have hrot : rotated.val =
         (a.value.val * 2 ^ (31 - exp1.val) % 2 ^ 32 % 2 ^ 31 |||
           a.value.val / 2 ^ (31 - (31 - exp1.val))) := by
-      rw [rotated_post1, UScalar.val_or, right_post1, UScalar.val_and, hi4,
-        Nat.and_two_pow_sub_one_eq_mod, i2_post1, Nat.shiftLeft_eq, U32.size_def, U32.numBits_def,
-        UScalarTy.U32_numBits_eq, left_post1, Nat.shiftRight_eq_div_pow, i1_post1,
+      rw [‹rotated.val = (left ||| right).val›, UScalar.val_or, right_post, UScalar.val_and, hi4,
+        Nat.and_two_pow_sub_one_eq_mod, i2_post, Nat.shiftLeft_eq, U32.size_def, U32.numBits_def,
+        UScalarTy.U32_numBits_eq, left_post, Nat.shiftRight_eq_div_pow, i1_post,
         show 31 - (31 - exp1.val) = exp1.val by omega, Nat.or_comm]
     have hr := rotl31 a.value.val (31 - exp1.val) ha' (by omega)
   · rw [hrot]; exact hr.1
-  · simp only [Valid, r_post]
+  · rename r.value = _ => r_post
+    simp only [Valid, r_post]
     rw [hrot]
     refine ⟨hr.1, ?_⟩
     rw [Nat.mul_mod, hr.2, ← Nat.mul_mod, Nat.mul_assoc, ← pow_add, Nat.mul_mod, two_pow_mod,
       show (31 - exp1.val + e.val) % 31 = 0 by omega]
     simp
 
-end Plonky3Lean.Proofs.Mersenne31
+end Plonky3Lean.Proofs.P3Mersenne31

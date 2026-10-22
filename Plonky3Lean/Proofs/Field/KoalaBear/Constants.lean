@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.KoalaBear
+module
+
+public import Plonky3Lean.Proofs.Field.KoalaBear
+
+@[expose] public section
 
 /-!
 # KoalaBear: the base-field constants
@@ -11,7 +15,7 @@ open p3_koala_bear
 open Plonky3Lean.Spec.KoalaBear
 open Plonky3Lean.Lib
 
-namespace Plonky3Lean.Proofs.KoalaBear
+namespace Plonky3Lean.Proofs.P3KoalaBear
 
 /-! ## `FieldParameters` -/
 
@@ -31,11 +35,11 @@ theorem FieldParams.MONTY_NEG_ONE.toField :
     FieldParams.MONTY_NEG_ONE ⦃ r => Canonical r ∧ Spec.KoalaBear.toField r = -1 ⦄ := by
   dsimp only
   unfold koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.PRIME
-  step as ⟨i1, i1_post1, i1_post2⟩
+  step as ⟨i1, i1_post, i1_post1⟩
   refine WP.spec_mono (koala_bear.KoalaBear.new.toField i1) ?_
   rintro r ⟨hc, hr⟩
   refine ⟨hc, ?_⟩
-  rw [hr, i1_post1]
+  rw [hr, i1_post]
   decide
 
 theorem FieldParams.HALF_P_PLUS_1.spec :
@@ -45,7 +49,7 @@ theorem FieldParams.HALF_P_PLUS_1.spec :
   unfold koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.PRIME
   step*
   have hh : h.val = (KoalaBear.fieldSize + 1) / 2 := by
-    rw [h_post1, i1_post, Nat.shiftRight_eq_div_pow]; rfl
+    rw [h_post, i1_post, Nat.shiftRight_eq_div_pow]; rfl
   refine ⟨hh, ?_⟩
   rw [hh]
   decide
@@ -73,7 +77,8 @@ theorem slice_of_new_array {N : Std.Usize} (input : Array Std.U32 N) {L : List K
       ⦃ s => (∀ y ∈ s.val, Canonical y) ∧ s.val.map Spec.KoalaBear.toField = L ⦄ := by
   apply WP.spec_bind (koala_bear.KoalaBear.new_array.toField input)
   rintro a ⟨hc, hm⟩
-  exact (WP.spec_ok _).mpr ⟨hc, by rw [← hL]; exact hm⟩
+  exact (WP.spec_ok _).mpr ⟨by simpa [Array.to_slice] using hc,
+    by simpa [Array.to_slice, ← hL] using hm⟩
 
 /-- `TWO_ADIC_GENERATORS` is CompPoly's `KoalaBear.twoAdicGenerators`. -/
 theorem TwoAdicParams.TWO_ADIC_GENERATORS.eq_twoAdicGenerators :
@@ -164,10 +169,10 @@ theorem TwoAdicParams.ODD_FACTOR.spec :
     koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsTwoAdicDataSharedStaticSliceMontyField31KoalaBearParameters.TWO_ADICITY
   step*
   have h127 : (UScalar.hcast IScalarTy.I32 i2).val = 127 := by
-    rw [UScalar.hcast_val_eq, i2_post1]; decide
+    rw [UScalar.hcast_val_eq, i2_post]; decide
   refine ⟨h127, ?_⟩
   rw [h127, koala_bear.KoalaBearParameters.PRIME.eq_fieldSize,
     koala_bear.KoalaBearParameters.TWO_ADICITY.eq_twoAdicity]
   decide
 
-end Plonky3Lean.Proofs.KoalaBear
+end Plonky3Lean.Proofs.P3KoalaBear

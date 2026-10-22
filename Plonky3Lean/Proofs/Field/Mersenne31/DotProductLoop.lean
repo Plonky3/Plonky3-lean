@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.Mersenne31.Field
+module
+
+public import Plonky3Lean.Proofs.Field.Mersenne31.Field
+
+@[expose] public section
 
 /-!
 # Mersenne31: `dot_product`
@@ -14,7 +18,7 @@ open Aeneas Aeneas.Std CoreModels
 open p3_mersenne_31
 open Plonky3Lean.Spec.Mersenne31 Plonky3Lean.Lib
 
-namespace Plonky3Lean.Proofs.Mersenne31
+namespace Plonky3Lean.Proofs.P3Mersenne31
 
 /-- The product of the stored values at index `j`. -/
 def prodAt (lhs rhs : List Element) (j : ℕ) : ℕ :=
@@ -72,12 +76,13 @@ theorem loop0.body.spec {N : Std.Usize} (lhs rhs : Array Element N)
   all_goals subst_vars
   all_goals
     have hl' := prodAt_lt lhs.val rhs.val hl hr
-    try rw [prod_eq lhs rhs _ m m1] at i4_post
-    try rw [prod_eq lhs rhs _ m2 m3] at i8_post
-    try rw [prod_eq lhs rhs _ m4 m5] at i13_post
-    try rw [prod_eq lhs rhs _ m6 m7] at i18_post
+    try rw [prod_eq lhs rhs _ m_post m1_post] at i4_post
+    try rw [prod_eq lhs rhs _ m2_post m3_post] at i8_post
+    try rw [prod_eq lhs rhs _ m4_post m5_post] at i13_post
+    try rw [prod_eq lhs rhs _ m6_post m7_post] at i18_post
   · have := hl' i.val; have := hl' i5.val; scalar_tac
   · have := hl' i.val; have := hl' i5.val; have := hl' i10.val; scalar_tac
+  · rw [prod_eq lhs rhs _ m6_post m7_post]; have := hl' i15.val; scalar_tac
   · have := hl' i.val; have := hl' i5.val; have := hl' i10.val; have := hl' i15.val; scalar_tac
   have := hl' i.val; have := hl' i5.val; have := hl' i10.val; have := hl' i15.val
   have hcs : chunk_sum.val < 2 ^ 64 := by scalar_tac
@@ -127,14 +132,14 @@ theorem loop1.body.spec {N : Std.Usize} (lhs rhs : Array Element N)
   all_goals subst_vars
   all_goals
     have hl' := prodAt_lt lhs.val rhs.val hl hr
-  · rw [prod_eq lhs rhs _ m m1] at i3_post
+  · rw [prod_eq lhs rhs _ m_post m1_post] at i3_post
     have := hl' i.val
     have : i.val - i0 ≤ 2 := by scalar_tac
     have : acc.val < 2 ^ 62 + 2 * 2 ^ 62 := by
       calc acc.val < 2 ^ 62 + (i.val - i0) * 2 ^ 62 := hacc
         _ ≤ 2 ^ 62 + 2 * 2 ^ 62 := by gcongr
     scalar_tac
-  · rw [prod_eq lhs rhs _ m m1] at i3_post
+  · rw [prod_eq lhs rhs _ m_post m1_post] at i3_post
     have := hl' i.val
     refine ⟨⟨by scalar_tac, by scalar_tac, ?_, ?_⟩, by scalar_tac⟩
     · rw [acc1_post, i3_post, i4_post]
@@ -190,30 +195,29 @@ theorem dot_product.spec {N : Std.Usize} (lhs rhs : Array Element N)
     try have hd := congrArg (dotNat lhs.val rhs.val) h
   · step*
     all_goals subst_vars
-    all_goals first
+    all_goals try first
       | exact hl _ (List.getElem_mem _)
       | exact hr _ (List.getElem_mem _)
-      | skip
-    refine ⟨r_post1, ?_⟩
-    rw [r_post2, hd, d1, prodAt_eq lhs rhs 0 (by omega) (by omega)]
+    refine ⟨r_post, ?_⟩
+    rw [r_post1, hd, d1, prodAt_eq lhs rhs 0 (by omega) (by omega)]
   all_goals try (step*; all_goals subst_vars)
   all_goals (try simp only [cast_u32_u64_val] at *)
   all_goals
     have pk : ∀ k (h1 : k < lhs.val.length) (h2 : k < rhs.val.length),
         (lhs.val[k]'h1).value.val * (rhs.val[k]'h2).value.val < 2 ^ 62 := fun k h1 h2 => by
       rw [← prodAt_eq lhs rhs k h1 h2]; exact hl' k
-    try have := pk 0 m m1
-    try have := pk 1 m2 m3
-    try have := pk 2 m4 m5
-    try have := pk 3 m6 m7
-  all_goals first | scalar_tac | skip
+    try have := pk 0 m_post m1_post
+    try have := pk 1 m2_post m3_post
+    try have := pk 2 m4_post m5_post
+    try have := pk 3 m6_post m7_post
+  all_goals try scalar_tac
   iterate 3
     · refine ⟨by unfold Valid; omega, ?_⟩
       rw [hd]
       first | rw [d2] | rw [d3] | rw [d4]
-      rw [prodAt_eq lhs rhs 0 m m1, prodAt_eq lhs rhs 1 m2 m3]
-      try rw [prodAt_eq lhs rhs 2 m4 m5]
-      try rw [prodAt_eq lhs rhs 3 m6 m7]
+      rw [prodAt_eq lhs rhs 0 m_post m1_post, prodAt_eq lhs rhs 1 m2_post m3_post]
+      try rw [prodAt_eq lhs rhs 2 m4_post m5_post]
+      try rw [prodAt_eq lhs rhs 3 m6_post m7_post]
       omega
   refine WP.spec_bind (loop0.spec lhs rhs hl hr hN) ?_
   rintro ⟨acc, i⟩ ⟨⟨h4, hiN, hacc, hmod⟩, hlt⟩
@@ -222,11 +226,12 @@ theorem dot_product.spec {N : Std.Usize} (lhs rhs : Array Element N)
     ⟨le_rfl, hiN, by have : i.val / 4 * 2 ^ 34 < 2 ^ 62 := by omega
                      simp only [Nat.sub_self, zero_mul, add_zero]; omega, hmod⟩ as ⟨acc1, h1⟩
   step*
-  refine ⟨by unfold Valid; rw [r_post]; omega, by rw [r_post]; omega⟩
+  rename r.value = i1 => r_post
+  refine ⟨by unfold Valid; rw [r_post, i1_post]; omega, by rw [r_post, i1_post]; omega⟩
 
-end Plonky3Lean.Proofs.Mersenne31
+end Plonky3Lean.Proofs.P3Mersenne31
 
-namespace Plonky3Lean.Proofs.Mersenne31
+namespace Plonky3Lean.Proofs.P3Mersenne31
 
 /-- `dot_product` is the field dot product, for `N < 2^30`. -/
 theorem dot_product.toField {N : Std.Usize} (lhs rhs : Array Element N)
@@ -245,4 +250,4 @@ theorem dot_product.toField {N : Std.Usize} (lhs rhs : Array Element N)
   intro j _
   simp [prodAt]
 
-end Plonky3Lean.Proofs.Mersenne31
+end Plonky3Lean.Proofs.P3Mersenne31

@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.Monty31.Element
+module
+
+public import Plonky3Lean.Proofs.Field.Monty31.Element
+
+@[expose] public section
 
 /-!
 # Monty31: integers into the field, for any valid parameters
@@ -68,7 +72,9 @@ theorem from_int_i128.spec (hv : FieldValid inst p mu) (x : Std.I128) :
     rw [UScalar.hcast_val_eq, IScalarTy.I128_numBits_eq]
     exact Int.bmod_eq_of_le (by omega) (by omega)
   step*
-  rename_i r1 _ hr1 _
+  rename r.value = v => hrv
+  rename_i r1 _ _
+  have hr1 := r_post
   have hp' : (0 : ℤ) < p.val := by omega
   rw [hc] at hr1
   have hlt := Int.tmod_lt_of_pos x.val hp'
@@ -77,9 +83,9 @@ theorem from_int_i128.spec (hv : FieldValid inst p mu) (x : Std.I128) :
     rw [IScalar.cast_val_eq, IScalarTy.I32_numBits_eq, IScalarTy.I128_numBits_eq,
       show Min.min 32 128 = 32 from rfl]
     exact Int.bmod_eq_of_le (by push_cast; omega) (by push_cast; omega)
-  rw [r_post]
-  refine ⟨v_post1, ?_⟩
-  rw [v_post2, h32, hr1, Int.mul_emod, Int.tmod_def]
+  rw [hrv]
+  refine ⟨v_post, ?_⟩
+  rw [v_post1, h32, hr1, Int.mul_emod, Int.tmod_def]
   simp [Int.sub_emod, Int.mul_emod_right, ← Int.mul_emod]
 
 open monty_31.MontyField31.Insts in
@@ -113,9 +119,9 @@ theorem from_canonical_checked_i32.spec (hv : FieldValid inst p mu) (x : Std.I32
     rw [Int.bmod_eq_of_le (by push_cast; omega) (by push_cast; omega)]
     push_cast; omega
   step*
-  all_goals have hb := hhalf half half_post1
+  all_goals have hb := hhalf half half_post
   all_goals simp only [IScalar.le_equiv, ge_iff_le] at *
-  · refine ⟨fun _ _ => ⟨e, rfl, e_post ▸ v_post1, e_post ▸ v_post2⟩, fun h => ?_⟩
+  · refine ⟨fun _ _ => ⟨e, rfl, ‹e.value = v› ▸ ‹v.val < p.val›, ‹e.value = v› ▸ v_post1⟩, fun h => ?_⟩
     omega
 
 open monty_31.MontyField31.Insts in
@@ -162,14 +168,14 @@ theorem from_canonical_checked_i64.spec (hv : FieldValid inst p mu) (x : Std.I64
     rw [Int.bmod_eq_of_le (by push_cast; omega) (by push_cast; omega)]
     push_cast; omega
   step*
-  all_goals have hb := hhalf half half_post1
+  all_goals have hb := hhalf half half_post
   all_goals simp only [IScalar.le_equiv, ge_iff_le] at *
   · have hc : (IScalar.cast .I32 x).val = x.val := by
       rw [IScalar.cast_val_eq, IScalarTy.I32_numBits_eq, IScalarTy.I64_numBits_eq,
         show Min.min 32 64 = 32 from rfl]
       exact Int.bmod_eq_of_le (by push_cast; omega) (by push_cast; omega)
-    rw [hc] at v_post2
-    refine ⟨fun _ _ => ⟨e, rfl, e_post ▸ v_post1, e_post ▸ v_post2⟩, fun h => ?_⟩
+    rw [hc] at v_post1
+    refine ⟨fun _ _ => ⟨e, rfl, ‹e.value = v› ▸ ‹v.val < p.val›, ‹e.value = v› ▸ v_post1⟩, fun h => ?_⟩
     omega
 
 open monty_31.MontyField31.Insts in
@@ -192,14 +198,14 @@ theorem from_canonical_checked_i128.spec (hv : FieldValid inst p mu) (x : Std.I1
     rw [Int.bmod_eq_of_le (by push_cast; omega) (by push_cast; omega)]
     push_cast; omega
   step*
-  all_goals have hb := hhalf half half_post1
+  all_goals have hb := hhalf half half_post
   all_goals simp only [IScalar.le_equiv, ge_iff_le] at *
   · have hc : (IScalar.cast .I32 x).val = x.val := by
       rw [IScalar.cast_val_eq, IScalarTy.I32_numBits_eq, IScalarTy.I128_numBits_eq,
         show Min.min 32 128 = 32 from rfl]
       exact Int.bmod_eq_of_le (by push_cast; omega) (by push_cast; omega)
-    rw [hc] at v_post2
-    refine ⟨fun _ _ => ⟨e, rfl, e_post ▸ v_post1, e_post ▸ v_post2⟩, fun h => ?_⟩
+    rw [hc] at v_post1
+    refine ⟨fun _ _ => ⟨e, rfl, ‹e.value = v› ▸ ‹v.val < p.val›, ‹e.value = v› ▸ v_post1⟩, fun h => ?_⟩
     omega
 
 end Plonky3Lean.Proofs.Monty31

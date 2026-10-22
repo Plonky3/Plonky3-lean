@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.KoalaBear
+module
+
+public import Plonky3Lean.Proofs.Field.KoalaBear
+
+@[expose] public section
 
 /-!
 # KoalaBear: the Poseidon round-constant length assertions
@@ -12,18 +16,15 @@ Post-extraction patch 030 renames those to `const_check_N`.
 open Aeneas Aeneas.Std CoreModels
 open p3_koala_bear
 
-namespace Plonky3Lean.Proofs.KoalaBear
+namespace Plonky3Lean.Proofs.P3KoalaBear
 
 /-- Closes a length assertion on a round-constant table `t`, given that the table builds (`ht`). -/
 macro "poseidon_length " ht:ident : tactic =>
   `(tactic| (
-    simp only [$ht:ident, bind_tc_ok, CoreModels.core.slice.Slice.len,
-      CoreModels.rust_primitives.slice.slice_length]
-    step*
-    all_goals
-      simp only [not_not]
-      apply UScalar.eq_of_val_eq
-      simp_all))
+    rw [$ht:ident, bind_ok]
+    simp only [CoreModels.core.array.Array.as_slice, CoreModels.rust_primitives.slice.array_as_slice,
+      CoreModels.core.slice.Slice.len, CoreModels.rust_primitives.slice.slice_length, bind_ok]
+    step*))
 
 /-- `koala-bear/src/poseidon1.rs:65`, on `KOALABEAR_POSEIDON1_RC_16`. -/
 theorem poseidon1._.holds : poseidon1._ ⦃ _ => True ⦄ := by
@@ -102,4 +103,4 @@ theorem poseidon2.const_check_8.holds : poseidon2.const_check_8 ⦃ _ => True �
   unfold poseidon2.const_check_8 poseidon2.KOALABEAR_POSEIDON2_PARTIAL_ROUNDS_32
   poseidon_length ht
 
-end Plonky3Lean.Proofs.KoalaBear
+end Plonky3Lean.Proofs.P3KoalaBear

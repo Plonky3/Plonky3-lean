@@ -1,6 +1,10 @@
-import Plonky3Lean.Proofs.Field.KoalaBear.Constants
-import ToCompPoly.Fields.KoalaBear.Extension
-import ToCompPoly.Fields.KoalaBear.Quintic
+module
+
+public import Plonky3Lean.Proofs.Field.KoalaBear.Constants
+public import ToCompPoly.Fields.KoalaBear.Extension
+public import ToCompPoly.Fields.KoalaBear.Quintic
+
+@[expose] public section
 
 /-!
 # KoalaBear: the binomial extensions
@@ -22,7 +26,7 @@ open Aeneas Aeneas.Std CoreModels Polynomial
 open p3_koala_bear
 open Plonky3Lean.Spec.KoalaBear
 
-namespace Plonky3Lean.Proofs.KoalaBear
+namespace Plonky3Lean.Proofs.P3KoalaBear
 
 theorem Ext4Params.W.spec :
     Ext4Params.W ⦃ w => Canonical w ∧ Spec.KoalaBear.toField w = 3 ∧
@@ -56,7 +60,7 @@ theorem Ext4Params.DTH_ROOT.spec :
   obtain ⟨r, hr, hrc, hrv⟩ := Aeneas.Std.WP.spec_imp_exists hd
   refine ⟨w, r, hw, hr, hrc, ?_⟩
   rw [hrv, hw3, show (3 : KoalaBear.Field) = ((3 : ℕ) : KoalaBear.Field) by norm_cast,
-    ZMod.natCast_pow_eq_powMod 3 _ (by unfold KoalaBear.fieldSize; norm_num)]
+    ZMod.natCast_pow_eq_powMod 3 _]
   decide
 
 theorem Ext8Params.W.spec :
@@ -91,7 +95,7 @@ theorem Ext8Params.DTH_ROOT.spec :
   obtain ⟨r, hr, hrc, hrv⟩ := Aeneas.Std.WP.spec_imp_exists hd
   refine ⟨w, r, hw, hr, hrc, ?_⟩
   rw [hrv, hw3, show (3 : KoalaBear.Field) = ((3 : ℕ) : KoalaBear.Field) by norm_cast,
-    ZMod.natCast_pow_eq_powMod 3 _ (by unfold KoalaBear.fieldSize; norm_num)]
+    ZMod.natCast_pow_eq_powMod 3 _]
   decide
 
 /-! ## Elements of the extensions -/
@@ -325,4 +329,4 @@ theorem QuinticParams.FROBENIUS_COEFFS.spec :
   congr 1
   simp only [← hc, List.getElem_map]
 
-end Plonky3Lean.Proofs.KoalaBear
+end Plonky3Lean.Proofs.P3KoalaBear

@@ -1,6 +1,10 @@
-import Plonky3Lean.Proofs.Field.Monty31.PowersOfTwo
-import Plonky3Lean.Proofs.Util.GcdInversion
-import Mathlib.FieldTheory.Finite.Basic
+module
+
+public import Plonky3Lean.Proofs.Field.Monty31.PowersOfTwo
+public import Plonky3Lean.Proofs.Util.GcdInversion
+public import Mathlib.FieldTheory.Finite.Basic
+
+@[expose] public section
 
 /-!
 # Monty31: inversion, for any valid parameters with `p > 2^30`
@@ -78,7 +82,6 @@ theorem monty_31.MontyField31.try_inverse.spec (hv : FieldValid inst p mu)
   have hodd := hm.odd
   -- Phase 1: zero returns `None`.
   step*
-  case h1 => simp [zero_post]
   -- Phase 2: a nonzero canonical input.
   rename_i hne
   have ha0 : a.value.val ≠ 0 := by
@@ -93,8 +96,8 @@ theorem monty_31.MontyField31.try_inverse.spec (hv : FieldValid inst p mu)
       (Nat.pos_of_ne_zero ha0) ha)
   obtain ⟨v', hv'_eq, hr1, hr2⟩ := WP.spec_imp_exists
     (Util.gcd_inversion_prime_field_32.pos_inverse a.value p hp30 hp)
-  rw [hv_eq] at hv'_eq; cases hv'_eq
-  simp only [bind_tc_ok, hv_eq]
+  rw [hv_eq] at hv'_eq; obtain rfl := RustM.ok_injective hv'_eq
+  simp only [bind_ok, hv_eq]
   -- Phase 4: the shifted sum is positive, so the cast to `u64` keeps its value.
   have hvabs := abs_le.mp hvb
   have hshift : ∀ sh : Std.I64,
@@ -111,18 +114,19 @@ theorem monty_31.MontyField31.try_inverse.spec (hv : FieldValid inst p mu)
     rw [IScalar.hcast_val_eq, UScalarTy.U64_numBits_eq,
       Int.emod_eq_of_lt hs.le (by have := s.hBounds; simp at this; omega)]
   step*
-  all_goals have hsh := hshift shifted shifted_post1
+  all_goals have hsh := hshift shifted shifted_post
   have hexp : (UScalar.cast .U64 exp).val = 36 := by
-    rw [cast_u32_u64_val, exp_post1, three_bits_post]
+    rw [cast_u32_u64_val, exp_post, three_bits_post]
   have hsum : ((IScalar.hcast .U64 sum).val : ℤ) = p.val * 2 ^ 30 + v.val := by
     rw [hpos sum (by omega), sum_post, hsh, Int.toNat_of_nonneg (by omega)]
   -- Phase 5: multiply by `2^36`, then conclude with the arithmetic lemma.
+  rename uncorrected_value.value = r => uncorrected_value_post
   step with monty_31.MontyField31.mul_2exp_u64.spec_lt hv hd uncorrected_value
-    (by rw [uncorrected_value_post]; exact r_post1) _ (by rw [hexp]; norm_num)
+    (by rw [uncorrected_value_post]; exact r_post) _ (by rw [hexp]; norm_num)
     (by rw [hexp]; norm_num)
-  refine ⟨fun h => absurd h ha0, fun _ => ⟨_, rfl, v_post1, ?_⟩⟩
-  haveI := Fact.mk hprime
-  rw [hexp, uncorrected_value_post] at v_post2
-  exact inv_core hodd v_post2 r_post2 hsum hvc
+  refine ⟨fun h => absurd h ha0, fun _ => ⟨_, rfl, v_post, ?_⟩⟩
+  have := Fact.mk hprime
+  rw [hexp, uncorrected_value_post] at v_post1
+  exact inv_core hodd v_post1 r_post1 hsum hvc
 
 end Plonky3Lean.Proofs.Monty31

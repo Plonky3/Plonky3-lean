@@ -1,4 +1,9 @@
-import Plonky3Lean.Proofs.Field.Mersenne31.Field
+module
+
+public import Plonky3Lean.Lib.Array
+public import Plonky3Lean.Proofs.Field.Mersenne31.Field
+
+@[expose] public section
 
 /-!
 # Mersenne31: `new_array`
@@ -8,7 +13,7 @@ open Aeneas Aeneas.Std CoreModels
 open p3_mersenne_31
 open Plonky3Lean.Spec.Mersenne31 Plonky3Lean.Lib
 
-namespace Plonky3Lean.Proofs.Mersenne31
+namespace Plonky3Lean.Proofs.P3Mersenne31
 
 /-- After `i` iterations, the first `i` entries are reduced inputs. -/
 def ArrInv {N : Std.Usize} (input : Array Std.U32 N) (output : Array Element N) (i : ℕ) : Prop :=
@@ -44,6 +49,9 @@ theorem new_array.spec {N : Std.Usize} (input : Array Std.U32 N) :
         Canonical (r.val[j]'h1) ∧
           Spec.Mersenne31.toField (r.val[j]'h1) = ((input.val[j]'h2).val : Mersenne31.Field) ⦄ := by
   unfold mersenne_31.Mersenne31.new_array
+  obtain ⟨out, hout⟩ := array_repeat_ok N mersenne_31.Mersenne31.Insts.CoreCloneClone
+    (fun x => ⟨x, rfl⟩) _
+  rw [hout, bind_ok]
   refine WP.spec_mono (new_array_loop.spec input _ 0#usize ⟨Nat.zero_le _, fun j hj => by
     simp at hj⟩) ?_
   rintro r ⟨-, hr⟩ j h1 h2
@@ -53,4 +61,4 @@ theorem new_array.spec {N : Std.Usize} (input : Array Std.U32 N) :
   unfold Spec.Mersenne31.toField
   rw [this, natCast_eq_iff]; omega
 
-end Plonky3Lean.Proofs.Mersenne31
+end Plonky3Lean.Proofs.P3Mersenne31

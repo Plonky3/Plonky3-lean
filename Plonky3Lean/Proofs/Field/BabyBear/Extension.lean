@@ -1,5 +1,9 @@
-import Plonky3Lean.Proofs.Field.BabyBear.Constants
-import ToCompPoly.Fields.BabyBear.Extension
+module
+
+public import Plonky3Lean.Proofs.Field.BabyBear.Constants
+public import ToCompPoly.Fields.BabyBear.Extension
+
+@[expose] public section
 
 /-!
 # BabyBear: the binomial extensions
@@ -16,7 +20,7 @@ open Aeneas Aeneas.Std CoreModels Polynomial
 open p3_baby_bear
 open Plonky3Lean.Spec.BabyBear
 
-namespace Plonky3Lean.Proofs.BabyBear
+namespace Plonky3Lean.Proofs.P3BabyBear
 
 theorem Ext4Params.W.spec :
     Ext4Params.W ⦃ w => Canonical w ∧ Spec.BabyBear.toField w = 11 ∧
@@ -41,16 +45,16 @@ theorem Ext4Params.EXT_TWO_ADICITY.spec :
 theorem Ext4Params.DTH_ROOT.spec :
     ∃ w r, Ext4Params.W = .ok w ∧ Ext4Params.DTH_ROOT = .ok r ∧ Canonical r ∧
       Spec.BabyBear.toField r = Spec.BabyBear.toField w ^ ((BabyBear.fieldSize - 1) / 4) := by
-  obtain ⟨w, hw, -, hw11, -⟩ := Aeneas.Std.WP.spec_imp_exists Ext4Params.W.spec
+  obtain ⟨w, hw, -, hw11, -⟩ := Plonky3Lean.Lib.spec_imp_exists Ext4Params.W.spec
   have hd : Ext4Params.DTH_ROOT ⦃ r => Canonical r ∧
       Spec.BabyBear.toField r = ((1728404513 : ℕ) : BabyBear.Field) ⦄ := by
     dsimp only
     unfold baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsBinomialExtensionDataArrayArrayMontyField31BabyBearParameters424.DTH_ROOT
     exact baby_bear.BabyBear.new.toField _
-  obtain ⟨r, hr, hrc, hrv⟩ := Aeneas.Std.WP.spec_imp_exists hd
+  obtain ⟨r, hr, hrc, hrv⟩ := Plonky3Lean.Lib.spec_imp_exists hd
   refine ⟨w, r, hw, hr, hrc, ?_⟩
   rw [hrv, hw11, show (11 : BabyBear.Field) = ((11 : ℕ) : BabyBear.Field) by norm_cast,
-    ZMod.natCast_pow_eq_powMod 11 _ (by unfold BabyBear.fieldSize; norm_num)]
+    BabyBear.natCast_pow_eq_powMod 11 _]
   decide
 
 theorem Ext5Params.W.spec :
@@ -76,16 +80,16 @@ theorem Ext5Params.EXT_TWO_ADICITY.spec :
 theorem Ext5Params.DTH_ROOT.spec :
     ∃ w r, Ext5Params.W = .ok w ∧ Ext5Params.DTH_ROOT = .ok r ∧ Canonical r ∧
       Spec.BabyBear.toField r = Spec.BabyBear.toField w ^ ((BabyBear.fieldSize - 1) / 5) := by
-  obtain ⟨w, hw, -, hw11, -⟩ := Aeneas.Std.WP.spec_imp_exists Ext5Params.W.spec
+  obtain ⟨w, hw, -, hw11, -⟩ := Plonky3Lean.Lib.spec_imp_exists Ext5Params.W.spec
   have hd : Ext5Params.DTH_ROOT ⦃ r => Canonical r ∧
       Spec.BabyBear.toField r = ((815036133 : ℕ) : BabyBear.Field) ⦄ := by
     dsimp only
     unfold baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsBinomialExtensionDataArrayArrayMontyField31BabyBearParameters505.DTH_ROOT
     exact baby_bear.BabyBear.new.toField _
-  obtain ⟨r, hr, hrc, hrv⟩ := Aeneas.Std.WP.spec_imp_exists hd
+  obtain ⟨r, hr, hrc, hrv⟩ := Plonky3Lean.Lib.spec_imp_exists hd
   refine ⟨w, r, hw, hr, hrc, ?_⟩
   rw [hrv, hw11, show (2 : BabyBear.Field) = ((2 : ℕ) : BabyBear.Field) by norm_cast,
-    ZMod.natCast_pow_eq_powMod 2 _ (by unfold BabyBear.fieldSize; norm_num)]
+    BabyBear.natCast_pow_eq_powMod 2 _]
   decide
 
 theorem Ext8Params.W.spec :
@@ -111,16 +115,16 @@ theorem Ext8Params.EXT_TWO_ADICITY.spec :
 theorem Ext8Params.DTH_ROOT.spec :
     ∃ w r, Ext8Params.W = .ok w ∧ Ext8Params.DTH_ROOT = .ok r ∧ Canonical r ∧
       Spec.BabyBear.toField r = Spec.BabyBear.toField w ^ ((BabyBear.fieldSize - 1) / 8) := by
-  obtain ⟨w, hw, -, hw11, -⟩ := Aeneas.Std.WP.spec_imp_exists Ext8Params.W.spec
+  obtain ⟨w, hw, -, hw11, -⟩ := Plonky3Lean.Lib.spec_imp_exists Ext8Params.W.spec
   have hd : Ext8Params.DTH_ROOT ⦃ r => Canonical r ∧
       Spec.BabyBear.toField r = ((420899707 : ℕ) : BabyBear.Field) ⦄ := by
     dsimp only
     unfold baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsBinomialExtensionDataArrayArrayMontyField31BabyBearParameters838.DTH_ROOT
     exact baby_bear.BabyBear.new.toField _
-  obtain ⟨r, hr, hrc, hrv⟩ := Aeneas.Std.WP.spec_imp_exists hd
+  obtain ⟨r, hr, hrc, hrv⟩ := Plonky3Lean.Lib.spec_imp_exists hd
   refine ⟨w, r, hw, hr, hrc, ?_⟩
   rw [hrv, hw11, show (11 : BabyBear.Field) = ((11 : ℕ) : BabyBear.Field) by norm_cast,
-    ZMod.natCast_pow_eq_powMod 11 _ (by unfold BabyBear.fieldSize; norm_num)]
+    BabyBear.natCast_pow_eq_powMod 11 _]
   decide
 
 /-! ## Elements of the extensions -/
@@ -148,7 +152,7 @@ theorem Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.eq :
 theorem Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.toExt_eq :
     ∃ t, Ext4Params.TWO_ADIC_EXTENSION_GENERATORS = .ok t ∧
       t.val.map (toExt 11) = BabyBear.ext4TwoAdicGenerators := by
-  obtain ⟨t, ht, hc⟩ := Aeneas.Std.WP.spec_imp_exists Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.eq
+  obtain ⟨t, ht, hc⟩ := Plonky3Lean.Lib.spec_imp_exists Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.eq
   refine ⟨t, ht, ?_⟩
   unfold BabyBear.ext4TwoAdicGenerators
   rw [← hc, List.map_map]
@@ -159,7 +163,7 @@ theorem Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.sq_succ :
       let chain := AdjoinRoot.of _ BabyBear.twoAdicGenerators[TWO_ADICITY.val]! ::
         t.val.map (toExt (Spec.BabyBear.toField w))
       ∀ i (h : i + 1 < chain.length), chain[i + 1] ^ 2 = chain[i] := by
-  obtain ⟨w, hw, -, hw11, -⟩ := Aeneas.Std.WP.spec_imp_exists Ext4Params.W.spec
+  obtain ⟨w, hw, -, hw11, -⟩ := Plonky3Lean.Lib.spec_imp_exists Ext4Params.W.spec
   obtain ⟨t, ht, hm⟩ := Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.toExt_eq
   refine ⟨w, t, hw, ht, ?_⟩
   have key : ∀ v : BabyBear.Field, v = 11 →
@@ -179,7 +183,7 @@ theorem Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.order :
       ∀ i (h : i < t.val.length),
         orderOf (toExt (Spec.BabyBear.toField w) t.val[i]) =
           2 ^ (TWO_ADICITY.val + 1 + i) := by
-  obtain ⟨w, hw, -, hw11, -⟩ := Aeneas.Std.WP.spec_imp_exists Ext4Params.W.spec
+  obtain ⟨w, hw, -, hw11, -⟩ := Plonky3Lean.Lib.spec_imp_exists Ext4Params.W.spec
   obtain ⟨t, ht, hm⟩ := Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.toExt_eq
   refine ⟨w, t, 29#usize, hw, ht, ?_, ?_, ?_⟩
   · dsimp only
@@ -216,7 +220,7 @@ theorem Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.eq :
 theorem Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.toExt_eq :
     ∃ t, Ext8Params.TWO_ADIC_EXTENSION_GENERATORS = .ok t ∧
       t.val.map (toExt 11) = BabyBear.ext8TwoAdicGenerators := by
-  obtain ⟨t, ht, hc⟩ := Aeneas.Std.WP.spec_imp_exists Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.eq
+  obtain ⟨t, ht, hc⟩ := Plonky3Lean.Lib.spec_imp_exists Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.eq
   refine ⟨t, ht, ?_⟩
   unfold BabyBear.ext8TwoAdicGenerators
   rw [← hc, List.map_map]
@@ -227,7 +231,7 @@ theorem Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.sq_succ :
       let chain := AdjoinRoot.of _ BabyBear.twoAdicGenerators[TWO_ADICITY.val]! ::
         t.val.map (toExt (Spec.BabyBear.toField w))
       ∀ i (h : i + 1 < chain.length), chain[i + 1] ^ 2 = chain[i] := by
-  obtain ⟨w, hw, -, hw11, -⟩ := Aeneas.Std.WP.spec_imp_exists Ext8Params.W.spec
+  obtain ⟨w, hw, -, hw11, -⟩ := Plonky3Lean.Lib.spec_imp_exists Ext8Params.W.spec
   obtain ⟨t, ht, hm⟩ := Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.toExt_eq
   refine ⟨w, t, hw, ht, ?_⟩
   have key : ∀ v : BabyBear.Field, v = 11 →
@@ -247,7 +251,7 @@ theorem Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.order :
       ∀ i (h : i < t.val.length),
         orderOf (toExt (Spec.BabyBear.toField w) t.val[i]) =
           2 ^ (TWO_ADICITY.val + 1 + i) := by
-  obtain ⟨w, hw, -, hw11, -⟩ := Aeneas.Std.WP.spec_imp_exists Ext8Params.W.spec
+  obtain ⟨w, hw, -, hw11, -⟩ := Plonky3Lean.Lib.spec_imp_exists Ext8Params.W.spec
   obtain ⟨t, ht, hm⟩ := Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.toExt_eq
   refine ⟨w, t, 30#usize, hw, ht, ?_, ?_, ?_⟩
   · dsimp only
@@ -267,4 +271,4 @@ theorem Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.order :
     exact BabyBear.ext8TwoAdicGenerators_order i _
   exact key _ hw11
 
-end Plonky3Lean.Proofs.BabyBear
+end Plonky3Lean.Proofs.P3BabyBear

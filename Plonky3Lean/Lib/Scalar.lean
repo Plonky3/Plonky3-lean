@@ -1,6 +1,10 @@
-import Aeneas
-import CoreModels
-import HaxExt
+module
+
+public import Aeneas
+public import CoreModels
+public import HaxExt
+
+@[expose] public section
 
 /-!
 # Rust integer primitives, as natural numbers
@@ -90,13 +94,60 @@ theorem overflowing_sub_val {ty} (x y : UScalar ty) :
       Nat.add_mod_right, Nat.mod_eq_of_lt (by omega)]
     omega
 
+/-- `uoverflowing_sub x y`, the value behind `overflowing_sub` on unsigned integers:
+the wrapped difference, and whether it wrapped. The same statement as Aeneas's
+`UScalar.overflowing_sub_eq`, for CoreModels' definition. -/
+theorem uoverflowing_sub_eq {ty : UScalarTy} (x y : UScalar ty) :
+    let z := uoverflowing_sub x y
+    if x.val < y.val then
+      z.fst.val + y.val = x.val + UScalar.size ty ∧ z.snd = true
+    else
+      z.fst.val = x.val - y.val ∧ z.snd = false := by
+  have hx := x.hBounds
+  have hy := y.hBounds
+  simp only [uoverflowing_sub, UScalar.size]
+  split
+  · rename_i h
+    refine ⟨?_, by simpa using h⟩
+    show (x.bv - y.bv).toNat + y.val = x.val + 2 ^ ty.numBits
+    rw [BitVec.toNat_sub]
+    simp only [UScalar.bv_toNat] at *
+    rw [Nat.mod_eq_of_lt (by omega)]
+    omega
+  · rename_i h
+    refine ⟨?_, by simpa using h⟩
+    show (x.bv - y.bv).toNat = x.val - y.val
+    rw [BitVec.toNat_sub]
+    simp only [UScalar.bv_toNat] at *
+    rw [show 2 ^ ty.numBits - y.val + x.val = (x.val - y.val) + 2 ^ ty.numBits by omega,
+      Nat.add_mod_right, Nat.mod_eq_of_lt (by omega)]
+
+/-- `overflowing_sub_val`, for CoreModels' `uoverflowing_sub`. -/
+theorem uoverflowing_sub_val {ty} (x y : UScalar ty) :
+    (uoverflowing_sub x y).2 = decide (x.val < y.val) ∧
+      (uoverflowing_sub x y).1.val = (x.val + UScalar.size ty - y.val) % UScalar.size ty := by
+  have h := uoverflowing_sub_eq x y
+  have hs : UScalar.size ty = 2 ^ ty.numBits := by simp only [UScalar.size]
+  have hx := x.hBounds
+  have hy := y.hBounds
+  have hr := (uoverflowing_sub x y).1.hBounds
+  simp only at h
+  split at h <;> rename_i hlt <;> obtain ⟨h1, h2⟩ := h
+  · refine ⟨by simp [h2, hlt], ?_⟩
+    rw [Nat.mod_eq_of_lt (by omega)]
+    omega
+  · refine ⟨by simp [h2, hlt], ?_⟩
+    rw [show x.val + UScalar.size ty - y.val = (x.val - y.val) + UScalar.size ty by omega,
+      Nat.add_mod_right, Nat.mod_eq_of_lt (by omega)]
+    omega
+
 @[step]
 theorem core.num.U32.overflowing_sub.spec (x y : Std.U32) :
     CoreModels.core.num.U32.overflowing_sub x y ⦃ r =>
       r.2 = decide (x.val < y.val) ∧ r.1.val = (x.val + 2 ^ 32 - y.val) % 2 ^ 32 ⦄ := by
   simp only [CoreModels.core.num.U32.overflowing_sub,
     CoreModels.rust_primitives.arithmetic.overflowing_sub_u32, WP.spec_ok]
-  rw [← size_u32]; exact overflowing_sub_val x y
+  rw [← size_u32]; exact uoverflowing_sub_val x y
 
 @[step]
 theorem core.num.U64.overflowing_sub.spec (x y : Std.U64) :
@@ -104,7 +155,7 @@ theorem core.num.U64.overflowing_sub.spec (x y : Std.U64) :
       r.2 = decide (x.val < y.val) ∧ r.1.val = (x.val + 2 ^ 64 - y.val) % 2 ^ 64 ⦄ := by
   simp only [CoreModels.core.num.U64.overflowing_sub,
     CoreModels.rust_primitives.arithmetic.overflowing_sub_u64, WP.spec_ok]
-  rw [← size_u64]; exact overflowing_sub_val x y
+  rw [← size_u64]; exact uoverflowing_sub_val x y
 
 /-! ## `wrapping_*` -/
 

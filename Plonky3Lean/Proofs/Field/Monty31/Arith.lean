@@ -1,14 +1,19 @@
-import Mathlib.Data.ZMod.Units
-import Plonky3Lean.Lib.RustM
-import Plonky3Lean.Proofs.Field.Monty31.Element
+module
+
+public import Mathlib.Data.ZMod.Units
+public import Plonky3Lean.Lib.Array
+public import Plonky3Lean.Lib.RustM
+public import Plonky3Lean.Proofs.Field.Monty31.Element
+
+@[expose] public section
 
 /-!
 # Monty31: constructors and scalar arithmetic as field operations, for any valid parameters
 
 `MontyField31::new`, `new_array` and `new_2d_array`, and the `MontyField31` operators `Add`, `Sub`, `Mul`, `Neg` and `PrimeCharacteristicRing::halve`, and `from_monty`, read through `Plonky3Lean.Spec.Monty31.toField`.
 
-The operators are transcribed in `P3Monty31.Assumptions.Mirror`.
-The `u32` arithmetic they wrap is extracted.
+The constructors and operators are extracted, and so is the `u32` arithmetic they wrap.
+`halve` is transcribed in `P3Monty31.Assumptions.Mirror`.
 
 Each operator, on canonical inputs, is the field operation and returns a canonical value.
 -/
@@ -83,21 +88,32 @@ theorem forall₂_newRel {P : ℕ} {l : List Std.U32} {l' : List (Element MP)}
       · exact ih.1 y hy
     · simp [hxy.2, ih.2]
 
+/-- Cloning a `MontyField31` returns it. -/
+theorem monty_31.MontyField31.clone.eq (cinst : CoreModels.core.clone.Clone MP) (x : Element MP) :
+    (monty_31.MontyField31.Insts.CoreCloneClone cinst inst).clone x = .ok x := by
+  show monty_31.MontyField31.Insts.CoreCloneClone.clone cinst inst x = _
+  unfold monty_31.MontyField31.Insts.CoreCloneClone.clone
+    CoreModels.core.U32.Insts.CoreCloneClone.clone
+    CoreModels.core.marker.PhantomData.Insts.CoreCloneClone.clone
+  rw [bind_ok, bind_ok]
+
 /-- `MontyField31::new_array` applies `new` elementwise: every output is canonical, and the outputs stand for the inputs mod `p`.
 
-About the hand-written transcription of `new_array`. -/
+The Rust `while` loop is extracted as aeneas's `loop`. -/
 theorem monty_31.MontyField31.new_array.toField (hv : Valid inst p mu) {P : ℕ}
     (hP : p.val = P) {N : Std.Usize} (input : Array Std.U32 N) :
     monty_31.MontyField31.new_array inst input
       ⦃ r => (∀ y ∈ r.val, Canonical P y) ∧
         r.val.map (toField P) = input.val.map (fun x => (x.val : ZMod P)) ⦄ := by
-  obtain ⟨l', hl', hall⟩ :=
-    mapM_forall₂ _ (NewRel P) (monty_31.MontyField31.new.toField hv hP) input.val
-  have hlen : l'.length = N.val := by rw [← hall.length_eq]; exact input.property
   unfold monty_31.MontyField31.new_array
-  rw [hl']
-  simp only [bind_tc_ok, hlen, _root_.dite_true]
-  exact (WP.spec_ok _).mpr (forall₂_newRel hall)
+  obtain ⟨mf, hmf⟩ : ∃ mf, monty_31.MontyField31.new_monty inst 0#u32 = .ok mf := ⟨_, rfl⟩
+  rw [hmf, bind_ok]
+  obtain ⟨out, hout⟩ := array_repeat_ok N _
+    (fun x => ⟨x, monty_31.MontyField31.clone.eq _ x⟩) mf
+  rw [hout, bind_ok]
+  unfold monty_31.MontyField31.new_array_loop
+  exact WP.spec_mono (elementwise_loop _ (NewRel P) (monty_31.MontyField31.new.toField hv hP)
+    input out 0#usize (by simp) (by simp)) fun _ h => forall₂_newRel h
 
 /-- What `new_array` does to one row, as a relation between input and output. -/
 def NewArrayRel (P : ℕ) {N : Std.Usize} (x : Array Std.U32 N) (r : Array (Element MP) N) :
@@ -119,22 +135,26 @@ theorem forall₂_newArrayRel {P : ℕ} {N : Std.Usize} {l : List (Array Std.U32
       · exact ih.1 row hrow
     · simp [hxy.2, ih.2]
 
-/-- `MontyField31::new_2d_array` applies `new_array` to each row: every output is canonical, and the outputs stand for the inputs mod `p`.
-
-About the hand-written transcription of `new_2d_array`. -/
+/-- `MontyField31::new_2d_array` applies `new_array` to each row: every output is canonical, and the outputs stand for the inputs mod `p`. -/
 theorem monty_31.MontyField31.new_2d_array.toField (hv : Valid inst p mu) {P : ℕ}
     (hP : p.val = P) {N M : Std.Usize} (input : Array (Array Std.U32 N) M) :
     monty_31.MontyField31.new_2d_array inst input
       ⦃ r => (∀ row ∈ r.val, ∀ y ∈ row.val, Canonical P y) ∧
         r.val.map (fun row => row.val.map (toField P)) =
           input.val.map (fun row => row.val.map (fun x => (x.val : ZMod P))) ⦄ := by
-  obtain ⟨l', hl', hall⟩ :=
-    mapM_forall₂ _ (NewArrayRel P) (monty_31.MontyField31.new_array.toField hv hP) input.val
-  have hlen : l'.length = M.val := by rw [← hall.length_eq]; exact input.property
   unfold monty_31.MontyField31.new_2d_array
-  rw [hl']
-  simp only [bind_tc_ok, hlen, _root_.dite_true]
-  exact (WP.spec_ok _).mpr (forall₂_newArrayRel hall)
+  obtain ⟨mf, hmf⟩ : ∃ mf, monty_31.MontyField31.new_monty inst 0#u32 = .ok mf := ⟨_, rfl⟩
+  rw [hmf, bind_ok]
+  obtain ⟨row, hrow⟩ := array_repeat_ok N _
+    (fun x => ⟨x, monty_31.MontyField31.clone.eq _ x⟩) mf
+  rw [hrow, bind_ok]
+  obtain ⟨out, hout⟩ := array_repeat_ok M _
+    (array_clone_ok _ (fun x => ⟨x, monty_31.MontyField31.clone.eq _ x⟩)) row
+  rw [hout, bind_ok]
+  unfold monty_31.MontyField31.new_2d_array_loop
+  exact WP.spec_mono (elementwise_loop _ (NewArrayRel P)
+    (monty_31.MontyField31.new_array.toField hv hP) input out 0#usize (by simp) (by simp))
+    fun _ h => forall₂_newArrayRel h
 
 /-- `MontyField31::new_array` never panics on valid parameters. -/
 theorem monty_31.MontyField31.new_array.ok (hv : Valid inst p mu) {N : Std.Usize}
@@ -160,11 +180,11 @@ theorem toField_congr {P : ℕ} {x y : Element MP} (h : (x.value.val : ZMod P) =
 /-- `a + b`, for canonical `a` and `b`, is canonical and stands for `toField a + toField b`. -/
 theorem monty_31.MontyField31.add.toField (hv : Valid inst p mu) {P : ℕ} (hP : p.val = P)
     (a b : Element MP) (ha : Canonical P a) (hb : Canonical P b) :
-    monty_31.MontyField31.add inst a b
+    monty_31.MontyField31.Insts.CoreOpsArithAddMontyField31MontyField31.add inst a b
       ⦃ c => Canonical P c ∧ toField P c = toField P a + toField P b ⦄ := by
   unfold Canonical at *
   rw [← hP] at ha hb
-  unfold monty_31.MontyField31.add
+  unfold monty_31.MontyField31.Insts.CoreOpsArithAddMontyField31MontyField31.add
   refine WP.spec_bind (utils.add.spec hv _ _ ha hb) fun v hv' => ?_
   refine WP.spec_mono (monty_31.MontyField31.new_monty.spec v) fun c hc => ?_
   have hp0 : 0 < p.val := by have := hv.odd; omega
@@ -175,11 +195,11 @@ theorem monty_31.MontyField31.add.toField (hv : Valid inst p mu) {P : ℕ} (hP :
 /-- `a - b`, for canonical `a` and `b`, is canonical and stands for `toField a - toField b`. -/
 theorem monty_31.MontyField31.sub.toField (hv : Valid inst p mu) {P : ℕ} (hP : p.val = P)
     (a b : Element MP) (ha : Canonical P a) (hb : Canonical P b) :
-    monty_31.MontyField31.sub inst a b
+    monty_31.MontyField31.Insts.CoreOpsArithSubMontyField31MontyField31.sub inst a b
       ⦃ c => Canonical P c ∧ toField P c = toField P a - toField P b ⦄ := by
   unfold Canonical at *
   rw [← hP] at ha hb
-  unfold monty_31.MontyField31.sub
+  unfold monty_31.MontyField31.Insts.CoreOpsArithSubMontyField31MontyField31.sub
   refine WP.spec_bind (utils.sub.spec hv _ _ ha hb) fun v hv' => ?_
   refine WP.spec_mono (monty_31.MontyField31.new_monty.spec v) fun c hc => ?_
   have hp0 : 0 < p.val := by have := hv.odd; omega
@@ -193,7 +213,7 @@ theorem monty_31.MontyField31.sub.toField (hv : Valid inst p mu) {P : ℕ} (hP :
 The `u64` product is below `p^2 < 2^32 p`, which is `monty_reduce`'s precondition. -/
 theorem monty_31.MontyField31.mul.toField (hv : Valid inst p mu) {P : ℕ} (hP : p.val = P)
     (a b : Element MP) (ha : Canonical P a) (hb : Canonical P b) :
-    monty_31.MontyField31.mul inst a b
+    monty_31.MontyField31.Insts.CoreOpsArithMulMontyField31MontyField31.mul inst a b
       ⦃ c => Canonical P c ∧ toField P c = toField P a * toField P b ⦄ := by
   unfold Canonical at *
   rw [← hP] at ha hb
@@ -233,8 +253,9 @@ theorem monty_31.MontyField31.neg.toField (hv : FieldValid finst p mu) {P : ℕ}
     (hP : p.val = P)
     (hz : finst.MONTY_ZERO ⦃ z => Canonical P z ∧ toField P z = 0 ⦄)
     (a : Element FP) (ha : Canonical P a) :
-    monty_31.MontyField31.neg finst a ⦃ c => Canonical P c ∧ toField P c = -toField P a ⦄ := by
-  unfold monty_31.MontyField31.neg
+    monty_31.MontyField31.Insts.CoreOpsArithNegMontyField31.neg finst a ⦃ c => Canonical P c ∧ toField P c = -toField P a ⦄ := by
+  unfold monty_31.MontyField31.Insts.CoreOpsArithNegMontyField31.neg
+    monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.ZERO
   refine WP.spec_bind hz fun z hz' => ?_
   refine WP.spec_mono (monty_31.MontyField31.sub.toField hv.monty hP z a hz'.1 ha) fun c hc => ?_
   rw [hc.2, hz'.2, zero_sub]
