@@ -56,15 +56,12 @@ start_from = [
   "{impl core::ops::arith::Sub for p3_monty_31::monty_31::MontyField31<_>}::sub",
   "{impl core::ops::arith::Mul for p3_monty_31::monty_31::MontyField31<_>}::mul",
   "{impl core::ops::arith::Neg for p3_monty_31::monty_31::MontyField31<_>}::neg",
-  "{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::halve",
   "p3_monty_31::monty_31::MontyField31::MONTY_POWERS_OF_TWO",
-  # Some transcribed items cannot be roots.
-  #
-  # Inversion and powers of two pull in the field trait hierarchy.
-  #
-  # aeneas rejects that hierarchy (docs/extractor-issues.md, 9).
-  #
-  # Integer conversions implement a generic trait, which charon cannot root.
+  # One-line wrappers, compiled only for extraction (pre-patch
+  # 010-extraction-roots), for the methods a pattern cannot root: the
+  # `QuotientMap<uN>` impls, and provided-method overrides charon skips when
+  # nothing calls them.
+  "p3_monty_31::hax_roots",
 ]
 
 watch = ["monty-31/src", "monty-31/Cargo.toml"]
@@ -72,9 +69,6 @@ watch = ["monty-31/src", "monty-31/Cargo.toml"]
 # The transcriptions in extraction/P3Monty31/Assumptions/Mirror.lean. Hashes
 # are pending tools/mirror; until it exists, the transcriptions are re-read by
 # hand when a commit in `watch` touches them.
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.halve"
-rust = "{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::halve"
 
 [[mirror]]
 lean = "p3_monty_31.no_packing.poseidon1.Poseidon1InternalLayerMonty31"
@@ -132,46 +126,13 @@ rust = "{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31
 lean = "p3_monty_31.monty_31.MontyField31.try_inverse"
 rust = "{impl p3_field::field::Field for p3_monty_31::monty_31::MontyField31<_>}::try_inverse"
 
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU32.from_canonical_checked"
-rust = "{impl p3_field::integers::QuotientMap<u32> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked"
 
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_int"
-rust = "{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<_>}::from_int"
 
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_canonical_checked"
-rust = "{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked"
 
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_int"
-rust = "{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<_>}::from_int"
 
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked"
-rust = "{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked"
 
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_int"
-rust = "{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<_>}::from_int"
 
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_checked"
-rust = "{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked"
 
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_int"
-rust = "{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<_>}::from_int"
 
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_checked"
-rust = "{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked"
 
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_int"
-rust = "{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<_>}::from_int"
 
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked"
-rust = "{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked"

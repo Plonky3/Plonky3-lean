@@ -413,7 +413,7 @@ theorem baby_bear.BabyBear.neg.toField (a : Element) (ha : Canonical a) :
 /-- `a.halve()` on a canonical BabyBear element is canonical, and is half the
 field element it stands for. -/
 theorem baby_bear.BabyBear.halve.toField (a : Element) (ha : Canonical a) :
-    p3_monty_31.monty_31.MontyField31.halve FieldParams a
+    p3_monty_31.monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.halve FieldParams a
       ⦃ c => Canonical c ∧ Spec.BabyBear.toField c * 2 = Spec.BabyBear.toField a ⦄ :=
   Proofs.P3BabyBear.baby_bear.BabyBear.halve.toField a ha
 

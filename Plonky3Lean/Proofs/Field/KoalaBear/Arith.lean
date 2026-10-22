@@ -48,9 +48,9 @@ theorem koala_bear.KoalaBear.neg.toField (a : Element) (ha : Canonical a) :
 
 /-- `a.halve()`, for canonical `a`, is canonical and stands for `toField a / 2`. -/
 theorem koala_bear.KoalaBear.halve.toField (a : Element) (ha : Canonical a) :
-    p3_monty_31.monty_31.MontyField31.halve FieldParams a
+    p3_monty_31.monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.halve FieldParams a
       ⦃ c => Canonical c ∧ toField c * 2 = toField a ⦄ :=
-  Monty31.monty_31.MontyField31.halve.toField FieldParams.valid
+  Monty31.monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.halve.toField FieldParams.valid
     koala_bear.KoalaBearParameters.PRIME.eq_fieldSize a ha
 
 /-- `from_monty(a.value)`, the body of `as_canonical_u32`, is the canonical `u32` for the field element `a` stands for. -/

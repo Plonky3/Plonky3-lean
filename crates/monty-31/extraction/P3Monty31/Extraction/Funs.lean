@@ -193,6 +193,824 @@ def data_traits.TwoAdicData.ODD_FACTOR.default {Self : Type _}
   let i2 ← i >>> i1
   ok (UScalar.hcast .I32 i2)
 
+/-- [p3_monty_31::utils::halve_u32]:
+    Source: 'monty-31/src/utils.rs', lines 92:0-97:1 -/
+def utils.halve_u32
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (input : Std.U32) :
+  RustM Std.U32
+  := do
+  let shr ← input >>> 1#i32
+  let lo_bit ← lift (input &&& 1#u32)
+  let i ← data_traitsFieldParametersInst.HALF_P_PLUS_1
+  let shr_corr ← shr + i
+  if lo_bit = 0#u32
+  then ok shr
+  else ok shr_corr
+
+/-- [p3_monty_31::monty_31::{p3_monty_31::monty_31::MontyField31<MP>[TraitClause0]}::new_monty]:
+    Source: 'monty-31/src/monty_31.rs', lines 71:4-76:5 -/
+def monty_31.MontyField31.new_monty
+  {MP : Type _} (data_traitsMontyParametersInst : data_traits.MontyParameters
+  MP) (value : Std.U32) :
+  RustM (monty_31.MontyField31 MP)
+  := do
+  ok { value, _phantom := () }
+
+/-- [p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<FP>}::halve]:
+    Source: 'monty-31/src/monty_31.rs', lines 225:4-227:5
+    Visibility: public -/
+def monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.halve
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (self : monty_31.MontyField31 FP) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  let i ← utils.halve_u32 data_traitsFieldParametersInst self.value
+  monty_31.MontyField31.new_monty
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+    i
+
+/-- [p3_monty_31::hax_roots::halve]:
+    Source: 'monty-31/src/hax_roots.rs', lines 16:0-18:1
+    Visibility: public -/
+def hax_roots.halve
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (x : monty_31.MontyField31 FP) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.halve
+    data_traitsFieldParametersInst x
+
+/-- [p3_monty_31::utils::monty_reduce]:
+    Source: 'monty-31/src/utils.rs', lines 105:0-125:1 -/
+def utils.monty_reduce
+  {MP : Type _} (data_traitsMontyParametersInst : data_traits.MontyParameters
+  MP) (x : Std.U64) :
+  RustM Std.U32
+  := do
+  let i ← data_traitsMontyParametersInst.MONTY_MU
+  let i1 ← lift (UScalar.cast .U64 i)
+  let i2 ← core.num.U64.wrapping_mul x i1
+  let i3 ← data_traitsMontyParametersInst.MONTY_MASK
+  let i4 ← lift (UScalar.cast .U64 i3)
+  let t ← lift (i2 &&& i4)
+  let i5 ← data_traitsMontyParametersInst.PRIME
+  let i6 ← lift (UScalar.cast .U64 i5)
+  let u ← t * i6
+  let (x_sub_u, over) ← core.num.U64.overflowing_sub x u
+  let i7 ← data_traitsMontyParametersInst.MONTY_BITS
+  let i8 ← x_sub_u >>> i7
+  let x_sub_u_hi ← lift (UScalar.cast .U32 i8)
+  let corr ← if over
+               then ok i5
+               else ok 0#u32
+  core.num.U32.wrapping_add x_sub_u_hi corr
+
+/-- [p3_monty_31::utils::from_monty]:
+    Source: 'monty-31/src/utils.rs', lines 50:0-52:1 -/
+def utils.from_monty
+  {MP : Type _} (data_traitsMontyParametersInst : data_traits.MontyParameters
+  MP) (x : Std.U32) :
+  RustM Std.U32
+  := do
+  let i ← lift (UScalar.cast .U64 x)
+  utils.monty_reduce data_traitsMontyParametersInst i
+
+/-- [p3_monty_31::monty_31::{p3_monty_31::monty_31::MontyField31<MP>[TraitClause0]}::to_u32]:
+    Source: 'monty-31/src/monty_31.rs', lines 80:4-82:5 -/
+def monty_31.MontyField31.to_u32
+  {MP : Type _} (data_traitsMontyParametersInst : data_traits.MontyParameters
+  MP) (elem : monty_31.MontyField31 MP) :
+  RustM Std.U32
+  := do
+  utils.from_monty data_traitsMontyParametersInst elem.value
+
+/-- [p3_monty_31::monty_31::{impl p3_field::field::PrimeField32 for p3_monty_31::monty_31::MontyField31<FP>}::as_canonical_u32]:
+    Source: 'monty-31/src/monty_31.rs', lines 697:4-699:5
+    Visibility: public -/
+def monty_31.MontyField31.Insts.P3_fieldFieldPrimeField32.as_canonical_u32
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (self : monty_31.MontyField31 FP) :
+  RustM Std.U32
+  := do
+  monty_31.MontyField31.to_u32
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+    self
+
+/-- [p3_monty_31::hax_roots::as_canonical_u32]:
+    Source: 'monty-31/src/hax_roots.rs', lines 24:0-26:1
+    Visibility: public -/
+def hax_roots.as_canonical_u32
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (x : monty_31.MontyField31 FP) :
+  RustM Std.U32
+  := do
+  monty_31.MontyField31.Insts.P3_fieldFieldPrimeField32.as_canonical_u32
+    data_traitsFieldParametersInst x
+
+/-- [p3_monty_31::monty_31::{impl p3_field::field::PrimeField64 for p3_monty_31::monty_31::MontyField31<FP>}::as_canonical_u64]:
+    Source: 'monty-31/src/monty_31.rs', lines 681:4-683:5
+    Visibility: public -/
+def monty_31.MontyField31.Insts.P3_fieldFieldPrimeField64.as_canonical_u64
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (self : monty_31.MontyField31 FP) :
+  RustM Std.U64
+  := do
+  let i ←
+    monty_31.MontyField31.Insts.P3_fieldFieldPrimeField32.as_canonical_u32
+      data_traitsFieldParametersInst self
+  core.convert.Into.Blanket.into core.U64.Insts.CoreConvertFromU32 i
+
+/-- [p3_monty_31::hax_roots::as_canonical_u64]:
+    Source: 'monty-31/src/hax_roots.rs', lines 28:0-30:1
+    Visibility: public -/
+def hax_roots.as_canonical_u64
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (x : monty_31.MontyField31 FP) :
+  RustM Std.U64
+  := do
+  monty_31.MontyField31.Insts.P3_fieldFieldPrimeField64.as_canonical_u64
+    data_traitsFieldParametersInst x
+
+/-- [p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<FP>}::ONE]
+    Source: 'monty-31/src/monty_31.rs', lines 215:4-215:36
+    Visibility: public -/
+@[global_simps, irreducible]
+def monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.ONE {FP :
+  Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+  : RustM (monty_31.MontyField31 FP) :=
+  data_traitsFieldParametersInst.MONTY_ONE
+
+/-- [p3_monty_31::hax_roots::one]:
+    Source: 'monty-31/src/hax_roots.rs', lines 32:0-34:1
+    Visibility: public -/
+def hax_roots.one
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.ONE
+    data_traitsFieldParametersInst
+
+/-- [p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<FP>}::TWO]
+    Source: 'monty-31/src/monty_31.rs', lines 216:4-216:36
+    Visibility: public -/
+@[global_simps, irreducible]
+def monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.TWO {FP :
+  Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+  : RustM (monty_31.MontyField31 FP) :=
+  data_traitsFieldParametersInst.MONTY_TWO
+
+/-- [p3_monty_31::hax_roots::two]:
+    Source: 'monty-31/src/hax_roots.rs', lines 36:0-38:1
+    Visibility: public -/
+def hax_roots.two
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.TWO
+    data_traitsFieldParametersInst
+
+/-- [p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<FP>}::NEG_ONE]
+    Source: 'monty-31/src/monty_31.rs', lines 217:4-217:44
+    Visibility: public -/
+@[global_simps, irreducible]
+def monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.NEG_ONE
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) : RustM (monty_31.MontyField31 FP) :=
+  data_traitsFieldParametersInst.MONTY_NEG_ONE
+
+/-- [p3_monty_31::hax_roots::neg_one]:
+    Source: 'monty-31/src/hax_roots.rs', lines 40:0-42:1
+    Visibility: public -/
+def hax_roots.neg_one
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.NEG_ONE
+    data_traitsFieldParametersInst
+
+/-- [p3_monty_31::monty_31::{impl p3_field::field::Field for p3_monty_31::monty_31::MontyField31<FP>}::GENERATOR]
+    Source: 'monty-31/src/monty_31.rs', lines 454:4-454:42
+    Visibility: public -/
+@[global_simps, irreducible]
+def monty_31.MontyField31.Insts.P3_fieldFieldField.GENERATOR {FP : Type _}
+  (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+  : RustM (monty_31.MontyField31 FP) :=
+  data_traitsFieldParametersInst.MONTY_GEN
+
+/-- [p3_monty_31::hax_roots::generator]:
+    Source: 'monty-31/src/hax_roots.rs', lines 44:0-46:1
+    Visibility: public -/
+def hax_roots.generator
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  monty_31.MontyField31.Insts.P3_fieldFieldField.GENERATOR
+    data_traitsFieldParametersInst
+
+/-- [p3_monty_31::monty_31::{impl p3_field::field::PrimeField32 for p3_monty_31::monty_31::MontyField31<FP>}::ORDER_U32]
+    Source: 'monty-31/src/monty_31.rs', lines 694:4-694:37
+    Visibility: public -/
+@[global_simps, irreducible]
+def monty_31.MontyField31.Insts.P3_fieldFieldPrimeField32.ORDER_U32 {FP :
+  Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+  : RustM Std.U32 :=
+  data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst.PRIME
+
+/-- [p3_monty_31::hax_roots::order_u32]:
+    Source: 'monty-31/src/hax_roots.rs', lines 48:0-50:1
+    Visibility: public -/
+def hax_roots.order_u32
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) :
+  RustM Std.U32
+  := do
+  monty_31.MontyField31.Insts.P3_fieldFieldPrimeField32.ORDER_U32
+    data_traitsFieldParametersInst
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u32> for p3_monty_31::monty_31::MontyField31<FP>}::from_int]:
+    Source: 'monty-31/src/monty_31.rs', lines 521:4-523:5
+    Visibility: public -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU32.from_int
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.U32) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  monty_31.MontyField31.new
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+    int
+
+/-- [p3_monty_31::hax_roots::from_u32]:
+    Source: 'monty-31/src/hax_roots.rs', lines 52:0-54:1
+    Visibility: public -/
+def hax_roots.from_u32
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.U32) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU32.from_int
+    data_traitsFieldParametersInst int
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u32> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{impl core::ops::function::FnOnce<(), p3_monty_31::monty_31::MontyField31<FP>> for p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u32> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}<'_0, FP>}::call_once]:
+    Source: 'monty-31/src/monty_31.rs', lines 530:31-530:48 -/
+def
+  monty_31.QuotientMapMontyField31U32.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31.call_once
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP)
+  (c : monty_31.QuotientMapMontyField31U32.from_canonical_checked.closure FP)
+  (_ : Unit) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  monty_31.MontyField31.new
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+    c
+
+/-- Trait implementation: [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u32> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{impl core::ops::function::FnOnce<(), p3_monty_31::monty_31::MontyField31<FP>> for p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u32> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}<'_0, FP>}]
+    Source: 'monty-31/src/monty_31.rs', lines 530:31-530:48 -/
+@[reducible]
+def
+  monty_31.QuotientMapMontyField31U32.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) : core.ops.function.FnOnce
+  (monty_31.QuotientMapMontyField31U32.from_canonical_checked.closure FP) Unit
+  (monty_31.MontyField31 FP) := {
+  call_once :=
+    monty_31.QuotientMapMontyField31U32.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31.call_once
+    data_traitsFieldParametersInst
+}
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u32> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked]:
+    Source: 'monty-31/src/monty_31.rs', lines 529:4-531:5
+    Visibility: public -/
+def
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU32.from_canonical_checked
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.U32) :
+  RustM (core.option.Option (monty_31.MontyField31 FP))
+  := do
+  let i ←
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst.PRIME
+  core.bool.Bool.then
+    (monty_31.QuotientMapMontyField31U32.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31
+    data_traitsFieldParametersInst) (int < i) int
+
+/-- [p3_monty_31::hax_roots::from_canonical_checked_u32]:
+    Source: 'monty-31/src/hax_roots.rs', lines 56:0-58:1
+    Visibility: public -/
+def hax_roots.from_canonical_checked_u32
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.U32) :
+  RustM (core.option.Option (monty_31.MontyField31 FP))
+  := do
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU32.from_canonical_checked
+    data_traitsFieldParametersInst int
+
+/-- [p3_monty_31::utils::to_monty_signed]:
+    Source: 'monty-31/src/utils.rs', lines 15:0-22:1 -/
+def utils.to_monty_signed
+  {MP : Type _} (data_traitsMontyParametersInst : data_traits.MontyParameters
+  MP) (x : Std.I32) :
+  RustM Std.U32
+  := do
+  let i ← lift (IScalar.cast .I64 x)
+  let i1 ← data_traitsMontyParametersInst.MONTY_BITS
+  let i2 ← i <<< i1
+  let i3 ← data_traitsMontyParametersInst.PRIME
+  let i4 ← lift (UScalar.hcast .I64 i3)
+  let i5 ← i2 % i4
+  let red ← lift (IScalar.cast .I32 i5)
+  if red >= 0#i32
+  then ok (IScalar.hcast .U32 red)
+  else core.num.U32.wrapping_add_signed i3 red
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<FP>}::from_int]:
+    Source: 'monty-31/src/monty_31.rs', lines 546:4-548:5
+    Visibility: public -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_int
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.I32) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  let i ←
+    utils.to_monty_signed
+      data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+      int
+  monty_31.MontyField31.new_monty
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+    i
+
+/-- [p3_monty_31::hax_roots::from_i32]:
+    Source: 'monty-31/src/hax_roots.rs', lines 60:0-62:1
+    Visibility: public -/
+def hax_roots.from_i32
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.I32) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_int
+    data_traitsFieldParametersInst int
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{impl core::ops::function::FnOnce<(), p3_monty_31::monty_31::MontyField31<FP>> for p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}<'_0, FP>}::call_once]:
+    Source: 'monty-31/src/monty_31.rs', lines 557:35-557:81 -/
+def
+  monty_31.QuotientMapMontyField31I32.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31.call_once
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP)
+  (c : monty_31.QuotientMapMontyField31I32.from_canonical_checked.closure FP)
+  (_ : Unit) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  let i ←
+    utils.to_monty_signed
+      data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+      c
+  monty_31.MontyField31.new_monty
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+    i
+
+/-- Trait implementation: [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{impl core::ops::function::FnOnce<(), p3_monty_31::monty_31::MontyField31<FP>> for p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}<'_0, FP>}]
+    Source: 'monty-31/src/monty_31.rs', lines 557:35-557:81 -/
+@[reducible]
+def
+  monty_31.QuotientMapMontyField31I32.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) : core.ops.function.FnOnce
+  (monty_31.QuotientMapMontyField31I32.from_canonical_checked.closure FP) Unit
+  (monty_31.MontyField31 FP) := {
+  call_once :=
+    monty_31.QuotientMapMontyField31I32.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31.call_once
+    data_traitsFieldParametersInst
+}
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked]:
+    Source: 'monty-31/src/monty_31.rs', lines 554:4-561:5
+    Visibility: public -/
+def
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_canonical_checked
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.I32) :
+  RustM (core.option.Option (monty_31.MontyField31 FP))
+  := do
+  let i ←
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst.PRIME
+  let i1 ← i >>> 1#i32
+  let bound ← lift (UScalar.hcast .I32 i1)
+  if int <= bound
+  then
+    let i2 ← -. bound
+    core.bool.Bool.then
+      (monty_31.QuotientMapMontyField31I32.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31
+      data_traitsFieldParametersInst) (int >= i2) int
+  else ok core.option.Option.None
+
+/-- [p3_monty_31::hax_roots::from_canonical_checked_i32]:
+    Source: 'monty-31/src/hax_roots.rs', lines 64:0-66:1
+    Visibility: public -/
+def hax_roots.from_canonical_checked_i32
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.I32) :
+  RustM (core.option.Option (monty_31.MontyField31 FP))
+  := do
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_canonical_checked
+    data_traitsFieldParametersInst int
+
+/-- [p3_monty_31::utils::to_monty_64]:
+    Source: 'monty-31/src/utils.rs', lines 28:0-30:1 -/
+def utils.to_monty_64
+  {MP : Type _} (data_traitsMontyParametersInst : data_traits.MontyParameters
+  MP) (x : Std.U64) :
+  RustM Std.U32
+  := do
+  let i ← lift (UScalar.cast .U128 x)
+  let i1 ← data_traitsMontyParametersInst.MONTY_BITS
+  let i2 ← i <<< i1
+  let i3 ← data_traitsMontyParametersInst.PRIME
+  let i4 ← lift (UScalar.cast .U128 i3)
+  let i5 ← i2 % i4
+  ok (UScalar.cast .U32 i5)
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<FP>}::from_int]:
+    Source: 'monty-31/src/monty_31.rs', lines 575:4-577:5
+    Visibility: public -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_int
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.U64) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  let i ←
+    utils.to_monty_64
+      data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+      int
+  monty_31.MontyField31.new_monty
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+    i
+
+/-- [p3_monty_31::hax_roots::from_u64]:
+    Source: 'monty-31/src/hax_roots.rs', lines 68:0-70:1
+    Visibility: public -/
+def hax_roots.from_u64
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.U64) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_int
+    data_traitsFieldParametersInst int
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{impl core::ops::function::FnOnce<(), p3_monty_31::monty_31::MontyField31<FP>> for p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}<'_0, FP>}::call_once]:
+    Source: 'monty-31/src/monty_31.rs', lines 583:38-583:62 -/
+def
+  monty_31.QuotientMapMontyField31U64.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31.call_once
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP)
+  (c : monty_31.QuotientMapMontyField31U64.from_canonical_checked.closure FP)
+  (_ : Unit) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  let i ← lift (UScalar.cast .U32 c)
+  monty_31.MontyField31.new
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+    i
+
+/-- Trait implementation: [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{impl core::ops::function::FnOnce<(), p3_monty_31::monty_31::MontyField31<FP>> for p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}<'_0, FP>}]
+    Source: 'monty-31/src/monty_31.rs', lines 583:38-583:62 -/
+@[reducible]
+def
+  monty_31.QuotientMapMontyField31U64.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) : core.ops.function.FnOnce
+  (monty_31.QuotientMapMontyField31U64.from_canonical_checked.closure FP) Unit
+  (monty_31.MontyField31 FP) := {
+  call_once :=
+    monty_31.QuotientMapMontyField31U64.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31.call_once
+    data_traitsFieldParametersInst
+}
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked]:
+    Source: 'monty-31/src/monty_31.rs', lines 582:4-584:5
+    Visibility: public -/
+def
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.U64) :
+  RustM (core.option.Option (monty_31.MontyField31 FP))
+  := do
+  let i ←
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst.PRIME
+  let i1 ← lift (UScalar.cast .U64 i)
+  core.bool.Bool.then
+    (monty_31.QuotientMapMontyField31U64.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31
+    data_traitsFieldParametersInst) (int < i1) int
+
+/-- [p3_monty_31::hax_roots::from_canonical_checked_u64]:
+    Source: 'monty-31/src/hax_roots.rs', lines 72:0-74:1
+    Visibility: public -/
+def hax_roots.from_canonical_checked_u64
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.U64) :
+  RustM (core.option.Option (monty_31.MontyField31 FP))
+  := do
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked
+    data_traitsFieldParametersInst int
+
+/-- [p3_monty_31::utils::to_monty_64_signed]:
+    Source: 'monty-31/src/utils.rs', lines 36:0-43:1 -/
+def utils.to_monty_64_signed
+  {MP : Type _} (data_traitsMontyParametersInst : data_traits.MontyParameters
+  MP) (x : Std.I64) :
+  RustM Std.U32
+  := do
+  let i ← lift (IScalar.cast .I128 x)
+  let i1 ← data_traitsMontyParametersInst.MONTY_BITS
+  let i2 ← i <<< i1
+  let i3 ← data_traitsMontyParametersInst.PRIME
+  let i4 ← lift (UScalar.hcast .I128 i3)
+  let i5 ← i2 % i4
+  let red ← lift (IScalar.cast .I32 i5)
+  if red >= 0#i32
+  then ok (IScalar.hcast .U32 red)
+  else core.num.U32.wrapping_add_signed i3 red
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<FP>}::from_int]:
+    Source: 'monty-31/src/monty_31.rs', lines 597:4-599:5
+    Visibility: public -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_int
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.I64) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  let i ←
+    utils.to_monty_64_signed
+      data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+      int
+  monty_31.MontyField31.new_monty
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+    i
+
+/-- [p3_monty_31::hax_roots::from_i64]:
+    Source: 'monty-31/src/hax_roots.rs', lines 76:0-78:1
+    Visibility: public -/
+def hax_roots.from_i64
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.I64) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_int
+    data_traitsFieldParametersInst int
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{impl core::ops::function::FnOnce<(), p3_monty_31::monty_31::MontyField31<FP>> for p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}<'_0, FP>}::call_once]:
+    Source: 'monty-31/src/monty_31.rs', lines 607:35-607:88 -/
+def
+  monty_31.QuotientMapMontyField31I64.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31.call_once
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP)
+  (c : monty_31.QuotientMapMontyField31I64.from_canonical_checked.closure FP)
+  (_ : Unit) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  let i ← lift (IScalar.cast .I32 c)
+  let i1 ←
+    utils.to_monty_signed
+      data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+      i
+  monty_31.MontyField31.new_monty
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+    i1
+
+/-- Trait implementation: [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{impl core::ops::function::FnOnce<(), p3_monty_31::monty_31::MontyField31<FP>> for p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}<'_0, FP>}]
+    Source: 'monty-31/src/monty_31.rs', lines 607:35-607:88 -/
+@[reducible]
+def
+  monty_31.QuotientMapMontyField31I64.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) : core.ops.function.FnOnce
+  (monty_31.QuotientMapMontyField31I64.from_canonical_checked.closure FP) Unit
+  (monty_31.MontyField31 FP) := {
+  call_once :=
+    monty_31.QuotientMapMontyField31I64.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31.call_once
+    data_traitsFieldParametersInst
+}
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked]:
+    Source: 'monty-31/src/monty_31.rs', lines 604:4-611:5
+    Visibility: public -/
+def
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_checked
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.I64) :
+  RustM (core.option.Option (monty_31.MontyField31 FP))
+  := do
+  let i ←
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst.PRIME
+  let i1 ← i >>> 1#i32
+  let bound ← lift (UScalar.hcast .I64 i1)
+  if int <= bound
+  then
+    let i2 ← -. bound
+    core.bool.Bool.then
+      (monty_31.QuotientMapMontyField31I64.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31
+      data_traitsFieldParametersInst) (int >= i2) int
+  else ok core.option.Option.None
+
+/-- [p3_monty_31::hax_roots::from_canonical_checked_i64]:
+    Source: 'monty-31/src/hax_roots.rs', lines 80:0-82:1
+    Visibility: public -/
+def hax_roots.from_canonical_checked_i64
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.I64) :
+  RustM (core.option.Option (monty_31.MontyField31 FP))
+  := do
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_checked
+    data_traitsFieldParametersInst int
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<FP>}::from_int]:
+    Source: 'monty-31/src/monty_31.rs', lines 624:4-626:5
+    Visibility: public -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_int
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.U128) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  let i ←
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst.PRIME
+  let i1 ← lift (UScalar.cast .U128 i)
+  let i2 ← int % i1
+  let i3 ← lift (UScalar.cast .U32 i2)
+  let i4 ←
+    utils.to_monty
+      data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+      i3
+  monty_31.MontyField31.new_monty
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+    i4
+
+/-- [p3_monty_31::hax_roots::from_u128]:
+    Source: 'monty-31/src/hax_roots.rs', lines 84:0-86:1
+    Visibility: public -/
+def hax_roots.from_u128
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.U128) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_int
+    data_traitsFieldParametersInst int
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{impl core::ops::function::FnOnce<(), p3_monty_31::monty_31::MontyField31<FP>> for p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}<'_0, FP>}::call_once]:
+    Source: 'monty-31/src/monty_31.rs', lines 632:39-632:63 -/
+def
+  monty_31.QuotientMapMontyField31U128.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31.call_once
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP)
+  (c : monty_31.QuotientMapMontyField31U128.from_canonical_checked.closure FP)
+  (_ : Unit) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  let i ← lift (UScalar.cast .U32 c)
+  monty_31.MontyField31.new
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+    i
+
+/-- Trait implementation: [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{impl core::ops::function::FnOnce<(), p3_monty_31::monty_31::MontyField31<FP>> for p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}<'_0, FP>}]
+    Source: 'monty-31/src/monty_31.rs', lines 632:39-632:63 -/
+@[reducible]
+def
+  monty_31.QuotientMapMontyField31U128.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) : core.ops.function.FnOnce
+  (monty_31.QuotientMapMontyField31U128.from_canonical_checked.closure FP) Unit
+  (monty_31.MontyField31 FP) := {
+  call_once :=
+    monty_31.QuotientMapMontyField31U128.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31.call_once
+    data_traitsFieldParametersInst
+}
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked]:
+    Source: 'monty-31/src/monty_31.rs', lines 631:4-633:5
+    Visibility: public -/
+def
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_checked
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.U128) :
+  RustM (core.option.Option (monty_31.MontyField31 FP))
+  := do
+  let i ←
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst.PRIME
+  let i1 ← lift (UScalar.cast .U128 i)
+  core.bool.Bool.then
+    (monty_31.QuotientMapMontyField31U128.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31
+    data_traitsFieldParametersInst) (int < i1) int
+
+/-- [p3_monty_31::hax_roots::from_canonical_checked_u128]:
+    Source: 'monty-31/src/hax_roots.rs', lines 88:0-90:1
+    Visibility: public -/
+def hax_roots.from_canonical_checked_u128
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.U128) :
+  RustM (core.option.Option (monty_31.MontyField31 FP))
+  := do
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_checked
+    data_traitsFieldParametersInst int
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<FP>}::from_int]:
+    Source: 'monty-31/src/monty_31.rs', lines 646:4-648:5
+    Visibility: public -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_int
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.I128) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  let i ←
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst.PRIME
+  let i1 ← lift (UScalar.hcast .I128 i)
+  let i2 ← int % i1
+  let i3 ← lift (IScalar.cast .I32 i2)
+  let i4 ←
+    utils.to_monty_signed
+      data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+      i3
+  monty_31.MontyField31.new_monty
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+    i4
+
+/-- [p3_monty_31::hax_roots::from_i128]:
+    Source: 'monty-31/src/hax_roots.rs', lines 92:0-94:1
+    Visibility: public -/
+def hax_roots.from_i128
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.I128) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_int
+    data_traitsFieldParametersInst int
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{impl core::ops::function::FnOnce<(), p3_monty_31::monty_31::MontyField31<FP>> for p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}<'_0, FP>}::call_once]:
+    Source: 'monty-31/src/monty_31.rs', lines 656:35-656:88 -/
+def
+  monty_31.QuotientMapMontyField31I128.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31.call_once
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP)
+  (c : monty_31.QuotientMapMontyField31I128.from_canonical_checked.closure FP)
+  (_ : Unit) :
+  RustM (monty_31.MontyField31 FP)
+  := do
+  let i ← lift (IScalar.cast .I32 c)
+  let i1 ←
+    utils.to_monty_signed
+      data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+      i
+  monty_31.MontyField31.new_monty
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+    i1
+
+/-- Trait implementation: [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{impl core::ops::function::FnOnce<(), p3_monty_31::monty_31::MontyField31<FP>> for p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}<'_0, FP>}]
+    Source: 'monty-31/src/monty_31.rs', lines 656:35-656:88 -/
+@[reducible]
+def
+  monty_31.QuotientMapMontyField31I128.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) : core.ops.function.FnOnce
+  (monty_31.QuotientMapMontyField31I128.from_canonical_checked.closure FP) Unit
+  (monty_31.MontyField31 FP) := {
+  call_once :=
+    monty_31.QuotientMapMontyField31I128.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31.call_once
+    data_traitsFieldParametersInst
+}
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked]:
+    Source: 'monty-31/src/monty_31.rs', lines 653:4-660:5
+    Visibility: public -/
+def
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.I128) :
+  RustM (core.option.Option (monty_31.MontyField31 FP))
+  := do
+  let i ←
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst.PRIME
+  let i1 ← i >>> 1#i32
+  let bound ← lift (UScalar.hcast .I128 i1)
+  if int <= bound
+  then
+    let i2 ← -. bound
+    core.bool.Bool.then
+      (monty_31.QuotientMapMontyField31I128.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMontyField31
+      data_traitsFieldParametersInst) (int >= i2) int
+  else ok core.option.Option.None
+
+/-- [p3_monty_31::hax_roots::from_canonical_checked_i128]:
+    Source: 'monty-31/src/hax_roots.rs', lines 96:0-98:1
+    Visibility: public -/
+def hax_roots.from_canonical_checked_i128
+  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
+  FP) (int : Std.I128) :
+  RustM (core.option.Option (monty_31.MontyField31 FP))
+  := do
+  monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked
+    data_traitsFieldParametersInst int
+
 /-- [p3_monty_31::monty_31::{impl core::clone::Clone for p3_monty_31::monty_31::MontyField31<MP>}::clone]:
     Source: 'monty-31/src/monty_31.rs', lines 34:9-34:14
     Visibility: public -/
@@ -218,15 +1036,6 @@ def monty_31.MontyField31.Insts.CoreCloneClone {MP : Type _}
   -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
   clone_from := fun _ source => (monty_31.MontyField31.Insts.CoreCloneClone.clone corecloneCloneInst data_traitsMontyParametersInst) source
 }
-
-/-- [p3_monty_31::monty_31::{p3_monty_31::monty_31::MontyField31<MP>[TraitClause0]}::new_monty]:
-    Source: 'monty-31/src/monty_31.rs', lines 71:4-76:5 -/
-def monty_31.MontyField31.new_monty
-  {MP : Type _} (data_traitsMontyParametersInst : data_traits.MontyParameters
-  MP) (value : Std.U32) :
-  RustM (monty_31.MontyField31 MP)
-  := do
-  ok { value, _phantom := () }
 
 /-- [p3_monty_31::monty_31::{p3_monty_31::monty_31::MontyField31<MP>[TraitClause0]}::new_array]: loop body 0:
     Source: 'monty-31/src/monty_31.rs', lines 91:8-94:9
@@ -336,21 +1145,6 @@ def monty_31.MontyField31.new_2d_array
       data_traitsMontyParametersInst)) a
   monty_31.MontyField31.new_2d_array_loop data_traitsMontyParametersInst input
     output 0#usize
-
-/-- [p3_monty_31::utils::to_monty_64]:
-    Source: 'monty-31/src/utils.rs', lines 28:0-30:1 -/
-def utils.to_monty_64
-  {MP : Type _} (data_traitsMontyParametersInst : data_traits.MontyParameters
-  MP) (x : Std.U64) :
-  RustM Std.U32
-  := do
-  let i ← lift (UScalar.cast .U128 x)
-  let i1 ← data_traitsMontyParametersInst.MONTY_BITS
-  let i2 ← i <<< i1
-  let i3 ← data_traitsMontyParametersInst.PRIME
-  let i4 ← lift (UScalar.cast .U128 i3)
-  let i5 ← i2 % i4
-  ok (UScalar.cast .U32 i5)
 
 /-- [p3_monty_31::monty_31::{p3_monty_31::monty_31::MontyField31<FP>[TraitClause0::ImpliedClause0::ImpliedClause0]}::MONTY_POWERS_OF_TWO]: loop body 0:
     Source: 'monty-31/src/monty_31.rs', lines 118:8-121:9 -/
@@ -481,31 +1275,6 @@ def monty_31.MontyField31.Insts.CoreOpsArithNegMontyField31.neg
     data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
     mf self
 
-/-- [p3_monty_31::utils::monty_reduce]:
-    Source: 'monty-31/src/utils.rs', lines 105:0-125:1 -/
-def utils.monty_reduce
-  {MP : Type _} (data_traitsMontyParametersInst : data_traits.MontyParameters
-  MP) (x : Std.U64) :
-  RustM Std.U32
-  := do
-  let i ← data_traitsMontyParametersInst.MONTY_MU
-  let i1 ← lift (UScalar.cast .U64 i)
-  let i2 ← core.num.U64.wrapping_mul x i1
-  let i3 ← data_traitsMontyParametersInst.MONTY_MASK
-  let i4 ← lift (UScalar.cast .U64 i3)
-  let t ← lift (i2 &&& i4)
-  let i5 ← data_traitsMontyParametersInst.PRIME
-  let i6 ← lift (UScalar.cast .U64 i5)
-  let u ← t * i6
-  let (x_sub_u, over) ← core.num.U64.overflowing_sub x u
-  let i7 ← data_traitsMontyParametersInst.MONTY_BITS
-  let i8 ← x_sub_u >>> i7
-  let x_sub_u_hi ← lift (UScalar.cast .U32 i8)
-  let corr ← if over
-               then ok i5
-               else ok 0#u32
-  core.num.U32.wrapping_add x_sub_u_hi corr
-
 /-- [p3_monty_31::monty_31::{impl core::ops::arith::Mul<p3_monty_31::monty_31::MontyField31<FP>, p3_monty_31::monty_31::MontyField31<FP>> for p3_monty_31::monty_31::MontyField31<FP>}::mul]:
     Source: 'monty-31/src/monty_31.rs', lines 760:4-763:5
     Visibility: public -/
@@ -527,67 +1296,6 @@ def monty_31.MontyField31.Insts.CoreOpsArithMulMontyField31MontyField31.mul
 def poseidon1.PartialRoundBaseParameters.USE_TEXTBOOK.default (Self : Type _)
   (MP : Type _) (WIDTH : Std.Usize) : Bool :=
   false
-
-/-- [p3_monty_31::utils::to_monty_signed]:
-    Source: 'monty-31/src/utils.rs', lines 15:0-22:1 -/
-def utils.to_monty_signed
-  {MP : Type _} (data_traitsMontyParametersInst : data_traits.MontyParameters
-  MP) (x : Std.I32) :
-  RustM Std.U32
-  := do
-  let i ← lift (IScalar.cast .I64 x)
-  let i1 ← data_traitsMontyParametersInst.MONTY_BITS
-  let i2 ← i <<< i1
-  let i3 ← data_traitsMontyParametersInst.PRIME
-  let i4 ← lift (UScalar.hcast .I64 i3)
-  let i5 ← i2 % i4
-  let red ← lift (IScalar.cast .I32 i5)
-  if red >= 0#i32
-  then ok (IScalar.hcast .U32 red)
-  else core.num.U32.wrapping_add_signed i3 red
-
-/-- [p3_monty_31::utils::to_monty_64_signed]:
-    Source: 'monty-31/src/utils.rs', lines 36:0-43:1 -/
-def utils.to_monty_64_signed
-  {MP : Type _} (data_traitsMontyParametersInst : data_traits.MontyParameters
-  MP) (x : Std.I64) :
-  RustM Std.U32
-  := do
-  let i ← lift (IScalar.cast .I128 x)
-  let i1 ← data_traitsMontyParametersInst.MONTY_BITS
-  let i2 ← i <<< i1
-  let i3 ← data_traitsMontyParametersInst.PRIME
-  let i4 ← lift (UScalar.hcast .I128 i3)
-  let i5 ← i2 % i4
-  let red ← lift (IScalar.cast .I32 i5)
-  if red >= 0#i32
-  then ok (IScalar.hcast .U32 red)
-  else core.num.U32.wrapping_add_signed i3 red
-
-/-- [p3_monty_31::utils::from_monty]:
-    Source: 'monty-31/src/utils.rs', lines 50:0-52:1 -/
-def utils.from_monty
-  {MP : Type _} (data_traitsMontyParametersInst : data_traits.MontyParameters
-  MP) (x : Std.U32) :
-  RustM Std.U32
-  := do
-  let i ← lift (UScalar.cast .U64 x)
-  utils.monty_reduce data_traitsMontyParametersInst i
-
-/-- [p3_monty_31::utils::halve_u32]:
-    Source: 'monty-31/src/utils.rs', lines 92:0-97:1 -/
-def utils.halve_u32
-  {FP : Type _} (data_traitsFieldParametersInst : data_traits.FieldParameters
-  FP) (input : Std.U32) :
-  RustM Std.U32
-  := do
-  let shr ← input >>> 1#i32
-  let lo_bit ← lift (input &&& 1#u32)
-  let i ← data_traitsFieldParametersInst.HALF_P_PLUS_1
-  let shr_corr ← shr + i
-  if lo_bit = 0#u32
-  then ok shr
-  else ok shr_corr
 
 /-- [p3_monty_31::utils::large_monty_reduce]:
     Source: 'monty-31/src/utils.rs', lines 134:0-158:1 -/
