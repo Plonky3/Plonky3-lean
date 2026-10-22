@@ -95,3 +95,11 @@ srcDir = "crates/util/extraction"
 [[lean_lib]]
 name = "P3BinaryField"
 srcDir = "crates/binary-field/extraction"
+
+name = "P3Sha256"
+srcDir = "crates/sha256/extraction"
+
+# Not a Plonky3 crate: the dependency p3-sha256 compresses with (crates/sha2/crate.toml).
+[[lean_lib]]
+name = "Sha2"
+srcDir = "crates/sha2/extraction"

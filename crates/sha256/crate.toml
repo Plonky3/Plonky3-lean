@@ -1,0 +1,20 @@
+# p3-sha256: SHA-256 as a hash and as a 2-to-1 compression function.
+#
+# The compression function is sha2's, extracted in crates/sha2.
+
+lean_lib = "P3Sha256"
+
+# Only the compression function is extracted.
+#
+# The hasher is sha2's incremental `Digest`, and the batched paths are compiled
+# only for SIMD targets.
+state = "scoped"
+
+features = []
+
+# Charon splits option values on ',', so the trait's generic arguments are omitted.
+start_from = [
+  "{impl p3_symmetric::compression::PseudoCompressionFunction for p3_sha256::Sha256Compress}::compress",
+]
+
+watch = ["sha256/src", "sha256/Cargo.toml"]

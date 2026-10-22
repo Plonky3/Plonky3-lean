@@ -77,3 +77,13 @@ keeps its number and says so.
     unfolds it, which fails on p3-binary-field's 511-entry `tables::EXP` (either
     attribute alone elaborates). Post-patch `binary-field/010` keeps only
     `irreducible` there.
+14. **The models lack `transmute`, `slice::from_ref`, `as_chunks_mut` and a zip
+    over `IterMut`.** aeneas emits calls to them, which do not elaborate.
+    p3-sha256's `Sha256Compress::compress` uses all four; pre-patch
+    `sha256/010` gives the extracted variant the same body with a copied block
+    and indexed writes.
+15. **aeneas runs out of memory on sha2's unrolled SHA-256 backend**, the one a
+    default build for the extraction target compiles: 64 inlined rounds exceed
+    20 GB. Its round constants are also read through raw pointers. The sha2
+    run selects the compact backend with sha2's own cfg
+    (`crates/sha2/crate.toml`), so the model is that backend.
