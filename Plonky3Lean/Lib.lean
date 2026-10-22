@@ -1,5 +1,6 @@
 import Plonky3Lean.Lib.RustM
 import Plonky3Lean.Lib.Scalar
+import Plonky3Lean.Lib.Scalar.U64
 
 /-!
 # Library
