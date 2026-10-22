@@ -1,6 +1,6 @@
 module
 
-public import Plonky3Lean.Proofs.Field.Binary.Poly64Irreducible
+public import Plonky3Lean.Proofs.Field.Binary.Poly64Halves
 
 @[expose] public section
 
@@ -57,15 +57,15 @@ theorem root_x_64_val : clmul.gf64.ROOT_X.val = 0xffff_ffff_0000_000a := by
 
 /-- `ROOT_X` squares to `X` modulo the modulus. -/
 theorem root_x_64_sq :
-    AdjoinRoot.mk Poly64.modulus (natPoly clmul.gf64.ROOT_X.val) ^ 2 =
-      AdjoinRoot.mk Poly64.modulus X := by
+    AdjoinRoot.mk BF64.basePoly (natPoly clmul.gf64.ROOT_X.val) ^ 2 =
+      AdjoinRoot.mk BF64.basePoly X := by
   rw [root_x_64_val, sq, ← mk_mulModHalves (by norm_num) (by norm_num),
     show mulModHalves 0xffff_ffff_0000_000a 0xffff_ffff_0000_000a = 2 by decide +kernel,
     natPoly_two]
 
-theorem two_eq_zero_quot64 : (2 : Poly64.Quot) = 0 := by
-  calc (2 : Poly64.Quot) = AdjoinRoot.mk Poly64.modulus 2 := (map_ofNat _ 2).symm
-    _ = AdjoinRoot.mk Poly64.modulus 0 := by rw [ZMod2Poly.two_eq_zero]
+theorem two_eq_zero_quot64 : (2 : BF64.BF64Quot) = 0 := by
+  calc (2 : BF64.BF64Quot) = AdjoinRoot.mk BF64.basePoly 2 := (map_ofNat _ 2).symm
+    _ = AdjoinRoot.mk BF64.basePoly 0 := by rw [ZMod2Poly.two_eq_zero]
     _ = 0 := map_zero _
 
 theorem compactNat_val (x : ℕ) : (⟨BitVec.ofNat 64 (compactNat x)⟩ : Std.U64).val = compactNat x :=
@@ -83,7 +83,7 @@ theorem poly_sqrt_64_toQuot (a : Std.U64) :
       show I32.toNat 1#i32 = 1 from rfl]
     rw [Nat.mod_eq_of_lt (lt_of_le_of_lt (Nat.shiftRight_le _ _) (u64_val_lt a))]
     rfl
-  simp only [compact_even_eq, hs, poly_mul_64_eq, bind_tc_ok, WP.spec_ok]
+  simp only [compact_even_eq, hs, poly_mul_64_eq, Aeneas.Std.bind_ok, WP.spec_ok]
   have hx : ∀ x y : Std.U64, toQuot64 (x ^^^ y) = toQuot64 x + toQuot64 y := by
     intro x y
     rw [toQuot64_eq, toQuot64_eq, toQuot64_eq, ← map_add, ← natPoly_xor]
@@ -93,8 +93,8 @@ theorem poly_sqrt_64_toQuot (a : Std.U64) :
     natPoly_even_odd_64 (u64_val_lt a)]
   simp only [map_add, map_mul, map_pow]
   rw [← sq, ← root_x_64_sq]
-  linear_combination (AdjoinRoot.mk Poly64.modulus (natPoly (compactNat a.val)) *
-    (AdjoinRoot.mk Poly64.modulus (natPoly clmul.gf64.ROOT_X.val) *
-      AdjoinRoot.mk Poly64.modulus (natPoly (compactNat (a.val >>> 1))))) * two_eq_zero_quot64
+  linear_combination (AdjoinRoot.mk BF64.basePoly (natPoly (compactNat a.val)) *
+    (AdjoinRoot.mk BF64.basePoly (natPoly clmul.gf64.ROOT_X.val) *
+      AdjoinRoot.mk BF64.basePoly (natPoly (compactNat (a.val >>> 1))))) * two_eq_zero_quot64
 
 end Plonky3Lean.Proofs.Binary

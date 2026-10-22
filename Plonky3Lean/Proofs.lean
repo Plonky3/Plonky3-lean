@@ -15,7 +15,7 @@ public import Plonky3Lean.Proofs.Field.Binary.Poly192
 public import Plonky3Lean.Proofs.Field.Binary.Poly192Irreducible
 public import Plonky3Lean.Proofs.Field.Binary.Poly64
 public import Plonky3Lean.Proofs.Field.Binary.Poly64Field
-public import Plonky3Lean.Proofs.Field.Binary.Poly64Irreducible
+public import Plonky3Lean.Proofs.Field.Binary.Poly64Halves
 public import Plonky3Lean.Proofs.Field.Binary.Poly64Sqrt
 public import Plonky3Lean.Proofs.Field.Binary.Statements
 public import Plonky3Lean.Proofs.Field.Binary.Tables

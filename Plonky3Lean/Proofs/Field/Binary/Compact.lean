@@ -116,7 +116,7 @@ theorem compactNat_lt (v : ℕ) : compactNat v < 2 ^ 32 := by
 theorem compact_even_eq (x : Std.U64) :
     clmul.sqrt.compact_even x = .ok ⟨BitVec.ofNat 64 (compactNat x.val)⟩ := by
   unfold clmul.sqrt.compact_even
-  simp (disch := decide) only [shiftRight_i32_eq, lift_eq, bind_tc_ok]
+  simp (disch := decide) only [shiftRight_i32_eq, lift_eq, Aeneas.Std.bind_ok]
   congr 1
   apply UScalar.eq_of_val_eq
   simp only [UScalar.val, and_bv, or_bv, BitVec.toNat_and, BitVec.toNat_or,

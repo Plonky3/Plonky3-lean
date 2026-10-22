@@ -38,7 +38,7 @@ theorem bmul64_eq (x y : Std.U64) :
     clmul.portable.bmul64 x y = .ok ⟨BitVec.ofNat 64 (bmulNat x.val y.val)⟩ := by
   unfold clmul.portable.bmul64 clmul.portable.NIBBLE_1 clmul.portable.NIBBLE_2
     clmul.portable.NIBBLE_3
-  simp (disch := decide) only [shiftLeft_i32_eq, lift_eq, bind_tc_ok, wrapping_mul_u64_eq]
+  simp (disch := decide) only [shiftLeft_i32_eq, lift_eq, Aeneas.Std.bind_ok, wrapping_mul_u64_eq]
   congr 1
   apply UScalar.eq_of_val_eq
   have h0 : clmul.portable.NIBBLE_0.bv.toNat = nibbleMask 0 := by
@@ -69,7 +69,7 @@ theorem natPoly_reverse (v : BitVec 64) :
     BitVec.getMsbD]
   by_cases hi : i ≤ 63
   · rw [revAt_le hi, BitVec.testBit_toNat, decide_eq_true (by omega), Bool.true_and]
-  · rw [revAt, Function.Embedding.coeFn_mk, ite_eq_right hi, decide_eq_false (by omega),
+  · rw [revAt_eq_self_of_lt (by omega), decide_eq_false (by omega),
       Bool.false_and, BitVec.testBit_toNat, BitVec.getLsbD_of_ge _ _ (by omega)]
 
 /-- The coefficients of a product of two polynomials of degree below `64` stop at `126`. -/
@@ -127,7 +127,7 @@ theorem clmul_64x64_halves_eq (a b : Std.U64) :
     clmul.portable.clmul_64x64_halves a b =
       .ok (⟨BitVec.ofNat 64 (bmulNat a.val b.val)⟩, ⟨BitVec.ofNat 64 (highNat a.bv b.bv)⟩) := by
   unfold clmul.portable.clmul_64x64_halves
-  simp (disch := decide) only [bmul64_eq, reverse_bits_u64_eq, shiftRight_i32_eq, bind_tc_ok]
+  simp (disch := decide) only [bmul64_eq, reverse_bits_u64_eq, shiftRight_i32_eq, Aeneas.Std.bind_ok]
   congr 3
   apply BitVec.eq_of_toNat_eq
   simp only [BitVec.toNat_ushiftRight, UScalarTy.U64_numBits_eq, BitVec.toNat_ofNat,
@@ -140,7 +140,7 @@ theorem clmul_64x64_eq (a b : Std.U64) :
       .ok ⟨BitVec.ofNat 128 (bmulNat a.val b.val ||| highNat a.bv b.bv <<< 64)⟩ := by
   unfold clmul.portable.clmul_64x64
   rw [clmul_64x64_halves_eq]
-  simp (disch := decide) only [lift_eq, shiftLeft_i32_eq, bind_tc_ok]
+  simp (disch := decide) only [lift_eq, shiftLeft_i32_eq, Aeneas.Std.bind_ok]
   show RustM.ok _ = _
   congr 1
   apply UScalar.eq_of_val_eq

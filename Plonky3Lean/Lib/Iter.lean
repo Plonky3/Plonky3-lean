@@ -11,7 +11,7 @@ public import CoreModels
 A fold over a `usize` range, and a map over an array, as `CoreModels` runs them.
 -/
 
-open Aeneas Aeneas.Std CoreModels
+open Aeneas Aeneas.Std CoreModels Std.Do
 
 namespace Plonky3Lean.Lib
 
@@ -34,10 +34,11 @@ theorem range_next_lt (i K : Std.Usize) (h : i.val < K.val) :
   obtain ⟨e1, e2⟩ := e
   refine ⟨(UScalar.overflowing_add i 1#usize).1, ?_, by rw [e1]; rfl⟩
   simp only [CoreModels.core.num.Usize.overflowing_add,
-    CoreModels.rust_primitives.arithmetic.overflowing_add_usize, bind_tc_ok]
+    CoreModels.rust_primitives.arithmetic.overflowing_add_usize, Aeneas.Std.bind_ok]
   rw [show UScalar.overflowing_add i 1#usize = ((UScalar.overflowing_add i 1#usize).1, false) from
     Prod.ext rfl e2]
-  rfl
+  dsimp only
+  simp
 
 theorem range_next_ge (i K : Std.Usize) (h : K.val ≤ i.val) :
     core.IteratorRange.next core.Usize.Insts.CoreIterRangeStep { start := i, «end» := K } =
@@ -73,33 +74,26 @@ theorem iter_fold_loop_range {B F : Type} (inst : CoreModels.core.ops.function.F
       core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator, e, hstep]
     exact ih i' K (g x) (by omega)
 
-/-- The fold behind `array_map`, with a closure that returns `g x` and keeps its state. -/
-theorem array_map_foldlM {T U F : Type} (inst : CoreModels.core.ops.function.FnMut F T U) (f : F)
-    (g : T → U) (hg : ∀ x, inst.call_mut f x = .ok (g x, f)) :
-    ∀ (l : List T) (acc : List U),
-      l.foldlM (fun (s : List U × F) (x : T) => do
-          let (v, f') ← inst.call_mut s.2 x
-          RustM.ok (s.1 ++ [v], f')) (acc, f) = .ok (acc ++ l.map g, f) := by
-  intro l
-  induction l with
-  | nil => intro acc; simp; rfl
-  | cons x xs ih =>
-    intro acc
-    simp only [List.foldlM_cons, hg, bind_tc_ok, List.map_cons]
-    rw [ih]
-    simp
-
 /-- `array_map` with a closure that returns `g x` and keeps its state maps `g` over the array. -/
 theorem array_map_eq {T U F : Type} {N : Std.Usize} (inst : CoreModels.core.ops.function.FnMut F T U)
     (a : Std.Array T N) (f : F) (g : T → U) (hg : ∀ x, inst.call_mut f x = .ok (g x, f)) :
     CoreModels.rust_primitives.slice.array_map inst a f =
-      .ok ⟨a.val.map g, by simp [a.property]⟩ := by
-  unfold CoreModels.rust_primitives.slice.array_map
-  split <;> rename_i h <;> rw [array_map_foldlM inst f g hg] at h
-  · simp at h
-  · simp at h
-  · simp only [RustM.ok.injEq] at h
-    subst h
-    simp
+      .ok (Std.Array.from (a.val.map g) (by simp)) := by
+  have hpure : ∀ x ∈ a.val, ⦃ ⌜ True ⌝ ⦄ inst.call_mut f x ⦃ ⇓ r => ⌜ r.2 = f ⌝ ⦄ :=
+    fun x _ => Aeneas.Std.triple_iff_exists_ok.2 ⟨_, hg x, rfl⟩
+  obtain ⟨b, hb, hall⟩ := Aeneas.Std.triple_iff_exists_ok.1
+    (CoreModels.rust_primitives.slice.array_map_spec inst a f hpure)
+  rw [hb]
+  congr 1
+  apply Std.Array.ext
+  rw [Std.Array.from_val]
+  apply List.ext_getElem (by simp)
+  intro i h1 h2
+  obtain ⟨y, hy, hy1⟩ := Aeneas.Std.triple_iff_exists_ok.1 (hall i (by simpa using h1))
+  rw [hg] at hy
+  have hy' := RustM.ok_injective hy
+  subst hy'
+  simp only [List.getElem_map] at hy1 ⊢
+  exact hy1.symm
 
 end Plonky3Lean.Lib

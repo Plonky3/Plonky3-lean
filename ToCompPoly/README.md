@@ -42,6 +42,7 @@ of the claims stays CompPoly's, not this repository's.
 | `Fields/Mersenne/Complex.lean` | new file | `Complex = F[X] / (X ^ 2 + 1)`; Frobenius is conjugation; the two-adic generators of `Complex` with their orders, squaring chain and norms |
 | `Fields/Mersenne/Extension.lean` | new file | `X ^ 3 - 5`, `Y ^ 2 - (2 + i)` and `Y ^ 3 - 5i` are irreducible; their `DTH_ROOT`s; `12 + i` generates `Complex`; an element of order `2 ^ 33` in QM31 |
 | `Data/Nat/PowMod.lean` | appended to `Mathlib/Data/ZMod/Basic.lean` (mathlib candidate) | A power in `ZMod m` as core's `Nat.powMod`, which the kernel evaluates in `O(log e)` steps |
+| `Fields/Binary/BF64Ext3.lean` | appended to `CompPoly/Fields/Binary/BF64/Ext3.lean` | products in `Ext3` from coefficients: of two elements, and by an element of `GF(2 ^ 64)` |
 | `Fields/Binary/NatPoly.lean` | appended to `CompPoly/Fields/Binary/Common.lean` | `natPoly n`, the polynomial over `GF(2)` whose coefficients are the bits of `n`; how xor, shifts, splits and bounds act on it |
 | `Fields/Binary/Tower/NatMul.lean` | appended to `CompPoly/Fields/Binary/Tower/Concrete/Core.lean` | `towerMul`, the tower product by structural recursion on `Nat`, which the kernel evaluates; it agrees with `concrete_mul` at every level |
 

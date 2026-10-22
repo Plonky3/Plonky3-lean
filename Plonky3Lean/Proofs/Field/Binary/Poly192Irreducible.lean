@@ -29,7 +29,7 @@ theorem monic_poly192 : Poly192.modulus.Monic := by
   monicity!
 
 /-- `Y^3 + Y + 1` has no root in `GF(2^64)`. -/
-theorem not_isRoot_poly192 (r : Poly64.Quot) : ¬ Poly192.modulus.IsRoot r := by
+theorem not_isRoot_poly192 (r : BF64.BF64Quot) : ¬ Poly192.modulus.IsRoot r := by
   intro h
   have h2 := two_eq_zero_quot64
   have hr : r ^ 3 + r + 1 = 0 := by
@@ -52,7 +52,7 @@ theorem not_isRoot_poly192 (r : Poly64.Quot) : ¬ Poly192.modulus.IsRoot r := by
     · exact absurd h hr0
     · exact sub_eq_zero.mp h
   rw [h1] at hr
-  have : (1 : Poly64.Quot) = 0 := by linear_combination hr - h2
+  have : (1 : BF64.BF64Quot) = 0 := by linear_combination hr - h2
   exact one_ne_zero this
 
 /-- `Y^3 + Y + 1` is irreducible over `GF(2^64)`. -/

@@ -63,7 +63,7 @@ theorem reduce128Nat_lt {L H : ℕ} (hL : L < 2 ^ 128) (hH : H < 2 ^ 128) :
 theorem reduce_128_eq (low high : Std.U128) :
     clmul.reduce_128 low high = .ok ⟨BitVec.ofNat 128 (reduce128Nat low.val high.val)⟩ := by
   unfold clmul.reduce_128
-  simp (disch := decide) only [shiftLeft_i32_eq, shiftRight_i32_eq, lift_eq, bind_tc_ok]
+  simp (disch := decide) only [shiftLeft_i32_eq, shiftRight_i32_eq, lift_eq, Aeneas.Std.bind_ok]
   congr 1
   apply UScalar.eq_of_val_eq
   simp only [UScalar.val, xor_bv, BitVec.toNat_xor, BitVec.toNat_shiftLeft,
@@ -133,7 +133,7 @@ theorem wide_mul_128_spec (a b : Std.U128) :
       natPoly lo.val + X ^ 128 * natPoly hi.val = natPoly a.val * natPoly b.val := by
   unfold clmul.portable.wide_mul_128
   simp (disch := decide) only [clmul_64x64_halves_eq, shiftLeft_i32_eq, shiftRight_i32_eq, lift_eq,
-    bind_tc_ok]
+    Aeneas.Std.bind_ok]
   refine ⟨_, _, rfl, ?_⟩
   simp only [UScalar.val, or_bv, xor_bv, cast_bv, BitVec.toNat_or, BitVec.toNat_xor,
     BitVec.toNat_shiftLeft, BitVec.toNat_ushiftRight, BitVec.toNat_setWidth, BitVec.toNat_ofNat,
@@ -192,14 +192,14 @@ theorem wide_mul_128_spec (a b : Std.U128) :
 
 /-- In `GF(2)[x] / (ghashPoly)`, an integer is the element `toQuot` reads it as. -/
 theorem toQuot_eq_mk (x : Std.U128) :
-    toQuot x.bv = AdjoinRoot.mk ghashPoly (natPoly x.val) := by
+    toQuot (ghash x) = AdjoinRoot.mk ghashPoly (natPoly x.val) := by
   rw [toQuot, toPoly_eq_natPoly]
   rfl
 
 /-- A reduced pair `(low, high)` is the element `low + X ^ 128 · high`. -/
 theorem reduce_128_toQuot (low high : Std.U128) :
     clmul.reduce_128 low high ⦃ r =>
-      toQuot r.bv = AdjoinRoot.mk ghashPoly (natPoly low.val + X ^ 128 * natPoly high.val) ⦄ := by
+      toQuot (ghash r) = AdjoinRoot.mk ghashPoly (natPoly low.val + X ^ 128 * natPoly high.val) ⦄ := by
   rw [reduce_128_eq, WP.spec_ok, toQuot_eq_mk, ← mk_natPoly_reduce128Nat (u128_val_lt high)]
   congr 2
   show (BitVec.ofNat 128 _).toNat = _
@@ -207,7 +207,7 @@ theorem reduce_128_toQuot (low high : Std.U128) :
 
 /-- `poly_mul_128` never panics and multiplies in `GF(2)[x] / (ghashPoly)`. -/
 theorem poly_mul_128_toQuot (a b : Std.U128) :
-    clmul.portable.poly_mul_128 a b ⦃ r => toQuot r.bv = toQuot a.bv * toQuot b.bv ⦄ := by
+    clmul.portable.poly_mul_128 a b ⦃ r => toQuot (ghash r) = toQuot (ghash a) * toQuot (ghash b) ⦄ := by
   obtain ⟨lo, hi, e, hp⟩ := wide_mul_128_spec a b
   unfold clmul.portable.poly_mul_128
   refine spec_bind_pair_of_eq e ?_
@@ -215,19 +215,13 @@ theorem poly_mul_128_toQuot (a b : Std.U128) :
   intro r hr
   rw [hr, hp, toQuot_eq_mk, toQuot_eq_mk, map_mul]
 
-/-- The reduced product is CompPoly's: the result is determined by its image in the field. -/
-theorem eq_of_toQuot (r : Std.U128) (x : ConcreteBF128Ghash) (h : toQuot r.bv = toQuot x) :
-    r.bv = x :=
-  toQuot_injective h
-
-/-- `poly_mul_128` never panics and returns CompPoly's product in `ConcreteBF128Ghash`. -/
+/-- `poly_mul_128` never panics and returns the product in CompPoly's GHASH field. -/
 theorem poly_mul_128_spec (a b : Std.U128) :
-    clmul.portable.poly_mul_128 a b ⦃ r => r.bv = reduce_clMul (clMul a.bv b.bv) ⦄ := by
+    clmul.portable.poly_mul_128 a b ⦃ r => ghash r = ghash a * ghash b ⦄ := by
   apply WP.spec_mono (poly_mul_128_toQuot a b)
   intro r hr
   apply toQuot_injective
-  rw [hr]
-  exact (toQuot_mul a.bv b.bv).symm
+  rw [hr, toQuot_mul]
 
 /-! ## Squaring -/
 
@@ -321,7 +315,7 @@ theorem natPoly_spreadNat {v : ℕ} (hv : v < 2 ^ 64) : natPoly (spreadNat v) = 
 theorem spread_bits_64_eq (v : Std.U64) :
     clmul.portable.spread_bits_64 v = .ok ⟨BitVec.ofNat 128 (spreadNat v.val)⟩ := by
   unfold clmul.portable.spread_bits_64
-  simp (disch := decide) only [shiftLeft_i32_eq, lift_eq, bind_tc_ok]
+  simp (disch := decide) only [shiftLeft_i32_eq, lift_eq, Aeneas.Std.bind_ok]
   congr 1
   apply UScalar.eq_of_val_eq
   simp only [UScalar.val, and_bv, or_bv, cast_bv, BitVec.toNat_and, BitVec.toNat_or,
@@ -339,9 +333,9 @@ theorem shiftRight_64_lt (a : Std.U128) : a.val >>> 64 < 2 ^ 64 := by
 
 /-- `poly_square_128` never panics and squares in `GF(2)[x] / (ghashPoly)`. -/
 theorem poly_square_128_toQuot (a : Std.U128) :
-    clmul.portable.poly_square_128 a ⦃ r => toQuot r.bv = toQuot a.bv * toQuot a.bv ⦄ := by
+    clmul.portable.poly_square_128 a ⦃ r => toQuot (ghash r) = toQuot (ghash a) * toQuot (ghash a) ⦄ := by
   unfold clmul.portable.poly_square_128
-  simp (disch := decide) only [spread_bits_64_eq, shiftRight_i32_eq, lift_eq, bind_tc_ok]
+  simp (disch := decide) only [spread_bits_64_eq, shiftRight_i32_eq, lift_eq, Aeneas.Std.bind_ok]
   apply WP.spec_mono (reduce_128_toQuot _ _)
   intro r hr
   rw [hr, toQuot_eq_mk, ← map_mul]
@@ -381,12 +375,12 @@ theorem clmul_64x64_ok (a b : Std.U64) :
 /-- `poly_mul_128_by_64` never panics and multiplies in `GF(2)[x] / (ghashPoly)`. -/
 theorem poly_mul_128_by_64_toQuot (a : Std.U128) (b : Std.U64) :
     clmul.portable.poly_mul_128_by_64 a b ⦃ r =>
-      toQuot r.bv = toQuot a.bv * AdjoinRoot.mk ghashPoly (natPoly b.val) ⦄ := by
+      toQuot (ghash r) = toQuot (ghash a) * AdjoinRoot.mk ghashPoly (natPoly b.val) ⦄ := by
   obtain ⟨lo, elo, hlo⟩ := clmul_64x64_ok (UScalar.cast .U64 a) b
   obtain ⟨mid, emid, hmid⟩ :=
     clmul_64x64_ok (UScalar.cast .U64 (⟨a.bv >>> I32.toNat 64#i32⟩ : Std.U128)) b
   unfold clmul.portable.poly_mul_128_by_64
-  simp (disch := decide) only [lift_eq, shiftLeft_i32_eq, shiftRight_i32_eq, bind_tc_ok, elo,
+  simp (disch := decide) only [lift_eq, shiftLeft_i32_eq, shiftRight_i32_eq, Aeneas.Std.bind_ok, elo,
     emid]
   apply WP.spec_mono (reduce_128_toQuot _ _)
   intro r hr
@@ -506,7 +500,7 @@ theorem unshuffle_eq (a : Std.U128) :
       .ok (⟨BitVec.ofNat 64 (evenNat a.val)⟩, ⟨BitVec.ofNat 64 (oddNat a.val)⟩) := by
   unfold clmul.sqrt.unshuffle
   simp (disch := decide) only [compact_even_eq, shiftLeft_i32_eq, shiftRight_i32_eq, lift_eq,
-    bind_tc_ok]
+    Aeneas.Std.bind_ok]
   congr 2 <;> apply UScalar.eq_of_val_eq <;>
   simp only [or_bv, BitVec.toNat_or, BitVec.toNat_shiftLeft, BitVec.toNat_ushiftRight,
     BitVec.toNat_ofNat, cast_bv, BitVec.toNat_setWidth, UScalarTy.U64_numBits_eq,
@@ -524,14 +518,14 @@ theorem two_eq_zero_quot : (2 : AdjoinRoot ghashPoly) = 0 := by
 
 /-- `poly_sqrt_128` never panics and returns a square root in `GF(2)[x] / (ghashPoly)`. -/
 theorem poly_sqrt_128_toQuot (a : Std.U128) :
-    clmul.sqrt.poly_sqrt_128 a ⦃ r => toQuot r.bv * toQuot r.bv = toQuot a.bv ⦄ := by
+    clmul.sqrt.poly_sqrt_128 a ⦃ r => toQuot (ghash r) * toQuot (ghash r) = toQuot (ghash a) ⦄ := by
   unfold clmul.sqrt.poly_sqrt_128
   refine spec_bind_pair_of_eq (unshuffle_eq a) ?_
   obtain ⟨m, em, hm⟩ := WP.spec_imp_exists
     (poly_mul_128_by_64_toQuot clmul.sqrt.ROOT_X ⟨BitVec.ofNat 64 (oddNat a.val)⟩)
-  simp only [from_u64_u128_eq, bind_tc_ok, em, WP.spec_ok]
-  have he : toQuot (UScalar.cast .U128 (⟨BitVec.ofNat 64 (evenNat a.val)⟩ : Std.U64) ^^^ m).bv =
-      AdjoinRoot.mk ghashPoly (natPoly (evenNat a.val)) + toQuot m.bv := by
+  simp only [from_u64_u128_eq, Aeneas.Std.bind_ok, em, WP.spec_ok]
+  have he : toQuot (ghash (UScalar.cast .U128 (⟨BitVec.ofNat 64 (evenNat a.val)⟩ : Std.U64) ^^^ m)) =
+      AdjoinRoot.mk ghashPoly (natPoly (evenNat a.val)) + toQuot (ghash m) := by
     rw [toQuot_eq_mk, toQuot_eq_mk, ← map_add, ← natPoly_xor]
     congr 2
     show (BitVec.setWidth 128 (BitVec.ofNat 64 _) ^^^ m.bv).toNat = _

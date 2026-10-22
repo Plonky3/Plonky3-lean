@@ -48,7 +48,7 @@ theorem xor_val {ty : UScalarTy} (x y : UScalar ty) : (x ^^^ y).val = x.val ^^^ 
 def reduceLimb (x : Std.U128) : Std.U64 := ⟨BitVec.ofNat 64 (reduce64Nat x.val)⟩
 
 theorem toQuot64_reduceLimb (x : Std.U128) :
-    toQuot64 (reduceLimb x) = AdjoinRoot.mk Poly64.modulus (natPoly x.val) := by
+    toQuot64 (reduceLimb x) = AdjoinRoot.mk BF64.basePoly (natPoly x.val) := by
   rw [reduceLimb, toQuot64_eq, val_ofNat_64 (reduce64Nat_lt _),
     mk_natPoly_reduce64Nat (u128_val_lt x)]
 
@@ -60,19 +60,19 @@ theorem map_reduce_64_eq (x y z : Std.U128) :
   unfold core.array.Array.map
   rw [array_map_eq _ _ _ reduceLimb (fun v => by
     show (do let i ← clmul.reduce_64 v; RustM.ok (i, clmul.reduce_64)) = _
-    rw [reduce_64_eq, bind_tc_ok]
+    rw [reduce_64_eq, Aeneas.Std.bind_ok]
     rfl)]
   rfl
 
 /-- The limb `Σ` that a combination of carry-less products stands for, in `GF(2^64)`. -/
 theorem mk_natPoly_xor (u v : Std.U128) :
-    AdjoinRoot.mk Poly64.modulus (natPoly (u ^^^ v).val) =
-      AdjoinRoot.mk Poly64.modulus (natPoly u.val) + AdjoinRoot.mk Poly64.modulus (natPoly v.val) := by
+    AdjoinRoot.mk BF64.basePoly (natPoly (u ^^^ v).val) =
+      AdjoinRoot.mk BF64.basePoly (natPoly u.val) + AdjoinRoot.mk BF64.basePoly (natPoly v.val) := by
   rw [xor_val, natPoly_xor, map_add]
 
 theorem mk_natPoly_xor64 (u v : Std.U64) :
-    AdjoinRoot.mk Poly64.modulus (natPoly (u ^^^ v).val) =
-      AdjoinRoot.mk Poly64.modulus (natPoly u.val) + AdjoinRoot.mk Poly64.modulus (natPoly v.val) := by
+    AdjoinRoot.mk BF64.basePoly (natPoly (u ^^^ v).val) =
+      AdjoinRoot.mk BF64.basePoly (natPoly u.val) + AdjoinRoot.mk BF64.basePoly (natPoly v.val) := by
   rw [xor_val, natPoly_xor, map_add]
 
 theorem toQuot64_xor (u v : Std.U64) : toQuot64 (u ^^^ v) = toQuot64 u + toQuot64 v := by
@@ -94,11 +94,11 @@ theorem natPoly_clmulVal (a b : Std.U64) :
 
 /-! ## Arithmetic in the extension -/
 
-theorem two_eq_zero_poly192 : (2 : Poly64.Quot[X]) = 0 := by
-  rw [show (2 : Poly64.Quot[X]) = C 2 from (map_ofNat C 2).symm, two_eq_zero_quot64, map_zero]
+theorem two_eq_zero_poly192 : (2 : BF64.BF64Quot[X]) = 0 := by
+  rw [show (2 : BF64.BF64Quot[X]) = C 2 from (map_ofNat C 2).symm, two_eq_zero_quot64, map_zero]
 
 /-- The schoolbook product of two elements, with `Y^3 = Y + 1` and `Y^4 = Y^2 + Y`. -/
-theorem ofCoeffs_mul (a₀ a₁ a₂ b₀ b₁ b₂ : Poly64.Quot) :
+theorem ofCoeffs_mul (a₀ a₁ a₂ b₀ b₁ b₂ : BF64.BF64Quot) :
     Poly192.ofCoeffs a₀ a₁ a₂ * Poly192.ofCoeffs b₀ b₁ b₂ =
       Poly192.ofCoeffs (a₀ * b₀ + a₁ * b₂ + a₂ * b₁)
         (a₀ * b₁ + a₁ * b₀ + a₁ * b₂ + a₂ * b₁ + a₂ * b₂)
@@ -125,7 +125,7 @@ theorem poly_mul_192_toQuot_mk (a₀ a₁ a₂ b₀ b₁ b₂ : Std.U64) :
   obtain ⟨d₀₂, f₀₂, k₀₂⟩ := clmul_64x64_ok (a₀ ^^^ a₂) (b₀ ^^^ b₂)
   obtain ⟨d₁₂, f₁₂, k₁₂⟩ := clmul_64x64_ok (a₁ ^^^ a₂) (b₁ ^^^ b₂)
   unfold clmul.gf192.poly_mul_192 clmul.gf192.composed_mul_192 clmul.gf192.mul_unreduced
-  simp only [index_usize_0, index_usize_1, index_usize_2, lift_eq, bind_tc_ok, e₀, e₁, e₂, f₀₁,
+  simp only [index_usize_0, index_usize_1, index_usize_2, lift_eq, Aeneas.Std.bind_ok, e₀, e₁, e₂, f₀₁,
     f₀₂, f₁₂, map_reduce_64_eq, WP.spec_ok]
   rw [toQuot192_mk, toQuot192_mk, toQuot192_mk, toQuot64_reduceLimb, toQuot64_reduceLimb,
     toQuot64_reduceLimb, ofCoeffs_mul]
@@ -155,7 +155,7 @@ theorem poly_square_192_toQuot_mk (a₀ a₁ a₂ : Std.U64) :
   obtain ⟨s₁, e₁, h₁⟩ := clmul_64x64_ok a₁ a₁
   obtain ⟨s₂, e₂, h₂⟩ := clmul_64x64_ok a₂ a₂
   unfold clmul.gf192.poly_square_192 clmul.gf192.composed_square_192
-  simp only [index_usize_0, index_usize_1, index_usize_2, lift_eq, bind_tc_ok, e₀, e₁, e₂,
+  simp only [index_usize_0, index_usize_1, index_usize_2, lift_eq, Aeneas.Std.bind_ok, e₀, e₁, e₂,
     map_reduce_64_eq, WP.spec_ok]
   rw [toQuot192_mk, toQuot192_mk, toQuot64_reduceLimb, toQuot64_reduceLimb,
     toQuot64_reduceLimb, ofCoeffs_mul]
@@ -188,7 +188,7 @@ theorem poly_mul_192_by_64_toQuot_mk (a₀ a₁ a₂ k : Std.U64) :
         let i ← clmul.portable.clmul_64x64 v k
         let i1 ← clmul.reduce_64 i
         RustM.ok (i1, k)) = _
-      rw [clmul_64x64_eq_clmulVal, bind_tc_ok, reduce_64_eq, bind_tc_ok]
+      rw [clmul_64x64_eq_clmulVal, Aeneas.Std.bind_ok, reduce_64_eq, Aeneas.Std.bind_ok]
       rfl), WP.spec_ok]
   show toQuot192 ⟨[_, _, _], rfl⟩ = _
   rw [toQuot192_mk, toQuot192_mk, toQuot64_reduceLimb, toQuot64_reduceLimb,

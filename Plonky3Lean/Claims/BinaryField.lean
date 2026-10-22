@@ -50,39 +50,39 @@ theorem clmul.portable.clmul_64x64.poly (a b : Std.U64) :
 /-- `reduce_128(low, high)` is `low + X^128 · high` in the GHASH field. -/
 theorem clmul.reduce_128.toQuot (low high : Std.U128) :
     clmul.reduce_128 low high ⦃ r =>
-      toQuot r.bv = AdjoinRoot.mk ghashPoly (poly low + X ^ 128 * poly high) ⦄ :=
+      toQuot (ghash r) = AdjoinRoot.mk ghashPoly (poly low + X ^ 128 * poly high) ⦄ :=
   Proofs.Binary.reduce_128_toQuot_poly low high
 
 /-- `poly_mul_128` is multiplication in the GHASH field. -/
 theorem clmul.portable.poly_mul_128.toQuot (a b : Std.U128) :
-    clmul.portable.poly_mul_128 a b ⦃ r => toQuot r.bv = toQuot a.bv * toQuot b.bv ⦄ :=
+    clmul.portable.poly_mul_128 a b ⦃ r => toQuot (ghash r) = toQuot (ghash a) * toQuot (ghash b) ⦄ :=
   Proofs.Binary.poly_mul_128_toQuot a b
 
 /-- `poly_square_128` is squaring in the GHASH field. -/
 theorem clmul.portable.poly_square_128.toQuot (a : Std.U128) :
-    clmul.portable.poly_square_128 a ⦃ r => toQuot r.bv = toQuot a.bv * toQuot a.bv ⦄ :=
+    clmul.portable.poly_square_128 a ⦃ r => toQuot (ghash r) = toQuot (ghash a) * toQuot (ghash a) ⦄ :=
   Proofs.Binary.poly_square_128_toQuot a
 
 /-- `poly_mul_128_by_64` is multiplication by a polynomial of degree below `64` in the GHASH field. -/
 theorem clmul.portable.poly_mul_128_by_64.toQuot (a : Std.U128) (b : Std.U64) :
     clmul.portable.poly_mul_128_by_64 a b ⦃ r =>
-      toQuot r.bv = toQuot a.bv * AdjoinRoot.mk ghashPoly (poly b) ⦄ :=
+      toQuot (ghash r) = toQuot (ghash a) * AdjoinRoot.mk ghashPoly (poly b) ⦄ :=
   Proofs.Binary.poly_mul_128_by_64_toQuot_poly a b
 
 /-- `poly_sqrt_128` returns a square root in the GHASH field. -/
 theorem clmul.sqrt.poly_sqrt_128.toQuot (a : Std.U128) :
-    clmul.sqrt.poly_sqrt_128 a ⦃ r => toQuot r.bv * toQuot r.bv = toQuot a.bv ⦄ :=
+    clmul.sqrt.poly_sqrt_128 a ⦃ r => toQuot (ghash r) * toQuot (ghash r) = toQuot (ghash a) ⦄ :=
   Proofs.Binary.poly_sqrt_128_toQuot a
 
 /-! ## `GF(2^64)` -/
 
 /-- `X^64 + X^4 + X^3 + X + 1` is irreducible over `GF(2)`, so `GF(2)[X] / (modulus)` is a field. -/
-theorem Poly64.modulus.irreducible : Irreducible Poly64.modulus :=
+theorem BF64.basePoly.irreducible : Irreducible BF64.basePoly :=
   Proofs.Binary.modulus_irreducible
 
 /-- `reduce_64(p)` is `p` modulo `X^64 + X^4 + X^3 + X + 1`. -/
 theorem clmul.reduce_64.toQuot64 (p : Std.U128) :
-    clmul.reduce_64 p ⦃ r => toQuot64 r = AdjoinRoot.mk Poly64.modulus (poly p) ⦄ :=
+    clmul.reduce_64 p ⦃ r => toQuot64 r = AdjoinRoot.mk BF64.basePoly (poly p) ⦄ :=
   Proofs.Binary.reduce_64_toQuot64 p
 
 /-- `poly_mul_64` is multiplication in `GF(2^64)`. -/

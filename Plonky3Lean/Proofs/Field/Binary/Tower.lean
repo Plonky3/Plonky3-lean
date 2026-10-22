@@ -36,7 +36,7 @@ theorem mod_numBits_of_lt {n : ℕ} (h : n < 2 ^ 32) : n % 2 ^ System.Platform.n
 theorem gf2_raw_from_repr_spec (r : Std.U8) :
     gf2.Gf2.raw_from_repr r ⦃ x => x.val = r.val % 2 ^ 2 ^ 0 ⦄ := by
   unfold gf2.Gf2.raw_from_repr
-  simp only [Plonky3Lean.Lib.lift_eq, bind_tc_ok, WP.spec_ok]
+  simp only [Plonky3Lean.Lib.lift_eq, Aeneas.Std.bind_ok, WP.spec_ok]
   rw [UScalar.val_and, show (1#u8).val = 1 from rfl, Nat.and_one_is_mod]; rfl
 
 @[step]
@@ -58,13 +58,13 @@ theorem gf2_to_repr_spec (x : gf2.Gf2) (hx : x.val < 2 ^ 2 ^ 0) : gf2.Gf2.to_rep
 theorem gf2_add_spec (a b : gf2.Gf2) :
     gf2.Gf2.Insts.CoreOpsArithAddGf2Gf2.add a b ⦃ y => y.val = a.val ^^^ b.val ⦄ := by
   unfold gf2.Gf2.Insts.CoreOpsArithAddGf2Gf2.add
-  simp only [lift_eq, bind_tc_ok, WP.spec_ok, UScalar.val_xor]
+  simp only [lift_eq, Aeneas.Std.bind_ok, WP.spec_ok, UScalar.val_xor]
 
 @[step]
 theorem gf2_mul_spec (a b : gf2.Gf2) :
     gf2.Gf2.Insts.CoreOpsArithMulGf2Gf2.mul a b ⦃ y => y.val = towerMul 0 a.val b.val ⦄ := by
   unfold gf2.Gf2.Insts.CoreOpsArithMulGf2Gf2.mul
-  simp only [lift_eq, bind_tc_ok, WP.spec_ok, UScalar.val_and, towerMul]
+  simp only [lift_eq, Aeneas.Std.bind_ok, WP.spec_ok, UScalar.val_and, towerMul]
 
 @[step]
 theorem gf2_reference_mul_spec (a b : gf2.Gf2) :
