@@ -497,7 +497,7 @@ name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.exp_root_d
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
-name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.field_valid"
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.fieldValid"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -731,4 +731,12 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.Monty31.QuotientMap.from_canonical_checked_i128"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.fieldDefaults"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBear.try_inverse.toField"
 axioms = ["Classical.choice", "Quot.sound", "propext"]

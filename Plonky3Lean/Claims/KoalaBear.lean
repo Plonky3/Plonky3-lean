@@ -3,6 +3,7 @@ import Plonky3Lean.Proofs.Field.KoalaBear
 import Plonky3Lean.Proofs.Field.KoalaBear.Arith
 import Plonky3Lean.Proofs.Field.KoalaBear.Constants
 import Plonky3Lean.Proofs.Field.KoalaBear.Extension
+import Plonky3Lean.Proofs.Field.KoalaBear.Generic
 import Plonky3Lean.Proofs.Field.KoalaBear.Poseidon
 import ToCompPoly.Fields.KoalaBear.Extension
 
@@ -20,7 +21,7 @@ KoalaBear's parameters pass the checks of `MontyField31::new`, so the generic Mo
 Most claims below are those theorems at KoalaBear's parameters.
 
 Not claimed:
-- inversion, exponentiation, and the other `PrimeCharacteristicRing` methods KoalaBear overrides;
+- exponentiation, and the other `PrimeCharacteristicRing` methods KoalaBear overrides;
 - the integer conversions and deserialization;
 - the packed (SIMD) and extension-field arithmetic, and `mul_w`, which the extraction does not produce;
 - the body of `exp_1420470955`, which the model leaves opaque;
@@ -109,17 +110,37 @@ theorem koala_bear.KoalaBearParameters.TWO_ADICITY.maximal :
     ¬ 2 ^ (TWO_ADICITY.val + 1) ∣ PRIME.val - 1 :=
   Proofs.KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.maximal
 
-/-- KoalaBear's `MontyParameters` pass every check of `MontyField31::new`, and `MONTY_MASK` is `2^32 - 1`.
+/-! ## The generic Monty31 claims apply
 
-So every generic Monty31 theorem holds at KoalaBear's parameters. -/
+`Plonky3Lean.Claims.Monty31` holds for every parameter set that passes the checks of `MontyField31::new`.
+
+These three claims say KoalaBear's do. -/
+
+/-- KoalaBear's `MontyParameters` pass every check of `MontyField31::new`, and `MONTY_MASK` is `2^32 - 1`. -/
 theorem koala_bear.KoalaBearParameters.valid :
     Spec.Monty31.Valid MontyParams PRIME MONTY_MU :=
   Proofs.KoalaBear.MontyParams.valid
 
 /-- KoalaBear's `FieldParameters` are valid: its `MontyParameters` are, and `HALF_P_PLUS_1` is `(p + 1) / 2`. -/
-theorem koala_bear.KoalaBearParameters.field_valid :
+theorem koala_bear.KoalaBearParameters.fieldValid :
     Spec.Monty31.FieldValid FieldParams PRIME MONTY_MU :=
   Proofs.KoalaBear.FieldParams.valid
+
+/-- KoalaBear's `FieldParameters` keep `MONTY_ZERO`, `MONTY_ONE` and `MONTY_TWO` at their defaults. -/
+theorem koala_bear.KoalaBearParameters.fieldDefaults :
+    Spec.Monty31.FieldDefaults FieldParams :=
+  Proofs.KoalaBear.FieldParams.defaults
+
+/-- `try_inverse(a)` of a canonical KoalaBear element: `None` for zero, and otherwise the inverse.
+
+The inverse is stored canonically, and its product with `a` is `1` in the field.
+
+KoalaBear's prime is above `2^30`, which the generic inversion claim needs. -/
+theorem koala_bear.KoalaBear.try_inverse.toField (a : Element) (ha : Canonical a) :
+    p3_monty_31.monty_31.MontyField31.try_inverse FieldParams a ⦃ r =>
+      (toField a = 0 → r = none) ∧
+      (toField a ≠ 0 → ∃ c, r = some c ∧ Canonical c ∧ toField c * toField a = 1) ⦄ :=
+  Proofs.KoalaBear.koala_bear.KoalaBear.try_inverse.toField a ha
 
 /-! ## The `KoalaBear` constructors
 

@@ -9,6 +9,7 @@ import Plonky3Lean.Proofs.Field.KoalaBear
 import Plonky3Lean.Proofs.Field.KoalaBear.Arith
 import Plonky3Lean.Proofs.Field.KoalaBear.Constants
 import Plonky3Lean.Proofs.Field.KoalaBear.Extension
+import Plonky3Lean.Proofs.Field.KoalaBear.Generic
 import Plonky3Lean.Proofs.Field.KoalaBear.Poseidon
 import Plonky3Lean.Proofs.Field.Monty31.Arith
 import Plonky3Lean.Proofs.Field.Monty31.Convert

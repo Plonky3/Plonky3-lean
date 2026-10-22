@@ -56,9 +56,11 @@ structure field.UniformSamplingField (Self : Type) where
   MAX_SINGLE_SAMPLE_BITS : RustM Std.Usize
   SAMPLING_BITS_M : RustM (Array Std.U64 64#usize)
 
-/-- [p3_field::exponentiation::exp_1420470955]: `val ^ 1420470955`, via an
-addition chain. Upstream: `field/src/exponentiation.rs:37`. Assumed, like
-`exp_1725656503` below. -/
+/-- [p3_field::exponentiation::exp_1420470955]: `val ^ 1420470955`, via an addition chain.
+
+Upstream: `field/src/exponentiation.rs:37`.
+
+Assumed: its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here. -/
 opaque exponentiation.exp_1420470955 {R : Type}
     (PrimeCharacteristicRingInst : field.PrimeCharacteristicRing R) (val : R) :
     RustM R

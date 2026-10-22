@@ -3,14 +3,17 @@
 lean_lib = "P3KoalaBear"
 state = "extracted"
 
-# Cargo features enabled for extraction. The target comes from toolchain.toml.
+# Cargo features enabled for extraction.
+#
+# The target comes from toolchain.toml.
 features = []
 
 # The whole crate is extracted, so there are no charon roots.
 start_from = []
 
-# What can change this crate's model: its own sources, and the sources its
-# pre-extraction patches touch.
+# What can change this crate's model.
+#
+# Its own sources, and the sources the pre-extraction patches touch.
 watch = [
   "koala-bear/src",
   "koala-bear/Cargo.toml",

@@ -31,7 +31,7 @@ theorem FieldParams.MONTY_NEG_ONE.toField :
     FieldParams.MONTY_NEG_ONE ⦃ r => Canonical r ∧ Spec.KoalaBear.toField r = -1 ⦄ := by
   dsimp only
   unfold koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.PRIME
-  step*
+  step as ⟨i1, i1_post1, i1_post2⟩
   refine WP.spec_mono (koala_bear.KoalaBear.new.toField i1) ?_
   rintro r ⟨hc, hr⟩
   refine ⟨hc, ?_⟩

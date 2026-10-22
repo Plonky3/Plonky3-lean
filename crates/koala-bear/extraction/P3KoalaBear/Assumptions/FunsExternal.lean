@@ -33,7 +33,8 @@ open p3_koala_bear
 
 /-- [p3_koala_bear::koala_bear::{impl core::fmt::Debug for p3_koala_bear::koala_bear::KoalaBearParameters}::fmt]:
     Source: 'koala-bear/src/koala_bear.rs', lines 11:31-11:36
-    Visibility: public -/
+    Visibility: public
+    Assumed: `Debug` bodies are opaque by `charon_args` (toolchain.toml). -/
 opaque koala_bear.KoalaBearParameters.Insts.CoreFmtDebug.fmt
   :
   koala_bear.KoalaBearParameters → core.fmt.Formatter → RustM
@@ -41,7 +42,8 @@ opaque koala_bear.KoalaBearParameters.Insts.CoreFmtDebug.fmt
 
 /-- [p3_koala_bear::mds::{impl core::fmt::Debug for p3_koala_bear::mds::MDSKoalaBearData}::fmt]:
     Source: 'koala-bear/src/mds.rs', lines 12:25-12:30
-    Visibility: public -/
+    Visibility: public
+    Assumed: `Debug` bodies are opaque by `charon_args` (toolchain.toml). -/
 opaque mds.MDSKoalaBearData.Insts.CoreFmtDebug.fmt
   :
   mds.MDSKoalaBearData → core.fmt.Formatter → RustM ((core.result.Result
@@ -49,7 +51,8 @@ opaque mds.MDSKoalaBearData.Insts.CoreFmtDebug.fmt
 
 /-- [p3_koala_bear::poseidon1::{impl core::fmt::Debug for p3_koala_bear::poseidon1::KoalaBearPoseidonParameters}::fmt]:
     Source: 'koala-bear/src/poseidon1.rs', lines 92:9-92:14
-    Visibility: public -/
+    Visibility: public
+    Assumed: `Debug` bodies are opaque by `charon_args` (toolchain.toml). -/
 opaque poseidon1.KoalaBearPoseidonParameters.Insts.CoreFmtDebug.fmt
   :
   poseidon1.KoalaBearPoseidonParameters → core.fmt.Formatter → RustM
@@ -57,7 +60,8 @@ opaque poseidon1.KoalaBearPoseidonParameters.Insts.CoreFmtDebug.fmt
 
 /-- [p3_koala_bear::poseidon2::{impl core::fmt::Debug for p3_koala_bear::poseidon2::KoalaBearInternalLayerParameters}::fmt]:
     Source: 'koala-bear/src/poseidon2.rs', lines 404:9-404:14
-    Visibility: public -/
+    Visibility: public
+    Assumed: `Debug` bodies are opaque by `charon_args` (toolchain.toml). -/
 opaque poseidon2.KoalaBearInternalLayerParameters.Insts.CoreFmtDebug.fmt
   :
   poseidon2.KoalaBearInternalLayerParameters → core.fmt.Formatter → RustM
