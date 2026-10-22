@@ -122,11 +122,11 @@ charon errors: 7, at `library/core/src/iter/adapters/zip.rs:74:1`, `library/core
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 68) whose dependencies include it; reaching one is not using it.
+(of 70) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
-| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 59 |
+| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 61 |
 | `baby-bear` | `mds.MDSBabyBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon2.BabyBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
@@ -143,7 +143,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 68) whose dependencies include the declaration.
+counts the claims (of 70) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -152,8 +152,8 @@ counts the claims (of 68) whose dependencies include the declaration.
 | `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 0 |
 | `field` | `p3_field.field.PrimeField` | `p3_field::field::PrimeField` | stub | 0 |
 | `field` | `p3_field.field.UniformSamplingField` | `p3_field::field::UniformSamplingField` | stub | 0 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_array` | `p3_monty_31::monty_31::MontyField31::new_array` | dropped | 37 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_2d_array` | `p3_monty_31::monty_31::MontyField31::new_2d_array` | dropped | 20 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_array` | `p3_monty_31::monty_31::MontyField31::new_array` | dropped | 39 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_2d_array` | `p3_monty_31::monty_31::MontyField31::new_2d_array` | dropped | 22 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.new_monty` | `p3_monty_31::monty_31::MontyField31::new_monty` | dropped | 5 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.add` | `{impl core::ops::arith::Add for p3_monty_31::monty_31::MontyField31<_>}::add` | dropped | 1 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.sub` | `{impl core::ops::arith::Sub for p3_monty_31::monty_31::MontyField31<_>}::sub` | dropped | 2 |
@@ -209,6 +209,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.baby_bear.BabyBear.sub.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.eq_ext4TwoAdicGenerators` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -217,6 +218,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData5.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.eq_ext8TwoAdicGenerators` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
