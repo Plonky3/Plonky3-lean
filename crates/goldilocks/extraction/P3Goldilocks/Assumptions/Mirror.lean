@@ -1,30 +1,22 @@
 /-
 # `p3-goldilocks`: what the scoped extraction does not produce
 
-Most of p3-goldilocks's scalar arithmetic comes from its scoped extraction,
-`P3Goldilocks/Extraction/`: `reduce128` and its helpers, `Add`, `Mul`, `Neg`,
-`as_canonical_u64`, `is_zero`, `mul_2exp_u64`, the GCD inversion behind
-`try_inverse`, `Ord::cmp`, `two_adic_generator`, and the constant tables.
+The items below are translated by charon but not emitted by aeneas (docs/extractor-issues.md, 4).
 
-The items below are in the LLBC with bodies, but aeneas does not emit them,
-because nothing it emits calls them (docs/extractor-issues.md, 4).
-Each is transcribed from its Rust body, operation by operation, with the same
-integer widths and the same checked or wrapping semantics as aeneas gives the
-extracted items.
-The names are the ones aeneas would generate, so an extraction that starts
-emitting one of them collides with its transcription.
+Each is transcribed operation by operation, with aeneas's integer widths and checked or wrapping semantics.
 
-* `Sub::sub`, `PartialEq::eq`.
-* The `PrimeCharacteristicRing` overrides `halve`, `div_2exp_u64`,
-  `sum_array` and `dot_product`.
-  `halve` and `dot_product` read their local constants `HALF_P_PLUS_1` and
-  `OFFSET` from the extraction.
+The names are those aeneas would generate, so a future emission collides with its transcription.
+
+* `Sub::sub` and `PartialEq::eq`.
+* The overrides `halve`, `div_2exp_u64`, `sum_array` and `dot_product`.
 * `Sum::sum`, over the list of items the iterator yields.
 * The `QuotientMap` conversions from `u64`, `u128`, `i64` and `i128`.
 
+`halve` and `dot_product` read their local constants from the extraction.
+
 `unchecked_add` and `unchecked_sub` are undefined behaviour on overflow.
-They are transcribed as the checked operators, which fail on overflow, so a
-proof that the code does not fail proves that they do not overflow.
+
+They are transcribed as checked operators, so a proof of no failure proves no overflow.
 -/
 import P3Goldilocks.Extraction
 open CoreModels Aeneas

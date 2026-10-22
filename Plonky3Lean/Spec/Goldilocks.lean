@@ -6,13 +6,10 @@ import P3Goldilocks
 
 A Rust `Goldilocks` is one `u64`, not necessarily reduced.
 
-* `toField` reads the stored `u64` as an element of CompPoly's
-  `Goldilocks.Field` (`ZMod p`, `p = 2^64 - 2^32 + 1`).
-  Every `u64` stands for its residue mod `p`.
-  So the values `x` and `x + p`, for `x < 2^32 - 1`, stand for the same element.
-* `Canonical` says the stored `u64` is fully reduced, `< p`.
-  The Rust does not maintain it: no claim assumes it of an input.
-  Some operations promise it of their output (`as_canonical_u64`, `from_int`).
+* `toField` reads it as an element of CompPoly's `Goldilocks.Field`, `ZMod p` with `p = 2^64 - 2^32 + 1`.
+* Every `u64` stands for its residue, so `x` and `x + p` stand for the same element.
+* `Canonical` says the stored `u64` is below `p`.
+* No claim assumes `Canonical` of an input.
 -/
 
 open Aeneas Aeneas.Std
