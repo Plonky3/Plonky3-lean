@@ -1314,7 +1314,7 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.div_2exp_u64.panics"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
+axioms = ["Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.double.towerOf"
@@ -1326,7 +1326,7 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.halve.panics"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
+axioms = ["Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.mul_2exp_u64.towerOf"
