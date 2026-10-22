@@ -288,4 +288,55 @@ theorem hash_many_with_eq (input : Slice Std.U8) (out : Slice (Std.Array Std.U8 
   simp only [Aeneas.Std.uncurry_apply_pair]
   exact (bind_ok _ _).trans (ite_eq_right_of_eq_false _ _ (eq_false (by simp)))
 
+/-- Every digest of a batch of equal-length messages is that message's lane digest. -/
+theorem hash_many_eq (input : Slice Std.U8) (out : Slice (Std.Array Std.U8 32#usize)) (len : ℕ)
+    (hn : 0 < out.val.length) (hlen : input.val.length = out.val.length * len)
+    (h32 : input.val.length + 1024 < 2 ^ 32) (hn32 : out.val.length < 2 ^ 32) :
+    ∃ r, p3_blake3.hax_roots.hash_many input out = .ok r ∧
+      r.val = (List.range out.val.length).map (digestArr (sbytes input) len) := by
+  unfold p3_blake3.hax_roots.hash_many p3_blake3.Blake3.Insts.P3_symmetricHasherCryptographicHasherU8ArrayU832.hash_many
+  have hlv : (Slice.len out).val = out.val.length := by simp
+  have hli : (Slice.len input).val = input.val.length := by simp
+  have h0 : (Slice.len out).val ≠ 0 := by rw [hlv]; omega
+  have hne : ¬ Slice.len out = 0#usize := fun e => h0 (by rw [e]; rfl)
+  obtain ⟨m, hm, hmv⟩ := spec_imp_exists (UScalar.rem_spec (Slice.len input) h0)
+  have hm0 : m = 0#usize := UScalar.eq_of_val_eq (by
+    rw [hmv, hli, hlv, hlen]; simp)
+  obtain ⟨q, hq, hqv⟩ := UScalar.div_spec (Slice.len input) h0
+  have hql : q = usz len := eq_usz (by
+      rcases Nat.eq_zero_or_pos len with h | h
+      · omega
+      · nlinarith) (by rw [hqv, hli, hlv, hlen]; exact Nat.mul_div_cancel_left _ hn)
+  simp only [CoreModels.core.slice.Slice.is_empty, CoreModels.core.slice.Slice.len,
+    CoreModels.rust_primitives.slice.slice_length, bind_ok, hne, decide_false, ite_false,
+    CoreModels.core.num.Usize.is_multiple_of]
+  simp only [Bool.false_eq_true, ite_false, hm, bind_ok, hm0, decide_true, ite_true, hq, hql,
+    p3_blake3.batch.hash_many]
+  exact ⟨_, hash_many_with_eq input out len hlen h32 hn32, outsAt_full out _⟩
+
+/-- No digests requested: `out` comes back unchanged, whatever the input. -/
+theorem hash_many_empty (input : Slice Std.U8) (out : Slice (Std.Array Std.U8 32#usize)) (h : out.val = []) :
+    p3_blake3.hax_roots.hash_many input out = .ok out := by
+  unfold p3_blake3.hax_roots.hash_many p3_blake3.Blake3.Insts.P3_symmetricHasherCryptographicHasherU8ArrayU832.hash_many
+  have he : Slice.len out = 0#usize := UScalar.eq_of_val_eq (by simp [h])
+  simp only [CoreModels.core.slice.Slice.is_empty, CoreModels.core.slice.Slice.len,
+    CoreModels.rust_primitives.slice.slice_length, bind_ok, he, decide_true, ite_true]
+
+/-- An input whose length the digest count does not divide panics. -/
+theorem hash_many_ragged (input : Slice Std.U8) (out : Slice (Std.Array Std.U8 32#usize))
+    (hn : 0 < out.val.length) (h : input.val.length % out.val.length ≠ 0) :
+    p3_blake3.hax_roots.hash_many input out = .fail .panic := by
+  unfold p3_blake3.hax_roots.hash_many p3_blake3.Blake3.Insts.P3_symmetricHasherCryptographicHasherU8ArrayU832.hash_many
+  have hlv : (Slice.len out).val = out.val.length := by simp
+  have hli : (Slice.len input).val = input.val.length := by simp
+  have h0 : (Slice.len out).val ≠ 0 := by rw [hlv]; omega
+  have hne : ¬ Slice.len out = 0#usize := fun e => h0 (by rw [e]; rfl)
+  obtain ⟨m, hm, hmv⟩ := spec_imp_exists (UScalar.rem_spec (Slice.len input) h0)
+  have hm0 : ¬ m = 0#usize := fun e => h (by
+    have := congrArg UScalar.val e; rw [hmv, hli, hlv] at this; simpa using this)
+  simp only [CoreModels.core.slice.Slice.is_empty, CoreModels.core.slice.Slice.len,
+    CoreModels.rust_primitives.slice.slice_length, bind_ok, hne, decide_false, ite_false,
+    CoreModels.core.num.Usize.is_multiple_of, Bool.false_eq_true, hm, hm0,
+    CoreModels.core.fmt.rt.Argument.new_display, CoreModels.core.fmt.Arguments.new]
+
 end Plonky3Lean.Proofs.Blake3
