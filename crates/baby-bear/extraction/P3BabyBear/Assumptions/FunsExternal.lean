@@ -33,7 +33,8 @@ open p3_baby_bear
 
 /-- [p3_baby_bear::baby_bear::{impl core::fmt::Debug for p3_baby_bear::baby_bear::BabyBearParameters}::fmt]:
     Source: 'baby-bear/src/baby_bear.rs', lines 11:31-11:36
-    Visibility: public -/
+    Visibility: public
+    Assumed: `Debug` bodies are opaque by `charon_args` (toolchain.toml). -/
 opaque baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt
   :
   baby_bear.BabyBearParameters → core.fmt.Formatter → RustM
@@ -41,7 +42,8 @@ opaque baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt
 
 /-- [p3_baby_bear::mds::{impl core::fmt::Debug for p3_baby_bear::mds::MDSBabyBearData}::fmt]:
     Source: 'baby-bear/src/mds.rs', lines 12:25-12:30
-    Visibility: public -/
+    Visibility: public
+    Assumed: `Debug` bodies are opaque by `charon_args` (toolchain.toml). -/
 opaque mds.MDSBabyBearData.Insts.CoreFmtDebug.fmt
   :
   mds.MDSBabyBearData → core.fmt.Formatter → RustM ((core.result.Result
@@ -49,7 +51,8 @@ opaque mds.MDSBabyBearData.Insts.CoreFmtDebug.fmt
 
 /-- [p3_baby_bear::poseidon1::{impl core::fmt::Debug for p3_baby_bear::poseidon1::BabyBearPoseidonParameters}::fmt]:
     Source: 'baby-bear/src/poseidon1.rs', lines 93:9-93:14
-    Visibility: public -/
+    Visibility: public
+    Assumed: `Debug` bodies are opaque by `charon_args` (toolchain.toml). -/
 opaque poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt
   :
   poseidon1.BabyBearPoseidonParameters → core.fmt.Formatter → RustM
@@ -57,7 +60,8 @@ opaque poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt
 
 /-- [p3_baby_bear::poseidon2::{impl core::fmt::Debug for p3_baby_bear::poseidon2::BabyBearInternalLayerParameters}::fmt]:
     Source: 'baby-bear/src/poseidon2.rs', lines 392:9-392:14
-    Visibility: public -/
+    Visibility: public
+    Assumed: `Debug` bodies are opaque by `charon_args` (toolchain.toml). -/
 opaque poseidon2.BabyBearInternalLayerParameters.Insts.CoreFmtDebug.fmt
   :
   poseidon2.BabyBearInternalLayerParameters → core.fmt.Formatter → RustM

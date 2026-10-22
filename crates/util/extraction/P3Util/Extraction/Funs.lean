@@ -3,6 +3,7 @@
 import Aeneas
 import CoreModels
 import P3Util.Extraction.Types
+import P3Util.Extraction.FunsExternal
 open CoreModels Aeneas
 open Aeneas.Std hiding namespace core alloc
 open RustM ControlFlow Error
@@ -20,7 +21,74 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace p3_util
+
+/-- [p3_util::gcd_inner]: loop body 0:
+    Source: 'util/src/lib.rs', lines 767:4-785:5
+    Visibility: public -/
+@[rust_loop_body]
+def gcd_inner_loop.body
+  (NUM_ROUNDS : Std.Usize) (a : Std.U64) (b : Std.U64) (f0 : Std.I64)
+  (g0 : Std.I64) (f1 : Std.I64) (g1 : Std.I64) (round : Std.Usize) :
+  RustM (ControlFlow (Std.U64 × Std.U64 × Std.I64 × Std.I64 × Std.I64 ×
+    Std.I64 × Std.Usize) (Std.U64 × Std.U64 × Std.I64 × Std.I64 × Std.I64
+    × Std.I64))
+  := do
+  if round < NUM_ROUNDS
+  then
+    let i ← lift (a &&& 1#u64)
+    let (a1, b1, f01, g01, f11, g11) ←
+      if i = 0#u64
+      then do
+           let a2 ← a >>> 1#i32
+           ok (a2, b, f0, g0, f1, g1)
+      else
+        do
+        let (a2, b2, f02, g02, f12, g12) ←
+          if a < b
+          then
+            do
+            let (a3, b3) ← core.mem.swap a b
+            ok (a3, b3, f1, g1, f0, g0)
+          else ok (a, b, f0, g0, f1, g1)
+        let a3 ← a2 - b2
+        let a4 ← a3 >>> 1#i32
+        let f03 ← f02 - f12
+        let g03 ← g02 - g12
+        ok (a4, b2, f03, g03, f12, g12)
+    let f12 ← f11 <<< 1#i32
+    let g12 ← g11 <<< 1#i32
+    let round1 ← round + 1#usize
+    ok (cont (a1, b1, f01, g01, f12, g12, round1))
+  else ok (done (a, b, f0, g0, f1, g1))
+
+/-- [p3_util::gcd_inner]: loop 0:
+    Source: 'util/src/lib.rs', lines 767:4-785:5
+    Visibility: public -/
+@[rust_loop]
+def gcd_inner_loop
+  (NUM_ROUNDS : Std.Usize) (a : Std.U64) (b : Std.U64) (f0 : Std.I64)
+  (g0 : Std.I64) (f1 : Std.I64) (g1 : Std.I64) (round : Std.Usize) :
+  RustM (Std.U64 × Std.U64 × Std.I64 × Std.I64 × Std.I64 × Std.I64)
+  := do
+  loop
+    (fun (a1, b1, f01, g01, f11, g11, round1) => gcd_inner_loop.body NUM_ROUNDS
+      a1 b1 f01 g01 f11 g11 round1)
+    (a, b, f0, g0, f1, g1, round)
+
+/-- [p3_util::gcd_inner]:
+    Source: 'util/src/lib.rs', lines 758:0-792:1
+    Visibility: public -/
+def gcd_inner
+  (NUM_ROUNDS : Std.Usize) (a : Std.U64) (b : Std.U64) :
+  RustM ((Std.I64 × Std.I64 × Std.I64 × Std.I64) × Std.U64 × Std.U64)
+  := do
+  let (a1, b1, f0, g0, f1, g1) ←
+    gcd_inner_loop NUM_ROUNDS a b 1#i64 0#i64 0#i64 1#i64 0#usize
+  ok ((f0, g0, f1, g1), a1, b1)
 
 /-- [p3_util::gcd_inversion_prime_field_32]: loop body 0:
     Source: 'util/src/lib.rs', lines 823:4-861:5

@@ -1,0 +1,15 @@
+# Mutation of: 020-field-cfg-raw-data-serializable-supertrait
+# Breaks:      the normal-build `FieldRawData` loses its `RawDataSerializable` supertrait.
+#
+diff --git a/field/src/field.rs b/field/src/field.rs
+--- a/field/src/field.rs
++++ b/field/src/field.rs
+@@ -1043,7 +1043,7 @@
+ /// `RawDataSerializable`'s `-> impl IntoIterator` methods (hidden GATs, which
+ /// aeneas cannot translate) out of everything that mentions `Field`.
+ #[cfg(not(hax_backend_lean))]
+-pub trait FieldRawData: RawDataSerializable {}
++pub trait FieldRawData {}
+ #[cfg(not(hax_backend_lean))]
+ impl<T: RawDataSerializable> FieldRawData for T {}
+ /// See the normal-build definition.

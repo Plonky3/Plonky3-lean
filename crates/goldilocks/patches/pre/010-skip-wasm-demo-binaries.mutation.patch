@@ -1,0 +1,14 @@
+# Mutation of: 010-skip-wasm-demo-binaries
+# Breaks:      the manifest also drops the library, so the library tests are gone.
+#
+diff --git a/goldilocks/Cargo.toml b/goldilocks/Cargo.toml
+--- a/goldilocks/Cargo.toml
++++ b/goldilocks/Cargo.toml
+@@ -10,6 +10,7 @@
+ categories.workspace = true
+ # PATCHED: the wasm32 demo binaries in src/bin need std, which the extraction target lacks.
+ autobins = false
++autolib = false
+ 
+ # criterion pulls rayon transitively and rayon does not build on wasi.
+ [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]

@@ -1,0 +1,15 @@
+# Mutation of: 040-field-cfg-rpitit-bit-plane-expansion
+# Breaks:      `prepare_bit_plane_expansion` is gated on the wrong cfg, so the normal build lacks it.
+#
+diff --git a/field/src/field.rs b/field/src/field.rs
+--- a/field/src/field.rs
++++ b/field/src/field.rs
+@@ -1098,7 +1098,7 @@
+     /// For lane `l`, the prepared operation appends the sum of `weights[c]` for every corner
+     /// `c` whose word has bit `l` set. Unsupported fields and targets return `None` so callers
+     /// retain their portable path.
+-    #[cfg(not(hax_backend_lean))] // PATCHED: `-> Option<impl Fn>`, a hidden GAT for aeneas
++    #[cfg(hax_backend_lean)] // PATCHED: `-> Option<impl Fn>`, a hidden GAT for aeneas
+     #[must_use]
+     fn prepare_bit_plane_expansion(
+         weights: &[Self; 64],

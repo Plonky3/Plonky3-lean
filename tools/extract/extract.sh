@@ -14,7 +14,9 @@
 #      agree with what hax resolves
 #   1. check the patch conventions (check-patches.sh)
 #   2. run upstream's tests with and without the pre-extraction patches, and
-#      record every difference in the patch headers (test-pre-patches.py)
+#      record every difference in the patch headers (test-pre-patches.py);
+#      then show that each pre-patch's own tests pass, and fail under its
+#      recorded mutation (check-mutations.py)
 #   3. apply every crates/*/patches/pre/ patch to plonky3/, and `cargo check`
 #      each extracted crate in the variant charon sees
 #   4. run `cargo hax into lean` over each crate whose state is `extracted`
@@ -22,7 +24,8 @@
 #   5. revert the pre-extraction patches (unconditionally, even on failure)
 #   6. check each hand-written `Assumptions/*External.lean` against the template
 #      aeneas regenerated, install the output into crates/<crate>/extraction/,
-#      and snapshot it as the pristine baseline for post-extraction patches
+#      snapshot it as the pristine baseline for post-extraction patches, and
+#      write crates/<crate>/extraction/gaps.toml (gap-report.py)
 #   7. apply each crate's patches/post/ patches
 #   8. `lake build`, which must be warning-free
 #
@@ -214,6 +217,8 @@ echo "==> 1/8 checking patch conventions"
 
 echo "==> 2/8 upstream tests, with and without the pre-extraction patches"
 "$HERE/test-pre-patches.py"
+echo "    -- each pre-patch's tests, and its recorded mutation"
+"$HERE/check-mutations.py"
 
 echo "==> 3/8 pre-extraction patches (plonky3/) and cargo check ($HAX_TARGET, $EXTRACT_RUSTFLAGS)"
 "$CONFIG" pre-patches > "$PRE_LIST"
@@ -255,8 +260,11 @@ printf '%s\n' "$CRATES" | while IFS='|' read -r crate lib state; do
     out="$WORK/out/$crate"
     mkdir -p "$out"
     args="$("$CONFIG" charon-args "$crate")"
+    # hax's output also goes to a per-crate log, which gap-report.py reads for
+    # charon's diagnostics.
     (cd "$RUST/$crate" && RUSTFLAGS="$EXTRACT_RUSTFLAGS" CARGO_TARGET_DIR="$WORK/target-hax" \
-        "$HAX_BIN" hax into --output-dir "$out" lean --charon-args="$args")
+        "$HAX_BIN" hax into --output-dir "$out" lean --charon-args="$args" 2>&1 \
+        | tee "$WORK/hax-$crate.log"; exit "${PIPESTATUS[0]}")
 done
 
 # Revert now, before the Lean build, so the rest of the run sees a clean tree.
@@ -311,6 +319,9 @@ while IFS='|' read -r crate lib state; do
     cp "$WORK/out/$crate/$lib/Extraction"/*.lean "$dest/Extraction/"
     cp "$WORK/out/$crate/$lib/Extraction.lean" "$dest/Extraction.lean"
     cp "$dest/Extraction"/*.lean "$PRISTINE/$crate/extraction/$lib/Extraction/"
+    # What charon translated but aeneas did not emit; read by tools/status.py.
+    "$HERE/gap-report.py" "$ROOT/crates/$crate" "$WORK/out/$crate/llbc/"*.llbc \
+        "$WORK/hax-$crate.log" > "$ROOT/crates/$crate/extraction/gaps.toml"
 done <<< "$CRATES"
 echo "    ok; pristine output in ${PRISTINE#"$ROOT"/}/"
 
@@ -351,9 +362,12 @@ echo "    0 warnings; generated code contains $n_sorry 'sorry'; hand-written cod
 
 if [ "$CHECK" = "1" ]; then
     echo "==> check: re-extraction is byte-identical to the committed output"
-    if ! (cd "$ROOT" && git diff --quiet -- crates/'*'/extraction \
-            && [ -z "$(git ls-files --others --exclude-standard -- crates/'*'/extraction)" ]); then
-        (cd "$ROOT" && git status --short -- crates/'*'/extraction) >&2
+    # A glob pathspec: a plain `crates/*/extraction` matches only a path equal to
+    # it, never the files under it, and so would compare nothing.
+    spec=':(glob)crates/*/extraction/**'
+    if ! (cd "$ROOT" && git diff --quiet -- "$spec" \
+            && [ -z "$(git ls-files --others --exclude-standard -- "$spec")" ]); then
+        (cd "$ROOT" && git status --short -- "$spec") >&2
         echo "error: re-extraction changed the committed output above." >&2
         exit 1
     fi

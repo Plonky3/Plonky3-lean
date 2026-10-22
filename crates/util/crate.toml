@@ -1,14 +1,29 @@
-# p3-util: shared helpers. The prime fields use its GCD-based inversion.
+# p3-util: shared helpers.
+#
+# The prime fields invert through its binary GCD.
 
 lean_lib = "P3Util"
 
-# Only the inversion is extracted. The rest of the crate is unsafe transposes
-# and iterator helpers that no field claim needs.
+# Only the inversions are extracted.
+#
+# The rest is transposes and iterator helpers, which no field claim needs.
+#
+# `branch_hint` holds an inline `asm!`, which aeneas rejects.
+# It is transcribed in extraction/P3Util/Assumptions/Mirror.lean.
 state = "scoped"
 
 features = []
 
-# `MontyField31::try_inverse` calls the inversion with `FIELD_BITS = 31`.
-start_from = ["p3_util::gcd_inversion_prime_field_32"]
+# Monty31 inversion calls the 32-bit routine with 31-bit fields.
+#
+# Goldilocks inversion calls `gcd_inner` twice.
+start_from = ["p3_util::gcd_inversion_prime_field_32", "p3_util::gcd_inner"]
 
 watch = ["util/src", "util/Cargo.toml"]
+
+# The transcription in extraction/P3Util/Assumptions/Mirror.lean. Hashes are
+# pending tools/mirror; until it exists, the transcription is re-read by hand
+# when a commit in `watch` touches it.
+[[mirror]]
+lean = "p3_util.branch_hint"
+rust = "p3_util::branch_hint"

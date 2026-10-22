@@ -1,4 +1,5 @@
 import Plonky3Lean.Lib.Scalar
+import Plonky3Lean.Lib.Scalar.U64
 import HaxExt
 
 /-!
@@ -6,7 +7,7 @@ import HaxExt
 
 Specifications of the `core::num` methods on signed integers, and of the casts between signed and unsigned integers, that the field crates call.
 
-The `HaxExt` models (`wrapping_add_signed`, `unsigned_abs`) are specified here too.
+The `HaxExt` models `Ord::min`, `bool::then` and `i64::unsigned_abs` are specified here too.
 -/
 
 open Aeneas Aeneas.Std CoreModels
@@ -79,20 +80,6 @@ theorem core.num.U32.wrapping_sub.spec (x y : Std.U32) :
   rw [UScalarTy.U32_numBits_eq] at this
   congr 1; omega
 
-/-- `x.wrapping_add_signed(y)`: `x + y` modulo `2^32`. -/
-@[step]
-theorem core.num.U32.wrapping_add_signed.spec (x : Std.U32) (y : Std.I32) :
-    CoreModels.core.num.U32.wrapping_add_signed x y ⦃ r =>
-      (r.val : Int) = ((x.val : Int) + y.val) % 2 ^ 32 ⦄ := by
-  unfold CoreModels.core.num.U32.wrapping_add_signed
-  simp only [lift, bind_tc_ok, CoreModels.core.num.U32.wrapping_add,
-    CoreModels.rust_primitives.arithmetic.wrapping_add_u32, WP.spec_ok,
-    U32.wrapping_add_val_eq, size_u32, IScalar.hcast_val_eq, UScalarTy.U32_numBits_eq]
-  have := y.hBounds
-  push_cast
-  rw [Int.toNat_of_nonneg (Int.emod_nonneg _ (by norm_num))]
-  omega
-
 /-- `i64::unsigned_abs`: the magnitude. -/
 @[step]
 theorem core.num.I64.unsigned_abs.spec (x : Std.I64) :
@@ -100,15 +87,6 @@ theorem core.num.I64.unsigned_abs.spec (x : Std.I64) :
   simp only [CoreModels.core.num.I64.unsigned_abs, WP.spec_ok, UScalar.val, BitVec.toNat_ofNat]
   have := x.hBounds
   simp only [IScalarTy.I64_numBits_eq, UScalarTy.U64_numBits_eq] at *
-  exact Nat.mod_eq_of_lt (by omega)
-
-/-- `i128::unsigned_abs`: the magnitude. -/
-@[step]
-theorem core.num.I128.unsigned_abs.spec (x : Std.I128) :
-    CoreModels.core.num.I128.unsigned_abs x ⦃ r => r.val = x.val.natAbs ⦄ := by
-  simp only [CoreModels.core.num.I128.unsigned_abs, WP.spec_ok, UScalar.val, BitVec.toNat_ofNat]
-  have := x.hBounds
-  simp only [IScalarTy.I128_numBits_eq, UScalarTy.U128_numBits_eq] at *
   exact Nat.mod_eq_of_lt (by omega)
 
 /-! ## Conversions and comparisons -/

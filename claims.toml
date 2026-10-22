@@ -287,3 +287,623 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 [[claim]]
 name   = "Plonky3Lean.Claims.BabyBear.p3_monty_31.utils.sub.spec"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Util.gcd_inversion_prime_field_32.cong"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Util.gcd_inversion_prime_field_32.inverse"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Util.gcd_inversion_prime_field_32.never_panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Util.gcd_inversion_prime_field_32.one"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Util.gcd_inversion_prime_field_32.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Util.gcd_inversion_prime_field_32.pos_inverse"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Util.gcd_inversion_prime_field_32.pos_inverse_small_prime"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Util.gcd_inversion_prime_field_32.wrong_of_large_a"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Util.gcd_inversion_prime_field_32.zero"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.utils.monty_reduce.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.utils.large_monty_reduce.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.utils.monty_reduce_u128.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.utils.from_monty.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.utils.add.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.utils.sub.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.utils.halve_u32.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.utils.to_monty.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.utils.to_monty_64.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.utils.to_monty_signed.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.utils.to_monty_64_signed.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.monty_31.MontyField31.new.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.monty_31.MontyField31.mul.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.monty_31.MontyField31.mul_2exp_u64.spec_lt"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.monty_31.MontyField31.try_inverse.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.thirty_bit_prime.valid"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.thirty_bit_prime.low_limb_out_of_range"
+axioms = ["propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.valid"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.fieldValid"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.fieldDefaults"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBear.try_inverse.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.QuotientMap.from_int_i32"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.QuotientMap.from_int_u64"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.QuotientMap.from_int_i64"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.QuotientMap.from_int_u128"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.QuotientMap.from_int_i128"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.QuotientMap.from_canonical_checked_u32"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.QuotientMap.from_canonical_checked_i32"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.QuotientMap.from_canonical_checked_u64"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.QuotientMap.from_canonical_checked_u128"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.QuotientMap.from_canonical_checked_i64"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Monty31.QuotientMap.from_canonical_checked_i128"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBear.add.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBear.from_monty.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBear.halve.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBear.mul.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBear.neg.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBear.new.montgomery_form"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBear.new.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBear.new_2d_array.never_panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBear.new_2d_array.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBear.new_array.never_panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBear.new_array.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBear.sub.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBear.try_inverse.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.DTH_ROOT.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.EXT_GENERATOR.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.EXT_TWO_ADICITY.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.eq_ext4TwoAdicGenerators"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.sq_succ"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.W.irreducible"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.DTH_ROOT.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.EXT_GENERATOR.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.EXT_TWO_ADICITY.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.eq_ext8TwoAdicGenerators"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.sq_succ"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.W.irreducible"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.HALF_P_PLUS_1.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.INV_ROOTS_16.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.INV_ROOTS_8.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.MONTY_BITS.from_instance"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.MONTY_BITS.val_eq_32"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.MONTY_GEN.generator"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.MONTY_MU.from_instance"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.MONTY_MU.inverse"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.MONTY_NEG_ONE.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.MONTY_ONE.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.MONTY_TWO.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.MONTY_ZERO.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.ODD_FACTOR.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.PRIME.coprime_three_pred"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.PRIME.eq_fieldSize"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.PRIME.from_instance"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.PRIME.is_prime"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.ROOTS_16.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.ROOTS_8.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.eq_twoAdicity"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.factorization"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.from_instance"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.maximal"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.TWO_ADIC_GENERATORS.eq_twoAdicGenerators"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.TWO_ADIC_GENERATORS.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.TWO_ADIC_GENERATORS.sq_succ"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.TrinomialQuinticData.EXT_GENERATOR.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.TrinomialQuinticData.EXT_TWO_ADICITY.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.TrinomialQuinticData.FROBENIUS_COEFFS.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.TrinomialQuinticData.irreducible"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.exp_root_d.exponent"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.fieldDefaults"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.fieldValid"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.koala_bear.KoalaBearParameters.valid"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.p3_monty_31.utils.add.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.p3_monty_31.utils.from_monty.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.p3_monty_31.utils.halve_u32.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.p3_monty_31.utils.monty_reduce.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.p3_monty_31.utils.sub.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.p3_monty_31.utils.to_monty.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.poseidon1._.holds"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.poseidon1.const_check_1.holds"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.poseidon2._.holds"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.poseidon2.const_check_1.holds"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.poseidon2.const_check_2.holds"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.poseidon2.const_check_3.holds"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.poseidon2.const_check_4.holds"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.poseidon2.const_check_5.holds"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.poseidon2.const_check_6.holds"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.poseidon2.const_check_7.holds"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KoalaBear.poseidon2.const_check_8.holds"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.GENERATOR.generates"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.NEG_ONE.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.ORDER_U64.eq_fieldSize"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.POWERS_OF_TWO.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.TWO_ADIC_GENERATORS.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.add.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.as_canonical_u64.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.cmp.canonical"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.div_2exp_u64.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.dot_product.const_check_truncates"
+axioms = ["propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.dot_product.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.eq.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.from_canonical_checked_i128.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.from_canonical_checked_i64.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.from_canonical_checked_u128.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.from_canonical_checked_u64.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.from_canonical_unchecked_i128.doc_range_counterexample"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.from_canonical_unchecked_i128.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.from_canonical_unchecked_i64.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.from_canonical_unchecked_u128.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.from_int_i128.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.from_int_i64.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.from_int_u128.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.from_int_u64.value"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.halve.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.is_zero.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.mul.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.mul_2exp_u64.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.neg.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.sub.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.sum.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.sum_array.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.try_inverse.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.two_adic_generator.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.Goldilocks.two_adic_generator.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.reduce128.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]

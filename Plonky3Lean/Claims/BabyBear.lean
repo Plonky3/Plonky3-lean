@@ -4,6 +4,7 @@ import Plonky3Lean.Proofs.Field.BabyBear.Arith
 import Plonky3Lean.Proofs.Field.BabyBear.Constants
 import Plonky3Lean.Proofs.Field.BabyBear.Element
 import Plonky3Lean.Proofs.Field.BabyBear.Extension
+import Plonky3Lean.Proofs.Field.BabyBear.Generic
 import ToCompPoly.Fields.BabyBear.Extension
 
 /-!
@@ -17,8 +18,8 @@ CompPoly's specification of the field, extended by `ToCompPoly` with what is
 staged for CompPoly but not yet upstream (the binomial extensions, the
 multiplicative generator).
 
-Not claimed: the scalar arithmetic that does not go through the five claimed
-operators, which is inversion, exponentiation, the other
+Not claimed: the scalar arithmetic that does not go through the claimed
+operators and inversion, which is exponentiation, the other
 `PrimeCharacteristicRing` methods BabyBear overrides (`mul_2exp_u64` and
 `div_2exp_u64` with their `MONTY_POWERS_OF_TWO` table, `sum_array`,
 `dot_product`), `Sum::sum`, the integer conversions (`QuotientMap`'s
@@ -667,5 +668,40 @@ width-32 internal round constants, `BABYBEAR_POSEIDON2_RC_32_INTERNAL`, number
 `PARTIAL_ROUNDS_32 = 30`, one per partial round. -/
 theorem poseidon2.const_check_8.holds : poseidon2.const_check_8 ⦃ _ => True ⦄ :=
   Proofs.BabyBear.poseidon2.const_check_8.holds
+
+/-! ## The generic Monty31 claims apply
+
+`Plonky3Lean.Claims.Monty31` holds for every parameter set that passes `MontyField31::new`'s checks.
+
+These three claims say BabyBear's do, so every claim there applies at BabyBear. -/
+
+/-- BabyBear's `MontyParameters` pass every check of `MontyField31::new`. -/
+theorem baby_bear.BabyBearParameters.valid :
+    Plonky3Lean.Spec.Monty31.Valid MontyParams 2013265921#u32 2281701377#u32 :=
+  Proofs.BabyBear.valid
+
+/-- BabyBear's `FieldParameters` keep `HALF_P_PLUS_1` at its default `(p + 1) / 2`. -/
+theorem baby_bear.BabyBearParameters.fieldValid :
+    Plonky3Lean.Spec.Monty31.FieldValid FieldParams 2013265921#u32 2281701377#u32 :=
+  Proofs.BabyBear.fieldValid
+
+/-- BabyBear's `FieldParameters` keep `MONTY_ZERO`, `MONTY_ONE` and `MONTY_TWO` at their defaults. -/
+theorem baby_bear.BabyBearParameters.fieldDefaults :
+    Plonky3Lean.Spec.Monty31.FieldDefaults FieldParams :=
+  Proofs.BabyBear.fieldDefaults
+
+/-! ## Inversion -/
+
+/-- `try_inverse(a)` of a canonical BabyBear element: `None` for zero, and otherwise the inverse.
+
+The inverse is stored canonically, and its product with `a` is `1` in the field.
+
+BabyBear's prime is above `2^30`, which the generic inversion claim needs. -/
+theorem baby_bear.BabyBear.try_inverse.toField (a : Element) (ha : Canonical a) :
+    p3_monty_31.monty_31.MontyField31.try_inverse FieldParams a ⦃ r =>
+      (Spec.BabyBear.toField a = 0 → r = none) ∧
+      (Spec.BabyBear.toField a ≠ 0 → ∃ c, r = some c ∧ Canonical c ∧
+        Spec.BabyBear.toField c * Spec.BabyBear.toField a = 1) ⦄ :=
+  Proofs.BabyBear.baby_bear.BabyBear.try_inverse.toField a ha
 
 end Plonky3Lean.Claims.BabyBear
