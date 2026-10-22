@@ -17,7 +17,7 @@ target `thumbv7em-none-eabi`
 | `baby-bear` | extracted | 2949 | 103 | 4 | 0 | 4 / 3 | pre `020`, `030`, `040` |
 | `field` | stub | | 67 | 1 | 5 | 0 / 0 | |
 | `mds` | scoped | 91 | 8 | 0 | 0 | 0 / 0 | |
-| `monty-31` | scoped | 479 | 212 | 0 | 10 | 0 / 1 | |
+| `monty-31` | scoped | 556 | 277 | 0 | 17 | 0 / 1 | |
 | `poseidon1` | stub | | 67 | 3 | 4 | 0 / 0 | |
 | `poseidon2` | stub | | 64 | 2 | 4 | 0 / 0 | |
 
@@ -31,7 +31,7 @@ Every `opaque` constant, all hand-written. An opaque constant is not an axiom:
 it adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about
 code that mentions one would go through for any value of it. Two of these are
 in the dependencies of a claim. `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt`:
-48 of the 57 claims reach it as the `Debug` supertrait field of the
+59 of the 68 claims reach it as the `Debug` supertrait field of the
 `MontyParameters` instance, which every claim reading a constant through
 `FieldParams`, `TwoAdicParams` or `Ext*Params` goes through. No proof uses it.
 `p3_field.exponentiation.exp_1725656503`: `exp_root_d.exponent` states that
@@ -47,6 +47,47 @@ in the dependencies of a claim. `baby_bear.BabyBearParameters.Insts.CoreFmtDebug
 | `poseidon1` | `p3_poseidon1.external.FullRoundConstants`, `p3_poseidon1.internal.PartialRoundConstants` (types) | p3-poseidon1 is a stub |
 | `poseidon1` | `p3_poseidon1.Poseidon1.new` | the same |
 | `poseidon2` | `p3_poseidon2.external.ExternalLayerConstants.new`, `p3_poseidon2.Poseidon2.new` | p3-poseidon2 is a stub |
+
+## Transcriptions
+
+Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a
+Rust item. A claim that reaches one is only as faithful as the transcription,
+which is re-read by hand when upstream changes it until `tools/mirror` hashes
+the Rust item. `neg` has two entries, since it also transcribes `ZERO`. The last
+column counts the claims (of 68) whose dependencies include the declaration.
+
+| Crate | Lean | Rust | Claims |
+|---|---|---|---:|
+| `field` | `p3_field.dup.Dup` | `p3_field::dup::Dup` | 0 |
+| `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | 1 |
+| `field` | `p3_field.field.Field` | `p3_field::field::Field` | 0 |
+| `field` | `p3_field.field.PrimeField` | `p3_field::field::PrimeField` | 0 |
+| `field` | `p3_field.field.UniformSamplingField` | `p3_field::field::UniformSamplingField` | 0 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_array` | `p3_monty_31::monty_31::MontyField31::new_array` | 37 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_2d_array` | `p3_monty_31::monty_31::MontyField31::new_2d_array` | 20 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_monty` | `p3_monty_31::monty_31::MontyField31::new_monty` | 5 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.add` | `{impl core::ops::arith::Add for p3_monty_31::monty_31::MontyField31<_>}::add` | 1 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.sub` | `{impl core::ops::arith::Sub for p3_monty_31::monty_31::MontyField31<_>}::sub` | 2 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.mul` | `{impl core::ops::arith::Mul for p3_monty_31::monty_31::MontyField31<_>}::mul` | 1 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.neg` | `{impl core::ops::arith::Neg for p3_monty_31::monty_31::MontyField31<_>}::neg` | 1 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.neg` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::ZERO` | 1 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.halve` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::halve` | 1 |
+| `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1InternalLayerMonty31` | `p3_monty_31::no_packing::poseidon1::Poseidon1InternalLayerMonty31` | 0 |
+| `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1ExternalLayerMonty31` | `p3_monty_31::no_packing::poseidon1::Poseidon1ExternalLayerMonty31` | 0 |
+| `monty-31` | `p3_monty_31.no_packing.poseidon2.Poseidon2InternalLayerMonty31` | `p3_monty_31::no_packing::poseidon2::Poseidon2InternalLayerMonty31` | 0 |
+| `monty-31` | `p3_monty_31.no_packing.poseidon2.Poseidon2ExternalLayerMonty31` | `p3_monty_31::no_packing::poseidon2::Poseidon2ExternalLayerMonty31` | 0 |
+| `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1InternalLayerMonty31.Insts.P3_poseidon1InternalPartialRoundLayerConstructorMontyField31WIDTH` | `{impl p3_poseidon1::internal::PartialRoundLayerConstructor for p3_monty_31::no_packing::poseidon1::Poseidon1InternalLayerMonty31}` | 0 |
+| `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1ExternalLayerMonty31.Insts.P3_poseidon1ExternalFullRoundLayerConstructorMontyField31WIDTH` | `{impl p3_poseidon1::external::FullRoundLayerConstructor for p3_monty_31::no_packing::poseidon1::Poseidon1ExternalLayerMonty31}` | 0 |
+| `monty-31` | `p3_monty_31.no_packing.poseidon2.Poseidon2InternalLayerMonty31.Insts.P3_poseidon2InternalInternalLayerConstructorMontyField31` | `{impl p3_poseidon2::internal::InternalLayerConstructor for p3_monty_31::no_packing::poseidon2::Poseidon2InternalLayerMonty31}` | 0 |
+| `monty-31` | `p3_monty_31.no_packing.poseidon2.Poseidon2ExternalLayerMonty31.Insts.P3_poseidon2ExternalExternalLayerConstructorMontyField31WIDTH` | `{impl p3_poseidon2::external::ExternalLayerConstructor for p3_monty_31::no_packing::poseidon2::Poseidon2ExternalLayerMonty31}` | 0 |
+| `poseidon1` | `p3_poseidon1.external.FullRoundLayerConstructor` | `p3_poseidon1::external::FullRoundLayerConstructor` | 0 |
+| `poseidon1` | `p3_poseidon1.internal.PartialRoundLayerConstructor` | `p3_poseidon1::internal::PartialRoundLayerConstructor` | 0 |
+| `poseidon1` | `p3_poseidon1.Poseidon1Constants` | `p3_poseidon1::Poseidon1Constants` | 0 |
+| `poseidon1` | `p3_poseidon1.Poseidon1` | `p3_poseidon1::Poseidon1` | 0 |
+| `poseidon2` | `p3_poseidon2.external.ExternalLayerConstants` | `p3_poseidon2::external::ExternalLayerConstants` | 0 |
+| `poseidon2` | `p3_poseidon2.external.ExternalLayerConstructor` | `p3_poseidon2::external::ExternalLayerConstructor` | 0 |
+| `poseidon2` | `p3_poseidon2.internal.InternalLayerConstructor` | `p3_poseidon2::internal::InternalLayerConstructor` | 0 |
+| `poseidon2` | `p3_poseidon2.Poseidon2` | `p3_poseidon2::Poseidon2` | 0 |
 
 ## Patches with a cost
 
@@ -123,6 +164,17 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.from_monty.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.halve.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.mul.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.neg.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBear.sub.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.p3_monty_31.utils.add.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.p3_monty_31.utils.from_monty.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.p3_monty_31.utils.halve_u32.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.p3_monty_31.utils.monty_reduce.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.p3_monty_31.utils.sub.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 
 ## Upstream warnings
 

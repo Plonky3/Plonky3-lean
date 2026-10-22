@@ -20,9 +20,22 @@ one of them is still present.
    `N.default (Self : Type) : Usize` in p3-monty-31's run is called as
    `N.default <inst> : RustM Usize` from p3-baby-bear's. Post-patch
    `baby-bear/020-trait-default-constant-shape`.
-4. **aeneas silently drops `MontyField31::new_array` and `new_2d_array`.** They
-   are in the LLBC with bodies, and no diagnostic is printed. Transcribed by
-   hand in `crates/monty-31/extraction/P3Monty31/Assumptions/Mirror.lean`.
+4. **charon leaves some translated methods out of `ordered_decls`**, so aeneas,
+   which emits only what that list orders, silently drops them. Affected:
+   `MontyField31::new_array`, `new_2d_array` and `new_monty`, and the `add`
+   method of `impl Add for MontyField31` (and with it `Sub`, `Mul`, `Neg`),
+   even when each is a `--start-from` root. All are in the LLBC's `fun_decls`
+   with bodies; free functions such as `utils::add` are ordered and extracted.
+   It happens with and without `--targets`, so it is not 2. No diagnostic is
+   printed. Transcribed by hand in
+   `crates/monty-31/extraction/P3Monty31/Assumptions/Mirror.lean`.
+   `PrimeCharacteristicRing::halve` fails earlier. The trait provides a
+   default body that MontyField31 overrides, and charon skips provided methods
+   that nothing uses, even when one is a `--start-from` root (the pattern
+   matches, and no diagnostic is printed). With `--translate-all-methods` it
+   reaches `fun_decls` with its body and is left out of `ordered_decls` like
+   the others, but that flag also pulls in p3-field's trait hierarchy, which
+   aeneas rejects (9). It is transcribed in the same file.
 5. **aeneas's `__N` names for anonymous consts** trip mathlib's `nameCheck`
    linter. Post-patch `baby-bear/030-name-anonymous-const-assertions`.
 6. **The seeded `Debug::fmt` signatures do not match `CoreModels`**: aeneas
