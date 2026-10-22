@@ -2,8 +2,10 @@
 
 Everything that, if wrong, could make a claim in `Plonky3Lean.Claims` false
 without a Lean error. The layers below are shared by every crate. The per-crate
-ones, each stub's `opaque` declarations and transcriptions and each crate's
-patches, are listed in the generated [`STATUS.md`](STATUS.md).
+ones, each crate's `opaque` declarations, its transcriptions (`[[mirror]]`
+entries, in stubs and alongside scoped extractions) and its patches, are listed
+in the generated [`STATUS.md`](STATUS.md), with the number of claims that rest
+on each transcription.
 
 ## 1. The Lean kernel and toolchain
 
