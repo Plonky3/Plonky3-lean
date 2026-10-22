@@ -2,7 +2,7 @@ module
 
 public import Plonky3Lean.Proofs.Field.Binary.Aes
 public import Plonky3Lean.Proofs.Field.Binary.Operators
-public import Plonky3Lean.Proofs.Field.Binary.TowerSquare
+public import Plonky3Lean.Proofs.Field.Binary.TowerInverse
 
 @[expose] public section
 
@@ -474,5 +474,74 @@ theorem tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.square.t
     tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.square a ⦃ r =>
       towerOf 7 r = towerOf 7 a * towerOf 7 a ⦄ :=
   WP.spec_mono (Proofs.Binary.bf128_square_spec a) fun _ h => Proofs.Binary.towerOf_mul h
+/-! ### Inversion at every level
+
+`GF(2)`, `GF(2^2)` and `GF(2^4)` are stored in a `u8`, and the claims there assume the value is
+canonical: it fits in `2^k` bits. Every constructor, deserializer and operation of the crate keeps
+it so. Every result below is canonical too. -/
+
+/-- `try_inverse` is inversion in level `0` of the tower: `None` exactly for zero. -/
+theorem gf2.Gf2.Insts.P3_fieldFieldField.try_inverse.towerOf (a : gf2.Gf2) (hA : a.val < 2 ^ 2 ^ 0) :
+    gf2.Gf2.Insts.P3_fieldFieldField.try_inverse a ⦃ r =>
+      (towerOf 0 a = 0 → r = .None) ∧
+        (towerOf 0 a ≠ 0 → ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 0 ∧
+          towerOf 0 c = (towerOf 0 a)⁻¹) ⦄ :=
+  Proofs.Binary.gf2_try_inverse_spec a hA
+
+/-- `try_inverse` is inversion in level `1` of the tower: `None` exactly for zero. -/
+theorem tower.BinaryField2.Insts.P3_fieldFieldField.try_inverse.towerOf (a : tower.BinaryField2) (hA : a.val < 2 ^ 2 ^ 1) :
+    tower.BinaryField2.Insts.P3_fieldFieldField.try_inverse a ⦃ r =>
+      (towerOf 1 a = 0 → r = .None) ∧
+        (towerOf 1 a ≠ 0 → ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 1 ∧
+          towerOf 1 c = (towerOf 1 a)⁻¹) ⦄ :=
+  Proofs.Binary.bf2_try_inverse_spec a hA
+
+/-- `try_inverse` is inversion in level `2` of the tower: `None` exactly for zero. -/
+theorem tower.BinaryField4.Insts.P3_fieldFieldField.try_inverse.towerOf (a : tower.BinaryField4) (hA : a.val < 2 ^ 2 ^ 2) :
+    tower.BinaryField4.Insts.P3_fieldFieldField.try_inverse a ⦃ r =>
+      (towerOf 2 a = 0 → r = .None) ∧
+        (towerOf 2 a ≠ 0 → ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 2 ∧
+          towerOf 2 c = (towerOf 2 a)⁻¹) ⦄ :=
+  Proofs.Binary.bf4_try_inverse_spec a hA
+
+/-- `try_inverse` is inversion in level `3` of the tower: `None` exactly for zero. -/
+theorem tower.BinaryField8.Insts.P3_fieldFieldField.try_inverse.towerOf (a : tower.BinaryField8) :
+    tower.BinaryField8.Insts.P3_fieldFieldField.try_inverse a ⦃ r =>
+      (towerOf 3 a = 0 → r = .None) ∧
+        (towerOf 3 a ≠ 0 → ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 3 ∧
+          towerOf 3 c = (towerOf 3 a)⁻¹) ⦄ :=
+  Proofs.Binary.bf8_try_inverse_spec a
+
+/-- `try_inverse` is inversion in level `4` of the tower: `None` exactly for zero. -/
+theorem tower.BinaryField16.Insts.P3_fieldFieldField.try_inverse.towerOf (a : tower.BinaryField16) :
+    tower.BinaryField16.Insts.P3_fieldFieldField.try_inverse a ⦃ r =>
+      (towerOf 4 a = 0 → r = .None) ∧
+        (towerOf 4 a ≠ 0 → ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 4 ∧
+          towerOf 4 c = (towerOf 4 a)⁻¹) ⦄ :=
+  Proofs.Binary.bf16_try_inverse_spec a
+
+/-- `try_inverse` is inversion in level `5` of the tower: `None` exactly for zero. -/
+theorem tower.BinaryField32.Insts.P3_fieldFieldField.try_inverse.towerOf (a : tower.BinaryField32) :
+    tower.BinaryField32.Insts.P3_fieldFieldField.try_inverse a ⦃ r =>
+      (towerOf 5 a = 0 → r = .None) ∧
+        (towerOf 5 a ≠ 0 → ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 5 ∧
+          towerOf 5 c = (towerOf 5 a)⁻¹) ⦄ :=
+  Proofs.Binary.bf32_try_inverse_spec a
+
+/-- `try_inverse` is inversion in level `6` of the tower: `None` exactly for zero. -/
+theorem tower.BinaryField64.Insts.P3_fieldFieldField.try_inverse.towerOf (a : tower.BinaryField64) :
+    tower.BinaryField64.Insts.P3_fieldFieldField.try_inverse a ⦃ r =>
+      (towerOf 6 a = 0 → r = .None) ∧
+        (towerOf 6 a ≠ 0 → ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 6 ∧
+          towerOf 6 c = (towerOf 6 a)⁻¹) ⦄ :=
+  Proofs.Binary.bf64_try_inverse_spec a
+
+/-- `try_inverse` is inversion in level `7` of the tower: `None` exactly for zero. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldField.try_inverse.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.Insts.P3_fieldFieldField.try_inverse a ⦃ r =>
+      (towerOf 7 a = 0 → r = .None) ∧
+        (towerOf 7 a ≠ 0 → ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 7 ∧
+          towerOf 7 c = (towerOf 7 a)⁻¹) ⦄ :=
+  Proofs.Binary.bf128_try_inverse_spec a
 
 end Plonky3Lean.Claims.P3BinaryField

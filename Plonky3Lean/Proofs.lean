@@ -29,6 +29,7 @@ public import Plonky3Lean.Proofs.Field.Binary.Tables
 public import Plonky3Lean.Proofs.Field.Binary.Tower
 public import Plonky3Lean.Proofs.Field.Binary.TowerField
 public import Plonky3Lean.Proofs.Field.Binary.TowerSquare
+public import Plonky3Lean.Proofs.Field.Binary.TowerInverse
 public import Plonky3Lean.Proofs.Field.Goldilocks.Arith
 public import Plonky3Lean.Proofs.Field.Goldilocks.Basic
 public import Plonky3Lean.Proofs.Field.Goldilocks.Constants
