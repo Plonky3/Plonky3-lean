@@ -238,4 +238,38 @@ theorem treeCv_spec (B : List (BitVec 8)) (s len : ℕ) (hB : s + len ≤ B.leng
       compressOut_zero, compressOut_zero]
     simp only [compressOut, parentOutput]
 
+theorem subtreeOutput_counter (f : ℕ) (l : List (List (BitVec 8))) : (subtreeOutput f l 0).counter = 0 := by
+  rcases f with _ | f
+  · rfl
+  · rw [subtreeOutput]; split <;> rfl
+
+/-- The lane digest is the BLAKE3 digest of the lane's message. -/
+theorem laneDigest_eq (B : List (BitVec 8)) (s len : ℕ) (hB : s + len ≤ B.length) :
+    laneDigest B s len = digest ((B.drop s).take len) := by
+  have hml : ((B.drop s).take len).length = len := by simp; omega
+  obtain ⟨hn, hg⟩ := pieces_spec 1024 (by norm_num) ((B.drop s).take len)
+  have hN : (pieces 1024 ((B.drop s).take len)).length = nchunks len := by
+    rw [hn, hml, nchunks]
+    by_cases h0 : len = 0
+    · have : (B.drop s).take len = [] := List.length_eq_zero_iff.1 (by omega)
+      rw [ite_eq_left_of_eq_true _ _ (eq_true this), ite_eq_left_of_eq_true _ _ (eq_true (by omega))]
+    · have : (B.drop s).take len ≠ [] := fun h => h0 (by rw [← hml, h]; rfl)
+      rw [ite_eq_right_of_eq_false _ _ (eq_false this)]
+      split_ifs with h
+      · exact Nat.div_eq_of_lt_le (by omega) (by omega)
+      · rfl
+  unfold laneDigest digest
+  dsimp only
+  rw [treeCv_spec B s len hB (pieces 1024 ((B.drop s).take len)) (fun i hi => hg i hi)
+      (fun i hi => by
+        rw [hN, nchunks] at hi
+        split_ifs at hi with h
+        · omega
+        · have := (Nat.lt_div_iff_mul_lt (by norm_num)).1 hi
+          omega)
+      (nchunks len) 0 (nchunks len) ROOT (by unfold nchunks; split_ifs <;> omega) (by omega) le_rfl,
+    ← hN, List.drop_zero, List.take_length,
+    cvBytes_eq _ (by simp [compressOut, compress])]
+  simp only [compressOut, Output.rootBytes, subtreeOutput_counter, List.take_take, Nat.min_self]
+
 end Plonky3Lean.Proofs.Blake3
