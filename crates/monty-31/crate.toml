@@ -3,7 +3,7 @@
 
 lean_lib = "P3Monty31"
 
-# Only the items p3-baby-bear refers to are extracted, rooted at `start_from`.
+# Only the items p3-baby-bear and p3-koala-bear refer to are extracted, rooted at `start_from`.
 # Extracting the whole crate fails: it reaches p3-field's mutually recursive
 # trait hierarchy, which aeneas rejects (docs/extractor-issues.md, 9). What the
 # scoped run does not produce is in extraction/P3Monty31/Assumptions/.
@@ -21,6 +21,7 @@ start_from = [
   "p3_monty_31::data_traits::RelativelyPrimePower",
   "p3_monty_31::data_traits::TwoAdicData",
   "p3_monty_31::data_traits::BinomialExtensionData",
+  "p3_monty_31::data_traits::TrinomialQuinticData",
   "p3_monty_31::mds::MDSUtils",
   "p3_monty_31::poseidon1::PartialRoundBaseParameters",
   "p3_monty_31::poseidon1::PartialRoundParameters",

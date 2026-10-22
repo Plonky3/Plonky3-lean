@@ -1,0 +1,101 @@
+# Patch:     030-name-anonymous-const-assertions
+# Phase:     post
+# Target:    extraction/P3KoalaBear/Extraction/Funs.lean
+# Hunks:     9
+# Cost:      none. Renames only; the bodies are untouched.
+# Upstream:  aeneas names Rust's anonymous `const _: () = assert!(..)` items
+#            `__1`, `__2`, …, which mathlib's `linter.style.nameCheck`
+#            rejects (one warning each).
+# Drop when: aeneas generates a name without a double underscore.
+#
+# koala-bear's Poseidon tables carry their length invariants as anonymous
+# const assertions (eleven of them: two in poseidon1.rs, nine in poseidon2.rs).
+# aeneas names the first in each module `_` and the rest `__1`, `__2`, ….
+# This patch renames the nine `__N` definitions to `const_check_N`. A `__`
+# name is valid Lean, but mathlib's `nameCheck` warns on each one, and the
+# build must stay warning-clean without switching linters off. The `_` names
+# do not warn, so they are left as `poseidon1._` and `poseidon2._`.
+#
+--- a/extraction/P3KoalaBear/Extraction/Funs.lean
++++ b/extraction/P3KoalaBear/Extraction/Funs.lean
+@@ -1421,7 +1421,7 @@
+ /-- [p3_koala_bear::poseidon1::_#1]
+     Source: 'koala-bear/src/poseidon1.rs', lines 69:0-72:2 -/
+ @[global_simps, irreducible]
+-def poseidon1.__1 : RustM Unit := do
++def poseidon1.const_check_1 : RustM Unit := do -- PATCHED: aeneas emitted `poseidon1.__1`
+   let a ← poseidon1.KOALABEAR_POSEIDON1_RC_24
+   let s ← lift (Array.to_slice a)
+   let i ← core.slice.Slice.len s
+@@ -1738,7 +1738,7 @@
+ /-- [p3_koala_bear::poseidon2::_#1]
+     Source: 'koala-bear/src/poseidon2.rs', lines 72:0-73:100 -/
+ @[global_simps, irreducible]
+-def poseidon2.__1 : RustM Unit := do
++def poseidon2.const_check_1 : RustM Unit := do -- PATCHED: aeneas emitted `poseidon2.__1`
+   let a ← poseidon2.KOALABEAR_POSEIDON2_RC_16_EXTERNAL_FINAL
+   let s ← lift (Array.to_slice a)
+   let i ← core.slice.Slice.len s
+@@ -1766,7 +1766,7 @@
+ /-- [p3_koala_bear::poseidon2::_#2]
+     Source: 'koala-bear/src/poseidon2.rs', lines 74:0-75:95 -/
+ @[global_simps, irreducible]
+-def poseidon2.__2 : RustM Unit := do
++def poseidon2.const_check_2 : RustM Unit := do -- PATCHED: aeneas emitted `poseidon2.__2`
+   let a ← poseidon2.KOALABEAR_POSEIDON2_RC_16_INTERNAL
+   let s ← lift (Array.to_slice a)
+   let i ← core.slice.Slice.len s
+@@ -1821,7 +1821,7 @@
+ /-- [p3_koala_bear::poseidon2::_#3]
+     Source: 'koala-bear/src/poseidon2.rs', lines 76:0-78:2 -/
+ @[global_simps, irreducible]
+-def poseidon2.__3 : RustM Unit := do
++def poseidon2.const_check_3 : RustM Unit := do -- PATCHED: aeneas emitted `poseidon2.__3`
+   let a ← poseidon2.KOALABEAR_POSEIDON2_RC_24_EXTERNAL_INITIAL
+   let s ← lift (Array.to_slice a)
+   let i ← core.slice.Slice.len s
+@@ -1876,7 +1876,7 @@
+ /-- [p3_koala_bear::poseidon2::_#4]
+     Source: 'koala-bear/src/poseidon2.rs', lines 79:0-80:100 -/
+ @[global_simps, irreducible]
+-def poseidon2.__4 : RustM Unit := do
++def poseidon2.const_check_4 : RustM Unit := do -- PATCHED: aeneas emitted `poseidon2.__4`
+   let a ← poseidon2.KOALABEAR_POSEIDON2_RC_24_EXTERNAL_FINAL
+   let s ← lift (Array.to_slice a)
+   let i ← core.slice.Slice.len s
+@@ -1905,7 +1905,7 @@
+ /-- [p3_koala_bear::poseidon2::_#5]
+     Source: 'koala-bear/src/poseidon2.rs', lines 81:0-82:95 -/
+ @[global_simps, irreducible]
+-def poseidon2.__5 : RustM Unit := do
++def poseidon2.const_check_5 : RustM Unit := do -- PATCHED: aeneas emitted `poseidon2.__5`
+   let a ← poseidon2.KOALABEAR_POSEIDON2_RC_24_INTERNAL
+   let s ← lift (Array.to_slice a)
+   let i ← core.slice.Slice.len s
+@@ -1968,7 +1968,7 @@
+ /-- [p3_koala_bear::poseidon2::_#6]
+     Source: 'koala-bear/src/poseidon2.rs', lines 83:0-85:2 -/
+ @[global_simps, irreducible]
+-def poseidon2.__6 : RustM Unit := do
++def poseidon2.const_check_6 : RustM Unit := do -- PATCHED: aeneas emitted `poseidon2.__6`
+   let a ← poseidon2.KOALABEAR_POSEIDON2_RC_32_EXTERNAL_INITIAL
+   let s ← lift (Array.to_slice a)
+   let i ← core.slice.Slice.len s
+@@ -2031,7 +2031,7 @@
+ /-- [p3_koala_bear::poseidon2::_#7]
+     Source: 'koala-bear/src/poseidon2.rs', lines 86:0-87:100 -/
+ @[global_simps, irreducible]
+-def poseidon2.__7 : RustM Unit := do
++def poseidon2.const_check_7 : RustM Unit := do -- PATCHED: aeneas emitted `poseidon2.__7`
+   let a ← poseidon2.KOALABEAR_POSEIDON2_RC_32_EXTERNAL_FINAL
+   let s ← lift (Array.to_slice a)
+   let i ← core.slice.Slice.len s
+@@ -2062,7 +2062,7 @@
+ /-- [p3_koala_bear::poseidon2::_#8]
+     Source: 'koala-bear/src/poseidon2.rs', lines 88:0-89:95 -/
+ @[global_simps, irreducible]
+-def poseidon2.__8 : RustM Unit := do
++def poseidon2.const_check_8 : RustM Unit := do -- PATCHED: aeneas emitted `poseidon2.__8`
+   let a ← poseidon2.KOALABEAR_POSEIDON2_RC_32_INTERNAL
+   let s ← lift (Array.to_slice a)
+   let i ← core.slice.Slice.len s
