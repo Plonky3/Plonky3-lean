@@ -20,32 +20,35 @@ one of them is still present.
    `N.default (Self : Type) : Usize` in p3-monty-31's run is called as
    `N.default <inst> : RustM Usize` from p3-baby-bear's. Post-patch
    `baby-bear/020-trait-default-constant-shape`.
-4. **charon leaves some translated methods out of `ordered_decls`**, so aeneas,
-   which emits only what that list orders, silently drops them. Affected:
-   `MontyField31::new_array`, `new_2d_array` and `new_monty`, and the `add`
-   method of `impl Add for MontyField31` (and with it `Sub`, `Mul`, `Neg`),
-   even when each is a `--start-from` root. All are in the LLBC's `fun_decls`
-   with bodies; free functions such as `utils::add` are ordered and extracted.
-   It happens with and without `--targets`, so it is not 2. No diagnostic is
-   printed. Transcribed by hand in
-   `crates/monty-31/extraction/P3Monty31/Assumptions/Mirror.lean`.
-   `PrimeCharacteristicRing::halve` fails earlier. The trait provides a
-   default body that MontyField31 overrides, and charon skips provided methods
-   that nothing uses, even when one is a `--start-from` root (the pattern
-   matches, and no diagnostic is printed). With `--translate-all-methods` it
-   reaches `fun_decls` with its body and is left out of `ordered_decls` like
-   the others, but that flag also pulls in p3-field's trait hierarchy, which
-   aeneas rejects (9). It is transcribed in the same file.
+4. **charon leaves some translated items out of `ordered_decls`**, so aeneas,
+   which emits only what that list orders, silently drops them. No diagnostic
+   is printed, and it happens with and without `--targets`, so it is not 2.
+   Each crate's `extraction/gaps.toml` lists every item it drops, and
+   `STATUS.md` shows them. For p3-monty-31, rooted at the items transcribed in
+   `crates/monty-31/extraction/P3Monty31/Assumptions/Mirror.lean`
+   (`MontyField31::new_array`, `new_2d_array`, `new_monty`, and the `Add`,
+   `Sub`, `Mul` and `Neg` impls), charon translates MontyField31's whole impl
+   family with bodies and drops 66 items: those roots, `ZERO`/`ONE`/…,
+   `try_inverse`, every `QuotientMap::from_int`, `Sum::sum`, `mul_2exp_u64`,
+   and free functions reached only from them (`utils::to_monty_64`,
+   `large_monty_reduce`, `monty_reduce_u128`). Free functions reached from an
+   emitted item, such as `utils::add`, are ordered and extracted.
+   `PrimeCharacteristicRing::halve` is not this issue: the trait provides a
+   default body that MontyField31 overrides, and charon skips a provided method
+   that nothing uses, even when it is a `--start-from` root (the pattern
+   matches; no diagnostic). With `--translate-all-methods` charon translates
+   *and* orders it, but that flag also pulls in p3-field's trait hierarchy,
+   which aeneas rejects (9). It is transcribed in the same file.
 5. **aeneas's `__N` names for anonymous consts** trip mathlib's `nameCheck`
    linter. Post-patch `baby-bear/030-name-anonymous-const-assertions`.
 6. **The seeded `Debug::fmt` signatures do not match `CoreModels`**: aeneas
    adds a `&mut Formatter` back-function that `core.fmt.Debug` lacks. Fixed in
    the hand-written `crates/baby-bear/extraction/P3BabyBear/Assumptions/FunsExternal.lean`.
-7. **charon reports 2 `Type error after transformations` in the scoped
-   p3-monty-31 run.** Both are in `core`'s own slice-iterator macros
-   (`library/core/src/slice/iter/macros.rs:153`), which charon translates as a
-   dependency, not in any Plonky3 item. aeneas exits 0, and nothing generated
-   refers to them.
+7. **charon reports `Type error after transformations` in the scoped
+   p3-monty-31 run**, all in `core`'s own iterator code (slice iterators,
+   `Zip`), which charon translates as a dependency, not in any Plonky3 item.
+   aeneas exits 0, and nothing generated refers to them. The count and sites
+   are in `crates/monty-31/extraction/gaps.toml`.
 8. **charon splits option values on `,`**, so an impl pattern with two generic
    arguments cannot be written. The patterns omit the generics.
 9. **Neither p3-monty-31 nor p3-mds extracts as a whole crate.** Whole-crate
