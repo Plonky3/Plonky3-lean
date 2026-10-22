@@ -30,6 +30,10 @@ public import Plonky3Lean.Proofs.Field.Binary.Tower
 public import Plonky3Lean.Proofs.Field.Binary.TowerField
 public import Plonky3Lean.Proofs.Field.Binary.TowerSquare
 public import Plonky3Lean.Proofs.Field.Binary.TowerInverse
+public import Plonky3Lean.Proofs.Field.Binary.LinearSqrt
+public import Plonky3Lean.Proofs.Field.Binary.Conjugate
+public import Plonky3Lean.Proofs.Field.Binary.TowerFrobenius
+public import Plonky3Lean.Proofs.Field.Binary.TowerSqrt
 public import Plonky3Lean.Proofs.Field.Goldilocks.Arith
 public import Plonky3Lean.Proofs.Field.Goldilocks.Basic
 public import Plonky3Lean.Proofs.Field.Goldilocks.Constants

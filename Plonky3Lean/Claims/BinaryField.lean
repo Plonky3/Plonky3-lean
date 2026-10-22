@@ -2,7 +2,7 @@ module
 
 public import Plonky3Lean.Proofs.Field.Binary.Aes
 public import Plonky3Lean.Proofs.Field.Binary.Operators
-public import Plonky3Lean.Proofs.Field.Binary.TowerInverse
+public import Plonky3Lean.Proofs.Field.Binary.TowerSqrt
 
 @[expose] public section
 
@@ -543,5 +543,78 @@ theorem tower.BinaryField128.Insts.P3_fieldFieldField.try_inverse.towerOf (a : t
         (towerOf 7 a ≠ 0 → ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 7 ∧
           towerOf 7 c = (towerOf 7 a)⁻¹) ⦄ :=
   Proofs.Binary.bf128_try_inverse_spec a
+
+/-! ### Square roots at every level
+
+Every element has a square root. Below `GF(2^16)`, `try_sqrt` computes it as `a^(2^(BITS - 1))`
+with `exp_power_of_2`. -/
+
+/-- `try_sqrt` returns a square root in level `0` of the tower. -/
+theorem gf2.Gf2.Insts.P3_fieldFieldField.try_sqrt.towerOf (a : gf2.Gf2) (hA : a.val < 2 ^ 2 ^ 0) :
+    gf2.Gf2.Insts.P3_fieldFieldField.try_sqrt a ⦃ r =>
+      ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 0 ∧ towerOf 0 c * towerOf 0 c = towerOf 0 a ⦄ :=
+  Proofs.Binary.gf2_try_sqrt_spec a hA
+
+/-- `try_sqrt` returns a square root in level `1` of the tower. -/
+theorem tower.BinaryField2.Insts.P3_fieldFieldField.try_sqrt.towerOf (a : tower.BinaryField2) (hA : a.val < 2 ^ 2 ^ 1) :
+    tower.BinaryField2.Insts.P3_fieldFieldField.try_sqrt a ⦃ r =>
+      ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 1 ∧ towerOf 1 c * towerOf 1 c = towerOf 1 a ⦄ :=
+  Proofs.Binary.bf2_try_sqrt_spec a hA
+
+/-- `try_sqrt` returns a square root in level `2` of the tower. -/
+theorem tower.BinaryField4.Insts.P3_fieldFieldField.try_sqrt.towerOf (a : tower.BinaryField4) (hA : a.val < 2 ^ 2 ^ 2) :
+    tower.BinaryField4.Insts.P3_fieldFieldField.try_sqrt a ⦃ r =>
+      ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 2 ∧ towerOf 2 c * towerOf 2 c = towerOf 2 a ⦄ :=
+  Proofs.Binary.bf4_try_sqrt_spec a hA
+
+/-- `try_sqrt` returns a square root in level `3` of the tower. -/
+theorem tower.BinaryField8.Insts.P3_fieldFieldField.try_sqrt.towerOf (a : tower.BinaryField8) :
+    tower.BinaryField8.Insts.P3_fieldFieldField.try_sqrt a ⦃ r =>
+      ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 3 ∧ towerOf 3 c * towerOf 3 c = towerOf 3 a ⦄ :=
+  Proofs.Binary.bf8_try_sqrt_spec a
+
+/-- `try_sqrt` returns a square root in level `4` of the tower. -/
+theorem tower.BinaryField16.Insts.P3_fieldFieldField.try_sqrt.towerOf (a : tower.BinaryField16) :
+    tower.BinaryField16.Insts.P3_fieldFieldField.try_sqrt a ⦃ r =>
+      ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 4 ∧ towerOf 4 c * towerOf 4 c = towerOf 4 a ⦄ :=
+  Proofs.Binary.bf16_try_sqrt_spec a
+
+/-- `try_sqrt` returns a square root in level `5` of the tower. -/
+theorem tower.BinaryField32.Insts.P3_fieldFieldField.try_sqrt.towerOf (a : tower.BinaryField32) :
+    tower.BinaryField32.Insts.P3_fieldFieldField.try_sqrt a ⦃ r =>
+      ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 5 ∧ towerOf 5 c * towerOf 5 c = towerOf 5 a ⦄ :=
+  Proofs.Binary.bf32_try_sqrt_spec a
+
+/-- `try_sqrt` returns a square root in level `6` of the tower. -/
+theorem tower.BinaryField64.Insts.P3_fieldFieldField.try_sqrt.towerOf (a : tower.BinaryField64) :
+    tower.BinaryField64.Insts.P3_fieldFieldField.try_sqrt a ⦃ r =>
+      ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 6 ∧ towerOf 6 c * towerOf 6 c = towerOf 6 a ⦄ :=
+  Proofs.Binary.bf64_try_sqrt_spec a
+
+/-- `try_sqrt` returns a square root in level `7` of the tower. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldField.try_sqrt.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.Insts.P3_fieldFieldField.try_sqrt a ⦃ r =>
+      ∃ c, r = .Some c ∧ c.val < 2 ^ 2 ^ 7 ∧ towerOf 7 c * towerOf 7 c = towerOf 7 a ⦄ :=
+  Proofs.Binary.bf128_try_sqrt_spec a
+
+/-! ### Powers `x^(2^n)` below `GF(2^16)` -/
+
+/-- `exp_power_of_2 a n` is `a^(2^n)` in level `1` of the tower. -/
+theorem tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf (a : tower.BinaryField2) (hA : a.val < 2 ^ 2 ^ 1) (n : Std.Usize) :
+    tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2 a n ⦃ r =>
+      r.val < 2 ^ 2 ^ 1 ∧ towerOf 1 r = towerOf 1 a ^ 2 ^ n.val ⦄ :=
+  Proofs.Binary.bf2_exp_power_of_2_spec a hA n
+
+/-- `exp_power_of_2 a n` is `a^(2^n)` in level `2` of the tower. -/
+theorem tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf (a : tower.BinaryField4) (hA : a.val < 2 ^ 2 ^ 2) (n : Std.Usize) :
+    tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2 a n ⦃ r =>
+      r.val < 2 ^ 2 ^ 2 ∧ towerOf 2 r = towerOf 2 a ^ 2 ^ n.val ⦄ :=
+  Proofs.Binary.bf4_exp_power_of_2_spec a hA n
+
+/-- `exp_power_of_2 a n` is `a^(2^n)` in level `3` of the tower. -/
+theorem tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf (a : tower.BinaryField8) (n : Std.Usize) :
+    tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2 a n ⦃ r =>
+      r.val < 2 ^ 2 ^ 3 ∧ towerOf 3 r = towerOf 3 a ^ 2 ^ n.val ⦄ :=
+  Proofs.Binary.bf8_exp_power_of_2_spec a n
 
 end Plonky3Lean.Claims.P3BinaryField
