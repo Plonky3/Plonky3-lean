@@ -95,4 +95,110 @@ theorem toNat_concrete_mul : ∀ (k : ℕ) (a b : ConcreteBTField k),
     rw [towerMul]
     rfl
 
+/-! ## Facts about `towerMul` -/
+
+theorem zNat_lt (k : ℕ) : zNat k < 2 ^ (2 ^ k) := by
+  unfold zNat
+  split_ifs with h
+  · subst h; norm_num
+  · exact Nat.pow_lt_pow_right (by norm_num) (Nat.pow_lt_pow_right (by norm_num) (by omega))
+
+/-- A product of level `k` fits in `2 ^ k` bits. -/
+theorem towerMul_lt : ∀ (k : ℕ) {a b : ℕ}, a < 2 ^ (2 ^ k) → b < 2 ^ (2 ^ k) →
+    towerMul k a b < 2 ^ (2 ^ k)
+  | 0, a, b, ha, _ => by
+    simp only [towerMul]
+    exact lt_of_le_of_lt Nat.and_le_left ha
+  | k + 1, a, b, _, _ => by
+    have hm : ∀ x, x % 2 ^ (2 ^ k) < 2 ^ (2 ^ k) := fun x => Nat.mod_lt _ (by positivity)
+    have hx : ∀ x y, x < 2 ^ (2 ^ k) → y < 2 ^ (2 ^ k) → x ^^^ y < 2 ^ (2 ^ k) :=
+      fun x y hx hy => Nat.xor_lt_two_pow hx hy
+    have ih : ∀ {x y : ℕ}, x < 2 ^ (2 ^ k) → y < 2 ^ (2 ^ k) → towerMul k x y < 2 ^ (2 ^ k) :=
+      fun hx hy => towerMul_lt k hx hy
+    have hz := zNat_lt k
+    have hsq : 2 ^ 2 ^ (k + 1) = 2 ^ 2 ^ k * 2 ^ 2 ^ k := by rw [pow_succ, pow_mul, sq]
+    have key : ∀ hi lo, hi < 2 ^ (2 ^ k) → lo < 2 ^ (2 ^ k) →
+        hi <<< 2 ^ k ||| lo < 2 ^ (2 ^ (k + 1)) := by
+      intro hi lo hhi hlo
+      refine Nat.or_lt_two_pow ?_ (lt_of_lt_of_le hlo ?_)
+      · rw [Nat.shiftLeft_eq, hsq]
+        exact Nat.mul_lt_mul_of_pos_right hhi (by positivity)
+      · rw [hsq]; exact Nat.le_mul_of_pos_left _ (by positivity)
+    simp only [towerMul]
+    apply key <;>
+      repeat (first | exact hz | apply hx | apply ih | apply hm)
+
+theorem towerMul_zero_left : ∀ (k b : ℕ), towerMul k 0 b = 0
+  | 0, b => by simp [towerMul]
+  | k + 1, b => by
+    simp only [towerMul, Nat.zero_shiftRight, Nat.zero_mod, Nat.zero_and,
+      towerMul_zero_left k, Nat.xor_zero, Nat.zero_shiftLeft, Nat.zero_or]
+
+theorem towerMul_zero_right : ∀ (k a : ℕ), towerMul k a 0 = 0
+  | 0, a => by simp [towerMul]
+  | k + 1, a => by
+    simp only [towerMul, Nat.zero_shiftRight, Nat.zero_mod, Nat.zero_and, Nat.xor_zero,
+      towerMul_zero_right k, towerMul_zero_left k, Nat.zero_shiftLeft, Nat.zero_or]
+
+/-- A number below `2 ^ (2 n)` is its high half shifted back over its low half. -/
+theorem shiftRight_shiftLeft_or_mod {a n : ℕ} :
+    (a >>> n) <<< n ||| a % 2 ^ n = a := by
+  apply Nat.eq_of_testBit_eq
+  intro i
+  rw [Nat.testBit_or, Nat.testBit_shiftLeft, Nat.testBit_shiftRight, Nat.testBit_mod_two_pow]
+  by_cases h : n ≤ i
+  · simp [h, show ¬ i < n by omega, show n + (i - n) = i by omega]
+  · simp [h, show i < n by omega]
+
+theorem mod_two_pow_two_pow_of_lt {a k : ℕ} (ha : a < 2 ^ (2 ^ (k + 1))) :
+    (a >>> 2 ^ k) % 2 ^ (2 ^ k) = a >>> 2 ^ k := by
+  apply Nat.mod_eq_of_lt
+  rw [Nat.shiftRight_eq_div_pow]
+  apply Nat.div_lt_of_lt_mul
+  rw [← pow_add, ← two_mul, ← pow_succ']
+  exact ha
+
+theorem and_sub_one_mod {a n : ℕ} : (a &&& (2 ^ n - 1)) % 2 ^ n = a % 2 ^ n := by
+  rw [Nat.and_two_pow_sub_one_eq_mod, Nat.mod_mod]
+
+/-- `1` is the identity of every level. -/
+theorem towerMul_one : ∀ (k : ℕ) {a : ℕ}, a < 2 ^ (2 ^ k) → towerMul k a 1 = a
+  | 0, a, ha => by
+    simp only [towerMul]
+    have : a = 0 ∨ a = 1 := by norm_num at ha; omega
+    rcases this with rfl | rfl <;> rfl
+  | k + 1, a, ha => by
+    have h1 : (1 >>> 2 ^ k) % 2 ^ (2 ^ k) = 0 := by
+      rw [Nat.shiftRight_eq_div_pow, Nat.div_eq_of_lt (Nat.one_lt_two_pow (by positivity))]; rfl
+    have h0 : (1 &&& (2 ^ (2 ^ k) - 1)) % 2 ^ (2 ^ k) = 1 := by
+      rw [and_sub_one_mod, Nat.mod_eq_of_lt (Nat.one_lt_two_pow (by positivity))]
+    have hlo := towerMul_one k (a := (a &&& (2 ^ (2 ^ k) - 1)) % 2 ^ (2 ^ k)) (Nat.mod_lt _ (by positivity))
+    have hx := towerMul_one k (a := (a >>> 2 ^ k) % 2 ^ (2 ^ k) ^^^ (a &&& (2 ^ (2 ^ k) - 1)) % 2 ^ (2 ^ k))
+      (Nat.xor_lt_two_pow (Nat.mod_lt _ (by positivity)) (Nat.mod_lt _ (by positivity)))
+    simp only [towerMul, h1, h0, towerMul_zero_right, Nat.xor_zero, Nat.zero_xor, towerMul_zero_left,
+      hlo, hx]
+    rw [Nat.xor_assoc, Nat.xor_self, Nat.xor_zero, mod_two_pow_two_pow_of_lt ha, and_sub_one_mod,
+      shiftRight_shiftLeft_or_mod]
+
+/-- Multiplying by the generator `zNat (k + 1)`: `(a_0 + a_1 X) X = a_1 + (a_0 + a_1 α) X`. -/
+theorem towerMul_zNat_succ (k : ℕ) {a : ℕ} :
+    towerMul (k + 1) a (zNat (k + 1)) =
+      ((a &&& (2 ^ (2 ^ k) - 1)) % 2 ^ (2 ^ k) ^^^
+        towerMul k ((a >>> 2 ^ k) % 2 ^ (2 ^ k)) (zNat k)) <<< 2 ^ k |||
+      (a >>> 2 ^ k) % 2 ^ (2 ^ k) := by
+  have hz : zNat (k + 1) = 2 ^ (2 ^ k) := by simp [zNat]
+  have h1 : (2 ^ (2 ^ k) >>> 2 ^ k) % 2 ^ (2 ^ k) = 1 := by
+    rw [Nat.shiftRight_eq_div_pow, Nat.div_self (by positivity),
+      Nat.mod_eq_of_lt (Nat.one_lt_two_pow (by positivity))]
+  have h0 : (2 ^ (2 ^ k) &&& (2 ^ (2 ^ k) - 1)) % 2 ^ (2 ^ k) = 0 := by
+    rw [and_sub_one_mod, Nat.mod_self]
+  have hm : ∀ x, x % 2 ^ (2 ^ k) < 2 ^ (2 ^ k) := fun x => Nat.mod_lt _ (by positivity)
+  simp only [towerMul, hz, h1, h0, towerMul_zero_right, Nat.xor_zero, Nat.zero_xor,
+    towerMul_one k (hm _), towerMul_one k (Nat.xor_lt_two_pow (hm _) (hm _))]
+  congr 2
+  apply Nat.eq_of_testBit_eq
+  intro i
+  simp only [Nat.testBit_xor]
+  cases ((a >>> 2 ^ k) % 2 ^ 2 ^ k).testBit i <;> simp
+
 end ConcreteBinaryTower
