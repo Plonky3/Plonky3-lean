@@ -1,0 +1,221 @@
+# Patch:        060-field-default-shims
+# Phase:        pre
+# Target:       binary-field/src/aes/packed.rs, binary-field/src/bitslice/packing.rs, binary-field/src/field_defaults.rs, binary-field/src/lib.rs
+# Hunks:        4
+# Class:        equiv-rewrite
+# Gap:          docs/extractor-issues.md 9: a call to a default method of
+#               p3-field's traits takes the type's whole `Field` dictionary,
+#               which reaches the mutually recursive trait group; for a
+#               field's `Div` impl, which calls `Field::inverse`, the `Field`
+#               impl and the `Div` impl are themselves mutually recursive.
+# Cost:         none in a normal build: the copies are compiled but unused
+#               there. In the extracted variant, inherent `inverse`, `is_zero`
+#               and `is_one` shadow the `Field` defaults at every call site on
+#               a concrete field type of this crate, and call copies of the
+#               default bodies.
+# Upstreamable: no: the shims exist only for the extractor.
+# Drop when:    aeneas accepts p3-field's trait hierarchy (issue 9).
+# Test:         test p3-binary-field --lib pre_patch_060
+# Mutation:     `raw_is_zero` compares with `ONE`, so it disagrees with
+#               `Field::is_zero` and the differential test fails.
+#
+# `Field::inverse`, `is_zero` and `is_one` have default bodies
+# (`self.try_inverse().expect("Tried to invert zero")`, `*self == Self::ZERO`,
+# `*self == Self::ONE`), and no type here overrides them. Called on a concrete
+# type, each still takes the type's `Field` dictionary. That pulls in the whole
+# impl and, through it, `Gf2`'s (every type's `PrimeSubfield`), the serde
+# supertraits, and the trait group aeneas rejects. `impl_div_methods!`'s `Div`
+# calls `inverse`, so a field's `Div` impl and its `Field` impl become mutually
+# recursive, which aeneas rejects outright.
+#
+# `field_defaults.rs` gives each of the twelve field types copies of the three
+# default bodies (`raw_*`, compiled in every build) and, under
+# cfg(hax_backend_lean), inherent methods of the trait methods' names that call
+# them. Method resolution prefers inherent methods, so the call sites, the
+# `Div` impls `impl_div_methods!` expands here included, reach the copies
+# without being edited. Two files then no longer use their `Field` import
+# under the cfg, which is allowed there.
+#
+# The differential test compares each copy with the trait default on zero, one,
+# the generator and 64 random elements of each type, and checks that
+# `raw_inverse` panics on zero.
+#
+diff --git a/binary-field/src/aes/packed.rs b/binary-field/src/aes/packed.rs
+index 8e0cd8f..e7ce2c8 100644
+--- a/binary-field/src/aes/packed.rs
++++ b/binary-field/src/aes/packed.rs
+@@ -12,6 +12,9 @@ use core::iter::{Product, Sum};
+ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+ use core::{array, ptr};
+ 
++// PATCHED: `Field` is unused under hax's Lean backend, where `inverse` resolves to
++// the inherent method of `field_defaults`.
++#[cfg_attr(hax_backend_lean, allow(unused_imports))]
+ use p3_field::{
+     Algebra, Field, PackedField, PackedFieldPow2, PackedValue, PrimeCharacteristicRing,
+ };
+diff --git a/binary-field/src/bitslice/packing.rs b/binary-field/src/bitslice/packing.rs
+index c243f9e..2643ccb 100644
+--- a/binary-field/src/bitslice/packing.rs
++++ b/binary-field/src/bitslice/packing.rs
+@@ -5,6 +5,9 @@ use core::iter::{Product, Sum};
+ use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+ use core::slice;
+ 
++// PATCHED: `Field` is unused under hax's Lean backend, where `inverse` resolves to
++// the inherent method of `field_defaults`.
++#[cfg_attr(hax_backend_lean, allow(unused_imports))]
+ use p3_field::{Algebra, Field, PrimeCharacteristicRing};
+ use rand::Rng;
+ use rand::distr::{Distribution, StandardUniform};
+diff --git a/binary-field/src/field_defaults.rs b/binary-field/src/field_defaults.rs
+new file mode 100644
+index 0000000..3285d10
+--- /dev/null
++++ b/binary-field/src/field_defaults.rs
+@@ -0,0 +1,132 @@
++//! PATCHED: copies of three `Field` default methods for every field type of this crate,
++//! and, only under hax's Lean backend, inherent methods of the same names that call them.
++//!
++//! Called as defaults, `inverse`, `is_zero` and `is_one` take the type's whole `Field`
++//! dictionary, which aeneas cannot model (Plonky3-lean, docs/extractor-issues.md, 9). An
++//! inherent method shadows the trait method at every call site on a concrete type,
++//! including the `Div` impls `impl_div_methods!` expands here, so under the cfg those call
++//! sites reach these copies instead.
++
++use p3_field::{Field, PrimeCharacteristicRing};
++
++use crate::{
++    BinaryField2, BinaryField4, BinaryField8, BinaryField16, BinaryField32, BinaryField64,
++    BinaryField128, Gf2, Ghash128, Poly64, Poly192, Rijndael8b,
++};
++
++macro_rules! field_defaults {
++    ($($t:ty),* $(,)?) => {$(
++        impl $t {
++            /// The body of `Field::inverse`, compiled in every build.
++            #[allow(dead_code)]
++            #[inline]
++            pub(crate) fn raw_inverse(&self) -> Self {
++                self.try_inverse().expect("Tried to invert zero")
++            }
++
++            /// The body of `Field::is_zero`, compiled in every build.
++            #[allow(dead_code)]
++            #[inline]
++            pub(crate) fn raw_is_zero(&self) -> bool {
++                *self == Self::ZERO
++            }
++
++            /// The body of `Field::is_one`, compiled in every build.
++            #[allow(dead_code)]
++            #[inline]
++            pub(crate) fn raw_is_one(&self) -> bool {
++                *self == Self::ONE
++            }
++
++            // The selection, only under hax's Lean backend.
++            #[cfg(hax_backend_lean)]
++            #[allow(dead_code)]
++            #[inline]
++            pub(crate) fn inverse(&self) -> Self {
++                self.raw_inverse()
++            }
++
++            #[cfg(hax_backend_lean)]
++            #[allow(dead_code)]
++            #[inline]
++            pub(crate) fn is_zero(&self) -> bool {
++                self.raw_is_zero()
++            }
++
++            #[cfg(hax_backend_lean)]
++            #[allow(dead_code)]
++            #[inline]
++            pub(crate) fn is_one(&self) -> bool {
++                self.raw_is_one()
++            }
++        }
++    )*};
++}
++
++field_defaults!(
++    Gf2,
++    BinaryField2,
++    BinaryField4,
++    BinaryField8,
++    BinaryField16,
++    BinaryField32,
++    BinaryField64,
++    BinaryField128,
++    Poly64,
++    Poly192,
++    Ghash128,
++    Rijndael8b,
++);
++
++#[cfg(test)]
++mod pre_patch_060 {
++    extern crate std;
++
++    use std::vec;
++
++    use p3_field::{Field, PrimeCharacteristicRing};
++    use rand::rngs::SmallRng;
++    use rand::{RngExt, SeedableRng};
++
++    use crate::{
++        BinaryField2, BinaryField4, BinaryField8, BinaryField16, BinaryField32,
++        BinaryField64, BinaryField128, Gf2, Ghash128, Poly64, Poly192, Rijndael8b,
++    };
++
++    /// The copies agree with the trait defaults on zero, one, the generator and random
++    /// elements, and `raw_inverse` panics on zero as `Field::inverse` does.
++    macro_rules! check {
++        ($($t:ty),* $(,)?) => {$({
++            let mut rng = SmallRng::seed_from_u64(60);
++            let mut values = vec![<$t>::ZERO, <$t>::ONE, <$t>::GENERATOR];
++            values.extend((0..64).map(|_| rng.random::<$t>()));
++            for x in values {
++                assert_eq!(x.raw_is_zero(), Field::is_zero(&x), "{}", stringify!($t));
++                assert_eq!(x.raw_is_one(), Field::is_one(&x), "{}", stringify!($t));
++                if !Field::is_zero(&x) {
++                    assert_eq!(x.raw_inverse(), Field::inverse(&x), "{}", stringify!($t));
++                }
++            }
++            let zero = <$t>::ZERO;
++            assert!(std::panic::catch_unwind(|| zero.raw_inverse()).is_err());
++        })*};
++    }
++
++    #[test]
++    fn copies_agree_with_the_field_defaults() {
++        check!(
++            Gf2,
++            BinaryField2,
++            BinaryField4,
++            BinaryField8,
++            BinaryField16,
++            BinaryField32,
++            BinaryField64,
++            BinaryField128,
++            Poly64,
++            Poly192,
++            Ghash128,
++            Rijndael8b,
++        );
++    }
++}
+diff --git a/binary-field/src/lib.rs b/binary-field/src/lib.rs
+index e14ab89..ce77d69 100644
+--- a/binary-field/src/lib.rs
++++ b/binary-field/src/lib.rs
+@@ -10,6 +10,8 @@ mod challenger;
+ mod clmul;
+ mod coordinates;
+ mod extension;
++// PATCHED: copies of three `Field` defaults, and their selection under hax's Lean backend.
++mod field_defaults;
+ mod gf2;
+ mod ghash;
+ // PATCHED: extraction roots, only under hax's Lean backend.

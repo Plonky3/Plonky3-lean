@@ -2,14 +2,15 @@
 # Breaks:      the module is gated on a misspelled cfg.
 #
 diff --git a/binary-field/src/lib.rs b/binary-field/src/lib.rs
+index 31d1bf3..37fbb8a 100644
 --- a/binary-field/src/lib.rs
 +++ b/binary-field/src/lib.rs
-@@ -13,7 +13,7 @@ mod extension;
+@@ -15,7 +15,7 @@ mod field_defaults;
  mod gf2;
  mod ghash;
  // PATCHED: extraction roots, only under hax's Lean backend.
 -#[cfg(hax_backend_lean)]
 +#[cfg(hax_backend_lea)]
  pub mod hax_roots;
- mod linear;
- mod packed;
+ // PATCHED: roots for the methods the field types implement, only under hax's Lean backend.
+ #[cfg(hax_backend_lean)]

@@ -5,3 +5,559 @@
 crate  = "p3_binary_field"
 errors = 0
 error_sites = []
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::clmul::gf192::composed_dot_192"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::clmul::gf192::composed_dot_192_by_64"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::clmul::gf192::poly_dot_192"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::clmul::gf192::poly_dot_192_by_64"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::clmul::portable::poly_dot_128"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::extension::{impl core::ops::arith::Add}::add"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::extension::{impl core::ops::arith::Sub}::sub"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::extension::{impl p3_field::extension::HasFrobenius}::pseudo_inv"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::extension::{impl p3_field::field::AlgebraIdentity}::algebra_id"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::extension::{impl p3_field::field::BasedVectorSpace}::as_basis_coefficients_slice"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::extension::{impl p3_field::field::BasedVectorSpace}::from_basis_coefficients_iter"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::extension::{impl p3_field::field::BasedVectorSpace}::from_basis_coefficients_iter::{impl core::marker::Destruct}"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::extension::{impl p3_field::field::BasedVectorSpace}::reconstitute_from_base"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::add_assign_lane"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::extract"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::from_ext_slice"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::packed_ext_powers"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl core::clone::Clone}::clone"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl core::cmp::Ord}::cmp"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl core::cmp::PartialOrd}::partial_cmp"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl core::default::Default}::default"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl core::fmt::Debug}::fmt"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl core::fmt::Display}::fmt"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl core::hash::Hash}::hash"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl core::iter::traits::accum::Product}::product"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl core::iter::traits::accum::Sum}::sum"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl p3_field::field::Field}::GENERATOR"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl p3_field::field::Field}::order"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl p3_field::field::PrimeCharacteristicRing}::NEG_ONE"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl p3_field::field::PrimeCharacteristicRing}::TWO"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl p3_field::field::PrimeField32}::ORDER_U32"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl p3_field::field::PrimeField64}::ORDER_U64"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl p3_field::field::PrimeField}::as_canonical_biguint"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl p3_field::integers::QuotientMap}::from_canonical_checked"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::gf2::{impl p3_field::integers::QuotientMap}::from_int"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::ALPHA"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::TOWER_GENERATOR"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl core::clone::Clone}::clone"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl core::default::Default}::default"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl core::fmt::Debug}::fmt"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl core::fmt::Display}::fmt"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl core::hash::Hash}::hash"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl core::iter::traits::accum::Product}::product"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl core::iter::traits::accum::Sum}::sum"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl p3_binary_field::tower::TowerLevel}::LOG_BITS"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl p3_binary_field::tower::TowerLevel}::from_le_byte_iter"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl p3_binary_field::tower::TowerLevel}::from_repr"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl p3_binary_field::tower::TowerLevel}::mul_alpha"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl p3_binary_field::tower::TowerLevel}::to_repr"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl p3_field::field::Field}::GENERATOR"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl p3_field::field::Field}::order"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::NEG_ONE"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::ONE"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::TWO"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::div_2exp_u64"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::dot_product"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::double"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::halve"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::mul_2exp_u64"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::xor"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl core::clone::Clone}::clone"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl core::default::Default}::default"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl core::fmt::Debug}::fmt"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl core::fmt::Display}::fmt"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl core::hash::Hash}::hash"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl core::iter::traits::accum::Product}::product"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl core::iter::traits::accum::Sum}::sum"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl core::ops::arith::Add}::add"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl core::ops::arith::Sub}::sub"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::extension::HasFrobenius}::pseudo_inv"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::AlgebraIdentity}::algebra_id"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::BasedVectorSpace}::DIMENSION"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::BasedVectorSpace}::as_basis_coefficients_slice"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::BasedVectorSpace}::from_basis_coefficients_fn"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::BasedVectorSpace}::from_basis_coefficients_iter"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::BasedVectorSpace}::from_basis_coefficients_iter::{impl core::marker::Destruct}"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::Field}::GENERATOR"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::Field}::order"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::NEG_ONE"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::ONE"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::TWO"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::div_2exp_u64"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::dot_product"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::double"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::halve"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::mul_2exp_u64"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::xor"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::add_assign_lane"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::extract"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::from_ext_slice"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::packed_ext_powers"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly192::{impl}::limbs"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::ALPHA"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::TOWER_GENERATOR"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl core::clone::Clone}::clone"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl core::default::Default}::default"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl core::fmt::Debug}::fmt"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl core::fmt::Display}::fmt"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl core::hash::Hash}::hash"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl core::iter::traits::accum::Product}::product"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl core::iter::traits::accum::Sum}::sum"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl p3_binary_field::tower::TowerLevel}::LOG_BITS"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl p3_binary_field::tower::TowerLevel}::from_le_byte_iter"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl p3_binary_field::tower::TowerLevel}::from_repr"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl p3_binary_field::tower::TowerLevel}::mul_alpha"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl p3_binary_field::tower::TowerLevel}::to_repr"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl p3_field::field::Field}::GENERATOR"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl p3_field::field::Field}::order"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing}::NEG_ONE"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing}::ONE"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing}::TWO"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing}::div_2exp_u64"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing}::double"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing}::halve"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing}::mul_2exp_u64"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing}::xor"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::BYTE_STREAM_ENDED"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl core::clone::Clone}::clone"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl core::default::Default}::default"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl core::fmt::Debug}::fmt"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl core::fmt::Display}::fmt"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl core::hash::Hash}::hash"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl core::iter::traits::accum::Product}::product"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl p3_binary_field::tower::TowerLevel}::LOG_BITS"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl p3_binary_field::tower::TowerLevel}::from_le_byte_iter"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl p3_binary_field::tower::TowerLevel}::from_repr"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl p3_binary_field::tower::TowerLevel}::mul_alpha"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl p3_binary_field::tower::TowerLevel}::to_repr"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl p3_field::field::Field}::GENERATOR"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl p3_field::field::Field}::order"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::NEG_ONE"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::ONE"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::TWO"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::div_2exp_u64"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::double"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::halve"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::mul_2exp_u64"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::xor"
+source = ""

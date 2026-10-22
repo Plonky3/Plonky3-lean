@@ -55,11 +55,16 @@ keeps its number and says so.
    mutually recursive definitions"). `--opaque p3_field` does not help, because
    it hides bodies, not trait declarations. p3-mds also hits 28 unsupported
    lifetime constraints of its own. Hence the `scoped` state of both crates,
-   and the `field` stub. In p3-binary-field the group is reached through any
-   tower arithmetic, since `TowerLevel: Field` and each level calls the level
-   below through `TowerLevel` methods; pre-patch `binary-field/040` gives the
-   arithmetic inherent copies of those methods. A trait method of the group
-   (`square`, `try_inverse`, …) still cannot be a root.
+   and the `field` stub.
+   What reaches the group is a trait dictionary, not a trait method: a method a
+   concrete type implements, called on that type, extracts on its own (p3-binary-
+   field's `square`, `try_inverse`, … are roots of pre-patch `binary-field/070`).
+   A dictionary is needed by a call to a default method of the group
+   (`is_zero`, `inverse`, …), by `TowerLevel` methods, which name the group
+   through `TowerLevel: Field`, and by a field's `Div`, whose `inverse` makes it
+   mutually recursive with the `Field` impl. In p3-binary-field, pre-patches
+   `binary-field/040` and `060` give each such call an inherent copy to resolve
+   to. Code generic over `F: Field` still needs the dictionary.
 10. **charon and aeneas cannot lift `-> impl Trait` in trait methods**
     ([charon#1266](https://github.com/AeneasVerif/charon/issues/1266)). rustc
     desugars each into a hidden generic associated type, and p3-field has many.
@@ -71,7 +76,9 @@ keeps its number and says so.
 12. **aeneas does not support dereferencing a raw pointer** ("Aeneas does not
     yet support dereferencing raw pointers"). p3-binary-field's `Poly192::limbs`
     reborrows `[Poly64; 3]` as `&[u64; 3]` through one; pre-patch
-    `binary-field/050` gives the products a copy instead.
+    `binary-field/050` gives the products and `square` a copy instead. A closure
+    that returns references into the coordinates, as in `Poly192`'s dot
+    products, fails aeneas's borrow checker instead ("Can't end abstraction").
 13. **`@[global_simps, irreducible]` on a long array literal reaches the maximum
     recursion depth**: registering the simp lemma of an irreducible constant
     unfolds it, which fails on p3-binary-field's 511-entry `tables::EXP` (either

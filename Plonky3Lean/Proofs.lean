@@ -11,6 +11,7 @@ public import Plonky3Lean.Proofs.Field.BabyBear.Constants
 public import Plonky3Lean.Proofs.Field.BabyBear.Element
 public import Plonky3Lean.Proofs.Field.BabyBear.Extension
 public import Plonky3Lean.Proofs.Field.BabyBear.Generic
+public import Plonky3Lean.Proofs.Field.Binary.Aes
 public import Plonky3Lean.Proofs.Field.Binary.Clmul
 public import Plonky3Lean.Proofs.Field.Binary.Compact
 public import Plonky3Lean.Proofs.Field.Binary.Ghash

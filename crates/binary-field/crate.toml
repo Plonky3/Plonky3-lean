@@ -30,8 +30,19 @@ start_from = [
   "p3_binary_field::tables::mul",
   "p3_binary_field::tables::square",
   "p3_binary_field::tables::try_inverse",
+  "p3_binary_field::aes::mul_bytes",
+  "p3_binary_field::aes::invert_byte",
   # The field types' methods, through pre-patch 030's one-line wrappers.
   "p3_binary_field::hax_roots",
+  "p3_binary_field::hax_api",
+]
+
+# Passed to charon after toolchain.toml's `charon_args`, for this crate only.
+#   Display impls -> opaque: `Field: Display`, so every root that names a field's
+#                    `Field` impl reaches them, and their `core::fmt` bodies are
+#                    not modeled (as for `Debug` in toolchain.toml).
+charon_args = [
+  "--opaque", "{impl core::fmt::Display for _}",
 ]
 
 watch = ["binary-field/src", "binary-field/Cargo.toml"]

@@ -1,0 +1,16 @@
+# Mutation of: 070-field-api-roots
+# Breaks:      the module is gated on a misspelled cfg.
+#
+diff --git a/binary-field/src/lib.rs b/binary-field/src/lib.rs
+index 31d1bf3..41674b1 100644
+--- a/binary-field/src/lib.rs
++++ b/binary-field/src/lib.rs
+@@ -18,7 +18,7 @@ mod ghash;
+ #[cfg(hax_backend_lean)]
+ pub mod hax_roots;
+ // PATCHED: roots for the methods the field types implement, only under hax's Lean backend.
+-#[cfg(hax_backend_lean)]
++#[cfg(hax_backend_lea)]
+ pub mod hax_api;
+ mod linear;
+ mod packed;

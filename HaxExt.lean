@@ -126,4 +126,78 @@ def core.fmt.rt.Argument.new_display {T : Type} (_displayInst : core.fmt.Display
     RustM core.fmt.rt.Argument :=
   ok ⟨.Placeholder ()⟩
 
+/-! ## Iterators
+
+aeneas projects `fold` and `reduce` from an `Iterator` dictionary, and refers to the
+`Sum`/`Product` traits, `Iterator::sum` and the `IntoIterator` impl of `&[T; N]`.
+`CoreModels`' `Iterator` carries only `next`; these are its provided methods, driven by
+`next` through `CoreModels`' own defaults. -/
+
+/-- `Iterator::fold`, as a projection of the dictionary. -/
+abbrev core.iter.traits.iterator.Iterator.fold {Self Item : Type}
+    (IteratorInst : core.iter.traits.iterator.Iterator Self Item) {B F : Type}
+    (FnInst : core.ops.function.FnMut F (B × Item) B) (self : Self) (init : B) (f : F) :
+    RustM B :=
+  core.iter.traits.iterator.Iterator.fold.default IteratorInst FnInst self init f
+
+/-- `Iterator::reduce`, as a projection of the dictionary. -/
+abbrev core.iter.traits.iterator.Iterator.reduce {Self Item : Type}
+    (IteratorInst : core.iter.traits.iterator.Iterator Self Item) {F : Type}
+    (FnInst : core.ops.function.FnMut F (Item × Item) Item) (self : Self) (f : F) :
+    RustM (core.option.Option Item) :=
+  core.iter.traits.iterator.Iterator.reduce.default IteratorInst FnInst self f
+
+/-- Trait declaration: `core::iter::traits::accum::Sum`. -/
+structure core.iter.traits.accum.Sum (Self A : Type) where
+  sum : forall {I : Type}, core.iter.traits.iterator.Iterator I A → I → RustM Self
+
+/-- Trait declaration: `core::iter::traits::accum::Product`. -/
+structure core.iter.traits.accum.Product (Self A : Type) where
+  product : forall {I : Type}, core.iter.traits.iterator.Iterator I A → I → RustM Self
+
+/-- `Iterator::sum`: `S::sum(self)`. -/
+def core.iter.traits.iterator.Iterator.sum.default {Self Item S : Type}
+    (IteratorInst : core.iter.traits.iterator.Iterator Self Item)
+    (SumInst : core.iter.traits.accum.Sum S Item) (self : Self) : RustM S :=
+  SumInst.sum IteratorInst self
+
+/-- `Iterator::product`: `P::product(self)`. -/
+def core.iter.traits.iterator.Iterator.product.default {Self Item P : Type}
+    (IteratorInst : core.iter.traits.iterator.Iterator Self Item)
+    (ProductInst : core.iter.traits.accum.Product P Item) (self : Self) : RustM P :=
+  ProductInst.product IteratorInst self
+
+/-- `impl IntoIterator for &[T; N]`: the slice iterator over the array. -/
+def core.SharedAArray.Insts.CoreIterTraitsCollectIntoIteratorSharedATIter.into_iter
+    {T : Type} {N : Std.Usize} (self : Array T N) : RustM (core.slice.iter.Iter T) := do
+  let s ← core.array.Array.as_slice self
+  core.slice.Slice.iter s
+
+@[reducible]
+def core.SharedAArray.Insts.CoreIterTraitsCollectIntoIteratorSharedATIter (T : Type)
+    (N : Std.Usize) :
+    core.iter.traits.collect.IntoIterator (Array T N) T (core.slice.iter.Iter T) := {
+  iteratorIteratorInst := core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT T
+  into_iter := core.SharedAArray.Insts.CoreIterTraitsCollectIntoIteratorSharedATIter.into_iter
+}
+
+/-- `bool::then_some` (`library/core/src/bool.rs`): `if self { Some(t) } else { None }`. -/
+def core.bool.Bool.then_some {T : Type} (self : Bool) (t : T) :
+    RustM (core.option.Option T) :=
+  ok (if self then core.option.Option.Some t else core.option.Option.None)
+
+/-- `u128::trailing_zeros` (`library/core/src/num/uint_macros.rs`): the number of
+trailing zero bits, `128` for zero. -/
+def core.num.U128.trailing_zeros (x : Std.U128) : RustM Std.U32 :=
+  ok ⟨BitVec.ofNat 32 (((List.range 128).find? fun i => x.val.testBit i).getD 128)⟩
+
+/-- `Range::contains` (`library/core/src/ops/range.rs`), the inherent method:
+`<Self as RangeBounds<Idx>>::contains(self, item)`. The first dictionary is the
+`Idx: PartialOrd<Idx>` bound of the impl block, which the body does not use. -/
+def core.ops.range.Range.contains {Idx U : Type} (_ : core.cmp.PartialOrd Idx Idx)
+    (IdxU : core.cmp.PartialOrd Idx U) (UIdx : core.cmp.PartialOrd U Idx)
+    (self : core.ops.range.Range Idx) (item : U) : RustM Bool :=
+  core.ops.range.RangeBounds.contains.default
+    (core.ops.range.Range.Insts.CoreOpsRangeRangeBounds Idx) IdxU UIdx self item
+
 end CoreModels

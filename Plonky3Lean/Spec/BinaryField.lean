@@ -5,6 +5,7 @@ public import CompPoly.Fields.Binary.Common
 public import CompPoly.Fields.Binary.BF64.Ext3
 public import CompPoly.Fields.Binary.Tower.Impl
 public import CompPoly.Fields.Binary.BF128Ghash.Impl
+public import CompPoly.Fields.Binary.Aes.Basic
 
 @[expose] public section
 
@@ -24,6 +25,8 @@ Every field below is CompPoly's:
 - Three 64-bit limbs `[a_0, a_1, a_2]` stand for `a_0 + a_1 Y + a_2 Y^2` in `BF64.Ext3`,
   `BF64[Y] / (Y^3 + Y + 1)`.
 - A 128-bit integer stands for an element of the GHASH field, through `toQuot`.
+- A byte stands for an element of the block cipher's field, `GF(2)[X] / (X^8 + X^4 + X^3 + X + 1)`,
+  CompPoly's `AesField`.
 - An integer stands for an element of the tower's level `k`, `ConcreteBTField k`, through its
   low `2^k` bits.
 -/
@@ -60,5 +63,8 @@ def towerOf (k : ℕ) {ty : UScalarTy} (x : UScalar ty) : ConcreteBinaryTower.Co
 
 /-- The element of the tower's `GF(2^8)` an 8-bit integer stands for. -/
 def tower8 (x : Std.U8) : ConcreteBinaryTower.ConcreteBTField 3 := towerOf 3 x
+
+/-- The element of CompPoly's `AesField` a byte stands for: bit `i` is the coefficient of `X ^ i`. -/
+def aes (x : Std.U8) : AesField := AesField.ofBitVec x.bv
 
 end Plonky3Lean.Spec.BinaryField

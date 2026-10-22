@@ -1,5 +1,6 @@
 module
 
+public import Plonky3Lean.Proofs.Field.Binary.Aes
 public import Plonky3Lean.Proofs.Field.Binary.Operators
 
 @[expose] public section
@@ -16,6 +17,8 @@ pinned in `plonky3/`.
   - `GF(2^64)` is `BF64`, `GF(2)[X] / (X^64 + X^4 + X^3 + X + 1)`, read through `bf64`;
   - `GF(2^128)` is the GHASH field, `GF(2)[X] / (X^128 + X^7 + X^2 + X + 1)`, read through `ghash`;
   - `GF(2^192)` is `BF64.Ext3`, `BF64[Y] / (Y^3 + Y + 1)`, three limbs read through `toExt3`;
+  - the block cipher's `GF(2^8)` is `AesField`, `GF(2)[X] / (X^8 + X^4 + X^3 + X + 1)`, read
+    through `aes`;
   - level `k` of the binary tower, `GF(2^(2^k))`, is `ConcreteBTField k`, read through `towerOf k`
     from the low `2^k` bits.
 - CompPoly proves each of these is a field.
@@ -168,6 +171,18 @@ theorem poly192.Poly192.Insts.CoreOpsArithMulPoly192Poly192.mul.toExt3 (a b : po
     poly192.Poly192.Insts.CoreOpsArithMulPoly192Poly192.mul a b ⦃ r =>
       toExt3 r = toExt3 a * toExt3 b ⦄ :=
   Proofs.Binary.poly192_mul_ext a b
+
+/-! ## The block cipher's `GF(2^8)` -/
+
+/-- `aes::mul_bytes` is multiplication in the block cipher's field. -/
+theorem aes.mul_bytes.toAesField (a b : Std.U8) :
+    aes.mul_bytes a b ⦃ r => Spec.BinaryField.aes r = Spec.BinaryField.aes a * Spec.BinaryField.aes b ⦄ :=
+  Proofs.Binary.mul_bytes_aes a b
+
+/-- `aes::invert_byte` is inversion in the block cipher's field, with `0` sent to `0`. -/
+theorem aes.invert_byte.toAesField (a : Std.U8) :
+    aes.invert_byte a ⦃ r => Spec.BinaryField.aes r = (Spec.BinaryField.aes a)⁻¹ ⦄ :=
+  Proofs.Binary.invert_byte_aes a
 
 /-! ## The binary tower
 

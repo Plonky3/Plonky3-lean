@@ -1105,6 +1105,14 @@ name   = "Plonky3Lean.Claims.P3Mersenne31.mersenne_31.Mersenne31.new_array.toFie
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.aes.invert_byte.toAesField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.aes.mul_bytes.toAesField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.clmul.gf192.poly_mul_192.toExt3"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 

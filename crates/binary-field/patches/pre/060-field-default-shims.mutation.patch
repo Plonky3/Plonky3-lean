@@ -1,0 +1,16 @@
+# Mutation of: 060-field-default-shims
+# Breaks:      `raw_is_zero` compares with `ONE` instead of `ZERO`.
+#
+diff --git a/binary-field/src/field_defaults.rs b/binary-field/src/field_defaults.rs
+index 3285d10..e8925b1 100644
+--- a/binary-field/src/field_defaults.rs
++++ b/binary-field/src/field_defaults.rs
+@@ -28,7 +28,7 @@ macro_rules! field_defaults {
+             #[allow(dead_code)]
+             #[inline]
+             pub(crate) fn raw_is_zero(&self) -> bool {
+-                *self == Self::ZERO
++                *self == Self::ONE
+             }
+ 
+             /// The body of `Field::is_one`, compiled in every build.

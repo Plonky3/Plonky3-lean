@@ -1,0 +1,37 @@
+# Patch:        020-restore-partial-eq-ne
+# Phase:        post
+# Target:       extraction/P3BinaryField/Extraction/Funs.lean
+# Hunks:        1
+# Class:        restore
+# Gap:          docs/extractor-issues.md 2: charon's multi-target mode
+#               (`--targets`) forces `--translate-all-methods`, then filters
+#               unused methods after the merge, which drops the default-method
+#               roots hax adds (`--start-from core::cmp::PartialEq::ne`).
+#               `--targets` is needed because of 1.
+# Cost:         none. The added field is the body of the CoreModels default
+#               method it stands for (`cmp.PartialEq.ne.default`), inlined.
+# Upstreamable: yes: charon could keep `--start-from` roots through the
+#               multi-target merge, or hax could pass `--target` to charon's
+#               cargo (issue 1).
+# Drop when:    charon keeps `--start-from` roots through the multi-target
+#               merge, or hax can pass `--target` to charon's cargo.
+#
+# CoreModels' `core.cmp.PartialEq` has an `ne` field with no default. The
+# roots of pre-patch 070 reach `Poly64`'s derived `PartialEq` impl as a whole,
+# and it comes out without `ne`, so Lean rejects the structure literal. As for
+# goldilocks's `clone_from` (goldilocks/post/010), the field is added by hand:
+#   ne := fun self other => (eq self other) = false     (= ne.default)
+#
+--- a/extraction/P3BinaryField/Extraction/Funs.lean
++++ b/extraction/P3BinaryField/Extraction/Funs.lean
+@@ -19885,6 +19885,10 @@
+ def poly64.Poly64.Insts.CoreCmpPartialEqPoly64 : core.cmp.PartialEq
+   poly64.Poly64 poly64.Poly64 := {
+   eq := poly64.Poly64.Insts.CoreCmpPartialEqPoly64.eq
++  -- PATCHED: default method, body of `core.cmp.PartialEq.ne.default`
++  ne := fun self other => do
++    let b ← poly64.Poly64.Insts.CoreCmpPartialEqPoly64.eq self other
++    ok (b = false)
+ }
+ 
+ /-- [p3_binary_field::poly192::{impl core::cmp::PartialEq<p3_binary_field::poly192::Poly192> for p3_binary_field::poly192::Poly192}::eq]:
