@@ -83,4 +83,24 @@ theorem hash_group_eq (batch : Slice Std.U8) (s len : ℕ) (hB : s + len ≤ bat
       subtree_eq batch s len hB h32 _ 0 _ (by omega) (by simpa using chunks_bound len), bind_ok,
       store_all_eq _ (length_treeCv ..) old hold, ite_eq_right_of_eq_false _ _ (eq_false h)]
 
+theorem start_lane (first len : ℕ) (h : (first + 1) * len < 2 ^ 32) (h1 : first + 1 < 2 ^ 32) :
+    p3_blake3.batch.hash_many_with.closure.closure.Insts.CoreOpsFunctionFnMutTupleUsizeUsize.call_mut
+      (G := 1#usize) p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1
+      ((usz first, usz 0, usz len) : p3_blake3.batch.hash_many_with.closure.closure Std.U32 1#usize 1#usize)
+      (usz 0) = .ok (usz (first * len), (usz first, usz 0, usz len)) := by
+  unfold p3_blake3.batch.hash_many_with.closure.closure.Insts.CoreOpsFunctionFnMutTupleUsizeUsize.call_mut
+  show (do
+      let i3 ← usz 0 * (1#usize : Std.Usize)
+      let i4 ← usz first + i3
+      let i5 ← i4 + usz 0
+      let i6 ← i5 * usz len
+      RustM.ok (i6, ((usz first, usz 0, usz len) :
+        p3_blake3.batch.hash_many_with.closure.closure Std.U32 1#usize 1#usize))) = _
+  have hm : (usz 0 * (1#usize : Std.Usize) : RustM Std.Usize) = .ok (usz 0) := by
+    rw [lit1]; exact usz_mul (a := 0) (b := 1) (by norm_num) (by norm_num) (by norm_num)
+  rw [hm, bind_tc_ok, usz_add (a := first) (b := 0) (by omega), bind_tc_ok, usz_add (a := first + 0) (b := 0) (by omega),
+    bind_tc_ok, usz_mul (a := first + 0 + 0) (b := len) (by simp; nlinarith) (by omega) (by nlinarith), bind_tc_ok]
+  simp only [add_zero]
+  rfl
+
 end Plonky3Lean.Proofs.Blake3
