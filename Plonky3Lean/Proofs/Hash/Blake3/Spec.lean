@@ -144,4 +144,56 @@ theorem window_block (B : List (BitVec 8)) (s len idx i k : ℕ) (hk : k ≤ 64)
       have := hfull (by omega)
       omega))]
 
+theorem plainCv_fold (B : List (BitVec 8)) (s len idx P : ℕ) (blocks : List (List (BitVec 8)))
+    (hblk : ∀ i < P, blocks.getD i [] = ((chunkAt B s len idx).drop (64 * i)).take 64)
+    (hP : idx * 1024 + 64 * P ≤ len) (hP2 : 64 * P ≤ 1024) (k : ℕ) (hk : k ≤ P) :
+    (List.range k).foldl (fun cv i => (compress cv (blockWords (blocks.getD i [])) idx 64
+        (if i = 0 then CHUNK_START else 0)).take 8) IV = plainCv B (s + idx * 1024) idx k := by
+  induction k with
+  | zero => rfl
+  | succ k ih =>
+    rw [List.range_succ, List.foldl_append, ih (by omega), List.foldl_cons, List.foldl_nil, plainCv,
+      hblk k (by omega), ← window_block B s len idx k 64 le_rfl (by omega)
+        (by generalize idx * 1024 = st at hP ⊢; omega) (by omega),
+      Nat.add_assoc]
+
+theorem chunkCv_spec (B : List (BitVec 8)) (s len idx : ℕ) (root : Word) (hB : s + len ≤ B.length)
+    (hidx : idx * 1024 ≤ len) :
+    chunkCv B s len idx root =
+      (compress (chunkOutput (chunkAt B s len idx) idx).cv (chunkOutput (chunkAt B s len idx) idx).block idx
+        (chunkOutput (chunkAt B s len idx) idx).blockLen
+        ((chunkOutput (chunkAt B s len idx) idx).flags ||| root)).take 8 := by
+  have hm := length_chunkAt B s len idx hB
+  obtain ⟨hn, hg⟩ := pieces_spec 64 (by norm_num) (chunkAt B s len idx)
+  unfold chunkCv chunkOutput
+  dsimp only
+  generalize hst : idx * 1024 = st at hm hidx ⊢
+  generalize he : min len (st + 1024) = e at hm ⊢
+  generalize hc : chunkAt B s len idx = C at hm hn hg ⊢
+  have he1 : e ≤ len := by omega
+  have he2 : st ≤ e := by omega
+  have he3 : e ≤ st + 1024 := by omega
+  generalize hP : (e - st - 1) / 64 = P
+  have hd := Nat.div_mul_le_self (e - st - 1) 64
+  have hmd := Nat.lt_div_mul_add (a := e - st - 1) (b := 64) (by norm_num)
+  rw [hP] at hd hmd
+  have hn' : (pieces 64 C).length = P + 1 := by
+    rw [hn]
+    by_cases h0 : C = []
+    · subst h0; simp at hm; rw [ite_eq_left_of_eq_true _ _ (eq_true rfl)]; omega
+    · rw [ite_eq_right_of_eq_false _ _ (eq_false h0)]
+      have : C.length ≠ 0 := fun h => h0 (List.length_eq_zero_iff.1 h)
+      omega
+  have hf := plainCv_fold B s len idx P (pieces 64 C) (fun i hi => by rw [hg i (by omega), hc])
+    (by rw [hst]; omega) (by omega) P le_rfl
+  have hw := window_block B s len idx P (e - (st + P * 64)) (by omega) (by omega) (by rw [hst]; omega)
+    (by intro h; rw [hst]; omega)
+  rw [hst, hc, Nat.mul_comm 64 P] at hw
+  rw [hst] at hf
+  have hl : ((pieces 64 C).getD P []).length = e - (st + P * 64) := by
+    rw [hg P (by omega)]; simp [hm]; omega
+  rw [hn', Nat.add_sub_cancel, hf, hl, hw, hg P (by omega), Nat.mul_comm 64 P]
+  congr 3
+  simp
+
 end Plonky3Lean.Proofs.Blake3
