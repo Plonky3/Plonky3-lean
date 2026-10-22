@@ -10,6 +10,8 @@
 /Plonky3Lean/Claims.lean @Nashtare @tcoratger
 /Plonky3Lean/Spec/      @Nashtare @tcoratger
 /Plonky3Lean/Spec.lean  @Nashtare @tcoratger
+/ToCompPoly/            @Nashtare @tcoratger
+/ToCompPoly.lean        @Nashtare @tcoratger
 /claims.toml            @Nashtare @tcoratger
 /crates/*/patches/pre/  @Nashtare @tcoratger
 /TRUST.md               @Nashtare @tcoratger
