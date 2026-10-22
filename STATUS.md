@@ -15,9 +15,10 @@ target `thumbv7em-none-eabi`
 | Crate | State | Generated lines | Hand-written lines | `opaque` | Mirrored | Dropped by the extractor | Patches (pre / post) | Patches with a cost |
 |---|---|---:|---:|---:|---:|---:|---|---|
 | `baby-bear` | extracted | 2947 | 107 | 4 | 0 | 0 | 4 / 3 | pre `020`, pre `030`, pre `040` |
-| `field` | stub |  | 67 | 1 | 5 |  | 0 / 0 |  |
+| `field` | stub |  | 76 | 2 | 5 |  | 0 / 0 |  |
+| `koala-bear` | extracted | 3018 | 107 | 4 | 0 | 0 | 0 / 3 |  |
 | `mds` | scoped | 91 | 8 | 0 | 0 | 0 | 0 / 0 |  |
-| `monty-31` | scoped | 661 | 592 | 0 | 34 | 61 | 0 / 1 |  |
+| `monty-31` | scoped | 676 | 592 | 0 | 34 | 61 | 0 / 1 |  |
 | `poseidon1` | stub |  | 68 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 64 | 2 | 4 |  | 0 / 0 |  |
 | `util` | scoped | 108 | 8 | 0 | 0 | 0 | 0 / 0 |  |
@@ -35,6 +36,11 @@ charon's output and `--check` requires to reproduce. An item is *mirrored* when 
 `[[mirror]]` entry transcribes it by hand.
 
 ### `baby-bear`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `koala-bear`
 
 charon errors: 0.
 Nothing translated is dropped.
@@ -123,7 +129,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 111) whose dependencies include it; reaching one is not using it.
+(of 189) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -131,7 +137,12 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 | `baby-bear` | `mds.MDSBabyBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon2.BabyBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `field` | `p3_field.exponentiation.exp_1420470955` | its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here | 1 |
 | `field` | `p3_field.exponentiation.exp_1725656503` | its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here | 1 |
+| `koala-bear` | `koala_bear.KoalaBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 68 |
+| `koala-bear` | `mds.MDSKoalaBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `koala-bear` | `poseidon1.KoalaBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `koala-bear` | `poseidon2.KoalaBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `poseidon1` | `p3_poseidon1.Poseidon1.new` | the sparse-matrix decomposition in its body is not modelled | 0 |
 | `poseidon1` | `p3_poseidon1.external.FullRoundConstants` | p3-poseidon1 is a stub, and the extraction never observes this type's layout | 0 |
 | `poseidon1` | `p3_poseidon1.internal.PartialRoundConstants` | p3-poseidon1 is a stub, and the extraction never observes this type's layout | 0 |
@@ -144,24 +155,24 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 111) whose dependencies include the declaration.
+counts the claims (of 189) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
 | `field` | `p3_field.dup.Dup` | `p3_field::dup::Dup` | stub | 0 |
-| `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 1 |
+| `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 2 |
 | `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 0 |
 | `field` | `p3_field.field.PrimeField` | `p3_field::field::PrimeField` | stub | 0 |
 | `field` | `p3_field.field.UniformSamplingField` | `p3_field::field::UniformSamplingField` | stub | 0 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_array` | `p3_monty_31::monty_31::MontyField31::new_array` | dropped | 39 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_2d_array` | `p3_monty_31::monty_31::MontyField31::new_2d_array` | dropped | 22 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_monty` | `p3_monty_31::monty_31::MontyField31::new_monty` | dropped | 17 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.add` | `{impl core::ops::arith::Add for p3_monty_31::monty_31::MontyField31<_>}::add` | dropped | 4 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.sub` | `{impl core::ops::arith::Sub for p3_monty_31::monty_31::MontyField31<_>}::sub` | dropped | 2 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.mul` | `{impl core::ops::arith::Mul for p3_monty_31::monty_31::MontyField31<_>}::mul` | dropped | 5 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.neg` | `{impl core::ops::arith::Neg for p3_monty_31::monty_31::MontyField31<_>}::neg` | dropped | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.neg` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::ZERO` | dropped | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.halve` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::halve` | not translated | 1 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_array` | `p3_monty_31::monty_31::MontyField31::new_array` | dropped | 80 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_2d_array` | `p3_monty_31::monty_31::MontyField31::new_2d_array` | dropped | 49 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_monty` | `p3_monty_31::monty_31::MontyField31::new_monty` | dropped | 23 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.add` | `{impl core::ops::arith::Add for p3_monty_31::monty_31::MontyField31<_>}::add` | dropped | 6 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.sub` | `{impl core::ops::arith::Sub for p3_monty_31::monty_31::MontyField31<_>}::sub` | dropped | 4 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.mul` | `{impl core::ops::arith::Mul for p3_monty_31::monty_31::MontyField31<_>}::mul` | dropped | 7 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.neg` | `{impl core::ops::arith::Neg for p3_monty_31::monty_31::MontyField31<_>}::neg` | dropped | 2 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.neg` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::ZERO` | dropped | 2 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.halve` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::halve` | not translated | 2 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1InternalLayerMonty31` | `p3_monty_31::no_packing::poseidon1::Poseidon1InternalLayerMonty31` | not translated | 0 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1ExternalLayerMonty31` | `p3_monty_31::no_packing::poseidon1::Poseidon1ExternalLayerMonty31` | not translated | 0 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon2.Poseidon2InternalLayerMonty31` | `p3_monty_31::no_packing::poseidon2::Poseidon2InternalLayerMonty31` | not translated | 0 |
@@ -170,12 +181,12 @@ counts the claims (of 111) whose dependencies include the declaration.
 | `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1ExternalLayerMonty31.Insts.P3_poseidon1ExternalFullRoundLayerConstructorMontyField31WIDTH` | `{impl p3_poseidon1::external::FullRoundLayerConstructor for p3_monty_31::no_packing::poseidon1::Poseidon1ExternalLayerMonty31}` | not translated | 0 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon2.Poseidon2InternalLayerMonty31.Insts.P3_poseidon2InternalInternalLayerConstructorMontyField31` | `{impl p3_poseidon2::internal::InternalLayerConstructor for p3_monty_31::no_packing::poseidon2::Poseidon2InternalLayerMonty31}` | not translated | 0 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon2.Poseidon2ExternalLayerMonty31.Insts.P3_poseidon2ExternalExternalLayerConstructorMontyField31WIDTH` | `{impl p3_poseidon2::external::ExternalLayerConstructor for p3_monty_31::no_packing::poseidon2::Poseidon2ExternalLayerMonty31}` | not translated | 0 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.square` | `p3_field::field::PrimeCharacteristicRing::square` | not translated | 3 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.exp_u64` | `p3_field::field::PrimeCharacteristicRing::exp_u64` | not translated | 3 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.exp_u64.step` | `p3_field::field::PrimeCharacteristicRing::exp_u64` | not translated | 3 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.MONTY_POWERS_OF_TWO` | `p3_monty_31::monty_31::MontyField31::MONTY_POWERS_OF_TWO` | dropped | 3 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.mul_2exp_u64` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::mul_2exp_u64` | dropped | 3 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.try_inverse` | `{impl p3_field::field::Field for p3_monty_31::monty_31::MontyField31<_>}::try_inverse` | dropped | 2 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.square` | `p3_field::field::PrimeCharacteristicRing::square` | not translated | 4 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.exp_u64` | `p3_field::field::PrimeCharacteristicRing::exp_u64` | not translated | 4 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.exp_u64.step` | `p3_field::field::PrimeCharacteristicRing::exp_u64` | not translated | 4 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.MONTY_POWERS_OF_TWO` | `p3_monty_31::monty_31::MontyField31::MONTY_POWERS_OF_TWO` | dropped | 4 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.mul_2exp_u64` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::mul_2exp_u64` | dropped | 4 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.try_inverse` | `{impl p3_field::field::Field for p3_monty_31::monty_31::MontyField31<_>}::try_inverse` | dropped | 3 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU32.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<u32> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_int` | `{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
@@ -287,6 +298,84 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.poseidon2.const_check_6.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.from_monty.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.halve.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.mul.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.neg.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new.montgomery_form` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new_2d_array.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new_2d_array.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new_array.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new_array.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.sub.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.try_inverse.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.EXT_GENERATOR.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.eq_ext4TwoAdicGenerators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.EXT_GENERATOR.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.eq_ext8TwoAdicGenerators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.HALF_P_PLUS_1.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.INV_ROOTS_16.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.INV_ROOTS_8.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_BITS.from_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_BITS.val_eq_32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_GEN.generator` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_MU.from_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_MU.inverse` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_NEG_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_TWO.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_ZERO.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.ODD_FACTOR.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.PRIME.coprime_three_pred` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.PRIME.eq_fieldSize` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.PRIME.from_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.PRIME.is_prime` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.ROOTS_16.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.ROOTS_8.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.eq_twoAdicity` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.factorization` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.from_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.maximal` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADIC_GENERATORS.eq_twoAdicGenerators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADIC_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADIC_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TrinomialQuinticData.EXT_GENERATOR.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TrinomialQuinticData.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TrinomialQuinticData.FROBENIUS_COEFFS.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TrinomialQuinticData.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.exp_root_d.exponent` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.fieldDefaults` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.fieldValid` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.valid` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.add.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.from_monty.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.halve_u32.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.monty_reduce.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.sub.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.to_monty.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon1._.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon1.const_check_1.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2._.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_1.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_2.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_3.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_4.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_5.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_6.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.QuotientMap.from_canonical_checked_i128` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.QuotientMap.from_canonical_checked_i32` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.QuotientMap.from_canonical_checked_i64` | `Classical.choice`, `Quot.sound`, `propext` |

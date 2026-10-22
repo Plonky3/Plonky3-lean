@@ -2,6 +2,7 @@ import CompPoly.Fields.KoalaBear
 import P3KoalaBear
 import Plonky3Lean.Spec.Monty31
 import ToCompPoly.Fields.KoalaBear.Extension
+import ToCompPoly.Fields.KoalaBear.Quintic
 
 /-!
 # KoalaBear: what the model's values mean
@@ -11,6 +12,7 @@ KoalaBear is p3-monty-31 at `p = 2^31 - 2^24 + 1`, so its elements mean what any
 * **What an element means.**
   `toField` and `Canonical` are the generic `Plonky3Lean.Spec.Monty31` ones at `p`, landing in CompPoly's `KoalaBear.Field`.
   `toExt` reads an array of coefficients as an element of a binomial extension `F[X] / (X ^ D - w)`.
+  `toQuintic` reads one as an element of the quintic extension `F[X] / (X ^ 5 + X ^ 2 - 1)`.
 * **Names for the model's constants.**
   `abbrev`s for the trait constants and instances that aeneas generated for `KoalaBearParameters`.
   Each is an alias of a generated definition and adds nothing to it.
@@ -91,5 +93,11 @@ This is how `BinomialExtensionField<KoalaBear, D>` stores an element, with `X ^ 
 noncomputable def toExt {D : Usize} (w : KoalaBear.Field) (coeffs : Array Element D) :
     AdjoinRoot (X ^ D.val - C w) :=
   KoalaBear.ofCoeffs D.val w (coeffs.val.map toField)
+
+/-- The element `Σ j, c_j · X ^ j` of `F[X] / (X ^ 5 + X ^ 2 - 1)` that a coefficient array stands for.
+
+This is how `QuinticTrinomialExtensionField<KoalaBear>` stores an element, with `X ^ 5 = 1 - X ^ 2`. -/
+noncomputable def toQuintic (coeffs : Array Element 5#usize) : KoalaBear.Ext5 :=
+  KoalaBear.ofQuinticCoeffs (coeffs.val.map toField)
 
 end Plonky3Lean.Spec.KoalaBear

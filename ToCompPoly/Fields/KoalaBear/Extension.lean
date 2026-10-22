@@ -7,7 +7,10 @@ import CompPoly.Fields.KoalaBear
 import Mathlib.RingTheory.AdjoinRoot
 import ToCompPoly.Data.Nat.PowMod
 import ToCompPoly.Fields.KoalaBear
+import CompPoly.Fields.PrattCertificate
+import Mathlib.Tactic.NormNum.Prime
 import ToCompPoly.ToMathlib.Order.OrderOfSq
+import ToCompPoly.ToMathlib.Polynomial.CoeffList
 import ToCompPoly.ToMathlib.Polynomial.XPowSubC
 
 /-!
@@ -21,6 +24,9 @@ import ToCompPoly.ToMathlib.Polynomial.XPowSubC
 
   Entry `i` of `ext*TwoAdicGenerators` has order `2 ^ (twoAdicity + 1 + i)`.
   Entry `0` squares to `twoAdicGenerators[twoAdicity]`, and each later entry to the one before.
+
+  `ext4Generator` and `ext8Generator` generate the multiplicative groups of `Ext4` and `Ext8`.
+  Their orders are checked from the factorisation of `p ^ D - 1`, with powers computed on coefficient lists.
 
   The two-adicity of `p ^ 5 - 1` is recorded too: it equals that of `p - 1`.
 
@@ -43,6 +49,16 @@ theorem root_pow_eq (D : ℕ) (W : Field) :
   have h := AdjoinRoot.eval₂_root (X ^ D - C W)
   simp only [eval₂_sub, eval₂_X_pow, eval₂_C] at h
   exact sub_eq_zero.mp h
+
+/-- `ofCoeffs` is the class of the polynomial `CoeffList.toPoly cs`. -/
+theorem ofCoeffs_eq_mk_toPoly (D : ℕ) (W : Field) (cs : List Field) :
+    ofCoeffs D W cs = AdjoinRoot.mk _ (CoeffList.toPoly cs) := by
+  rw [ofCoeffs, CoeffList.toPoly_eq_sum]
+
+/-- `X ^ D = W` in `F[X] / (X ^ D - W)`, as `CoeffList` takes it. -/
+theorem mk_X_pow_eq (D : ℕ) (W : Field) :
+    AdjoinRoot.mk (X ^ D - C W) (X ^ D) = AdjoinRoot.mk (X ^ D - C W) (CoeffList.toPoly [W]) := by
+  simpa [map_pow, AdjoinRoot.mk_X, AdjoinRoot.mk_C] using root_pow_eq D W
 
 /-- `twoAdicGenerators[24]`, mapped into an extension, keeps its order `2 ^ 24`. -/
 theorem orderOf_of_twoAdicGenerator_24 {D : ℕ} (hD : 0 < D) (W : Field) :
@@ -141,6 +157,26 @@ theorem ext4TwoAdicGenerators_order :
   interval_cases i
   · exact h0
   · exact h1
+
+/-- The coefficients of a generator of the multiplicative group of `Ext4`: `X + 2`. -/
+def ext4GeneratorCoeffs : List Field := [2, 1, 0, 0]
+
+/-- `X + 2` generates the multiplicative group of `Ext4`: its order is `p ^ 4 - 1`.
+
+The primes of `p ^ 4 - 1` are `2, 3, 5, 127, 283, 1254833, 453990990362758349`. -/
+theorem orderOf_ext4Generator :
+    orderOf (ofCoeffs 4 ext4W ext4GeneratorCoeffs) = fieldSize ^ 4 - 1 := by
+  rw [ofCoeffs_eq_mk_toPoly]
+  refine CoeffList.orderOf_mk_toPoly (monic_X_pow_sub_C _ (by norm_num)) natDegree_X_pow_sub_C
+    (by norm_num) (mk_X_pow_eq 4 _) _
+    [(2, 26), (3, 1), (5, 1), (127, 1), (283, 1), (1254833, 1), (453990990362758349, 1)]
+    ?_ (by unfold fieldSize; norm_num) (by unfold fieldSize; norm_num)
+    (by unfold fieldSize; norm_num) (by decide +kernel) (by decide +kernel)
+  intro q hq
+  simp only [List.mem_cons, List.not_mem_nil, or_false] at hq
+  rcases hq with rfl | rfl | rfl | rfl | rfl | rfl | rfl
+  iterate 6 (on_goal 1 => norm_num)
+  pratt
 
 /-! ## Degree 5 -/
 
@@ -246,5 +282,27 @@ theorem ext8TwoAdicGenerators_order :
   · exact h0
   · exact h1
   · exact h2
+
+/-- The coefficients of a generator of the multiplicative group of `Ext8`: `X + 10`. -/
+def ext8GeneratorCoeffs : List Field := [10, 1, 0, 0, 0, 0, 0, 0]
+
+/-- `X + 10` generates the multiplicative group of `Ext8`: its order is `p ^ 8 - 1`.
+
+The primes of `p ^ 8 - 1` are those of `p ^ 4 - 1` and `17, 137, 260283155268050089696848485460377`. -/
+theorem orderOf_ext8Generator :
+    orderOf (ofCoeffs 8 ext8W ext8GeneratorCoeffs) = fieldSize ^ 8 - 1 := by
+  rw [ofCoeffs_eq_mk_toPoly]
+  refine CoeffList.orderOf_mk_toPoly (monic_X_pow_sub_C _ (by norm_num)) natDegree_X_pow_sub_C
+    (by norm_num) (mk_X_pow_eq 8 _) _
+    [(2, 27), (3, 1), (5, 1), (17, 2), (127, 1), (137, 1), (283, 1), (1254833, 1),
+      (453990990362758349, 1), (260283155268050089696848485460377, 1)]
+    ?_ (by unfold fieldSize; norm_num) (by unfold fieldSize; norm_num)
+    (by unfold fieldSize; norm_num) (by decide +kernel) (by decide +kernel)
+  intro q hq
+  simp only [List.mem_cons, List.not_mem_nil, or_false] at hq
+  rcases hq with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
+  iterate 8 (on_goal 1 => norm_num)
+  · pratt
+  · pratt
 
 end KoalaBear

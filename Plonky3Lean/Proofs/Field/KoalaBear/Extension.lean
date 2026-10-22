@@ -1,5 +1,6 @@
 import Plonky3Lean.Proofs.Field.KoalaBear.Constants
 import ToCompPoly.Fields.KoalaBear.Extension
+import ToCompPoly.Fields.KoalaBear.Quintic
 
 /-!
 # KoalaBear: the binomial extensions
@@ -12,7 +13,9 @@ import ToCompPoly.Fields.KoalaBear.Extension
 
 Each is compared with CompPoly's specification of the extension (`KoalaBear.Ext4`, `Ext8`), staged in `ToCompPoly.Fields.KoalaBear.Extension`.
 
-`TrinomialQuinticData`'s `EXT_TWO_ADICITY` is checked too.
+Each `EXT_GENERATOR` generates its extension's multiplicative group.
+
+For `TrinomialQuinticData`: `X ^ 5 + X ^ 2 - 1` is irreducible, and `EXT_GENERATOR`, `EXT_TWO_ADICITY` and `FROBENIUS_COEFFS` are checked.
 -/
 
 open Aeneas Aeneas.Std CoreModels Polynomial
@@ -246,5 +249,80 @@ theorem QuinticParams.EXT_TWO_ADICITY.spec :
     koala_bear.KoalaBearParameters.TWO_ADICITY.eq_twoAdicity]
   unfold koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsTrinomialQuinticDataArrayArrayMontyField31KoalaBearParameters50.EXT_TWO_ADICITY
   exact ⟨rfl, KoalaBear.ext5TwoAdicity_spec⟩
+
+/-! ## The multiplicative generators -/
+
+theorem Ext4Params.EXT_GENERATOR.order :
+    ∃ w g, Ext4Params.W = .ok w ∧ Ext4Params.EXT_GENERATOR = .ok g ∧
+      orderOf (toExt (Spec.KoalaBear.toField w) g) = KoalaBear.fieldSize ^ 4 - 1 := by
+  obtain ⟨w, hw, -, hw3, -⟩ := WP.spec_imp_exists Ext4Params.W.spec
+  have hg : Ext4Params.EXT_GENERATOR ⦃ g =>
+      g.val.map Spec.KoalaBear.toField = KoalaBear.ext4GeneratorCoeffs ⦄ := by
+    dsimp only
+    unfold koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsBinomialExtensionDataArrayArrayMontyField31KoalaBearParameters424.EXT_GENERATOR
+    refine WP.spec_mono (koala_bear.KoalaBear.new_array.toField _) ?_
+    rintro g ⟨-, hg⟩
+    rw [hg]; decide
+  obtain ⟨g, hg', hgv⟩ := WP.spec_imp_exists hg
+  refine ⟨w, g, hw, hg', ?_⟩
+  have key : ∀ v : KoalaBear.Field, v = 3 →
+      orderOf (toExt v g) = KoalaBear.fieldSize ^ 4 - 1 := by
+    rintro v rfl
+    unfold toExt
+    rw [hgv]
+    exact KoalaBear.orderOf_ext4Generator
+  exact key _ hw3
+
+theorem Ext8Params.EXT_GENERATOR.order :
+    ∃ w g, Ext8Params.W = .ok w ∧ Ext8Params.EXT_GENERATOR = .ok g ∧
+      orderOf (toExt (Spec.KoalaBear.toField w) g) = KoalaBear.fieldSize ^ 8 - 1 := by
+  obtain ⟨w, hw, -, hw3, -⟩ := WP.spec_imp_exists Ext8Params.W.spec
+  have hg : Ext8Params.EXT_GENERATOR ⦃ g =>
+      g.val.map Spec.KoalaBear.toField = KoalaBear.ext8GeneratorCoeffs ⦄ := by
+    dsimp only
+    unfold koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsBinomialExtensionDataArrayArrayMontyField31KoalaBearParameters838.EXT_GENERATOR
+    refine WP.spec_mono (koala_bear.KoalaBear.new_array.toField _) ?_
+    rintro g ⟨-, hg⟩
+    rw [hg]; decide
+  obtain ⟨g, hg', hgv⟩ := WP.spec_imp_exists hg
+  refine ⟨w, g, hw, hg', ?_⟩
+  have key : ∀ v : KoalaBear.Field, v = 3 →
+      orderOf (toExt v g) = KoalaBear.fieldSize ^ 8 - 1 := by
+    rintro v rfl
+    unfold toExt
+    rw [hgv]
+    exact KoalaBear.orderOf_ext8Generator
+  exact key _ hw3
+
+theorem QuinticParams.EXT_GENERATOR.order :
+    QuinticParams.EXT_GENERATOR ⦃ g => orderOf (toQuintic g) = KoalaBear.fieldSize ^ 5 - 1 ⦄ := by
+  dsimp only
+  unfold koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsTrinomialQuinticDataArrayArrayMontyField31KoalaBearParameters50.EXT_GENERATOR
+  refine WP.spec_mono (koala_bear.KoalaBear.new_array.toField _) ?_
+  rintro g ⟨-, hg⟩
+  have hc : g.val.map Spec.KoalaBear.toField = KoalaBear.quinticGeneratorCoeffs := by
+    rw [hg]; decide
+  unfold toQuintic
+  rw [hc]
+  exact KoalaBear.orderOf_quinticGenerator
+
+/-- `FROBENIUS_COEFFS[k]` stands for `X ^ ((k + 1) · p)` in `F[X] / (X ^ 5 + X ^ 2 - 1)`. -/
+theorem QuinticParams.FROBENIUS_COEFFS.spec :
+    QuinticParams.FROBENIUS_COEFFS ⦃ t => ∀ k (h : k < t.val.length),
+      toQuintic t.val[k] = AdjoinRoot.root KoalaBear.quinticPoly ^ ((k + 1) * KoalaBear.fieldSize) ⦄ := by
+  dsimp only
+  unfold koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsTrinomialQuinticDataArrayArrayMontyField31KoalaBearParameters50.FROBENIUS_COEFFS
+  refine WP.spec_mono (koala_bear.KoalaBear.new_2d_array.toField _) ?_
+  rintro t ⟨-, ht⟩
+  have hc : t.val.map (fun row => row.val.map Spec.KoalaBear.toField) =
+      KoalaBear.quinticFrobeniusCoeffs := by
+    rw [ht]; decide
+  intro k hk
+  have hk' : k < KoalaBear.quinticFrobeniusCoeffs.length := by
+    rw [← hc, List.length_map]; exact hk
+  rw [← KoalaBear.quinticFrobeniusCoeffs_spec k hk']
+  unfold toQuintic
+  congr 1
+  simp only [← hc, List.getElem_map]
 
 end Plonky3Lean.Proofs.KoalaBear

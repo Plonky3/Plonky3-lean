@@ -6,6 +6,7 @@ import Plonky3Lean.Proofs.Field.KoalaBear.Extension
 import Plonky3Lean.Proofs.Field.KoalaBear.Generic
 import Plonky3Lean.Proofs.Field.KoalaBear.Poseidon
 import ToCompPoly.Fields.KoalaBear.Extension
+import ToCompPoly.Fields.KoalaBear.Quintic
 
 /-!
 # KoalaBear: claims
@@ -14,7 +15,7 @@ What this repository asserts about p3-koala-bear, at the Plonky3 commit pinned i
 
 - The model is the extraction in `crates/koala-bear` and the scoped extraction in `crates/monty-31`.
 - `PRIME`, `MontyParams` and the other names are `Plonky3Lean.Spec.KoalaBear`'s aliases for its constants.
-- `KoalaBear.*` is CompPoly's specification of the field, extended by `ToCompPoly` (the binomial extensions, cube roots).
+- `KoalaBear.*` is CompPoly's specification of the field, extended by `ToCompPoly` (the extensions, cube roots).
 - `toField` and `Canonical` are the generic Monty31 ones at `p = KoalaBear.fieldSize`.
 
 KoalaBear's parameters pass the checks of `MontyField31::new`, so the generic Monty31 theorems apply at them.
@@ -25,7 +26,6 @@ Not claimed:
 - the integer conversions and deserialization;
 - the packed (SIMD) and extension-field arithmetic, and `mul_w`, which the extraction does not produce;
 - the body of `exp_1420470955`, which the model leaves opaque;
-- the extension fields' `EXT_GENERATOR`s, and `TrinomialQuinticData`'s `EXT_GENERATOR` and `FROBENIUS_COEFFS`;
 - `UniformSamplingField`'s `SAMPLING_BITS_M`;
 - the Poseidon1 and Poseidon2 permutations, the MDS layer, and the values of the round constants.
 -/
@@ -427,6 +427,12 @@ theorem koala_bear.KoalaBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION
       ∀ i (h : i + 1 < chain.length), chain[i + 1] ^ 2 = chain[i] :=
   Proofs.KoalaBear.Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.sq_succ
 
+/-- The degree-4 `EXT_GENERATOR`, `X + 2`, generates the multiplicative group of `F[X] / (X ^ 4 - W)`: its order is `p ^ 4 - 1`. -/
+theorem koala_bear.KoalaBearParameters.BinomialExtensionData4.EXT_GENERATOR.order :
+    ∃ w g, Ext4Params.W = .ok w ∧ Ext4Params.EXT_GENERATOR = .ok g ∧
+      orderOf (toExt (toField w) g) = KoalaBear.fieldSize ^ 4 - 1 :=
+  Proofs.KoalaBear.Ext4Params.EXT_GENERATOR.order
+
 /-- `W = 3` for the degree-8 extension, stored canonically, and `X ^ 8 - W` is irreducible. -/
 theorem koala_bear.KoalaBearParameters.BinomialExtensionData8.W.irreducible :
     Ext8Params.W ⦃ w => Canonical w ∧ toField w = 3 ∧
@@ -469,6 +475,12 @@ theorem koala_bear.KoalaBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION
       ∀ i (h : i + 1 < chain.length), chain[i + 1] ^ 2 = chain[i] :=
   Proofs.KoalaBear.Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.sq_succ
 
+/-- The degree-8 `EXT_GENERATOR`, `X + 10`, generates the multiplicative group of `F[X] / (X ^ 8 - W)`: its order is `p ^ 8 - 1`. -/
+theorem koala_bear.KoalaBearParameters.BinomialExtensionData8.EXT_GENERATOR.order :
+    ∃ w g, Ext8Params.W = .ok w ∧ Ext8Params.EXT_GENERATOR = .ok g ∧
+      orderOf (toExt (toField w) g) = KoalaBear.fieldSize ^ 8 - 1 :=
+  Proofs.KoalaBear.Ext8Params.EXT_GENERATOR.order
+
 /-! ## `TrinomialQuinticData` -/
 
 /-- The quintic extension's `EXT_TWO_ADICITY` is the two-adicity of `p ^ 5 - 1`, equal to `TWO_ADICITY`.
@@ -478,6 +490,24 @@ theorem koala_bear.KoalaBearParameters.TrinomialQuinticData.EXT_TWO_ADICITY.spec
     QuinticParams.EXT_TWO_ADICITY ⦃ e => e.val = TWO_ADICITY.val ∧
       2 ^ e.val ∣ PRIME.val ^ 5 - 1 ∧ ¬ 2 ^ (e.val + 1) ∣ PRIME.val ^ 5 - 1 ⦄ :=
   Proofs.KoalaBear.QuinticParams.EXT_TWO_ADICITY.spec
+
+/-- `X ^ 5 + X ^ 2 - 1` is irreducible over KoalaBear, so the quintic extension is a field of order `p ^ 5`.
+
+`quintic_extension.rs` requires it and states it was verified. -/
+theorem koala_bear.KoalaBearParameters.TrinomialQuinticData.irreducible :
+    Irreducible (Polynomial.X ^ 5 + Polynomial.X ^ 2 - 1 : Polynomial KoalaBear.Field) :=
+  KoalaBear.irreducible_quinticPoly
+
+/-- The quintic `EXT_GENERATOR`, `X + 2`, generates the multiplicative group: its order is `p ^ 5 - 1`. -/
+theorem koala_bear.KoalaBearParameters.TrinomialQuinticData.EXT_GENERATOR.order :
+    QuinticParams.EXT_GENERATOR ⦃ g => orderOf (toQuintic g) = KoalaBear.fieldSize ^ 5 - 1 ⦄ :=
+  Proofs.KoalaBear.QuinticParams.EXT_GENERATOR.order
+
+/-- `FROBENIUS_COEFFS[k]` stands for `X ^ ((k + 1) · p)`, which `frobenius` relies on. -/
+theorem koala_bear.KoalaBearParameters.TrinomialQuinticData.FROBENIUS_COEFFS.spec :
+    QuinticParams.FROBENIUS_COEFFS ⦃ t => ∀ k (h : k < t.val.length),
+      toQuintic t.val[k] = AdjoinRoot.root KoalaBear.quinticPoly ^ ((k + 1) * KoalaBear.fieldSize) ⦄ :=
+  Proofs.KoalaBear.QuinticParams.FROBENIUS_COEFFS.spec
 
 /-! ## The Poseidon round-constant length assertions
 
