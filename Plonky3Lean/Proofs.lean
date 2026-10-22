@@ -19,6 +19,15 @@ import Plonky3Lean.Proofs.Field.KoalaBear.Constants
 import Plonky3Lean.Proofs.Field.KoalaBear.Extension
 import Plonky3Lean.Proofs.Field.KoalaBear.Generic
 import Plonky3Lean.Proofs.Field.KoalaBear.Poseidon
+import Plonky3Lean.Proofs.Field.Mersenne31.Basic
+import Plonky3Lean.Proofs.Field.Mersenne31.Complex
+import Plonky3Lean.Proofs.Field.Mersenne31.Constants
+import Plonky3Lean.Proofs.Field.Mersenne31.Conversions
+import Plonky3Lean.Proofs.Field.Mersenne31.DotProduct
+import Plonky3Lean.Proofs.Field.Mersenne31.DotProductLoop
+import Plonky3Lean.Proofs.Field.Mersenne31.Field
+import Plonky3Lean.Proofs.Field.Mersenne31.Inverse
+import Plonky3Lean.Proofs.Field.Mersenne31.Sum
 import Plonky3Lean.Proofs.Field.Monty31.Arith
 import Plonky3Lean.Proofs.Field.Monty31.Convert
 import Plonky3Lean.Proofs.Field.Monty31.Element

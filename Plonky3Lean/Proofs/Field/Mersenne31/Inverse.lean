@@ -1,12 +1,13 @@
 import CompPoly.Fields.Mersenne
 import Plonky3Lean.Proofs.Field.Mersenne31.Conversions
+import Plonky3Lean.Proofs.Util.GcdInversion
 
 /-!
 # Mersenne31: `try_inverse`
 
-`try_inverse` calls p3-util's GCD inversion, whose documented output is `2^60 a^{-1} mod p` as an `i64`.
+`try_inverse` calls p3-util's GCD inversion, whose output is `2^60 a^{-1} mod p` as an `i64`.
 
-The specification below takes that contract as a hypothesis, the only property of the GCD it uses.
+That congruence is the only property of the GCD it uses: every `i64` converts correctly, so its size does not matter.
 -/
 
 open Aeneas Aeneas.Std CoreModels
@@ -58,5 +59,13 @@ theorem try_inverse.spec (hg : GcdInversionContract) (a : Element) (ha : Valid a
     push_cast at this ⊢; exact this
   have := congrArg ZMod.val key
   rwa [ZMod.val_natCast, ZMod.val_one] at this
+
+/-- The GCD inversion meets its contract at `p = 2^31 - 1`. -/
+theorem gcdInversionContract : GcdInversionContract := by
+  intro a ha0 hap
+  refine WP.spec_mono (Proofs.Util.gcd_inversion_prime_field_32.spec_prime a 2147483647#u32
+    Mersenne31.is_prime (by decide) (by decide) ha0 hap) ?_
+  rintro v ⟨-, hv⟩
+  exact hv
 
 end Plonky3Lean.Proofs.Mersenne31

@@ -18,6 +18,7 @@ watch = ["mersenne-31/src", "mersenne-31/Cargo.toml", "field/src/integers.rs", "
 
 # The transcriptions in extraction/P3Mersenne31/Assumptions/Mirror.lean.
 # Hashes are pending tools/mirror.
+# Items in `extraction/gaps.toml` are named as it names them, so the cross-check finds them.
 
 [[mirror]]
 lean = "p3_mersenne_31.mersenne_31.Mersenne31.Insts.CoreIterTraitsAccumSumMersenne31.sum"
@@ -29,15 +30,15 @@ rust = "{impl p3_field::field::PrimeCharacteristicRing for p3_mersenne_31::merse
 
 [[mirror]]
 lean = "p3_mersenne_31.complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS"
-rust = "p3_mersenne_31::mersenne_31::Mersenne31::CIRCLE_TWO_ADIC_GENERATORS"
+rust = "p3_mersenne_31::complex::{impl}::CIRCLE_TWO_ADIC_GENERATORS"
 
 [[mirror]]
 lean = "p3_mersenne_31.complex.Mersenne31.COMPLEX_GENERATOR"
-rust = "{impl p3_field::extension::complex::ComplexExtendable for p3_mersenne_31::mersenne_31::Mersenne31}::COMPLEX_GENERATOR"
+rust = "p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::COMPLEX_GENERATOR"
 
 [[mirror]]
 lean = "p3_mersenne_31.complex.Mersenne31.circle_two_adic_generator"
-rust = "{impl p3_field::extension::complex::ComplexExtendable for p3_mersenne_31::mersenne_31::Mersenne31}::circle_two_adic_generator"
+rust = "p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::circle_two_adic_generator"
 
 [[mirror]]
 lean = "p3_mersenne_31.extension.Mersenne31.QUADRATIC_W"

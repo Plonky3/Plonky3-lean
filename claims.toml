@@ -907,3 +907,195 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 [[claim]]
 name   = "Plonky3Lean.Claims.Goldilocks.goldilocks.reduce128.toField"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.complex.Mersenne31.COMPLEX_GENERATOR.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.complex.Mersenne31.circle_two_adic_generator.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.extension.Mersenne31.CUBIC_DTH_ROOT.toComplex"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.extension.Mersenne31.CUBIC_W.irreducible"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.extension.Mersenne31.QUADRATIC_DTH_ROOT.toComplex"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.extension.Mersenne31.QUADRATIC_EXT_TWO_ADIC_GENERATOR_33.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.extension.Mersenne31.QUADRATIC_W.irreducible"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.extension.Mersenne31.mul_by_w.toComplex"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.CUBIC_DTH_ROOT.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.CUBIC_EXT_GENERATOR.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.CUBIC_W.irreducible"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.EXT_TWO_ADIC_GENERATORS.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.GENERATOR.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.NEG_ONE.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.add.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.as_canonical_u32.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.div_2exp_u64.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.dot_product.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.eq.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.ext_two_adic_generator.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.from_bool.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.from_canonical_checked_i64.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.from_canonical_unchecked_u32.panics_at_p"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.from_canonical_unchecked_u32.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.from_int_i128.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.from_int_i32.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.from_int_i64.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.from_int_u128.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.from_int_u32.toField"
+axioms = ["Classical.choice", "Plonky3Lean.Proofs.Mersenne31.clear_msb_toNat._native.bv_decide.ax_1_5", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.from_int_u64.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.halve.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.injective_exp_root_n.exponent"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.is_zero.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.mul.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.mul_2exp_u64.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.neg.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.new.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.new_checked.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.sub.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.sum.length_bound"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.sum.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.sum.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.Mersenne31.try_inverse.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.P.eq_fieldSize"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.from_u62.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.partial_reduce.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Mersenne31.mersenne_31.reduce_64.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]

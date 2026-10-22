@@ -15,10 +15,11 @@ target `thumbv7em-none-eabi`
 | Crate | State | Generated lines | Hand-written lines | `opaque` | Mirrored | Dropped by the extractor | Patches (pre / post) | Patches with a cost |
 |---|---|---:|---:|---:|---:|---:|---|---|
 | `baby-bear` | extracted | 2947 | 107 | 4 | 0 | 0 | 4 / 3 | pre `020`, pre `030`, pre `040` |
-| `field` | stub |  | 76 | 2 | 5 |  | 0 / 0 |  |
+| `field` | stub |  | 87 | 2 | 6 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 563 | 409 | 0 | 19 | 37 | 1 / 0 |  |
 | `koala-bear` | extracted | 3018 | 107 | 4 | 0 | 0 | 0 / 3 |  |
 | `mds` | scoped | 91 | 8 | 0 | 0 | 0 | 0 / 0 |  |
+| `mersenne-31` | scoped | 1421 | 241 | 0 | 12 | 32 | 1 / 0 | pre `010` |
 | `monty-31` | scoped | 676 | 592 | 0 | 34 | 61 | 0 / 1 |  |
 | `poseidon1` | stub |  | 68 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 64 | 2 | 4 |  | 0 / 0 |  |
@@ -95,6 +96,46 @@ Nothing translated is dropped.
 
 charon errors: 0.
 Nothing translated is dropped.
+
+### `mersenne-31`
+
+charon errors: 2, at `library/core/src/slice/iter/macros.rs:153:9`.
+32 item(s) dropped, 4 of them mirrored.
+
+| Item | Source | Mirrored |
+|---|---|---|
+| `p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::CIRCLE_TWO_ADICITY` | `mersenne-31/src/complex.rs:53` |  |
+| `p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::COMPLEX_GENERATOR` | `mersenne-31/src/complex.rs:61` | yes |
+| `p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::circle_two_adic_generator` | `mersenne-31/src/complex.rs:63` | yes |
+| `p3_mersenne_31::complex::{impl}::CIRCLE_TWO_ADIC_GENERATORS` | `mersenne-31/src/complex.rs:16` | yes |
+| `p3_mersenne_31::extension::{impl p3_field::extension::BinomiallyExtendable}::binomial_algebra_id` | `mersenne-31/src/extension.rs:22` |  |
+| `p3_mersenne_31::extension::{impl p3_field::extension::ExtensionAlgebra}::ext_mul` | `mersenne-31/src/extension.rs:11` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::clone::Clone}::clone` | `mersenne-31/src/mersenne_31.rs:33` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::cmp::PartialOrd}::partial_cmp` | `mersenne-31/src/mersenne_31.rs:151` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::default::Default}::default` | `mersenne-31/src/mersenne_31.rs:33` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::fmt::Debug}::fmt` | `mersenne-31/src/mersenne_31.rs:164` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::fmt::Display}::fmt` | `mersenne-31/src/mersenne_31.rs:157` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::hash::Hash}::hash` | `mersenne-31/src/mersenne_31.rs:137` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::iter::traits::accum::Product}::product` | `field/src/op_assign_macros.rs:91` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::iter::traits::accum::Sum}::sum` | `mersenne-31/src/mersenne_31.rs:620` | yes |
+| `p3_mersenne_31::mersenne_31::{impl core::ops::arith::AddAssign}::add_assign` | `field/src/op_assign_macros.rs:28` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::ops::arith::DivAssign}::div_assign` | `field/src/op_assign_macros.rs:214` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::ops::arith::Div}::div` | `field/src/op_assign_macros.rs:206` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::ops::arith::MulAssign}::mul_assign` | `field/src/op_assign_macros.rs:84` |  |
+| `p3_mersenne_31::mersenne_31::{impl core::ops::arith::SubAssign}::sub_assign` | `field/src/op_assign_macros.rs:64` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::field::Field}::BENEFITS_FROM_LOCKSTEP_EVALUATION` | `mersenne-31/src/mersenne_31.rs:386` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::field::Field}::order` | `mersenne-31/src/mersenne_31.rs:407` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::field::Field}::try_inverse::NUM_PRIME_BITS` | `mersenne-31/src/mersenne_31.rs:399` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::field::PrimeCharacteristicRing}::from_prime_subfield` | `mersenne-31/src/mersenne_31.rs:229` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::field::PrimeField64}::ORDER_U64` | `mersenne-31/src/mersenne_31.rs:548` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::field::PrimeField64}::as_canonical_u64` | `mersenne-31/src/mersenne_31.rs:551` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::field::PrimeField}::as_canonical_biguint` | `mersenne-31/src/mersenne_31.rs:527` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::integers::QuotientMap}::from_canonical_checked` | `field/src/integers.rs:105` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::integers::QuotientMap}::from_canonical_checked::NEG_TWO_EXP_30_PLUS_1` | `mersenne-31/src/mersenne_31.rs:502` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::integers::QuotientMap}::from_canonical_checked::TWO_EXP_30` | `mersenne-31/src/mersenne_31.rs:501` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `field/src/integers.rs:116` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `field/src/integers.rs:304` |  |
+| `p3_mersenne_31::mersenne_31::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `field/src/integers.rs:403` |  |
 
 ### `monty-31`
 
@@ -175,7 +216,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 225) whose dependencies include it; reaching one is not using it.
+(of 273) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -201,7 +242,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 225) whose dependencies include the declaration.
+counts the claims (of 273) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -210,6 +251,7 @@ counts the claims (of 225) whose dependencies include the declaration.
 | `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 0 |
 | `field` | `p3_field.field.PrimeField` | `p3_field::field::PrimeField` | stub | 0 |
 | `field` | `p3_field.field.UniformSamplingField` | `p3_field::field::UniformSamplingField` | stub | 0 |
+| `field` | `p3_field.helpers.halve_u32` | `p3_field::helpers::halve_u32` | stub | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreOpsArithSubGoldilocksGoldilocks.sub` | `{impl core::ops::arith::Sub for p3_goldilocks::goldilocks::Goldilocks}::sub` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreCmpPartialEqGoldilocks.eq` | `{impl core::cmp::PartialEq for p3_goldilocks::goldilocks::Goldilocks}::eq` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.halve` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::halve` | not translated | 2 |
@@ -229,6 +271,18 @@ counts the claims (of 225) whose dependencies include the declaration.
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_unchecked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked` | dropped | 2 |
+| `mersenne-31` | `p3_mersenne_31.mersenne_31.Mersenne31.Insts.CoreIterTraitsAccumSumMersenne31.sum` | `{impl core::iter::traits::accum::Sum for p3_mersenne_31::mersenne_31::Mersenne31}::sum` | dropped | 2 |
+| `mersenne-31` | `p3_mersenne_31.mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.sum_array` | `{impl p3_field::field::PrimeCharacteristicRing for p3_mersenne_31::mersenne_31::Mersenne31}::sum_array` | not translated | 0 |
+| `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS` | `p3_mersenne_31::complex::{impl}::CIRCLE_TWO_ADIC_GENERATORS` | dropped | 2 |
+| `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.COMPLEX_GENERATOR` | `p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::COMPLEX_GENERATOR` | dropped | 1 |
+| `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.circle_two_adic_generator` | `p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::circle_two_adic_generator` | dropped | 1 |
+| `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.QUADRATIC_W` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::W` | not translated | 2 |
+| `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.QUADRATIC_DTH_ROOT` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::DTH_ROOT` | not translated | 1 |
+| `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.mul_by_w` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::mul_by_w` | not translated | 1 |
+| `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.QUADRATIC_EXT_TWO_ADIC_GENERATOR_33` | `{impl p3_field::extension::complex::HasTwoAdicComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::complex_ext_two_adic_generator` | not translated | 1 |
+| `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.CUBIC_W` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<3> for p3_mersenne_31::mersenne_31::Mersenne31}::W` | not translated | 1 |
+| `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.CUBIC_DTH_ROOT` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<3> for p3_mersenne_31::mersenne_31::Mersenne31}::DTH_ROOT` | not translated | 1 |
+| `mersenne-31` | `p3_mersenne_31.complex.new_complex_new` | `p3_field::extension::complex::Complex::new_complex` | not translated | 2 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.new_array` | `p3_monty_31::monty_31::MontyField31::new_array` | dropped | 80 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.new_2d_array` | `p3_monty_31::monty_31::MontyField31::new_2d_array` | dropped | 49 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.new_monty` | `p3_monty_31::monty_31::MontyField31::new_monty` | dropped | 23 |
@@ -280,6 +334,7 @@ counts the claims (of 225) whose dependencies include the declaration.
 | `baby-bear/pre/020-field-cfg-raw-data-serializable-supertrait` | none in a normal build (see below). In the extracted variant, `Field` no longer implies `RawDataSerializable`. |
 | `baby-bear/pre/030-field-cfg-rpitit-packed-methods` | none in a normal build: every change is behind cfg(hax_backend_lean). In the extracted variant, four default methods are absent and `to_ext_iter` sits on an extension trait. |
 | `baby-bear/pre/040-field-cfg-rpitit-bit-plane-expansion` | none in a normal build: the change is behind cfg(hax_backend_lean). In the extracted variant, `Field::prepare_bit_plane_expansion` is absent. |
+| `mersenne-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of `Mersenne31`. No existing body changes. |
 
 Upstream tests (`test-pre-patches.py`): 6715 of Plonky3's 6769 pass as shipped and 6715 with the pre-extraction patches, with 0 divergence(s).
 
@@ -478,6 +533,54 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `KoalaBear.poseidon2.const_check_6.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `KoalaBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `KoalaBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.complex.Mersenne31.COMPLEX_GENERATOR.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.complex.Mersenne31.circle_two_adic_generator.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.extension.Mersenne31.CUBIC_DTH_ROOT.toComplex` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.extension.Mersenne31.CUBIC_W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.extension.Mersenne31.QUADRATIC_DTH_ROOT.toComplex` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.extension.Mersenne31.QUADRATIC_EXT_TWO_ADIC_GENERATOR_33.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.extension.Mersenne31.QUADRATIC_W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.extension.Mersenne31.mul_by_w.toComplex` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.CUBIC_DTH_ROOT.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.CUBIC_EXT_GENERATOR.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.CUBIC_W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.EXT_TWO_ADIC_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.GENERATOR.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.NEG_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.as_canonical_u32.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.div_2exp_u64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.dot_product.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.eq.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.ext_two_adic_generator.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_bool.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_canonical_checked_i64.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_canonical_unchecked_u32.panics_at_p` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_canonical_unchecked_u32.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_int_i128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_int_i32.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_int_i64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_int_u128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_int_u32.toField` | `Classical.choice`, `Plonky3Lean.Proofs.Mersenne31.clear_msb_toNat._native.bv_decide.ax_1_5`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.from_int_u64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.halve.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.injective_exp_root_n.exponent` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.is_zero.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.mul.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.mul_2exp_u64.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.neg.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.new.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.new_checked.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.sub.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.sum.length_bound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.sum.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.sum.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.Mersenne31.try_inverse.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.P.eq_fieldSize` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.from_u62.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.partial_reduce.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Mersenne31.mersenne_31.reduce_64.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.QuotientMap.from_canonical_checked_i128` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.QuotientMap.from_canonical_checked_i32` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.QuotientMap.from_canonical_checked_i64` | `Classical.choice`, `Quot.sound`, `propext` |

@@ -1,27 +1,31 @@
-# Patch:     010-extraction-roots
-# Phase:     pre
-# Target:    mersenne-31/src/lib.rs, mersenne-31/src/hax_roots.rs
-# Hunks:     2
-# Cost:      none in a normal build: the module exists only under
-#            cfg(hax_backend_lean). In the extracted variant it adds free
-#            functions, each of which calls one method of `Mersenne31` and
-#            does nothing else; no existing body is changed.
-# Upstream:  docs/extractor-issues.md, 4 (charon leaves methods that no free
-#            function calls out of `ordered_decls`, and aeneas drops them).
-# Drop when: charon orders `--start-from` methods, so that the methods
-#            themselves can be roots.
+# Patch:        010-extraction-roots
+# Phase:        pre
+# Target:       mersenne-31/src/lib.rs, mersenne-31/src/hax_roots.rs
+# Hunks:        2
+# Class:        bound
+# Gap:          docs/extractor-issues.md 4 (charon leaves methods that no free
+#               function calls out of `ordered_decls`, and aeneas drops them).
+# Cost:         none in a normal build: the module exists only under
+#               cfg(hax_backend_lean). In the extracted variant it adds free
+#               functions, each of which calls one method of `Mersenne31`.
+#               No existing body changes.
+# Upstreamable: no: the module exists only for the extractor. Charon ordering
+#               `--start-from` methods would make it unnecessary.
+# Drop when:    charon orders `--start-from` methods, so that the methods
+#               themselves can be roots.
+# Test:         lint p3-mersenne-31 unexpected_cfgs
+# Mutation:     the module is gated on a misspelled cfg, so a normal
+#               `cargo check` reports `unexpected_cfgs`.
 #
-# Charon translates every method of `Mersenne31` with its body, but aeneas only
-# emits the ones a free function reaches: in a run rooted at the methods
-# themselves, `Sub`, `Mul`, `Neg`, `new`, `from_int` and the rest are silently
-# dropped, while `Add` survives because `from_u62` calls it. Rooting the run at
-# a module of one-line wrappers makes every wrapped method reachable, so its
-# own body is extracted instead of transcribed by hand.
+# Charon translates every method of `Mersenne31` with its body.
+# aeneas emits only the ones a free function reaches.
+# Rooted at the methods themselves, `Sub`, `Mul`, `Neg`, `new`, `from_int` and the rest are silently dropped.
+# `Add` survives only because `from_u62` calls it.
+# Rooted at a module of one-line wrappers, every wrapped method is reachable, so its own body is extracted instead of transcribed.
 #
-# Methods that need a whole trait-impl dictionary (`to_unique_u32`, anything
-# on `Complex<Mersenne31>`) or `core::iter` (`sum_array`, `Sum`) are not
-# wrapped: aeneas rejects p3-field's trait hierarchy (issue 9) and fails on
-# `core::iter` (issue 11).
+# Methods that need a whole trait-impl dictionary (`to_unique_u32`, anything on `Complex<Mersenne31>`) are not wrapped.
+# Nor are those that reach `core::iter` (`sum_array`, `Sum`).
+# aeneas rejects p3-field's trait hierarchy (issue 9) and fails on `core::iter` (issue 11).
 #
 diff --git a/mersenne-31/src/hax_roots.rs b/mersenne-31/src/hax_roots.rs
 new file mode 100644
