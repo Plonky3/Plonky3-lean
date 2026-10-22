@@ -16,13 +16,13 @@ namespace Plonky3Lean.Proofs.Monty31
 
 variable {MP : Type} {inst : data_traits.MontyParameters MP} {p mu : Std.U32}
 
-/-- `to_monty_signed(x)` puts any `i32` into Montgomery form: the canonical
-representative of `x · 2^32 mod p`.
+/-- `to_monty_signed(x)` puts any `i32` into Montgomery form, canonically: `x · 2^32 mod p`.
 
 The shift is done in `i64`, where `|x| · 2^32 <= 2^63`.
 
-The remainder truncates toward zero, so a negative input gives a negative
-remainder, which is shifted back into `[0, p)` by adding `p`. -/
+The remainder truncates toward zero, so a negative input gives a negative remainder.
+
+Adding `p` shifts it back into `[0, p)`. -/
 @[step]
 theorem utils.to_monty_signed.spec (hv : Valid inst p mu) (x : Std.I32) :
     utils.to_monty_signed inst x ⦃ r => r.val < p.val ∧
@@ -88,11 +88,11 @@ theorem utils.to_monty_64.spec (hv : Valid inst p mu) (x : Std.U64) :
   have hx := u64_lt x
   step*
 
-/-- `to_monty_64_signed(x)` puts any `i64` into Montgomery form: the canonical
-representative of `x · 2^32 mod p`.
+/-- `to_monty_64_signed(x)` puts any `i64` into Montgomery form, canonically: `x · 2^32 mod p`.
 
-The shift is done in `i128`, and the remainder is shifted back into `[0, p)`
-when it is negative, as for `i32`. -/
+The shift is done in `i128`.
+
+A negative remainder is shifted back into `[0, p)`, as for `i32`. -/
 @[step]
 theorem utils.to_monty_64_signed.spec (hv : Valid inst p mu) (x : Std.I64) :
     utils.to_monty_64_signed inst x ⦃ r => r.val < p.val ∧

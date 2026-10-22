@@ -4,11 +4,11 @@ import Plonky3Lean.Proofs.Field.Monty31.Inverse
 /-!
 # p3-monty-31: claims, for every prime
 
-What this repository asserts about `MontyField31` and its `u32` helpers, for every
-`MontyParameters` impl that passes `MontyField31::new`'s checks.
+What this repository asserts about `MontyField31` and its `u32` helpers.
 
-`Valid inst p mu` is exactly those checks: `p` odd, `p < 2^31`, `MONTY_BITS = 32`, and
-`p · mu ≡ 1 (mod 2^32)`.
+Each claim holds for every `MontyParameters` impl that passes `MontyField31::new`'s checks.
+
+`Valid inst p mu` is exactly those checks: `p` odd, `p < 2^31`, `MONTY_BITS = 32`, `p · mu ≡ 1 (mod 2^32)`.
 
 A claim that needs more says so, and why.
 
@@ -156,8 +156,9 @@ theorem thirty_bit_prime.valid :
     Valid Proofs.Monty31.Findings.thirtyBit 536870909#u32 894784853#u32 :=
   Proofs.Monty31.Findings.thirtyBit_valid
 
-/-- For that prime and `x = 2^64 - 1`, the 96-bit reduction's single subtraction of `2 · 2^32 · p`
-leaves the low limb at least `2 · 2^32 · p`, outside the domain its inner reduction is proved for. -/
+/-- For that prime and `x = 2^64 - 1`, the 96-bit reduction's low limb stays at least `2 · 2^32 · p`.
+
+One subtraction of `2 · 2^32 · p` is not enough, and the inner reduction is applied outside its proved domain. -/
 theorem thirty_bit_prime.low_limb_out_of_range :
     2 * 2 ^ 32 * 536870909 ≤ 2 ^ 64 - 1 ∧
       2 * 2 ^ 32 * 536870909 ≤ (2 ^ 64 - 1) - 2 * 2 ^ 32 * 536870909 :=

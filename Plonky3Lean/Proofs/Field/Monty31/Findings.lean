@@ -36,8 +36,9 @@ theorem thirtyBit_valid : Valid thirtyBit 536870909#u32 894784853#u32 where
   lt := by decide
   inv := by decide
 
-/-- For `x = 2^64 - 1` and `p = 2^29 - 3`, one subtraction of `2 · 2^32 · p` leaves the low limb
-at least `2 · 2^32 · p`, outside the domain of the inner reduction. -/
+/-- For `x = 2^64 - 1` and `p = 2^29 - 3`, the low limb stays at least `2 · 2^32 · p` after one subtraction.
+
+That is outside the domain of the inner reduction. -/
 theorem thirtyBit_low_limb_out_of_range :
     let p := 536870909
     let lo := 2 ^ 64 - 1

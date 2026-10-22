@@ -5,13 +5,16 @@ import HaxExt
 /-!
 # Rust integer primitives, as natural numbers
 
-The extracted code calls `core::num` through `CoreModels`, which wraps each
-method in `RustM`. These are their specifications in terms of `.val`, tagged
-`@[step]` so that `step*` discharges them.
+The extracted code calls `core::num` through `CoreModels`, which wraps each method in `RustM`.
 
-Each lemma states the whole behaviour: an `overflowing_*` returns the wrapped
-value and whether it wrapped, a `wrapping_*` returns the value modulo the
-width. A proof that uses them never reasons about `BitVec`.
+These are their specifications on `.val`, tagged `@[step]` so that `step*` applies them.
+
+Each lemma states the whole behaviour:
+
+- an `overflowing_*` returns the wrapped value and whether it wrapped,
+- a `wrapping_*` returns the value modulo the width.
+
+A proof that uses them never reasons about `BitVec`.
 -/
 
 open Aeneas Aeneas.Std CoreModels
