@@ -15,6 +15,7 @@ public import Plonky3Lean.Proofs.Field.Binary.Aes
 public import Plonky3Lean.Proofs.Field.Binary.Clmul
 public import Plonky3Lean.Proofs.Field.Binary.Compact
 public import Plonky3Lean.Proofs.Field.Binary.Ghash
+public import Plonky3Lean.Proofs.Field.Binary.Linear
 public import Plonky3Lean.Proofs.Field.Binary.MaskedMul
 public import Plonky3Lean.Proofs.Field.Binary.Operators
 public import Plonky3Lean.Proofs.Field.Binary.Poly192
