@@ -16,6 +16,7 @@ import Plonky3Lean.Proofs.Field.Monty31.Element
 import Plonky3Lean.Proofs.Field.Monty31.Findings
 import Plonky3Lean.Proofs.Field.Monty31.Inverse
 import Plonky3Lean.Proofs.Field.Monty31.PowersOfTwo
+import Plonky3Lean.Proofs.Field.Monty31.QuotientMap
 import Plonky3Lean.Proofs.Field.Monty31.Reduce
 import Plonky3Lean.Proofs.Field.Monty31.Utils
 import Plonky3Lean.Proofs.Util.GcdInversion

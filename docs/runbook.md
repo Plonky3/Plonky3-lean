@@ -60,7 +60,7 @@ To move the pin by hand: check out the new commit in `plonky3/`, run
 `tools/extract/extract.sh`, reconcile what fails (patches that no longer apply,
 `Assumptions/` out of date with their templates, proofs that no longer check),
 review `git diff crates/`, and re-read every mirrored transcription whose Rust
-item changed in the range. Then update `STATUS.md`.
+item changed in the range. Then regenerate `STATUS.md` with `tools/status.py`.
 
 Moving the hax, Lean or CompPoly pins is its own pull request. A hax release
 fixes the charon and aeneas builds, the `Aeneas` and `CoreModels` revisions and

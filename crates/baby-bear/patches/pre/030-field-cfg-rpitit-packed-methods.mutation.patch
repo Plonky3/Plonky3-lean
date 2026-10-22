@@ -1,0 +1,15 @@
+# Mutation of: 030-field-cfg-rpitit-packed-methods
+# Breaks:      `unpack_ext_iter` is gated on the wrong cfg, so the normal build lacks it.
+#
+diff --git a/field/src/packed/packed_traits.rs b/field/src/packed/packed_traits.rs
+--- a/field/src/packed/packed_traits.rs
++++ b/field/src/packed/packed_traits.rs
+@@ -519,7 +519,7 @@
+     ///
+     /// Yields `WIDTH` rows of `N` extension elements without requiring a pre-allocated
+     /// buffer. Analog of [`PackedValue::unpack_iter`].
+-    #[cfg(not(hax_backend_lean))] // PATCHED: `-> impl Iterator`, a hidden GAT for aeneas
++    #[cfg(hax_backend_lean)] // PATCHED: `-> impl Iterator`, a hidden GAT for aeneas
+     #[inline]
+     fn unpack_ext_iter<const N: usize>(packed: [Self; N]) -> impl Iterator<Item = [ExtField; N]> {
+         (0..BaseField::Packing::WIDTH).map(move |lane| {

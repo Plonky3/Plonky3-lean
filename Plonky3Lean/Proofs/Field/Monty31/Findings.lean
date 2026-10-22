@@ -7,7 +7,7 @@ import Plonky3Lean.Proofs.Field.Monty31.Reduce
 
 The prime `2^29 - 3` passes every check `MontyField31::new` makes.
 
-For it, the 96-bit reduction leaves its low limb outside the range its inner reduction is proved for.
+For it, the 96-bit reduction leaves its low limb out of range.
 -/
 
 open Aeneas Aeneas.Std CoreModels
@@ -36,9 +36,13 @@ theorem thirtyBit_valid : Valid thirtyBit 536870909#u32 894784853#u32 where
   lt := by decide
   inv := by decide
 
-/-- For `x = 2^64 - 1` and `p = 2^29 - 3`, the low limb stays at least `2 · 2^32 · p` after one subtraction.
+/-- For `x = 2^64 - 1` and `p = 2^29 - 3`, one subtraction leaves the low limb too large.
 
-That is outside the domain of the inner reduction. -/
+```text
+  lo                  = 2^64 - 1
+  lo - 2 · 2^32 · p  >= 2 · 2^32 · p    (outside the inner reduction's domain)
+```
+-/
 theorem thirtyBit_low_limb_out_of_range :
     let p := 536870909
     let lo := 2 ^ 64 - 1

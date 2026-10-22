@@ -14,8 +14,9 @@ namespace Plonky3Lean.Proofs.Monty31
 
 variable {MP : Type} {inst : data_traits.MontyParameters MP} {p mu : Std.U32}
 
-/-- `MontyField31::new(x)` passes its four parameter checks and stores
-`x · 2^32 mod p`, for every `u32` input. -/
+/-- `MontyField31::new(x)` passes its four parameter checks.
+
+It stores `x · 2^32 mod p`, for every `u32` input. -/
 @[step]
 theorem monty_31.MontyField31.new.spec (hv : Valid inst p mu) (x : Std.U32) :
     monty_31.MontyField31.new inst x ⦃ r => r.value.val = x.val * 2 ^ 32 % p.val ⦄ := by

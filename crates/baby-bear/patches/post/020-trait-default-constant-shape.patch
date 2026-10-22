@@ -1,13 +1,16 @@
-# Patch:     020-trait-default-constant-shape
-# Phase:     post
-# Target:    extraction/P3BabyBear/Extraction/Funs.lean
-# Hunks:     2
-# Cost:      none. The same default constant is referenced, with the
-#            arguments and monad its definition actually has.
-# Upstream:  aeneas: the defining crate's run and a downstream crate's run
-#            disagree on the signature of a trait-default associated constant
-#            that does not use `Self`.
-# Drop when: aeneas emits one shape for such defaults in both positions.
+# Patch:        020-trait-default-constant-shape
+# Phase:        post
+# Target:       extraction/P3BabyBear/Extraction/Funs.lean
+# Hunks:        2
+# Class:        reshape
+# Gap:          docs/extractor-issues.md 3: aeneas's defining and using runs
+#               disagree on the signature of a trait-default associated constant
+#               that does not use `Self`.
+# Cost:         none. The same default constant is referenced, with the
+#               arguments and monad its definition actually has.
+# Upstreamable: yes: aeneas could emit one shape for such defaults in both
+#               positions.
+# Drop when:    aeneas emits one shape for such defaults in both positions.
 #
 # Three trait defaults do not depend on the implementing type:
 #   BarrettParameters::N            = 40

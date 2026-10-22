@@ -4,9 +4,9 @@ import Plonky3Lean.Spec.Monty31
 /-!
 # Monty31: the `u32` helpers, for any valid parameters
 
-The arithmetic of `monty-31/src/utils.rs`, proved once for every
-`MontyParameters` impl that passes `MontyField31::new`'s checks
-(`Plonky3Lean.Spec.Monty31.Valid`).
+The arithmetic of `monty-31/src/utils.rs`.
+
+Each theorem holds for every parameter set that passes `MontyField31::new`'s checks.
 -/
 
 open Aeneas Aeneas.Std CoreModels
@@ -34,8 +34,10 @@ theorem monty_core (x t P : ℕ) (hP : 0 < P) (hP31 : P < 2 ^ 31) (hx : x < 2 ^ 
       (if x < t * P then P else 0)) % 2 ^ 32
     r < P ∧ r * 2 ^ 32 % P = x % P := by
   intro r
+  -- `x - t · p` is a multiple of `2^32`, say `± k · 2^32`, with `k < p`.
   by_cases hlt : x < t * P
-  · obtain ⟨k, hk⟩ : ∃ k, t * P - x = k * 2 ^ 32 := ⟨(t * P - x) / 2 ^ 32, by omega⟩
+  · -- Negative case: the `u64` subtraction wraps, and adding `p` back gives `p - k`.
+    obtain ⟨k, hk⟩ : ∃ k, t * P - x = k * 2 ^ 32 := ⟨(t * P - x) / 2 ^ 32, by omega⟩
     have h1 : (x + 2 ^ 64 - t * P) % 2 ^ 64 / 2 ^ 32 = 2 ^ 32 - k := by
       rw [Nat.mod_eq_of_lt (by omega)]; omega
     have hk0 : 0 < k := by omega
@@ -50,7 +52,8 @@ theorem monty_core (x t P : ℕ) (hP : 0 < P) (hP31 : P < 2 ^ 31) (hx : x < 2 ^ 
       rw [Nat.sub_mul]; omega
     have h2 : ((P - k) * 2 ^ 32 + t * P) % P = (x + P * 2 ^ 32) % P := by rw [this]
     simpa [Nat.add_mul_mod_self_left, Nat.mul_mod_left] using h2
-  · rw [not_lt] at hlt
+  · -- Nonnegative case: the high half of `x - t · p` is `k` itself.
+    rw [not_lt] at hlt
     obtain ⟨k, hk⟩ : ∃ k, x - t * P = k * 2 ^ 32 := ⟨(x - t * P) / 2 ^ 32, by omega⟩
     have hkp : k < P := Nat.lt_of_mul_lt_mul_right (a := 2 ^ 32) (by rw [Nat.mul_comm P]; omega)
     have hr : r = k := by

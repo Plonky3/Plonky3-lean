@@ -36,13 +36,33 @@ start_from = [
   "p3_monty_31::utils::monty_reduce",
   "p3_monty_31::utils::from_monty",
   "p3_monty_31::utils::halve_u32",
-  # The conversions into Montgomery form from every integer width, and the
-  # reductions that dot_product and try_inverse rely on.
+  # Conversions into Montgomery form, from every integer width.
+  #
+  # Wide reductions, which dot products and inversion rely on.
   "p3_monty_31::utils::to_monty_signed",
   "p3_monty_31::utils::to_monty_64",
   "p3_monty_31::utils::to_monty_64_signed",
   "p3_monty_31::utils::large_monty_reduce",
   "p3_monty_31::utils::monty_reduce_u128",
+  # Every item transcribed in Mirror.lean is also a root, so that
+  # extraction/gaps.toml shows what charon does with it (translated and dropped,
+  # or not translated), and a fix upstream shows up there first.
+  "p3_monty_31::monty_31::MontyField31::new_monty",
+  "p3_monty_31::monty_31::MontyField31::new_array",
+  "p3_monty_31::monty_31::MontyField31::new_2d_array",
+  "{impl core::ops::arith::Add for p3_monty_31::monty_31::MontyField31<_>}::add",
+  "{impl core::ops::arith::Sub for p3_monty_31::monty_31::MontyField31<_>}::sub",
+  "{impl core::ops::arith::Mul for p3_monty_31::monty_31::MontyField31<_>}::mul",
+  "{impl core::ops::arith::Neg for p3_monty_31::monty_31::MontyField31<_>}::neg",
+  "{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::halve",
+  "p3_monty_31::monty_31::MontyField31::MONTY_POWERS_OF_TWO",
+  # Some transcribed items cannot be roots.
+  #
+  # Inversion and powers of two pull in the field trait hierarchy.
+  #
+  # aeneas rejects that hierarchy (docs/extractor-issues.md, 9).
+  #
+  # Integer conversions implement a generic trait, which charon cannot root.
 ]
 
 watch = ["monty-31/src", "monty-31/Cargo.toml"]
@@ -119,3 +139,75 @@ rust = "{impl p3_poseidon2::internal::InternalLayerConstructor for p3_monty_31::
 [[mirror]]
 lean = "p3_monty_31.no_packing.poseidon2.Poseidon2ExternalLayerMonty31.Insts.P3_poseidon2ExternalExternalLayerConstructorMontyField31WIDTH"
 rust = "{impl p3_poseidon2::external::ExternalLayerConstructor for p3_monty_31::no_packing::poseidon2::Poseidon2ExternalLayerMonty31}"
+
+# Inversion, powers of two and integer conversions, in Mirror.lean.
+#
+# Squaring and exponentiation are trait defaults, transcribed for this field.
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.square"
+rust = "p3_field::field::PrimeCharacteristicRing::square"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.exp_u64"
+rust = "p3_field::field::PrimeCharacteristicRing::exp_u64"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.exp_u64.step"
+rust = "p3_field::field::PrimeCharacteristicRing::exp_u64"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.MONTY_POWERS_OF_TWO"
+rust = "p3_monty_31::monty_31::MontyField31::MONTY_POWERS_OF_TWO"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.mul_2exp_u64"
+rust = "{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::mul_2exp_u64"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.try_inverse"
+rust = "{impl p3_field::field::Field for p3_monty_31::monty_31::MontyField31<_>}::try_inverse"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU32.from_canonical_checked"
+rust = "{impl p3_field::integers::QuotientMap<u32> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_int"
+rust = "{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<_>}::from_int"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_canonical_checked"
+rust = "{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_int"
+rust = "{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<_>}::from_int"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked"
+rust = "{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_int"
+rust = "{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<_>}::from_int"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_checked"
+rust = "{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_int"
+rust = "{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<_>}::from_int"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_checked"
+rust = "{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_int"
+rust = "{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<_>}::from_int"
+
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked"
+rust = "{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked"

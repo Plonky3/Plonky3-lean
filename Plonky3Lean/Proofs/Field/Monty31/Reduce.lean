@@ -16,10 +16,11 @@ namespace Plonky3Lean.Proofs.Monty31
 
 variable {MP : Type} {inst : data_traits.MontyParameters MP} {p mu : Std.U32}
 
-/-- `large_monty_reduce(x)`, for `x < 2 · 2^32 · p`, is the canonical `r` with
-`r · 2^32 ≡ x (mod p)`.
+/-- `large_monty_reduce(x)`, for `x < 2 · 2^32 · p`, gives the canonical `r` with `r · 2^32 ≡ x`.
 
-It first subtracts `p · 2^32` when `x` is at least that, then reduces as `monty_reduce` does. -/
+It first subtracts `p · 2^32` when `x` reaches it.
+
+Then it reduces as the plain Montgomery reduction does. -/
 @[step]
 theorem utils.large_monty_reduce.spec (hv : Valid inst p mu) (x : Std.U64)
     (hx : x.val < 2 * 2 ^ 32 * p.val) :
@@ -85,18 +86,17 @@ theorem utils.large_monty_reduce.spec (hv : Valid inst p mu) (x : Std.U64)
     · simp only [hlt2, decide_false, Bool.false_eq_true, if_false, bind_tc_ok]
       step*
 
-/-- `monty_reduce_u128(x)`, for `x < 2^96`, is the canonical `r` with
-`r · 2^32 ≡ x (mod p)`, when `p >= 2^30`.
+/-- `monty_reduce_u128(x)`, for `x < 2^96`, gives the canonical `r` with `r · 2^32 ≡ x`.
 
 # Why `p >= 2^30`
 
-The low 64 bits `lo` are brought below `2 · 2^32 · p` by subtracting that bound at most once.
+The low 64 bits are brought below `2 · 2^32 · p` by one subtraction of that bound.
 
-One subtraction suffices only when `2^64 <= 4 · 2^32 · p`, that is `p >= 2^30`.
+One subtraction is enough only when `2^64 <= 4 · 2^32 · p`.
 
-`MontyField31::new` checks `p < 2^31` and not this lower bound.
+That is `p >= 2^30`, which `MontyField31::new` does not check.
 
-For a smaller prime, some `lo` stays out of range and the result is wrong. -/
+For a smaller prime, some inputs stay out of range, and the result is wrong. -/
 @[step]
 theorem utils.monty_reduce_u128.spec (hv : Valid inst p mu) (hp30 : 2 ^ 30 ≤ p.val)
     (x : Std.U128) (hx : x.val < 2 ^ 96) :
@@ -116,6 +116,7 @@ theorem utils.monty_reduce_u128.spec (hv : Valid inst p mu) (hp30 : 2 ^ 30 ≤ p
   have hhi : hi.val = x.val / 2 ^ 64 := by
     rw [hi_post, UScalar.cast_val_eq, UScalarTy.U32_numBits_eq, i2_post1, Nat.shiftRight_eq_div_pow]
     exact Nat.mod_eq_of_lt (by omega)
+  -- Split `x = hi · 2^64 + lo`, with `hi < 2^32` since `x < 2^96`.
   have hl := u64_lt lo
   have hx_split : x.val = x.val / 2 ^ 64 * 2 ^ 64 + x.val % 2 ^ 64 := (Nat.div_add_mod' _ _).symm
   -- The result `(hi · 2^32 + r1) mod p`, with `r1 · 2^32 ≡ lo' ≡ lo`, is `x · 2^(-32)`.
@@ -132,6 +133,9 @@ theorem utils.monty_reduce_u128.spec (hv : Valid inst p mu) (hp30 : 2 ^ 30 ≤ p
     rw [hhi, hlo] at e3
     unfold Nat.ModEq at e3
     rw [e3]; congr 1; rw [hx_split]; ring_nf; omega
+  -- One subtraction of `2 · 2^32 · p` brings `lo` into the inner reduction's domain.
+  --
+  --     lo < 2^64 <= 4 · 2^32 · p      (this is where p >= 2^30 is used)
   by_cases hge : two_rp.val ≤ lo.val
   · simp only [ge_iff_le, UScalar.le_equiv, hge, if_true]
     step*

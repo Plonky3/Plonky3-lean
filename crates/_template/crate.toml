@@ -32,7 +32,9 @@ watch = []
 
 # One entry per hand-written, non-opaque declaration in stub/ or in
 # extraction/<lean_lib>/Assumptions/. `hash` is the hash of the Rust item's
-# token stream, as printed by tools/mirror.
+# token stream, as printed by tools/mirror. A transcription is the fallback
+# where no pre patch can make the extractor translate the item
+# (docs/patches.md, "Pre-patch or transcription?").
 #
 # [[mirror]]
 # lean = "p3_example.util.helper"

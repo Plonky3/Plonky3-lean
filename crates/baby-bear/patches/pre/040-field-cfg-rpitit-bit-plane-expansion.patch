@@ -1,12 +1,17 @@
-# Patch:     040-field-cfg-rpitit-bit-plane-expansion
-# Phase:     pre
-# Target:    field/src/field.rs
-# Hunks:     1
-# Cost:      none in a normal build: the change is behind
-#            cfg(hax_backend_lean). In the extracted variant,
-#            `Field::prepare_bit_plane_expansion` is absent.
-# Upstream:  charon#1266 (same root cause as 020 and 030).
-# Drop when: as for 020.
+# Patch:        040-field-cfg-rpitit-bit-plane-expansion
+# Phase:        pre
+# Target:       field/src/field.rs, baby-bear/tests/pre_patch_040.rs
+# Hunks:        2
+# Class:        cfg-hide
+# Gap:          docs/extractor-issues.md 10 (charon#1266, as for 020 and 030).
+# Cost:         none in a normal build: the change is behind
+#               cfg(hax_backend_lean). In the extracted variant,
+#               `Field::prepare_bit_plane_expansion` is absent.
+# Upstreamable: yes: one `cfg` attribute, inert in a normal build.
+# Drop when:    as for 020.
+# Test:         test p3-baby-bear --test pre_patch_040
+# Mutation:     `prepare_bit_plane_expansion` is gated on the wrong cfg, so a
+#               normal build lacks it.
 #
 # `Field::prepare_bit_plane_expansion` returns
 # `Option<impl Fn(&[u64; 64], &mut Vec<Self>) + Send + Sync + 'static>`, so,
@@ -34,3 +39,31 @@ index 4567ffd0..0088f0ce 100644
      #[must_use]
      fn prepare_bit_plane_expansion(
          weights: &[Self; 64],
+diff --git a/baby-bear/tests/pre_patch_040.rs b/baby-bear/tests/pre_patch_040.rs
+new file mode 100644
+--- /dev/null
++++ b/baby-bear/tests/pre_patch_040.rs
+@@ -0,0 +1,23 @@
++//! PATCHED: added by Plonky3-lean pre-patch 040 (`field-cfg-rpitit-bit-plane-expansion`).
++//!
++//! The patch removes `Field::prepare_bit_plane_expansion` from the extracted
++//! variant only. In a normal build it must still be a method of `Field`,
++//! reachable through the bound alone, with its documented default: fields
++//! without a target-specific expansion return `None`.
++
++use p3_baby_bear::BabyBear;
++use p3_field::extension::BinomialExtensionField;
++use p3_field::{Field, PrimeCharacteristicRing};
++
++fn has_expansion<F: Field>(weights: &[F; 64]) -> bool {
++    F::prepare_bit_plane_expansion(weights).is_some()
++}
++
++#[test]
++fn bit_plane_expansion_is_a_field_method_with_the_default() {
++    let weights: [BabyBear; 64] = core::array::from_fn(|i| BabyBear::from_usize(i + 1));
++    assert!(!has_expansion(&weights));
++    let ext_weights: [BinomialExtensionField<BabyBear, 4>; 64] =
++        core::array::from_fn(|i| BinomialExtensionField::from_usize(i + 1));
++    assert!(!has_expansion(&ext_weights));
++}

@@ -1,14 +1,17 @@
-# p3-util: shared helpers. The prime fields use its GCD-based inversion.
+# p3-util: shared helpers.
+#
+# The prime fields invert through its binary GCD.
 
 lean_lib = "P3Util"
 
-# Only the inversion is extracted. The rest of the crate is unsafe transposes
-# and iterator helpers that no field claim needs.
+# Only the inversion is extracted.
+#
+# The rest is transposes and iterator helpers, which no field claim needs.
 state = "scoped"
 
 features = []
 
-# `MontyField31::try_inverse` calls the inversion with `FIELD_BITS = 31`.
+# Monty31 inversion calls it with 31-bit fields.
 start_from = ["p3_util::gcd_inversion_prime_field_32"]
 
 watch = ["util/src", "util/Cargo.toml"]

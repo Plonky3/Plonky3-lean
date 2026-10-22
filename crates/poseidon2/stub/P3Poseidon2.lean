@@ -49,7 +49,7 @@ structure Poseidon2 (F : Type) (ExternalPerm : Type) (InternalPerm : Type)
   _phantom : core.marker.PhantomData F
 
 /-- [p3_poseidon2::Poseidon2::new]. Upstream: `poseidon2/src/lib.rs:50`.
-Assumed. -/
+Assumed: p3-poseidon2 is a stub, and its body is not modelled. -/
 opaque Poseidon2.new {F ExternalPerm InternalPerm : Type}
     {WIDTH : Std.Usize} (D : Std.U64)
     (p3_fieldfieldPrimeFieldInst : p3_field.field.PrimeField F)
