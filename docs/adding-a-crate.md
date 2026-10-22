@@ -27,7 +27,11 @@ the extracted crates that depend on it reference.
    with each hole an `opaque` constant, and write the library root
    `extraction/<Lib>.lean`.
 3. Add `patches/post/` patches until `lake build` is green, and `patches/pre/`
-   patches only when nothing else works (see [`patches.md`](patches.md)).
+   patches only when nothing else works (see [`patches.md`](patches.md)). An
+   item the extractor drops is given its body by a pre patch that reshapes the
+   Rust where the stop rules allow one, and by a transcription only otherwise
+   ([`patches.md`](patches.md#pre-patch-or-transcription)). Each pre patch
+   brings its own test and recorded mutation.
 4. Delete `stub/` and point the crate's `[[lean_lib]]` at `extraction/`.
    Dependent crates keep importing the same library.
 5. Stub, in their own crate directories, any dependencies that are referenced

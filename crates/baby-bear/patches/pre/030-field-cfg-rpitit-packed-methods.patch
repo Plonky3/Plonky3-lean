@@ -1,12 +1,20 @@
-# Patch:     030-field-cfg-rpitit-packed-methods
-# Phase:     pre
-# Target:    field/src/packed/packed_traits.rs, matrix/src/lib.rs
-# Hunks:     5
-# Cost:      none in a normal build: every change is behind
-#            cfg(hax_backend_lean). In the extracted variant, four default
-#            methods are absent and `to_ext_iter` sits on an extension trait.
-# Upstream:  charon#1266 (same root cause as 020).
-# Drop when: as for 020.
+# Patch:        030-field-cfg-rpitit-packed-methods
+# Phase:        pre
+# Target:       field/src/packed/packed_traits.rs, matrix/src/lib.rs, baby-bear/tests/pre_patch_030.rs
+# Hunks:        6
+# Class:        cfg-hide
+# Gap:          docs/extractor-issues.md 10 (charon#1266, as for 020), and 9 for
+#               `unpack_iter`'s mixed type/function recursion group.
+# Cost:         none in a normal build: every change is behind
+#               cfg(hax_backend_lean). In the extracted variant, four default
+#               methods are absent and `to_ext_iter` sits on an extension trait.
+# Upstreamable: yes: inert in a normal build, but it adds an extractor-only
+#               trait to p3-field and an import to p3-matrix; charon#1266 is the
+#               better fix.
+# Drop when:    as for 020.
+# Test:         test p3-baby-bear --test pre_patch_030
+# Mutation:     `unpack_ext_iter` is gated on the wrong cfg, so a normal build
+#               lacks it.
 #
 # Same root cause as 020, but these traits cannot be cut loose, because
 # `Field::Packing: PackedField` is load-bearing. Four default methods return
@@ -122,3 +130,82 @@ index 1f326e3f..5dbde4ed 100644
  use p3_field::{
      BasedVectorSpace, ExtensionField, Field, FieldArray, PackedField, PackedFieldExtension,
      PackedValue, PrimeCharacteristicRing,
+diff --git a/baby-bear/tests/pre_patch_030.rs b/baby-bear/tests/pre_patch_030.rs
+new file mode 100644
+--- /dev/null
++++ b/baby-bear/tests/pre_patch_030.rs
+@@ -0,0 +1,74 @@
++//! PATCHED: added by Plonky3-lean pre-patch 030 (`field-cfg-rpitit-packed-methods`).
++//!
++//! The patch removes four `-> impl Iterator` methods from the extracted variant
++//! only. In a normal build they must exist where they were and return what they
++//! returned. Each is checked against the buffer-based method it is the iterator
++//! form of, or against scalar arithmetic.
++
++use p3_baby_bear::BabyBear;
++use p3_field::extension::BinomialExtensionField;
++use p3_field::{
++    BasedVectorSpace, ExtensionField, Field, PackedFieldExtension, PackedValue,
++    PrimeCharacteristicRing,
++};
++
++type F = BabyBear;
++type P = <F as Field>::Packing;
++type EF = BinomialExtensionField<F, 4>;
++type EP = <EF as ExtensionField<F>>::ExtensionPacking;
++
++const W: usize = <P as PackedValue>::WIDTH;
++
++fn base(i: usize) -> F {
++    F::from_u32(2_654_435_761u32.wrapping_mul(i as u32 + 1))
++}
++
++fn ext(i: usize) -> EF {
++    BasedVectorSpace::<F>::from_basis_coefficients_fn(|d| base(4 * i + d))
++}
++
++fn pack(lanes: &[EF]) -> EP {
++    <EP as PackedFieldExtension<F, EF>>::from_ext_slice(lanes)
++}
++
++#[test]
++fn unpack_iter_matches_unpack_into() {
++    let packed: [P; 3] = core::array::from_fn(|col| P::from_fn(|lane| base(W * col + lane)));
++    let mut rows = vec![[F::ZERO; 3]; W];
++    P::unpack_into(&packed, &mut rows);
++    assert_eq!(P::unpack_iter(packed).collect::<Vec<_>>(), rows);
++}
++
++#[test]
++fn unpack_ext_iter_matches_unpack_ext_into() {
++    let packed: [EP; 3] = core::array::from_fn(|col| {
++        pack(&(0..W).map(|lane| ext(W * col + lane)).collect::<Vec<_>>())
++    });
++    let mut rows = vec![[EF::ZERO; 3]; W];
++    <EP as PackedFieldExtension<F, EF>>::unpack_ext_into(&packed, &mut rows);
++    let iter = <EP as PackedFieldExtension<F, EF>>::unpack_ext_iter(packed);
++    assert_eq!(iter.collect::<Vec<_>>(), rows);
++}
++
++#[test]
++fn to_ext_iter_is_every_lane_in_order() {
++    let values: Vec<EF> = (0..3 * W).map(ext).collect();
++    let packed: Vec<EP> = values.chunks(W).map(pack).collect();
++    let iter = <EP as PackedFieldExtension<F, EF>>::to_ext_iter(packed);
++    assert_eq!(iter.collect::<Vec<_>>(), values);
++}
++
++#[test]
++fn packed_ext_powers_capped_is_the_first_powers() {
++    let b = ext(5);
++    for len in [0, 1, W - 1, W, W + 1, 3 * W] {
++        let packed: Vec<EP> = EP::packed_ext_powers_capped(b, len).collect();
++        assert_eq!(packed.len(), len.div_ceil(W), "len {len}");
++        let lanes: Vec<EF> = packed.iter().flat_map(|p| (0..W).map(|l| p.extract(l))).collect();
++        let mut power = EF::ONE;
++        for (i, &x) in lanes.iter().enumerate() {
++            assert_eq!(x, power, "len {len}, power {i}");
++            power *= b;
++        }
++    }
++}

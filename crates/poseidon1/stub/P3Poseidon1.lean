@@ -15,11 +15,12 @@ open RustM ControlFlow Error
 
 namespace p3_poseidon1
 
-/-- [p3_poseidon1::external::FullRoundConstants]. Its layout is not observed
-by the extraction. -/
+/-- [p3_poseidon1::external::FullRoundConstants]. Assumed: p3-poseidon1 is a
+stub, and the extraction never observes this type's layout. -/
 opaque external.FullRoundConstants (F : Type) (WIDTH : Std.Usize) : Type
 
-/-- [p3_poseidon1::internal::PartialRoundConstants]. As above. -/
+/-- [p3_poseidon1::internal::PartialRoundConstants]. Assumed: p3-poseidon1 is a
+stub, and the extraction never observes this type's layout. -/
 opaque internal.PartialRoundConstants (F : Type) (WIDTH : Std.Usize) : Type
 
 /-- [p3_poseidon1::external::FullRoundLayerConstructor].
