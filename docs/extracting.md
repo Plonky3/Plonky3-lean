@@ -31,7 +31,8 @@ pre-extraction patch has changed, it re-runs Plonky3's test suite on the tree
 with and without the patches, which takes 10 to 20 minutes. The result is cached
 on the content of the tree, under `.lake/extract/pretest/`.
 
-After a run, `git diff crates/` shows what moved in the generated code.
+After a run, `git diff crates/` shows what moved in the generated code, and
+`tools/status.py` regenerates `STATUS.md` from it (CI checks that it is current).
 `tools/extract/check-patches.sh` and `tools/extract/new-patch.sh` maintain the
 patches; see [`patches.md`](patches.md).
 
@@ -44,7 +45,16 @@ crate applied to `plonky3/` and the charon flags in `toolchain.toml`. hax writes
 into a scratch directory under `.lake/extract/`; the script copies each crate's
 `<Lib>/Extraction/` and `<Lib>/Extraction.lean` into
 `crates/<crate>/extraction/` and applies the crate's post-extraction patches
-there. Nothing else under `crates/` is written.
+there. It also writes `crates/<crate>/extraction/gaps.toml`
+(`tools/extract/gap-report.py`): the errors charon reported, and every item of
+the crate that charon translated with a body and aeneas did not emit
+(extractor issue 4). It is committed, `--check` requires it to reproduce like the
+generated Lean, and `tools/status.py` reads it into `STATUS.md`. Nothing else
+under `crates/` is written.
+
+A scoped crate also roots every item it transcribes by hand, so that its
+`gaps.toml` shows what charon does with each one, and a fix in the extractor
+shows up there first.
 
 hax also emits `Extraction/<X>External_Template.lean`: the declarations the
 generated code expects someone to supply. Each hand-written

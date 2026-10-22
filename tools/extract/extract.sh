@@ -22,7 +22,8 @@
 #   5. revert the pre-extraction patches (unconditionally, even on failure)
 #   6. check each hand-written `Assumptions/*External.lean` against the template
 #      aeneas regenerated, install the output into crates/<crate>/extraction/,
-#      and snapshot it as the pristine baseline for post-extraction patches
+#      snapshot it as the pristine baseline for post-extraction patches, and
+#      write crates/<crate>/extraction/gaps.toml (gap-report.py)
 #   7. apply each crate's patches/post/ patches
 #   8. `lake build`, which must be warning-free
 #
@@ -255,8 +256,11 @@ printf '%s\n' "$CRATES" | while IFS='|' read -r crate lib state; do
     out="$WORK/out/$crate"
     mkdir -p "$out"
     args="$("$CONFIG" charon-args "$crate")"
+    # hax's output also goes to a per-crate log, which gap-report.py reads for
+    # charon's diagnostics.
     (cd "$RUST/$crate" && RUSTFLAGS="$EXTRACT_RUSTFLAGS" CARGO_TARGET_DIR="$WORK/target-hax" \
-        "$HAX_BIN" hax into --output-dir "$out" lean --charon-args="$args")
+        "$HAX_BIN" hax into --output-dir "$out" lean --charon-args="$args" 2>&1 \
+        | tee "$WORK/hax-$crate.log"; exit "${PIPESTATUS[0]}")
 done
 
 # Revert now, before the Lean build, so the rest of the run sees a clean tree.
@@ -311,6 +315,9 @@ while IFS='|' read -r crate lib state; do
     cp "$WORK/out/$crate/$lib/Extraction"/*.lean "$dest/Extraction/"
     cp "$WORK/out/$crate/$lib/Extraction.lean" "$dest/Extraction.lean"
     cp "$dest/Extraction"/*.lean "$PRISTINE/$crate/extraction/$lib/Extraction/"
+    # What charon translated but aeneas did not emit; read by tools/status.py.
+    "$HERE/gap-report.py" "$ROOT/crates/$crate" "$WORK/out/$crate/llbc/"*.llbc \
+        "$WORK/hax-$crate.log" > "$ROOT/crates/$crate/extraction/gaps.toml"
 done <<< "$CRATES"
 echo "    ok; pristine output in ${PRISTINE#"$ROOT"/}/"
 
