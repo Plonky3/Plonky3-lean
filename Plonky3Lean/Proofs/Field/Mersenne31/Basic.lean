@@ -196,12 +196,14 @@ theorem mul.spec (a b : Element) (ha : Valid a) (hb : Valid b) :
 
 /-! ## Constructors -/
 
+@[step]
 theorem new.spec (x : Std.U32) :
     mersenne_31.Mersenne31.new x ⦃ r => r.value.val = x.val % 2147483647 ⦄ := by
   unfold mersenne_31.Mersenne31.new
   rw [mersenne_31.P.eq]
   step*
 
+@[step]
 theorem new_checked.spec (x : Std.U32) :
     mersenne_31.Mersenne31.new_checked x ⦃ r =>
       r = if x.val < 2 ^ 31 then .Some { value := x } else .None ⦄ := by
@@ -224,6 +226,7 @@ theorem as_canonical_u32.spec (a : Element) :
   rw [ORDER_U32.eq]
   step*
 
+@[step]
 theorem is_zero.spec (a : Element) :
     mersenne_31.Mersenne31.Insts.P3_fieldFieldField.is_zero a
       ⦃ r => r = decide (a.value.val = 0 ∨ a.value.val = 2147483647) ⦄ := by
@@ -231,6 +234,7 @@ theorem is_zero.spec (a : Element) :
   rw [ORDER_U32.eq]
   step*
 
+@[step]
 theorem eq.spec (a b : Element) :
     mersenne_31.Mersenne31.Insts.CoreCmpPartialEqMersenne31.eq a b ⦃ r =>
       r = decide ((if a.value.val = 2147483647 then 0 else a.value.val) =
@@ -238,6 +242,7 @@ theorem eq.spec (a b : Element) :
   unfold mersenne_31.Mersenne31.Insts.CoreCmpPartialEqMersenne31.eq
   step*
 
+@[step]
 theorem cmp.spec (a b : Element) :
     mersenne_31.Mersenne31.Insts.CoreCmpOrd.cmp a b ⦃ r =>
       r = match compare (if a.value.val = 2147483647 then 0 else a.value.val)
@@ -279,6 +284,7 @@ theorem halve_u32.spec (P x : Std.U32) (hP : P.val < 2 ^ 31) (hx : x.val ≤ P.v
   · have : i1.val ≠ 0 := fun h => ‹¬i1 = 0#u32› (UScalar.eq_of_val_eq h)
     rw [if_neg (by omega), r_post, hh, hsh]
 
+@[step]
 theorem from_bool.spec (b : Bool) :
     mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool b
       ⦃ r => r.value.val = b.toNat ⦄ := by
@@ -286,6 +292,7 @@ theorem from_bool.spec (b : Bool) :
   step*
   cases b <;> simp_all
 
+@[step]
 theorem halve.spec (a : Element) (ha : Valid a) :
     mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.halve a
       ⦃ r => Valid r ∧ r.value.val * 2 % 2147483647 = a.value.val % 2147483647 ⦄ := by
@@ -296,6 +303,7 @@ theorem halve.spec (a : Element) (ha : Valid a) :
   · simp only [Valid, r_post]
     split_ifs at i_post <;> exact ⟨by omega, by omega⟩
 
+@[step]
 theorem mul_2exp_u64.spec (a : Element) (ha : Valid a) (e : Std.U64) :
     mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.mul_2exp_u64 a e
       ⦃ r => Valid r ∧ r.value.val % 2147483647 = a.value.val * 2 ^ e.val % 2147483647 ⦄ := by
@@ -319,6 +327,7 @@ theorem mul_2exp_u64.spec (a : Element) (ha : Valid a) (e : Std.U64) :
       rw [two_pow_mod e.val, exp1_post]
     rw [hr.2, Nat.mul_mod, h2, ← Nat.mul_mod]
 
+@[step]
 theorem div_2exp_u64.spec (a : Element) (ha : Valid a) (e : Std.U64) :
     mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.div_2exp_u64 a e
       ⦃ r => Valid r ∧ r.value.val * 2 ^ e.val % 2147483647 = a.value.val % 2147483647 ⦄ := by

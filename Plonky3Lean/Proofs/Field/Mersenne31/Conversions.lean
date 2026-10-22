@@ -336,4 +336,7 @@ theorem from_canonical_checked_i128.spec (x : Std.I128) :
       rw [hc] at val_post
       exact val_post
 
+attribute [step] add.spec sub.spec neg.spec from_u62.spec mul.spec from_int_u32.spec
+  from_int_i32.spec from_int_i64.spec from_int_i128.spec
+
 end Plonky3Lean.Proofs.Mersenne31
