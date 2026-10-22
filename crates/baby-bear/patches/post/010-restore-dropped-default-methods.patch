@@ -1,18 +1,22 @@
-# Patch:     010-restore-dropped-default-methods
-# Phase:     post
-# Target:    extraction/P3BabyBear/Extraction/Funs.lean
-# Hunks:     5
-# Cost:      none. Each added field is the body of the CoreModels default
-#            method it stands for (`clone.Clone.clone_from.default`,
-#            `cmp.PartialEq.ne.default`), inlined.
-# Upstream:  charon multi-target mode (`--targets`) forces
-#            `--translate-all-methods`, then filters unused methods after the
-#            merge, and that drops the default-method roots hax adds with
-#            `--start-from core::clone::Clone::clone_from` and
-#            `core::cmp::PartialEq::ne`.
-# Drop when: charon keeps `--start-from` roots through the multi-target merge,
-#            or hax can pass `--target` to charon's cargo (then extract.sh
-#            can drop `--targets`).
+# Patch:        010-restore-dropped-default-methods
+# Phase:        post
+# Target:       extraction/P3BabyBear/Extraction/Funs.lean
+# Hunks:        5
+# Class:        restore
+# Gap:          docs/extractor-issues.md 2: charon's multi-target mode
+#               (`--targets`) forces `--translate-all-methods`, then filters
+#               unused methods after the merge, which drops the default-method
+#               roots hax adds (`--start-from core::clone::Clone::clone_from`,
+#               `core::cmp::PartialEq::ne`). `--targets` is needed because of 1.
+# Cost:         none. Each added field is the body of the CoreModels default
+#               method it stands for (`clone.Clone.clone_from.default`,
+#               `cmp.PartialEq.ne.default`), inlined.
+# Upstreamable: yes: charon could keep `--start-from` roots through the
+#               multi-target merge, or hax could pass `--target` to charon's
+#               cargo (issue 1).
+# Drop when:    charon keeps `--start-from` roots through the multi-target
+#               merge, or hax can pass `--target` to charon's cargo (then
+#               extract.sh can drop `--targets`).
 #
 # CoreModels' `core.clone.Clone` has a `clone_from` field and
 # `core.cmp.PartialEq` has `ne`. A derived `Clone`/`PartialEq` never defines

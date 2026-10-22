@@ -1,0 +1,86 @@
+# Patch:        010-restore-dropped-default-methods
+# Phase:        post
+# Target:       extraction/P3KoalaBear/Extraction/Funs.lean
+# Hunks:        5
+# Class:        restore
+# Gap:          docs/extractor-issues.md 2: charon's multi-target mode
+#               (`--targets`) forces `--translate-all-methods`, then filters
+#               unused methods after the merge, which drops the default-method
+#               roots hax adds (`--start-from core::clone::Clone::clone_from`,
+#               `core::cmp::PartialEq::ne`). `--targets` is needed because of 1.
+# Cost:         none. Each added field is the body of the CoreModels default
+#               method it stands for (`clone.Clone.clone_from.default`,
+#               `cmp.PartialEq.ne.default`), inlined.
+# Upstreamable: yes: charon could keep `--start-from` roots through the
+#               multi-target merge, or hax could pass `--target` to charon's
+#               cargo (issue 1).
+# Drop when:    charon keeps `--start-from` roots through the multi-target
+#               merge, or hax can pass `--target` to charon's cargo (then
+#               extract.sh can drop `--targets`).
+#
+# CoreModels' `core.clone.Clone` has a `clone_from` field and
+# `core.cmp.PartialEq` has `ne`. A derived `Clone`/`PartialEq` never defines
+# them, so aeneas fills them with the trait's default method, but only if charon
+# translated it. hax adds the default methods as charon roots for exactly this
+# purpose. We extract with `--targets thumbv7em-none-eabi` (the only way to reach
+# charon's cargo with a target through hax 0.4.1 or 0.4.2), and in that mode charon
+# drops them again (measured: 11 `clone_from` in the LLBC without `--targets`,
+# 2 with it). So every derived impl comes out missing the field, and Lean
+# rejects the structure literal.
+#
+# The alternative, `--translate-all-methods`, grows the extraction until it
+# fails with 276 errors. Adding the field by hand is the narrow fix:
+#   clone_from := fun _ source => <clone> source        (= clone_from.default)
+#   ne := fun self other => do let b ← <eq> self other; ok (b = false)
+#                                                       (= ne.default)
+# Four derived `Clone` impls and one derived `PartialEq`, as in p3-baby-bear.
+#
+--- a/extraction/P3KoalaBear/Extraction/Funs.lean
++++ b/extraction/P3KoalaBear/Extraction/Funs.lean
+@@ -41,6 +41,8 @@
+ def koala_bear.KoalaBearParameters.Insts.CoreCloneClone : core.clone.Clone
+   koala_bear.KoalaBearParameters := {
+   clone := koala_bear.KoalaBearParameters.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => (koala_bear.KoalaBearParameters.Insts.CoreCloneClone.clone) source
+ }
+ 
+ /-- Trait implementation: [p3_koala_bear::koala_bear::{impl core::marker::Copy for p3_koala_bear::koala_bear::KoalaBearParameters}]
+@@ -92,6 +94,10 @@
+   koala_bear.KoalaBearParameters := {
+   eq :=
+     koala_bear.KoalaBearParameters.Insts.CoreCmpPartialEqKoalaBearParameters.eq
++  -- PATCHED: default method, body of `core.cmp.PartialEq.ne.default`
++  ne := fun self other => do
++    let b ← (koala_bear.KoalaBearParameters.Insts.CoreCmpPartialEqKoalaBearParameters.eq) self other
++    ok (b = false)
+ }
+ 
+ /-- Trait implementation: [p3_koala_bear::koala_bear::{impl core::cmp::Eq for p3_koala_bear::koala_bear::KoalaBearParameters}]
+@@ -785,6 +791,8 @@
+ def mds.MDSKoalaBearData.Insts.CoreCloneClone : core.clone.Clone
+   mds.MDSKoalaBearData := {
+   clone := mds.MDSKoalaBearData.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => (mds.MDSKoalaBearData.Insts.CoreCloneClone.clone) source
+ }
+ 
+ /-- [p3_koala_bear::mds::{impl core::default::Default for p3_koala_bear::mds::MDSKoalaBearData}::default]:
+@@ -1438,6 +1446,8 @@
+ def poseidon1.KoalaBearPoseidonParameters.Insts.CoreCloneClone :
+   core.clone.Clone poseidon1.KoalaBearPoseidonParameters := {
+   clone := poseidon1.KoalaBearPoseidonParameters.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => (poseidon1.KoalaBearPoseidonParameters.Insts.CoreCloneClone.clone) source
+ }
+ 
+ /-- [p3_koala_bear::poseidon1::{impl core::default::Default for p3_koala_bear::poseidon1::KoalaBearPoseidonParameters}::default]:
+@@ -2203,6 +2213,8 @@
+   core.clone.Clone poseidon2.KoalaBearInternalLayerParameters := {
+   clone :=
+     poseidon2.KoalaBearInternalLayerParameters.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => (poseidon2.KoalaBearInternalLayerParameters.Insts.CoreCloneClone.clone) source
+ }
+ 
+ /-- Trait implementation: [p3_koala_bear::poseidon2::{impl p3_monty_31::poseidon2::InternalLayerBaseParameters<p3_koala_bear::koala_bear::KoalaBearParameters, 16usize> for p3_koala_bear::poseidon2::KoalaBearInternalLayerParameters}]

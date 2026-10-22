@@ -1,12 +1,14 @@
-# Patch:     030-name-anonymous-const-assertions
-# Phase:     post
-# Target:    extraction/P3BabyBear/Extraction/Funs.lean
-# Hunks:     9
-# Cost:      none. Renames only; the bodies are untouched.
-# Upstream:  aeneas names Rust's anonymous `const _: () = assert!(..)` items
-#            `__1`, `__2`, …, which mathlib's `linter.style.nameCheck`
-#            rejects (one warning each).
-# Drop when: aeneas generates a name without a double underscore.
+# Patch:        030-name-anonymous-const-assertions
+# Phase:        post
+# Target:       extraction/P3BabyBear/Extraction/Funs.lean
+# Hunks:        9
+# Class:        rename
+# Gap:          docs/extractor-issues.md 5: aeneas names anonymous `const _: ()
+#               = assert!(..)` items `__1`, `__2`, ..., which mathlib's
+#               `linter.style.nameCheck` rejects (one warning each).
+# Cost:         none. Renames only; the bodies are untouched.
+# Upstreamable: yes: aeneas could generate names without a double underscore.
+# Drop when:    aeneas generates a name without a double underscore.
 #
 # baby-bear's Poseidon tables carry their length invariants as anonymous
 # const assertions (eleven of them: two in poseidon1.rs, nine in poseidon2.rs).

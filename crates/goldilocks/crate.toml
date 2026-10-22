@@ -54,6 +54,9 @@ watch = ["goldilocks/src", "goldilocks/Cargo.toml", "field/src/integers.rs"]
 # are pending tools/mirror; until it exists, the transcriptions are re-read by
 # hand when a commit in `watch` touches them. The `i128` conversions come from
 # p3-field's `quotient_map_large_iint!`, so `field/src/integers.rs` is watched too.
+#
+# The `QuotientMap` paths omit the integer type, as gap-report.py renders them.
+# The Lean name says which impl each entry transcribes.
 
 [[mirror]]
 lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.CoreOpsArithSubGoldilocksGoldilocks.sub"
@@ -89,44 +92,44 @@ rust = "{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldil
 
 [[mirror]]
 lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU64.from_int"
-rust = "{impl p3_field::integers::QuotientMap<u64> for p3_goldilocks::goldilocks::Goldilocks}::from_int"
+rust = "{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int"
 
 [[mirror]]
 lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked"
-rust = "{impl p3_field::integers::QuotientMap<u64> for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked"
+rust = "{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked"
 
 [[mirror]]
 lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU128.from_int"
-rust = "{impl p3_field::integers::QuotientMap<u128> for p3_goldilocks::goldilocks::Goldilocks}::from_int"
+rust = "{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int"
 
 [[mirror]]
 lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_checked"
-rust = "{impl p3_field::integers::QuotientMap<u128> for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked"
+rust = "{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked"
 
 [[mirror]]
 lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_unchecked"
-rust = "{impl p3_field::integers::QuotientMap<u128> for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked"
+rust = "{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked"
 
 [[mirror]]
 lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI64.from_int"
-rust = "{impl p3_field::integers::QuotientMap<i64> for p3_goldilocks::goldilocks::Goldilocks}::from_int"
+rust = "{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int"
 
 [[mirror]]
 lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_checked"
-rust = "{impl p3_field::integers::QuotientMap<i64> for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked"
+rust = "{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked"
 
 [[mirror]]
 lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_unchecked"
-rust = "{impl p3_field::integers::QuotientMap<i64> for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked"
+rust = "{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked"
 
 [[mirror]]
 lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_int"
-rust = "{impl p3_field::integers::QuotientMap<i128> for p3_goldilocks::goldilocks::Goldilocks}::from_int"
+rust = "{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int"
 
 [[mirror]]
 lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked"
-rust = "{impl p3_field::integers::QuotientMap<i128> for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked"
+rust = "{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked"
 
 [[mirror]]
 lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_unchecked"
-rust = "{impl p3_field::integers::QuotientMap<i128> for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked"
+rust = "{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked"

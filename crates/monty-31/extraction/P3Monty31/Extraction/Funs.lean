@@ -300,6 +300,57 @@ def
     InternalLayerBaseParametersInst p3_fieldfieldPrimeCharacteristicRingInst
 }
 
+/-- [p3_monty_31::utils::to_monty_signed]:
+    Source: 'monty-31/src/utils.rs', lines 15:0-22:1 -/
+def utils.to_monty_signed
+  {MP : Type} (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
+  (x : Std.I32) :
+  RustM Std.U32
+  := do
+  let i ← lift (IScalar.cast .I64 x)
+  let i1 ← data_traitsMontyParametersInst.MONTY_BITS
+  let i2 ← i <<< i1
+  let i3 ← data_traitsMontyParametersInst.PRIME
+  let i4 ← lift (UScalar.hcast .I64 i3)
+  let i5 ← i2 % i4
+  let red ← lift (IScalar.cast .I32 i5)
+  if red >= 0#i32
+  then ok (IScalar.hcast .U32 red)
+  else core.num.U32.wrapping_add_signed i3 red
+
+/-- [p3_monty_31::utils::to_monty_64]:
+    Source: 'monty-31/src/utils.rs', lines 28:0-30:1 -/
+def utils.to_monty_64
+  {MP : Type} (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
+  (x : Std.U64) :
+  RustM Std.U32
+  := do
+  let i ← lift (UScalar.cast .U128 x)
+  let i1 ← data_traitsMontyParametersInst.MONTY_BITS
+  let i2 ← i <<< i1
+  let i3 ← data_traitsMontyParametersInst.PRIME
+  let i4 ← lift (UScalar.cast .U128 i3)
+  let i5 ← i2 % i4
+  ok (UScalar.cast .U32 i5)
+
+/-- [p3_monty_31::utils::to_monty_64_signed]:
+    Source: 'monty-31/src/utils.rs', lines 36:0-43:1 -/
+def utils.to_monty_64_signed
+  {MP : Type} (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
+  (x : Std.I64) :
+  RustM Std.U32
+  := do
+  let i ← lift (IScalar.cast .I128 x)
+  let i1 ← data_traitsMontyParametersInst.MONTY_BITS
+  let i2 ← i <<< i1
+  let i3 ← data_traitsMontyParametersInst.PRIME
+  let i4 ← lift (UScalar.hcast .I128 i3)
+  let i5 ← i2 % i4
+  let red ← lift (IScalar.cast .I32 i5)
+  if red >= 0#i32
+  then ok (IScalar.hcast .U32 red)
+  else core.num.U32.wrapping_add_signed i3 red
+
 /-- [p3_monty_31::utils::monty_reduce]:
     Source: 'monty-31/src/utils.rs', lines 105:0-125:1 -/
 def utils.monty_reduce
@@ -376,5 +427,61 @@ def utils.halve_u32
   if lo_bit = 0#u32
   then ok shr
   else ok shr_corr
+
+/-- [p3_monty_31::utils::large_monty_reduce]:
+    Source: 'monty-31/src/utils.rs', lines 134:0-158:1 -/
+def utils.large_monty_reduce
+  {MP : Type} (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
+  (x : Std.U64) :
+  RustM Std.U32
+  := do
+  let i ← data_traitsMontyParametersInst.MONTY_MU
+  let i1 ← lift (UScalar.cast .U64 i)
+  let i2 ← core.num.U64.wrapping_mul x i1
+  let i3 ← data_traitsMontyParametersInst.MONTY_MASK
+  let i4 ← lift (UScalar.cast .U64 i3)
+  let t ← lift (i2 &&& i4)
+  let i5 ← data_traitsMontyParametersInst.PRIME
+  let i6 ← lift (UScalar.cast .U64 i5)
+  let u ← t * i6
+  let i7 ← lift (UScalar.cast .U64 i5)
+  let i8 ← data_traitsMontyParametersInst.MONTY_BITS
+  let i9 ← i7 <<< i8
+  let (x_prime, over) ← core.num.U64.overflowing_sub x i9
+  let x_corr ← if over
+                 then ok x
+                 else ok x_prime
+  let (x_sub_u, over1) ← core.num.U64.overflowing_sub x_corr u
+  let i10 ← x_sub_u >>> i8
+  let x_sub_u_hi ← lift (UScalar.cast .U32 i10)
+  let corr ← if over1
+               then ok i5
+               else ok 0#u32
+  core.num.U32.wrapping_add x_sub_u_hi corr
+
+/-- [p3_monty_31::utils::monty_reduce_u128]:
+    Source: 'monty-31/src/utils.rs', lines 168:0-222:1 -/
+def utils.monty_reduce_u128
+  {MP : Type} (data_traitsMontyParametersInst : data_traits.MontyParameters MP)
+  (x : Std.U128) :
+  RustM Std.U32
+  := do
+  let i ← data_traitsMontyParametersInst.MONTY_BITS
+  massert (i = 32#u32)
+  let i1 ← 1#u128 <<< 96#i32
+  massert (x < i1)
+  let lo ← lift (UScalar.cast .U64 x)
+  let i2 ← x >>> 64#i32
+  let hi ← lift (UScalar.cast .U32 i2)
+  let i3 ← data_traitsMontyParametersInst.PRIME
+  let i4 ← lift (UScalar.cast .U64 i3)
+  let i5 ← i4 <<< i
+  let two_rp ← i5 <<< 1#i32
+  let lo_reduced ← if lo >= two_rp
+                     then lo - two_rp
+                     else ok lo
+  let r ← utils.large_monty_reduce data_traitsMontyParametersInst lo_reduced
+  let hi_r_mod_p ← utils.to_monty data_traitsMontyParametersInst hi
+  utils.add data_traitsMontyParametersInst hi_r_mod_p r
 
 end p3_monty_31

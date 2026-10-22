@@ -1,0 +1,70 @@
+# Patch:        020-trait-default-constant-shape
+# Phase:        post
+# Target:       extraction/P3KoalaBear/Extraction/Funs.lean
+# Hunks:        2
+# Class:        reshape
+# Gap:          docs/extractor-issues.md 3: aeneas's defining and using runs
+#               disagree on the signature of a trait-default associated constant
+#               that does not use `Self`.
+# Cost:         none. The same default constant is referenced, with the
+#               arguments and monad its definition actually has.
+# Upstreamable: yes: aeneas could emit one shape for such defaults in both
+#               positions.
+# Drop when:    aeneas emits one shape for such defaults in both positions.
+#
+# Three trait defaults do not depend on the implementing type:
+#   BarrettParameters::N            = 40
+#   BarrettParameters::MASK         = (1 << 10) - 1
+#   PartialRoundBaseParameters::USE_TEXTBOOK = false
+# In the scoped p3-monty-31 extraction (the crate that defines them), aeneas
+# emits them taking the *type* and, for `N` and `USE_TEXTBOOK`, as pure values:
+#   def BarrettParameters.N.default (Self : Type) : Std.Usize
+# In p3-koala-bear's extraction (which only uses them), aeneas calls them with
+# the *instance* and expects a `RustM`:
+#   N := BarrettParameters.N.default <BarrettParameters instance>
+# The two runs of one aeneas build disagree, so the call sites are rewritten to
+# the defining side's shape (`ok (… .default KoalaBearParameters)` and so on).
+# The original call is kept as a comment beside each one.
+#
+--- a/extraction/P3KoalaBear/Extraction/Funs.lean
++++ b/extraction/P3KoalaBear/Extraction/Funs.lean
+@@ -279,14 +279,20 @@
+   koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsBarrettParameters
+   : p3_monty_31.data_traits.BarrettParameters koala_bear.KoalaBearParameters
+   := {
+-  N := p3_monty_31.data_traits.BarrettParameters.N.default
+-    koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsBarrettParameters
++  N := -- PATCHED: the default is emitted as `(Self : Type) : Std.Usize` upstream
++    ok (p3_monty_31.data_traits.BarrettParameters.N.default
++    koala_bear.KoalaBearParameters)
++    -- (p3_monty_31.data_traits.BarrettParameters.N.default
++    --   koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsBarrettParameters)
+   PRIME_I128 := p3_monty_31.data_traits.BarrettParameters.PRIME_I128.default
+     koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsBarrettParameters
+   PSEUDO_INV := p3_monty_31.data_traits.BarrettParameters.PSEUDO_INV.default
+     koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsBarrettParameters
+-  MASK := p3_monty_31.data_traits.BarrettParameters.MASK.default
+-    koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsBarrettParameters
++  MASK := -- PATCHED: the default is emitted as `(Self : Type) : RustM Std.I64` upstream
++    p3_monty_31.data_traits.BarrettParameters.MASK.default
++    koala_bear.KoalaBearParameters
++    -- (… MASK.default
++    --   koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsBarrettParameters)
+   MontyParametersInst :=
+     koala_bear.KoalaBearParameters.Insts.P3_monty_31Data_traitsMontyParameters
+ }
+@@ -1499,9 +1505,11 @@
+   : p3_monty_31.poseidon1.PartialRoundBaseParameters
+   poseidon1.KoalaBearPoseidonParameters koala_bear.KoalaBearParameters 24#usize
+   := {
+-  USE_TEXTBOOK :=
+-    p3_monty_31.poseidon1.PartialRoundBaseParameters.USE_TEXTBOOK.default
+-    poseidon1.KoalaBearPoseidonParameters.Insts.P3_monty_31Poseidon1PartialRoundBaseParametersKoalaBearParameters24
++  USE_TEXTBOOK := -- PATCHED: the default is emitted as `(Self MP WIDTH) : Bool` upstream
++    ok (p3_monty_31.poseidon1.PartialRoundBaseParameters.USE_TEXTBOOK.default
++    poseidon1.KoalaBearPoseidonParameters koala_bear.KoalaBearParameters 24#usize)
++    -- (… USE_TEXTBOOK.default
++    --   poseidon1.KoalaBearPoseidonParameters.Insts.P3_monty_31Poseidon1PartialRoundBaseParametersKoalaBearParameters24)
+   corecloneCloneInst :=
+     poseidon1.KoalaBearPoseidonParameters.Insts.CoreCloneClone
+   data_traitsMontyParametersInst :=

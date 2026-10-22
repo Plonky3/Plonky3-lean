@@ -52,4 +52,14 @@ for `i128::MIN`. -/
 def core.num.I128.unsigned_abs (self : Std.I128) : RustM Std.U128 :=
   ok ⟨BitVec.ofNat _ self.val.natAbs⟩
 
+/-- `u32::wrapping_add_signed`: `self + rhs` modulo `2^32`, with `rhs` signed.
+
+Rust computes `self.wrapping_add(rhs as Self)` (`library/core/src/num/uint_macros.rs`).
+
+The cast reinterprets the bits of `rhs`.
+
+p3-monty-31's signed conversions into Montgomery form use it. -/
+def core.num.U32.wrapping_add_signed (self : Std.U32) (rhs : Std.I32) : RustM Std.U32 :=
+  ok (self.wrapping_add (IScalar.hcast .U32 rhs))
+
 end CoreModels

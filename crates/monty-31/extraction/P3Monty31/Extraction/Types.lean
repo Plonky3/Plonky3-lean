@@ -110,6 +110,21 @@ structure data_traits.BinomialExtensionData (Self : Type) (Self_ArrayLike :
     core.convert.AsRef Self_ArrayLike (Slice (Array (monty_31.MontyField31
     Self) DEG))
 
+/-- Trait declaration: [p3_monty_31::data_traits::TrinomialQuinticData]
+    Source: 'monty-31/src/data_traits.rs', lines 155:0-170:1
+    Visibility: public -/
+structure data_traits.TrinomialQuinticData (Self : Type) (Self_ArrayLike :
+  Type) where
+  EXT_GENERATOR : RustM (Array (monty_31.MontyField31 Self) 5#usize)
+  EXT_TWO_ADICITY : RustM Std.Usize
+  FROBENIUS_COEFFS : RustM (Array (Array (monty_31.MontyField31 Self) 5#usize)
+    4#usize)
+  TWO_ADIC_EXTENSION_GENERATORS : RustM Self_ArrayLike
+  MontyParametersInst : data_traits.MontyParameters Self
+  coreconvertAsRefSelf_ArrayLikeSliceArrayMontyField315Inst :
+    core.convert.AsRef Self_ArrayLike (Slice (Array (monty_31.MontyField31
+    Self) 5#usize))
+
 /-- Trait declaration: [p3_monty_31::mds::MDSUtils]
     Source: 'monty-31/src/mds.rs', lines 11:0-18:1
     Visibility: public -/
