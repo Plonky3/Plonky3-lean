@@ -11,6 +11,7 @@ import Plonky3Lean.Proofs.Field.Goldilocks.Constants
 import Plonky3Lean.Proofs.Field.Goldilocks.Convert
 import Plonky3Lean.Proofs.Field.Goldilocks.Inverse
 import Plonky3Lean.Proofs.Field.Goldilocks.PowersOfTwo
+import Plonky3Lean.Proofs.Field.Goldilocks.Sum
 import Plonky3Lean.Proofs.Field.KoalaBear
 import Plonky3Lean.Proofs.Field.KoalaBear.Arith
 import Plonky3Lean.Proofs.Field.KoalaBear.Constants
