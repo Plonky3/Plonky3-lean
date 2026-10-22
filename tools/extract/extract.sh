@@ -351,9 +351,12 @@ echo "    0 warnings; generated code contains $n_sorry 'sorry'; hand-written cod
 
 if [ "$CHECK" = "1" ]; then
     echo "==> check: re-extraction is byte-identical to the committed output"
-    if ! (cd "$ROOT" && git diff --quiet -- crates/'*'/extraction \
-            && [ -z "$(git ls-files --others --exclude-standard -- crates/'*'/extraction)" ]); then
-        (cd "$ROOT" && git status --short -- crates/'*'/extraction) >&2
+    # A glob pathspec: a plain `crates/*/extraction` matches only a path equal to
+    # it, never the files under it, and so would compare nothing.
+    spec=':(glob)crates/*/extraction/**'
+    if ! (cd "$ROOT" && git diff --quiet -- "$spec" \
+            && [ -z "$(git ls-files --others --exclude-standard -- "$spec")" ]); then
+        (cd "$ROOT" && git status --short -- "$spec") >&2
         echo "error: re-extraction changed the committed output above." >&2
         exit 1
     fi
