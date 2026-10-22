@@ -1,0 +1,67 @@
+import Mathlib.Data.ZMod.Basic
+import P3Monty31
+
+/-!
+# Monty31: what a `MontyField31` means, for any parameters
+
+p3-monty-31 implements one field per `MontyParameters` impl: BabyBear,
+KoalaBear, and any 31-bit prime a downstream crate chooses.
+
+The code is generic, so its specification is too.
+
+* **The parameters.** `Valid inst p mu` is what `MontyField31::new` asserts of
+  the impl, in a `const` block, and nothing more:
+
+  - `PRIME` is odd,
+  - `PRIME < 2^31`,
+  - `MONTY_BITS = 32`,
+  - `PRIME · MONTY_MU ≡ 1 (mod 2^32)`.
+
+  It also records that `MONTY_MASK` keeps its default, `2^32 - 1`.
+
+  A proof that needs more than this has found a property the Rust relies on and
+  does not check.
+
+* **An element.** The stored `u32` is the element `a` in Montgomery form,
+  `a · 2^32 mod p`.
+
+  `toField` decodes it into `ZMod p`.
+
+  `Canonical` says it is fully reduced, `< p`, which equality and hashing rely on.
+-/
+
+open Aeneas Aeneas.Std CoreModels
+open p3_monty_31
+
+namespace Plonky3Lean.Spec.Monty31
+
+/-- The parameters of a `MontyParameters` impl, as `MontyField31::new` checks
+them, at the values `p` (`PRIME`) and `mu` (`MONTY_MU`). -/
+structure Valid {MP : Type} (inst : data_traits.MontyParameters MP) (p mu : Std.U32) : Prop where
+  prime : inst.PRIME = .ok p
+  bits : inst.MONTY_BITS = .ok 32#u32
+  monty_mu : inst.MONTY_MU = .ok mu
+  mask : inst.MONTY_MASK = .ok 4294967295#u32
+  odd : p.val % 2 = 1
+  lt : p.val < 2 ^ 31
+  inv : p.val * mu.val % 2 ^ 32 = 1
+
+/-- The parameters of a `FieldParameters` impl: valid `MontyParameters`, and
+`HALF_P_PLUS_1` at its default `(p + 1) / 2`, which `halve` relies on. -/
+structure FieldValid {FP : Type} (inst : data_traits.FieldParameters FP) (p mu : Std.U32) : Prop where
+  monty : Valid inst.PackedMontyParametersInst.MontyParametersInst p mu
+  half : ∃ h : Std.U32, inst.HALF_P_PLUS_1 = .ok h ∧ h.val = (p.val + 1) / 2
+
+/-- A field element as the model has it: Rust's `MontyField31<MP>`. -/
+abbrev Element (MP : Type) := monty_31.MontyField31 MP
+
+/-- The element of `ZMod p` that a stored value stands for: the stored `u32`
+times `2^(-32)`. -/
+def toField {MP : Type} (p : ℕ) (x : Element MP) : ZMod p :=
+  (x.value.val : ZMod p) * (2 ^ 32 : ZMod p)⁻¹
+
+/-- The representation invariant: the stored value is fully reduced. -/
+def Canonical {MP : Type} (p : ℕ) (x : Element MP) : Prop :=
+  x.value.val < p
+
+end Plonky3Lean.Spec.Monty31
