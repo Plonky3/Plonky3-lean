@@ -65,6 +65,10 @@ name = "P3Mds"
 srcDir = "crates/mds/extraction"
 
 [[lean_lib]]
+name = "P3Mersenne31"
+srcDir = "crates/mersenne-31/extraction"
+
+[[lean_lib]]
 name = "P3Monty31"
 srcDir = "crates/monty-31/extraction"
 

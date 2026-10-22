@@ -64,4 +64,15 @@ opaque exponentiation.exp_1725656503 {R : Type}
     (PrimeCharacteristicRingInst : field.PrimeCharacteristicRing R) (val : R) :
     RustM R
 
+/-- [p3_field::helpers::halve_u32]: `x / 2` in `F_P`, for `x < P`. Upstream:
+`field/src/helpers.rs:113`, `let shift = (P + 1) >> 1; let half = x >> 1;`
+`if x & 1 == 0 { half } else { half + shift }`. Transcribed as aeneas renders
+it: `+` is checked, and the `else` addition happens only in that branch. -/
+def helpers.halve_u32 (P : Std.U32) (x : Std.U32) : RustM Std.U32 := do
+  let i ← P + 1#u32
+  let shift ← i >>> 1#i32
+  let half ← x >>> 1#i32
+  let i1 ← lift (x &&& 1#u32)
+  if i1 = 0#u32 then ok half else half + shift
+
 end p3_field
