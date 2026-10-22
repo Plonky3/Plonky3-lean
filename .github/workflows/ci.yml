@@ -18,3 +18,5 @@ jobs:
       - uses: leanprover/lean-action@v1
       - name: Check the axioms of every claim
         run: python3 tools/check-claims.py
+      - name: Check that STATUS.md is generated from this commit
+        run: python3 tools/status.py --check

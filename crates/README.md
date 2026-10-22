@@ -64,7 +64,9 @@ exists, the entries have no `hash`, and the transcriptions are re-read by hand
 when a commit in the crate's `watch` paths touches them.
 
 The `*External.lean` files hold only imports and `opaque` constants. Each
-`opaque` constant is listed in [`STATUS.md`](../STATUS.md).
+`opaque` constant is listed in [`STATUS.md`](../STATUS.md), with the reason its
+docstring gives in a sentence starting "Assumed"; `tools/status.py` fails on an
+opaque constant without one.
 
 ## Imports follow the Cargo graph
 
