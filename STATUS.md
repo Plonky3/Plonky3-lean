@@ -29,10 +29,13 @@ crate. The `[[mirror]]` entries have no hashes yet (`tools/mirror` is planned).
 
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom:
 it adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about
-code that mentions one would go through for any value of it. Of these, only
-`baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` is in the dependencies of
-a claim: 16 of them reach it as the `Debug` supertrait field of the
-`MontyParameters` instance, whose constants they are about. No proof uses it.
+code that mentions one would go through for any value of it. Two of these are
+in the dependencies of a claim. `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt`:
+48 of the 57 claims reach it as the `Debug` supertrait field of the
+`MontyParameters` instance, which every claim reading a constant through
+`FieldParams`, `TwoAdicParams` or `Ext*Params` goes through. No proof uses it.
+`p3_field.exponentiation.exp_1725656503`: `exp_root_d.exponent` states that
+`exp_root_d` calls it, and says nothing about its value.
 
 | Crate | Constant | Why |
 |---|---|---|
@@ -110,6 +113,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData5.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData5.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -117,6 +121,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
 
 ## Upstream warnings
