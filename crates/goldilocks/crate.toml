@@ -1,0 +1,132 @@
+# p3-goldilocks: the prime field p = 2^64 - 2^32 + 1, with elements stored as
+# any u64 (not necessarily reduced).
+
+lean_lib = "P3Goldilocks"
+
+# Only the scalar arithmetic is extracted, rooted at `start_from`. Extracting
+# the whole crate fails: it reaches p3-field's mutually recursive trait
+# hierarchy, which aeneas rejects (docs/extractor-issues.md, 9). The same
+# happens for any root that instantiates a provided method of
+# `PrimeCharacteristicRing` at `Goldilocks` (such as `exp_2_31_minus_1`, which
+# calls `square`), since that needs the whole impl.
+state = "scoped"
+
+features = []
+
+# Charon roots, one `--start-from` each. A trait method that is a root but that
+# no extracted item calls is translated and then left out of the declaration
+# order (docs/extractor-issues.md, 4). Such methods are transcribed in
+# extraction/P3Goldilocks/Assumptions/Mirror.lean. The roots below that end up
+# extracted are those reachable from a free function or from a method that
+# survives: `try_inverse` calls `gcd_inversion`, which calls `Add`, `Mul` and
+# `mul_2exp_u64`, which calls `Neg`.
+start_from = [
+  "p3_goldilocks::goldilocks::Goldilocks::new",
+  "p3_goldilocks::goldilocks::Goldilocks::new_array",
+  "p3_goldilocks::goldilocks::Goldilocks::TWO_ADIC_GENERATORS",
+  "p3_goldilocks::goldilocks::Goldilocks::POWERS_OF_TWO",
+  "p3_goldilocks::goldilocks::reduce128",
+  "p3_goldilocks::goldilocks::split",
+  "p3_goldilocks::goldilocks::add_no_canonicalize_trashing_input",
+  "p3_goldilocks::goldilocks::mul_wide",
+  "p3_goldilocks::goldilocks::const_add",
+  "p3_goldilocks::goldilocks::from_unusual_int",
+  "p3_goldilocks::goldilocks::gcd_inversion",
+  "{impl p3_field::field::PrimeField64 for p3_goldilocks::goldilocks::Goldilocks}::as_canonical_u64",
+  # Dropped (docs/extractor-issues.md, 4), but their local constants
+  # `HALF_P_PLUS_1` and `OFFSET` are extracted, and the transcriptions use them.
+  "{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::halve",
+  "{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::dot_product",
+  "{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::NEG_ONE",
+  "{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::TWO",
+  "{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::ZERO",
+  "{impl p3_field::field::Field for p3_goldilocks::goldilocks::Goldilocks}::is_zero",
+  "{impl p3_field::field::Field for p3_goldilocks::goldilocks::Goldilocks}::try_inverse",
+  "{impl p3_field::field::Field for p3_goldilocks::goldilocks::Goldilocks}::GENERATOR",
+  "{impl p3_field::field::TwoAdicField for p3_goldilocks::goldilocks::Goldilocks}::two_adic_generator",
+  "{impl p3_field::field::TwoAdicField for p3_goldilocks::goldilocks::Goldilocks}::TWO_ADICITY",
+  "{impl core::cmp::Ord for p3_goldilocks::goldilocks::Goldilocks}::cmp",
+]
+
+watch = ["goldilocks/src", "goldilocks/Cargo.toml", "field/src/integers.rs"]
+
+# The transcriptions in extraction/P3Goldilocks/Assumptions/Mirror.lean. Hashes
+# are pending tools/mirror; until it exists, the transcriptions are re-read by
+# hand when a commit in `watch` touches them. The `i128` conversions come from
+# p3-field's `quotient_map_large_iint!`, so `field/src/integers.rs` is watched too.
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.CoreOpsArithSubGoldilocksGoldilocks.sub"
+rust = "{impl core::ops::arith::Sub for p3_goldilocks::goldilocks::Goldilocks}::sub"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.CoreCmpPartialEqGoldilocks.eq"
+rust = "{impl core::cmp::PartialEq for p3_goldilocks::goldilocks::Goldilocks}::eq"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.halve"
+rust = "{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::halve"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.div_2exp_u64"
+rust = "{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::div_2exp_u64"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.CoreIterTraitsAccumSumGoldilocks.sum"
+rust = "{impl core::iter::traits::accum::Sum for p3_goldilocks::goldilocks::Goldilocks}::sum"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.sum_array"
+rust = "{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::sum_array"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.PrimeCharacteristicRingGoldilocks.dot_product.fold_step"
+rust = "{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::dot_product"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product"
+rust = "{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::dot_product"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU64.from_int"
+rust = "{impl p3_field::integers::QuotientMap<u64> for p3_goldilocks::goldilocks::Goldilocks}::from_int"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked"
+rust = "{impl p3_field::integers::QuotientMap<u64> for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU128.from_int"
+rust = "{impl p3_field::integers::QuotientMap<u128> for p3_goldilocks::goldilocks::Goldilocks}::from_int"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_checked"
+rust = "{impl p3_field::integers::QuotientMap<u128> for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_unchecked"
+rust = "{impl p3_field::integers::QuotientMap<u128> for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI64.from_int"
+rust = "{impl p3_field::integers::QuotientMap<i64> for p3_goldilocks::goldilocks::Goldilocks}::from_int"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_checked"
+rust = "{impl p3_field::integers::QuotientMap<i64> for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_unchecked"
+rust = "{impl p3_field::integers::QuotientMap<i64> for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_int"
+rust = "{impl p3_field::integers::QuotientMap<i128> for p3_goldilocks::goldilocks::Goldilocks}::from_int"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked"
+rust = "{impl p3_field::integers::QuotientMap<i128> for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked"
+
+[[mirror]]
+lean = "p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_unchecked"
+rust = "{impl p3_field::integers::QuotientMap<i128> for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked"

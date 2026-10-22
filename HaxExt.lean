@@ -33,4 +33,23 @@ def core.Shared0T.Insts.CoreConvertAsRef {T U : Type}
     (convertAsRefInst : core.convert.AsRef T U) : core.convert.AsRef T U :=
   { as_ref := convertAsRefInst.as_ref }
 
+/-- `core::hint::assert_unchecked(cond)` (`library/core/src/hint.rs`).
+
+A false `cond` is undefined behaviour, so it is modelled as a failure (`undef`).
+
+A proof that a caller does not fail therefore proves `cond` at every call. -/
+def core.hint.assert_unchecked (cond : Bool) : RustM Unit :=
+  if cond then ok () else fail .undef
+
+/-- `u64::wrapping_add_signed`, whose body is `self.wrapping_add(rhs as Self)`
+(`library/core/src/num/uint_macros.rs`). -/
+def core.num.U64.wrapping_add_signed (self : Std.U64) (rhs : Std.I64) : RustM Std.U64 :=
+  core.num.U64.wrapping_add self (IScalar.hcast .U64 rhs)
+
+/-- `i128::unsigned_abs`, whose body is `self.wrapping_abs() as u128`
+(`library/core/src/num/int_macros.rs`): `|self|`, which fits in a `u128` even
+for `i128::MIN`. -/
+def core.num.I128.unsigned_abs (self : Std.I128) : RustM Std.U128 :=
+  ok ⟨BitVec.ofNat _ self.val.natAbs⟩
+
 end CoreModels
