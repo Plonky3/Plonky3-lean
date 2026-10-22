@@ -47,6 +47,7 @@ theorem partial_reduce.spec (x : Std.U64) :
   · rw [r_post, hi3, hhi]
     omega
 
+@[step]
 theorem reduce_64.spec (x : Std.U64) :
     mersenne_31.reduce_64 x ⦃ r => r.val = x.val % 2147483647 ⦄ := by
   unfold mersenne_31.reduce_64
