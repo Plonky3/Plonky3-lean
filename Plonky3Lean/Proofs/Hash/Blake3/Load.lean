@@ -464,4 +464,24 @@ theorem mask_tail_eq (batch : Slice Std.U8) (a K tail : ℕ) (hK : tail ≤ K) (
   · obtain rfl : K = tail := by omega
     rw [ite_eq_right_of_eq_false _ _ (eq_false (by rw [usz_lt_iff (by omega) (by norm_num)]; exact h))]
 
+/-- The only lane, whose message starts at byte `s` of the batch. -/
+def lane1 (batch : Slice Std.U8) (s : ℕ) : p3_blake3.batch.Lanes 1#usize 1#usize :=
+  { batch := batch, starts := sts s, last := usz s }
+
+theorem last_block_eq (batch : Slice Std.U8) (s off tail : ℕ) (hT : tail ≤ 64)
+    (hB : s + off + tail ≤ batch.val.length) (h32 : batch.val.length + 64 < 2 ^ 32) :
+    p3_blake3.batch.last_block p3_blake3.U32.Insts.P3_blake3BatchLanesBackend1 (lane1 batch s) (usz off)
+      (usz tail) = .ok (wblock batch (s + off) tail) := by
+  unfold p3_blake3.batch.last_block lane1
+  dsimp only
+  rw [usz_add (by omega), bind_ok, BLOCK_LEN_eq, bind_ok, usz_add (by omega), bind_ok,
+    slice_len_eq batch (by omega), bind_ok]
+  by_cases h : s + off + 64 ≤ batch.val.length
+  · rw [ite_eq_left_of_eq_true _ _ (eq_true ((usz_le_iff (by omega) (by omega)).2 h)),
+      load_parts_eq batch s s off h h (by omega), bind_ok]
+    exact mask_tail_eq batch (s + off) 64 tail hT le_rfl (by omega)
+  · rw [ite_eq_right_of_eq_false _ _ (eq_false (by rw [usz_le_iff (by omega) (by omega)]; exact h)),
+      spill_parts_eq batch s off tail hT hB (by omega), bind_ok]
+    exact mask_tail_eq batch (s + off) tail tail le_rfl hT (Or.inr rfl)
+
 end Plonky3Lean.Proofs.Blake3
