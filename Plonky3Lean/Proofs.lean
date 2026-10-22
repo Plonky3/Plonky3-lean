@@ -27,6 +27,7 @@ import Plonky3Lean.Proofs.Field.Mersenne31.DotProduct
 import Plonky3Lean.Proofs.Field.Mersenne31.DotProductLoop
 import Plonky3Lean.Proofs.Field.Mersenne31.Field
 import Plonky3Lean.Proofs.Field.Mersenne31.Inverse
+import Plonky3Lean.Proofs.Field.Mersenne31.NewArray
 import Plonky3Lean.Proofs.Field.Mersenne31.Sum
 import Plonky3Lean.Proofs.Field.Monty31.Arith
 import Plonky3Lean.Proofs.Field.Monty31.Convert

@@ -1,5 +1,6 @@
 import Plonky3Lean.Proofs.Field.Mersenne31.Complex
 import Plonky3Lean.Proofs.Field.Mersenne31.DotProductLoop
+import Plonky3Lean.Proofs.Field.Mersenne31.NewArray
 import Plonky3Lean.Proofs.Field.Mersenne31.Sum
 
 /-!
@@ -20,7 +21,7 @@ So `p` itself is a valid stored value, a second representation of zero.
 Never panicking covers each overflow-checked operation and each `debug_assert!`.
 
 Not claimed:
-- exponentiation, `try_sqrt`, `injective_exp_root_n`, `sum_array` and `new_array`;
+- exponentiation, `try_sqrt`, `injective_exp_root_n` and `sum_array`;
 - serialization, hashing and sampling;
 - the packed (SIMD) arithmetic;
 - the generic extension-field arithmetic of p3-field, and the `EXT_GENERATOR`s of QM31 and of the cubic extension of `F[i]`;
@@ -57,6 +58,13 @@ theorem mersenne_31.Mersenne31.new_checked.toField (x : Std.U32) :
       | .Some y => x.val < 2 ^ 31 ∧ y.value = x ∧ Valid y ∧ toField y = (x.val : Mersenne31.Field)
       | .None => 2 ^ 31 ≤ x.val ⦄ :=
   Proofs.Mersenne31.new_checked.toField x
+
+/-- `new_array(input)` reduces each entry. -/
+theorem mersenne_31.Mersenne31.new_array.toField {N : Std.Usize} (input : Array Std.U32 N) :
+    mersenne_31.Mersenne31.new_array input ⦃ r =>
+      ∀ j (h1 : j < r.val.length) (h2 : j < input.val.length),
+        Canonical (r.val[j]'h1) ∧ toField (r.val[j]'h1) = ((input.val[j]'h2).val : Mersenne31.Field) ⦄ :=
+  Proofs.Mersenne31.new_array.spec input
 
 /-- `as_canonical_u32` returns the canonical residue, also for the stored value `p`. -/
 theorem mersenne_31.Mersenne31.as_canonical_u32.toField (a : Element) (ha : Valid a) :
