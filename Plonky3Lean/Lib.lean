@@ -7,6 +7,9 @@ public import Plonky3Lean.Lib.Scalar
 public import Plonky3Lean.Lib.Scalar.Bits
 public import Plonky3Lean.Lib.Scalar.Signed
 public import Plonky3Lean.Lib.Scalar.U64
+public import Plonky3Lean.Lib.Range
+public import Plonky3Lean.Lib.Slice
+public import Plonky3Lean.Lib.Scalar.Words
 
 @[expose] public section
 

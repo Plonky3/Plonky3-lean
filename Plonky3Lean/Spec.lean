@@ -6,6 +6,7 @@ public import Plonky3Lean.Spec.Goldilocks
 public import Plonky3Lean.Spec.KoalaBear
 public import Plonky3Lean.Spec.Mersenne31
 public import Plonky3Lean.Spec.Monty31
+public import Plonky3Lean.Spec.Sha256
 
 @[expose] public section
 

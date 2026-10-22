@@ -6,6 +6,7 @@ public import Plonky3Lean.Claims.Goldilocks
 public import Plonky3Lean.Claims.KoalaBear
 public import Plonky3Lean.Claims.Mersenne31
 public import Plonky3Lean.Claims.Monty31
+public import Plonky3Lean.Claims.Sha256
 public import Plonky3Lean.Claims.Util
 public import Plonky3Lean.Proofs
 
