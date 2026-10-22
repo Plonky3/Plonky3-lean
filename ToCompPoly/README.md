@@ -31,6 +31,8 @@ of the claims stays CompPoly's, not this repository's.
 | `ToMathlib/Polynomial/XPowSubC.lean` | new file (mathlib candidate) | `X ^ n - a` is irreducible over `ZMod q`, from finitely many gcds |
 | `Fields/BabyBear.lean` | appended to `CompPoly/Fields/BabyBear.lean` | `generator = 31` and its order; `x ↦ x ^ 1725656503` inverts `x ↦ x ^ 7` |
 | `Fields/BabyBear/Extension.lean` | new file | `ofCoeffs`; the extensions `Ext4`, `Ext5`, `Ext8` (`X ^ D - W` irreducible); the two-adicity of `p ^ D - 1`; the two-adic generators of `Ext4` and `Ext8` with their orders and squaring chain |
+| `Fields/KoalaBear.lean` | appended to `CompPoly/Fields/KoalaBear/Basic.lean` | `x ↦ x ^ 1420470955` inverts `x ↦ x ^ 3`; a kernel-checkable `x ^ e ≠ 1` test |
+| `Fields/KoalaBear/Extension.lean` | new file | `ofCoeffs`; the extensions `Ext4`, `Ext8` (`X ^ D - 3` irreducible); the two-adicity of `p ^ D - 1` for `D = 4, 5, 8`; the two-adic generators of `Ext4` and `Ext8` with their orders and squaring chain |
 
 When a file lands upstream, delete it here, bump the CompPoly `rev` in
 `lakefile.toml`, and change the imports that named it.
