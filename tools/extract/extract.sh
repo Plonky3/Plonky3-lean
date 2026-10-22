@@ -14,7 +14,9 @@
 #      agree with what hax resolves
 #   1. check the patch conventions (check-patches.sh)
 #   2. run upstream's tests with and without the pre-extraction patches, and
-#      record every difference in the patch headers (test-pre-patches.py)
+#      record every difference in the patch headers (test-pre-patches.py);
+#      then show that each pre-patch's own tests pass, and fail under its
+#      recorded mutation (check-mutations.py)
 #   3. apply every crates/*/patches/pre/ patch to plonky3/, and `cargo check`
 #      each extracted crate in the variant charon sees
 #   4. run `cargo hax into lean` over each crate whose state is `extracted`
@@ -215,6 +217,8 @@ echo "==> 1/8 checking patch conventions"
 
 echo "==> 2/8 upstream tests, with and without the pre-extraction patches"
 "$HERE/test-pre-patches.py"
+echo "    -- each pre-patch's tests, and its recorded mutation"
+"$HERE/check-mutations.py"
 
 echo "==> 3/8 pre-extraction patches (plonky3/) and cargo check ($HAX_TARGET, $EXTRACT_RUSTFLAGS)"
 "$CONFIG" pre-patches > "$PRE_LIST"

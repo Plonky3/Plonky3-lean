@@ -49,9 +49,12 @@ def main(argv):
         # Crate by crate, each crate's patches in filename order. Every
         # extraction run applies all of them: the cfg they gate on is set for
         # every crate, so the trees the crates see must agree.
+        # A `NNN-slug.mutation.patch` is the recorded mutation of patch
+        # NNN-slug (check-mutations.py), not a patch.
         for name, _ in crates():
             for p in sorted((ROOT / "crates" / name / "patches" / "pre").glob("[0-9]*.patch")):
-                print(p)
+                if not p.name.endswith(".mutation.patch"):
+                    print(p)
     else:
         sys.exit(__doc__)
 

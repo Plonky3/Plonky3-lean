@@ -17,6 +17,11 @@ A *divergence* is any of:
     `#[test]` fn's source is compared, found by brace matching (not a full
     Rust parser).
 
+A test that exists only in `patched` is one a patch adds to make its own case
+(its `# Test:`, checked further by check-mutations.py). It is not a
+divergence, and it is not counted in `Tested:`, but the run fails unless it
+passes.
+
 Each divergence is attributed to the first patch that introduces it, by
 re-running on prefixes of the patch list (only when there is one), and the
 script **writes it into that patch's header**, in a block it maintains:
@@ -363,11 +368,13 @@ def main():
         elif div:
             attributed = {t: ps[0].name for t in div}
         n_base = sum(1 for s in base[0].values() if s == "ok")
-        n_pat = sum(1 for s in pat[0].values() if s == "ok")
+        # Upstream tests only: the tests the patches add are counted apart.
+        n_pat = sum(1 for t, s in pat[0].items() if s == "ok" and t in base[0])
         added = sorted(set(pat[0]) - set(base[0]))
         res = {"key": key, "tests_base": len(base[0]), "passed_base": n_base,
                "passed_patched": n_pat, "failed_base": sorted(t for t, s in base[0].items() if s == "FAILED"),
                "added": added,
+               "added_failing": {t: pat[0][t] for t in added if pat[0][t] != "ok"},
                "divergences": {t: {"what": w, "patch": attributed.get(t, "?")} for t, w in div.items()}}
         cache.write_text(json.dumps(res, indent=1))
 
@@ -380,6 +387,14 @@ def main():
             print(f"      {t}")
 
     fail = False
+    # Tests that exist only in the patched tree are the patches' own (their
+    # `# Test:`). They are not divergences, since nothing upstream changed,
+    # but they must pass.
+    print(f"    {len(res['added'])} test(s) added by the pre-patches, "
+          f"{len(res['added_failing'])} failing")
+    for t, st in sorted(res["added_failing"].items()):
+        print(f"    ERROR: test {t}, added by the pre-patches, is {st}")
+        fail = True
     unattributed = [t for t, d in res["divergences"].items() if d["patch"] not in {p.name for p in ps}]
     for t in unattributed:
         print(f"    ERROR: divergence {t} appears with the full set but with no prefix of it "

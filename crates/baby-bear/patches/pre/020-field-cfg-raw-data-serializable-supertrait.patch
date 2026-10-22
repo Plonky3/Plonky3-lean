@@ -1,13 +1,21 @@
-# Patch:     020-field-cfg-raw-data-serializable-supertrait
-# Phase:     pre
-# Target:    field/src/extension/binomial_extension.rs, field/src/extension/cubic_extension.rs, field/src/extension/quintic_extension.rs, field/src/field.rs, symmetric/src/serializing_hasher.rs
-# Hunks:     11
-# Cost:      none in a normal build (see below). In the extracted variant,
-#            `Field` no longer implies `RawDataSerializable`.
-# Upstream:  charon#1266 (RPITIT/GAT lift is out of scope for
-#            `--lift-associated-types`); aeneas has no GAT model.
-# Drop when: charon lifts RPITIT to a named associated type, or aeneas models
-#            GATs.
+# Patch:        020-field-cfg-raw-data-serializable-supertrait
+# Phase:        pre
+# Target:       field/src/extension/binomial_extension.rs, field/src/extension/cubic_extension.rs, field/src/extension/quintic_extension.rs, field/src/field.rs, symmetric/src/serializing_hasher.rs, baby-bear/tests/pre_patch_020.rs
+# Hunks:        12
+# Class:        cfg-hide
+# Gap:          docs/extractor-issues.md 10: charon#1266 (an `-> impl Trait`
+#               method is a hidden GAT, which `--lift-associated-types` cannot
+#               lift); aeneas has no GAT model.
+# Cost:         none in a normal build (see below). In the extracted variant,
+#               `Field` no longer implies `RawDataSerializable`.
+# Upstreamable: yes: inert in a normal build, so Plonky3 could carry the
+#               `FieldRawData` split and the explicit bounds, but they exist
+#               only for the extractor; charon#1266 is the better fix.
+# Drop when:    charon lifts RPITIT to a named associated type, or aeneas models
+#               GATs.
+# Test:         test p3-baby-bear --test pre_patch_020
+# Mutation:     the normal-build `FieldRawData` loses its `RawDataSerializable`
+#               supertrait, so `F: Field` no longer implies it.
 #
 # Every method of `RawDataSerializable` except `NUM_BYTES` returns
 # `impl IntoIterator`. rustc desugars each one into a hidden generic
@@ -181,3 +189,52 @@ index 1c363370..424d1e87 100644
      Inner: CryptographicHasher<[u64; M], [[u64; M]; N]>,
  {
      fn hash_iter<I>(&self, input: I) -> [[u64; M]; N]
+diff --git a/baby-bear/tests/pre_patch_020.rs b/baby-bear/tests/pre_patch_020.rs
+new file mode 100644
+--- /dev/null
++++ b/baby-bear/tests/pre_patch_020.rs
+@@ -0,0 +1,44 @@
++//! PATCHED: added by Plonky3-lean pre-patch 020 (`field-cfg-raw-data-serializable-supertrait`).
++//!
++//! In a normal build `Field` reaches `RawDataSerializable` through `FieldRawData`,
++//! so `F: Field` must still imply `F: RawDataSerializable`, and the extension
++//! fields' `RawDataSerializable` impls, which now state the bound on `F`
++//! themselves, must serialise exactly as before.
++
++use p3_baby_bear::BabyBear;
++use p3_field::extension::BinomialExtensionField;
++use p3_field::{BasedVectorSpace, Field, PrimeCharacteristicRing, PrimeField32};
++
++/// Serialises through the `Field` bound alone, so this compiles only while
++/// `Field` implies `RawDataSerializable`.
++fn bytes_through_field<F: Field>(x: F) -> Vec<u8> {
++    x.into_bytes().into_iter().collect()
++}
++
++fn num_bytes_through_field<F: Field>() -> usize {
++    F::NUM_BYTES
++}
++
++#[test]
++fn field_implies_raw_data_serializable() {
++    for v in [0, 1, 2, 0x7800_0000, 123_456_789] {
++        let x = BabyBear::from_u32(v);
++        // A `MontyField31` serialises its unique (Montgomery-form) `u32`, little-endian.
++        assert_eq!(bytes_through_field(x), x.to_unique_u32().to_le_bytes());
++    }
++    assert_eq!(num_bytes_through_field::<BabyBear>(), 4);
++}
++
++#[test]
++fn extension_bytes_are_the_coefficients_bytes() {
++    type EF = BinomialExtensionField<BabyBear, 4>;
++    let x: EF = BasedVectorSpace::<BabyBear>::from_basis_coefficients_fn(|i| {
++        BabyBear::from_u32(1_000_003 * i as u32 + 7)
++    });
++    let expected: Vec<u8> = BasedVectorSpace::<BabyBear>::as_basis_coefficients_slice(&x)
++        .iter()
++        .flat_map(|c| c.to_unique_u32().to_le_bytes())
++        .collect();
++    assert_eq!(bytes_through_field(x), expected);
++    assert_eq!(num_bytes_through_field::<EF>(), 16);
++}
