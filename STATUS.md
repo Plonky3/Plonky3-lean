@@ -31,7 +31,7 @@ Every `opaque` constant, all hand-written. An opaque constant is not an axiom:
 it adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about
 code that mentions one would go through for any value of it. Two of these are
 in the dependencies of a claim. `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt`:
-59 of the 68 claims reach it as the `Debug` supertrait field of the
+61 of the 70 claims reach it as the `Debug` supertrait field of the
 `MontyParameters` instance, which every claim reading a constant through
 `FieldParams`, `TwoAdicParams` or `Ext*Params` goes through. No proof uses it.
 `p3_field.exponentiation.exp_1725656503`: `exp_root_d.exponent` states that
@@ -54,7 +54,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a
 Rust item. A claim that reaches one is only as faithful as the transcription,
 which is re-read by hand when upstream changes it until `tools/mirror` hashes
 the Rust item. `neg` has two entries, since it also transcribes `ZERO`. The last
-column counts the claims (of 68) whose dependencies include the declaration.
+column counts the claims (of 70) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Claims |
 |---|---|---|---:|
@@ -63,8 +63,8 @@ column counts the claims (of 68) whose dependencies include the declaration.
 | `field` | `p3_field.field.Field` | `p3_field::field::Field` | 0 |
 | `field` | `p3_field.field.PrimeField` | `p3_field::field::PrimeField` | 0 |
 | `field` | `p3_field.field.UniformSamplingField` | `p3_field::field::UniformSamplingField` | 0 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_array` | `p3_monty_31::monty_31::MontyField31::new_array` | 37 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_2d_array` | `p3_monty_31::monty_31::MontyField31::new_2d_array` | 20 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_array` | `p3_monty_31::monty_31::MontyField31::new_array` | 39 |
+| `monty-31` | `p3_monty_31.monty_31.MontyField31.new_2d_array` | `p3_monty_31::monty_31::MontyField31::new_2d_array` | 22 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.new_monty` | `p3_monty_31::monty_31::MontyField31::new_monty` | 5 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.add` | `{impl core::ops::arith::Add for p3_monty_31::monty_31::MontyField31<_>}::add` | 1 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.sub` | `{impl core::ops::arith::Sub for p3_monty_31::monty_31::MontyField31<_>}::sub` | 2 |
@@ -154,6 +154,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.eq_ext4TwoAdicGenerators` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData5.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -162,6 +163,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.eq_ext8TwoAdicGenerators` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.baby_bear.BabyBear.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |

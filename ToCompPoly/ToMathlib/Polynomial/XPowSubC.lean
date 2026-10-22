@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 CompPoly. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Derek Sorensen
+-/
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.RingTheory.AdjoinRoot
 
@@ -15,11 +20,13 @@ with `q ^ d` elements, so `α ^ (q ^ d - 1) = 1`; and `α ^ n = a` with
 exponents is `1`. If, for every `d < n`, that gcd divides `n * ((q - 1) / ℓ)`,
 then `a ^ ((q - 1) / ℓ) = 1`, which the hypothesis `ha` excludes; so every
 irreducible factor has degree `n`.
+
+Upstreaming candidate (mathlib).
 -/
 
 open Polynomial
 
-namespace Plonky3Lean.Lib
+namespace Polynomial
 
 /-- `X ^ n - C a` is irreducible over `ZMod q` if `a ≠ 0`, `a ^ ((q - 1) / ℓ) ≠ 1`, and
 for every `0 < d < n`, `gcd (q ^ d - 1) (n * (q - 1))` divides `n * ((q - 1) / ℓ)`. -/
@@ -80,4 +87,4 @@ theorem X_pow_sub_C_irreducible_of_gcd {q : ℕ} [hq : Fact q.Prime] {n ℓ : �
       intro hc; apply hh0; rw [eq_C_of_natDegree_eq_zero hh, hc, map_zero]))
   exact (irreducible_mul_isUnit hhu).mpr hg
 
-end Plonky3Lean.Lib
+end Polynomial

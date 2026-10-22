@@ -1,6 +1,6 @@
 import CompPoly.Fields.BabyBear
-import Mathlib.RingTheory.AdjoinRoot
 import P3BabyBear
+import ToCompPoly.Fields.BabyBear.Extension
 
 /-!
 # BabyBear: what the model's values mean
@@ -13,7 +13,8 @@ Two things the BabyBear claims are stated in.
   `BabyBear.Field` (`ZMod p`), the specification every claim compares against,
   and `Canonical` is the invariant the Rust relies on, that the stored value is
   fully reduced. `toExt` reads an array of coefficients as an element of a
-  binomial extension `F[X] / (X ^ D - w)`, through `toField`. These three
+  binomial extension `F[X] / (X ^ D - w)` (CompPoly's `BabyBear.ofCoeffs`),
+  through `toField`. These three
   definitions are the whole of the interpretation: a claim about field
   arithmetic or a field constant says something about `toField` or `toExt` of
   the model's values.
@@ -100,9 +101,11 @@ coefficient array stands for, `Σ j, c_j · X ^ j`, with each coefficient read
 through `toField`. This is how Plonky3's `BinomialExtensionField<BabyBear, D>`
 represents an element: its `[BabyBear; D]` of coefficients in the basis
 `1, X, …, X ^ (D - 1)`, with `X ^ D = W`. The degree is the array's length, so
-only a `[BabyBear; D]` is read as an element of the degree-`D` extension. -/
+only a `[BabyBear; D]` is read as an element of the degree-`D` extension. The
+element itself is CompPoly's `BabyBear.ofCoeffs`; only the reading of the
+coefficients is the model's. -/
 noncomputable def toExt {D : Usize} (w : BabyBear.Field) (coeffs : Array Element D) :
     AdjoinRoot (X ^ D.val - C w) :=
-  AdjoinRoot.mk _ (((coeffs.val.map toField).mapIdx fun j a => C a * X ^ j).sum)
+  BabyBear.ofCoeffs D.val w (coeffs.val.map toField)
 
 end Plonky3Lean.Spec.BabyBear

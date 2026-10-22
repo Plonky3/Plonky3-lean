@@ -1,6 +1,6 @@
 name = "Plonky3Lean"
 version = "0.1.0"
-defaultTargets = ["HaxExt", "P3BabyBear", "Plonky3Lean"]
+defaultTargets = ["HaxExt", "P3BabyBear", "ToCompPoly", "Plonky3Lean"]
 
 # The two Lean libraries the generated code imports. Both revs must equal what
 # the hax release in toolchain.toml resolves (`cargo hax tools show`): the
@@ -32,6 +32,12 @@ rev = "v4.31.0"
 # Definitions `Aeneas` and `CoreModels` lack. See HaxExt.lean.
 [[lean_lib]]
 name = "HaxExt"
+
+# Field specifications and lemmas staged for CompPoly, written in its namespaces
+# so that each file moves upstream unchanged. See ToCompPoly/README.md.
+[[lean_lib]]
+name = "ToCompPoly"
+leanOptions = { warningAsError = true }
 
 # Hand-written claims, specifications and proofs. See Plonky3Lean.lean.
 # Warnings are errors here, so a `sorry` fails the build whatever

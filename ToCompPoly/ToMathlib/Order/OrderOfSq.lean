@@ -1,11 +1,16 @@
+/-
+Copyright (c) 2026 CompPoly. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Derek Sorensen
+-/
 import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.Tactic.Positivity
 
 /-!
-# Orders of elements
--/
+# Orders of square roots of `2`-power roots of unity
 
-namespace Plonky3Lean.Lib
+Upstreaming candidate (mathlib).
+-/
 
 /-- If `x ^ 2` has order `2 ^ (k + 1)`, then `x` has order `2 ^ (k + 2)`: a square
 root of a primitive `2 ^ (k + 1)`-th root of unity is a primitive
@@ -20,5 +25,3 @@ theorem orderOf_eq_two_pow_succ_of_sq {M : Type*} [Monoid M] {x y : M} {k : ℕ}
     exact absurd (Nat.le_of_dvd (by positivity) hd) (by
       rw [not_le]; exact Nat.pow_lt_pow_right (by norm_num) (by omega))
   · rw [pow_succ', pow_mul, hxy, ← hy, pow_orderOf_eq_one]
-
-end Plonky3Lean.Lib

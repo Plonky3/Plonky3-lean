@@ -4,6 +4,7 @@ import Plonky3Lean.Proofs.Field.BabyBear.Arith
 import Plonky3Lean.Proofs.Field.BabyBear.Constants
 import Plonky3Lean.Proofs.Field.BabyBear.Element
 import Plonky3Lean.Proofs.Field.BabyBear.Extension
+import ToCompPoly.Fields.BabyBear.Extension
 
 /-!
 # BabyBear: claims
@@ -12,7 +13,9 @@ What this repository asserts about p3-baby-bear, at the Plonky3 commit pinned
 in `plonky3/`. The model is the extraction in `crates/baby-bear` and the scoped
 extraction in `crates/monty-31`; `PRIME`, `MontyParams` and the other names are
 `Plonky3Lean.Spec.BabyBear`'s aliases for its constants, and `BabyBear.*` is
-CompPoly's specification of the field.
+CompPoly's specification of the field, extended by `ToCompPoly` with what is
+staged for CompPoly but not yet upstream (the binomial extensions, the
+multiplicative generator).
 
 Not claimed: the scalar arithmetic that does not go through the five claimed
 operators, which is inversion, exponentiation, the other
@@ -327,7 +330,7 @@ theorem baby_bear.BabyBearParameters.exp_root_d.exponent :
           inst x =
         p3_field.exponentiation.exp_1725656503 inst x) ∧
     ∀ x : BabyBear.Field, (x ^ 1725656503) ^ 7 = x :=
-  ⟨fun _ _ => rfl, Proofs.BabyBear.exp_root_seven⟩
+  ⟨fun _ _ => rfl, BabyBear.pow_1725656503_pow_seven⟩
 
 /-! ## Scalar arithmetic
 
@@ -480,6 +483,16 @@ theorem baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_G
           2 ^ (TWO_ADICITY.val + 1 + i) :=
   Proofs.BabyBear.Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.order
 
+/-- `TWO_ADIC_EXTENSION_GENERATORS` for the degree-4 extension is, entry for entry
+and coefficient for coefficient, `BabyBear.ext4TwoAdicGeneratorCoeffs`: read in
+`F[X] / (X ^ 4 - W)`, its entries are `BabyBear.ext4TwoAdicGenerators`, whose
+orders and squaring chain the two claims below restate. -/
+theorem baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.eq_ext4TwoAdicGenerators :
+    Ext4Params.TWO_ADIC_EXTENSION_GENERATORS ⦃ t =>
+      t.val.map (fun row => row.val.map Spec.BabyBear.toField) =
+        BabyBear.ext4TwoAdicGeneratorCoeffs ⦄ :=
+  Proofs.BabyBear.Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.eq
+
 /-- `TWO_ADIC_EXTENSION_GENERATORS` for the degree-4 extension continues the base
 field's two-adic generators: in `F[X] / (X ^ 4 - W)`, entry `0` squares to
 `TWO_ADIC_GENERATORS[TWO_ADICITY]` (CompPoly's table, which
@@ -550,6 +563,16 @@ theorem baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_G
         orderOf (toExt (Spec.BabyBear.toField w) t.val[i]) =
           2 ^ (TWO_ADICITY.val + 1 + i) :=
   Proofs.BabyBear.Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.order
+
+/-- `TWO_ADIC_EXTENSION_GENERATORS` for the degree-8 extension is, entry for entry
+and coefficient for coefficient, `BabyBear.ext8TwoAdicGeneratorCoeffs`: read in
+`F[X] / (X ^ 8 - W)`, its entries are `BabyBear.ext8TwoAdicGenerators`, whose
+orders and squaring chain the two claims below restate. -/
+theorem baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.eq_ext8TwoAdicGenerators :
+    Ext8Params.TWO_ADIC_EXTENSION_GENERATORS ⦃ t =>
+      t.val.map (fun row => row.val.map Spec.BabyBear.toField) =
+        BabyBear.ext8TwoAdicGeneratorCoeffs ⦄ :=
+  Proofs.BabyBear.Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.eq
 
 /-- `TWO_ADIC_EXTENSION_GENERATORS` for the degree-8 extension continues the base
 field's two-adic generators: in `F[X] / (X ^ 8 - W)`, entry `0` squares to
