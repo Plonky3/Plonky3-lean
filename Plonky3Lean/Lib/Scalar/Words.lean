@@ -85,4 +85,18 @@ theorem u32_and_bv (x y : Std.U32) : (x &&& y).bv = x.bv &&& y.bv := rfl
 
 theorem u32_not_bv (x : Std.U32) : (~~~x).bv = ~~~x.bv := rfl
 
+/-- Four big-endian bytes, as one word. -/
+theorem fromBEBytes_four (b₀ b₁ b₂ b₃ : BitVec 8) :
+    (BitVec.fromBEBytes [b₀, b₁, b₂, b₃]).cast (by simp) = b₀ ++ b₁ ++ b₂ ++ b₃ := by
+  ext i hi
+  simp only [BitVec.getElem_cast]
+  simp [BitVec.fromBEBytes]
+  have hq : i / 8 < 4 := by omega
+  rcases (by omega : i / 8 = 0 ∨ i / 8 = 1 ∨ i / 8 = 2 ∨ i / 8 = 3) with h | h | h | h <;>
+    simp [h, Byte.testBit, BitVec.testBit_toNat]
+  all_goals
+    rw [← BitVec.getLsbD_eq_getElem, BitVec.getLsbD_append, BitVec.getLsbD_append,
+      BitVec.getLsbD_append]
+    split_ifs <;> first | omega | (congr 1; omega)
+
 end Plonky3Lean.Lib

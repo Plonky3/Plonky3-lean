@@ -2,6 +2,7 @@ module
 
 public import Sha2
 public import Plonky3Lean.Lib.Range
+public import Plonky3Lean.Lib.Slice
 public import Plonky3Lean.Lib.Scalar.Words
 public import Plonky3Lean.Proofs.Hash.Sha256.Schedule
 
@@ -304,5 +305,161 @@ theorem compress_u32_eq (s₀ s₁ s₂ s₃ s₄ s₅ s₆ s₇ : Std.U32) (blo
   apply congrArg RustM.ok
   apply Std.Array.ext
   simp [toArray8, compress, Vars.toList, Vars.ofList]
+
+/-! ## Loading a block -/
+
+/-- The four bytes of word `k` of a block. -/
+def chunk (block : Std.Array Std.U8 64#usize) (k : ℕ) : Std.Array Std.U8 4#usize :=
+  Std.Array.make 4#usize [block.val[4 * k]!, block.val[4 * k + 1]!, block.val[4 * k + 2]!,
+    block.val[4 * k + 3]!]
+
+theorem to_u32s_call (block : Std.Array Std.U8 64#usize) (k : ℕ) (hk : k < 16) :
+    sha2.sha256.soft.to_u32s.closure.Insts.CoreOpsFunctionFnMutTupleUsizeU32.call_mut block (usz k)
+      = .ok (Aeneas.Std.core.num.U32.from_be_bytes (chunk block k), block) := by
+  unfold sha2.sha256.soft.to_u32s.closure.Insts.CoreOpsFunctionFnMutTupleUsizeU32.call_mut
+  have hlen : block.val.length = 64 := by simp
+  have hm : (4#usize * usz k : RustM Std.Usize) = .ok (usz (4 * k)) := by
+    rw [show (4#usize : Std.Usize) = usz 4 from ofNatCore_eq_usz _ _ (by norm_num)]
+    exact usz_mul (by omega) (by omega) (by omega)
+  rw [hm, bind_ok, index_rangeFrom_eq block _ (by rw [usz_val (by omega)]; omega), bind_ok,
+    index_rangeTo_eq _ _ (by simp [List.slice_length, usz_val (show 4 * k < 2 ^ 32 by omega)]; omega),
+    bind_ok, try_from_eq _ _ _ (by simp [List.slice_length, usz_val (show 4 * k < 2 ^ 32 by omega)]; omega)
+      (by decide), bind_ok]
+  simp only [CoreModels.core.result.Result.unwrap, bind_ok, CoreModels.core.num.U32.from_be_bytes,
+    CoreModels.rust_primitives.arithmetic.from_be_bytes_u32]
+  congr 3
+  apply Std.Array.ext
+  simp only [Std.Array.from_val, Slice.from_val, chunk, Std.Array.make_val,
+    usz_val (show 4 * k < 2 ^ 32 by omega)]
+  apply List.ext_getElem (by simp [List.slice_length]; omega)
+  intro j h1 h2
+  have hj : j < 4 := by simpa using h2
+  rw [List.getElem_slice, List.getElem_slice]
+  · rcases (by omega : j = 0 ∨ j = 1 ∨ j = 2 ∨ j = 3) with rfl | rfl | rfl | rfl <;>
+      exact (getElem!_pos _ _ (by omega)).symm
+  all_goals (simp [List.slice_length, UScalar.ofNatCore_val_eq]; omega)
+
+theorem to_u32s_eq (block : Std.Array Std.U8 64#usize) :
+    sha2.sha256.soft.to_u32s block = .ok (Std.Array.from ((List.range 16).map fun k =>
+      Aeneas.Std.core.num.U32.from_be_bytes (chunk block k)) (by simp)) := by
+  unfold sha2.sha256.soft.to_u32s
+  simp only [CoreModels.core.array.from_fn]
+  exact array_from_fn_eq _ _ _ _ (fun k hk => to_u32s_call block k (by simpa using hk))
+
+theorem compress_u32_toArray8 (H : List Word) (hH : H.length = 8)
+    (block : Std.Array Std.U32 16#usize) :
+    sha2.sha256.soft.compact.compress_u32 (toArray8 H) block =
+      .ok (toArray8 (compress H (block.val.map UScalar.bv))) := by
+  match H, hH with
+  | [h₀, h₁, h₂, h₃, h₄, h₅, h₆, h₇], _ =>
+    have e : toArray8 [h₀, h₁, h₂, h₃, h₄, h₅, h₆, h₇] =
+        Std.Array.make 8#usize [⟨h₀⟩, ⟨h₁⟩, ⟨h₂⟩, ⟨h₃⟩, ⟨h₄⟩, ⟨h₅⟩, ⟨h₆⟩, ⟨h₇⟩] := rfl
+    rw [e, compress_u32_eq]
+    rfl
+
+/-- The words a block loads are its bytes, four at a time, big-endian. -/
+theorem to_u32s_bv (block : Std.Array Std.U8 64#usize) :
+    ((List.range 16).map fun k => Aeneas.Std.core.num.U32.from_be_bytes (chunk block k)).map
+      UScalar.bv = wordsOfBytes (block.val.map UScalar.bv) := by
+  rw [wordsOfBytes_eq 16 _ (by simp), List.map_map]
+  apply List.map_congr_left
+  intro k hk
+  rw [List.mem_range] at hk
+  have hl : block.val.length = 64 := by simp
+  have key : ∀ i < 64, (block.val.map UScalar.bv).getD i 0 = (block.val[i]!).bv := by
+    intro i hi
+    rw [List.getD_eq_getElem _ _ (by simpa [hl] using hi), List.getElem_map,
+      getElem!_pos _ _ (by omega)]
+  rw [key _ (by omega), key _ (by omega), key _ (by omega), key _ (by omega)]
+  simp only [Function.comp, Aeneas.Std.core.num.U32.from_be_bytes, chunk]
+  exact fromBEBytes_four ..
+
+/-- The hash value after compressing each block in turn. -/
+def compressBlocks (H : List Word) (blocks : List (Std.Array Std.U8 64#usize)) : List Word :=
+  blocks.foldl (fun H b => compress H (wordsOfBytes (b.val.map UScalar.bv))) H
+
+theorem length_compressBlocks (H : List Word) (hH : H.length = 8)
+    (blocks : List (Std.Array Std.U8 64#usize)) : (compressBlocks H blocks).length = 8 := by
+  induction blocks generalizing H with
+  | nil => exact hH
+  | cons b bs ih => exact ih _ (length_compress _ _ hH)
+
+/-- A slice as the iterator over it. -/
+def seqFrom {α : Type} (l : List α) (h : l.length ≤ Usize.max) : _root_.rust_primitives.sequence.Seq α :=
+  Slice.from l h
+
+theorem compress_body_nil (s : Slice (Std.Array Std.U8 64#usize)) (hs : s.val = [])
+    (st : Std.Array Std.U32 8#usize) :
+    sha2.sha256.soft.compact.compress_loop.body s st = .ok (.done st) := by
+  have hl : Slice.len s = 0#usize := UScalar.eq_of_val_eq (by simp [hs])
+  simp only [sha2.sha256.soft.compact.compress_loop.body,
+    CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT.next,
+    CoreModels.rust_primitives.sequence.seq_len, bind_ok, hl, ite_true]
+  rfl
+
+theorem compress_body_cons (s : Slice (Std.Array Std.U8 64#usize)) (b : Std.Array Std.U8 64#usize)
+    (rest : List (Std.Array Std.U8 64#usize)) (hs : s.val = b :: rest) (H : List Word)
+    (hH : H.length = 8) :
+    sha2.sha256.soft.compact.compress_loop.body s (toArray8 H) =
+      .ok (.cont (seqFrom rest (by have := s.property; simp [hs] at this; omega),
+        toArray8 (compress H (wordsOfBytes (b.val.map UScalar.bv))))) := by
+  have hl : ¬ Slice.len s = 0#usize := fun e => by
+    have := congrArg UScalar.val e; simp [hs] at this
+  simp only [sha2.sha256.soft.compact.compress_loop.body,
+    CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT.next,
+    CoreModels.rust_primitives.sequence.seq_len, bind_ok, hl, ite_false]
+  have hr : CoreModels.rust_primitives.sequence.seq_remove s 0#usize =
+      .ok (b, seqFrom rest (by have := s.property; simp [hs] at this; omega)) := by
+    simp only [CoreModels.rust_primitives.sequence.seq_remove]
+    rw [dite_eq_left_of_eq_true (eq_true (by simp [hs]))]
+    congr 2
+    · simp [hs]
+    · apply Slice.ext; simp [hs, seqFrom]
+  rw [hr]
+  simp only [bind_ok, to_u32s_eq, compress_u32_toArray8 _ hH,
+    Std.Array.from_val, List.map_map]
+  have hw : (List.range 16).map (UScalar.bv ∘ fun k =>
+      Aeneas.Std.core.num.U32.from_be_bytes (chunk b k)) = wordsOfBytes (b.val.map UScalar.bv) := by
+    rw [← List.map_map, to_u32s_bv]
+  rw [← hw]
+  simp only [Aeneas.Std.uncurry_apply_pair, bind_ok]
+
+theorem compress_loop_eq (n : ℕ) (s : Slice (Std.Array Std.U8 64#usize)) (hn : s.val.length = n)
+    (H : List Word) (hH : H.length = 8) :
+    sha2.sha256.soft.compact.compress_loop s (toArray8 H) =
+      .ok (toArray8 (compressBlocks H s.val)) := by
+  induction n generalizing s H with
+  | zero =>
+    have hs : s.val = [] := List.eq_nil_of_length_eq_zero hn
+    unfold sha2.sha256.soft.compact.compress_loop
+    rw [loop]
+    dsimp only
+    rw [compress_body_nil s hs, bind_ok, hs]
+    rfl
+  | succ n ih =>
+    obtain ⟨b, rest, hs⟩ : ∃ b rest, s.val = b :: rest := by
+      cases h : s.val with
+      | nil => simp [h] at hn
+      | cons b rest => exact ⟨b, rest, rfl⟩
+    unfold sha2.sha256.soft.compact.compress_loop
+    rw [loop]
+    dsimp only
+    rw [compress_body_cons s b rest hs H hH, bind_ok, hs]
+    have hrest := ih (Slice.from rest (by have := s.property; simp [hs] at this; omega))
+      (by simp only [Slice.from_val]; simp [hs] at hn; omega)
+      (compress H (wordsOfBytes (b.val.map UScalar.bv))) (length_compress _ _ hH)
+    unfold sha2.sha256.soft.compact.compress_loop at hrest
+    dsimp only at hrest ⊢
+    rw [Slice.from_val] at hrest
+    exact hrest
+
+/-- sha2's `compress256` compresses each block in turn, as FIPS 180-4 does. -/
+theorem compress256_eq (H : List Word) (hH : H.length = 8)
+    (blocks : Slice (Std.Array Std.U8 64#usize)) :
+    sha2.sha256.compress256 (toArray8 H) blocks = .ok (toArray8 (compressBlocks H blocks.val)) := by
+  simp only [sha2.sha256.compress256, sha2.sha256.compress, sha2.sha256.soft.compact.compress,
+    CoreModels.core.slice.Slice.iter, CoreModels.rust_primitives.sequence.seq_from_slice]
+  erw [bind_ok, bind_ok]
+  exact compress_loop_eq _ blocks rfl H hH
 
 end Plonky3Lean.Proofs.Sha256

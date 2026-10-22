@@ -71,4 +71,18 @@ theorem rounds_succ (W : List Word) (v : Vars) (k : ℕ) :
     rounds W v (k + 1) = round (rounds W v k) (K.getD k 0) (W.getD k 0) := by
   simp [rounds, List.range_succ, List.foldl_append]
 
+/-- The words of `4 n` bytes, by index. -/
+theorem wordsOfBytes_eq (n : ℕ) (l : List Byte) (hl : l.length = 4 * n) :
+    wordsOfBytes l = (List.range n).map fun k =>
+      wordOfBytes (l.getD (4 * k) 0) (l.getD (4 * k + 1) 0) (l.getD (4 * k + 2) 0)
+        (l.getD (4 * k + 3) 0) := by
+  induction n generalizing l with
+  | zero => simp at hl; subst hl; rfl
+  | succ n ih =>
+    match l, hl with
+    | a :: b :: c :: d :: rest, hl =>
+      simp only [List.length_cons] at hl
+      rw [wordsOfBytes, ih rest (by omega), List.range_succ_eq_map]
+      simp [Nat.mul_succ, Nat.add_assoc]
+
 end Plonky3Lean.Proofs.Sha256
