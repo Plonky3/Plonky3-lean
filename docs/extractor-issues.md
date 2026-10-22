@@ -96,3 +96,13 @@ keeps its number and says so.
     but hax's lean backend passes `--no-gen-tuple-structs`, which charon
     refuses alongside it. p3-blake2s assumes `Blake2s256::hash`; p3-sha256's
     `hash_iter` and `hash_iter_slices` are not extracted.
+17. **aeneas rejects a loop that runs while a struct holding a shared slice is
+    borrowed** ("Joining region abstractions containing shared loans whose shared
+    value contains borrows"), **and a trait method that recurses with a generic
+    function through its default implementation** ("mixed mutually recursive
+    definitions"). p3-blake3's batch driver loads blocks in loops over
+    `&Lanes`, whose `batch` field is a `&[u8]`, and its `Backend` trait forwards
+    `hash_group`, `subtree`, `leaf` and `parent` to generic functions that call
+    back into it. Pre-patch `blake3/020` gives the extracted variant a copy of
+    the driver whose loops take the slice as an argument and whose tree calls
+    the generic functions directly, on the one-lane backend.

@@ -26,7 +26,7 @@ set_option maxRecDepth 2048
 namespace p3_blake3
 
 /-- Trait declaration: [p3_blake3::batch::lanes::Word]
-    Source: 'blake3/src/batch/lanes/mod.rs', lines 229:0-253:1 -/
+    Source: 'blake3/src/hax_reshaped/lanes/mod.rs', lines 13:0-37:1 -/
 structure batch.lanes.Word (Self : Type _) where
   coremarkerCopyInst : core.marker.Copy Self
   splat : Std.U32 → RustM Self
@@ -39,82 +39,81 @@ structure batch.lanes.Word (Self : Type _) where
   rotr_7 : Self → RustM Self
 
 /-- [p3_blake3::batch::compress::working_vector::{closure#1}::{closure}]
-    Source: 'blake3/src/batch/compress.rs', lines 132:29-138:9 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 132:29-138:9 -/
 def batch.compress.working_vector.closure_1.closure (V : Type _) (G :
   Std.Usize) :=
   Array (Array V 8#usize) G × Std.Usize × Array V 8#usize
 
 /-- [p3_blake3::batch::compress::working_vector::{closure#1}]
-    Source: 'blake3/src/batch/compress.rs', lines 131:25-139:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 131:25-139:5 -/
 def batch.compress.working_vector.closure_1 (V : Type _) (G : Std.Usize) :=
   Array (Array V 8#usize) G × Array V 8#usize
 
 /-- [p3_blake3::batch::compress::working_vector::{closure}]
-    Source: 'blake3/src/batch/compress.rs', lines 130:56-130:79 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 130:56-130:79 -/
 @[reducible]
 def batch.compress.working_vector.closure (V : Type _) (G : Std.Usize) :=
   Array Std.U32 8#usize
 
 /-- Trait declaration: [p3_blake3::batch::lanes::Backend]
-    Source: 'blake3/src/batch/lanes/mod.rs', lines 260:0-276:1 -/
+    Source: 'blake3/src/hax_reshaped/lanes/mod.rs', lines 40:0-49:1 -/
 structure batch.lanes.Backend (Self : Type _) (W : Std.Usize) where
   WordInst : batch.lanes.Word Self
-  supported : RustM Bool
   load_block : Array (Array Std.U8 64#usize) W → RustM (Array Self 16#usize)
   store_digests : Array Self 8#usize → Array (Array Std.U8 32#usize) W →
     RustM (Array (Array Std.U8 32#usize) W)
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}::load_block::{closure}]
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 70:29-70:114 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 57:29-57:114 -/
 @[reducible]
 def batch.lanes.portable.BackendU321.load_block.closure :=
   Array Std.U8 64#usize
 
 /-- [p3_blake3::batch::Lanes]
-    Source: 'blake3/src/batch/mod.rs', lines 30:0-37:1 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 28:0-35:1 -/
 structure batch.Lanes (W : Std.Usize) (G : Std.Usize) where
   batch : Slice Std.U8
   starts : Array (Array Std.Usize W) G
   last : Std.Usize
 
 /-- [p3_blake3::batch::Mode]
-    Source: 'blake3/src/batch/mod.rs', lines 57:0-62:1 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 43:0-48:1 -/
 structure batch.Mode where
   key : Array Std.U32 8#usize
   flags : Std.U32
 
 /-- [p3_blake3::batch::{p3_blake3::batch::Mode}::state::{closure}]
-    Source: 'blake3/src/batch/mod.rs', lines 71:30-71:55 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 57:30-57:55 -/
 @[reducible]
 def batch.Mode.state.closure (V : Type _) (G : Std.Usize) :=
   Array Std.U32 8#usize
 
 /-- [p3_blake3::batch::hash_many_with::{closure#2}]
-    Source: 'blake3/src/batch/mod.rs', lines 130:72-130:100 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 111:72-111:100 -/
 def batch.hash_many_with.closure_2 (V : Type _) (W : Std.Usize) (G : Std.Usize)
   :=
   Std.Usize × Std.Usize × Std.Usize
 
 /-- [p3_blake3::batch::hash_many_with::{closure#1}]
-    Source: 'blake3/src/batch/mod.rs', lines 120:72-120:93 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 101:72-101:93 -/
 def batch.hash_many_with.closure_1 (V : Type _) (W : Std.Usize) (G : Std.Usize)
   :=
   Std.Usize × Std.Usize
 
 /-- [p3_blake3::batch::hash_many_with::{closure}::{closure}]
-    Source: 'blake3/src/batch/mod.rs', lines 108:67-108:96 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 89:67-89:96 -/
 def batch.hash_many_with.closure.closure (V : Type _) (W : Std.Usize) (G :
   Std.Usize) :=
   Std.Usize × Std.Usize × Std.Usize
 
 /-- [p3_blake3::batch::hash_many_with::{closure}]
-    Source: 'blake3/src/batch/mod.rs', lines 108:42-108:97 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 89:42-89:97 -/
 def batch.hash_many_with.closure (V : Type _) (W : Std.Usize) (G : Std.Usize)
   :=
   Std.Usize × Std.Usize
 
 /-- [p3_blake3::Blake3]
-    Source: 'blake3/src/lib.rs', lines 34:0-34:18
+    Source: 'blake3/src/lib.rs', lines 46:0-46:18
     Visibility: public -/
 @[reducible]
 def Blake3 := Unit

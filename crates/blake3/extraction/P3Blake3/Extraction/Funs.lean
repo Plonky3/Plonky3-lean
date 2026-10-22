@@ -30,21 +30,21 @@ noncomputable section
 namespace p3_blake3
 
 /-- [p3_blake3::batch::compress::BLOCK_WORDS]
-    Source: 'blake3/src/batch/compress.rs', lines 6:0-6:41 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 6:0-6:41 -/
 @[global_simps, irreducible]
 def batch.compress.BLOCK_WORDS : Std.Usize := 16#usize
 
 /-- [p3_blake3::batch::compress::STATE_WORDS]
-    Source: 'blake3/src/batch/compress.rs', lines 9:0-9:40 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 9:0-9:40 -/
 @[global_simps, irreducible]
 def batch.compress.STATE_WORDS : Std.Usize := 8#usize
 
 /-- [p3_blake3::batch::compress::ROUNDS]
-    Source: 'blake3/src/batch/compress.rs', lines 12:0-12:24 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 12:0-12:24 -/
 @[global_simps, irreducible] def batch.compress.ROUNDS : Std.Usize := 7#usize
 
 /-- [p3_blake3::batch::compress::IV]
-    Source: 'blake3/src/batch/compress.rs', lines 17:0-26:2 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 17:0-26:2 -/
 @[global_simps, irreducible]
 def batch.compress.IV : Array Std.U32 8#usize :=
   Array.make 8#usize [
@@ -53,27 +53,27 @@ def batch.compress.IV : Array Std.U32 8#usize :=
     ]
 
 /-- [p3_blake3::batch::compress::CHUNK_START]
-    Source: 'blake3/src/batch/compress.rs', lines 29:0-29:43 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 29:0-29:43 -/
 @[global_simps, irreducible]
 def batch.compress.CHUNK_START : RustM Std.U32 := 1#u32 <<< 0#i32
 
 /-- [p3_blake3::batch::compress::CHUNK_END]
-    Source: 'blake3/src/batch/compress.rs', lines 32:0-32:41 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 32:0-32:41 -/
 @[global_simps, irreducible]
 def batch.compress.CHUNK_END : RustM Std.U32 := 1#u32 <<< 1#i32
 
 /-- [p3_blake3::batch::compress::PARENT]
-    Source: 'blake3/src/batch/compress.rs', lines 35:0-35:38 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 35:0-35:38 -/
 @[global_simps, irreducible]
 def batch.compress.PARENT : RustM Std.U32 := 1#u32 <<< 2#i32
 
 /-- [p3_blake3::batch::compress::ROOT]
-    Source: 'blake3/src/batch/compress.rs', lines 38:0-38:36 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 38:0-38:36 -/
 @[global_simps, irreducible]
 def batch.compress.ROOT : RustM Std.U32 := 1#u32 <<< 3#i32
 
 /-- [p3_blake3::batch::compress::PERMUTATION]
-    Source: 'blake3/src/batch/compress.rs', lines 41:0-41:97 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 41:0-41:97 -/
 @[global_simps, irreducible]
 def batch.compress.PERMUTATION : Array Std.Usize 16#usize :=
   Array.make 16#usize [
@@ -82,7 +82,7 @@ def batch.compress.PERMUTATION : Array Std.Usize 16#usize :=
     ]
 
 /-- [p3_blake3::batch::compress::SCHEDULE]: loop body 0:
-    Source: 'blake3/src/batch/compress.rs', lines 52:4-55:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 52:4-55:5 -/
 @[rust_loop_body]
 def batch.compress.SCHEDULE_loop0.body
   (schedule : Array (Array Std.Usize 16#usize) 7#usize) (i : Std.Usize) :
@@ -99,7 +99,7 @@ def batch.compress.SCHEDULE_loop0.body
   else ok (done schedule)
 
 /-- [p3_blake3::batch::compress::SCHEDULE]: loop 0:
-    Source: 'blake3/src/batch/compress.rs', lines 52:4-55:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 52:4-55:5 -/
 @[rust_loop]
 def batch.compress.SCHEDULE_loop0
   (schedule : Array (Array Std.Usize 16#usize) 7#usize) (i : Std.Usize) :
@@ -110,7 +110,7 @@ def batch.compress.SCHEDULE_loop0
     (schedule, i)
 
 /-- [p3_blake3::batch::compress::SCHEDULE]: loop body 2:
-    Source: 'blake3/src/batch/compress.rs', lines 59:8-62:9 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 59:8-62:9 -/
 @[rust_loop_body]
 def batch.compress.SCHEDULE_loop1_loop0.body
   (r : Std.Usize) (schedule : Array (Array Std.Usize 16#usize) 7#usize)
@@ -132,7 +132,7 @@ def batch.compress.SCHEDULE_loop1_loop0.body
   else ok (done schedule)
 
 /-- [p3_blake3::batch::compress::SCHEDULE]: loop 2:
-    Source: 'blake3/src/batch/compress.rs', lines 59:8-62:9 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 59:8-62:9 -/
 @[rust_loop]
 def batch.compress.SCHEDULE_loop1_loop0
   (schedule : Array (Array Std.Usize 16#usize) 7#usize) (r : Std.Usize)
@@ -145,7 +145,7 @@ def batch.compress.SCHEDULE_loop1_loop0
     (schedule, i)
 
 /-- [p3_blake3::batch::compress::SCHEDULE]: loop body 1:
-    Source: 'blake3/src/batch/compress.rs', lines 57:4-64:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 57:4-64:5 -/
 @[rust_loop_body]
 def batch.compress.SCHEDULE_loop1.body
   (schedule : Array (Array Std.Usize 16#usize) 7#usize) (r : Std.Usize) :
@@ -160,7 +160,7 @@ def batch.compress.SCHEDULE_loop1.body
   else ok (done schedule)
 
 /-- [p3_blake3::batch::compress::SCHEDULE]: loop 1:
-    Source: 'blake3/src/batch/compress.rs', lines 57:4-64:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 57:4-64:5 -/
 @[rust_loop]
 def batch.compress.SCHEDULE_loop1
   (schedule : Array (Array Std.Usize 16#usize) 7#usize) (r : Std.Usize) :
@@ -171,7 +171,7 @@ def batch.compress.SCHEDULE_loop1
     (schedule, r)
 
 /-- [p3_blake3::batch::compress::SCHEDULE]
-    Source: 'blake3/src/batch/compress.rs', lines 49:0-66:2 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 49:0-66:2 -/
 @[global_simps, irreducible]
 def batch.compress.SCHEDULE
   : RustM (Array (Array Std.Usize 16#usize) 7#usize) := do
@@ -183,7 +183,7 @@ def batch.compress.SCHEDULE
   batch.compress.SCHEDULE_loop1 schedule1 1#usize
 
 /-- [p3_blake3::batch::compress::mix]: loop body 0:
-    Source: 'blake3/src/batch/compress.rs', lines 177:4-179:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 177:4-179:5 -/
 @[rust_loop_body]
 def batch.compress.mix_loop0.body
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -212,7 +212,7 @@ def batch.compress.mix_loop0.body
     ok (cont (iter1, a5))
 
 /-- [p3_blake3::batch::compress::mix]: loop 0:
-    Source: 'blake3/src/batch/compress.rs', lines 177:4-179:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 177:4-179:5 -/
 @[rust_loop]
 def batch.compress.mix_loop0
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -227,7 +227,7 @@ def batch.compress.mix_loop0
     (iter, v)
 
 /-- [p3_blake3::batch::compress::mix]: loop body 1:
-    Source: 'blake3/src/batch/compress.rs', lines 180:4-182:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 180:4-182:5 -/
 @[rust_loop_body]
 def batch.compress.mix_loop1.body
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -253,7 +253,7 @@ def batch.compress.mix_loop1.body
     ok (cont (iter1, a4))
 
 /-- [p3_blake3::batch::compress::mix]: loop 1:
-    Source: 'blake3/src/batch/compress.rs', lines 180:4-182:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 180:4-182:5 -/
 @[rust_loop]
 def batch.compress.mix_loop1
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -267,7 +267,7 @@ def batch.compress.mix_loop1
     (iter, v)
 
 /-- [p3_blake3::batch::compress::mix]: loop body 2:
-    Source: 'blake3/src/batch/compress.rs', lines 183:4-185:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 183:4-185:5 -/
 @[rust_loop_body]
 def batch.compress.mix_loop2.body
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -292,7 +292,7 @@ def batch.compress.mix_loop2.body
     ok (cont (iter1, a3))
 
 /-- [p3_blake3::batch::compress::mix]: loop 2:
-    Source: 'blake3/src/batch/compress.rs', lines 183:4-185:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 183:4-185:5 -/
 @[rust_loop]
 def batch.compress.mix_loop2
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -306,7 +306,7 @@ def batch.compress.mix_loop2
     (iter, v)
 
 /-- [p3_blake3::batch::compress::mix]: loop body 3:
-    Source: 'blake3/src/batch/compress.rs', lines 186:4-188:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 186:4-188:5 -/
 @[rust_loop_body]
 def batch.compress.mix_loop3.body
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -332,7 +332,7 @@ def batch.compress.mix_loop3.body
     ok (cont (iter1, a3))
 
 /-- [p3_blake3::batch::compress::mix]: loop 3:
-    Source: 'blake3/src/batch/compress.rs', lines 186:4-188:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 186:4-188:5 -/
 @[rust_loop]
 def batch.compress.mix_loop3
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -346,7 +346,7 @@ def batch.compress.mix_loop3
     (iter, v)
 
 /-- [p3_blake3::batch::compress::mix]: loop body 4:
-    Source: 'blake3/src/batch/compress.rs', lines 189:4-191:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 189:4-191:5 -/
 @[rust_loop_body]
 def batch.compress.mix_loop4.body
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -375,7 +375,7 @@ def batch.compress.mix_loop4.body
     ok (cont (iter1, a5))
 
 /-- [p3_blake3::batch::compress::mix]: loop 4:
-    Source: 'blake3/src/batch/compress.rs', lines 189:4-191:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 189:4-191:5 -/
 @[rust_loop]
 def batch.compress.mix_loop4
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -390,7 +390,7 @@ def batch.compress.mix_loop4
     (iter, v)
 
 /-- [p3_blake3::batch::compress::mix]: loop body 5:
-    Source: 'blake3/src/batch/compress.rs', lines 192:4-194:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 192:4-194:5 -/
 @[rust_loop_body]
 def batch.compress.mix_loop5.body
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -416,7 +416,7 @@ def batch.compress.mix_loop5.body
     ok (cont (iter1, a4))
 
 /-- [p3_blake3::batch::compress::mix]: loop 5:
-    Source: 'blake3/src/batch/compress.rs', lines 192:4-194:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 192:4-194:5 -/
 @[rust_loop]
 def batch.compress.mix_loop5
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -430,7 +430,7 @@ def batch.compress.mix_loop5
     (iter, v)
 
 /-- [p3_blake3::batch::compress::mix]: loop body 6:
-    Source: 'blake3/src/batch/compress.rs', lines 195:4-197:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 195:4-197:5 -/
 @[rust_loop_body]
 def batch.compress.mix_loop6.body
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -455,7 +455,7 @@ def batch.compress.mix_loop6.body
     ok (cont (iter1, a3))
 
 /-- [p3_blake3::batch::compress::mix]: loop 6:
-    Source: 'blake3/src/batch/compress.rs', lines 195:4-197:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 195:4-197:5 -/
 @[rust_loop]
 def batch.compress.mix_loop6
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -469,7 +469,7 @@ def batch.compress.mix_loop6
     (iter, v)
 
 /-- [p3_blake3::batch::compress::mix]: loop body 7:
-    Source: 'blake3/src/batch/compress.rs', lines 198:4-200:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 198:4-200:5 -/
 @[rust_loop_body]
 def batch.compress.mix_loop7.body
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -495,7 +495,7 @@ def batch.compress.mix_loop7.body
     ok (cont (iter1, a3))
 
 /-- [p3_blake3::batch::compress::mix]: loop 7:
-    Source: 'blake3/src/batch/compress.rs', lines 198:4-200:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 198:4-200:5 -/
 @[rust_loop]
 def batch.compress.mix_loop7
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -509,7 +509,7 @@ def batch.compress.mix_loop7
     (iter, v)
 
 /-- [p3_blake3::batch::compress::mix]:
-    Source: 'blake3/src/batch/compress.rs', lines 170:0-201:1 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 170:0-201:1 -/
 def batch.compress.mix
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
   (v : Array (Array V 16#usize) G) (m : Array (Array V 16#usize) G)
@@ -547,7 +547,7 @@ def batch.compress.mix
     b c
 
 /-- [p3_blake3::batch::compress::round]:
-    Source: 'blake3/src/batch/compress.rs', lines 144:0-162:1 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 144:0-162:1 -/
 def batch.compress.round
   {V : Type _} (R : Std.Usize) {G : Std.Usize} (lanesWordInst :
   batch.lanes.Word V) (v : Array (Array V 16#usize) G)
@@ -605,7 +605,7 @@ def batch.compress.round
     (Array.make 2#usize [ i14, i15 ])
 
 /-- [p3_blake3::batch::compress::working_vector::{closure#1}::{impl core::ops::function::FnMut<(usize,), V> for p3_blake3::batch::compress::working_vector::{closure#1}::{closure}<'_0, '_1, '_2, V, G>}::call_mut]:
-    Source: 'blake3/src/batch/compress.rs', lines 132:29-138:9 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 132:29-138:9 -/
 def
   batch.compress.working_vector.closure_1.closure.Insts.CoreOpsFunctionFnMutTupleUsizeV.call_mut
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -625,7 +625,7 @@ def
     ok (t, c)
 
 /-- [p3_blake3::batch::compress::working_vector::{closure#1}::{impl core::ops::function::FnOnce<(usize,), V> for p3_blake3::batch::compress::working_vector::{closure#1}::{closure}<'_0, '_1, '_2, V, G>}::call_once]:
-    Source: 'blake3/src/batch/compress.rs', lines 132:29-138:9 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 132:29-138:9 -/
 def
   batch.compress.working_vector.closure_1.closure.Insts.CoreOpsFunctionFnOnceTupleUsizeV.call_once
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -638,7 +638,7 @@ def
   ok t
 
 /-- Trait implementation: [p3_blake3::batch::compress::working_vector::{closure#1}::{impl core::ops::function::FnOnce<(usize,), V> for p3_blake3::batch::compress::working_vector::{closure#1}::{closure}<'_0, '_1, '_2, V, G>}]
-    Source: 'blake3/src/batch/compress.rs', lines 132:29-138:9 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 132:29-138:9 -/
 @[reducible]
 def
   batch.compress.working_vector.closure_1.closure.Insts.CoreOpsFunctionFnOnceTupleUsizeV
@@ -651,7 +651,7 @@ def
 }
 
 /-- Trait implementation: [p3_blake3::batch::compress::working_vector::{closure#1}::{impl core::ops::function::FnMut<(usize,), V> for p3_blake3::batch::compress::working_vector::{closure#1}::{closure}<'_0, '_1, '_2, V, G>}]
-    Source: 'blake3/src/batch/compress.rs', lines 132:29-138:9 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 132:29-138:9 -/
 @[reducible]
 def
   batch.compress.working_vector.closure_1.closure.Insts.CoreOpsFunctionFnMutTupleUsizeV
@@ -667,7 +667,7 @@ def
 }
 
 /-- [p3_blake3::batch::compress::working_vector::{impl core::ops::function::FnMut<(usize,), [V; 16usize]> for p3_blake3::batch::compress::working_vector::{closure#1}<'_0, '_1, V, G>}::call_mut]:
-    Source: 'blake3/src/batch/compress.rs', lines 131:25-139:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 131:25-139:5 -/
 def
   batch.compress.working_vector.closure_1.Insts.CoreOpsFunctionFnMutTupleUsizeArrayV16.call_mut
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -682,7 +682,7 @@ def
   ok (a2, c)
 
 /-- [p3_blake3::batch::compress::working_vector::{impl core::ops::function::FnOnce<(usize,), [V; 16usize]> for p3_blake3::batch::compress::working_vector::{closure#1}<'_0, '_1, V, G>}::call_once]:
-    Source: 'blake3/src/batch/compress.rs', lines 131:25-139:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 131:25-139:5 -/
 def
   batch.compress.working_vector.closure_1.Insts.CoreOpsFunctionFnOnceTupleUsizeArrayV16.call_once
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -695,7 +695,7 @@ def
   ok a
 
 /-- Trait implementation: [p3_blake3::batch::compress::working_vector::{impl core::ops::function::FnOnce<(usize,), [V; 16usize]> for p3_blake3::batch::compress::working_vector::{closure#1}<'_0, '_1, V, G>}]
-    Source: 'blake3/src/batch/compress.rs', lines 131:25-139:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 131:25-139:5 -/
 @[reducible]
 def
   batch.compress.working_vector.closure_1.Insts.CoreOpsFunctionFnOnceTupleUsizeArrayV16
@@ -708,7 +708,7 @@ def
 }
 
 /-- Trait implementation: [p3_blake3::batch::compress::working_vector::{impl core::ops::function::FnMut<(usize,), [V; 16usize]> for p3_blake3::batch::compress::working_vector::{closure#1}<'_0, '_1, V, G>}]
-    Source: 'blake3/src/batch/compress.rs', lines 131:25-139:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 131:25-139:5 -/
 @[reducible]
 def
   batch.compress.working_vector.closure_1.Insts.CoreOpsFunctionFnMutTupleUsizeArrayV16
@@ -724,7 +724,7 @@ def
 }
 
 /-- [p3_blake3::batch::compress::working_vector::{impl core::ops::function::FnMut<(usize,), V> for p3_blake3::batch::compress::working_vector::{closure}<'_0, V, G>}::call_mut]:
-    Source: 'blake3/src/batch/compress.rs', lines 130:56-130:79 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 130:56-130:79 -/
 def
   batch.compress.working_vector.closure.Insts.CoreOpsFunctionFnMutTupleUsizeV.call_mut
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -736,7 +736,7 @@ def
   ok (t, c)
 
 /-- [p3_blake3::batch::compress::working_vector::{impl core::ops::function::FnOnce<(usize,), V> for p3_blake3::batch::compress::working_vector::{closure}<'_0, V, G>}::call_once]:
-    Source: 'blake3/src/batch/compress.rs', lines 130:56-130:79 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 130:56-130:79 -/
 def
   batch.compress.working_vector.closure.Insts.CoreOpsFunctionFnOnceTupleUsizeV.call_once
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -749,7 +749,7 @@ def
   ok t
 
 /-- Trait implementation: [p3_blake3::batch::compress::working_vector::{impl core::ops::function::FnOnce<(usize,), V> for p3_blake3::batch::compress::working_vector::{closure}<'_0, V, G>}]
-    Source: 'blake3/src/batch/compress.rs', lines 130:56-130:79 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 130:56-130:79 -/
 @[reducible]
 def
   batch.compress.working_vector.closure.Insts.CoreOpsFunctionFnOnceTupleUsizeV
@@ -762,7 +762,7 @@ def
 }
 
 /-- Trait implementation: [p3_blake3::batch::compress::working_vector::{impl core::ops::function::FnMut<(usize,), V> for p3_blake3::batch::compress::working_vector::{closure}<'_0, V, G>}]
-    Source: 'blake3/src/batch/compress.rs', lines 130:56-130:79 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 130:56-130:79 -/
 @[reducible]
 def batch.compress.working_vector.closure.Insts.CoreOpsFunctionFnMutTupleUsizeV
   {V : Type _} (G : Std.Usize) (lanesWordInst : batch.lanes.Word V) :
@@ -777,7 +777,7 @@ def batch.compress.working_vector.closure.Insts.CoreOpsFunctionFnMutTupleUsizeV
 }
 
 /-- [p3_blake3::batch::compress::working_vector]:
-    Source: 'blake3/src/batch/compress.rs', lines 126:0-140:1 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 126:0-140:1 -/
 def batch.compress.working_vector
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
   (h : Array (Array V 8#usize) G) (params : Array Std.U32 8#usize) :
@@ -792,7 +792,7 @@ def batch.compress.working_vector
     G lanesWordInst) (h, second)
 
 /-- [p3_blake3::batch::compress::compress]: loop body 1:
-    Source: 'blake3/src/batch/compress.rs', lines 112:8-114:9 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 112:8-114:9 -/
 @[rust_loop_body]
 def batch.compress.compress_loop0_loop0.body
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -818,7 +818,7 @@ def batch.compress.compress_loop0_loop0.body
     ok (cont (iter1, a3))
 
 /-- [p3_blake3::batch::compress::compress]: loop 1:
-    Source: 'blake3/src/batch/compress.rs', lines 112:8-114:9 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 112:8-114:9 -/
 @[rust_loop]
 def batch.compress.compress_loop0_loop0
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -832,7 +832,7 @@ def batch.compress.compress_loop0_loop0
     (iter, h)
 
 /-- [p3_blake3::batch::compress::compress]: loop body 0:
-    Source: 'blake3/src/batch/compress.rs', lines 111:4-115:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 111:4-115:5 -/
 @[rust_loop_body]
 def batch.compress.compress_loop0.body
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -853,7 +853,7 @@ def batch.compress.compress_loop0.body
     ok (cont (iter1, h1))
 
 /-- [p3_blake3::batch::compress::compress]: loop 0:
-    Source: 'blake3/src/batch/compress.rs', lines 111:4-115:5 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 111:4-115:5 -/
 @[rust_loop]
 def batch.compress.compress_loop0
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -867,7 +867,7 @@ def batch.compress.compress_loop0
     (iter, h)
 
 /-- [p3_blake3::batch::compress::compress]:
-    Source: 'blake3/src/batch/compress.rs', lines 80:0-116:1 -/
+    Source: 'blake3/src/hax_reshaped/compress.rs', lines 80:0-116:1 -/
 def batch.compress.compress
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
   (h : Array (Array V 8#usize) G) (m : Array (Array V 16#usize) G)
@@ -895,55 +895,55 @@ def batch.compress.compress
     { start := 0#usize, «end» := G } h v7
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Word for u32}::rotr_7]:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 53:4-55:5 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 48:4-50:5 -/
 def U32.Insts.P3_blake3BatchLanesWord.rotr_7
   (self : Std.U32) : RustM Std.U32 := do
   core.num.U32.rotate_right self 7#u32
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Word for u32}::rotr_8]:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 48:4-50:5 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 43:4-45:5 -/
 def U32.Insts.P3_blake3BatchLanesWord.rotr_8
   (self : Std.U32) : RustM Std.U32 := do
   core.num.U32.rotate_right self 8#u32
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Word for u32}::rotr_12]:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 43:4-45:5 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 38:4-40:5 -/
 def U32.Insts.P3_blake3BatchLanesWord.rotr_12
   (self : Std.U32) : RustM Std.U32 := do
   core.num.U32.rotate_right self 12#u32
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Word for u32}::rotr_16]:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 38:4-40:5 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 33:4-35:5 -/
 def U32.Insts.P3_blake3BatchLanesWord.rotr_16
   (self : Std.U32) : RustM Std.U32 := do
   core.num.U32.rotate_right self 16#u32
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Word for u32}::xor]:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 33:4-35:5 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 28:4-30:5 -/
 def U32.Insts.P3_blake3BatchLanesWord.xor
   (self : Std.U32) (rhs : Std.U32) : RustM Std.U32 := do
   ok (self ^^^ rhs)
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Word for u32}::and]:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 28:4-30:5 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 23:4-25:5 -/
 def U32.Insts.P3_blake3BatchLanesWord.and
   (self : Std.U32) (rhs : Std.U32) : RustM Std.U32 := do
   ok (self &&& rhs)
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Word for u32}::add]:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 23:4-25:5 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 18:4-20:5 -/
 def U32.Insts.P3_blake3BatchLanesWord.add
   (self : Std.U32) (rhs : Std.U32) : RustM Std.U32 := do
   core.num.U32.wrapping_add self rhs
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Word for u32}::splat]:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 18:4-20:5 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 13:4-15:5 -/
 def U32.Insts.P3_blake3BatchLanesWord.splat
   (value : Std.U32) : RustM Std.U32 := do
   ok value
 
 /-- Trait implementation: [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Word for u32}]
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 16:0-56:1 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 11:0-51:1 -/
 @[reducible]
 def U32.Insts.P3_blake3BatchLanesWord : batch.lanes.Word Std.U32 := {
   coremarkerCopyInst := core.U32.Insts.CoreMarkerCopy
@@ -958,7 +958,7 @@ def U32.Insts.P3_blake3BatchLanesWord : batch.lanes.Word Std.U32 := {
 }
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}::store_digests]: loop body 1:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 78:12-80:13 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 65:12-67:13 -/
 @[rust_loop_body]
 def U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0_loop0.body
   (i : Std.Usize) (bytes : Array Std.U8 4#usize)
@@ -979,7 +979,7 @@ def U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0_loop0.body
     ok (cont (iter1, a))
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}::store_digests]: loop 1:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 78:12-80:13 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 65:12-67:13 -/
 @[rust_loop]
 def U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0_loop0
   (iter : core.ops.range.Range Std.Usize) (out : Array Std.U8 32#usize)
@@ -993,7 +993,7 @@ def U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0_loop0
     (iter, out)
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}::store_digests]: loop body 0:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 76:8-81:9 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 63:8-68:9 -/
 @[rust_loop_body]
 def U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0.body
   (state : Array Std.U32 8#usize) (iter : core.ops.range.Range Std.Usize)
@@ -1015,7 +1015,7 @@ def U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0.body
     ok (cont (iter1, out1))
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}::store_digests]: loop 0:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 76:8-81:9 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 63:8-68:9 -/
 @[rust_loop]
 def U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0
   (iter : core.ops.range.Range Std.Usize) (state : Array Std.U32 8#usize)
@@ -1029,7 +1029,7 @@ def U32.Insts.P3_blake3BatchLanesBackend1.store_digests_loop0
     (iter, out)
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}::store_digests]:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 75:4-82:5 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 62:4-69:5 -/
 def U32.Insts.P3_blake3BatchLanesBackend1.store_digests
   (state : Array Std.U32 8#usize) (a : Array (Array Std.U8 32#usize) 1#usize) :
   RustM (Array (Array Std.U8 32#usize) 1#usize)
@@ -1041,7 +1041,7 @@ def U32.Insts.P3_blake3BatchLanesBackend1.store_digests
   ok (index_mut_back out1)
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}::load_block::{impl core::ops::function::FnMut<(usize,), u32> for p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}::load_block::{closure}<'_0>}::call_mut]:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 70:29-70:114 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 57:29-57:114 -/
 def
   batch.lanes.portable.BackendU321.load_block.closure.Insts.CoreOpsFunctionFnMutTupleUsizeU32.call_mut
   (c : batch.lanes.portable.BackendU321.load_block.closure)
@@ -1060,7 +1060,7 @@ def
   ok (i8, c)
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}::load_block::{impl core::ops::function::FnOnce<(usize,), u32> for p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}::load_block::{closure}<'_0>}::call_once]:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 70:29-70:114 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 57:29-57:114 -/
 def
   batch.lanes.portable.BackendU321.load_block.closure.Insts.CoreOpsFunctionFnOnceTupleUsizeU32.call_once
   (c : batch.lanes.portable.BackendU321.load_block.closure) (i : Std.Usize) :
@@ -1072,7 +1072,7 @@ def
   ok i1
 
 /-- Trait implementation: [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}::load_block::{impl core::ops::function::FnOnce<(usize,), u32> for p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}::load_block::{closure}<'_0>}]
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 70:29-70:114 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 57:29-57:114 -/
 @[reducible]
 def
   batch.lanes.portable.BackendU321.load_block.closure.Insts.CoreOpsFunctionFnOnceTupleUsizeU32
@@ -1083,7 +1083,7 @@ def
 }
 
 /-- Trait implementation: [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}::load_block::{impl core::ops::function::FnMut<(usize,), u32> for p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}::load_block::{closure}<'_0>}]
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 70:29-70:114 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 57:29-57:114 -/
 @[reducible]
 def
   batch.lanes.portable.BackendU321.load_block.closure.Insts.CoreOpsFunctionFnMutTupleUsizeU32
@@ -1096,7 +1096,7 @@ def
 }
 
 /-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}::load_block]:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 69:4-71:5 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 56:4-58:5 -/
 def U32.Insts.P3_blake3BatchLanesBackend1.load_block
   (a : Array (Array Std.U8 64#usize) 1#usize) :
   RustM (Array Std.U32 16#usize)
@@ -1106,30 +1106,24 @@ def U32.Insts.P3_blake3BatchLanesBackend1.load_block
     batch.lanes.portable.BackendU321.load_block.closure.Insts.CoreOpsFunctionFnMutTupleUsizeU32
     row
 
-/-- [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}::supported]:
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 63:4-65:5 -/
-def U32.Insts.P3_blake3BatchLanesBackend1.supported : RustM Bool := do
-  ok true
-
 /-- Trait implementation: [p3_blake3::batch::lanes::portable::{impl p3_blake3::batch::lanes::Backend<1usize> for u32}]
-    Source: 'blake3/src/batch/lanes/portable.rs', lines 61:0-84:1 -/
+    Source: 'blake3/src/hax_reshaped/lanes/portable.rs', lines 53:0-70:1 -/
 @[reducible]
 def U32.Insts.P3_blake3BatchLanesBackend1 : batch.lanes.Backend Std.U32 1#usize
   := {
   WordInst := U32.Insts.P3_blake3BatchLanesWord
-  supported := U32.Insts.P3_blake3BatchLanesBackend1.supported
   load_block := U32.Insts.P3_blake3BatchLanesBackend1.load_block
   store_digests := U32.Insts.P3_blake3BatchLanesBackend1.store_digests
 }
 
 /-- [p3_blake3::batch::{p3_blake3::batch::Mode}::HASH]
-    Source: 'blake3/src/batch/mod.rs', lines 66:4-66:61 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 52:4-52:61 -/
 @[global_simps, irreducible]
 def batch.Mode.HASH : batch.Mode :=
   { key := batch.compress.IV, flags := 0#u32 }
 
 /-- [p3_blake3::batch::{p3_blake3::batch::Mode}::state::{impl core::ops::function::FnMut<(usize,), V> for p3_blake3::batch::{p3_blake3::batch::Mode}::state::{closure}<'_0, V, G>}::call_mut]:
-    Source: 'blake3/src/batch/mod.rs', lines 71:30-71:55 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 57:30-57:55 -/
 def batch.Mode.state.closure.Insts.CoreOpsFunctionFnMutTupleUsizeV.call_mut
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
   (c : batch.Mode.state.closure V G) (tupled_args : Std.Usize) :
@@ -1140,7 +1134,7 @@ def batch.Mode.state.closure.Insts.CoreOpsFunctionFnMutTupleUsizeV.call_mut
   ok (t, c)
 
 /-- [p3_blake3::batch::{p3_blake3::batch::Mode}::state::{impl core::ops::function::FnOnce<(usize,), V> for p3_blake3::batch::{p3_blake3::batch::Mode}::state::{closure}<'_0, V, G>}::call_once]:
-    Source: 'blake3/src/batch/mod.rs', lines 71:30-71:55 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 57:30-57:55 -/
 def batch.Mode.state.closure.Insts.CoreOpsFunctionFnOnceTupleUsizeV.call_once
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
   (c : batch.Mode.state.closure V G) (i : Std.Usize) :
@@ -1152,7 +1146,7 @@ def batch.Mode.state.closure.Insts.CoreOpsFunctionFnOnceTupleUsizeV.call_once
   ok t
 
 /-- Trait implementation: [p3_blake3::batch::{p3_blake3::batch::Mode}::state::{impl core::ops::function::FnOnce<(usize,), V> for p3_blake3::batch::{p3_blake3::batch::Mode}::state::{closure}<'_0, V, G>}]
-    Source: 'blake3/src/batch/mod.rs', lines 71:30-71:55 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 57:30-57:55 -/
 @[reducible]
 def batch.Mode.state.closure.Insts.CoreOpsFunctionFnOnceTupleUsizeV {V :
   Type _} (G : Std.Usize) (lanesWordInst : batch.lanes.Word V) :
@@ -1163,7 +1157,7 @@ def batch.Mode.state.closure.Insts.CoreOpsFunctionFnOnceTupleUsizeV {V :
 }
 
 /-- Trait implementation: [p3_blake3::batch::{p3_blake3::batch::Mode}::state::{impl core::ops::function::FnMut<(usize,), V> for p3_blake3::batch::{p3_blake3::batch::Mode}::state::{closure}<'_0, V, G>}]
-    Source: 'blake3/src/batch/mod.rs', lines 71:30-71:55 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 57:30-57:55 -/
 @[reducible]
 def batch.Mode.state.closure.Insts.CoreOpsFunctionFnMutTupleUsizeV {V : Type _}
   (G : Std.Usize) (lanesWordInst : batch.lanes.Word V) :
@@ -1176,7 +1170,7 @@ def batch.Mode.state.closure.Insts.CoreOpsFunctionFnMutTupleUsizeV {V : Type _}
 }
 
 /-- [p3_blake3::batch::{p3_blake3::batch::Mode}::state]:
-    Source: 'blake3/src/batch/mod.rs', lines 70:4-72:5 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 56:4-58:5 -/
 def batch.Mode.state
   {V : Type _} (G : Std.Usize) (lanesWordInst : batch.lanes.Word V)
   (self : batch.Mode) :
@@ -1190,7 +1184,7 @@ def batch.Mode.state
     lanesWordInst.coremarkerCopyInst.cloneCloneInst) a
 
 /-- [p3_blake3::batch::store_all]: loop body 0:
-    Source: 'blake3/src/batch/mod.rs', lines 373:4-377:5 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 330:4-334:5 -/
 @[rust_loop_body]
 def batch.store_all_loop.body
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -1213,7 +1207,7 @@ def batch.store_all_loop.body
     ok (cont (iter1, a1))
 
 /-- [p3_blake3::batch::store_all]: loop 0:
-    Source: 'blake3/src/batch/mod.rs', lines 373:4-377:5 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 330:4-334:5 -/
 @[rust_loop]
 def batch.store_all_loop
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -1228,7 +1222,7 @@ def batch.store_all_loop
     (iter, out)
 
 /-- [p3_blake3::batch::store_all]:
-    Source: 'blake3/src/batch/mod.rs', lines 369:0-378:1 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 326:0-335:1 -/
 @[reducible]
 def batch.store_all
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -1240,7 +1234,7 @@ def batch.store_all
     state out
 
 /-- [p3_blake3::batch::load_parts]: loop body 2:
-    Source: 'blake3/src/batch/mod.rs', lines 325:12-327:13 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 282:12-284:13 -/
 @[rust_loop_body]
 def batch.load_parts_loop0_loop0_loop0.body
   {W : Std.Usize} (batch1 : Slice Std.U8) (l : Std.Usize) («at» : Std.Usize)
@@ -1263,7 +1257,7 @@ def batch.load_parts_loop0_loop0_loop0.body
     ok (cont (iter1, a2))
 
 /-- [p3_blake3::batch::load_parts]: loop 2:
-    Source: 'blake3/src/batch/mod.rs', lines 325:12-327:13 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 282:12-284:13 -/
 @[rust_loop]
 def batch.load_parts_loop0_loop0_loop0
   {W : Std.Usize} (iter : core.ops.range.Range Std.Usize)
@@ -1277,7 +1271,7 @@ def batch.load_parts_loop0_loop0_loop0
     (iter, rows)
 
 /-- [p3_blake3::batch::load_parts]: loop body 1:
-    Source: 'blake3/src/batch/mod.rs', lines 323:8-328:9 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 280:8-285:9 -/
 @[rust_loop_body]
 def batch.load_parts_loop0_loop0.body
   {W : Std.Usize} {G : Std.Usize} (i : Std.Usize) (batch1 : Slice Std.U8)
@@ -1302,7 +1296,7 @@ def batch.load_parts_loop0_loop0.body
     ok (cont (iter1, rows1))
 
 /-- [p3_blake3::batch::load_parts]: loop 1:
-    Source: 'blake3/src/batch/mod.rs', lines 323:8-328:9 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 280:8-285:9 -/
 @[rust_loop]
 def batch.load_parts_loop0_loop0
   {W : Std.Usize} {G : Std.Usize} (i : Std.Usize)
@@ -1317,7 +1311,7 @@ def batch.load_parts_loop0_loop0
     (iter, rows)
 
 /-- [p3_blake3::batch::load_parts]: loop body 0:
-    Source: 'blake3/src/batch/mod.rs', lines 321:4-330:5 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 278:4-287:5 -/
 @[rust_loop_body]
 def batch.load_parts_loop0.body
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -1347,7 +1341,7 @@ def batch.load_parts_loop0.body
     ok (cont (iter1, a3))
 
 /-- [p3_blake3::batch::load_parts]: loop 0:
-    Source: 'blake3/src/batch/mod.rs', lines 321:4-330:5 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 278:4-287:5 -/
 @[rust_loop]
 def batch.load_parts_loop0
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -1363,7 +1357,7 @@ def batch.load_parts_loop0
     (iter, block)
 
 /-- [p3_blake3::batch::load_parts]:
-    Source: 'blake3/src/batch/mod.rs', lines 313:0-332:1 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 270:0-289:1 -/
 def batch.load_parts
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
   batch.lanes.Backend V W) (batch1 : Slice Std.U8)
@@ -1387,7 +1381,7 @@ def batch.load_parts
     batch1 starts offset block
 
 /-- [p3_blake3::batch::compress_plain]: loop body 0:
-    Source: 'blake3/src/batch/mod.rs', lines 392:4-396:5 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 349:4-353:5 -/
 @[rust_loop_body]
 def batch.compress_plain_loop.body
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -1420,7 +1414,7 @@ def batch.compress_plain_loop.body
     ok (cont (iter1, state1))
 
 /-- [p3_blake3::batch::compress_plain]: loop 0:
-    Source: 'blake3/src/batch/mod.rs', lines 392:4-396:5 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 349:4-353:5 -/
 @[rust_loop]
 def batch.compress_plain_loop
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -1436,7 +1430,7 @@ def batch.compress_plain_loop
     (iter, state)
 
 /-- [p3_blake3::batch::compress_plain]:
-    Source: 'blake3/src/batch/mod.rs', lines 382:0-397:1 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 339:0-354:1 -/
 @[reducible]
 def batch.compress_plain
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -1451,7 +1445,7 @@ def batch.compress_plain
     counter state
 
 /-- [p3_blake3::batch::mask_tail]: loop body 1:
-    Source: 'blake3/src/batch/mod.rs', lines 361:12-363:13 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 318:12-320:13 -/
 @[rust_loop_body]
 def batch.mask_tail_loop0_loop0.body
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -1475,7 +1469,7 @@ def batch.mask_tail_loop0_loop0.body
     ok (cont (iter1, a3))
 
 /-- [p3_blake3::batch::mask_tail]: loop 1:
-    Source: 'blake3/src/batch/mod.rs', lines 361:12-363:13 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 318:12-320:13 -/
 @[rust_loop]
 def batch.mask_tail_loop0_loop0
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -1489,7 +1483,7 @@ def batch.mask_tail_loop0_loop0
     (iter, words)
 
 /-- [p3_blake3::batch::mask_tail]: loop body 0:
-    Source: 'blake3/src/batch/mod.rs', lines 358:8-364:9 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 315:8-321:9 -/
 @[rust_loop_body]
 def batch.mask_tail_loop0.body
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -1516,7 +1510,7 @@ def batch.mask_tail_loop0.body
     ok (cont (iter1, words1))
 
 /-- [p3_blake3::batch::mask_tail]: loop 0:
-    Source: 'blake3/src/batch/mod.rs', lines 358:8-364:9 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 315:8-321:9 -/
 @[rust_loop]
 def batch.mask_tail_loop0
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
@@ -1530,7 +1524,7 @@ def batch.mask_tail_loop0
     (iter, words)
 
 /-- [p3_blake3::batch::mask_tail]:
-    Source: 'blake3/src/batch/mod.rs', lines 356:0-366:1 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 313:0-323:1 -/
 def batch.mask_tail
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
   (words : Array (Array V 16#usize) G) (tail : Std.Usize) :
@@ -1545,7 +1539,7 @@ def batch.mask_tail
   else ok words
 
 /-- [p3_blake3::batch::spill_parts]: loop body 2:
-    Source: 'blake3/src/batch/mod.rs', lines 346:12-348:13 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 303:12-305:13 -/
 @[rust_loop_body]
 def batch.spill_parts_loop0_loop0_loop0.body
   {W : Std.Usize} (batch1 : Slice Std.U8) (offset : Std.Usize) (l : Std.Usize)
@@ -1569,7 +1563,7 @@ def batch.spill_parts_loop0_loop0_loop0.body
     ok (cont (iter1, a2))
 
 /-- [p3_blake3::batch::spill_parts]: loop 2:
-    Source: 'blake3/src/batch/mod.rs', lines 346:12-348:13 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 303:12-305:13 -/
 @[rust_loop]
 def batch.spill_parts_loop0_loop0_loop0
   {W : Std.Usize} (iter : core.ops.range.Range Std.Usize)
@@ -1584,7 +1578,7 @@ def batch.spill_parts_loop0_loop0_loop0
     (iter, spill)
 
 /-- [p3_blake3::batch::spill_parts]: loop body 1:
-    Source: 'blake3/src/batch/mod.rs', lines 344:8-349:9 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 301:8-306:9 -/
 @[rust_loop_body]
 def batch.spill_parts_loop0_loop0.body
   {W : Std.Usize} {G : Std.Usize} (batch1 : Slice Std.U8)
@@ -1608,7 +1602,7 @@ def batch.spill_parts_loop0_loop0.body
     ok (cont (iter1, spill1))
 
 /-- [p3_blake3::batch::spill_parts]: loop 1:
-    Source: 'blake3/src/batch/mod.rs', lines 344:8-349:9 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 301:8-306:9 -/
 @[rust_loop]
 def batch.spill_parts_loop0_loop0
   {W : Std.Usize} {G : Std.Usize} (iter : core.ops.range.Range Std.Usize)
@@ -1623,7 +1617,7 @@ def batch.spill_parts_loop0_loop0
     (iter, spill)
 
 /-- [p3_blake3::batch::spill_parts]: loop body 0:
-    Source: 'blake3/src/batch/mod.rs', lines 342:4-351:5 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 299:4-308:5 -/
 @[rust_loop_body]
 def batch.spill_parts_loop0.body
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -1653,7 +1647,7 @@ def batch.spill_parts_loop0.body
     ok (cont (iter1, a3))
 
 /-- [p3_blake3::batch::spill_parts]: loop 0:
-    Source: 'blake3/src/batch/mod.rs', lines 342:4-351:5 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 299:4-308:5 -/
 @[rust_loop]
 def batch.spill_parts_loop0
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -1669,7 +1663,7 @@ def batch.spill_parts_loop0
     (iter, block)
 
 /-- [p3_blake3::batch::spill_parts]:
-    Source: 'blake3/src/batch/mod.rs', lines 335:0-353:1 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 292:0-310:1 -/
 def batch.spill_parts
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
   batch.lanes.Backend V W) (batch1 : Slice Std.U8)
@@ -1688,7 +1682,7 @@ def batch.spill_parts
     batch1 starts offset tail block
 
 /-- [p3_blake3::batch::last_block]:
-    Source: 'blake3/src/batch/mod.rs', lines 274:0-286:1 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 255:0-267:1 -/
 def batch.last_block
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
   batch.lanes.Backend V W) (lanes : batch.Lanes W G) (offset : Std.Usize)
@@ -1711,7 +1705,7 @@ def batch.last_block
     batch.mask_tail lanesBackendInst.WordInst words tail
 
 /-- [p3_blake3::batch::chunk]:
-    Source: 'blake3/src/batch/mod.rs', lines 239:0-270:1 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 220:0-251:1 -/
 def batch.chunk
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
   batch.lanes.Backend V W) (mode : batch.Mode) (lanes : batch.Lanes W G)
@@ -1755,7 +1749,7 @@ def batch.chunk
       flags
 
 /-- [p3_blake3::batch::parent]: loop body 1:
-    Source: 'blake3/src/batch/mod.rs', lines 217:8-220:9 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 198:8-201:9 -/
 @[rust_loop_body]
 def batch.parent_loop0_loop0.body
   {V : Type _} {G : Std.Usize} (left : Array (Array V 8#usize) G)
@@ -1785,7 +1779,7 @@ def batch.parent_loop0_loop0.body
     ok (cont (iter1, a6))
 
 /-- [p3_blake3::batch::parent]: loop 1:
-    Source: 'blake3/src/batch/mod.rs', lines 217:8-220:9 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 198:8-201:9 -/
 @[rust_loop]
 def batch.parent_loop0_loop0
   {V : Type _} {G : Std.Usize} (iter : core.ops.range.Range Std.Usize)
@@ -1799,7 +1793,7 @@ def batch.parent_loop0_loop0
     (iter, block)
 
 /-- [p3_blake3::batch::parent]: loop body 0:
-    Source: 'blake3/src/batch/mod.rs', lines 216:4-221:5 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 197:4-202:5 -/
 @[rust_loop_body]
 def batch.parent_loop0.body
   {V : Type _} {G : Std.Usize} (left : Array (Array V 8#usize) G)
@@ -1821,7 +1815,7 @@ def batch.parent_loop0.body
     ok (cont (iter1, block1))
 
 /-- [p3_blake3::batch::parent]: loop 0:
-    Source: 'blake3/src/batch/mod.rs', lines 216:4-221:5 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 197:4-202:5 -/
 @[rust_loop]
 def batch.parent_loop0
   {V : Type _} {G : Std.Usize} (iter : core.ops.range.Range Std.Usize)
@@ -1834,7 +1828,7 @@ def batch.parent_loop0
     (iter, block)
 
 /-- [p3_blake3::batch::parent]:
-    Source: 'blake3/src/batch/mod.rs', lines 206:0-233:1 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 187:0-214:1 -/
 def batch.parent
   {V : Type _} {G : Std.Usize} (lanesWordInst : batch.lanes.Word V)
   (mode : batch.Mode) (left : Array (Array V 8#usize) G)
@@ -1859,7 +1853,7 @@ def batch.parent
   batch.compress.compress lanesWordInst state block1 0#u64 i1 i4
 
 /-- [p3_blake3::batch::subtree]:
-    Source: 'blake3/src/batch/mod.rs', lines 174:0-202:1 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 155:0-183:1 -/
 def batch.subtree
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
   batch.lanes.Backend V W) (mode : batch.Mode) (lanes : batch.Lanes W G)
@@ -1883,7 +1877,7 @@ def batch.subtree
 partial_fixpoint
 
 /-- [p3_blake3::batch::hash_group]:
-    Source: 'blake3/src/batch/mod.rs', lines 145:0-160:1 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 126:0-141:1 -/
 def batch.hash_group
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
   batch.lanes.Backend V W) (mode : batch.Mode) (lanes : batch.Lanes W G)
@@ -1903,7 +1897,7 @@ def batch.hash_group
     batch.store_all lanesBackendInst state out
 
 /-- [p3_blake3::batch::hash_many_with::{impl core::ops::function::FnMut<(usize,), usize> for p3_blake3::batch::hash_many_with::{closure#2}<'_0, '_1, '_2, V, W, G>}::call_mut]:
-    Source: 'blake3/src/batch/mod.rs', lines 130:72-130:100 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 111:72-111:100 -/
 def
   batch.hash_many_with.closure_2.Insts.CoreOpsFunctionFnMutTupleUsizeUsize.call_mut
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -1918,7 +1912,7 @@ def
   ok (i5, c)
 
 /-- [p3_blake3::batch::hash_many_with::{impl core::ops::function::FnOnce<(usize,), usize> for p3_blake3::batch::hash_many_with::{closure#2}<'_0, '_1, '_2, V, W, G>}::call_once]:
-    Source: 'blake3/src/batch/mod.rs', lines 130:72-130:100 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 111:72-111:100 -/
 def
   batch.hash_many_with.closure_2.Insts.CoreOpsFunctionFnOnceTupleUsizeUsize.call_once
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -1932,7 +1926,7 @@ def
   ok i1
 
 /-- Trait implementation: [p3_blake3::batch::hash_many_with::{impl core::ops::function::FnOnce<(usize,), usize> for p3_blake3::batch::hash_many_with::{closure#2}<'_0, '_1, '_2, V, W, G>}]
-    Source: 'blake3/src/batch/mod.rs', lines 130:72-130:100 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 111:72-111:100 -/
 @[reducible]
 def batch.hash_many_with.closure_2.Insts.CoreOpsFunctionFnOnceTupleUsizeUsize
   {V : Type _} {W : Std.Usize} (G : Std.Usize) (lanesBackendInst :
@@ -1944,7 +1938,7 @@ def batch.hash_many_with.closure_2.Insts.CoreOpsFunctionFnOnceTupleUsizeUsize
 }
 
 /-- Trait implementation: [p3_blake3::batch::hash_many_with::{impl core::ops::function::FnMut<(usize,), usize> for p3_blake3::batch::hash_many_with::{closure#2}<'_0, '_1, '_2, V, W, G>}]
-    Source: 'blake3/src/batch/mod.rs', lines 130:72-130:100 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 111:72-111:100 -/
 @[reducible]
 def batch.hash_many_with.closure_2.Insts.CoreOpsFunctionFnMutTupleUsizeUsize {V
   : Type _} {W : Std.Usize} (G : Std.Usize) (lanesBackendInst :
@@ -1959,7 +1953,7 @@ def batch.hash_many_with.closure_2.Insts.CoreOpsFunctionFnMutTupleUsizeUsize {V
 }
 
 /-- [p3_blake3::batch::hash_many_with::{impl core::ops::function::FnMut<(usize,), usize> for p3_blake3::batch::hash_many_with::{closure#1}<'_0, '_1, V, W, G>}::call_mut]:
-    Source: 'blake3/src/batch/mod.rs', lines 120:72-120:93 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 101:72-101:93 -/
 def
   batch.hash_many_with.closure_1.Insts.CoreOpsFunctionFnMutTupleUsizeUsize.call_mut
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -1973,7 +1967,7 @@ def
   ok (i3, c)
 
 /-- [p3_blake3::batch::hash_many_with::{impl core::ops::function::FnOnce<(usize,), usize> for p3_blake3::batch::hash_many_with::{closure#1}<'_0, '_1, V, W, G>}::call_once]:
-    Source: 'blake3/src/batch/mod.rs', lines 120:72-120:93 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 101:72-101:93 -/
 def
   batch.hash_many_with.closure_1.Insts.CoreOpsFunctionFnOnceTupleUsizeUsize.call_once
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -1987,7 +1981,7 @@ def
   ok i1
 
 /-- Trait implementation: [p3_blake3::batch::hash_many_with::{impl core::ops::function::FnOnce<(usize,), usize> for p3_blake3::batch::hash_many_with::{closure#1}<'_0, '_1, V, W, G>}]
-    Source: 'blake3/src/batch/mod.rs', lines 120:72-120:93 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 101:72-101:93 -/
 @[reducible]
 def batch.hash_many_with.closure_1.Insts.CoreOpsFunctionFnOnceTupleUsizeUsize
   {V : Type _} {W : Std.Usize} (G : Std.Usize) (lanesBackendInst :
@@ -1999,7 +1993,7 @@ def batch.hash_many_with.closure_1.Insts.CoreOpsFunctionFnOnceTupleUsizeUsize
 }
 
 /-- Trait implementation: [p3_blake3::batch::hash_many_with::{impl core::ops::function::FnMut<(usize,), usize> for p3_blake3::batch::hash_many_with::{closure#1}<'_0, '_1, V, W, G>}]
-    Source: 'blake3/src/batch/mod.rs', lines 120:72-120:93 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 101:72-101:93 -/
 @[reducible]
 def batch.hash_many_with.closure_1.Insts.CoreOpsFunctionFnMutTupleUsizeUsize {V
   : Type _} {W : Std.Usize} (G : Std.Usize) (lanesBackendInst :
@@ -2014,7 +2008,7 @@ def batch.hash_many_with.closure_1.Insts.CoreOpsFunctionFnMutTupleUsizeUsize {V
 }
 
 /-- [p3_blake3::batch::hash_many_with::{closure}::{impl core::ops::function::FnMut<(usize,), usize> for p3_blake3::batch::hash_many_with::{closure}::{closure}<'_0, '_1, '_2, V, W, G>}::call_mut]:
-    Source: 'blake3/src/batch/mod.rs', lines 108:67-108:96 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 89:67-89:96 -/
 def
   batch.hash_many_with.closure.closure.Insts.CoreOpsFunctionFnMutTupleUsizeUsize.call_mut
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -2030,7 +2024,7 @@ def
   ok (i6, c)
 
 /-- [p3_blake3::batch::hash_many_with::{closure}::{impl core::ops::function::FnOnce<(usize,), usize> for p3_blake3::batch::hash_many_with::{closure}::{closure}<'_0, '_1, '_2, V, W, G>}::call_once]:
-    Source: 'blake3/src/batch/mod.rs', lines 108:67-108:96 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 89:67-89:96 -/
 def
   batch.hash_many_with.closure.closure.Insts.CoreOpsFunctionFnOnceTupleUsizeUsize.call_once
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -2044,7 +2038,7 @@ def
   ok i1
 
 /-- Trait implementation: [p3_blake3::batch::hash_many_with::{closure}::{impl core::ops::function::FnOnce<(usize,), usize> for p3_blake3::batch::hash_many_with::{closure}::{closure}<'_0, '_1, '_2, V, W, G>}]
-    Source: 'blake3/src/batch/mod.rs', lines 108:67-108:96 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 89:67-89:96 -/
 @[reducible]
 def
   batch.hash_many_with.closure.closure.Insts.CoreOpsFunctionFnOnceTupleUsizeUsize
@@ -2057,7 +2051,7 @@ def
 }
 
 /-- Trait implementation: [p3_blake3::batch::hash_many_with::{closure}::{impl core::ops::function::FnMut<(usize,), usize> for p3_blake3::batch::hash_many_with::{closure}::{closure}<'_0, '_1, '_2, V, W, G>}]
-    Source: 'blake3/src/batch/mod.rs', lines 108:67-108:96 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 89:67-89:96 -/
 @[reducible]
 def
   batch.hash_many_with.closure.closure.Insts.CoreOpsFunctionFnMutTupleUsizeUsize
@@ -2073,7 +2067,7 @@ def
 }
 
 /-- [p3_blake3::batch::hash_many_with::{impl core::ops::function::FnMut<(usize,), [usize; W]> for p3_blake3::batch::hash_many_with::{closure}<'_0, '_1, V, W, G>}::call_mut]:
-    Source: 'blake3/src/batch/mod.rs', lines 108:42-108:97 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 89:42-89:97 -/
 def
   batch.hash_many_with.closure.Insts.CoreOpsFunctionFnMutTupleUsizeArrayUsizeW.call_mut
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -2089,7 +2083,7 @@ def
   ok (a, c)
 
 /-- [p3_blake3::batch::hash_many_with::{impl core::ops::function::FnOnce<(usize,), [usize; W]> for p3_blake3::batch::hash_many_with::{closure}<'_0, '_1, V, W, G>}::call_once]:
-    Source: 'blake3/src/batch/mod.rs', lines 108:42-108:97 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 89:42-89:97 -/
 def
   batch.hash_many_with.closure.Insts.CoreOpsFunctionFnOnceTupleUsizeArrayUsizeW.call_once
   {V : Type _} {W : Std.Usize} {G : Std.Usize} (lanesBackendInst :
@@ -2103,7 +2097,7 @@ def
   ok a
 
 /-- Trait implementation: [p3_blake3::batch::hash_many_with::{impl core::ops::function::FnOnce<(usize,), [usize; W]> for p3_blake3::batch::hash_many_with::{closure}<'_0, '_1, V, W, G>}]
-    Source: 'blake3/src/batch/mod.rs', lines 108:42-108:97 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 89:42-89:97 -/
 @[reducible]
 def
   batch.hash_many_with.closure.Insts.CoreOpsFunctionFnOnceTupleUsizeArrayUsizeW
@@ -2116,7 +2110,7 @@ def
 }
 
 /-- Trait implementation: [p3_blake3::batch::hash_many_with::{impl core::ops::function::FnMut<(usize,), [usize; W]> for p3_blake3::batch::hash_many_with::{closure}<'_0, '_1, V, W, G>}]
-    Source: 'blake3/src/batch/mod.rs', lines 108:42-108:97 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 89:42-89:97 -/
 @[reducible]
 def
   batch.hash_many_with.closure.Insts.CoreOpsFunctionFnMutTupleUsizeArrayUsizeW
@@ -2132,7 +2126,7 @@ def
 }
 
 /-- [p3_blake3::batch::hash_many_with]: loop body 2:
-    Source: 'blake3/src/batch/mod.rs', lines 113:12-115:13 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 94:12-96:13 -/
 @[rust_loop_body]
 def batch.hash_many_with_loop0_loop0_loop0.body
   {W : Std.Usize} {G : Std.Usize} (first : Std.Usize)
@@ -2157,7 +2151,7 @@ def batch.hash_many_with_loop0_loop0_loop0.body
     ok (cont (iter1, s))
 
 /-- [p3_blake3::batch::hash_many_with]: loop 2:
-    Source: 'blake3/src/batch/mod.rs', lines 113:12-115:13 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 94:12-96:13 -/
 @[rust_loop]
 def batch.hash_many_with_loop0_loop0_loop0
   {W : Std.Usize} {G : Std.Usize} (iter : core.ops.range.Range Std.Usize)
@@ -2171,7 +2165,7 @@ def batch.hash_many_with_loop0_loop0_loop0
     (iter, out)
 
 /-- [p3_blake3::batch::hash_many_with]: loop body 1:
-    Source: 'blake3/src/batch/mod.rs', lines 112:8-116:9 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 93:8-97:9 -/
 @[rust_loop_body]
 def batch.hash_many_with_loop0_loop0.body
   {W : Std.Usize} {G : Std.Usize} (first : Std.Usize)
@@ -2193,7 +2187,7 @@ def batch.hash_many_with_loop0_loop0.body
     ok (cont (iter1, out1))
 
 /-- [p3_blake3::batch::hash_many_with]: loop 1:
-    Source: 'blake3/src/batch/mod.rs', lines 112:8-116:9 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 93:8-97:9 -/
 @[rust_loop]
 def batch.hash_many_with_loop0_loop0
   {W : Std.Usize} {G : Std.Usize} (iter : core.ops.range.Range Std.Usize)
@@ -2207,7 +2201,7 @@ def batch.hash_many_with_loop0_loop0
     (iter, out)
 
 /-- [p3_blake3::batch::hash_many_with]: loop body 0:
-    Source: 'blake3/src/batch/mod.rs', lines 106:4-117:5 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 87:4-98:5 -/
 @[rust_loop_body]
 def batch.hash_many_with_loop0.body
   {V : Type _} {W : Std.Usize} (G : Std.Usize) (lanesBackendInst :
@@ -2250,7 +2244,7 @@ def batch.hash_many_with_loop0.body
     ok (cont (iter1, out1))
 
 /-- [p3_blake3::batch::hash_many_with]: loop 0:
-    Source: 'blake3/src/batch/mod.rs', lines 106:4-117:5 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 87:4-98:5 -/
 @[rust_loop]
 def batch.hash_many_with_loop0
   {V : Type _} {W : Std.Usize} (G : Std.Usize) (lanesBackendInst :
@@ -2265,7 +2259,7 @@ def batch.hash_many_with_loop0
     (iter, out)
 
 /-- [p3_blake3::batch::hash_many_with]: loop body 4:
-    Source: 'blake3/src/batch/mod.rs', lines 123:8-125:9 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 104:8-106:9 -/
 @[rust_loop_body]
 def batch.hash_many_with_loop1_loop0.body
   {W : Std.Usize} (first : Std.Usize)
@@ -2288,7 +2282,7 @@ def batch.hash_many_with_loop1_loop0.body
     ok (cont (iter1, s))
 
 /-- [p3_blake3::batch::hash_many_with]: loop 4:
-    Source: 'blake3/src/batch/mod.rs', lines 123:8-125:9 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 104:8-106:9 -/
 @[rust_loop]
 def batch.hash_many_with_loop1_loop0
   {W : Std.Usize} (iter : core.ops.range.Range Std.Usize)
@@ -2302,7 +2296,7 @@ def batch.hash_many_with_loop1_loop0
     (iter, out)
 
 /-- [p3_blake3::batch::hash_many_with]: loop body 3:
-    Source: 'blake3/src/batch/mod.rs', lines 119:4-127:5 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 100:4-108:5 -/
 @[rust_loop_body]
 def batch.hash_many_with_loop1.body
   {V : Type _} {W : Std.Usize} (G : Std.Usize) (lanesBackendInst :
@@ -2340,7 +2334,7 @@ def batch.hash_many_with_loop1.body
     ok (cont (iter1, out1, first1))
 
 /-- [p3_blake3::batch::hash_many_with]: loop 3:
-    Source: 'blake3/src/batch/mod.rs', lines 119:4-127:5 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 100:4-108:5 -/
 @[rust_loop]
 def batch.hash_many_with_loop1
   {V : Type _} {W : Std.Usize} (G : Std.Usize) (lanesBackendInst :
@@ -2355,7 +2349,7 @@ def batch.hash_many_with_loop1
     (iter, out, first)
 
 /-- [p3_blake3::batch::hash_many_with]: loop body 5:
-    Source: 'blake3/src/batch/mod.rs', lines 133:8-135:9 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 114:8-116:9 -/
 @[rust_loop_body]
 def batch.hash_many_with_loop2.body
   {W : Std.Usize} (first : Std.Usize)
@@ -2378,7 +2372,7 @@ def batch.hash_many_with_loop2.body
     ok (cont (iter1, s))
 
 /-- [p3_blake3::batch::hash_many_with]: loop 5:
-    Source: 'blake3/src/batch/mod.rs', lines 133:8-135:9 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 114:8-116:9 -/
 @[rust_loop]
 def batch.hash_many_with_loop2
   {W : Std.Usize} (iter : core.ops.range.Range Std.Usize)
@@ -2392,7 +2386,7 @@ def batch.hash_many_with_loop2
     (iter, out)
 
 /-- [p3_blake3::batch::hash_many_with]:
-    Source: 'blake3/src/batch/mod.rs', lines 97:0-137:1 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 78:0-118:1 -/
 def batch.hash_many_with
   {V : Type _} {W : Std.Usize} (G : Std.Usize) (lanesBackendInst :
   batch.lanes.Backend V W) (mode : batch.Mode) (input : Slice Std.U8)
@@ -2434,7 +2428,7 @@ def batch.hash_many_with
   else ok out2
 
 /-- [p3_blake3::batch::hash_many]:
-    Source: 'blake3/src/batch/mod.rs', lines 86:0-88:1 -/
+    Source: 'blake3/src/hax_reshaped/mod.rs', lines 66:0-69:1 -/
 def batch.hash_many
   (mode : batch.Mode) (input : Slice Std.U8) (len : Std.Usize)
   (out : Slice (Array Std.U8 32#usize)) :
@@ -2444,7 +2438,7 @@ def batch.hash_many
     len out
 
 /-- [p3_blake3::{impl p3_symmetric::hasher::CryptographicHasher<u8, [u8; 32usize]> for p3_blake3::Blake3}::hash_many]:
-    Source: 'blake3/src/lib.rs', lines 71:4-87:5
+    Source: 'blake3/src/lib.rs', lines 83:4-99:5
     Visibility: public -/
 def Blake3.Insts.P3_symmetricHasherCryptographicHasherU8ArrayU832.hash_many
   (self : Blake3) (input : Slice Std.U8) (out : Slice (Array Std.U8 32#usize))
@@ -2482,7 +2476,7 @@ def Blake3.Insts.P3_symmetricHasherCryptographicHasherU8ArrayU832.hash_many
       fail panic
 
 /-- [p3_blake3::hax_roots::hash_many]:
-    Source: 'blake3/src/lib.rs', lines 93:4-95:5
+    Source: 'blake3/src/hax_roots.rs', lines 10:0-12:1
     Visibility: public -/
 def hax_roots.hash_many
   (input : Slice Std.U8) (out : Slice (Array Std.U8 32#usize)) :

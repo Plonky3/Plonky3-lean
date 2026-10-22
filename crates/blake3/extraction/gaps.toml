@@ -11,19 +11,7 @@ item   = "p3_blake3::LANES"
 source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_blake3::batch::lanes::KERNELS"
-source = ""
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_blake3::batch::lanes::LANES"
-source = ""
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_blake3::batch::lanes::portable::KERNEL"
-source = ""
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_blake3::batch::lanes::{impl}::new"
 source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it

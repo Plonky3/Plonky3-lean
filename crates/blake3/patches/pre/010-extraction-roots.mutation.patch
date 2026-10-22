@@ -1,0 +1,12 @@
+# Mutation of: 010-extraction-roots
+# Breaks:      the module is gated on a misspelled cfg.
+#
+--- a/blake3/src/lib.rs
++++ b/blake3/src/lib.rs
+@@ -100,5 +100,5 @@
+ }
+ 
+ // PATCHED: extraction roots, only under hax's Lean backend.
+-#[cfg(hax_backend_lean)]
++#[cfg(hax_backend_lea)]
+ pub mod hax_roots;
