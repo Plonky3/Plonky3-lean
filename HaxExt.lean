@@ -69,6 +69,11 @@ which does not define it. -/
 def core.U32.Insts.CoreCmpOrd.min (self other : Std.U32) : RustM Std.U32 :=
   core.cmp.Ord.min.default core.U32.Insts.CoreCmpOrd self other
 
+/-- `<usize as Ord>::min`, the provided method `Ord::min` at `usize`.
+p3-blake3's `chunk` clamps a chunk's end to the message length with it. -/
+def core.Usize.Insts.CoreCmpOrd.min (self other : Std.Usize) : RustM Std.Usize :=
+  core.cmp.Ord.min.default core.Usize.Insts.CoreCmpOrd self other
+
 /-- `bool::then` (`library/core/src/bool.rs`):
 `if self { Some(f()) } else { None }`. -/
 def core.bool.Bool.then {T F : Type} (FnOnceInst : core.ops.function.FnOnce F Unit T)

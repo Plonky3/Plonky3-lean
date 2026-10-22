@@ -1,0 +1,19 @@
+# p3-blake3: BLAKE3 as a hash, and Plonky3's own batched tree hashing.
+#
+# On targets without a vector unit, which the extraction target is, `hash_many`
+# runs the portable backend: one lane of plain `u32`s.
+
+lean_lib = "P3Blake3"
+
+# Only `hash_many` is extracted.
+#
+# `hash_iter`, `hash_iter_slices` and `hash_slice` call the `blake3` crate,
+# whose hasher is not extracted. The vector backends are compiled only for
+# SIMD targets.
+state = "scoped"
+
+features = []
+
+start_from = ["p3_blake3::hax_roots::hash_many"]
+
+watch = ["blake3/src", "blake3/Cargo.toml"]

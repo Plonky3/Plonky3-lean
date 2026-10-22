@@ -1,0 +1,26 @@
+# blake3: the BLAKE3 crate, whose constants p3-blake3's batched hashing uses.
+#
+# Not a Plonky3 crate: `package` names the crates.io dependency. Only the three
+# constants the extraction of p3-blake3 references are transcribed.
+
+lean_lib = "Blake3Crate"
+
+package = "blake3"
+
+state = "stub"
+
+features = []
+
+watch = ["Cargo.toml"]
+
+[[mirror]]
+lean = "blake3.BLOCK_LEN"
+rust = "blake3::BLOCK_LEN"
+
+[[mirror]]
+lean = "blake3.CHUNK_LEN"
+rust = "blake3::CHUNK_LEN"
+
+[[mirror]]
+lean = "blake3.OUT_LEN"
+rust = "blake3::OUT_LEN"
