@@ -6,3 +6,4 @@ transcriptions of what that extraction cannot produce, in
 `P3Mersenne31/Assumptions/Mirror.lean`.
 -/
 import P3Mersenne31.Extraction
+import P3Mersenne31.Assumptions.Mirror
