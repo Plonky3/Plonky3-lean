@@ -1,6 +1,10 @@
-import Plonky3Lean.Proofs.Field.Binary.Ghash
-import ToCompPoly.Fields.Binary.Poly64.Basic
-import Plonky3Lean.Lib.Iter
+module
+
+public import Plonky3Lean.Proofs.Field.Binary.Ghash
+public import ToCompPoly.Fields.Binary.Poly64.Basic
+public import Plonky3Lean.Lib.Iter
+
+@[expose] public section
 
 /-!
 # `GF(2^64)` modulo `x^64 + x^4 + x^3 + x + 1`

@@ -1,6 +1,10 @@
-import Aeneas
-import CoreModels
-import HaxExt
+module
+
+public import Aeneas
+public import CoreModels
+public import HaxExt
+
+@[expose] public section
 
 /-!
 # Rust bit operations, as bit vectors

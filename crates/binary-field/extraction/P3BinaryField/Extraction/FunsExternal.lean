@@ -1,1 +1,3 @@
-import P3BinaryField.Assumptions.FunsExternal
+module
+
+public import P3BinaryField.Assumptions.FunsExternal

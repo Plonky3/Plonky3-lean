@@ -1,7 +1,11 @@
-import Aeneas
-import CompPoly.Fields.Binary.Common
-import ToCompPoly.Fields.Binary.Poly192.Basic
-import CompPoly.Fields.Binary.Tower.Impl
+module
+
+public import Aeneas
+public import CompPoly.Fields.Binary.Common
+public import ToCompPoly.Fields.Binary.Poly192.Basic
+public import CompPoly.Fields.Binary.Tower.Impl
+
+@[expose] public section
 
 /-!
 # Binary fields: what the model's integers mean

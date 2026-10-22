@@ -1,6 +1,10 @@
-import Plonky3Lean.Proofs.Field.Binary.Clmul
-import Plonky3Lean.Lib.Scalar
-import ToCompPoly.Fields.Binary.Tower.NatMul
+module
+
+public import Plonky3Lean.Proofs.Field.Binary.Clmul
+public import Plonky3Lean.Lib.Scalar
+public import ToCompPoly.Fields.Binary.Tower.NatMul
+
+@[expose] public section
 
 /-!
 # The `GF(2^8)` lookup tables

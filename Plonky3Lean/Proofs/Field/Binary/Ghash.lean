@@ -1,6 +1,10 @@
-import CompPoly.Fields.Binary.BF128Ghash.Impl
-import Mathlib.FieldTheory.Finite.Basic
-import Plonky3Lean.Proofs.Field.Binary.Compact
+module
+
+public import CompPoly.Fields.Binary.BF128Ghash.Impl
+public import Mathlib.FieldTheory.Finite.Basic
+public import Plonky3Lean.Proofs.Field.Binary.Compact
+
+@[expose] public section
 
 /-!
 # `GF(2^128)` modulo the GHASH polynomial

@@ -1,5 +1,9 @@
-import Plonky3Lean.Proofs.Field.Binary.Poly64Sqrt
-import ToCompPoly.Fields.Binary.Poly192.Basic
+module
+
+public import Plonky3Lean.Proofs.Field.Binary.Poly64Sqrt
+public import ToCompPoly.Fields.Binary.Poly192.Basic
+
+@[expose] public section
 
 /-!
 # `GF(2^192)` as `GF(2^64)[Y] / (Y^3 + Y + 1)`

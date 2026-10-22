@@ -3,7 +3,11 @@ Copyright (c) 2026 CompPoly. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Thomas Coratger
 -/
-import ToCompPoly.Fields.Binary.Poly64.Basic
+module
+
+public import ToCompPoly.Fields.Binary.Poly64.Basic
+
+@[expose] public section
 
 /-!
 # `GF(2^192)` as a cubic extension of `GF(2^64)`

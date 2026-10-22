@@ -1,5 +1,9 @@
-import Aeneas
-import CoreModels
+module
+
+public import Aeneas
+public import CoreModels
+
+@[expose] public section
 
 /-!
 # Iterators

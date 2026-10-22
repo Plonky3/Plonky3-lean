@@ -3,5 +3,5 @@
 
 [charon]
 crate  = "p3_binary_field"
-errors = 5
-error_sites = ["library/core/src/iter/adapters/enumerate.rs:62:1", "library/core/src/slice/iter/macros.rs:153:9"]
+errors = 0
+error_sites = []

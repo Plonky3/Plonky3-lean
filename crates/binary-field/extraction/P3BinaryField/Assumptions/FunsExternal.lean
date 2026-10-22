@@ -2,11 +2,15 @@
 -- HAND-WRITTEN, from hax's seed of Extraction/FunsExternal_Template.lean.
 -- The generated code imports it by this module name. extract.sh fails if the
 -- regenerated template declares different names than this file does.
-import Aeneas
-import CoreModels
-import P3BinaryField.Extraction.Types
+module
+
+public import Aeneas
+public import CoreModels
+public import P3BinaryField.Extraction.Types
 -- `core` models missing from hax-lean's CoreModels (`HaxExt.lean`).
-import HaxExt
+public import HaxExt
+
+@[expose] public section
 open CoreModels Aeneas
 open Aeneas.Std hiding namespace core alloc
 open RustM ControlFlow Error

@@ -3,9 +3,13 @@ Copyright (c) 2026 CompPoly. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Thomas Coratger
 -/
-import CompPoly.Data.Polynomial.Frobenius
-import CompPoly.Fields.Binary.Common
-import Mathlib.RingTheory.AdjoinRoot
+module
+
+public import CompPoly.Data.Polynomial.Frobenius
+public import CompPoly.Fields.Binary.Common
+public import Mathlib.RingTheory.AdjoinRoot
+
+@[expose] public section
 
 /-!
 # Rabin's irreducibility test over `GF(2)`, for degree a power of two

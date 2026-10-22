@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.Binary.Statements
+module
+
+public import Plonky3Lean.Proofs.Field.Binary.Statements
+
+@[expose] public section
 
 /-!
 # Binary fields: claims

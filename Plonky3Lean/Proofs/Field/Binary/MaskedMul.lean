@@ -1,6 +1,10 @@
-import Mathlib.Algebra.Polynomial.Expand
-import Mathlib.Algebra.Polynomial.Eval.Defs
-import ToCompPoly.Fields.Binary.NatPoly
+module
+
+public import Mathlib.Algebra.Polynomial.Expand
+public import Mathlib.Algebra.Polynomial.Eval.Defs
+public import ToCompPoly.Fields.Binary.NatPoly
+
+@[expose] public section
 
 /-!
 # A carry-less product from integer products

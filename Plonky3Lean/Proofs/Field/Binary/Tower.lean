@@ -1,5 +1,9 @@
-import Plonky3Lean.Proofs.Field.Binary.Tables
-import ToCompPoly.Fields.Binary.Tower.NatMul
+module
+
+public import Plonky3Lean.Proofs.Field.Binary.Tables
+public import ToCompPoly.Fields.Binary.Tower.NatMul
+
+@[expose] public section
 
 /-!
 # The binary tower's arithmetic

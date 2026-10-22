@@ -3,8 +3,12 @@
 -- The generated code imports it by this module name. extract.sh fails if the
 -- regenerated template declares different names than this file does.
 -- The template declares nothing.
-import Aeneas
-import CoreModels
+module
+
+public import Aeneas
+public import CoreModels
+
+@[expose] public section
 open CoreModels Aeneas
 open Aeneas.Std hiding namespace core alloc
 open RustM ControlFlow Error

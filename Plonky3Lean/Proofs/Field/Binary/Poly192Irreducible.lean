@@ -1,6 +1,10 @@
-import Mathlib.Algebra.Polynomial.SpecificDegree
-import Plonky3Lean.Proofs.Field.Binary.Poly192
-import Plonky3Lean.Proofs.Field.Binary.Poly64Field
+module
+
+public import Mathlib.Algebra.Polynomial.SpecificDegree
+public import Plonky3Lean.Proofs.Field.Binary.Poly192
+public import Plonky3Lean.Proofs.Field.Binary.Poly64Field
+
+@[expose] public section
 
 /-!
 # `Y^3 + Y + 1` is irreducible over `GF(2^64)`

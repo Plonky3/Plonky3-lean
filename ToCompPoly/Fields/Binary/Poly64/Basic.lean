@@ -3,7 +3,11 @@ Copyright (c) 2026 CompPoly. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Thomas Coratger
 -/
-import CompPoly.Fields.Binary.Common
+module
+
+public import CompPoly.Fields.Binary.Common
+
+@[expose] public section
 
 /-!
 # `GF(2^64)` modulo `X^64 + X^4 + X^3 + X + 1`

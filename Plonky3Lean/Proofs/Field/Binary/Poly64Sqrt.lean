@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.Binary.Poly64Irreducible
+module
+
+public import Plonky3Lean.Proofs.Field.Binary.Poly64Irreducible
+
+@[expose] public section
 
 /-!
 # The square root in `GF(2^64)`

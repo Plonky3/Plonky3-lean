@@ -1,5 +1,9 @@
-import Plonky3Lean.Proofs.Field.Binary.Poly64
-import ToCompPoly.ToMathlib.Polynomial.Rabin
+module
+
+public import Plonky3Lean.Proofs.Field.Binary.Poly64
+public import ToCompPoly.ToMathlib.Polynomial.Rabin
+
+@[expose] public section
 
 /-!
 # `x^64 + x^4 + x^3 + x + 1` is irreducible

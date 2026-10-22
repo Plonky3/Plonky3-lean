@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.Binary.Poly64Irreducible
+module
+
+public import Plonky3Lean.Proofs.Field.Binary.Poly64Irreducible
+
+@[expose] public section
 
 /-!
 # `GF(2^64)` is a field, and `poly_inverse_64` inverts in it

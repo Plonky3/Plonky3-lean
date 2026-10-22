@@ -1,5 +1,9 @@
-import Mathlib.FieldTheory.Finite.Basic
-import Plonky3Lean.Proofs.Field.Binary.Clmul
+module
+
+public import Mathlib.FieldTheory.Finite.Basic
+public import Plonky3Lean.Proofs.Field.Binary.Clmul
+
+@[expose] public section
 
 /-!
 # Gathering the even bits

@@ -72,3 +72,8 @@ keeps its number and says so.
     yet support dereferencing raw pointers"). p3-binary-field's `Poly192::limbs`
     reborrows `[Poly64; 3]` as `&[u64; 3]` through one; pre-patch
     `binary-field/050` gives the products a copy instead.
+13. **`@[global_simps, irreducible]` on a long array literal reaches the maximum
+    recursion depth**: registering the simp lemma of an irreducible constant
+    unfolds it, which fails on p3-binary-field's 511-entry `tables::EXP` (either
+    attribute alone elaborates). Post-patch `binary-field/010` keeps only
+    `irreducible` there.

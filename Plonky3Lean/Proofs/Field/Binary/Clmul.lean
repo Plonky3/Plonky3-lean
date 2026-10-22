@@ -1,7 +1,11 @@
-import P3BinaryField
-import Plonky3Lean.Lib.Scalar.Bits
-import Plonky3Lean.Proofs.Field.Binary.MaskedMul
-import Plonky3Lean.Spec.BinaryField
+module
+
+public import P3BinaryField
+public import Plonky3Lean.Lib.Scalar.Bits
+public import Plonky3Lean.Proofs.Field.Binary.MaskedMul
+public import Plonky3Lean.Spec.BinaryField
+
+@[expose] public section
 
 /-!
 # The portable carry-less multiply
