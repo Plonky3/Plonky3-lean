@@ -90,7 +90,8 @@ def header(pf):
 def patches(name):
     out = []
     for phase in ("pre", "post"):
-        for pf in sorted((ROOT / "crates" / name / "patches" / phase).glob("[0-9]*.patch")):
+        for pf in sorted(p for p in (ROOT / "crates" / name / "patches" / phase).glob("[0-9]*.patch")
+                         if not p.name.endswith(".mutation.patch")):
             out.append((phase, pf, header(pf)))
     return out
 
