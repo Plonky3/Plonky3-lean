@@ -15,9 +15,10 @@ target `thumbv7em-none-eabi`
 | Crate | State | Generated lines | Hand-written lines | `opaque` | Mirrored | Patches (pre / post) | Patches with a cost |
 |---|---|---:|---:|---:|---:|---|---|
 | `baby-bear` | extracted | 2949 | 103 | 4 | 0 | 4 / 3 | pre `020`, `030`, `040` |
-| `field` | stub | | 67 | 1 | 5 | 0 / 0 | |
+| `koala-bear` | extracted | 3020 | 103 | 4 | 0 | 0 / 3 | |
+| `field` | stub | | 74 | 2 | 5 | 0 / 0 | |
 | `mds` | scoped | 91 | 8 | 0 | 0 | 0 / 0 | |
-| `monty-31` | scoped | 556 | 277 | 0 | 17 | 0 / 1 | |
+| `monty-31` | scoped | 571 | 277 | 0 | 17 | 0 / 1 | |
 | `poseidon1` | stub | | 67 | 3 | 4 | 0 / 0 | |
 | `poseidon2` | stub | | 64 | 2 | 4 | 0 / 0 | |
 
@@ -44,6 +45,11 @@ in the dependencies of a claim. `baby_bear.BabyBearParameters.Insts.CoreFmtDebug
 | `baby-bear` | `poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | the same |
 | `baby-bear` | `poseidon2.BabyBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | the same |
 | `field` | `p3_field.exponentiation.exp_1725656503` | p3-field is a stub |
+| `field` | `p3_field.exponentiation.exp_1420470955` | the same |
+| `koala-bear` | `koala_bear.KoalaBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` |
+| `koala-bear` | `mds.MDSKoalaBearData.Insts.CoreFmtDebug.fmt` | the same |
+| `koala-bear` | `poseidon1.KoalaBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | the same |
+| `koala-bear` | `poseidon2.KoalaBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | the same |
 | `poseidon1` | `p3_poseidon1.external.FullRoundConstants`, `p3_poseidon1.internal.PartialRoundConstants` (types) | p3-poseidon1 is a stub |
 | `poseidon1` | `p3_poseidon1.Poseidon1.new` | the same |
 | `poseidon2` | `p3_poseidon2.external.ExternalLayerConstants.new`, `p3_poseidon2.Poseidon2.new` | p3-poseidon2 is a stub |
@@ -177,6 +183,77 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.p3_monty_31.utils.halve_u32.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.p3_monty_31.utils.monty_reduce.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.p3_monty_31.utils.sub.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.from_monty.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.halve.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.mul.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.neg.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new.montgomery_form` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new_2d_array.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new_2d_array.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new_array.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.new_array.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBear.sub.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.eq_ext4TwoAdicGenerators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData4.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.DTH_ROOT.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.eq_ext8TwoAdicGenerators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.BinomialExtensionData8.W.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.HALF_P_PLUS_1.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.INV_ROOTS_16.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.INV_ROOTS_8.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_BITS.from_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_BITS.val_eq_32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_GEN.generator` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_MU.from_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_MU.inverse` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_NEG_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_TWO.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.MONTY_ZERO.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.ODD_FACTOR.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.PRIME.coprime_three_pred` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.PRIME.eq_fieldSize` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.PRIME.from_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.PRIME.is_prime` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.ROOTS_16.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.ROOTS_8.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.eq_twoAdicity` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.factorization` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.from_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADICITY.maximal` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADIC_GENERATORS.eq_twoAdicGenerators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADIC_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TWO_ADIC_GENERATORS.sq_succ` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.TrinomialQuinticData.EXT_TWO_ADICITY.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.exp_root_d.exponent` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.field_valid` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.koala_bear.KoalaBearParameters.valid` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.add.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.from_monty.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.halve_u32.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.monty_reduce.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.sub.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.p3_monty_31.utils.to_monty.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon1._.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon1.const_check_1.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2._.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_1.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_2.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_3.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_4.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_5.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_6.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KoalaBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 
 ## Upstream warnings
 

@@ -1,5 +1,6 @@
 import Plonky3Lean.Proofs
 import Plonky3Lean.Claims.BabyBear
+import Plonky3Lean.Claims.KoalaBear
 
 /-!
 # Claims
