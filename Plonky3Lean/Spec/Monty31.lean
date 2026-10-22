@@ -1,5 +1,9 @@
-import Mathlib.Data.ZMod.Basic
-import P3Monty31
+module
+
+public import Mathlib.Data.ZMod.Basic
+public import P3Monty31
+
+@[expose] public section
 
 /-!
 # Monty31: what a `MontyField31` means, for any parameters

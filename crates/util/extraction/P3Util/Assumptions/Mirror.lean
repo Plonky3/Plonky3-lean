@@ -6,7 +6,11 @@
   and nothing elsewhere.
   aeneas rejects inline assembly, so it is transcribed below.
 -/
-import P3Util.Extraction
+module
+
+public import P3Util.Extraction
+
+@[expose] public section
 open CoreModels Aeneas
 open Aeneas.Std hiding namespace core alloc
 open RustM ControlFlow Error

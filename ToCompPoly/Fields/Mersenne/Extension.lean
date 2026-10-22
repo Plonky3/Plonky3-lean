@@ -3,9 +3,11 @@ Copyright (c) 2026 CompPoly. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Thomas Coratger
 -/
-import CompPoly.Fields.PrattCertificate
-import ToCompPoly.Fields.Mersenne.Complex
-import ToCompPoly.ToMathlib.Polynomial.CoeffList
+module
+
+public import CompPoly.Fields.PrattCertificate
+public import ToCompPoly.Fields.Mersenne.Complex
+public import ToCompPoly.ToMathlib.Polynomial.CoeffList
 
 /-!
   # Mersenne31: the binomial extensions of `F` and of `F[i]`
@@ -21,11 +23,13 @@ import ToCompPoly.ToMathlib.Polynomial.CoeffList
   Everything is kernel-checked, without `native_decide`.
 -/
 
+@[expose] public section
+
 open Polynomial
 
 namespace Mersenne31
 
-open Complex
+open _root_.Mersenne31.Complex
 
 /-! ## The cubic extension of `F` -/
 
@@ -35,7 +39,7 @@ theorem irreducible_ext3 : Irreducible (X ^ 3 - C (5 : Field)) :=
 /-- `5 ^ ((p - 1) / 3)`, the value of `DTH_ROOT` for `X ^ 3 - 5`. -/
 theorem five_pow_div_three : (5 : Field) ^ ((fieldSize - 1) / 3) = 1513477735 := by
   rw [show (5 : Field) = ((5 : ℕ) : Field) by norm_num,
-    natCast_pow_eq 5 1513477735 (by decide) (by decide)]
+    natCast_pow_eq 5 1513477735 (by decide)]
   rfl
 
 /-- `1513477735` is a primitive cube root of unity. -/
@@ -63,7 +67,9 @@ theorem orderOf_ext3Generator :
     (by unfold fieldSize; norm_num) (by decide +kernel) (by decide +kernel)
   intro q hq
   simp only [List.mem_cons, List.not_mem_nil, or_false] at hq
-  rcases hq with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;> norm_num
+  rcases hq with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
+  iterate 7 (on_goal 1 => norm_num)
+  all_goals pratt
 
 /-! ## Non-residues of `F[i]` -/
 
@@ -125,7 +131,7 @@ theorem mk_pow_norm (a b : Field) (k : ℕ) :
 theorem mk_two_one_pow_dth : mk 2 1 ^ ((fieldSize ^ 2 - 1) / 2) = -1 := by
   rw [show (fieldSize ^ 2 - 1) / 2 = (fieldSize + 1) * ((fieldSize - 1) / 2) by unfold fieldSize; norm_num,
     mk_pow_norm, show (2 : Field) * 2 + 1 * 1 = ((5 : ℕ) : Field) by norm_num,
-    natCast_pow_eq 5 2147483646 (by decide) (by decide)]
+    natCast_pow_eq 5 2147483646 (by decide)]
   rw [show ((2147483646 : ℕ) : Field) = -1 by decide, map_neg, map_one]
 
 /-- `(5i) ^ ((p ^ 2 - 1) / 3) = 634005911`, the value of `DTH_ROOT` for `Y ^ 3 - 5i`. -/
@@ -133,7 +139,7 @@ theorem mk_zero_five_pow_dth :
     mk 0 5 ^ ((fieldSize ^ 2 - 1) / 3) = AdjoinRoot.of complexPoly 634005911 := by
   rw [show (fieldSize ^ 2 - 1) / 3 = (fieldSize + 1) * ((fieldSize - 1) / 3) by unfold fieldSize; norm_num,
     mk_pow_norm, show (0 : Field) * 0 + 5 * 5 = ((25 : ℕ) : Field) by norm_num,
-    natCast_pow_eq 25 634005911 (by decide) (by decide)]
+    natCast_pow_eq 25 634005911 (by decide)]
   rfl
 
 /-! ## A generator of `F[i]` -/
@@ -160,8 +166,7 @@ theorem orderOf_mk_twelve_one : orderOf (mk 12 1) = fieldSize ^ 2 - 1 := by
     intro h
     have h' := hof h
     revert h'
-    have he : (fieldSize - 1) / q < 2 ^ 64 := lt_of_le_of_lt (Nat.div_le_self _ _) (by decide)
-    refine natCast_pow_ne_one 145 he ?_
+    refine natCast_pow_ne_one 145 ?_
     rcases prime_dvd_fieldSize_sub_one hq hq1 with rfl | rfl | rfl | rfl | rfl | rfl | rfl <;> decide
 
 /-! ## The order-`2 ^ 33` element of QM31 -/
@@ -186,7 +191,7 @@ theorem orderOf_qm31TwoAdicGenerator : orderOf qm31TwoAdicGenerator = 2 ^ 33 := 
     AdjoinRoot.of.injective_of_degree_ne_zero (by rw [degree_X_pow_sub_C (by norm_num)]; decide)
   have h32 := orderOf_injective (AdjoinRoot.of (X ^ 2 - C (mk 2 1))).toMonoidHom hinj
     (twoAdicGenerators[complexTwoAdicity])
-  simp only [RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe] at h32
+  simp only [RingHom.toMonoidHom_eq_coe, MonoidHom.coe_ofClass] at h32
   rw [twoAdicGenerators_order _ (by decide)] at h32
   exact orderOf_eq_two_pow_succ_of_sq (k := 31) qm31TwoAdicGenerator_sq h32
 

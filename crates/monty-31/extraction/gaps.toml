@@ -3,249 +3,153 @@
 
 [charon]
 crate  = "p3_monty_31"
-errors = 7
-error_sites = ["library/core/src/iter/adapters/zip.rs:74:1", "library/core/src/slice/iter.rs:1499:1", "library/core/src/slice/iter/macros.rs:153:9"]
+errors = 0
+error_sites = []
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl core::cmp::Ord}::cmp"
-source = "monty-31/src/monty_31.rs:130"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl core::cmp::PartialEq}::eq"
-source = "monty-31/src/monty_31.rs:34"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl core::cmp::PartialOrd}::partial_cmp"
-source = "monty-31/src/monty_31.rs:137"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl core::default::Default}::default"
-source = "monty-31/src/monty_31.rs:34"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl core::fmt::Debug}::fmt"
-source = "monty-31/src/monty_31.rs:149"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl core::fmt::Display}::fmt"
-source = "monty-31/src/monty_31.rs:143"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl core::hash::Hash}::hash"
-source = "monty-31/src/monty_31.rs:34"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl core::iter::traits::accum::Product}::product"
-source = "field/src/op_assign_macros.rs:91"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl core::iter::traits::accum::Sum}::sum"
-source = "monty-31/src/monty_31.rs:773"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl core::ops::arith::AddAssign}::add_assign"
-source = "field/src/op_assign_macros.rs:28"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl core::ops::arith::Add}::add"
-source = "monty-31/src/monty_31.rs:733"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl core::ops::arith::DivAssign}::div_assign"
-source = "field/src/op_assign_macros.rs:214"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl core::ops::arith::Div}::div"
-source = "field/src/op_assign_macros.rs:206"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl core::ops::arith::MulAssign}::mul_assign"
-source = "field/src/op_assign_macros.rs:84"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl core::ops::arith::Mul}::mul"
-source = "monty-31/src/monty_31.rs:760"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl core::ops::arith::Neg}::neg"
-source = "monty-31/src/monty_31.rs:751"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl core::ops::arith::SubAssign}::sub_assign"
-source = "field/src/op_assign_macros.rs:64"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl core::ops::arith::Sub}::sub"
-source = "monty-31/src/monty_31.rs:742"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::field::Field}::BENEFITS_FROM_LOCKSTEP_EVALUATION"
-source = "monty-31/src/monty_31.rs:456"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::field::Field}::GENERATOR"
-source = "monty-31/src/monty_31.rs:454"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::field::Field}::order"
-source = "monty-31/src/monty_31.rs:492"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::field::Field}::try_inverse"
-source = "monty-31/src/monty_31.rs:458"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::field::Field}::try_inverse::NUM_PRIME_BITS"
-source = "monty-31/src/monty_31.rs:464"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::NEG_ONE"
-source = "monty-31/src/monty_31.rs:217"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::ONE"
-source = "monty-31/src/monty_31.rs:215"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::TWO"
-source = "monty-31/src/monty_31.rs:216"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::ZERO"
-source = "monty-31/src/monty_31.rs:214"
+item   = "p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::div_2exp_u64"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::dot_product"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::from_prime_subfield"
-source = "monty-31/src/monty_31.rs:220"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::mul_2exp_u64"
-source = "monty-31/src/monty_31.rs:230"
+source = ""
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::sum_array"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::field::PrimeField32}::ORDER_U32"
-source = "monty-31/src/monty_31.rs:694"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::field::PrimeField32}::as_canonical_u32"
-source = "monty-31/src/monty_31.rs:697"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::field::PrimeField64}::ORDER_U64"
-source = "monty-31/src/monty_31.rs:678"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::field::PrimeField64}::as_canonical_u64"
-source = "monty-31/src/monty_31.rs:681"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::field::PrimeField}::as_canonical_biguint"
-source = "monty-31/src/monty_31.rs:672"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_checked"
-source = "field/src/integers.rs:105"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_checked"
-source = "monty-31/src/monty_31.rs:529"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_checked"
-source = "monty-31/src/monty_31.rs:554"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_checked"
-source = "monty-31/src/monty_31.rs:582"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_checked"
-source = "monty-31/src/monty_31.rs:604"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_checked"
-source = "monty-31/src/monty_31.rs:631"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_checked"
-source = "monty-31/src/monty_31.rs:653"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked"
-source = "field/src/integers.rs:116"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked"
-source = "monty-31/src/monty_31.rs:538"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked"
-source = "monty-31/src/monty_31.rs:568"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked"
-source = "monty-31/src/monty_31.rs:590"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked"
-source = "monty-31/src/monty_31.rs:617"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked"
-source = "monty-31/src/monty_31.rs:639"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked"
-source = "monty-31/src/monty_31.rs:666"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_int"
-source = "field/src/integers.rs:94"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_int"
-source = "monty-31/src/monty_31.rs:521"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_int"
-source = "monty-31/src/monty_31.rs:546"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_int"
-source = "monty-31/src/monty_31.rs:575"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_int"
-source = "monty-31/src/monty_31.rs:597"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_int"
-source = "monty-31/src/monty_31.rs:624"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_int"
-source = "monty-31/src/monty_31.rs:646"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl}::HALF"
-source = "monty-31/src/monty_31.rs:125"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl}::MONTY_POWERS_OF_TWO"
-source = "monty-31/src/monty_31.rs:115"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl}::new_2d_array"
-source = "monty-31/src/monty_31.rs:101"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl}::new_array"
-source = "monty-31/src/monty_31.rs:88"
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_monty_31::monty_31::{impl}::new_monty"
-source = "monty-31/src/monty_31.rs:71"
+source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_monty_31::monty_31::{impl}::to_u32"
-source = "monty-31/src/monty_31.rs:80"
+source = ""

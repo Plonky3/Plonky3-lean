@@ -3,10 +3,12 @@ Copyright (c) 2026 CompPoly. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Thomas Coratger
 -/
-import Mathlib.Data.List.Prime
-import Mathlib.Data.Nat.Prime.Basic
-import Mathlib.GroupTheory.OrderOfElement
-import Mathlib.RingTheory.AdjoinRoot
+module
+
+public import Mathlib.Data.List.Prime
+public import Mathlib.Data.Nat.Prime.Basic
+public import Mathlib.GroupTheory.OrderOfElement
+public import Mathlib.RingTheory.AdjoinRoot
 
 /-!
 # Arithmetic in `R[X] / (f)` on coefficient lists, that the kernel evaluates
@@ -22,6 +24,8 @@ This file gives list versions of the operations and proves them correct:
 
 `m` is the list of low coefficients of `X ^ D` modulo `f`: `X ^ D - toPoly m = f`.
 -/
+
+@[expose] public section
 
 open Polynomial
 
@@ -164,15 +168,15 @@ theorem mk_toPoly_powModAux (hX : AdjoinRoot.mk f (X ^ D) = AdjoinRoot.mk f (toP
     unfold powModAux
     by_cases h0 : e = 0
     · subst h0; simp
-    · rw [if_neg h0]
+    · simp only [h0, ↓reduceIte]
       have he2 : e / 2 < 2 ^ fuel := by rw [pow_succ] at he; omega
       have hsq : AdjoinRoot.mk f (toPoly (powModAux D m fuel (mulMod D m a a) (e / 2))) =
           AdjoinRoot.mk f (toPoly a) ^ (2 * (e / 2)) := by
         rw [ih _ _ he2, mk_toPoly_mulMod hX, pow_mul, sq]
       rcases Nat.mod_two_eq_zero_or_one e with h | h
-      · simp only [h, zero_ne_one, if_false]
+      · simp only [h, zero_ne_one, ↓reduceIte]
         rw [hsq]; congr 1; omega
-      · simp only [h, if_true]
+      · simp only [h, ↓reduceIte]
         rw [mk_toPoly_mulMod hX, hsq, ← pow_succ']
         congr 1; omega
 

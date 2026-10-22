@@ -5,8 +5,12 @@
 -- The template declares nothing. The imports supply what the generated code
 -- names from other crates: p3-util's `gcd_inner` and `branch_hint`, and the
 -- `core` models in `HaxExt`.
-import Aeneas
-import CoreModels
-import P3Goldilocks.Extraction.Types
-import P3Util
-import HaxExt
+module
+
+public import Aeneas
+public import CoreModels
+public import P3Goldilocks.Extraction.Types
+public import P3Util
+public import HaxExt
+
+@[expose] public section

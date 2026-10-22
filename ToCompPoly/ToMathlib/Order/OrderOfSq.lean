@@ -3,14 +3,17 @@ Copyright (c) 2026 CompPoly. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Derek Sorensen
 -/
-import Mathlib.GroupTheory.OrderOfElement
-import Mathlib.Tactic.Positivity
+module
 
+public import Mathlib.GroupTheory.OrderOfElement
+public import Mathlib.Tactic.Positivity
 /-!
 # Orders of square roots of `2`-power roots of unity
 
 Upstreaming candidate (mathlib).
 -/
+
+@[expose] public section
 
 /-- If `x ^ 2` has order `2 ^ (k + 1)`, then `x` has order `2 ^ (k + 2)`: a square
 root of a primitive `2 ^ (k + 1)`-th root of unity is a primitive

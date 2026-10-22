@@ -1,6 +1,12 @@
-import Plonky3Lean.Lib.Scalar
-import Plonky3Lean.Lib.Scalar.U64
-import HaxExt
+module
+
+public import Plonky3Lean.Lib.Scalar
+public import Plonky3Lean.Lib.Scalar.U64
+public import HaxExt
+-- `IScalar.overflowing_add`'s body, which Aeneas does not expose and which the proofs below unfold.
+import all Aeneas.Std.Scalar.OverflowingOps.Add
+
+@[expose] public section
 
 /-!
 # Signed integer primitives, as natural numbers and integers
@@ -29,9 +35,9 @@ theorem bv32_add_nonneg (a b : BitVec 32) (ha : a.toNat < 2 ^ 31) (hb : b.toNat 
       BitVec.saddOverflow a b = decide (2 ^ 31 ≤ a.toNat + b.toNat) := by
   refine ⟨by rw [BitVec.toNat_add]; exact Nat.mod_eq_of_lt (by omega), ?_⟩
   have hai : a.toInt = (a.toNat : Int) := by
-    rw [BitVec.toInt_eq_toNat_cond, if_pos (by omega)]
+    rw [BitVec.toInt_eq_toNat_cond, ite_eq_left (by omega)]
   have hbi : b.toInt = (b.toNat : Int) := by
-    rw [BitVec.toInt_eq_toNat_cond, if_pos (by omega)]
+    rw [BitVec.toInt_eq_toNat_cond, ite_eq_left (by omega)]
   simp only [BitVec.saddOverflow, hai, hbi]
   by_cases h : 2 ^ 31 ≤ a.toNat + b.toNat
   · rw [decide_eq_true h, decide_eq_true (by omega)]; rfl
@@ -43,6 +49,7 @@ theorem i32_overflowing_add_of_u32 (x y : Std.U32) (hx : x.val < 2 ^ 31) (hy : y
     (IScalar.hcast .U32 r.1).val = x.val + y.val ∧ r.2 = decide (2 ^ 31 ≤ x.val + y.val) := by
   intro r
   have h := bv32_add_nonneg x.bv y.bv hx hy
+  simp only [r, IScalar.overflowing_add]
   refine ⟨?_, h.2⟩
   show ((x.bv.setWidth 32 + y.bv.setWidth 32).signExtend 32).toNat = x.bv.toNat + y.bv.toNat
   rw [BitVec.signExtend_eq]
@@ -103,11 +110,17 @@ theorem core.cmp.Ord.min.default_u32.spec (x y : Std.U32) :
     CoreModels.core.cmp.Ord.min.default CoreModels.core.U32.Insts.CoreCmpOrd x y
       ⦃ r => r.val = min x.val y.val ⦄ := by
   simp only [CoreModels.core.cmp.Ord.min.default, CoreModels.core.cmp.min,
-    CoreModels.core.U32.Insts.CoreCmpOrd, CoreModels.core.mkUOrd, bind_tc_ok]
+    CoreModels.core.U32.Insts.CoreCmpOrd, CoreModels.core.mkUOrd]
   rcases Nat.lt_trichotomy x.val y.val with h | h | h
   · simp [compare_lt_iff_lt.mpr h]; omega
   · simp [h]
   · simp [compare_gt_iff_gt.mpr h]; omega
+
+/-- `x.min(y)` on `u32`s, called as the method of `u32`'s `Ord` instance. -/
+@[step]
+theorem core.U32.Insts.CoreCmpOrd.min.spec (x y : Std.U32) :
+    CoreModels.core.U32.Insts.CoreCmpOrd.min x y ⦃ r => r.val = min x.val y.val ⦄ :=
+  core.cmp.Ord.min.default_u32.spec x y
 
 /-- `x.cmp(y)` on `u32`s. -/
 theorem core.U32.Insts.CoreCmpOrd.cmp.eq (x y : Std.U32) :

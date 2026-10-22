@@ -1,5 +1,9 @@
-import Plonky3Lean.Lib.Scalar
-import Plonky3Lean.Spec.Monty31
+module
+
+public import Plonky3Lean.Lib.Scalar
+public import Plonky3Lean.Spec.Monty31
+
+@[expose] public section
 
 /-!
 # Monty31: the `u32` helpers, for any valid parameters
@@ -44,7 +48,7 @@ theorem monty_core (x t P : ℕ) (hP : 0 < P) (hP31 : P < 2 ^ 31) (hx : x < 2 ^ 
     have htP : t * P < 2 ^ 32 * P := Nat.mul_lt_mul_of_pos_right ht hP
     have hkp : k < P := Nat.lt_of_mul_lt_mul_right (a := 2 ^ 32) (by rw [Nat.mul_comm P]; omega)
     have hr : r = P - k := by
-      simp only [r, h1, if_pos hlt, Nat.mod_eq_of_lt (by omega : 2 ^ 32 - k < 2 ^ 32)]
+      simp only [r, h1, ite_eq_left hlt, Nat.mod_eq_of_lt (by omega : 2 ^ 32 - k < 2 ^ 32)]
       rw [show 2 ^ 32 - k + P = (P - k) + 2 ^ 32 by omega, Nat.add_mod_right,
         Nat.mod_eq_of_lt (by omega)]
     rw [hr]; refine ⟨by omega, ?_⟩
@@ -57,7 +61,7 @@ theorem monty_core (x t P : ℕ) (hP : 0 < P) (hP31 : P < 2 ^ 31) (hx : x < 2 ^ 
     obtain ⟨k, hk⟩ : ∃ k, x - t * P = k * 2 ^ 32 := ⟨(x - t * P) / 2 ^ 32, by omega⟩
     have hkp : k < P := Nat.lt_of_mul_lt_mul_right (a := 2 ^ 32) (by rw [Nat.mul_comm P]; omega)
     have hr : r = k := by
-      simp only [r, if_neg (not_lt.mpr hlt)]
+      simp only [r, ite_eq_right (not_lt.mpr hlt)]
       rw [show x + 2 ^ 64 - t * P = k * 2 ^ 32 + 2 ^ 64 by omega, Nat.add_mod_right,
         Nat.mod_eq_of_lt (by omega : k * 2 ^ 32 < 2 ^ 64), Nat.mul_div_cancel _ (by norm_num),
         Nat.mod_eq_of_lt (by omega : k < 2 ^ 32), Nat.add_zero, Nat.mod_eq_of_lt (by omega)]
@@ -87,7 +91,7 @@ theorem utils.monty_reduce.spec (hv : Valid inst p mu) (x : Std.U64)
     have hi6 : i6.val = p.val := by
       rw [i6_post, UScalar.cast_val_eq, UScalarTy.U64_numBits_eq]; omega
     have ht : t.val = x.val * mu.val % 2 ^ 64 % 2 ^ 32 := by
-      rw [t_post1, UScalar.val_and, i4_post, UScalar.cast_val_eq, UScalarTy.U64_numBits_eq,
+      rw [t_post, UScalar.val_and, i4_post, UScalar.cast_val_eq, UScalarTy.U64_numBits_eq,
         show (4294967295#u32).val % 2 ^ 64 = 2 ^ 32 - 1 by rfl, Nat.and_two_pow_sub_one_eq_mod,
         i2_post, hi1]
     have htlt : t.val < 2 ^ 32 := by rw [ht]; exact Nat.mod_lt _ (by norm_num)
@@ -99,13 +103,13 @@ theorem utils.monty_reduce.spec (hv : Valid inst p mu) (x : Std.U64)
     (by rw [ht]; exact monty_t_cong x.val p.val mu.val hv.inv)
   have hu : u.val = t.val * p.val := by rw [u_post, hi6]
   have hhi : x_sub_u_hi.val = (x.val + 2 ^ 64 - t.val * p.val) % 2 ^ 64 / 2 ^ 32 % 2 ^ 32 := by
-    rw [x_sub_u_hi_post, UScalar.cast_val_eq, UScalarTy.U32_numBits_eq, i8_post1,
-      Nat.shiftRight_eq_div_pow, x_sub_u_post2, hu]
-  rw [x_sub_u_post1, hu]
+    rw [x_sub_u_hi_post, UScalar.cast_val_eq, UScalarTy.U32_numBits_eq, i8_post,
+      Nat.shiftRight_eq_div_pow, x_sub_u_post, hu]
+  rw [over_post, hu]
   by_cases hlt : x.val < t.val * p.val
-  · simp only [hlt, decide_true, if_true, bind_tc_ok]
+  · simp only [hlt, decide_true, ite_true]
     step*
-  · simp only [hlt, decide_false, Bool.false_eq_true, if_false, bind_tc_ok]
+  · simp only [hlt, decide_false, Bool.false_eq_true, ite_false]
     step*
 /-- `from_monty(x)` takes `x` out of Montgomery form: the canonical `r` with `r · 2^32 ≡ x (mod p)`.
 
@@ -132,9 +136,9 @@ theorem utils.add.spec (hv : Valid inst p mu) (a b : Std.U32) (ha : a.val < p.va
   step*
   all_goals
     rename_i h
-    simp only [corr_sum_post1, decide_eq_true_eq] at h
+    simp only [over_post, decide_eq_true_eq] at h
     have hs := sum_post
-    have hc := corr_sum_post2
+    have hc := corr_sum_post
     rcases Nat.lt_or_ge (a.val + b.val) p.val with hlt | hge
     · rw [Nat.mod_eq_of_lt hlt]; omega
     · rw [Nat.mod_eq_sub_mod hge, Nat.mod_eq_of_lt (by omega)]; omega
@@ -148,16 +152,16 @@ theorem utils.sub.spec (hv : Valid inst p mu) (a b : Std.U32) (ha : a.val < p.va
   have hp := hv.lt
   rw [hv.prime]
   step*
-  rw [diff_post1]
+  rw [over_post]
   by_cases h : a.val < b.val
-  · simp only [h, decide_true, if_true, bind_tc_ok]
+  · simp only [h, decide_true, ite_true]
     step*
-    rw [r_post, diff_post2, Nat.mod_eq_of_lt (by omega : a.val + 2 ^ 32 - b.val < 2 ^ 32),
+    rw [r_post, diff_post, Nat.mod_eq_of_lt (by omega : a.val + 2 ^ 32 - b.val < 2 ^ 32),
       Nat.mod_eq_of_lt (by omega : a.val + p.val - b.val < p.val)]
     omega
-  · simp only [h, decide_false, Bool.false_eq_true, if_false, bind_tc_ok]
+  · simp only [h, decide_false, Bool.false_eq_true, ite_false]
     step*
-    rw [r_post, diff_post2, Nat.add_zero,
+    rw [r_post, diff_post, Nat.add_zero,
       show a.val + p.val - b.val = (a.val - b.val) + p.val by omega, Nat.add_mod_right,
       Nat.mod_eq_of_lt (by omega : a.val - b.val < p.val)]
     omega
@@ -182,14 +186,14 @@ theorem utils.halve_u32.spec {FP : Type} {inst : data_traits.FieldParameters FP}
   step*
   case h1 h0 =>
     have : lo_bit.val = 0 := by rw [h0]; rfl
-    rw [hlo lo_bit lo_bit_post1] at this
-    rw [hshr shr shr_post1]
+    rw [hlo lo_bit lo_bit_post] at this
+    rw [hshr shr shr_post]
     refine ⟨by omega, ?_⟩
     rw [show a.val / 2 * 2 = a.val by omega, Nat.mod_eq_of_lt ha]
   case h2 h0 =>
     have : lo_bit.val ≠ 0 := fun h' => h0 (UScalar.eq_of_val_eq (by rw [h']; rfl))
-    rw [hlo lo_bit lo_bit_post1] at this
-    rw [shr_corr_post, hshr shr shr_post1, hhv]
+    rw [hlo lo_bit lo_bit_post] at this
+    rw [shr_corr_post, hshr shr shr_post, hhv]
     refine ⟨by omega, ?_⟩
     rw [show (a.val / 2 + (p.val + 1) / 2) * 2 = a.val + p.val by omega, Nat.add_mod_right,
       Nat.mod_eq_of_lt ha]

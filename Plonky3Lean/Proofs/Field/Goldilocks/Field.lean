@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.Goldilocks.PowersOfTwo
+module
+
+public import Plonky3Lean.Proofs.Field.Goldilocks.PowersOfTwo
+
+@[expose] public section
 
 /-!
 # Goldilocks: the operators read in the field
@@ -9,7 +13,7 @@ The residue statements of `Arith`, restated through `toField`.
 open Aeneas Aeneas.Std CoreModels p3_goldilocks Plonky3Lean.Lib
 open Plonky3Lean.Spec.Goldilocks
 
-namespace Plonky3Lean.Proofs.Goldilocks
+namespace Plonky3Lean.Proofs.P3Goldilocks
 
 /-- `reduce128(x)` stands for `x`. -/
 theorem reduce128.field (x : Std.U128) :
@@ -48,4 +52,4 @@ theorem is_zero.field (a : goldilocks.Goldilocks) :
     rw [ZMod.natCast_eq_zero_iff, Nat.dvd_iff_mod_eq_zero]
     rfl)
 
-end Plonky3Lean.Proofs.Goldilocks
+end Plonky3Lean.Proofs.P3Goldilocks

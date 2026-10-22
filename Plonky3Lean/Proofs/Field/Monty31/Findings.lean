@@ -1,6 +1,10 @@
-import P3BabyBear
-import Plonky3Lean.Proofs.Field.BabyBear.Arith
-import Plonky3Lean.Proofs.Field.Monty31.Reduce
+module
+
+public import P3BabyBear
+public import Plonky3Lean.Proofs.Field.BabyBear.Arith
+public import Plonky3Lean.Proofs.Field.Monty31.Reduce
+
+@[expose] public section
 
 /-!
 # Monty31: a valid prime below `2^30`
@@ -31,7 +35,7 @@ theorem thirtyBit_valid : Valid thirtyBit 536870909#u32 894784853#u32 where
     unfold baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.MONTY_BITS
     rfl
   monty_mu := rfl
-  mask := Proofs.BabyBear.MontyParams.MONTY_MASK.eq
+  mask := Proofs.P3BabyBear.MontyParams.MONTY_MASK.eq
   odd := by decide
   lt := by decide
   inv := by decide

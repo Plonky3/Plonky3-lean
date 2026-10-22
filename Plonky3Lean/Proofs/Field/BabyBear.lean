@@ -1,6 +1,10 @@
-import CompPoly.Fields.BabyBear
-import Plonky3Lean.Lib.RustM
-import Plonky3Lean.Spec.BabyBear
+module
+
+public import CompPoly.Fields.BabyBear
+public import Plonky3Lean.Lib
+public import Plonky3Lean.Spec.BabyBear
+
+@[expose] public section
 
 /-!
 # BabyBear: proofs
@@ -20,7 +24,7 @@ open p3_baby_bear
 open Plonky3Lean.Spec.BabyBear
 open Plonky3Lean.Lib
 
-namespace Plonky3Lean.Proofs.BabyBear
+namespace Plonky3Lean.Proofs.P3BabyBear
 
 /-! ## `BabyBearParameters`
 
@@ -106,79 +110,107 @@ theorem baby_bear.BabyBearParameters.TWO_ADICITY.maximal :
 `BabyBear::new` (which is `MontyField31::new` at `BabyBearParameters`) and
 the table constructors `new_array` and `new_2d_array`. -/
 
-/-- `MONTY_MU` is BabyBear's Montgomery inverse modulo `2^32`, as a `u32`
-wrapping product, which is the form `MontyField31::new` asserts it in. -/
-theorem mu_wrapping : U32.wrapping_mul 2013265921#u32 2281701377#u32 = 1#u32 := by
-  apply UScalar.eq_of_val_eq
-  simp [U32.wrapping_mul_val_eq, U32.size, U32.numBits]
-
 /-- `BabyBear::new x` never panics and returns the Montgomery form
 `x · 2^32 mod p`. Rust checks four facts about the parameters in a
 `const { assert!(..) }` block; aeneas keeps them as runtime `massert`s, so this
 includes that they pass. -/
-theorem baby_bear.BabyBear.new.montgomery_form (x : Std.U32) :
-    p3_monty_31.monty_31.MontyField31.new MontyParams x
-      ⦃ r => r.value.val = x.val * 2 ^ 32 % BabyBear.fieldSize ⦄ := by
+theorem baby_bear.BabyBear.new.montgomery_form (v : Std.U32) :
+    p3_monty_31.monty_31.MontyField31.new MontyParams v
+      ⦃ r => r.value.val = v.val * 2 ^ 32 % BabyBear.fieldSize ⦄ := by
+  have hv : v.val < 2 ^ 32 := by simpa using v.hBounds
   unfold p3_monty_31.monty_31.MontyField31.new p3_monty_31.utils.to_monty
-  simp only [bind_tc_ok]
-  unfold baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.PRIME
+  rw [show MontyParams.PRIME = .ok PRIME from rfl, show MontyParams.MONTY_BITS = .ok MONTY_BITS from rfl,
+    show MontyParams.MONTY_MU = .ok MONTY_MU from rfl]
+  unfold PRIME MONTY_BITS MONTY_MU
+    baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.PRIME
     baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.MONTY_BITS
     baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.MONTY_MU
-    CoreModels.core.num.U32.wrapping_mul CoreModels.rust_primitives.arithmetic.wrapping_mul_u32
-  simp only [mu_wrapping]
-  step as ⟨ h1, h1p ⟩
-  step
-  step as ⟨ i2, i2p ⟩
-  step
-  step
-  step
-  step as ⟨ y, yp ⟩
-  step as ⟨ z, zp1, zp2 ⟩
-  step as ⟨ q, qp ⟩
-  step as ⟨ w, wp ⟩
-  have hx : x.val < 2 ^ 32 := by simpa using x.hBounds
-  have hy : y.val = x.val := by
-    rw [yp]; exact UScalar.cast_val_mod_pow_greater_numBits_eq _ _ (by simp)
-  have hq : q.val = 2013265921 := by rw [qp]; simp
-  have hz : z.val = x.val * 2 ^ 32 := by
-    rw [zp1, hy, Nat.shiftLeft_eq, U64.size, U64.numBits]
+  -- `to_monty` casts `v` to `u64` (`y`), shifts it left by 32 (`z`), and reduces
+  -- it modulo `p` cast to `u64` (`q`), giving `x`.
+  step*
+  rename_i y _ hy z _ hz q _ hq
+  have hyv : y.val = v.val := by
+    rw [hy]; exact UScalar.cast_val_mod_pow_greater_numBits_eq _ _ (by simp)
+  have hqv : q.val = 2013265921 := by rw [hq]; simp
+  have hzv : z.val = v.val * 2 ^ 32 := by
+    rw [hz, hyv, Nat.shiftLeft_eq, U64.size, U64.numBits]
     apply Nat.mod_eq_of_lt
     simp only [UScalarTy.U64_numBits_eq]
     omega
-  have hw : w.val = x.val * 2 ^ 32 % 2013265921 := by rw [wp, hz, hq]
-  have hlt : w.val < 2 ^ UScalarTy.U32.numBits := by
-    rw [hw]; have := Nat.mod_lt (x.val * 2 ^ 32) (show 2013265921 > 0 by decide)
+  have hwv : x.val = v.val * 2 ^ 32 % 2013265921 := by rw [x_post, hzv, hqv]
+  have hlt : x.val < 2 ^ UScalarTy.U32.numBits := by
+    rw [hwv]; have := Nat.mod_lt (v.val * 2 ^ 32) (show 2013265921 > 0 by decide)
     simp only [UScalarTy.U32_numBits_eq]; omega
-  rw [UScalar.cast_val_mod_pow_of_inBounds_eq _ _ hlt, hw]
+  rw [UScalar.cast_val_mod_pow_of_inBounds_eq _ _ hlt, hwv]
   rfl
 
 /-- `BabyBear::new` never panics: the existential half of `new.montgomery_form`. -/
 theorem baby_bear.BabyBear.new.ok (x : Std.U32) :
     ∃ v, p3_monty_31.monty_31.MontyField31.new MontyParams x = .ok v := by
-  obtain ⟨v, hv, -⟩ := Aeneas.Std.WP.spec_imp_exists (baby_bear.BabyBear.new.montgomery_form x)
+  obtain ⟨v, hv, -⟩ := Plonky3Lean.Lib.spec_imp_exists (baby_bear.BabyBear.new.montgomery_form x)
   exact ⟨v, hv⟩
 
-/-- `BabyBear::new_array` never panics. It is a hand-written transcription
-(`crates/monty-31/extraction/P3Monty31/Assumptions/Mirror.lean`): aeneas
-drops the Rust function. -/
+/-- What `new` does to one input: the stored value is its Montgomery form. -/
+def MontyRel (x : Std.U32) (r : Element) : Prop :=
+  r.value.val = x.val * 2 ^ 32 % BabyBear.fieldSize
+
+/-- Cloning a `BabyBear` returns it, and never fails. -/
+theorem baby_bear.BabyBear.clone.ok (inst : CoreModels.core.clone.Clone baby_bear.BabyBearParameters)
+    (x : Element) :
+    ∃ v, (p3_monty_31.monty_31.MontyField31.Insts.CoreCloneClone inst MontyParams).clone x
+      = .ok v := by
+  refine ⟨x, ?_⟩
+  show p3_monty_31.monty_31.MontyField31.Insts.CoreCloneClone.clone inst MontyParams x = _
+  unfold p3_monty_31.monty_31.MontyField31.Insts.CoreCloneClone.clone
+    CoreModels.core.U32.Insts.CoreCloneClone.clone
+    CoreModels.core.marker.PhantomData.Insts.CoreCloneClone.clone
+  rw [bind_ok, bind_ok]
+
+/-- `BabyBear::new_array` applies `new` elementwise: output `i` is the Montgomery
+form of input `i`. The Rust `while` loop is extracted as aeneas's `loop`. -/
+theorem baby_bear.BabyBear.new_array.montgomery_form {N : Std.Usize} (input : Array Std.U32 N) :
+    p3_monty_31.monty_31.MontyField31.new_array MontyParams input
+      ⦃ r => List.Forall₂ MontyRel input.val r.val ⦄ := by
+  unfold p3_monty_31.monty_31.MontyField31.new_array
+  obtain ⟨mf, hmf⟩ : ∃ mf, p3_monty_31.monty_31.MontyField31.new_monty MontyParams 0#u32 = .ok mf :=
+    ⟨_, rfl⟩
+  rw [hmf, bind_ok]
+  obtain ⟨out, hout⟩ := array_repeat_ok N _ (baby_bear.BabyBear.clone.ok _) mf
+  rw [hout, bind_ok]
+  unfold p3_monty_31.monty_31.MontyField31.new_array_loop
+  exact elementwise_loop _ MontyRel baby_bear.BabyBear.new.montgomery_form input out 0#usize
+    (by simp) (by simp)
+
+/-- `BabyBear::new_array` never panics. -/
 theorem baby_bear.BabyBear.new_array.never_panics {N : Std.Usize} (input : Array Std.U32 N) :
     ∃ r, p3_monty_31.monty_31.MontyField31.new_array MontyParams input = .ok r := by
-  obtain ⟨l', hl', hlen⟩ := mapM_total _ baby_bear.BabyBear.new.ok input.val
-  unfold p3_monty_31.monty_31.MontyField31.new_array
-  rw [hl']
-  have h : l'.length = N.val := by rw [hlen]; exact input.property
-  exact ⟨⟨l', h⟩, by simp [h]⟩
+  obtain ⟨r, hr, -⟩ := spec_imp_exists (baby_bear.BabyBear.new_array.montgomery_form input)
+  exact ⟨r, hr⟩
 
-/-- `BabyBear::new_2d_array` never panics; hand-transcribed, like `new_array`. -/
+/-- `BabyBear::new_2d_array` applies `new_array` to each row. -/
+theorem baby_bear.BabyBear.new_2d_array.montgomery_form {N M : Std.Usize}
+    (input : Array (Array Std.U32 N) M) :
+    p3_monty_31.monty_31.MontyField31.new_2d_array MontyParams input
+      ⦃ r => List.Forall₂ (fun (row : Array Std.U32 N) (out : Array Element N) =>
+        List.Forall₂ MontyRel row.val out.val) input.val r.val ⦄ := by
+  unfold p3_monty_31.monty_31.MontyField31.new_2d_array
+  obtain ⟨mf, hmf⟩ : ∃ mf, p3_monty_31.monty_31.MontyField31.new_monty MontyParams 0#u32 = .ok mf :=
+    ⟨_, rfl⟩
+  rw [hmf, bind_ok]
+  obtain ⟨row, hrow⟩ := array_repeat_ok N _ (baby_bear.BabyBear.clone.ok _) mf
+  rw [hrow, bind_ok]
+  obtain ⟨out, hout⟩ := array_repeat_ok M _ (array_clone_ok _ (baby_bear.BabyBear.clone.ok _)) row
+  rw [hout, bind_ok]
+  unfold p3_monty_31.monty_31.MontyField31.new_2d_array_loop
+  exact elementwise_loop _ _ baby_bear.BabyBear.new_array.montgomery_form input out 0#usize
+    (by simp) (by simp)
+
+/-- `BabyBear::new_2d_array` never panics. -/
 theorem baby_bear.BabyBear.new_2d_array.never_panics {N M : Std.Usize}
     (input : Array (Array Std.U32 N) M) :
     ∃ r, p3_monty_31.monty_31.MontyField31.new_2d_array MontyParams input = .ok r := by
-  obtain ⟨l', hl', hlen⟩ :=
-    mapM_total _ (fun a => baby_bear.BabyBear.new_array.never_panics a) input.val
-  unfold p3_monty_31.monty_31.MontyField31.new_2d_array
-  rw [hl']
-  have h : l'.length = M.val := by rw [hlen]; exact input.property
-  exact ⟨⟨l', h⟩, by simp [h]⟩
+  obtain ⟨r, hr, -⟩ := spec_imp_exists (baby_bear.BabyBear.new_2d_array.montgomery_form input)
+  exact ⟨r, hr⟩
 
 /-! ## The Poseidon round-constant length assertions
 
@@ -196,13 +228,10 @@ theorem poseidon1.const_check_1.holds : poseidon1.const_check_1 ⦃ _ => True �
     unfold poseidon1.BABYBEAR_POSEIDON1_RC_24; exact baby_bear.BabyBear.new_2d_array.never_panics _
   unfold poseidon1.const_check_1
     poseidon1.BABYBEAR_POSEIDON1_HALF_FULL_ROUNDS poseidon1.BABYBEAR_POSEIDON1_PARTIAL_ROUNDS_24
-  simp only [ht, bind_tc_ok, CoreModels.core.slice.Slice.len,
-    CoreModels.rust_primitives.slice.slice_length]
+  rw [ht, bind_ok]
+  simp only [CoreModels.core.array.Array.as_slice, CoreModels.rust_primitives.slice.array_as_slice,
+    CoreModels.core.slice.Slice.len, CoreModels.rust_primitives.slice.slice_length, bind_ok]
   step*
-  all_goals
-    simp only [not_not]
-    apply UScalar.eq_of_val_eq
-    simp_all
 
 /-! ### `poseidon2` -/
 
@@ -211,21 +240,19 @@ theorem poseidon2.const_check_1.holds : poseidon2.const_check_1 ⦃ _ => True �
   obtain ⟨t, ht⟩ : ∃ t, poseidon2.BABYBEAR_POSEIDON2_RC_16_EXTERNAL_FINAL = .ok t := by
     unfold poseidon2.BABYBEAR_POSEIDON2_RC_16_EXTERNAL_FINAL; exact baby_bear.BabyBear.new_2d_array.never_panics _
   unfold poseidon2.const_check_1 poseidon2.BABYBEAR_POSEIDON2_HALF_FULL_ROUNDS
-  simp only [ht, bind_tc_ok, CoreModels.core.slice.Slice.len,
-    CoreModels.rust_primitives.slice.slice_length]
+  rw [ht, bind_ok]
+  simp only [CoreModels.core.array.Array.as_slice, CoreModels.rust_primitives.slice.array_as_slice,
+    CoreModels.core.slice.Slice.len, CoreModels.rust_primitives.slice.slice_length, bind_ok]
   step*
-  all_goals
-    simp only [not_not]
-    apply UScalar.eq_of_val_eq
-    simp_all
 
 /-- `baby-bear/src/poseidon2.rs:68`, on `BABYBEAR_POSEIDON2_RC_16_INTERNAL`. -/
 theorem poseidon2.const_check_2.holds : poseidon2.const_check_2 ⦃ _ => True ⦄ := by
   obtain ⟨t, ht⟩ : ∃ t, poseidon2.BABYBEAR_POSEIDON2_RC_16_INTERNAL = .ok t := by
     unfold poseidon2.BABYBEAR_POSEIDON2_RC_16_INTERNAL; exact baby_bear.BabyBear.new_array.never_panics _
   unfold poseidon2.const_check_2 poseidon2.BABYBEAR_POSEIDON2_PARTIAL_ROUNDS_16
-  simp only [ht, bind_tc_ok, CoreModels.core.slice.Slice.len,
-    CoreModels.rust_primitives.slice.slice_length]
+  rw [ht, bind_ok]
+  simp only [CoreModels.core.array.Array.as_slice, CoreModels.rust_primitives.slice.array_as_slice,
+    CoreModels.core.slice.Slice.len, CoreModels.rust_primitives.slice.slice_length, bind_ok]
   step*
 
 /-- `baby-bear/src/poseidon2.rs:70`, on `BABYBEAR_POSEIDON2_RC_24_EXTERNAL_INITIAL`. -/
@@ -233,34 +260,29 @@ theorem poseidon2.const_check_3.holds : poseidon2.const_check_3 ⦃ _ => True �
   obtain ⟨t, ht⟩ : ∃ t, poseidon2.BABYBEAR_POSEIDON2_RC_24_EXTERNAL_INITIAL = .ok t := by
     unfold poseidon2.BABYBEAR_POSEIDON2_RC_24_EXTERNAL_INITIAL; exact baby_bear.BabyBear.new_2d_array.never_panics _
   unfold poseidon2.const_check_3 poseidon2.BABYBEAR_POSEIDON2_HALF_FULL_ROUNDS
-  simp only [ht, bind_tc_ok, CoreModels.core.slice.Slice.len,
-    CoreModels.rust_primitives.slice.slice_length]
+  rw [ht, bind_ok]
+  simp only [CoreModels.core.array.Array.as_slice, CoreModels.rust_primitives.slice.array_as_slice,
+    CoreModels.core.slice.Slice.len, CoreModels.rust_primitives.slice.slice_length, bind_ok]
   step*
-  all_goals
-    simp only [not_not]
-    apply UScalar.eq_of_val_eq
-    simp_all
 
 /-- `baby-bear/src/poseidon2.rs:72`, on `BABYBEAR_POSEIDON2_RC_24_EXTERNAL_FINAL`. -/
 theorem poseidon2.const_check_4.holds : poseidon2.const_check_4 ⦃ _ => True ⦄ := by
   obtain ⟨t, ht⟩ : ∃ t, poseidon2.BABYBEAR_POSEIDON2_RC_24_EXTERNAL_FINAL = .ok t := by
     unfold poseidon2.BABYBEAR_POSEIDON2_RC_24_EXTERNAL_FINAL; exact baby_bear.BabyBear.new_2d_array.never_panics _
   unfold poseidon2.const_check_4 poseidon2.BABYBEAR_POSEIDON2_HALF_FULL_ROUNDS
-  simp only [ht, bind_tc_ok, CoreModels.core.slice.Slice.len,
-    CoreModels.rust_primitives.slice.slice_length]
+  rw [ht, bind_ok]
+  simp only [CoreModels.core.array.Array.as_slice, CoreModels.rust_primitives.slice.array_as_slice,
+    CoreModels.core.slice.Slice.len, CoreModels.rust_primitives.slice.slice_length, bind_ok]
   step*
-  all_goals
-    simp only [not_not]
-    apply UScalar.eq_of_val_eq
-    simp_all
 
 /-- `baby-bear/src/poseidon2.rs:74`, on `BABYBEAR_POSEIDON2_RC_24_INTERNAL`. -/
 theorem poseidon2.const_check_5.holds : poseidon2.const_check_5 ⦃ _ => True ⦄ := by
   obtain ⟨t, ht⟩ : ∃ t, poseidon2.BABYBEAR_POSEIDON2_RC_24_INTERNAL = .ok t := by
     unfold poseidon2.BABYBEAR_POSEIDON2_RC_24_INTERNAL; exact baby_bear.BabyBear.new_array.never_panics _
   unfold poseidon2.const_check_5 poseidon2.BABYBEAR_POSEIDON2_PARTIAL_ROUNDS_24
-  simp only [ht, bind_tc_ok, CoreModels.core.slice.Slice.len,
-    CoreModels.rust_primitives.slice.slice_length]
+  rw [ht, bind_ok]
+  simp only [CoreModels.core.array.Array.as_slice, CoreModels.rust_primitives.slice.array_as_slice,
+    CoreModels.core.slice.Slice.len, CoreModels.rust_primitives.slice.slice_length, bind_ok]
   step*
 
 /-- `baby-bear/src/poseidon2.rs:76`, on `BABYBEAR_POSEIDON2_RC_32_EXTERNAL_INITIAL`. -/
@@ -268,34 +290,29 @@ theorem poseidon2.const_check_6.holds : poseidon2.const_check_6 ⦃ _ => True �
   obtain ⟨t, ht⟩ : ∃ t, poseidon2.BABYBEAR_POSEIDON2_RC_32_EXTERNAL_INITIAL = .ok t := by
     unfold poseidon2.BABYBEAR_POSEIDON2_RC_32_EXTERNAL_INITIAL; exact baby_bear.BabyBear.new_2d_array.never_panics _
   unfold poseidon2.const_check_6 poseidon2.BABYBEAR_POSEIDON2_HALF_FULL_ROUNDS
-  simp only [ht, bind_tc_ok, CoreModels.core.slice.Slice.len,
-    CoreModels.rust_primitives.slice.slice_length]
+  rw [ht, bind_ok]
+  simp only [CoreModels.core.array.Array.as_slice, CoreModels.rust_primitives.slice.array_as_slice,
+    CoreModels.core.slice.Slice.len, CoreModels.rust_primitives.slice.slice_length, bind_ok]
   step*
-  all_goals
-    simp only [not_not]
-    apply UScalar.eq_of_val_eq
-    simp_all
 
 /-- `baby-bear/src/poseidon2.rs:78`, on `BABYBEAR_POSEIDON2_RC_32_EXTERNAL_FINAL`. -/
 theorem poseidon2.const_check_7.holds : poseidon2.const_check_7 ⦃ _ => True ⦄ := by
   obtain ⟨t, ht⟩ : ∃ t, poseidon2.BABYBEAR_POSEIDON2_RC_32_EXTERNAL_FINAL = .ok t := by
     unfold poseidon2.BABYBEAR_POSEIDON2_RC_32_EXTERNAL_FINAL; exact baby_bear.BabyBear.new_2d_array.never_panics _
   unfold poseidon2.const_check_7 poseidon2.BABYBEAR_POSEIDON2_HALF_FULL_ROUNDS
-  simp only [ht, bind_tc_ok, CoreModels.core.slice.Slice.len,
-    CoreModels.rust_primitives.slice.slice_length]
+  rw [ht, bind_ok]
+  simp only [CoreModels.core.array.Array.as_slice, CoreModels.rust_primitives.slice.array_as_slice,
+    CoreModels.core.slice.Slice.len, CoreModels.rust_primitives.slice.slice_length, bind_ok]
   step*
-  all_goals
-    simp only [not_not]
-    apply UScalar.eq_of_val_eq
-    simp_all
 
 /-- `baby-bear/src/poseidon2.rs:80`, on `BABYBEAR_POSEIDON2_RC_32_INTERNAL`. -/
 theorem poseidon2.const_check_8.holds : poseidon2.const_check_8 ⦃ _ => True ⦄ := by
   obtain ⟨t, ht⟩ : ∃ t, poseidon2.BABYBEAR_POSEIDON2_RC_32_INTERNAL = .ok t := by
     unfold poseidon2.BABYBEAR_POSEIDON2_RC_32_INTERNAL; exact baby_bear.BabyBear.new_array.never_panics _
   unfold poseidon2.const_check_8 poseidon2.BABYBEAR_POSEIDON2_PARTIAL_ROUNDS_32
-  simp only [ht, bind_tc_ok, CoreModels.core.slice.Slice.len,
-    CoreModels.rust_primitives.slice.slice_length]
+  rw [ht, bind_ok]
+  simp only [CoreModels.core.array.Array.as_slice, CoreModels.rust_primitives.slice.array_as_slice,
+    CoreModels.core.slice.Slice.len, CoreModels.rust_primitives.slice.slice_length, bind_ok]
   step*
 
-end Plonky3Lean.Proofs.BabyBear
+end Plonky3Lean.Proofs.P3BabyBear

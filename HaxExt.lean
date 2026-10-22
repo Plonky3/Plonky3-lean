@@ -1,5 +1,9 @@
-import Aeneas
-import CoreModels
+module
+
+public import Aeneas
+public import CoreModels
+
+@[expose] public section
 
 /-!
 # Extensions to the Lean libraries of hax's backend
@@ -41,6 +45,13 @@ p3-mersenne-31's `reduce_64` calls it. -/
 def core.cmp.Ord.min.default {Self : Type} (OrdInst : core.cmp.Ord Self)
     (self other : Self) : RustM Self :=
   core.cmp.min OrdInst self other
+
+/-- `<u32 as Ord>::min`, the provided method `Ord::min` at `u32`.
+
+The generated code calls it by name, as a method of CoreModels' `Ord` instance for `u32`,
+which does not define it. -/
+def core.U32.Insts.CoreCmpOrd.min (self other : Std.U32) : RustM Std.U32 :=
+  core.cmp.Ord.min.default core.U32.Insts.CoreCmpOrd self other
 
 /-- `bool::then` (`library/core/src/bool.rs`):
 `if self { Some(f()) } else { None }`. -/

@@ -8,7 +8,11 @@ instances (`default_babybear_poseidon1_{16,24}`), and nothing in `Plonky3Lean`
 is about the permutation, so the types keep their upstream fields but `new` is
 assumed.
 -/
-import P3Field
+module
+
+public import P3Field
+
+@[expose] public section
 open CoreModels Aeneas
 open Aeneas.Std hiding namespace core alloc
 open RustM ControlFlow Error

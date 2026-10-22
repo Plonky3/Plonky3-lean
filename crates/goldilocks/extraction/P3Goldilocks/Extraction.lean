@@ -1,3 +1,5 @@
 -- Imports the extraction modules. Rewritten by hax on every extraction.
-import P3Goldilocks.Extraction.Types
-import P3Goldilocks.Extraction.Funs
+module
+
+public import P3Goldilocks.Extraction.Types
+public import P3Goldilocks.Extraction.Funs

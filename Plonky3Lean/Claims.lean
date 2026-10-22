@@ -1,10 +1,14 @@
-import Plonky3Lean.Proofs
-import Plonky3Lean.Claims.BabyBear
-import Plonky3Lean.Claims.Goldilocks
-import Plonky3Lean.Claims.KoalaBear
-import Plonky3Lean.Claims.Mersenne31
-import Plonky3Lean.Claims.Monty31
-import Plonky3Lean.Claims.Util
+module
+
+public import Plonky3Lean.Proofs
+public import Plonky3Lean.Claims.BabyBear
+public import Plonky3Lean.Claims.Goldilocks
+public import Plonky3Lean.Claims.KoalaBear
+public import Plonky3Lean.Claims.Mersenne31
+public import Plonky3Lean.Claims.Monty31
+public import Plonky3Lean.Claims.Util
+
+@[expose] public section
 
 /-!
 # Claims
@@ -18,7 +22,7 @@ Each claim restates its theorem in full and takes its proof from
 ```
 theorem baby_bear.BabyBearParameters.PRIME.is_prime :
     Nat.Prime PRIME.val :=
-  Proofs.BabyBear.baby_bear.BabyBearParameters.PRIME.is_prime
+  Proofs.P3BabyBear.baby_bear.BabyBearParameters.PRIME.is_prime
 ```
 
 A proof whose statement drifts no longer typechecks against its claim, so a

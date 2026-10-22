@@ -3,11 +3,13 @@ Copyright (c) 2026 CompPoly. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Thomas Coratger
 -/
-import CompPoly.Fields.KoalaBear
-import CompPoly.Fields.PrattCertificate
-import Mathlib.Tactic.NormNum.Prime
-import ToCompPoly.ToMathlib.Polynomial.CoeffList
-import ToCompPoly.ToMathlib.Polynomial.IrreducibleOfOrder
+module
+
+public import CompPoly.Fields.KoalaBear
+public import CompPoly.Fields.PrattCertificate
+public import Mathlib.Tactic.NormNum.Prime
+public import ToCompPoly.ToMathlib.Polynomial.CoeffList
+public import ToCompPoly.ToMathlib.Polynomial.IrreducibleOfOrder
 
 /-!
   # KoalaBear: the quintic extension `F[X] / (X ^ 5 + X ^ 2 - 1)`
@@ -19,6 +21,8 @@ import ToCompPoly.ToMathlib.Polynomial.IrreducibleOfOrder
 
   Every power is computed on coefficient lists by the kernel, without `native_decide`.
 -/
+
+@[expose] public section
 
 open Polynomial
 
@@ -45,7 +49,7 @@ theorem quinticPoly_natDegree : quinticPoly.natDegree = 5 := by
   rw [quinticPoly_eq]
   refine natDegree_eq_of_degree_eq_some ?_
   rw [degree_sub_eq_left_of_degree_lt] <;> rw [degree_X_pow]
-  all_goals first | rfl | exact_mod_cast degree_quinticReduction_lt
+  all_goals exact_mod_cast degree_quinticReduction_lt
 
 theorem mk_X_pow_five :
     AdjoinRoot.mk quinticPoly (X ^ 5) = AdjoinRoot.mk quinticPoly (CoeffList.toPoly quinticReduction) := by
@@ -72,14 +76,14 @@ theorem orderOf_quinticGenerator :
   intro q hq
   simp only [List.mem_cons, List.not_mem_nil, or_false] at hq
   rcases hq with rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  iterate 6 (on_goal 1 => norm_num)
-  pratt
+  iterate 5 (on_goal 1 => norm_num)
+  all_goals pratt
 
 /-- `X ^ 5 + X ^ 2 - 1` is irreducible, since `F[X] / (X ^ 5 + X ^ 2 - 1)` has an element of order `p ^ 5 - 1`. -/
 theorem irreducible_quinticPoly : Irreducible quinticPoly := by
   refine irreducible_of_orderOf quinticPoly_monic (by rw [quinticPoly_natDegree]; norm_num)
     (g := ofQuinticCoeffs quinticGeneratorCoeffs) ?_
-  rw [orderOf_quinticGenerator, ZMod.card, quinticPoly_natDegree]
+  simp only [orderOf_quinticGenerator, ZMod.card, quinticPoly_natDegree]
 
 instance : Fact (Irreducible quinticPoly) := ⟨irreducible_quinticPoly⟩
 

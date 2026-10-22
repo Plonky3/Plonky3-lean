@@ -3,10 +3,12 @@ Copyright (c) 2026 CompPoly. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Thomas Coratger
 -/
-import Mathlib.Algebra.Polynomial.Monic
-import Mathlib.GroupTheory.OrderOfElement
-import Mathlib.RingTheory.AdjoinRoot
-import Mathlib.RingTheory.Ideal.Quotient.Operations
+module
+
+public import Mathlib.Algebra.Polynomial.Monic
+public import Mathlib.GroupTheory.OrderOfElement
+public import Mathlib.RingTheory.AdjoinRoot
+public import Mathlib.RingTheory.Ideal.Quotient.Operations
 
 /-!
 # Irreducibility from an element of maximal order
@@ -18,6 +20,8 @@ So every nonzero element is a unit, the quotient is a domain, and `f` is irreduc
 
 This turns irreducibility into a computation, `irreducible_of_orderOf`.
 -/
+
+@[expose] public section
 
 open Polynomial
 
@@ -36,12 +40,12 @@ theorem AdjoinRoot.nat_card_of_monic {f : K[X]} (hf : f.Monic) :
 theorem irreducible_of_orderOf {f : K[X]} (hf : f.Monic) (hd : 0 < f.natDegree)
     {g : AdjoinRoot f} (hg : orderOf g = Fintype.card K ^ f.natDegree - 1) : Irreducible f := by
   classical
-  haveI : Nontrivial (AdjoinRoot f) := AdjoinRoot.nontrivial f (by
+  have : Nontrivial (AdjoinRoot f) := AdjoinRoot.nontrivial f (by
     rw [degree_eq_natDegree hf.ne_zero]; exact_mod_cast hd.ne')
-  haveI : Finite (AdjoinRoot f) := by
+  have : Finite (AdjoinRoot f) := by
     have := AdjoinRoot.nat_card_of_monic hf
     exact Nat.finite_of_card_ne_zero (by rw [this]; exact pow_ne_zero _ Fintype.card_ne_zero)
-  letI : Fintype (AdjoinRoot f) := Fintype.ofFinite _
+  let : Fintype (AdjoinRoot f) := Fintype.ofFinite _
   set n := Fintype.card K ^ f.natDegree - 1 with hn
   have hcard : Fintype.card (AdjoinRoot f) = n + 1 := by
     rw [← Nat.card_eq_fintype_card, AdjoinRoot.nat_card_of_monic hf, hn,
@@ -72,7 +76,7 @@ theorem irreducible_of_orderOf {f : K[X]} (hf : f.Monic) (hd : 0 < f.natDegree)
     obtain ⟨i, -, rfl⟩ := Finset.mem_image.mp this
     exact hunit.pow i
   -- Every nonzero element is a unit, so the quotient is a domain, and `(f)` is prime.
-  haveI : IsDomain (AdjoinRoot f) := by
+  have : IsDomain (AdjoinRoot f) := by
     refine @NoZeroDivisors.to_isDomain _ _ _ ⟨fun {a b} hab => ?_⟩
     by_cases ha : a = 0
     · exact Or.inl ha

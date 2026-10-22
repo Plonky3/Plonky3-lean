@@ -3,6 +3,10 @@
 -- The generated code imports it by this module name. extract.sh fails if the
 -- regenerated template declares different names than this file does.
 -- The template declares nothing: the extracted items call no external function.
-import Aeneas
-import CoreModels
-import P3Util.Extraction.Types
+module
+
+public import Aeneas
+public import CoreModels
+public import P3Util.Extraction.Types
+
+@[expose] public section

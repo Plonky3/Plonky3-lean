@@ -1,6 +1,10 @@
-import CompPoly.Fields.Mersenne
-import Plonky3Lean.Proofs.Field.Mersenne31.DotProduct
-import Plonky3Lean.Proofs.Field.Mersenne31.Inverse
+module
+
+public import CompPoly.Fields.Mersenne31
+public import Plonky3Lean.Proofs.Field.Mersenne31.DotProduct
+public import Plonky3Lean.Proofs.Field.Mersenne31.Inverse
+
+@[expose] public section
 
 /-!
 # Mersenne31: the scalar operations, as field operations
@@ -12,7 +16,7 @@ open Aeneas Aeneas.Std CoreModels
 open p3_mersenne_31
 open Plonky3Lean.Spec.Mersenne31 Plonky3Lean.Lib
 
-namespace Plonky3Lean.Proofs.Mersenne31
+namespace Plonky3Lean.Proofs.P3Mersenne31
 
 theorem fieldSize_val : Mersenne31.fieldSize = 2147483647 := rfl
 
@@ -243,10 +247,10 @@ theorem try_inverse.toField (hg : GcdInversionContract) (a : Element) (ha : Vali
   | .None, hr => exact (toField_eq_zero_iff a ha).mpr hr
   | .Some y, ⟨hv, hy⟩ =>
     refine ⟨hv, ?_⟩
-    haveI : Fact (Nat.Prime Mersenne31.fieldSize) := ⟨Mersenne31.is_prime⟩
+    have : Fact (Nat.Prime Mersenne31.fieldSize) := ⟨Mersenne31.is_prime⟩
     have h1 : Spec.Mersenne31.toField y * Spec.Mersenne31.toField a = 1 := by
       unfold Spec.Mersenne31.toField
       rw [← Nat.cast_mul, ← Nat.cast_one, natCast_eq_iff, hy]
     exact eq_inv_of_mul_eq_one_left h1
 
-end Plonky3Lean.Proofs.Mersenne31
+end Plonky3Lean.Proofs.P3Mersenne31

@@ -1,6 +1,10 @@
-import Plonky3Lean.Proofs.Field.BabyBear.Arith
-import Plonky3Lean.Proofs.Field.BabyBear.Constants
-import Plonky3Lean.Proofs.Field.Monty31.Inverse
+module
+
+public import Plonky3Lean.Proofs.Field.BabyBear.Arith
+public import Plonky3Lean.Proofs.Field.BabyBear.Constants
+public import Plonky3Lean.Proofs.Field.Monty31.Inverse
+
+@[expose] public section
 
 /-!
 # BabyBear: the generic Monty31 results, at BabyBear's parameters
@@ -11,7 +15,7 @@ open p3_baby_bear
 open Plonky3Lean.Spec.Monty31
 open Plonky3Lean.Spec.BabyBear (MontyParams FieldParams)
 
-namespace Plonky3Lean.Proofs.BabyBear
+namespace Plonky3Lean.Proofs.P3BabyBear
 
 /-- BabyBear's `MontyParameters` pass the checks of `MontyField31::new`. -/
 theorem valid : Valid MontyParams 2013265921#u32 2281701377#u32 where
@@ -24,7 +28,7 @@ theorem valid : Valid MontyParams 2013265921#u32 2281701377#u32 where
   monty_mu := by
     show RustM.ok baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.MONTY_MU = _
     unfold baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsMontyParameters.MONTY_MU; rfl
-  mask := Plonky3Lean.Proofs.BabyBear.MontyParams.MONTY_MASK.eq
+  mask := Plonky3Lean.Proofs.P3BabyBear.MontyParams.MONTY_MASK.eq
   odd := by decide
   lt := by decide
   inv := by decide
@@ -45,9 +49,9 @@ theorem fieldDefaults : FieldDefaults FieldParams where
   two := by
     simp
 
-end Plonky3Lean.Proofs.BabyBear
+end Plonky3Lean.Proofs.P3BabyBear
 
-namespace Plonky3Lean.Proofs.BabyBear
+namespace Plonky3Lean.Proofs.P3BabyBear
 
 open Plonky3Lean.Spec.BabyBear
 
@@ -85,4 +89,4 @@ theorem baby_bear.BabyBear.try_inverse.toField (a : Element) (ha : Spec.BabyBear
     _ = 2 ^ 64 * ((2 ^ 32)⁻¹ * (2 ^ 32)⁻¹) := by rw [hca']
     _ = 1 := by rw [show (2 : BabyBear.Field) ^ 64 = 2 ^ 32 * 2 ^ 32 by ring]; field_simp
 
-end Plonky3Lean.Proofs.BabyBear
+end Plonky3Lean.Proofs.P3BabyBear

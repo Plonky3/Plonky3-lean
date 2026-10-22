@@ -1,6 +1,10 @@
-import CompPoly.Fields.Mersenne
-import P3Mersenne31
-import ToCompPoly.Fields.Mersenne.Extension
+module
+
+public import CompPoly.Fields.Mersenne31
+public import P3Mersenne31
+public import ToCompPoly.Fields.Mersenne.Extension
+
+@[expose] public section
 
 /-!
 # Mersenne31: what the model's values mean

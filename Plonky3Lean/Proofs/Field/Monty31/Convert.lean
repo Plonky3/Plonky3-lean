@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.Monty31.Utils
+module
+
+public import Plonky3Lean.Proofs.Field.Monty31.Utils
+
+@[expose] public section
 
 /-!
 # Monty31: integers into Montgomery form, for any valid parameters
@@ -49,7 +53,7 @@ theorem utils.to_monty_signed.spec (hv : Valid inst p mu) (x : Std.I32) :
   all_goals
     have hi' := hi i i_post
     have hi4' := hi4 i4 i4_post
-    have hi2' := hi2 i i2 hi' i2_post1
+    have hi2' := hi2 i i2 hi' i2_post
     have hp' : (0 : ℤ) < p.val := by omega
     have h5lt := Int.tmod_lt_of_pos (i2.val) (hi4' ▸ hp')
     have h5gt := Int.lt_tmod_of_pos (i2.val) (hi4' ▸ hp')
@@ -119,7 +123,7 @@ theorem utils.to_monty_64_signed.spec (hv : Valid inst p mu) (x : Std.I64) :
   all_goals
     have hi' := hi i i_post
     have hi4' := hi4 i4 i4_post
-    have hi2' := hi2 i i2 hi' i2_post1
+    have hi2' := hi2 i i2 hi' i2_post
     have hp' : (0 : ℤ) < p.val := by omega
     have h5lt := Int.tmod_lt_of_pos (i2.val) (hi4' ▸ hp')
     have h5gt := Int.lt_tmod_of_pos (i2.val) (hi4' ▸ hp')

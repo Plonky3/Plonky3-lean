@@ -3,9 +3,10 @@ Copyright (c) 2026 CompPoly. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Derek Sorensen
 -/
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.RingTheory.AdjoinRoot
+module
 
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.RingTheory.AdjoinRoot
 /-!
 # Irreducibility of `X ^ n - a` over a prime field
 
@@ -23,6 +24,8 @@ irreducible factor has degree `n`.
 
 Upstreaming candidate (mathlib).
 -/
+
+@[expose] public section
 
 open Polynomial
 
@@ -48,12 +51,12 @@ theorem X_pow_sub_C_irreducible_of_gcd {q : ℕ} [hq : Fact q.Prime] {n ℓ : �
     rw [not_le] at hlt
     have hg0 : g ≠ 0 := hg.ne_zero
     have hdpos : 0 < g.natDegree := Irreducible.natDegree_pos hg
-    haveI : Fact (Irreducible g) := ⟨hg⟩
+    have : Fact (Irreducible g) := ⟨hg⟩
     let L := AdjoinRoot g
     let pb := AdjoinRoot.powerBasis hg0
-    haveI : Module.Finite (ZMod q) L := pb.finite
-    haveI : Finite L := Module.finite_of_finite (ZMod q)
-    letI : Fintype L := Fintype.ofFinite L
+    have : Module.Finite (ZMod q) L := pb.finite
+    have : Finite L := Module.finite_of_finite (ZMod q)
+    let : Fintype L := Fintype.ofFinite L
     have hcard : Fintype.card L = q ^ g.natDegree := by
       rw [Module.card_eq_pow_finrank (K := ZMod q), ZMod.card, pb.finrank,
         AdjoinRoot.powerBasis_dim]

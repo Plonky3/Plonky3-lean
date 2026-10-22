@@ -1,17 +1,19 @@
-import ToCompPoly.Data.Nat.PowMod
-import ToCompPoly.Fields.BabyBear
-import ToCompPoly.Fields.BabyBear.Extension
-import ToCompPoly.Fields.Goldilocks
-import ToCompPoly.Fields.KoalaBear
-import ToCompPoly.Fields.KoalaBear.Extension
-import ToCompPoly.Fields.KoalaBear.Quintic
-import ToCompPoly.Fields.Mersenne
-import ToCompPoly.Fields.Mersenne.Complex
-import ToCompPoly.Fields.Mersenne.Extension
-import ToCompPoly.ToMathlib.Order.OrderOfSq
-import ToCompPoly.ToMathlib.Polynomial.CoeffList
-import ToCompPoly.ToMathlib.Polynomial.IrreducibleOfOrder
-import ToCompPoly.ToMathlib.Polynomial.XPowSubC
+module
+
+public import ToCompPoly.Data.Nat.PowMod
+public import ToCompPoly.Fields.BabyBear
+public import ToCompPoly.Fields.BabyBear.Extension
+public import ToCompPoly.Fields.Goldilocks
+public import ToCompPoly.Fields.KoalaBear
+public import ToCompPoly.Fields.KoalaBear.Extension
+public import ToCompPoly.Fields.KoalaBear.Quintic
+public import ToCompPoly.Fields.Mersenne
+public import ToCompPoly.Fields.Mersenne.Complex
+public import ToCompPoly.Fields.Mersenne.Extension
+public import ToCompPoly.ToMathlib.Order.OrderOfSq
+public import ToCompPoly.ToMathlib.Polynomial.CoeffList
+public import ToCompPoly.ToMathlib.Polynomial.IrreducibleOfOrder
+public import ToCompPoly.ToMathlib.Polynomial.XPowSubC
 
 /-!
 # Staged for CompPoly

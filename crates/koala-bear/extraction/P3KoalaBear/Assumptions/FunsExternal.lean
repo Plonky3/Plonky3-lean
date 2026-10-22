@@ -10,9 +10,13 @@
 -- some inhabitant exists, so it adds nothing to a theorem's axiom footprint.
 -- These are the bodies of four derived `Debug` impls, which extract.sh
 -- makes opaque on purpose.
-import Aeneas
-import CoreModels
-import P3KoalaBear.Extraction.Types
+module
+
+public import Aeneas
+public import CoreModels
+public import P3KoalaBear.Extraction.Types
+
+@[expose] public section
 open CoreModels Aeneas
 open Aeneas.Std hiding namespace core alloc
 open RustM ControlFlow Error

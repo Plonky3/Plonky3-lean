@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.Mersenne31.Basic
+module
+
+public import Plonky3Lean.Proofs.Field.Mersenne31.Basic
+
+@[expose] public section
 
 /-!
 # Mersenne31: integer conversions (`QuotientMap`)
@@ -8,7 +12,7 @@ open Aeneas Aeneas.Std CoreModels
 open p3_mersenne_31
 open Plonky3Lean.Spec.Mersenne31 Plonky3Lean.Lib
 
-namespace Plonky3Lean.Proofs.Mersenne31
+namespace Plonky3Lean.Proofs.P3Mersenne31
 
 /-! ## Unsigned -/
 
@@ -51,20 +55,21 @@ theorem from_int_u32.spec (x : Std.U32) :
   step*
   all_goals
     have hi : i = 2147483648#u32 := UScalar.eq_of_val_eq (by
-      rw [i_post1, one_shl_u32 31 (by norm_num)]; rfl)
+      rw [i_post, one_shl_u32 31 (by norm_num)]; rfl)
     have h1 : i1.val = x.val % 2 ^ 31 := by
       have e : i1.bv = x.bv ^^^ (x.bv &&& i.bv) :=
-        i1_post2.trans (congrArg (x.bv ^^^ ·) msb_post2)
+        i1_post1.trans (congrArg (x.bv ^^^ ·) msb_post1)
       rw [hi] at e
       exact (congrArg BitVec.toNat e).trans (clear_msb_toNat x.bv)
     have h2 : msb_reduced.val = x.val / 2 ^ 31 := by
-      have e := msb_reduced_post2
-      simp only [msb_post2, hi] at e
+      have e := msb_reduced_post1
+      simp only [msb_post1, hi] at e
       exact (congrArg BitVec.toNat e).trans (msb_toNat x.bv)
     have hx := u32_lt x
   · omega
-  · omega
-  · refine WP.spec_mono (add.spec m m1 (by simp only [Valid, m_post]; omega)
+  · rename m.value = i1 => m_post
+    rename m1.value = msb_reduced => m1_post
+    refine WP.spec_mono (add.spec m m1 (by simp only [Valid, m_post]; omega)
       (by simp only [Valid, m1_post]; omega)) ?_
     rintro r ⟨hv, hr⟩
     refine ⟨hv, ?_⟩
@@ -98,16 +103,18 @@ theorem from_int_i32.spec (x : Std.I32) :
   simp only [IScalarTy.I32_numBits_eq] at hx
   step*
   · rw [i_post, IScalar.hcast_val_eq]; scalar_tac
-  · simp only [Valid, r_post, i_post, IScalar.hcast_val_eq, UScalarTy.U32_numBits_eq]
+  · rename r.value = _ => r_post
+    simp only [Valid, r_post, i_post, IScalar.hcast_val_eq, UScalarTy.U32_numBits_eq]
     have : 0 ≤ x.val := by scalar_tac
     refine ⟨by omega, ?_⟩
     rw [Int.toNat_of_nonneg (by omega)]
     omega
   all_goals
     have hi : i.val = -2147483648 := by
-      rw [i_post1, I32.size_def, I32.numBits_def]; decide
+      rw [i_post, I32.size_def, I32.numBits_def]; decide
     have hlt : x.val < 0 := by scalar_tac
   · have hgt : i.val < x.val := by scalar_tac
+    rename r.value = _ => r_post
     have : (i2.val : Int) = 2147483647 + x.val := by rw [i2_post]; omega
     simp only [Valid, r_post]
     omega
@@ -171,8 +178,10 @@ theorem from_canonical_unchecked_i32.spec (x : Std.I32) (hx : -2147483648 < x.va
     rw [i_post]; omega
   · have : 0 ≤ x.val := by scalar_tac
     have := hcast_i32_u32_val x this
+    rename r.value = _ => r_post
     simp only [Valid, r_post, i_post]; omega
   · have : x.val < 0 := by scalar_tac
+    rename r.value = _ => r_post
     simp only [Valid, r_post]; omega
 
 theorem from_int_i8.spec (x : Std.I8) :
@@ -207,7 +216,7 @@ theorem from_canonical_unchecked_u32.panics_at_p :
       2147483647#u32 = .fail .panic := by
   unfold mersenne_31.Mersenne31.Insts.P3_fieldIntegersQuotientMapU32.from_canonical_unchecked
   rw [ORDER_U32.eq]
-  rfl
+  simp [massert]
 
 /-! ## The checked conversions -/
 
@@ -217,16 +226,16 @@ theorem from_canonical_checked_u32.spec (x : Std.U32) :
   unfold mersenne_31.Mersenne31.Insts.P3_fieldIntegersQuotientMapU32.from_canonical_checked
   rw [ORDER_U32.eq]
   unfold CoreModels.core.bool.Bool.then
-  simp only [bind_tc_ok]
+  simp only [bind_ok]
   by_cases h : x.val < 2147483647
   · have h' : x < 2147483647#u32 := by scalar_tac
-    rw [if_pos (by simpa using h'), if_pos h]
+    rw [ite_eq_left (by simpa using h'), ite_eq_left h]
     unfold mersenne_31.QuotientMapMersenne31U32.from_canonical_checked.closure.Insts.CoreOpsFunctionFnOnceTupleMersenne31.call_once
     step*
     rw [← x_post]
   · have h' : ¬ x < 2147483647#u32 := by scalar_tac
-    rw [if_neg (by simpa using h'), if_neg h]
-    rfl
+    rw [ite_eq_right (by simpa using h'), ite_eq_right h]
+    exact (WP.spec_ok _).mpr rfl
 
 theorem from_canonical_checked_u64.spec (x : Std.U64) :
     mersenne_31.Mersenne31.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked x
@@ -256,9 +265,11 @@ theorem from_canonical_checked_i32.spec (x : Std.I32) :
   · have h0 : 0 ≤ x.val := by scalar_tac
     have := hcast_i32_u32_val x h0
     have : x.val < 1073741824 := by scalar_tac
+    rename m.value = _ => m_post
     simp only [Valid, m_post, i_post]; omega
   · have : x.val < 0 := by scalar_tac
     have : -1073741823 ≤ x.val := by scalar_tac
+    rename m.value = _ => m_post
     simp only [Valid, m_post]; omega
 
 theorem from_canonical_checked_u128.spec (x : Std.U128) :
@@ -280,25 +291,29 @@ theorem from_canonical_checked_i64.spec (x : Std.I64) :
   unfold CoreModels.core.I32.Insts.CoreConvertTryFromI64TryFromIntError.try_from
   have hmax : IScalar.cast .I64 core.num.I32.MAX = 2147483647#i64 := by rfl
   have hmin : IScalar.cast .I64 core.num.I32.MIN = (-2147483648)#i64 := by rfl
-  simp only [lift, bind_tc_ok, hmax, hmin]
+  simp only [lift, bind_ok, hmax, hmin]
   simp only [CoreModels.core.result.Result.ok, CoreModels.core.option.Option.map,
     CoreModels.core.option.Option.Insts.CoreOpsTry_traitTry.branch,
     CoreModels.core.option.Option.Insts.CoreOpsTry_traitTryTOptionInfallible.branch,
-    CoreModels.core.option.Option.Insts.CoreOpsTry_traitFromResidualOptionInfallible.from_residual,
+    CoreModels.core.option.Option.Insts.CoreOpsTry_traitFromResidualOptionNever.from_residual,
     P.Insts.CoreOpsFunctionFnOnceTupleI32OptionMersenne31.call_once]
   by_cases h1 : x > 2147483647#i64
   · have : 2147483647 < x.val := by scalar_tac
-    simp only [h1, if_true, bind_tc_ok, WP.spec_ok]
+    simp only [h1, ite_true, bind_ok,
+      CoreModels.core.option.Option.Insts.CoreOpsTry_traitFromResidualOptionInfallible.from_residual,
+      WP.spec_ok]
     omega
-  · simp only [h1, if_false]
+  · simp only [h1, ite_false]
     by_cases h2 : x < (-2147483648)#i64
     · have : x.val < -2147483648 := by scalar_tac
-      simp only [h2, if_true, bind_tc_ok, WP.spec_ok]
+      simp only [h2, ite_true, bind_ok,
+      CoreModels.core.option.Option.Insts.CoreOpsTry_traitFromResidualOptionInfallible.from_residual,
+      WP.spec_ok]
       omega
     · have : -2147483648 ≤ x.val := by scalar_tac
       have : x.val ≤ 2147483647 := by scalar_tac
       have hc := cast_i64_i32_val x (by omega) (by omega)
-      simp only [h2, if_false, bind_tc_ok]
+      simp only [h2, ite_false, bind_ok]
       step*
       rw [hc] at val_post
       exact val_post
@@ -313,25 +328,29 @@ theorem from_canonical_checked_i128.spec (x : Std.I128) :
   unfold CoreModels.core.I32.Insts.CoreConvertTryFromI128TryFromIntError.try_from
   have hmax : IScalar.cast .I128 core.num.I32.MAX = 2147483647#i128 := by rfl
   have hmin : IScalar.cast .I128 core.num.I32.MIN = (-2147483648)#i128 := by rfl
-  simp only [lift, bind_tc_ok, hmax, hmin]
+  simp only [lift, bind_ok, hmax, hmin]
   simp only [CoreModels.core.result.Result.ok, CoreModels.core.option.Option.map,
     CoreModels.core.option.Option.Insts.CoreOpsTry_traitTry.branch,
     CoreModels.core.option.Option.Insts.CoreOpsTry_traitTryTOptionInfallible.branch,
-    CoreModels.core.option.Option.Insts.CoreOpsTry_traitFromResidualOptionInfallible.from_residual,
+    CoreModels.core.option.Option.Insts.CoreOpsTry_traitFromResidualOptionNever.from_residual,
     P.Insts.CoreOpsFunctionFnOnceTupleI32OptionMersenne31.call_once]
   by_cases h1 : x > 2147483647#i128
   · have : 2147483647 < x.val := by scalar_tac
-    simp only [h1, if_true, bind_tc_ok, WP.spec_ok]
+    simp only [h1, ite_true, bind_ok,
+      CoreModels.core.option.Option.Insts.CoreOpsTry_traitFromResidualOptionInfallible.from_residual,
+      WP.spec_ok]
     omega
-  · simp only [h1, if_false]
+  · simp only [h1, ite_false]
     by_cases h2 : x < (-2147483648)#i128
     · have : x.val < -2147483648 := by scalar_tac
-      simp only [h2, if_true, bind_tc_ok, WP.spec_ok]
+      simp only [h2, ite_true, bind_ok,
+      CoreModels.core.option.Option.Insts.CoreOpsTry_traitFromResidualOptionInfallible.from_residual,
+      WP.spec_ok]
       omega
     · have : -2147483648 ≤ x.val := by scalar_tac
       have : x.val ≤ 2147483647 := by scalar_tac
       have hc := cast_i128_i32_val x (by omega) (by omega)
-      simp only [h2, if_false, bind_tc_ok]
+      simp only [h2, ite_false, bind_ok]
       step*
       rw [hc] at val_post
       exact val_post
@@ -339,4 +358,4 @@ theorem from_canonical_checked_i128.spec (x : Std.I128) :
 attribute [step] add.spec sub.spec neg.spec from_u62.spec mul.spec from_int_u32.spec
   from_int_i32.spec from_int_i64.spec from_int_i128.spec
 
-end Plonky3Lean.Proofs.Mersenne31
+end Plonky3Lean.Proofs.P3Mersenne31

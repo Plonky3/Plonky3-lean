@@ -1,4 +1,8 @@
-import Plonky3Lean.Proofs.Field.Monty31.Convert
+module
+
+public import Plonky3Lean.Proofs.Field.Monty31.Convert
+
+@[expose] public section
 
 /-!
 # Monty31: the wide Montgomery reductions, for any valid parameters
@@ -36,7 +40,7 @@ theorem utils.large_monty_reduce.spec (hv : Valid inst p mu) (x : Std.U64)
     have hi1 : i1.val = mu.val := by rw [i1_post, cast_u32_u64_val]
     have hi6 : i6.val = p.val := by rw [i6_post, cast_u32_u64_val]
     have ht : t.val = x.val * mu.val % 2 ^ 64 % 2 ^ 32 := by
-      rw [t_post1, UScalar.val_and, i4_post, UScalar.cast_val_eq, UScalarTy.U64_numBits_eq,
+      rw [t_post, UScalar.val_and, i4_post, UScalar.cast_val_eq, UScalarTy.U64_numBits_eq,
         show (4294967295#u32).val % 2 ^ 64 = 2 ^ 32 - 1 by rfl, Nat.and_two_pow_sub_one_eq_mod,
         i2_post, hi1]
     have htlt : t.val < 2 ^ 32 := by rw [ht]; exact Nat.mod_lt _ (by norm_num)
@@ -47,26 +51,26 @@ theorem utils.large_monty_reduce.spec (hv : Valid inst p mu) (x : Std.U64)
   have hu : u.val = t.val * p.val := by rw [u_post, hi6]
   have hi9 : i9.val = p.val * 2 ^ 32 := by
     have hs : U64.size = 2 ^ 64 := by simp [U64.size, U64.numBits]
-    rw [i9_post1, i7_post, cast_u32_u64_val, Nat.shiftLeft_eq, hs]
+    rw [i9_post, i7_post, cast_u32_u64_val, Nat.shiftLeft_eq, hs]
     exact Nat.mod_eq_of_lt (by omega)
   have hcong : t.val * p.val % 2 ^ 32 = x.val % 2 ^ 32 := by
     rw [ht]; exact monty_t_cong x.val p.val mu.val hv.inv
-  rw [x_prime_post1, hi9]
+  rw [over_post, hi9]
   by_cases hlt : x.val < p.val * 2 ^ 32
-  · simp only [hlt, decide_true, if_true, bind_tc_ok]
+  · simp only [hlt, decide_true, ite_true]
     have hcore := monty_core x.val t.val p.val hp0 hp (by omega) htlt hcong
     step*
     have hhi : x_sub_u_hi.val = (x.val + 2 ^ 64 - t.val * p.val) % 2 ^ 64 / 2 ^ 32 % 2 ^ 32 := by
-      rw [x_sub_u_hi_post, cast_u64_u32_val, i10_post1, Nat.shiftRight_eq_div_pow, x_sub_u_post2, hu]
-    rw [x_sub_u_post1, hu]
+      rw [x_sub_u_hi_post, cast_u64_u32_val, i10_post, Nat.shiftRight_eq_div_pow, x_sub_u_post, hu]
+    rw [over1_post, hu]
     by_cases hlt2 : x.val < t.val * p.val
-    · simp only [hlt2, decide_true, if_true, bind_tc_ok]
+    · simp only [hlt2, decide_true, ite_true]
       step*
-    · simp only [hlt2, decide_false, Bool.false_eq_true, if_false, bind_tc_ok]
+    · simp only [hlt2, decide_false, Bool.false_eq_true, ite_false]
       step*
-  · simp only [hlt, decide_false, Bool.false_eq_true, if_false, bind_tc_ok]
+  · simp only [hlt, decide_false, Bool.false_eq_true, ite_false]
     have hxp : x_prime.val = x.val - p.val * 2 ^ 32 := by
-      rw [x_prime_post2, hi9, show x.val + 2 ^ 64 - p.val * 2 ^ 32 = (x.val - p.val * 2 ^ 32) + 2 ^ 64 by
+      rw [x_prime_post, hi9, show x.val + 2 ^ 64 - p.val * 2 ^ 32 = (x.val - p.val * 2 ^ 32) + 2 ^ 64 by
         omega, Nat.add_mod_right, Nat.mod_eq_of_lt (by have := u64_lt x; omega)]
     have hcong' : t.val * p.val % 2 ^ 32 = x_prime.val % 2 ^ 32 := by
       rw [hcong, hxp]; omega
@@ -78,12 +82,12 @@ theorem utils.large_monty_reduce.spec (hv : Valid inst p mu) (x : Std.U64)
     step*
     have hhi : x_sub_u_hi.val =
         (x_prime.val + 2 ^ 64 - t.val * p.val) % 2 ^ 64 / 2 ^ 32 % 2 ^ 32 := by
-      rw [x_sub_u_hi_post, cast_u64_u32_val, i10_post1, Nat.shiftRight_eq_div_pow, x_sub_u_post2, hu]
-    rw [x_sub_u_post1, hu]
+      rw [x_sub_u_hi_post, cast_u64_u32_val, i10_post, Nat.shiftRight_eq_div_pow, x_sub_u_post, hu]
+    rw [over1_post, hu]
     by_cases hlt2 : x_prime.val < t.val * p.val
-    · simp only [hlt2, decide_true, if_true, bind_tc_ok]
+    · simp only [hlt2, decide_true, ite_true]
       step*
-    · simp only [hlt2, decide_false, Bool.false_eq_true, if_false, bind_tc_ok]
+    · simp only [hlt2, decide_false, Bool.false_eq_true, ite_false]
       step*
 
 /-- `monty_reduce_u128(x)`, for `x < 2^96`, gives the canonical `r` with `r · 2^32 ≡ x`.
@@ -109,12 +113,12 @@ theorem utils.monty_reduce_u128.spec (hv : Valid inst p mu) (hp30 : 2 ^ 30 ≤ p
   step*
   have hs64 : U64.size = 2 ^ 64 := by simp [U64.size, U64.numBits]
   have htwo : two_rp.val = 2 * 2 ^ 32 * p.val := by
-    rw [two_rp_post1, i5_post1, i4_post, cast_u32_u64_val, Nat.shiftLeft_eq, Nat.shiftLeft_eq, hs64,
+    rw [two_rp_post, i5_post, i4_post, cast_u32_u64_val, Nat.shiftLeft_eq, Nat.shiftLeft_eq, hs64,
       Nat.mod_eq_of_lt (by omega), Nat.mod_eq_of_lt (by omega)]
     ring
   have hlo : lo.val = x.val % 2 ^ 64 := by rw [lo_post, UScalar.cast_val_eq, UScalarTy.U64_numBits_eq]
   have hhi : hi.val = x.val / 2 ^ 64 := by
-    rw [hi_post, UScalar.cast_val_eq, UScalarTy.U32_numBits_eq, i2_post1, Nat.shiftRight_eq_div_pow]
+    rw [hi_post, UScalar.cast_val_eq, UScalarTy.U32_numBits_eq, i2_post, Nat.shiftRight_eq_div_pow]
     exact Nat.mod_eq_of_lt (by omega)
   -- Split `x = hi · 2^64 + lo`, with `hi < 2^32` since `x < 2^96`.
   have hl := u64_lt lo
@@ -137,13 +141,12 @@ theorem utils.monty_reduce_u128.spec (hv : Valid inst p mu) (hp30 : 2 ^ 30 ≤ p
   --
   --     lo < 2^64 <= 4 · 2^32 · p      (this is where p >= 2^30 is used)
   by_cases hge : two_rp.val ≤ lo.val
-  · simp only [ge_iff_le, UScalar.le_equiv, hge, if_true]
+  · simp only [ge_iff_le, UScalar.le_equiv, hge, ite_true]
     step*
-    rename_i r1 _ _
-    refine hfinish r r1 (0#u32) lo_reduced.val (by rw [r_post, hi_r_mod_p_post]) r_post2 ?_
-    rw [lo_reduced_post1, htwo, show lo.val = (lo.val - 2 * 2 ^ 32 * p.val) + (2 * 2 ^ 32) * p.val by
+    refine hfinish r _ (0#u32) lo_reduced.val (by rw [r_post, hi_r_mod_p_post]) r_post1 ?_
+    rw [lo_reduced_post, htwo, show lo.val = (lo.val - 2 * 2 ^ 32 * p.val) + (2 * 2 ^ 32) * p.val by
       omega, Nat.add_mul_mod_self_right, Nat.add_sub_cancel]
-  · simp only [ge_iff_le, UScalar.le_equiv, hge, if_false]
+  · simp only [ge_iff_le, UScalar.le_equiv, hge, ite_false]
     step*
 
 end Plonky3Lean.Proofs.Monty31

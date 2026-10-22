@@ -1,5 +1,9 @@
-import HaxExt
-import Plonky3Lean.Lib.Scalar
+module
+
+public import HaxExt
+public import Plonky3Lean.Lib.Scalar
+
+@[expose] public section
 
 /-!
 # `u64` and `u128` primitives, as natural numbers

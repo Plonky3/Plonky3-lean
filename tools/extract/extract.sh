@@ -27,7 +27,7 @@
 #      snapshot it as the pristine baseline for post-extraction patches, and
 #      write crates/<crate>/extraction/gaps.toml (gap-report.py)
 #   7. apply each crate's patches/post/ patches
-#   8. `lake build`, which must be warning-free
+#   8. `lake build`, whose warnings must be exactly those in known-warnings.txt
 #
 # With --check, the run must also leave crates/*/extraction/ exactly as
 # committed: re-extraction is byte-identical, or the run fails.
@@ -61,8 +61,17 @@ for arg in "$@"; do
 done
 
 tc() { "$CONFIG" toolchain "$1"; }
-HAX_VERSION="$(tc hax_version)"
+HAX_RELEASE="$(tc hax_release)"
 HAX_COMMIT="$(tc hax_commit)"
+if [ -n "$HAX_RELEASE" ]; then
+    HAX_NAME="hax $HAX_RELEASE"
+    HAX_INSTALL="cargo install --locked cargo-hax@$HAX_RELEASE --force"
+    HAX_ID_RE="version=$HAX_RELEASE|commit=$HAX_COMMIT"
+else
+    HAX_NAME="hax at ${HAX_COMMIT:0:7}"
+    HAX_INSTALL="cargo install --locked --git https://github.com/cryspen/hax --rev $HAX_COMMIT cargo-hax --force"
+    HAX_ID_RE="commit=$HAX_COMMIT"
+fi
 EXPECT_CHARON="$(tc charon)"
 EXPECT_AENEAS="$(tc aeneas)"
 CHARON_TOOLCHAIN="$(tc rust_toolchain)"
@@ -90,23 +99,24 @@ rustup target list --toolchain "$CHARON_TOOLCHAIN" --installed 2>/dev/null \
         "rustup toolchain install $CHARON_TOOLCHAIN --profile minimal --component $CHARON_COMPONENTS --target $HAX_TARGET"
 echo "    rust     $CHARON_TOOLCHAIN (for charon), target $HAX_TARGET"
 
+# The `cargo-hax` on PATH is the normal path; HAX_BIN overrides it.
 HAX_BIN="${HAX_BIN:-cargo-hax}"
 hax_id="$("$HAX_BIN" hax --version 2>/dev/null || true)"
-if ! printf '%s\n' "$hax_id" | grep -qxE "version=$HAX_VERSION|commit=$HAX_COMMIT"; then
+if ! printf '%s\n' "$hax_id" | grep -qxE "$HAX_ID_RE"; then
     if [ -z "$hax_id" ]; then
         echo "error: $HAX_BIN not found." >&2
     else
-        echo "error: $HAX_BIN is not hax $HAX_VERSION ($(printf '%s\n' "$hax_id" | grep -m1 '^version=')):" >&2
+        echo "error: $HAX_BIN is not $HAX_NAME ($(printf '%s\n' "$hax_id" | grep -m1 '^version=')):" >&2
     fi
-    echo "       cargo install --locked cargo-hax@$HAX_VERSION --force" >&2
+    echo "       $HAX_INSTALL" >&2
     exit 1
 fi
-echo "    hax      $HAX_VERSION ($(command -v "$HAX_BIN"))"
+echo "    hax      $HAX_NAME ($(command -v "$HAX_BIN"))"
 # Only a note: a newer release is a reason to bump (docs/runbook.md), not to fail.
 latest="$(git ls-remote --tags https://github.com/cryspen/hax 'refs/tags/cargo-hax-v*' 2>/dev/null \
           | sed -n 's#.*refs/tags/cargo-hax-v\([0-9.]*\)$#\1#p' | sort -t. -k1,1n -k2,2n -k3,3n | tail -1)"
-if [ -n "$latest" ] && [ "$latest" != "$HAX_VERSION" ]; then
-    echo "    note: hax $latest is released; toolchain.toml pins $HAX_VERSION"
+if [ -n "$latest" ] && [ "$latest" != "$HAX_RELEASE" ]; then
+    echo "    note: hax $latest is the latest release; toolchain.toml pins $HAX_NAME"
 fi
 
 # charon and aeneas: hax resolves the pinned versions and has fetched them. The
@@ -226,29 +236,44 @@ if [ -s "$PRE_LIST" ]; then
     echo "    WARNING: patching Rust source changes the artifact under" >&2
     echo "             verification. See docs/patches.md." >&2
 fi
+packages="$(printf '%s\n' "$CRATES" | cut -d'|' -f1 | sed 's/^/-p p3-/' | tr '\n' ' ')"
+check() {   # check <log>: cargo check of the extracted crates in the variant charon sees
+    (cd "$RUST" && env RUSTUP_TOOLCHAIN="$CHARON_TOOLCHAIN" \
+        RUSTFLAGS="$EXTRACT_RUSTFLAGS" CARGO_TARGET_DIR="$WORK/target-check" \
+        cargo check --quiet --target "$HAX_TARGET" $packages) > "$1" 2>&1
+}
+warnings() {   # the warning headlines of a check log, one per line, sorted
+    sed 's/\x1b\[[0-9;]*m//g' "$1" | grep '^warning' | sort || true
+}
+# Upstream's own warnings, from the tree as pinned: newer cargo lints Plonky3's
+# manifests, for example. They are reported, and only warnings the patches add
+# fail the run. Headlines are compared, not locations, since a patch may move lines.
+base_log="$(mktemp)"
+check "$base_log" || true
 apply_set "$PRE_LIST" "$RUST" "$PRE_RECORD"
 # If a patch removed something that code reachable from an extracted crate still
 # uses, this is where it fails. Warnings count too: a patch that leaves an unused
 # import behind is not finished.
 check_log="$(mktemp)"
-packages="$(printf '%s\n' "$CRATES" | cut -d'|' -f1 | sed 's/^/-p p3-/' | tr '\n' ' ')"
-if ! (cd "$RUST" && env RUSTUP_TOOLCHAIN="$CHARON_TOOLCHAIN" \
-        RUSTFLAGS="$EXTRACT_RUSTFLAGS" CARGO_TARGET_DIR="$WORK/target-check" \
-        cargo check --quiet --target "$HAX_TARGET" $packages) > "$check_log" 2>&1; then
+if ! check "$check_log"; then
     cat "$check_log" >&2
     echo "error: the patched tree does not compile; a pre-extraction patch" >&2
     echo "       removed something that is still used." >&2
-    rm -f "$check_log"
+    rm -f "$check_log" "$base_log"
     exit 1
 fi
-if grep -q '^warning' "$check_log"; then
+added="$(comm -13 <(warnings "$base_log") <(warnings "$check_log"))"
+n_base="$(warnings "$base_log" | grep -c . || true)"
+rm -f "$base_log"
+if [ -n "$added" ]; then
     cat "$check_log" >&2
-    echo "error: the patched tree compiles with warnings." >&2
+    echo "error: the pre-extraction patches add these warnings:" >&2
+    printf '%s\n' "$added" | sed 's/^/       /' >&2
     rm -f "$check_log"
     exit 1
 fi
 rm -f "$check_log"
-echo "    cargo check: ok, 0 warnings"
+echo "    cargo check: ok; the patches add no warnings ($n_base from upstream, also without them)"
 
 echo "==> 4/8 extracting with hax (backend: lean = charon + aeneas, target: $HAX_TARGET)"
 # Each crate gets a fresh output directory, so a removed item cannot linger.
@@ -348,17 +373,25 @@ if ! (cd "$ROOT" && lake build 2>&1 | tee "$build_log"; exit "${PIPESTATUS[0]}")
     rm -f "$build_log"
     exit 1
 fi
-n_warn="$(grep -c '^warning' "$build_log" || true)"
+# Every warning must be listed in known-warnings.txt, and every listed one must
+# still occur, so the list cannot go stale. A warning is compared as
+# `<file>: <message>`, without its line and column.
+seen="$(sed -nE 's/^warning: ([^:]+):[0-9]+:[0-9]+: (.*)$/\1: \2/p' "$build_log" | sort -u)"
+known="$(grep -v '^#' "$ROOT/known-warnings.txt" | sed '/^[[:space:]]*$/d' | sort -u)"
 rm -f "$build_log"
-if [ "$n_warn" -ne 0 ]; then
-    echo "error: lake build printed $n_warn warning(s); the build must be warning-free." >&2
+new_w="$(comm -23 <(printf '%s\n' "$seen" | sed '/^$/d') <(printf '%s\n' "$known" | sed '/^$/d'))"
+gone_w="$(comm -13 <(printf '%s\n' "$seen" | sed '/^$/d') <(printf '%s\n' "$known" | sed '/^$/d'))"
+if [ -n "$new_w" ] || [ -n "$gone_w" ]; then
+    [ -z "$new_w" ] || { echo "error: lake build printed warnings not in known-warnings.txt:" >&2; printf '  %s\n' "$new_w" >&2; }
+    [ -z "$gone_w" ] || { echo "error: known-warnings.txt lists warnings the build no longer prints; remove them:" >&2; printf '  %s\n' "$gone_w" >&2; }
     exit 1
 fi
+n_warn="$(printf '%s\n' "$seen" | sed '/^$/d' | wc -l | tr -d ' ')"
 n_sorry=$(cd "$ROOT" && find crates/*/extraction -path '*/Extraction/*.lean' ! -name '*_Template.lean' \
               | xargs cat | grep -c 'sorry' || true)
 n_opaque=$(cd "$ROOT" && find crates/*/extraction crates/*/stub -path '*/Assumptions/*.lean' -o -path '*/stub/*.lean' \
               | xargs cat | grep -cE '^(noncomputable )?(axiom|opaque) ' || true)
-echo "    0 warnings; generated code contains $n_sorry 'sorry'; hand-written code declares $n_opaque opaque constant(s)"
+echo "    $n_warn known warning(s); generated code contains $n_sorry 'sorry'; hand-written code declares $n_opaque opaque constant(s)"
 
 if [ "$CHECK" = "1" ]; then
     echo "==> check: re-extraction is byte-identical to the committed output"
