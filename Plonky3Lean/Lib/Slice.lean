@@ -82,6 +82,28 @@ theorem index_rangeFrom_eq {T : Type} {N : Std.Usize} (a : Std.Array T N) (st : 
   have hN : st.val ≤ N.val := by simpa using h
   simp [Slice.subslice, Std.Array.to_slice, hN]
 
+/-- `&s[start..]` of a slice. -/
+theorem slice_index_rangeFrom_eq {T : Type} (sl : Slice T) (st : Std.Usize)
+    (h : st.val ≤ sl.val.length) :
+    CoreModels.core.Slice.Insts.CoreOpsIndexIndex.index
+      (CoreModels.core.ops.range.RangeFromUsize.Insts.CoreSliceIndexSliceIndexSliceSlice T)
+      sl { start := st } =
+      .ok (Slice.from (sl.val.slice st.val sl.val.length) (by
+        have := sl.val.slice_length_le st.val sl.val.length; have := sl.property; scalar_tac)) := by
+  simp only [CoreModels.core.Slice.Insts.CoreOpsIndexIndex.index,
+    CoreModels.core.ops.range.RangeFromUsize.Insts.CoreSliceIndexSliceIndexSliceSlice.get,
+    CoreModels.rust_primitives.slice.slice_length, CoreModels.rust_primitives.slice.slice_slice,
+    bind_ok]
+  have hle : st ≤ Slice.len sl := by
+    rw [UScalar.le_equiv]; simpa using h
+  simp only [hle, ite_true]
+  simp [Slice.subslice, h]
+
+theorem slice_update_eq {α : Type} (s : Slice α) (i : Std.Usize) (x : α) (h : i.val < s.val.length) :
+    Slice.update s i x = .ok (Slice.from (s.val.set i.val x) (by have := s.property; simp [*])) := by
+  simp only [Slice.update]
+  rw [List.getElem?_eq_getElem h]
+
 /-- `&s[..end]` of a slice. -/
 theorem index_rangeTo_eq {T : Type} (sl : Slice T) (e : Std.Usize) (h : e.val ≤ sl.val.length) :
     CoreModels.core.Slice.Insts.CoreOpsIndexIndex.index

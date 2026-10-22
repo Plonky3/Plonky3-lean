@@ -1,6 +1,7 @@
 module
 
 public import Plonky3Lean.Lib
+public import Plonky3Lean.Proofs.Hash.Blake2s
 public import Plonky3Lean.Proofs.Hash.Sha256.Vectors
 public import Plonky3Lean.Proofs.Field.BabyBear
 public import Plonky3Lean.Proofs.Field.BabyBear.Arith

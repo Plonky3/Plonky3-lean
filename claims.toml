@@ -1423,3 +1423,15 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 [[claim]]
 name   = "Plonky3Lean.Claims.P3Sha256.digest.two_blocks"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Blake2s.batch.hash_many.empty"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Blake2s.batch.hash_many.ragged"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Blake2s.batch.hash_many.eq_hash"
+axioms = ["Classical.choice", "Quot.sound", "propext"]

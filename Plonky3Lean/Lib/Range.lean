@@ -63,6 +63,16 @@ theorem usz_val {k : ℕ} (h : k < 2 ^ 32) : (usz k).val = k := by
   rcases System.Platform.numBits_eq with e | e <;>
     simp only [UScalarTy.Usize_numBits_eq, e] <;> omega
 
+/-- `usz k` has value `k` when `k` fits in a `usize`, as any `k ≤ n.val` does. -/
+theorem usz_val_le {k : ℕ} (n : Std.Usize) (h : k ≤ n.val) : (usz k).val = k := by
+  show (BitVec.ofNat _ k).toNat = k
+  rw [BitVec.toNat_ofNat]
+  exact Nat.mod_eq_of_lt (by have := n.hBounds; omega)
+
+theorem eq_usz_le {x : Std.Usize} {k : ℕ} (n : Std.Usize) (h : k ≤ n.val) (hx : x.val = k) :
+    x = usz k :=
+  UScalar.eq_of_val_eq (by rw [hx, usz_val_le n h])
+
 theorem eq_usz {x : Std.Usize} {k : ℕ} (h : k < 2 ^ 32) (hx : x.val = k) : x = usz k :=
   UScalar.eq_of_val_eq (by rw [hx, usz_val h])
 

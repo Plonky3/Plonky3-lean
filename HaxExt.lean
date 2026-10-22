@@ -112,4 +112,13 @@ p3-monty-31's signed conversions into Montgomery form use it. -/
 def core.num.U32.wrapping_add_signed (self : Std.U32) (rhs : Std.I32) : RustM Std.U32 :=
   ok (self.wrapping_add (IScalar.hcast .U32 rhs))
 
+/-- `fmt::rt::Argument::new_display` (`library/core/src/fmt/rt.rs`): one argument
+of a formatted message. `fmt.Arguments` is `Unit`, so what an argument displays is
+not modelled; only the panic it reaches is.
+
+p3-blake2s's scalar `hash_many` formats its `assert!` message with it. -/
+def core.fmt.rt.Argument.new_display {T : Type} (_displayInst : core.fmt.Display T) (_x : T) :
+    RustM core.fmt.rt.Argument :=
+  ok ⟨.Placeholder ()⟩
+
 end CoreModels

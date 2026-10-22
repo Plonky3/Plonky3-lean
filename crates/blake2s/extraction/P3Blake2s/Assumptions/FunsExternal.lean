@@ -8,6 +8,7 @@ module
 
 public import Aeneas
 public import CoreModels
+public import HaxExt
 public import P3Blake2s.Extraction.Types
 
 @[expose] public section

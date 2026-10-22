@@ -1,6 +1,7 @@
 module
 
 public import Plonky3Lean.Claims.BabyBear
+public import Plonky3Lean.Claims.Blake2s
 public import Plonky3Lean.Claims.BinaryField
 public import Plonky3Lean.Claims.Goldilocks
 public import Plonky3Lean.Claims.KoalaBear
