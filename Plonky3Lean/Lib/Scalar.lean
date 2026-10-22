@@ -1,5 +1,6 @@
 import Aeneas
 import CoreModels
+import HaxExt
 
 /-!
 # Rust integer primitives, as natural numbers
@@ -134,5 +135,15 @@ theorem core.num.U64.wrapping_sub.spec (x y : Std.U64) :
   have := y.hBounds
   rw [UScalarTy.U64_numBits_eq] at this
   congr 1; omega
+
+@[step]
+theorem core.num.U32.wrapping_add_signed.spec (x : Std.U32) (y : Std.I32) :
+    CoreModels.core.num.U32.wrapping_add_signed x y ⦃ r =>
+      (r.val : ℤ) = (x.val + y.val) % 2 ^ 32 ⦄ := by
+  simp only [CoreModels.core.num.U32.wrapping_add_signed, WP.spec_ok,
+    U32.wrapping_add_val_eq, IScalar.hcast_val_eq, size_u32, UScalarTy.U32_numBits_eq]
+  have h0 : (0 : ℤ) ≤ y.val % 4294967296 := Int.emod_nonneg _ (by norm_num)
+  push_cast
+  rw [Int.toNat_of_nonneg h0, Int.add_emod_emod]
 
 end Plonky3Lean.Lib

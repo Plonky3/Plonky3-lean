@@ -35,6 +35,13 @@ start_from = [
   "p3_monty_31::utils::monty_reduce",
   "p3_monty_31::utils::from_monty",
   "p3_monty_31::utils::halve_u32",
+  # The conversions into Montgomery form from every integer width, and the
+  # reductions that dot_product and try_inverse rely on.
+  "p3_monty_31::utils::to_monty_signed",
+  "p3_monty_31::utils::to_monty_64",
+  "p3_monty_31::utils::to_monty_64_signed",
+  "p3_monty_31::utils::large_monty_reduce",
+  "p3_monty_31::utils::monty_reduce_u128",
 ]
 
 watch = ["monty-31/src", "monty-31/Cargo.toml"]
