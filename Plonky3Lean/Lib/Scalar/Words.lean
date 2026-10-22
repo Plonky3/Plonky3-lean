@@ -3,6 +3,7 @@ module
 public import Aeneas
 public import CoreModels
 public import HaxExt
+public import Plonky3Lean.Lib.Scalar.Bits
 
 @[expose] public section
 
@@ -64,8 +65,6 @@ theorem u32_rotate_right_eq (x n : Std.U32) :
 
 theorem u32_wrapping_add_eq (x y : Std.U32) :
     CoreModels.core.num.U32.wrapping_add x y = .ok ⟨x.bv + y.bv⟩ := rfl
-
-theorem lift_eq {α : Type} (x : α) : lift x = .ok x := rfl
 
 /-- A logical right shift by a nonnegative `i32` below the width. -/
 theorem u32_shiftRight_i32_eq (x : Std.U32) (s : Std.I32) (h0 : 0 ≤ s.val) (h : s.toNat < 32) :

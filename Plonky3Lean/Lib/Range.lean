@@ -3,6 +3,7 @@ module
 public import Aeneas
 public import CoreModels
 public import Plonky3Lean.Lib.RustM
+public import Plonky3Lean.Lib.Iter
 
 @[expose] public section
 
@@ -22,27 +23,8 @@ namespace Plonky3Lean.Lib
 theorem range_next_some (i K : Std.Usize) (h : i.val < K.val) :
     ∃ i' : Std.Usize, core.IteratorRange.next core.Usize.Insts.CoreIterRangeStep
       { start := i, «end» := K } =
-      .ok (core.option.Option.Some i, { start := i', «end» := K }) ∧ i'.val = i.val + 1 := by
-  unfold core.IteratorRange.next
-  simp [core.Usize.Insts.CoreCmpPartialOrdUsize, core.mkUPartialOrd, compare_lt_iff_lt.mpr h,
-    core.Usize.Insts.CoreCloneClone.clone, core.Usize.Insts.CoreIterRangeStep.forward_checked,
-    core.convert.TryFromUTInfallible.Blanket.try_from, core.convert.From.Blanket.from,
-    core.num.Usize.checked_add]
-  have hK := K.hBounds
-  have e := UScalar.overflowing_add_eq i 1#usize
-  have hmax : ¬ i.val + (1#usize : Std.Usize).val > UScalar.max .Usize := by
-    simp only [UScalar.max] at hK ⊢
-    have : (1#usize : Std.Usize).val = 1 := rfl
-    omega
-  rw [ite_eq_right hmax] at e
-  obtain ⟨e1, e2⟩ := e
-  refine ⟨(UScalar.overflowing_add i 1#usize).1, ?_, by rw [e1]; rfl⟩
-  simp only [CoreModels.core.num.Usize.overflowing_add,
-    CoreModels.rust_primitives.arithmetic.overflowing_add_usize, Aeneas.Std.bind_ok]
-  rw [show UScalar.overflowing_add i 1#usize = ((UScalar.overflowing_add i 1#usize).1, false) from
-    Prod.ext rfl e2]
-  dsimp only
-  simp
+      .ok (core.option.Option.Some i, { start := i', «end» := K }) ∧ i'.val = i.val + 1 :=
+  range_next_lt i K h
 
 /-- An exhausted range, `K ≤ i`. -/
 theorem range_next_none (i K : Std.Usize) (h : K.val ≤ i.val) :
