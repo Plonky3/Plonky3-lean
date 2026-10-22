@@ -78,6 +78,19 @@ theorem natPoly_shiftLeft (a k : ℕ) : natPoly (a <<< k) = X ^ k * natPoly a :=
 theorem natPoly_two_pow_mul (a k : ℕ) : natPoly (2 ^ k * a) = X ^ k * natPoly a := by
   rw [← natPoly_shiftLeft, Nat.shiftLeft_eq, Nat.mul_comm]
 
+/-- A power of two is a power of `X`. -/
+theorem natPoly_two_pow (k : ℕ) : natPoly (2 ^ k) = X ^ k := by
+  ext i
+  rw [coeff_natPoly, coeff_X_pow, Nat.testBit_two_pow]
+  by_cases h : k = i <;> simp [h, eq_comm]
+
+@[simp]
+theorem natPoly_one : natPoly 1 = 1 := by
+  simpa using natPoly_two_pow 0
+
+theorem natPoly_two : natPoly 2 = X := by
+  simpa using natPoly_two_pow 1
+
 /-- The bits from `k` up are the quotient by `X ^ k`. -/
 theorem natPoly_split (a k : ℕ) :
     natPoly a = X ^ k * natPoly (a >>> k) + natPoly (a % 2 ^ k) := by

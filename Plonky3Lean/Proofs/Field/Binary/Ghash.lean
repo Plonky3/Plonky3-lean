@@ -467,14 +467,6 @@ theorem natPoly_even_odd {a : ℕ} (ha : a < 2 ^ 128) :
     rw [coeff_expand (by norm_num), coeff_natPoly, testBit_oddNat ha]
     simp [h1]
 
-theorem natPoly_two : natPoly 2 = X := by
-  ext k
-  have h : (2 ^ 1 : ℕ).testBit k = decide (1 = k) := Nat.testBit_two_pow
-  rw [coeff_natPoly, coeff_X]
-  simp only [pow_one] at h
-  rw [h]
-  by_cases h1 : 1 = k <;> simp [h1]
-
 set_option maxRecDepth 4000 in
 /-- The square root of `X` modulo the GHASH polynomial, as `sqrt.rs` pins it. -/
 theorem root_x_sq :
