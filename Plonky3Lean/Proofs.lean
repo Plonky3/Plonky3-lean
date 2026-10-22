@@ -7,6 +7,7 @@ import Plonky3Lean.Proofs.Field.BabyBear.Element
 import Plonky3Lean.Proofs.Field.BabyBear.Extension
 import Plonky3Lean.Proofs.Field.Monty31.Convert
 import Plonky3Lean.Proofs.Field.Monty31.Element
+import Plonky3Lean.Proofs.Field.Monty31.Findings
 import Plonky3Lean.Proofs.Field.Monty31.Inverse
 import Plonky3Lean.Proofs.Field.Monty31.PowersOfTwo
 import Plonky3Lean.Proofs.Field.Monty31.Reduce
