@@ -14,9 +14,10 @@ impl). This file holds what that extraction does not produce:
   extracted `utils` functions: `Add`, `Sub`, `Mul`, `Neg` and
   `PrimeCharacteristicRing::halve`. Like `new_array`, charon translates the
   first five (with bodies) but leaves them out of the declaration order aeneas
-  reads, so they are not emitted (docs/extractor-issues.md, 4). `halve` fails
-  earlier: rooted at it, charon does not translate it at all. Each body is one
-  line and is transcribed below; the arithmetic itself (`utils::add`, `sub`,
+  reads, so they are not emitted (docs/extractor-issues.md, 4). `halve` is
+  not translated at all: it is a provided method of `PrimeCharacteristicRing`
+  that nothing calls, which charon skips even as a root. Each body is one line
+  and is transcribed below; the arithmetic itself (`utils::add`, `sub`,
   `monty_reduce`, `halve_u32`) is extracted.
 * the `no_packing` Poseidon layer types and their constructor impls. On a
   target with no SIMD these are the layers baby-bear's Poseidon instances use.

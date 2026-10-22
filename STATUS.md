@@ -17,7 +17,7 @@ target `thumbv7em-none-eabi`
 | `baby-bear` | extracted | 2949 | 103 | 4 | 0 | 4 / 3 | pre `020`, `030`, `040` |
 | `field` | stub | | 67 | 1 | 5 | 0 / 0 | |
 | `mds` | scoped | 91 | 8 | 0 | 0 | 0 / 0 | |
-| `monty-31` | scoped | 556 | 276 | 0 | 17 | 0 / 1 | |
+| `monty-31` | scoped | 556 | 277 | 0 | 17 | 0 / 1 | |
 | `poseidon1` | stub | | 67 | 3 | 4 | 0 / 0 | |
 | `poseidon2` | stub | | 64 | 2 | 4 | 0 / 0 | |
 
