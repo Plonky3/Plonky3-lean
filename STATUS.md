@@ -16,7 +16,7 @@ target `thumbv7em-none-eabi`
 |---|---|---:|---:|---:|---:|---:|---|---|
 | `baby-bear` | extracted | 2947 | 107 | 4 | 0 | 0 | 4 / 3 | pre `020`, pre `030`, pre `040` |
 | `field` | stub |  | 76 | 2 | 5 |  | 0 / 0 |  |
-| `goldilocks` | scoped | 563 | 417 | 0 | 19 | 37 | 1 / 0 |  |
+| `goldilocks` | scoped | 563 | 409 | 0 | 19 | 37 | 1 / 0 |  |
 | `koala-bear` | extracted | 3018 | 107 | 4 | 0 | 0 | 0 / 3 |  |
 | `mds` | scoped | 91 | 8 | 0 | 0 | 0 | 0 / 0 |  |
 | `monty-31` | scoped | 676 | 592 | 0 | 34 | 61 | 0 / 1 |  |
