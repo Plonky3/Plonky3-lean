@@ -1,0 +1,10 @@
+# Build warnings that are known and accepted: one per line, as `<file>: <message>`
+# (no line or column, so a warning survives edits elsewhere in its file).
+# tools/extract/extract.sh fails on any warning not listed here, and on any
+# entry here that the build no longer prints. tools/status.py lists them in
+# STATUS.md. Shrinking this file is the goal.
+#
+# The stub declares `p3_field.dup.Dup.dup`, the name aeneas's naming scheme gives
+# `p3_field::dup::Dup::dup`; the generated code refers to it, so it cannot be
+# renamed, and Lean's `dupNamespace` linter flags the repeated `dup`.
+crates/field/stub/P3Field.lean: The namespace `dup` is duplicated in the declaration `p3_field.dup.Dup.dup`.

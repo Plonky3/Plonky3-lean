@@ -10,8 +10,8 @@ and installs nothing; a missing tool stops it with the command to run.
 | Tool | Version | Install |
 |---|---|---|
 | Rust | current `stable`, via `rustup`: step 2 builds upstream's tests with it, as upstream CI does | <https://rustup.rs>; `rustup update stable` |
-| `cargo-hax` | `hax_version` in `toolchain.toml`, on `PATH` (or set `HAX_BIN`) | `cargo install --locked cargo-hax@<hax_version>` |
-| charon and aeneas | the builds that hax release resolves (`charon`, `aeneas` in `toolchain.toml`) | `(cd plonky3 && cargo hax tools install)`, checksum-verified, into `~/.cache/hax/` |
+| `cargo-hax` | the build `toolchain.toml` pins, on `PATH` (or set `HAX_BIN` to another install) | a release: `cargo install --locked cargo-hax@<hax_release> --force`; a commit (`hax_release = ""`): `cargo install --locked --git https://github.com/cryspen/hax --rev <hax_commit> cargo-hax --force` |
+| charon and aeneas | the builds the pinned hax resolves (`charon`, `aeneas` in `toolchain.toml`) | `(cd plonky3 && cargo hax tools install)`, checksum-verified, into `~/.cache/hax/` |
 | charon's Rust toolchain | `rust_toolchain` in `toolchain.toml`, with `rust_components` and `target` | `rustup toolchain install <rust_toolchain> --profile minimal --component rustc-dev,llvm-tools,rust-src --target thumbv7em-none-eabi` |
 | Lean | `lean-toolchain` | [elan](https://github.com/leanprover/elan), which fetches it on first use |
 | other | `python3` (3.11 or later), `rsync`, `patch`, `git` | system packages |
@@ -61,7 +61,13 @@ generated code expects someone to supply. Each hand-written
 `Assumptions/<X>External.lean` must declare exactly the names its template
 does, and must state assumptions as `opaque` constants, not `axiom`s; step 6
 fails otherwise. The templates are committed with the rest of `Extraction/` but
-are never imported, so they are not built.
+are never imported, so they are not built. The generated code is written as Lean
+modules, so every hand-written file it imports (`Assumptions/`, the stubs,
+`HaxExt.lean`) is one too: `module`, `public import`, and an
+`@[expose] public section` so that proofs can unfold its definitions.
+
+hax also writes a `Verification/ProofObligations.lean` scaffold for hand-written
+proofs. It is not installed: the proofs live in `Plonky3Lean`.
 
 ## Reading the extraction
 

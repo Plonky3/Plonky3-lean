@@ -12,14 +12,14 @@ defaultTargets = ["HaxExt", "P3BabyBear", "P3KoalaBear", "P3Util", "ToCompPoly",
 [[require]]
 name = "aeneas"
 git = "https://github.com/cryspen/aeneas"
-rev = "build-183e4f0"
+rev = "build-41977a5"
 subDir = "backends/lean"
 
 # `CoreModels`: the Lean models of `core` and `alloc` that aeneas's output names.
 [[require]]
 name = "hax"
 git = "https://github.com/cryspen/hax-lean"
-rev = "v0.3.30"
+rev = "v0.3.34"
 
 # Mathematical specifications of the fields (and, through it, mathlib). Its
 # mathlib must be the one aeneas pins, so that the two share one mathlib.
@@ -27,7 +27,7 @@ rev = "v0.3.30"
 [[require]]
 name = "CompPoly"
 git = "https://github.com/Verified-zkEVM/CompPoly"
-rev = "v4.31.0"
+rev = "v4.35.0"
 
 # Definitions `Aeneas` and `CoreModels` lack. See HaxExt.lean.
 [[lean_lib]]

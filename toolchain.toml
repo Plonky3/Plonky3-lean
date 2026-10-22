@@ -7,23 +7,29 @@
 # aeneas (LLBC to Lean). The generated code imports `Aeneas` and `CoreModels`.
 backend = "hax-lean"
 
-# The cargo-hax release, and the commit its tag `cargo-hax-v<version>` points to.
-# A crates.io build reports `version=<hax_version>`, a build from git at the tag
-# reports `commit=<hax_commit>`.
-hax_version = "0.4.2"
-hax_commit = "5ccf89dd2e996c9f88f2267eaa2a64739c4ca41a"
+# The cargo-hax build: `hax_commit` is the pin, and `hax_release` names the
+# release whose tag `cargo-hax-v<release>` points to it, or is empty while the pin
+# is a commit no release contains. A crates.io build reports
+# `version=<hax_release>`; a build from git reports `commit=<hax_commit>`.
+#
+# Pinned to hax main: no release yet pins a charon with the fix for
+# docs/extractor-issues.md 4 (charon nightly-2026.09.30 and later). This moves to
+# the first release that does. Install it with
+#   cargo install --locked --git https://github.com/cryspen/hax --rev <hax_commit> cargo-hax --force
+hax_release = ""
+hax_commit = "721d1a2710b1d7020a0b32de7291fe791885d215"
 
-# The charon and aeneas builds the hax release resolves by default
+# The charon and aeneas builds that hax resolves by default
 # (`cargo hax tools show`). Pinning hax pins them; they are restated here because
 # a `hax.toml` anywhere above a crate would override them. `aeneas` must equal
 # the `aeneas` require's `rev` in lakefile.toml.
-charon = "nightly-2026.09.02"
-aeneas = "build-183e4f0"
+charon = "nightly-2026.10.17"
+aeneas = "build-41977a5"
 
 # The rust toolchain charon's driver links against (from charon's own
 # `rust-toolchain`), with the components it needs. `cargo check` of the
 # pre-patched tree runs under the same nightly.
-rust_toolchain = "nightly-2026-08-18"
+rust_toolchain = "nightly-2026-09-17"
 rust_components = ["rustc-dev", "llvm-tools", "rust-src"]
 
 # The target charon compiles the crates for. It has no SIMD, so every AVX2,
