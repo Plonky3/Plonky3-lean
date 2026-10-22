@@ -20,11 +20,6 @@ namespace Plonky3Lean.Proofs.Binary
 
 /-! ## Limbs -/
 
-/-- The element of `GF(2^192)` three 64-bit limbs stand for. -/
-noncomputable def toQuot192 (a : Std.Array Std.U64 3#usize) : Poly192.Quot :=
-  Poly192.ofCoeffs (toQuot64 (a.val.getD 0 0#u64)) (toQuot64 (a.val.getD 1 0#u64))
-    (toQuot64 (a.val.getD 2 0#u64))
-
 theorem array3_eq {T : Type} (a : Std.Array T 3#usize) :
     ∃ x y z, a = ⟨[x, y, z], rfl⟩ := by
   obtain ⟨l, hl⟩ := a

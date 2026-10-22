@@ -5,6 +5,17 @@ import Plonky3Lean.Proofs.Field.BabyBear.Constants
 import Plonky3Lean.Proofs.Field.BabyBear.Element
 import Plonky3Lean.Proofs.Field.BabyBear.Extension
 import Plonky3Lean.Proofs.Field.BabyBear.Generic
+import Plonky3Lean.Proofs.Field.Binary.Clmul
+import Plonky3Lean.Proofs.Field.Binary.Compact
+import Plonky3Lean.Proofs.Field.Binary.Ghash
+import Plonky3Lean.Proofs.Field.Binary.MaskedMul
+import Plonky3Lean.Proofs.Field.Binary.Poly192
+import Plonky3Lean.Proofs.Field.Binary.Poly192Irreducible
+import Plonky3Lean.Proofs.Field.Binary.Poly64
+import Plonky3Lean.Proofs.Field.Binary.Poly64Field
+import Plonky3Lean.Proofs.Field.Binary.Poly64Irreducible
+import Plonky3Lean.Proofs.Field.Binary.Poly64Sqrt
+import Plonky3Lean.Proofs.Field.Binary.Statements
 import Plonky3Lean.Proofs.Field.Goldilocks.Arith
 import Plonky3Lean.Proofs.Field.Goldilocks.Basic
 import Plonky3Lean.Proofs.Field.Goldilocks.Constants

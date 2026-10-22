@@ -15,6 +15,7 @@ target `thumbv7em-none-eabi`
 | Crate | State | Generated lines | Hand-written lines | `opaque` | Mirrored | Dropped by the extractor | Patches (pre / post) | Patches with a cost |
 |---|---|---:|---:|---:|---:|---:|---|---|
 | `baby-bear` | extracted | 2947 | 107 | 4 | 0 | 0 | 4 / 3 | pre `020`, pre `030`, pre `040` |
+| `binary-field` | scoped | 823 | 35 | 0 | 0 | 0 | 2 / 0 | pre `010`, pre `020` |
 | `field` | stub |  | 87 | 2 | 6 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 563 | 409 | 0 | 19 | 37 | 1 / 0 |  |
 | `koala-bear` | extracted | 3018 | 107 | 4 | 0 | 0 | 0 / 3 |  |
@@ -38,6 +39,11 @@ charon's output and `--check` requires to reproduce. An item is *mirrored* when 
 `[[mirror]]` entry transcribes it by hand.
 
 ### `baby-bear`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `binary-field`
 
 charon errors: 0.
 Nothing translated is dropped.
@@ -216,7 +222,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 274) whose dependencies include it; reaching one is not using it.
+(of 290) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -242,7 +248,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 274) whose dependencies include the declaration.
+counts the claims (of 290) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -334,6 +340,8 @@ counts the claims (of 274) whose dependencies include the declaration.
 | `baby-bear/pre/020-field-cfg-raw-data-serializable-supertrait` | none in a normal build (see below). In the extracted variant, `Field` no longer implies `RawDataSerializable`. |
 | `baby-bear/pre/030-field-cfg-rpitit-packed-methods` | none in a normal build: every change is behind cfg(hax_backend_lean). In the extracted variant, four default methods are absent and `to_ext_iter` sits on an extension trait. |
 | `baby-bear/pre/040-field-cfg-rpitit-bit-plane-expansion` | none in a normal build: the change is behind cfg(hax_backend_lean). In the extracted variant, `Field::prepare_bit_plane_expansion` is absent. |
+| `binary-field/pre/010-cfg-raw-data-serializable-bounds` | none: each added bound is implied by `TowerLevel: Field` in a normal build. |
+| `binary-field/pre/020-cfg-hide-ghash-bit-plane-expansion` | none in a normal build: the change is behind cfg(hax_backend_lean). In the extracted variant, `Ghash128::prepare_bit_plane_expansion` is absent. |
 | `mersenne-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of `Mersenne31`. No existing body changes. |
 
 Upstream tests (`test-pre-patches.py`): 6715 of Plonky3's 6769 pass as shipped and 6715 with the pre-extraction patches, with 0 divergence(s).
@@ -419,6 +427,22 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BabyBear.poseidon2.const_check_6.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BabyBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.Poly192.modulus.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.Poly64.modulus.irreducible` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.clmul.gf192.poly_mul_192.toQuot192` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.clmul.gf192.poly_mul_192_by_64.toQuot192` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.clmul.gf192.poly_square_192.toQuot192` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.clmul.gf64.poly_inverse_64.toQuot64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.clmul.gf64.poly_mul_64.toQuot64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.clmul.gf64.poly_sqrt_64.toQuot64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.clmul.gf64.poly_square_64.toQuot64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.clmul.portable.clmul_64x64.poly` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.clmul.portable.poly_mul_128.toQuot` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.clmul.portable.poly_mul_128_by_64.toQuot` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.clmul.portable.poly_square_128.toQuot` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.clmul.reduce_128.toQuot` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.clmul.reduce_64.toQuot64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryField.clmul.sqrt.poly_sqrt_128.toQuot` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Goldilocks.goldilocks.Goldilocks.GENERATOR.generates` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Goldilocks.goldilocks.Goldilocks.NEG_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Goldilocks.goldilocks.Goldilocks.ORDER_U64.eq_fieldSize` | `Classical.choice`, `Quot.sound`, `propext` |

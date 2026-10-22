@@ -121,9 +121,6 @@ theorem mk_mulMod64 {a b : ℕ} (ha : a < 2 ^ 64) (hb : b < 2 ^ 64) :
       AdjoinRoot.mk Poly64.modulus (natPoly a) * AdjoinRoot.mk Poly64.modulus (natPoly b) := by
   rw [mulMod64, mk_natPoly_reduce64Nat (clmul64Nat_lt _ _), natPoly_clmul64Nat ha hb, map_mul]
 
-/-- The element of `GF(2)[x] / (modulus)` a 64-bit integer stands for. -/
-noncomputable def toQuot64 (x : Std.U64) : Poly64.Quot := AdjoinRoot.mk Poly64.modulus (poly x)
-
 theorem toQuot64_eq (x : Std.U64) : toQuot64 x = AdjoinRoot.mk Poly64.modulus (natPoly x.val) := by
   rw [toQuot64, poly_eq_natPoly]
 

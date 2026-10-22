@@ -1,4 +1,5 @@
 import Plonky3Lean.Spec.BabyBear
+import Plonky3Lean.Spec.BinaryField
 import Plonky3Lean.Spec.Goldilocks
 import Plonky3Lean.Spec.KoalaBear
 import Plonky3Lean.Spec.Mersenne31
