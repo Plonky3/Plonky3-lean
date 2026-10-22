@@ -324,7 +324,12 @@ The trait requires `X ^ D - W` to be irreducible (otherwise the quotient is not 
 field), `DTH_ROOT` to be `W ^ ((p - 1) / D)`, `EXT_TWO_ADICITY` to be the
 two-adicity of `p ^ D - 1`, and the `i`-th entry of
 `TWO_ADIC_EXTENSION_GENERATORS` to be a primitive `2 ^ (TWO_ADICITY + 1 + i)`-th
-root of unity. Each extension element is read through
+root of unity. `ext_two_adic_generator(bits)` indexes that array at
+`bits - TWO_ADICITY - 1` for `TWO_ADICITY < bits ≤ EXT_TWO_ADICITY`, so it has to
+have `EXT_TWO_ADICITY - TWO_ADICITY` entries, and Plonky3's
+`test_two_adic_generator_consistency` checks that the entries continue the base
+field's chain of square roots: entry `0` squares to `TWO_ADIC_GENERATORS[TWO_ADICITY]`
+and each later entry to the one before. Each extension element is read through
 `Plonky3Lean.Spec.BabyBear.toExt`.
 
 The degree-5 field has no two-adic extension generators: `p ^ 5 - 1` has the
@@ -357,15 +362,30 @@ theorem baby_bear.BabyBearParameters.BinomialExtensionData4.EXT_TWO_ADICITY.spec
       ¬ 2 ^ (e.val + 1) ∣ PRIME.val ^ 4 - 1 ⦄ :=
   Proofs.BabyBear.Ext4Params.EXT_TWO_ADICITY.spec
 
-/-- Entry `i` of `TWO_ADIC_EXTENSION_GENERATORS` for the degree-4 extension, read
-as an element of `F[X] / (X ^ 4 - W)`, has order exactly
-`2 ^ (TWO_ADICITY + 1 + i)`: it extends the base field's two-adic generators. -/
+/-- `TWO_ADIC_EXTENSION_GENERATORS` for the degree-4 extension has
+`EXT_TWO_ADICITY - TWO_ADICITY` entries, the number `ext_two_adic_generator`
+indexes, and entry `i`, read as an element of `F[X] / (X ^ 4 - W)`, has order
+exactly `2 ^ (TWO_ADICITY + 1 + i)`. -/
 theorem baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.order :
-    ∃ w t, Ext4Params.W = .ok w ∧ Ext4Params.TWO_ADIC_EXTENSION_GENERATORS = .ok t ∧
+    ∃ w t e, Ext4Params.W = .ok w ∧ Ext4Params.TWO_ADIC_EXTENSION_GENERATORS = .ok t ∧
+      Ext4Params.EXT_TWO_ADICITY = .ok e ∧ TWO_ADICITY.val + t.val.length = e.val ∧
       ∀ i (h : i < t.val.length),
-        orderOf (toExt 4 (Spec.BabyBear.toField w) t.val[i].val) =
+        orderOf (toExt (Spec.BabyBear.toField w) t.val[i]) =
           2 ^ (TWO_ADICITY.val + 1 + i) :=
   Proofs.BabyBear.Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.order
+
+/-- `TWO_ADIC_EXTENSION_GENERATORS` for the degree-4 extension continues the base
+field's two-adic generators: in `F[X] / (X ^ 4 - W)`, entry `0` squares to
+`TWO_ADIC_GENERATORS[TWO_ADICITY]` (CompPoly's table, which
+`TWO_ADIC_GENERATORS.eq_twoAdicGenerators` identifies with the model's), and each
+later entry squares to the one before. This is the chain
+`test_two_adic_generator_consistency` checks. -/
+theorem baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.sq_succ :
+    ∃ w t, Ext4Params.W = .ok w ∧ Ext4Params.TWO_ADIC_EXTENSION_GENERATORS = .ok t ∧
+      let chain := AdjoinRoot.of _ BabyBear.twoAdicGenerators[TWO_ADICITY.val]! ::
+        t.val.map (toExt (Spec.BabyBear.toField w))
+      ∀ i (h : i + 1 < chain.length), chain[i + 1] ^ 2 = chain[i] :=
+  Proofs.BabyBear.Ext4Params.TWO_ADIC_EXTENSION_GENERATORS.sq_succ
 
 /-- `W = 2` for the degree-5 extension, stored canonically, and `X ^ 5 - W` is
 irreducible over the BabyBear field, so `F[X] / (X ^ 5 - W)` is a field of order
@@ -413,15 +433,30 @@ theorem baby_bear.BabyBearParameters.BinomialExtensionData8.EXT_TWO_ADICITY.spec
       ¬ 2 ^ (e.val + 1) ∣ PRIME.val ^ 8 - 1 ⦄ :=
   Proofs.BabyBear.Ext8Params.EXT_TWO_ADICITY.spec
 
-/-- Entry `i` of `TWO_ADIC_EXTENSION_GENERATORS` for the degree-8 extension, read
-as an element of `F[X] / (X ^ 8 - W)`, has order exactly
-`2 ^ (TWO_ADICITY + 1 + i)`: it extends the base field's two-adic generators. -/
+/-- `TWO_ADIC_EXTENSION_GENERATORS` for the degree-8 extension has
+`EXT_TWO_ADICITY - TWO_ADICITY` entries, the number `ext_two_adic_generator`
+indexes, and entry `i`, read as an element of `F[X] / (X ^ 8 - W)`, has order
+exactly `2 ^ (TWO_ADICITY + 1 + i)`. -/
 theorem baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.order :
-    ∃ w t, Ext8Params.W = .ok w ∧ Ext8Params.TWO_ADIC_EXTENSION_GENERATORS = .ok t ∧
+    ∃ w t e, Ext8Params.W = .ok w ∧ Ext8Params.TWO_ADIC_EXTENSION_GENERATORS = .ok t ∧
+      Ext8Params.EXT_TWO_ADICITY = .ok e ∧ TWO_ADICITY.val + t.val.length = e.val ∧
       ∀ i (h : i < t.val.length),
-        orderOf (toExt 8 (Spec.BabyBear.toField w) t.val[i].val) =
+        orderOf (toExt (Spec.BabyBear.toField w) t.val[i]) =
           2 ^ (TWO_ADICITY.val + 1 + i) :=
   Proofs.BabyBear.Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.order
+
+/-- `TWO_ADIC_EXTENSION_GENERATORS` for the degree-8 extension continues the base
+field's two-adic generators: in `F[X] / (X ^ 8 - W)`, entry `0` squares to
+`TWO_ADIC_GENERATORS[TWO_ADICITY]` (CompPoly's table, which
+`TWO_ADIC_GENERATORS.eq_twoAdicGenerators` identifies with the model's), and each
+later entry squares to the one before. This is the chain
+`test_two_adic_generator_consistency` checks. -/
+theorem baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.sq_succ :
+    ∃ w t, Ext8Params.W = .ok w ∧ Ext8Params.TWO_ADIC_EXTENSION_GENERATORS = .ok t ∧
+      let chain := AdjoinRoot.of _ BabyBear.twoAdicGenerators[TWO_ADICITY.val]! ::
+        t.val.map (toExt (Spec.BabyBear.toField w))
+      ∀ i (h : i + 1 < chain.length), chain[i + 1] ^ 2 = chain[i] :=
+  Proofs.BabyBear.Ext8Params.TWO_ADIC_EXTENSION_GENERATORS.sq_succ
 
 /-! ## The Poseidon round-constant length assertions
 

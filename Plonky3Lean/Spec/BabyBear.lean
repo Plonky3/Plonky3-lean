@@ -99,9 +99,10 @@ open Polynomial in
 coefficient array stands for, `Σ j, c_j · X ^ j`, with each coefficient read
 through `toField`. This is how Plonky3's `BinomialExtensionField<BabyBear, D>`
 represents an element: its `[BabyBear; D]` of coefficients in the basis
-`1, X, …, X ^ (D - 1)`, with `X ^ D = W`. -/
-noncomputable def toExt (D : ℕ) (w : BabyBear.Field) (coeffs : List Element) :
-    AdjoinRoot (X ^ D - C w) :=
-  AdjoinRoot.mk _ (((coeffs.map toField).mapIdx fun j a => C a * X ^ j).sum)
+`1, X, …, X ^ (D - 1)`, with `X ^ D = W`. The degree is the array's length, so
+only a `[BabyBear; D]` is read as an element of the degree-`D` extension. -/
+noncomputable def toExt {D : Usize} (w : BabyBear.Field) (coeffs : Array Element D) :
+    AdjoinRoot (X ^ D.val - C w) :=
+  AdjoinRoot.mk _ (((coeffs.val.map toField).mapIdx fun j a => C a * X ^ j).sum)
 
 end Plonky3Lean.Spec.BabyBear

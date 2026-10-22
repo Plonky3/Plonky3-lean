@@ -197,6 +197,10 @@ name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExten
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.TWO_ADIC_EXTENSION_GENERATORS.sq_succ"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData4.W.irreducible"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -222,6 +226,10 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.order"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BabyBear.baby_bear.BabyBearParameters.BinomialExtensionData8.TWO_ADIC_EXTENSION_GENERATORS.sq_succ"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
