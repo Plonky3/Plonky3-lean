@@ -8,6 +8,7 @@ import Plonky3Lean.Proofs.Field.BabyBear.Generic
 import Plonky3Lean.Proofs.Field.Goldilocks.Arith
 import Plonky3Lean.Proofs.Field.Goldilocks.Basic
 import Plonky3Lean.Proofs.Field.Goldilocks.Convert
+import Plonky3Lean.Proofs.Field.Goldilocks.Inverse
 import Plonky3Lean.Proofs.Field.Goldilocks.PowersOfTwo
 import Plonky3Lean.Proofs.Field.KoalaBear
 import Plonky3Lean.Proofs.Field.KoalaBear.Arith
