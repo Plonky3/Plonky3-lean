@@ -1,0 +1,14 @@
+# Mutation of: 010-cfg-raw-data-serializable-bounds
+# Breaks:      one added bound is not implied by `TowerLevel`, so the impl no longer applies to every tower level.
+#
+--- a/binary-field/src/challenger.rs
++++ b/binary-field/src/challenger.rs
+@@ -87,7 +87,7 @@
+ }
+ 
+ // PATCHED: the bound on `F` was `TowerLevel`
+-impl<F: TowerLevel + RawDataSerializable, Inner: CanObserve<u8>> CanObserve<F>
++impl<F: TowerLevel + RawDataSerializable + core::fmt::LowerHex, Inner: CanObserve<u8>> CanObserve<F>
+     for BinaryChallenger<F, Inner>
+ {
+     fn observe(&mut self, value: F) {

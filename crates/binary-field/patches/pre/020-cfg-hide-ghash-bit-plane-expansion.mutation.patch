@@ -1,0 +1,15 @@
+# Mutation of: 020-cfg-hide-ghash-bit-plane-expansion
+# Breaks:      the override is gated on a misspelled cfg, which the workspace does not declare.
+#
+diff --git a/binary-field/src/ghash.rs b/binary-field/src/ghash.rs
+--- a/binary-field/src/ghash.rs
++++ b/binary-field/src/ghash.rs
+@@ -303,7 +303,7 @@
+ 
+     const GENERATOR: Self = Self(clmul::tower_image_128(TOWER_GENERATOR));
+ 
+-    #[cfg(not(hax_backend_lean))] // PATCHED: `-> Option<impl Fn>`, absent from `Field` under the cfg
++    #[cfg(not(hax_backend_lea))] // PATCHED: `-> Option<impl Fn>`, absent from `Field` under the cfg
+     #[inline]
+     fn prepare_bit_plane_expansion(
+         weights: &[Self; 64],

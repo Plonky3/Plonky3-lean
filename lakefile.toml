@@ -91,3 +91,7 @@ srcDir = "crates/poseidon2/stub"
 [[lean_lib]]
 name = "P3Util"
 srcDir = "crates/util/extraction"
+
+[[lean_lib]]
+name = "P3BinaryField"
+srcDir = "crates/binary-field/extraction"
