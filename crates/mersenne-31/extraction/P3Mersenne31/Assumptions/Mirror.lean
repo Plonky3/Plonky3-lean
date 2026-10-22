@@ -14,7 +14,11 @@ The arithmetic they call (`new`, `new_reduced`, `Add`, `Sub`, `from_u62`) is ext
 
 It is modelled by that array, `[real, imag]`.
 -/
-import P3Mersenne31.Extraction
+module
+
+public import P3Mersenne31.Extraction
+
+@[expose] public section
 open CoreModels Aeneas
 open Aeneas.Std hiding namespace core alloc
 open RustM ControlFlow Error
@@ -115,7 +119,7 @@ def complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS :
     (1765392370#u32, 461136547#u32), (1629751483#u32, 66485474#u32),
     (1501355827#u32, 1439063420#u32), (509778402#u32, 800467507#u32),
     (311014874#u32, 1584694829#u32)].mapM (fun c => complex.new_complex_new c.1 c.2) >>=
-    fun l => if h : l.length = 32 then ok ⟨l, h⟩ else fail .panic
+    fun l => if h : l.length = 32 then ok (Array.from l h) else fail .panic
 
 /-- `<Mersenne31 as ComplexExtendable>::COMPLEX_GENERATOR`. Upstream line 61: `Complex::new_complex(Self::new(12), Self::ONE)`. -/
 def complex.Mersenne31.COMPLEX_GENERATOR : RustM (Array mersenne_31.Mersenne31 2#usize) := do

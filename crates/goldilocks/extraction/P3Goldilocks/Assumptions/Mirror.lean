@@ -18,7 +18,11 @@ The names are those aeneas would generate, so a future emission collides with it
 
 They are transcribed as checked operators, so a proof of no failure proves no overflow.
 -/
-import P3Goldilocks.Extraction
+module
+
+public import P3Goldilocks.Extraction
+
+@[expose] public section
 open CoreModels Aeneas
 open Aeneas.Std hiding namespace core alloc
 open RustM ControlFlow Error

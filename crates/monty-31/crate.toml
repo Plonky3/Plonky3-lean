@@ -73,40 +73,6 @@ watch = ["monty-31/src", "monty-31/Cargo.toml"]
 # are pending tools/mirror; until it exists, the transcriptions are re-read by
 # hand when a commit in `watch` touches them.
 [[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.new_array"
-rust = "p3_monty_31::monty_31::MontyField31::new_array"
-
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.new_2d_array"
-rust = "p3_monty_31::monty_31::MontyField31::new_2d_array"
-
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.new_monty"
-rust = "p3_monty_31::monty_31::MontyField31::new_monty"
-
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.add"
-rust = "{impl core::ops::arith::Add for p3_monty_31::monty_31::MontyField31<_>}::add"
-
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.sub"
-rust = "{impl core::ops::arith::Sub for p3_monty_31::monty_31::MontyField31<_>}::sub"
-
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.mul"
-rust = "{impl core::ops::arith::Mul for p3_monty_31::monty_31::MontyField31<_>}::mul"
-
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.neg"
-rust = "{impl core::ops::arith::Neg for p3_monty_31::monty_31::MontyField31<_>}::neg"
-
-# `neg` also transcribes `Self::ZERO = FP::MONTY_ZERO`, a second Rust item, so
-# a change to either must reach it.
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.neg"
-rust = "{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::ZERO"
-
-[[mirror]]
 lean = "p3_monty_31.monty_31.MontyField31.halve"
 rust = "{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::halve"
 
@@ -157,10 +123,6 @@ rust = "p3_field::field::PrimeCharacteristicRing::exp_u64"
 [[mirror]]
 lean = "p3_monty_31.monty_31.MontyField31.exp_u64.step"
 rust = "p3_field::field::PrimeCharacteristicRing::exp_u64"
-
-[[mirror]]
-lean = "p3_monty_31.monty_31.MontyField31.MONTY_POWERS_OF_TWO"
-rust = "p3_monty_31::monty_31::MontyField31::MONTY_POWERS_OF_TWO"
 
 [[mirror]]
 lean = "p3_monty_31.monty_31.MontyField31.mul_2exp_u64"

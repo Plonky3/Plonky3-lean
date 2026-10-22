@@ -4,5 +4,9 @@ extraction, in `P3Monty31/Extraction/` (rooted at `start_from` in crate.toml),
 and the transcriptions of what that extraction does not produce, in
 `P3Monty31/Assumptions/Mirror.lean`.
 -/
-import P3Monty31.Extraction
-import P3Monty31.Assumptions.Mirror
+module
+
+public import P3Monty31.Extraction
+public import P3Monty31.Assumptions.Mirror
+
+@[expose] public section

@@ -5,5 +5,9 @@ The Lean model of p3-mersenne-31's scalar field: hax's scoped extraction, in
 transcriptions of what that extraction cannot produce, in
 `P3Mersenne31/Assumptions/Mirror.lean`.
 -/
-import P3Mersenne31.Extraction
-import P3Mersenne31.Assumptions.Mirror
+module
+
+public import P3Mersenne31.Extraction
+public import P3Mersenne31.Assumptions.Mirror
+
+@[expose] public section

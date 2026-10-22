@@ -2,14 +2,18 @@
 -- HAND-WRITTEN, from hax's seed of Extraction/TypesExternal_Template.lean.
 -- The generated code imports it by this module name. extract.sh fails if the
 -- regenerated template declares different names than this file does.
-import Aeneas
-import CoreModels
+module
+
+public import Aeneas
+public import CoreModels
 -- The dependency interface: the libraries of crates/mds and crates/monty-31,
 -- the scoped extractions of p3-mds and p3-monty-31 plus what they do not supply
 -- (`P3Monty31.Assumptions.Mirror`, which imports the p3-field and
 -- p3-poseidon{1,2} stubs).
-import P3Mds
-import P3Monty31
+public import P3Mds
+public import P3Monty31
+
+@[expose] public section
 open CoreModels Aeneas
 open Aeneas.Std hiding namespace core alloc
 open RustM ControlFlow Error

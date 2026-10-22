@@ -1,1 +1,3 @@
-import P3BabyBear.Assumptions.TypesExternal
+module
+
+public import P3BabyBear.Assumptions.TypesExternal

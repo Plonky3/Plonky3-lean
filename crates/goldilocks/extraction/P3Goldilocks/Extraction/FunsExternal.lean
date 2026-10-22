@@ -1,1 +1,3 @@
-import P3Goldilocks.Assumptions.FunsExternal
+module
+
+public import P3Goldilocks.Assumptions.FunsExternal

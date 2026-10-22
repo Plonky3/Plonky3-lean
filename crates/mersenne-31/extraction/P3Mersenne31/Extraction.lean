@@ -1,3 +1,5 @@
 -- Imports the extraction modules. Rewritten by hax on every extraction.
-import P3Mersenne31.Extraction.Types
-import P3Mersenne31.Extraction.Funs
+module
+
+public import P3Mersenne31.Extraction.Types
+public import P3Mersenne31.Extraction.Funs

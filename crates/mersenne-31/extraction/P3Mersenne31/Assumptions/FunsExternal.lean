@@ -2,16 +2,20 @@
 -- HAND-WRITTEN, from hax's seed of Extraction/FunsExternal_Template.lean.
 -- The generated code imports it by this module name. extract.sh fails if the
 -- regenerated template declares different names than this file does.
-import Aeneas
-import CoreModels
-import P3Mersenne31.Extraction.Types
+module
+
+public import Aeneas
+public import CoreModels
+public import P3Mersenne31.Extraction.Types
 -- `core` models missing from hax-lean's CoreModels (`HaxExt.lean`).
-import HaxExt
+public import HaxExt
 -- The functions of other crates the extraction calls:
 -- `p3_field::halve_u32` (crates/field/stub/P3Field.lean) and
 -- `p3_util::gcd_inversion_prime_field_32` (crates/util, extracted).
-import P3Field
-import P3Util
+public import P3Field
+public import P3Util
+
+@[expose] public section
 open CoreModels Aeneas
 open Aeneas.Std hiding namespace core alloc
 open RustM ControlFlow Error

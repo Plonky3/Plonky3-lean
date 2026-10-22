@@ -16,8 +16,12 @@ which is weaker than assuming `opaque` ring operations. Field
 names and argument order follow aeneas's naming scheme exactly, so the
 generated code elaborates against them unchanged.
 -/
-import Aeneas
-import CoreModels
+module
+
+public import Aeneas
+public import CoreModels
+
+@[expose] public section
 open CoreModels Aeneas
 open Aeneas.Std hiding namespace core alloc
 open RustM ControlFlow Error

@@ -2,11 +2,15 @@
 -- HAND-WRITTEN, from hax's seed of Extraction/TypesExternal_Template.lean.
 -- The generated code imports it by this module name. extract.sh fails if the
 -- regenerated template declares different names than this file does.
-import Aeneas
-import CoreModels
+module
+
+public import Aeneas
+public import CoreModels
 -- The only external items this scoped extraction refers to are p3-field's
 -- traits, which are hand-written (crates/field/stub/P3Field.lean).
-import P3Field
+public import P3Field
+
+@[expose] public section
 open CoreModels Aeneas
 open Aeneas.Std hiding namespace core alloc
 open RustM ControlFlow Error
