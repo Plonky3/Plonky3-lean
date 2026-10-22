@@ -70,9 +70,15 @@ rust = "{impl core::ops::arith::Mul for p3_monty_31::monty_31::MontyField31<_>}:
 lean = "p3_monty_31.monty_31.MontyField31.neg"
 rust = "{impl core::ops::arith::Neg for p3_monty_31::monty_31::MontyField31<_>}::neg"
 
+# `neg` also transcribes `Self::ZERO = FP::MONTY_ZERO`, a second Rust item, so
+# a change to either must reach it.
+[[mirror]]
+lean = "p3_monty_31.monty_31.MontyField31.neg"
+rust = "{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::ZERO"
+
 [[mirror]]
 lean = "p3_monty_31.monty_31.MontyField31.halve"
-rust = "{impl p3_field::field::Field for p3_monty_31::monty_31::MontyField31<_>}::halve"
+rust = "{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::halve"
 
 [[mirror]]
 lean = "p3_monty_31.no_packing.poseidon1.Poseidon1InternalLayerMonty31"

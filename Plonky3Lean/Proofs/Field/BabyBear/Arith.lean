@@ -6,7 +6,7 @@ import Plonky3Lean.Proofs.Field.BabyBear.Constants
 The `u32` arithmetic of p3-monty-31's `utils` (`add`, `sub`, `monty_reduce`,
 `halve_u32`, `from_monty`), extracted, at BabyBear's parameters; and the
 `MontyField31` operators that wrap them (`Add`, `Sub`, `Mul`, `Neg`,
-`Field::halve`), transcribed in `P3Monty31.Assumptions.Mirror`, read through
+`PrimeCharacteristicRing::halve`), transcribed in `P3Monty31.Assumptions.Mirror`, read through
 `Plonky3Lean.Spec.BabyBear.toField`: each is the field operation, and keeps
 values canonical.
 

@@ -11,12 +11,13 @@ impl). This file holds what that extraction does not produce:
   (docs/extractor-issues.md, 4). They are transcribed below: an elementwise
   `new`, left to right, as the Rust `while` loops are.
 * `MontyField31::new_monty` and the scalar arithmetic impls that wrap the
-  extracted `utils` functions: `Add`, `Sub`, `Mul`, `Neg` and `Field::halve`.
-  Like `new_array`, charon translates them (with bodies) but leaves them out
-  of the declaration order aeneas reads, so they are not emitted
-  (docs/extractor-issues.md, 4). Each body is one line and is transcribed
-  below; the arithmetic itself (`utils::add`, `sub`, `monty_reduce`,
-  `halve_u32`) is extracted.
+  extracted `utils` functions: `Add`, `Sub`, `Mul`, `Neg` and
+  `PrimeCharacteristicRing::halve`. Like `new_array`, charon translates the
+  first five (with bodies) but leaves them out of the declaration order aeneas
+  reads, so they are not emitted (docs/extractor-issues.md, 4). `halve` fails
+  earlier: rooted at it, charon does not translate it at all. Each body is one
+  line and is transcribed below; the arithmetic itself (`utils::add`, `sub`,
+  `monty_reduce`, `halve_u32`) is extracted.
 * the `no_packing` Poseidon layer types and their constructor impls. On a
   target with no SIMD these are the layers baby-bear's Poseidon instances use.
   The constructor bodies are one struct literal each and are transcribed.
@@ -100,7 +101,7 @@ def monty_31.MontyField31.neg {FP : Type}
   monty_31.MontyField31.sub
     data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst zero self
 
-/-- `<MontyField31<FP> as Field>::halve`. Upstream line 225:
+/-- `<MontyField31<FP> as PrimeCharacteristicRing>::halve`. Upstream line 225:
 `Self::new_monty(halve_u32::<FP>(self.value))`. -/
 def monty_31.MontyField31.halve {FP : Type}
     (data_traitsFieldParametersInst : data_traits.FieldParameters FP)

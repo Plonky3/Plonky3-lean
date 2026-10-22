@@ -29,6 +29,8 @@ one of them is still present.
    It happens with and without `--targets`, so it is not 2. No diagnostic is
    printed. Transcribed by hand in
    `crates/monty-31/extraction/P3Monty31/Assumptions/Mirror.lean`.
+   `PrimeCharacteristicRing::halve` fails earlier: as a `--start-from` root it
+   never reaches `fun_decls`. It is transcribed in the same file.
 5. **aeneas's `__N` names for anonymous consts** trip mathlib's `nameCheck`
    linter. Post-patch `baby-bear/030-name-anonymous-const-assertions`.
 6. **The seeded `Debug::fmt` signatures do not match `CoreModels`**: aeneas
