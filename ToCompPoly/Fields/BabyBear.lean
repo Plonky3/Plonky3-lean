@@ -3,10 +3,10 @@ Copyright (c) 2026 CompPoly. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Derek Sorensen
 -/
-import CompPoly.Fields.BabyBear
-import Mathlib.FieldTheory.Finite.Basic
-import ToCompPoly.Data.Nat.PowMod
+module
 
+public import CompPoly.Fields.BabyBear
+public import Mathlib.FieldTheory.Finite.Basic
 /-!
   # BabyBear: a multiplicative generator and seventh roots
 
@@ -14,16 +14,24 @@ import ToCompPoly.Data.Nat.PowMod
   - `generator = 31` generates the multiplicative group;
   - `x ↦ x ^ 1725656503` inverts `x ↦ x ^ 7`, since `7 · 1725656503 ≡ 1 (mod p - 1)`.
 
-  Both are kernel-checked, without `native_decide`.
+  Both are kernel-checked, without `native_decide`: powers are evaluated through core's
+  `Nat.powMod` under `decide`.
 -/
+
+@[expose] public section
 
 namespace BabyBear
 
-/-- A nonzero power of a natural number in the field, checked through `Nat.powMod`. -/
-theorem natCast_pow_ne_one {e : ℕ} (b : ℕ) (he : e < 2 ^ 64)
-    (h : (Nat.powMod b e fieldSize : Field) ≠ 1) :
+/-- A power of a natural number in the field, as core's `Nat.powMod`, which the kernel
+evaluates in `O(log e)` steps under `decide`. -/
+theorem natCast_pow_eq_powMod (b e : ℕ) :
+    (b : Field) ^ e = (Nat.powMod b e fieldSize : Field) := by
+  rw [Nat.powMod_def, ZMod.natCast_mod]; push_cast; rfl
+
+/-- A power of a natural number in the field is not `1`, checked through `Nat.powMod`. -/
+theorem natCast_pow_ne_one {e : ℕ} (b : ℕ) (h : (Nat.powMod b e fieldSize : Field) ≠ 1) :
     (b : Field) ^ e ≠ 1 := by
-  rwa [ZMod.natCast_pow_eq_powMod b e he]
+  rwa [natCast_pow_eq_powMod b e]
 
 /-- The primes dividing `p - 1 = 2 ^ 27 · 3 · 5`. -/
 theorem prime_dvd_fieldSize_sub_one {q : ℕ} (hq : q.Prime) (h : q ∣ fieldSize - 1) :
@@ -46,7 +54,7 @@ theorem orderOf_generator : orderOf generator = fieldSize - 1 := by
   · exact ZMod.pow_card_sub_one_eq_one (by decide)
   · intro q hq hdvd
     rcases prime_dvd_fieldSize_sub_one hq hdvd with rfl | rfl | rfl <;>
-    · exact_mod_cast natCast_pow_ne_one 31 (by unfold fieldSize; norm_num) (by decide)
+    · exact_mod_cast natCast_pow_ne_one 31 (by decide)
 
 /-- `x ↦ x ^ 1725656503` is the inverse of `x ↦ x ^ 7`: `7 · 1725656503 ≡ 1 (mod p - 1)`. -/
 theorem pow_1725656503_pow_seven (x : Field) : (x ^ 1725656503) ^ 7 = x := by

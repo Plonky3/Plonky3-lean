@@ -3,15 +3,17 @@ Copyright (c) 2026 CompPoly. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Thomas Coratger
 -/
-import CompPoly.Fields.KoalaBear
-import Mathlib.RingTheory.AdjoinRoot
-import ToCompPoly.Data.Nat.PowMod
-import ToCompPoly.Fields.KoalaBear
-import CompPoly.Fields.PrattCertificate
-import Mathlib.Tactic.NormNum.Prime
-import ToCompPoly.ToMathlib.Order.OrderOfSq
-import ToCompPoly.ToMathlib.Polynomial.CoeffList
-import ToCompPoly.ToMathlib.Polynomial.XPowSubC
+module
+
+public import CompPoly.Fields.KoalaBear
+public import Mathlib.RingTheory.AdjoinRoot
+public import ToCompPoly.Data.Nat.PowMod
+public import ToCompPoly.Fields.KoalaBear
+public import CompPoly.Fields.PrattCertificate
+public import Mathlib.Tactic.NormNum.Prime
+public import ToCompPoly.ToMathlib.Order.OrderOfSq
+public import ToCompPoly.ToMathlib.Polynomial.CoeffList
+public import ToCompPoly.ToMathlib.Polynomial.XPowSubC
 
 /-!
   # KoalaBear: binomial extension fields
@@ -32,6 +34,8 @@ import ToCompPoly.ToMathlib.Polynomial.XPowSubC
 
   Everything is kernel-checked, without `native_decide`.
 -/
+
+@[expose] public section
 
 open Polynomial
 
@@ -68,7 +72,7 @@ theorem orderOf_of_twoAdicGenerator_24 {D : ℕ} (hD : 0 < D) (W : Field) :
       (by rw [degree_X_pow_sub_C hD]; exact_mod_cast hD.ne')
   have h1 := orderOf_injective (AdjoinRoot.of (X ^ D - C W)).toMonoidHom hinj
     (0x6AC49F88 : Field)
-  simp only [RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe] at h1
+  simp only [RingHom.toMonoidHom_eq_coe, MonoidHom.coe_ofClass] at h1
   rw [h1]
   have := twoAdicGenerators_order ⟨24, by decide⟩
   simpa [twoAdicGenerators] using this
@@ -85,7 +89,7 @@ def ext4W : Field := 3
 theorem irreducible_ext4 : Irreducible (X ^ 4 - C ext4W) := by
   show Irreducible (X ^ 4 - C (3 : Field))
   refine X_pow_sub_C_irreducible_of_gcd (ℓ := 2) (by norm_num) (by decide) ?_ ?_
-  · exact_mod_cast natCast_pow_ne_one 3 (by unfold fieldSize; norm_num) (by decide)
+  · exact_mod_cast natCast_pow_ne_one 3 (by decide)
   · unfold fieldSize; decide
 
 instance : Fact (Irreducible (X ^ 4 - C ext4W)) := ⟨irreducible_ext4⟩
@@ -197,7 +201,7 @@ def ext8W : Field := 3
 theorem irreducible_ext8 : Irreducible (X ^ 8 - C ext8W) := by
   show Irreducible (X ^ 8 - C (3 : Field))
   refine X_pow_sub_C_irreducible_of_gcd (ℓ := 2) (by norm_num) (by decide) ?_ ?_
-  · exact_mod_cast natCast_pow_ne_one 3 (by unfold fieldSize; norm_num) (by decide)
+  · exact_mod_cast natCast_pow_ne_one 3 (by decide)
   · unfold fieldSize; decide
 
 instance : Fact (Irreducible (X ^ 8 - C ext8W)) := ⟨irreducible_ext8⟩

@@ -3,9 +3,11 @@ Copyright (c) 2026 CompPoly. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Thomas Coratger
 -/
-import Mathlib.RingTheory.AdjoinRoot
-import ToCompPoly.Fields.Mersenne
-import ToCompPoly.ToMathlib.Order.OrderOfSq
+module
+
+public import Mathlib.RingTheory.AdjoinRoot
+public import ToCompPoly.Fields.Mersenne
+public import ToCompPoly.ToMathlib.Order.OrderOfSq
 
 /-!
   # Mersenne31: the complex extension `F[i] = F[X] / (X ^ 2 + 1)`
@@ -20,6 +22,8 @@ import ToCompPoly.ToMathlib.Order.OrderOfSq
 
   Everything is kernel-checked, without `native_decide`.
 -/
+
+@[expose] public section
 
 open Polynomial
 
@@ -121,7 +125,7 @@ theorem mk_pow_fieldSize_succ (a b : Field) :
 
 end Complex
 
-open Complex
+open _root_.Mersenne31.Complex
 
 /-! ## Two-adic generators -/
 
@@ -184,7 +188,7 @@ theorem twoAdicGenerators_order (k : ℕ) (hk : k < twoAdicGenerators.length) :
   · simp [twoAdicGenerators, twoAdicGeneratorCoeffs, mk_one]
   · induction k with
     | zero =>
-      rw [twoAdicGenerators_one, orderOf_neg_one, ringChar_complex, if_neg (by decide)]; rfl
+      rw [twoAdicGenerators_one, orderOf_neg_one, ringChar_complex, ite_eq_right (by decide)]; rfl
     | succ k ih =>
       exact orderOf_eq_two_pow_succ_of_sq (twoAdicGenerators_sq_succ (k + 1) hk) (ih (by omega))
 

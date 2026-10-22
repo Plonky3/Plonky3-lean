@@ -3,9 +3,11 @@ Copyright (c) 2026 CompPoly. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Thomas Coratger
 -/
-import CompPoly.Fields.KoalaBear
-import Mathlib.FieldTheory.Finite.Basic
-import ToCompPoly.Data.Nat.PowMod
+module
+
+public import CompPoly.Fields.KoalaBear
+public import Mathlib.FieldTheory.Finite.Basic
+public import ToCompPoly.Data.Nat.PowMod
 
 /-!
   # KoalaBear: cube roots
@@ -17,13 +19,15 @@ import ToCompPoly.Data.Nat.PowMod
   Both are kernel-checked, without `native_decide`.
 -/
 
+@[expose] public section
+
 namespace KoalaBear
 
 /-- A nonzero power of a natural number in the field, checked through `Nat.powMod`. -/
-theorem natCast_pow_ne_one {e : ℕ} (b : ℕ) (he : e < 2 ^ 64)
+theorem natCast_pow_ne_one {e : ℕ} (b : ℕ)
     (h : (Nat.powMod b e fieldSize : Field) ≠ 1) :
     (b : Field) ^ e ≠ 1 := by
-  rwa [ZMod.natCast_pow_eq_powMod b e he]
+  rwa [ZMod.natCast_pow_eq_powMod b e]
 
 /-- `x ↦ x ^ 1420470955` is the inverse of `x ↦ x ^ 3`: `3 · 1420470955 ≡ 1 (mod p - 1)`. -/
 theorem pow_1420470955_pow_three (x : Field) : (x ^ 1420470955) ^ 3 = x := by

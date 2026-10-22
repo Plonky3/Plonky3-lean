@@ -3,10 +3,12 @@ Copyright (c) 2026 CompPoly. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Thomas Coratger
 -/
-import CompPoly.Fields.Goldilocks
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.Tactic.NormNum.Prime
-import ToCompPoly.Data.Nat.PowMod
+module
+
+public import CompPoly.Fields.Goldilocks
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.Tactic.NormNum.Prime
+public import ToCompPoly.Data.Nat.PowMod
 
 /-!
   # Goldilocks: two-adicity, a generator and a primitive `2^32`-th root of unity
@@ -19,6 +21,8 @@ import ToCompPoly.Data.Nat.PowMod
 
   All are kernel-checked, without `native_decide`.
 -/
+
+@[expose] public section
 
 namespace Goldilocks
 
@@ -37,10 +41,10 @@ theorem twoAdicity_maximal : ¬ 2 ^ (twoAdicity + 1) ∣ fieldSize - 1 := by
   decide
 
 /-- A power of a natural number in the field is not `1`, checked through `Nat.powMod`. -/
-theorem natCast_pow_ne_one {e : ℕ} (b : ℕ) (he : e < 2 ^ 64)
+theorem natCast_pow_ne_one {e : ℕ} (b : ℕ)
     (h : (Nat.powMod b e fieldSize : Field) ≠ 1) :
     (b : Field) ^ e ≠ 1 := by
-  rwa [ZMod.natCast_pow_eq_powMod b e he]
+  rwa [ZMod.natCast_pow_eq_powMod b e]
 
 /-- The primes dividing `p - 1 = 2^32 · 3 · 5 · 17 · 257 · 65537`. -/
 theorem prime_dvd_fieldSize_sub_one {q : ℕ} (hq : q.Prime) (h : q ∣ fieldSize - 1) :
@@ -74,7 +78,7 @@ theorem orderOf_generator : orderOf generator = fieldSize - 1 := by
   · exact ZMod.pow_card_sub_one_eq_one (by decide)
   · intro q hq hdvd
     rcases prime_dvd_fieldSize_sub_one hq hdvd with rfl | rfl | rfl | rfl | rfl | rfl <;>
-    · exact_mod_cast natCast_pow_ne_one 7 (by unfold fieldSize; norm_num) (by decide)
+    · exact_mod_cast natCast_pow_ne_one 7 (by decide +kernel)
 
 /-- A primitive `2^32`-th root of unity: `7^((p - 1) / 2^32)`. -/
 @[reducible]
@@ -83,7 +87,7 @@ def twoAdicGenerator : Field := 0x185629dcda58878c
 /-- `twoAdicGenerator` is `generator ^ ((p - 1) / 2^32)`. -/
 theorem twoAdicGenerator_eq : twoAdicGenerator = generator ^ ((fieldSize - 1) / 2 ^ 32) := by
   show ((0x185629dcda58878c : ℕ) : Field) = ((7 : ℕ) : Field) ^ ((fieldSize - 1) / 2 ^ 32)
-  rw [ZMod.natCast_pow_eq_powMod 7 _ (by unfold fieldSize; norm_num)]
+  rw [ZMod.natCast_pow_eq_powMod 7 _]
   decide
 
 /-- `twoAdicGenerator` has order `2^32`. -/
