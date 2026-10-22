@@ -15,20 +15,15 @@ target `thumbv7em-none-eabi`
 | Crate | State | Generated lines | Hand-written lines | `opaque` | Mirrored | Dropped by the extractor | Patches (pre / post) | Patches with a cost |
 |---|---|---:|---:|---:|---:|---:|---|---|
 | `baby-bear` | extracted | 2953 | 121 | 4 | 0 | 0 | 4 / 3 | pre `020`, pre `030`, pre `040` |
-| `binary-field` | scoped | 21777 | 66 | 0 | 0 | 139 | 7 / 2 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050`, pre `060`, pre `070` |
-| `blake2s` | scoped | 148 | 51 | 1 | 0 | 0 | 1 / 0 | pre `010` |
-| `blake3` | scoped | 2609 | 40 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
-| `blake3-crate` | stub |  | 26 | 0 | 3 |  | 0 / 0 |  |
+| `binary-field` | scoped | 3228 | 66 | 0 | 0 | 0 | 5 / 1 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050` |
 | `field` | stub |  | 91 | 2 | 6 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
 | `koala-bear` | extracted | 3024 | 121 | 4 | 0 | 0 | 0 / 3 |  |
 | `mds` | scoped | 101 | 43 | 0 | 0 | 0 | 0 / 0 |  |
 | `mersenne-31` | scoped | 1444 | 259 | 0 | 12 | 30 | 1 / 1 | pre `010` |
-| `monty-31` | scoped | 831 | 526 | 0 | 25 | 37 | 0 / 1 |  |
+| `monty-31` | scoped | 1581 | 327 | 0 | 13 | 29 | 1 / 1 | pre `010` |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 68 | 2 | 4 |  | 0 / 0 |  |
-| `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
-| `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
 | `util` | scoped | 182 | 56 | 0 | 1 | 0 | 0 / 0 |  |
 
 Generated lines are `extraction/<Lib>/Extraction/{Types,Funs}.lean`. Hand-written
@@ -51,168 +46,7 @@ Nothing translated is dropped.
 ### `binary-field`
 
 charon errors: 0.
-139 item(s) dropped, 0 of them mirrored.
-
-| Item | Source | Mirrored |
-|---|---|---|
-| `p3_binary_field::clmul::gf192::composed_dot_192` | `` |  |
-| `p3_binary_field::clmul::gf192::composed_dot_192_by_64` | `` |  |
-| `p3_binary_field::clmul::gf192::poly_dot_192` | `` |  |
-| `p3_binary_field::clmul::gf192::poly_dot_192_by_64` | `` |  |
-| `p3_binary_field::clmul::portable::poly_dot_128` | `` |  |
-| `p3_binary_field::extension::{impl core::ops::arith::Add}::add` | `` |  |
-| `p3_binary_field::extension::{impl core::ops::arith::Sub}::sub` | `` |  |
-| `p3_binary_field::extension::{impl p3_field::extension::HasFrobenius}::pseudo_inv` | `` |  |
-| `p3_binary_field::extension::{impl p3_field::field::AlgebraIdentity}::algebra_id` | `` |  |
-| `p3_binary_field::extension::{impl p3_field::field::BasedVectorSpace}::as_basis_coefficients_slice` | `` |  |
-| `p3_binary_field::extension::{impl p3_field::field::BasedVectorSpace}::from_basis_coefficients_iter` | `` |  |
-| `p3_binary_field::extension::{impl p3_field::field::BasedVectorSpace}::from_basis_coefficients_iter::{impl core::marker::Destruct}` | `` |  |
-| `p3_binary_field::extension::{impl p3_field::field::BasedVectorSpace}::reconstitute_from_base` | `` |  |
-| `p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::add_assign_lane` | `` |  |
-| `p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::extract` | `` |  |
-| `p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::from_ext_slice` | `` |  |
-| `p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::packed_ext_powers` | `` |  |
-| `p3_binary_field::gf2::{impl core::clone::Clone}::clone` | `` |  |
-| `p3_binary_field::gf2::{impl core::cmp::Ord}::cmp` | `` |  |
-| `p3_binary_field::gf2::{impl core::cmp::PartialOrd}::partial_cmp` | `` |  |
-| `p3_binary_field::gf2::{impl core::default::Default}::default` | `` |  |
-| `p3_binary_field::gf2::{impl core::fmt::Debug}::fmt` | `` |  |
-| `p3_binary_field::gf2::{impl core::fmt::Display}::fmt` | `` |  |
-| `p3_binary_field::gf2::{impl core::hash::Hash}::hash` | `` |  |
-| `p3_binary_field::gf2::{impl core::iter::traits::accum::Product}::product` | `` |  |
-| `p3_binary_field::gf2::{impl core::iter::traits::accum::Sum}::sum` | `` |  |
-| `p3_binary_field::gf2::{impl p3_field::field::Field}::GENERATOR` | `` |  |
-| `p3_binary_field::gf2::{impl p3_field::field::Field}::order` | `` |  |
-| `p3_binary_field::gf2::{impl p3_field::field::PrimeCharacteristicRing}::NEG_ONE` | `` |  |
-| `p3_binary_field::gf2::{impl p3_field::field::PrimeCharacteristicRing}::TWO` | `` |  |
-| `p3_binary_field::gf2::{impl p3_field::field::PrimeField32}::ORDER_U32` | `` |  |
-| `p3_binary_field::gf2::{impl p3_field::field::PrimeField64}::ORDER_U64` | `` |  |
-| `p3_binary_field::gf2::{impl p3_field::field::PrimeField}::as_canonical_biguint` | `` |  |
-| `p3_binary_field::gf2::{impl p3_field::integers::QuotientMap}::from_canonical_checked` | `` |  |
-| `p3_binary_field::gf2::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `` |  |
-| `p3_binary_field::gf2::{impl p3_field::integers::QuotientMap}::from_int` | `` |  |
-| `p3_binary_field::ghash::ALPHA` | `` |  |
-| `p3_binary_field::ghash::TOWER_GENERATOR` | `` |  |
-| `p3_binary_field::ghash::{impl core::clone::Clone}::clone` | `` |  |
-| `p3_binary_field::ghash::{impl core::default::Default}::default` | `` |  |
-| `p3_binary_field::ghash::{impl core::fmt::Debug}::fmt` | `` |  |
-| `p3_binary_field::ghash::{impl core::fmt::Display}::fmt` | `` |  |
-| `p3_binary_field::ghash::{impl core::hash::Hash}::hash` | `` |  |
-| `p3_binary_field::ghash::{impl core::iter::traits::accum::Product}::product` | `` |  |
-| `p3_binary_field::ghash::{impl core::iter::traits::accum::Sum}::sum` | `` |  |
-| `p3_binary_field::ghash::{impl p3_binary_field::tower::TowerLevel}::LOG_BITS` | `` |  |
-| `p3_binary_field::ghash::{impl p3_binary_field::tower::TowerLevel}::from_le_byte_iter` | `` |  |
-| `p3_binary_field::ghash::{impl p3_binary_field::tower::TowerLevel}::from_repr` | `` |  |
-| `p3_binary_field::ghash::{impl p3_binary_field::tower::TowerLevel}::mul_alpha` | `` |  |
-| `p3_binary_field::ghash::{impl p3_binary_field::tower::TowerLevel}::to_repr` | `` |  |
-| `p3_binary_field::ghash::{impl p3_field::field::Field}::GENERATOR` | `` |  |
-| `p3_binary_field::ghash::{impl p3_field::field::Field}::order` | `` |  |
-| `p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::NEG_ONE` | `` |  |
-| `p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::ONE` | `` |  |
-| `p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::TWO` | `` |  |
-| `p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::div_2exp_u64` | `` |  |
-| `p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::dot_product` | `` |  |
-| `p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::double` | `` |  |
-| `p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::halve` | `` |  |
-| `p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::mul_2exp_u64` | `` |  |
-| `p3_binary_field::ghash::{impl p3_field::field::PrimeCharacteristicRing}::xor` | `` |  |
-| `p3_binary_field::poly192::{impl core::clone::Clone}::clone` | `` |  |
-| `p3_binary_field::poly192::{impl core::default::Default}::default` | `` |  |
-| `p3_binary_field::poly192::{impl core::fmt::Debug}::fmt` | `` |  |
-| `p3_binary_field::poly192::{impl core::fmt::Display}::fmt` | `` |  |
-| `p3_binary_field::poly192::{impl core::hash::Hash}::hash` | `` |  |
-| `p3_binary_field::poly192::{impl core::iter::traits::accum::Product}::product` | `` |  |
-| `p3_binary_field::poly192::{impl core::iter::traits::accum::Sum}::sum` | `` |  |
-| `p3_binary_field::poly192::{impl core::ops::arith::Add}::add` | `` |  |
-| `p3_binary_field::poly192::{impl core::ops::arith::Sub}::sub` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::extension::HasFrobenius}::pseudo_inv` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::AlgebraIdentity}::algebra_id` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::BasedVectorSpace}::DIMENSION` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::BasedVectorSpace}::as_basis_coefficients_slice` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::BasedVectorSpace}::from_basis_coefficients_fn` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::BasedVectorSpace}::from_basis_coefficients_iter` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::BasedVectorSpace}::from_basis_coefficients_iter::{impl core::marker::Destruct}` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::Field}::GENERATOR` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::Field}::order` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::NEG_ONE` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::ONE` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::TWO` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::div_2exp_u64` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::dot_product` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::double` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::halve` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::mul_2exp_u64` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::field::PrimeCharacteristicRing}::xor` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::add_assign_lane` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::extract` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::from_ext_slice` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::packed_ext_powers` | `` |  |
-| `p3_binary_field::poly192::{impl}::limbs` | `` |  |
-| `p3_binary_field::poly64::ALPHA` | `` |  |
-| `p3_binary_field::poly64::TOWER_GENERATOR` | `` |  |
-| `p3_binary_field::poly64::{impl core::clone::Clone}::clone` | `` |  |
-| `p3_binary_field::poly64::{impl core::default::Default}::default` | `` |  |
-| `p3_binary_field::poly64::{impl core::fmt::Debug}::fmt` | `` |  |
-| `p3_binary_field::poly64::{impl core::fmt::Display}::fmt` | `` |  |
-| `p3_binary_field::poly64::{impl core::hash::Hash}::hash` | `` |  |
-| `p3_binary_field::poly64::{impl core::iter::traits::accum::Product}::product` | `` |  |
-| `p3_binary_field::poly64::{impl core::iter::traits::accum::Sum}::sum` | `` |  |
-| `p3_binary_field::poly64::{impl p3_binary_field::tower::TowerLevel}::LOG_BITS` | `` |  |
-| `p3_binary_field::poly64::{impl p3_binary_field::tower::TowerLevel}::from_le_byte_iter` | `` |  |
-| `p3_binary_field::poly64::{impl p3_binary_field::tower::TowerLevel}::from_repr` | `` |  |
-| `p3_binary_field::poly64::{impl p3_binary_field::tower::TowerLevel}::mul_alpha` | `` |  |
-| `p3_binary_field::poly64::{impl p3_binary_field::tower::TowerLevel}::to_repr` | `` |  |
-| `p3_binary_field::poly64::{impl p3_field::field::Field}::GENERATOR` | `` |  |
-| `p3_binary_field::poly64::{impl p3_field::field::Field}::order` | `` |  |
-| `p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing}::NEG_ONE` | `` |  |
-| `p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing}::ONE` | `` |  |
-| `p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing}::TWO` | `` |  |
-| `p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing}::div_2exp_u64` | `` |  |
-| `p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing}::double` | `` |  |
-| `p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing}::halve` | `` |  |
-| `p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing}::mul_2exp_u64` | `` |  |
-| `p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing}::xor` | `` |  |
-| `p3_binary_field::tower::BYTE_STREAM_ENDED` | `` |  |
-| `p3_binary_field::tower::{impl core::clone::Clone}::clone` | `` |  |
-| `p3_binary_field::tower::{impl core::default::Default}::default` | `` |  |
-| `p3_binary_field::tower::{impl core::fmt::Debug}::fmt` | `` |  |
-| `p3_binary_field::tower::{impl core::fmt::Display}::fmt` | `` |  |
-| `p3_binary_field::tower::{impl core::hash::Hash}::hash` | `` |  |
-| `p3_binary_field::tower::{impl core::iter::traits::accum::Product}::product` | `` |  |
-| `p3_binary_field::tower::{impl p3_binary_field::tower::TowerLevel}::LOG_BITS` | `` |  |
-| `p3_binary_field::tower::{impl p3_binary_field::tower::TowerLevel}::from_le_byte_iter` | `` |  |
-| `p3_binary_field::tower::{impl p3_binary_field::tower::TowerLevel}::from_repr` | `` |  |
-| `p3_binary_field::tower::{impl p3_binary_field::tower::TowerLevel}::mul_alpha` | `` |  |
-| `p3_binary_field::tower::{impl p3_binary_field::tower::TowerLevel}::to_repr` | `` |  |
-| `p3_binary_field::tower::{impl p3_field::field::Field}::GENERATOR` | `` |  |
-| `p3_binary_field::tower::{impl p3_field::field::Field}::order` | `` |  |
-| `p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::NEG_ONE` | `` |  |
-| `p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::ONE` | `` |  |
-| `p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::TWO` | `` |  |
-| `p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::div_2exp_u64` | `` |  |
-| `p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::double` | `` |  |
-| `p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::halve` | `` |  |
-| `p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::mul_2exp_u64` | `` |  |
-| `p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::xor` | `` |  |
-
-### `blake2s`
-
-charon errors: 0.
 Nothing translated is dropped.
-
-### `blake3`
-
-charon errors: 0.
-6 item(s) dropped, 0 of them mirrored.
-
-| Item | Source | Mirrored |
-|---|---|---|
-| `p3_blake3::LANES` | `` |  |
-| `p3_blake3::batch::lanes::LANES` | `` |  |
-| `p3_blake3::{impl core::clone::Clone}::clone` | `` |  |
-| `p3_blake3::{impl p3_symmetric::hasher::CryptographicHasher}::LANES` | `` |  |
-| `p3_blake3::{impl p3_symmetric::hasher::CryptographicHasher}::hash_iter` | `` |  |
-| `p3_blake3::{impl p3_symmetric::hasher::CryptographicHasher}::hash_iter::BUFLEN` | `` |  |
 
 ### `goldilocks`
 
@@ -300,7 +134,7 @@ charon errors: 0.
 ### `monty-31`
 
 charon errors: 0.
-37 item(s) dropped, 2 of them mirrored.
+29 item(s) dropped, 2 of them mirrored.
 
 | Item | Source | Mirrored |
 |---|---|---|
@@ -319,42 +153,20 @@ charon errors: 0.
 | `p3_monty_31::monty_31::{impl core::ops::arith::MulAssign}::mul_assign` | `` |  |
 | `p3_monty_31::monty_31::{impl core::ops::arith::SubAssign}::sub_assign` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::Field}::BENEFITS_FROM_LOCKSTEP_EVALUATION` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::Field}::GENERATOR` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::Field}::order` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::Field}::try_inverse` | `` | yes |
 | `p3_monty_31::monty_31::{impl p3_field::field::Field}::try_inverse::NUM_PRIME_BITS` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::NEG_ONE` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::ONE` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::TWO` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::div_2exp_u64` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::dot_product` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::from_prime_subfield` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::mul_2exp_u64` | `` | yes |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::sum_array` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeField32}::ORDER_U32` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeField32}::as_canonical_u32` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeField64}::ORDER_U64` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeField64}::as_canonical_u64` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeField}::as_canonical_biguint` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_checked` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_int` | `` |  |
 | `p3_monty_31::monty_31::{impl}::HALF` | `` |  |
-| `p3_monty_31::monty_31::{impl}::to_u32` | `` |  |
-
-### `sha2`
-
-charon errors: 0.
-Nothing translated is dropped.
-
-### `sha256`
-
-charon errors: 0.
-1 item(s) dropped, 0 of them mirrored.
-
-| Item | Source | Mirrored |
-|---|---|---|
-| `p3_sha256::{impl core::clone::Clone}::clone` | `` |  |
 
 ### `util`
 
@@ -366,7 +178,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 748) whose dependencies include it; reaching one is not using it.
+(of 348) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -374,7 +186,6 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 | `baby-bear` | `mds.MDSBabyBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon2.BabyBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
-| `blake2s` | `p3_blake2s.Blake2s256.hash` | its body goes through `blake2`'s incremental `Digest`, whose buffer type aeneas rejects (docs/extractor-issues.md 16) | 3 |
 | `field` | `p3_field.exponentiation.exp_1420470955` | its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here | 1 |
 | `field` | `p3_field.exponentiation.exp_1725656503` | its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here | 1 |
 | `koala-bear` | `koala_bear.KoalaBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 68 |
@@ -393,13 +204,10 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 748) whose dependencies include the declaration.
+counts the claims (of 348) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
-| `blake3-crate` | `blake3.BLOCK_LEN` | `blake3::BLOCK_LEN` | stub | 4 |
-| `blake3-crate` | `blake3.CHUNK_LEN` | `blake3::CHUNK_LEN` | stub | 4 |
-| `blake3-crate` | `blake3.OUT_LEN` | `blake3::OUT_LEN` | stub | 0 |
 | `field` | `p3_field.dup.Dup` | `p3_field::dup::Dup` | stub | 0 |
 | `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 2 |
 | `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 0 |
@@ -437,7 +245,6 @@ counts the claims (of 748) whose dependencies include the declaration.
 | `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.CUBIC_W` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<3> for p3_mersenne_31::mersenne_31::Mersenne31}::W` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.CUBIC_DTH_ROOT` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<3> for p3_mersenne_31::mersenne_31::Mersenne31}::DTH_ROOT` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.complex.new_complex_new` | `p3_field::extension::complex::Complex::new_complex` | not translated | 2 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.halve` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::halve` | not translated | 2 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1InternalLayerMonty31` | `p3_monty_31::no_packing::poseidon1::Poseidon1InternalLayerMonty31` | not translated | 0 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1ExternalLayerMonty31` | `p3_monty_31::no_packing::poseidon1::Poseidon1ExternalLayerMonty31` | not translated | 0 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon2.Poseidon2InternalLayerMonty31` | `p3_monty_31::no_packing::poseidon2::Poseidon2InternalLayerMonty31` | not translated | 0 |
@@ -451,17 +258,6 @@ counts the claims (of 748) whose dependencies include the declaration.
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.exp_u64.step` | `p3_field::field::PrimeCharacteristicRing::exp_u64` | not translated | 4 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.mul_2exp_u64` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::mul_2exp_u64` | dropped | 4 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.try_inverse` | `{impl p3_field::field::Field for p3_monty_31::monty_31::MontyField31<_>}::try_inverse` | dropped | 3 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU32.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<u32> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_int` | `{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_int` | `{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_int` | `{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_int` | `{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_int` | `{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
 | `poseidon1` | `p3_poseidon1.external.FullRoundLayerConstructor` | `p3_poseidon1::external::FullRoundLayerConstructor` | stub | 0 |
 | `poseidon1` | `p3_poseidon1.internal.PartialRoundLayerConstructor` | `p3_poseidon1::internal::PartialRoundLayerConstructor` | stub | 0 |
 | `poseidon1` | `p3_poseidon1.Poseidon1Constants` | `p3_poseidon1::Poseidon1Constants` | stub | 0 |
@@ -483,14 +279,9 @@ counts the claims (of 748) whose dependencies include the declaration.
 | `binary-field/pre/020-cfg-hide-ghash-bit-plane-expansion` | none in a normal build: the change is behind cfg(hax_backend_lean). In the extracted variant, `Ghash128::prepare_bit_plane_expansion` is absent. |
 | `binary-field/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of a field type. No existing body changes. |
 | `binary-field/pre/040-tower-inherent-repr` | none in a normal build: the copies are compiled but unused there. In the extracted variant, inherent `from_repr`, `to_repr` and `mul_alpha` shadow the `TowerLevel` methods at every call site on a concrete level, and call copies with the trait methods' bodies. `Gf2`'s copies build the value directly: `from_bool((r & 1) == 1)` is `Self(r & 1)`, and `u8::from(self.is_one())` is `(self.0 == 1) as u8`. |
-| `binary-field/pre/050-poly192-copied-limbs` | none in a normal build: the copy is compiled but unused there. In the extracted variant, `Mul`, `Mul<Poly64>` and `square` read the coordinates through `limbs_owned`, which copies each coordinate's bits, instead of borrowing them in place. |
-| `binary-field/pre/060-field-default-shims` | none in a normal build: the copies are compiled but unused there. In the extracted variant, inherent `inverse`, `is_zero` and `is_one` shadow the `Field` defaults at every call site on a concrete field type of this crate, and call copies of the default bodies. |
-| `binary-field/pre/070-field-api-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of a field type. No existing body changes. |
-| `blake2s/pre/010-reshape-hash-many` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the scalar `hash_many` calls the reshaped body, which a differential test equates with the original. |
-| `blake3/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds one free function, which calls `Blake3::hash_many`. No existing body changes. |
-| `blake3/pre/020-reshape-batch` | none in a normal build: the reshaped driver is compiled only under cfg(hax_backend_lean), as the crate's `batch` module, and under cfg(test), beside the shipped one. The extracted variant hashes on the one-lane backend, which is what the extraction target compiles. |
+| `binary-field/pre/050-poly192-copied-limbs` | none in a normal build: the copy is compiled but unused there. In the extracted variant, `Mul` and `Mul<Poly64>` read the coordinates through `limbs_owned`, which copies each coordinate's bits, instead of borrowing them in place. |
 | `mersenne-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of `Mersenne31`. No existing body changes. |
-| `sha256/pre/010-reshape-compress` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `Sha256Compress::compress` calls the reshaped body, which a differential test equates with the original. |
+| `monty-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method or constant of `MontyField31`. No existing body changes. |
 
 Upstream tests (`test-pre-patches.py`): 6715 of Plonky3's 6769 pass as shipped and 6715 with the pre-extraction patches, with 0 divergence(s).
 
@@ -603,28 +394,6 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3BabyBear.poseidon2.const_check_6.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.Proofs.Binary.N128.injective'` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.Proofs.Binary.cantorTower.indep'` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.Proofs.Binary.cantorTower.span'` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.Proofs.Binary.cantorTower.succ'` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.Proofs.Binary.cantorTower.zero'` | `Quot.sound`, `propext` |
-| `P3BinaryField.Proofs.Binary.cantorV.even'` | `Quot.sound`, `propext` |
-| `P3BinaryField.Proofs.Binary.towerToBF64.injective'` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.Proofs.Binary.towerToGhash.injective'` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.aes.invert_byte.toAesField` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.aes.mul_bytes.toAesField` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.basis.poly_to_tower_128.iso` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.basis.poly_to_tower_32.iso` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.basis.poly_to_tower_64.iso` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.basis.tower_image_128.iso` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.basis.tower_image_64.iso` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.basis.tower_to_poly_128.iso` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.basis.tower_to_poly_32.iso` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.basis.tower_to_poly_64.iso` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.clmul_128x128.poly` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.dot_product_128.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.dot_product_32.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.dot_product_64.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.clmul.gf192.poly_mul_192.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.clmul.gf192.poly_mul_192_by_64.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.clmul.gf192.poly_square_192.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -632,9 +401,6 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3BinaryField.clmul.gf64.poly_mul_64.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.clmul.gf64.poly_sqrt_64.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.clmul.gf64.poly_square_64.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.mul_128.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.mul_64.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.mul_pair_64.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.clmul.portable.clmul_64x64.poly` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.clmul.portable.poly_mul_128.ghash` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.clmul.portable.poly_mul_128_by_64.ghash` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -642,435 +408,66 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3BinaryField.clmul.reduce_128.toQuot` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.clmul.reduce_64.toQuot64` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.clmul.sqrt.poly_sqrt_128.ghash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.square_128.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.clmul.square_64.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.BinaryField128.inverse.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.BinaryField128.inverse.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.BinaryField16.inverse.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.BinaryField16.inverse.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.BinaryField2.inverse.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.BinaryField2.inverse.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.BinaryField32.inverse.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.BinaryField32.inverse.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.BinaryField4.inverse.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.BinaryField4.inverse.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.BinaryField64.inverse.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.BinaryField64.inverse.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.BinaryField8.inverse.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.BinaryField8.inverse.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.Gf2.inverse.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.Gf2.inverse.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.Gf2.is_one.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.Ghash128.inverse.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.Ghash128.inverse.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.Poly192.inverse.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.Poly64.inverse.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.Poly64.inverse.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.field_defaults.Poly64.is_zero.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.CoreCmpPartialEqGf2.eq.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.CoreOpsArithAddAssign.add_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.gf2.Gf2.Insts.CoreOpsArithAddGf2Gf2.add.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.CoreOpsArithDivAssignGf2.div_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.CoreOpsArithDivGf2Gf2.div.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.CoreOpsArithDivGf2Gf2.div.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.CoreOpsArithMulAssign.mul_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.gf2.Gf2.Insts.CoreOpsArithMulGf2Gf2.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.gf2.Gf2.Insts.CoreOpsArithNegGf2.neg.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.CoreOpsArithSubAssign.sub_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.gf2.Gf2.Insts.CoreOpsArithSubGf2Gf2.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldField.bits.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldField.interpolation_node.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldField.interpolation_node.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldField.try_inverse.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldField.try_sqrt.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.div_2exp_u64.panics` | `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.double.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.halve.panics` | `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.mul_2exp_u64.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.square.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.xor.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldPrimeField32.as_canonical_u32.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldFieldPrimeField64.as_canonical_u64.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldIntegersQuotientMapI8.from_canonical_checked.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldIntegersQuotientMapI8.from_int.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldIntegersQuotientMapU8.from_canonical_checked.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.Insts.P3_fieldIntegersQuotientMapU8.from_int.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.from_le_bytes.val` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.gf2.Gf2.from_repr.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.gf2.Gf2.mul_alpha.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.gf2.Gf2.new.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.CoreCmpPartialEqGhash128.eq.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.CoreConvertFromBinaryField128.from.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithAddAssign.add_assign.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithAddBinaryField128Ghash128.add.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithAddGhash128Ghash128.add.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithDivAssignGhash128.div_assign.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithDivAssignGhash128.div_assign.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithDivGhash128Ghash128.div.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithDivGhash128Ghash128.div.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithMulAssign.mul_assign.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithMulBinaryField128Ghash128.mul.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithMulGhash128Ghash128.mul.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithNegGhash128.neg.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithSubAssign.sub_assign.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithSubBinaryField128Ghash128.sub.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithSubGhash128Ghash128.sub.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.P3_binary_fieldTowerTowerLevelU128.cantor_basis.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.P3_binary_fieldTowerTowerLevelU128.cantor_basis.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.P3_fieldFieldField.bits.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.P3_fieldFieldField.interpolation_node.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.P3_fieldFieldField.try_inverse.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.P3_fieldFieldField.try_sqrt.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.Insts.P3_fieldFieldPrimeCharacteristicRing.square.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.from_le_bytes.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.ghash.Ghash128.invert_or_zero.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.CoreCmpPartialEqPoly192.eq.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.CoreConvertFromPoly64.from.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.CoreOpsArithAddAssign.add_assign.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.poly192.Poly192.Insts.CoreOpsArithAddPoly192Poly192.add.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.CoreOpsArithDivAssignPoly192.div_assign.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.CoreOpsArithDivPoly192Poly192.div.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.CoreOpsArithMulAssign.mul_assign.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.poly192.Poly192.Insts.CoreOpsArithMulPoly192Poly192.mul.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.CoreOpsArithMulPoly64Poly192.mul.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.poly192.Poly192.Insts.CoreOpsArithNegPoly192.neg.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.CoreOpsArithSubAssign.sub_assign.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.poly192.Poly192.Insts.CoreOpsArithSubPoly192Poly192.sub.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.P3_fieldExtensionHasFrobeniusPoly64.frobenius.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.P3_fieldExtensionHasFrobeniusPoly64.repeated_frobenius.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.P3_fieldFieldExtensionFieldPoly64.as_base.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.P3_fieldFieldExtensionFieldPoly64.is_in_basefield.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.P3_fieldFieldField.bits.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.P3_fieldFieldField.interpolation_node.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.P3_fieldFieldField.try_inverse.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.P3_fieldFieldField.try_sqrt.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.P3_fieldFieldPrimeCharacteristicRing.ZERO.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.Insts.P3_fieldFieldPrimeCharacteristicRing.square.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.coefficients.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.composed_mul.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.embed.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.invert_or_zero.toExt3` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly192.Poly192.new.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.CoreCmpPartialEqPoly64.eq.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.CoreConvertFromBinaryField64.from.toQuot64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.CoreOpsArithAddAssign.add_assign.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.poly64.Poly64.Insts.CoreOpsArithAddPoly64Poly64.add.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.CoreOpsArithDivAssignPoly64.div_assign.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.CoreOpsArithDivPoly64Poly64.div.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.CoreOpsArithDivPoly64Poly64.div.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.CoreOpsArithMulAssign.mul_assign.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.poly64.Poly64.Insts.CoreOpsArithMulPoly64Poly64.mul.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.poly64.Poly64.Insts.CoreOpsArithNegPoly64.neg.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.CoreOpsArithSubAssign.sub_assign.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.poly64.Poly64.Insts.CoreOpsArithSubPoly64Poly64.sub.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis.toQuot64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.P3_fieldFieldField.bits.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.P3_fieldFieldField.interpolation_node.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.P3_fieldFieldField.try_inverse.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.P3_fieldFieldField.try_sqrt.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.Insts.P3_fieldFieldPrimeCharacteristicRing.square.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.from_le_bytes.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.poly64.Poly64.invert_or_zero.bf64` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tables.mul.tower8` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tables.square.tower8` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tables.try_inverse.tower8` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.CoreCmpPartialEqBinaryField128.eq.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.CoreConvertFromBinaryField16.from.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.CoreConvertFromBinaryField32.from.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.CoreConvertFromBinaryField64.from.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.CoreConvertFromBinaryField8.from.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.CoreConvertFromGhash128.from.toGhash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithAddAssign.add_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithAddBinaryField128BinaryField128.add.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithDivAssignBinaryField128.div_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithDivBinaryField128BinaryField128.div.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithDivBinaryField128BinaryField128.div.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithMulAssign.mul_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithMulBinaryField128BinaryField128.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithMulBinaryField16BinaryField128.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithMulBinaryField32BinaryField128.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithMulBinaryField64BinaryField128.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithMulBinaryField8BinaryField128.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithNegBinaryField128.neg.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithSubAssign.sub_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithSubBinaryField128BinaryField128.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_binary_fieldTowerTowerLevelU128.cantor_basis.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_binary_fieldTowerTowerLevelU128.cantor_basis.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_binary_fieldTowerTowerLevelU128.from_repr.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.repeated_frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField32.frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField32.repeated_frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField64.frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField64.repeated_frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.repeated_frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField16.as_base.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField16.is_in_basefield.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField32.as_base.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField32.is_in_basefield.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField64.as_base.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField64.is_in_basefield.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField8.as_base.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField8.is_in_basefield.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldField.bits.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldField.interpolation_node.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldField.try_inverse.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldField.try_sqrt.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.square.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.from_le_bytes.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.reference_mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField128.table_square.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.CoreCmpPartialEqBinaryField16.eq.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.CoreConvertFromBinaryField8.from.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithAddAssign.add_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithAddBinaryField16BinaryField16.add.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithDivAssignBinaryField16.div_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithDivBinaryField16BinaryField16.div.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithDivBinaryField16BinaryField16.div.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithMulAssign.mul_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithMulBinaryField128BinaryField128.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithMulBinaryField16BinaryField16.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithMulBinaryField32BinaryField32.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithMulBinaryField64BinaryField64.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithMulBinaryField8BinaryField16.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithNegBinaryField16.neg.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithSubAssign.sub_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithSubBinaryField16BinaryField16.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_binary_fieldTowerTowerLevelU16.cantor_basis.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_binary_fieldTowerTowerLevelU16.cantor_basis.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_binary_fieldTowerTowerLevelU16.from_repr.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.repeated_frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_fieldFieldExtensionFieldBinaryField8.as_base.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_fieldFieldExtensionFieldBinaryField8.is_in_basefield.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_fieldFieldField.bits.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_fieldFieldField.interpolation_node.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_fieldFieldField.interpolation_node.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_fieldFieldField.try_inverse.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_fieldFieldField.try_sqrt.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.square.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.from_le_bytes.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField16.from_repr.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField16.mul_alpha.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField16.reference_mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.CoreCmpPartialEqBinaryField2.eq.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.CoreOpsArithAddAssign.add_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField2.Insts.CoreOpsArithAddBinaryField2BinaryField2.add.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.CoreOpsArithDivAssignBinaryField2.div_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.CoreOpsArithDivBinaryField2BinaryField2.div.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.CoreOpsArithDivBinaryField2BinaryField2.div.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.CoreOpsArithMulAssign.mul_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField2.Insts.CoreOpsArithMulBinaryField2BinaryField2.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField2.Insts.CoreOpsArithNegBinaryField2.neg.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.CoreOpsArithSubAssign.sub_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField2.Insts.CoreOpsArithSubBinaryField2BinaryField2.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.P3_binary_fieldTowerTowerLevelU8.from_repr.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.P3_fieldFieldField.bits.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.P3_fieldFieldField.interpolation_node.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.P3_fieldFieldField.interpolation_node.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.P3_fieldFieldField.try_inverse.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.P3_fieldFieldField.try_sqrt.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.square.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField2.from_le_bytes.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField2.from_repr.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField2.mul_alpha.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.CoreCmpPartialEqBinaryField32.eq.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.CoreConvertFromBinaryField16.from.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.CoreConvertFromBinaryField8.from.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithAddAssign.add_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithAddBinaryField32BinaryField32.add.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithDivAssignBinaryField32.div_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithDivBinaryField32BinaryField32.div.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithDivBinaryField32BinaryField32.div.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithMulAssign.mul_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithMulBinaryField128BinaryField128.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithMulBinaryField16BinaryField32.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithMulBinaryField32BinaryField32.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithMulBinaryField64BinaryField64.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithMulBinaryField8BinaryField32.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithNegBinaryField32.neg.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithSubAssign.sub_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithSubBinaryField32BinaryField32.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_binary_fieldTowerTowerLevelU32.cantor_basis.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_binary_fieldTowerTowerLevelU32.cantor_basis.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_binary_fieldTowerTowerLevelU32.from_repr.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.repeated_frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.repeated_frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldExtensionFieldBinaryField16.as_base.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldExtensionFieldBinaryField16.is_in_basefield.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldExtensionFieldBinaryField8.as_base.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldExtensionFieldBinaryField8.is_in_basefield.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldField.bits.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldField.interpolation_node.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldField.interpolation_node.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldField.try_inverse.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldField.try_sqrt.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.square.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.from_le_bytes.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField32.from_repr.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField32.mul_alpha.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.reference_mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField32.reference_square.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.CoreCmpPartialEqBinaryField4.eq.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.CoreOpsArithAddAssign.add_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField4.Insts.CoreOpsArithAddBinaryField4BinaryField4.add.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.CoreOpsArithDivAssignBinaryField4.div_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.CoreOpsArithDivBinaryField4BinaryField4.div.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.CoreOpsArithDivBinaryField4BinaryField4.div.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.CoreOpsArithMulAssign.mul_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField4.Insts.CoreOpsArithMulBinaryField4BinaryField4.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField4.Insts.CoreOpsArithNegBinaryField4.neg.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.CoreOpsArithSubAssign.sub_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField4.Insts.CoreOpsArithSubBinaryField4BinaryField4.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.P3_binary_fieldTowerTowerLevelU8.from_repr.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.P3_fieldFieldField.bits.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.P3_fieldFieldField.interpolation_node.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.P3_fieldFieldField.interpolation_node.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.P3_fieldFieldField.try_inverse.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.P3_fieldFieldField.try_sqrt.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.square.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField4.from_le_bytes.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField4.from_repr.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.CoreCmpPartialEqBinaryField64.eq.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.CoreConvertFromBinaryField16.from.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.CoreConvertFromBinaryField32.from.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.CoreConvertFromBinaryField8.from.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.CoreConvertFromPoly64.from.toQuot64` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithAddAssign.add_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithAddBinaryField64BinaryField64.add.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithDivAssignBinaryField64.div_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithDivBinaryField64BinaryField64.div.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithDivBinaryField64BinaryField64.div.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithMulAssign.mul_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithMulBinaryField128BinaryField128.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithMulBinaryField16BinaryField64.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithMulBinaryField32BinaryField64.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithMulBinaryField64BinaryField64.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithMulBinaryField8BinaryField64.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithNegBinaryField64.neg.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithSubAssign.sub_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithSubBinaryField64BinaryField64.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_binary_fieldTowerTowerLevelU64.from_repr.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.repeated_frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField32.frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField32.repeated_frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.repeated_frobenius.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField16.as_base.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField16.is_in_basefield.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField32.as_base.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField32.is_in_basefield.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField8.as_base.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField8.is_in_basefield.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldField.bits.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldField.interpolation_node.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldField.try_inverse.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldField.try_sqrt.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.square.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.from_le_bytes.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField64.from_repr.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField64.mul_alpha.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.reference_mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField64.table_square.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.CoreCmpPartialEqBinaryField8.eq.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithAddAssign.add_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithAddBinaryField8BinaryField8.add.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithDivAssignBinaryField8.div_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithDivBinaryField8BinaryField8.div.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithDivBinaryField8BinaryField8.div.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithMulAssign.mul_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithMulBinaryField128BinaryField128.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithMulBinaryField16BinaryField16.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithMulBinaryField32BinaryField32.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithMulBinaryField64BinaryField64.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithMulBinaryField8BinaryField8.mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithNegBinaryField8.neg.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithSubAssign.sub_assign.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithSubBinaryField8BinaryField8.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.P3_binary_fieldTowerTowerLevelU8.from_repr.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.P3_fieldFieldField.bits.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.P3_fieldFieldField.interpolation_node.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.P3_fieldFieldField.interpolation_node.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.P3_fieldFieldField.try_inverse.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.P3_fieldFieldField.try_sqrt.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.square.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.from_le_bytes.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField8.from_repr.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField8.mul_alpha.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3BinaryField.tower.BinaryField8.reference_mul.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Blake2s.batch.hash_many.empty` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Blake2s.batch.hash_many.eq_hash` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Blake2s.batch.hash_many.ragged` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Blake3.Blake3.hash_many.empty` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Blake3.Blake3.hash_many.eq_digest` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Blake3.Blake3.hash_many.kat_1025` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Blake3.Blake3.hash_many.ragged` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Blake3.digest.kat_0` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Blake3.digest.kat_1` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Blake3.digest.kat_1024` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Blake3.digest.kat_1025` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Blake3.digest.kat_2049` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Blake3.digest.kat_65` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Goldilocks.goldilocks.Goldilocks.GENERATOR.generates` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Goldilocks.goldilocks.Goldilocks.NEG_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Goldilocks.goldilocks.Goldilocks.ORDER_U64.eq_fieldSize` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -1234,12 +631,6 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Mersenne31.mersenne_31.from_u62.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Mersenne31.mersenne_31.partial_reduce.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Mersenne31.mersenne_31.reduce_64.spec` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Sha256.Sha256Compress.compress.abc` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Sha256.Sha256Compress.compress.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Sha256.compress256.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Sha256.digest.abc` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Sha256.digest.empty` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Sha256.digest.two_blocks` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.cong` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.inverse` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
