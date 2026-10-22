@@ -196,4 +196,46 @@ theorem chunkCv_spec (B : List (BitVec 8)) (s len idx : ℕ) (root : Word) (hB :
   congr 3
   simp
 
+/-- A node's chaining value with `root` added to its flags. -/
+def compressOut (o : Output) (root : Word) : List Word :=
+  (compress o.cv o.block o.counter o.blockLen (o.flags ||| root)).take 8
+
+theorem compressOut_zero (o : Output) : compressOut o 0 = o.chainingValue := by
+  simp [compressOut, Output.chainingValue]
+
+theorem treeCv_spec (B : List (BitVec 8)) (s len : ℕ) (hB : s + len ≤ B.length)
+    (chunks : List (List (BitVec 8)))
+    (hch : ∀ i < chunks.length, chunks.getD i [] = chunkAt B s len i)
+    (hidx : ∀ i < chunks.length, i * 1024 ≤ len) (c : ℕ) :
+    ∀ (first f : ℕ) (root : Word), 1 ≤ c → first + c ≤ chunks.length → c ≤ f →
+      treeCv B s len first c root = compressOut (subtreeOutput f ((chunks.drop first).take c) first) root := by
+  induction c using Nat.strong_induction_on with
+  | _ c ih =>
+  intro first f root hc hfc hf
+  have hlen : ((chunks.drop first).take c).length = c := by simp; omega
+  rw [treeCv]
+  by_cases h1 : c = 1
+  · subst h1
+    rw [ite_eq_left_of_eq_true _ _ (eq_true le_rfl)]
+    have hg : ((chunks.drop first).take 1).getD 0 [] = chunkAt B s len first := by
+      rw [getD_take', ite_eq_left_of_eq_true _ _ (eq_true (by norm_num)), getD_drop', Nat.add_zero,
+        hch first (by omega)]
+    have hs : subtreeOutput f ((chunks.drop first).take 1) first = chunkOutput (chunkAt B s len first) first := by
+      rcases f with _ | f
+      · simp only [subtreeOutput, hg]
+      · rw [subtreeOutput, ite_eq_left_of_eq_true _ _ (eq_true (by omega)), hg]
+    rw [hs, chunkCv_spec B s len first root hB (hidx first (by omega))]
+    rfl
+  · rw [ite_eq_right_of_eq_false _ _ (eq_false (by omega))]
+    obtain ⟨f', rfl⟩ : ∃ f', f = f' + 1 := ⟨f - 1, by omega⟩
+    have hL := leftChunks_lt c (by omega)
+    have hL0 := leftChunks_pos c
+    rw [subtreeOutput, ite_eq_right_of_eq_false _ _ (eq_false (by omega)), hlen, ← leftChunks_eq c (by omega)]
+    dsimp only
+    rw [List.take_take, Nat.min_eq_left hL.le, List.drop_take, List.drop_drop,
+      ih (leftChunks c) hL first f' 0 hL0 (by omega) (by omega),
+      ih (c - leftChunks c) (by omega) (first + leftChunks c) f' 0 (by omega) (by omega) (by omega),
+      compressOut_zero, compressOut_zero]
+    simp only [compressOut, parentOutput]
+
 end Plonky3Lean.Proofs.Blake3
