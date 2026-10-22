@@ -6,6 +6,7 @@ import Plonky3Lean.Proofs.Field.BabyBear.Constants
 import Plonky3Lean.Proofs.Field.BabyBear.Element
 import Plonky3Lean.Proofs.Field.BabyBear.Extension
 import Plonky3Lean.Proofs.Field.Monty31.Utils
+import Plonky3Lean.Proofs.Util.GcdInversion
 
 /-!
 # Proofs
