@@ -17,16 +17,6 @@ open Plonky3Lean.Spec.Sha256 Plonky3Lean.Lib
 
 namespace Plonky3Lean.Proofs.Sha256
 
-theorem index_usize_eq' {α : Type} [Inhabited α] {n : Std.Usize} (v : Std.Array α n) (i : Std.Usize)
-    (h : i.val < v.val.length) : Std.Array.index_usize v i = .ok (v.val[i.val]!) := by
-  rw [index_usize_eq _ _ h]
-  exact congrArg _ (getElem!_pos v.val i.val h).symm
-
-theorem update_eq' {α : Type} {n : Std.Usize} (v : Std.Array α n) (i : Std.Usize) (x : α)
-    (h : i.val < v.val.length) :
-    Std.Array.update v i x = .ok (Std.Array.from (v.val.set i.val x) (by simp)) :=
-  update_eq v i x h
-
 /-! ## Copying the halves into a block -/
 
 /-- The block after the first `k` rounds of the copy. -/

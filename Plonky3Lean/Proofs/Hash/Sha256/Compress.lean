@@ -21,31 +21,6 @@ open Plonky3Lean.Spec.Sha256 Plonky3Lean.Lib
 
 namespace Plonky3Lean.Proofs.Sha256
 
-theorem index_usize_eq {α : Type} {n : Std.Usize} (v : Std.Array α n) (i : Std.Usize)
-    (h : i.val < v.val.length) : Std.Array.index_usize v i = .ok (v.val[i.val]) := by
-  simp only [Std.Array.index_usize]
-  rw [show v[i]? = some (v.val[i.val]) from List.getElem?_eq_getElem h]
-
-theorem update_eq {α : Type} {n : Std.Usize} (v : Std.Array α n) (i : Std.Usize) (x : α)
-    (h : i.val < v.val.length) :
-    Std.Array.update v i x = .ok (Std.Array.from (v.val.set i.val x) (by simp)) := by
-  simp only [Std.Array.update]
-  rw [show v[i]? = some (v.val[i.val]) from List.getElem?_eq_getElem h]
-
-theorem index_make {α : Type} {n : Std.Usize} (l : List α) (h : l.length = n.val) (i : Std.Usize)
-    (hi : i.val < l.length) : Std.Array.index_usize (Std.Array.make n l h) i = .ok (l[i.val]) := by
-  rw [index_usize_eq _ _ (by simpa using hi)]
-  simp
-
-theorem update_make {α : Type} {n : Std.Usize} (l : List α) (h : l.length = n.val) (i : Std.Usize)
-    (x : α) (hi : i.val < l.length) :
-    Std.Array.update (Std.Array.make n l h) i x =
-      .ok (Std.Array.make n (l.set i.val x) (by simpa using h)) := by
-  rw [update_eq _ _ _ (by simpa using hi)]
-  congr 1
-  apply Std.Array.ext
-  simp
-
 /-! ## The schedule buffer -/
 
 /-- Word `t` of the schedule of block `M`. -/

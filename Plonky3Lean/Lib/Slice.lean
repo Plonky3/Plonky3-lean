@@ -176,4 +176,41 @@ theorem repeat_eq {T : Type} (N : Std.Usize) (cl : CoreModels.core.clone.Clone T
   unfold CoreModels.rust_primitives.slice.array_from_fn
   rw [e, bind_ok, dite_eq_left_of_eq_true (eq_true (by simp))]
 
+/-! ## Indexing and updating arrays -/
+
+theorem index_usize_eq {α : Type} {n : Std.Usize} (v : Std.Array α n) (i : Std.Usize)
+    (h : i.val < v.val.length) : Std.Array.index_usize v i = .ok (v.val[i.val]) := by
+  simp only [Std.Array.index_usize]
+  rw [show v[i]? = some (v.val[i.val]) from List.getElem?_eq_getElem h]
+
+theorem update_eq {α : Type} {n : Std.Usize} (v : Std.Array α n) (i : Std.Usize) (x : α)
+    (h : i.val < v.val.length) :
+    Std.Array.update v i x = .ok (Std.Array.from (v.val.set i.val x) (by simp)) := by
+  simp only [Std.Array.update]
+  rw [show v[i]? = some (v.val[i.val]) from List.getElem?_eq_getElem h]
+
+theorem index_make {α : Type} {n : Std.Usize} (l : List α) (h : l.length = n.val) (i : Std.Usize)
+    (hi : i.val < l.length) : Std.Array.index_usize (Std.Array.make n l h) i = .ok (l[i.val]) := by
+  rw [index_usize_eq _ _ (by simpa using hi)]
+  simp
+
+theorem update_make {α : Type} {n : Std.Usize} (l : List α) (h : l.length = n.val) (i : Std.Usize)
+    (x : α) (hi : i.val < l.length) :
+    Std.Array.update (Std.Array.make n l h) i x =
+      .ok (Std.Array.make n (l.set i.val x) (by simpa using h)) := by
+  rw [update_eq _ _ _ (by simpa using hi)]
+  congr 1
+  apply Std.Array.ext
+  simp
+
+theorem index_usize_eq' {α : Type} [Inhabited α] {n : Std.Usize} (v : Std.Array α n) (i : Std.Usize)
+    (h : i.val < v.val.length) : Std.Array.index_usize v i = .ok (v.val[i.val]!) := by
+  rw [index_usize_eq _ _ h]
+  exact congrArg _ (getElem!_pos v.val i.val h).symm
+
+theorem update_eq' {α : Type} {n : Std.Usize} (v : Std.Array α n) (i : Std.Usize) (x : α)
+    (h : i.val < v.val.length) :
+    Std.Array.update v i x = .ok (Std.Array.from (v.val.set i.val x) (by simp)) :=
+  update_eq v i x h
+
 end Plonky3Lean.Lib
