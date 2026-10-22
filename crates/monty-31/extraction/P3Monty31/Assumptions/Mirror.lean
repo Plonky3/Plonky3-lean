@@ -213,6 +213,143 @@ def monty_31.MontyField31.try_inverse {FP : Type}
       (UScalar.cast .U64 exp)
     ok (some v)
 
+/-! ## Integers into the field (`QuotientMap`, `monty-31/src/monty_31.rs:518`) -/
+
+/-- `QuotientMap<u32>::from_canonical_checked`: `(int < PRIME).then(|| Self::new(int))`. -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU32.from_canonical_checked
+    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (int : Std.U32) : RustM (Option (monty_31.MontyField31 FP)) := do
+  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+  let prime ← mp.PRIME
+  if int < prime then do
+    let v ← monty_31.MontyField31.new mp int
+    ok (some v)
+  else ok none
+
+/-- `QuotientMap<i32>::from_int`: `Self::new_monty(to_monty_signed(int))`. -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_int
+    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (int : Std.I32) : RustM (monty_31.MontyField31 FP) := do
+  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+  let v ← utils.to_monty_signed mp int
+  monty_31.MontyField31.new_monty mp v
+
+/-- `QuotientMap<i32>::from_canonical_checked`, with `bound = (PRIME >> 1) as i32`:
+`Some(new_monty(to_monty_signed(int)))` when `-bound <= int <= bound`, else `None`. -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_canonical_checked
+    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (int : Std.I32) : RustM (Option (monty_31.MontyField31 FP)) := do
+  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+  let prime ← mp.PRIME
+  let half ← prime >>> 1#i32
+  let bound := UScalar.hcast .I32 half
+  if int <= bound then do
+    let neg_bound ← IScalar.neg bound
+    if int >= neg_bound then do
+      let v ← utils.to_monty_signed mp int
+      let e ← monty_31.MontyField31.new_monty mp v
+      ok (some e)
+    else ok none
+  else ok none
+
+/-- `QuotientMap<u64>::from_int`: `Self::new_monty(to_monty_64(int))`. -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_int
+    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (int : Std.U64) : RustM (monty_31.MontyField31 FP) := do
+  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+  let v ← utils.to_monty_64 mp int
+  monty_31.MontyField31.new_monty mp v
+
+/-- `QuotientMap<u64>::from_canonical_checked`:
+`(int < PRIME as u64).then(|| Self::new(int as u32))`. -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked
+    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (int : Std.U64) : RustM (Option (monty_31.MontyField31 FP)) := do
+  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+  let prime ← mp.PRIME
+  if int < UScalar.cast .U64 prime then do
+    let v ← monty_31.MontyField31.new mp (UScalar.cast .U32 int)
+    ok (some v)
+  else ok none
+
+/-- `QuotientMap<i64>::from_int`: `Self::new_monty(to_monty_64_signed(int))`. -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_int
+    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (int : Std.I64) : RustM (monty_31.MontyField31 FP) := do
+  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+  let v ← utils.to_monty_64_signed mp int
+  monty_31.MontyField31.new_monty mp v
+
+/-- `QuotientMap<i64>::from_canonical_checked`, with `bound = (PRIME >> 1) as i64`:
+`Some(new_monty(to_monty_signed(int as i32)))` when `-bound <= int <= bound`, else `None`. -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_checked
+    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (int : Std.I64) : RustM (Option (monty_31.MontyField31 FP)) := do
+  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+  let prime ← mp.PRIME
+  let half ← prime >>> 1#i32
+  let bound := UScalar.hcast .I64 half
+  if int <= bound then do
+    let neg_bound ← IScalar.neg bound
+    if int >= neg_bound then do
+      let v ← utils.to_monty_signed mp (IScalar.cast .I32 int)
+      let e ← monty_31.MontyField31.new_monty mp v
+      ok (some e)
+    else ok none
+  else ok none
+
+/-- `QuotientMap<u128>::from_int`:
+`Self::new_monty(to_monty((int % (PRIME as u128)) as u32))`. -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_int
+    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (int : Std.U128) : RustM (monty_31.MontyField31 FP) := do
+  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+  let prime ← mp.PRIME
+  let r ← int % UScalar.cast .U128 prime
+  let v ← utils.to_monty mp (UScalar.cast .U32 r)
+  monty_31.MontyField31.new_monty mp v
+
+/-- `QuotientMap<u128>::from_canonical_checked`:
+`(int < PRIME as u128).then(|| Self::new(int as u32))`. -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_checked
+    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (int : Std.U128) : RustM (Option (monty_31.MontyField31 FP)) := do
+  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+  let prime ← mp.PRIME
+  if int < UScalar.cast .U128 prime then do
+    let v ← monty_31.MontyField31.new mp (UScalar.cast .U32 int)
+    ok (some v)
+  else ok none
+
+/-- `QuotientMap<i128>::from_int`:
+`Self::new_monty(to_monty_signed((int % (PRIME as i128)) as i32))`. -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_int
+    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (int : Std.I128) : RustM (monty_31.MontyField31 FP) := do
+  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+  let prime ← mp.PRIME
+  let r ← int % UScalar.hcast .I128 prime
+  let v ← utils.to_monty_signed mp (IScalar.cast .I32 r)
+  monty_31.MontyField31.new_monty mp v
+
+/-- `QuotientMap<i128>::from_canonical_checked`, with `bound = (PRIME >> 1) as i128`:
+`Some(new_monty(to_monty_signed(int as i32)))` when `-bound <= int <= bound`, else `None`. -/
+def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked
+    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (int : Std.I128) : RustM (Option (monty_31.MontyField31 FP)) := do
+  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+  let prime ← mp.PRIME
+  let half ← prime >>> 1#i32
+  let bound := UScalar.hcast .I128 half
+  if int <= bound then do
+    let neg_bound ← IScalar.neg bound
+    if int >= neg_bound then do
+      let v ← utils.to_monty_signed mp (IScalar.cast .I32 int)
+      let e ← monty_31.MontyField31.new_monty mp v
+      ok (some e)
+    else ok none
+  else ok none
+
 /-- `impl<FP: FieldParameters> PrimeField for MontyField31<FP>`
 (`monty-31/src/monty_31.rs:671`). `PrimeField` has no members here. -/
 def monty_31.MontyField31.Insts.P3_fieldFieldPrimeField {FP : Type}

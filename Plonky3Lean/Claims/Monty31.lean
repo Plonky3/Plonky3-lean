@@ -1,5 +1,6 @@
 import Plonky3Lean.Proofs.Field.Monty31.Findings
 import Plonky3Lean.Proofs.Field.Monty31.Inverse
+import Plonky3Lean.Proofs.Field.Monty31.QuotientMap
 
 /-!
 # p3-monty-31: claims, for every prime
@@ -103,6 +104,108 @@ theorem utils.to_monty_64_signed.spec (hv : Valid inst p mu) (x : Std.I64) :
     utils.to_monty_64_signed inst x ⦃ r => r.val < p.val ∧
       (r.val : ℤ) % p.val = x.val * 2 ^ 32 % p.val ⦄ :=
   Proofs.Monty31.utils.to_monty_64_signed.spec hv x
+
+/-! ## Integers into the field -/
+
+open monty_31.MontyField31.Insts in
+/-- `from_int` on an `i32` gives the element `x mod p`, stored canonically. -/
+theorem QuotientMap.from_int_i32 {FP : Type} {inst : data_traits.FieldParameters FP}
+    (hv : FieldValid inst p mu) (x : Std.I32) :
+    P3_fieldIntegersQuotientMapI32.from_int inst x ⦃ r => r.value.val < p.val ∧
+      (r.value.val : ℤ) % p.val = x.val * 2 ^ 32 % p.val ⦄ :=
+  Proofs.Monty31.from_int_i32.spec hv x
+
+open monty_31.MontyField31.Insts in
+/-- `from_int` on a `u64` gives the element `x mod p`. -/
+theorem QuotientMap.from_int_u64 {FP : Type} {inst : data_traits.FieldParameters FP}
+    (hv : FieldValid inst p mu) (x : Std.U64) :
+    P3_fieldIntegersQuotientMapU64.from_int inst x ⦃ r =>
+      r.value.val = x.val * 2 ^ 32 % p.val ⦄ :=
+  Proofs.Monty31.from_int_u64.spec hv x
+
+open monty_31.MontyField31.Insts in
+/-- `from_int` on an `i64` gives the element `x mod p`, stored canonically. -/
+theorem QuotientMap.from_int_i64 {FP : Type} {inst : data_traits.FieldParameters FP}
+    (hv : FieldValid inst p mu) (x : Std.I64) :
+    P3_fieldIntegersQuotientMapI64.from_int inst x ⦃ r => r.value.val < p.val ∧
+      (r.value.val : ℤ) % p.val = x.val * 2 ^ 32 % p.val ⦄ :=
+  Proofs.Monty31.from_int_i64.spec hv x
+
+open monty_31.MontyField31.Insts in
+/-- `from_int` on a `u128` gives the element `x mod p`. -/
+theorem QuotientMap.from_int_u128 {FP : Type} {inst : data_traits.FieldParameters FP}
+    (hv : FieldValid inst p mu) (x : Std.U128) :
+    P3_fieldIntegersQuotientMapU128.from_int inst x ⦃ r =>
+      r.value.val = x.val % p.val * 2 ^ 32 % p.val ⦄ :=
+  Proofs.Monty31.from_int_u128.spec hv x
+
+open monty_31.MontyField31.Insts in
+/-- `from_int` on an `i128` gives the element `x mod p`, stored canonically. -/
+theorem QuotientMap.from_int_i128 {FP : Type} {inst : data_traits.FieldParameters FP}
+    (hv : FieldValid inst p mu) (x : Std.I128) :
+    P3_fieldIntegersQuotientMapI128.from_int inst x ⦃ r => r.value.val < p.val ∧
+      (r.value.val : ℤ) % p.val = x.val * 2 ^ 32 % p.val ⦄ :=
+  Proofs.Monty31.from_int_i128.spec hv x
+
+open monty_31.MontyField31.Insts in
+/-- `from_canonical_checked` on a `u32` is `Some(x mod p)` for `x < p`, and `None` otherwise. -/
+theorem QuotientMap.from_canonical_checked_u32 {FP : Type} {inst : data_traits.FieldParameters FP}
+    (hv : FieldValid inst p mu) (x : Std.U32) :
+    P3_fieldIntegersQuotientMapU32.from_canonical_checked inst x ⦃ r =>
+      (x.val < p.val → ∃ e, r = some e ∧ e.value.val = x.val * 2 ^ 32 % p.val) ∧
+      (p.val ≤ x.val → r = none) ⦄ :=
+  Proofs.Monty31.from_canonical_checked_u32.spec hv x
+
+open monty_31.MontyField31.Insts in
+/-- `from_canonical_checked` on an `i32` is `Some(x mod p)` for `|x| <= (p - 1)/2`, and `None` otherwise. -/
+theorem QuotientMap.from_canonical_checked_i32 {FP : Type} {inst : data_traits.FieldParameters FP}
+    (hv : FieldValid inst p mu) (x : Std.I32) :
+    P3_fieldIntegersQuotientMapI32.from_canonical_checked inst x ⦃ r =>
+      (-((p.val - 1) / 2 : ℕ) ≤ x.val → x.val ≤ ((p.val - 1) / 2 : ℕ) →
+        ∃ e, r = some e ∧ e.value.val < p.val ∧
+          (e.value.val : ℤ) % p.val = x.val * 2 ^ 32 % p.val) ∧
+      ((x.val < -((p.val - 1) / 2 : ℕ) ∨ ((p.val - 1) / 2 : ℕ) < x.val) → r = none) ⦄ :=
+  Proofs.Monty31.from_canonical_checked_i32.spec hv x
+
+open monty_31.MontyField31.Insts in
+/-- `from_canonical_checked` on a `u64` is `Some(x mod p)` for `x < p`, and `None` otherwise. -/
+theorem QuotientMap.from_canonical_checked_u64 {FP : Type} {inst : data_traits.FieldParameters FP}
+    (hv : FieldValid inst p mu) (x : Std.U64) :
+    P3_fieldIntegersQuotientMapU64.from_canonical_checked inst x ⦃ r =>
+      (x.val < p.val → ∃ e, r = some e ∧ e.value.val = x.val * 2 ^ 32 % p.val) ∧
+      (p.val ≤ x.val → r = none) ⦄ :=
+  Proofs.Monty31.from_canonical_checked_u64.spec hv x
+
+open monty_31.MontyField31.Insts in
+/-- `from_canonical_checked` on a `u128` is `Some(x mod p)` for `x < p`, and `None` otherwise. -/
+theorem QuotientMap.from_canonical_checked_u128 {FP : Type} {inst : data_traits.FieldParameters FP}
+    (hv : FieldValid inst p mu) (x : Std.U128) :
+    P3_fieldIntegersQuotientMapU128.from_canonical_checked inst x ⦃ r =>
+      (x.val < p.val → ∃ e, r = some e ∧ e.value.val = x.val * 2 ^ 32 % p.val) ∧
+      (p.val ≤ x.val → r = none) ⦄ :=
+  Proofs.Monty31.from_canonical_checked_u128.spec hv x
+
+open monty_31.MontyField31.Insts in
+/-- `from_canonical_checked` on an `i64` is `Some(x mod p)` for `|x| <= (p - 1)/2`, and `None` otherwise. -/
+theorem QuotientMap.from_canonical_checked_i64 {FP : Type} {inst : data_traits.FieldParameters FP}
+    (hv : FieldValid inst p mu) (x : Std.I64) :
+    P3_fieldIntegersQuotientMapI64.from_canonical_checked inst x ⦃ r =>
+      (-((p.val - 1) / 2 : ℕ) ≤ x.val → x.val ≤ ((p.val - 1) / 2 : ℕ) →
+        ∃ e, r = some e ∧ e.value.val < p.val ∧
+          (e.value.val : ℤ) % p.val = x.val * 2 ^ 32 % p.val) ∧
+      ((x.val < -((p.val - 1) / 2 : ℕ) ∨ ((p.val - 1) / 2 : ℕ) < x.val) → r = none) ⦄ :=
+  Proofs.Monty31.from_canonical_checked_i64.spec hv x
+
+open monty_31.MontyField31.Insts in
+/-- `from_canonical_checked` on an `i128` is `Some(x mod p)` for `|x| <= (p - 1)/2`, and `None` otherwise. -/
+theorem QuotientMap.from_canonical_checked_i128 {FP : Type} {inst : data_traits.FieldParameters FP}
+    (hv : FieldValid inst p mu) (x : Std.I128) :
+    P3_fieldIntegersQuotientMapI128.from_canonical_checked inst x ⦃ r =>
+      (-((p.val - 1) / 2 : ℕ) ≤ x.val → x.val ≤ ((p.val - 1) / 2 : ℕ) →
+        ∃ e, r = some e ∧ e.value.val < p.val ∧
+          (e.value.val : ℤ) % p.val = x.val * 2 ^ 32 % p.val) ∧
+      ((x.val < -((p.val - 1) / 2 : ℕ) ∨ ((p.val - 1) / 2 : ℕ) < x.val) → r = none) ⦄ :=
+  Proofs.Monty31.from_canonical_checked_i128.spec hv x
 
 /-! ## Field elements -/
 
