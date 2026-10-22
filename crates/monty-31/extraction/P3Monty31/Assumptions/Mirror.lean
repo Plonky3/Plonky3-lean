@@ -27,6 +27,7 @@ impl). This file holds what that extraction does not produce:
   content.
 -/
 import P3Monty31.Extraction
+import P3Util
 import P3Poseidon1
 import P3Poseidon2
 open CoreModels Aeneas
@@ -110,6 +111,107 @@ def monty_31.MontyField31.halve {FP : Type}
   let v ← utils.halve_u32 data_traitsFieldParametersInst self.value
   monty_31.MontyField31.new_monty
     data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst v
+
+/-! ## Powers of two and inversion (`monty-31/src/monty_31.rs`) -/
+
+/-- `<MontyField31<FP> as PrimeCharacteristicRing>::square`, the trait default
+(`field/src/field.rs:160`): `self.dup() * self.dup()`. -/
+def monty_31.MontyField31.square {FP : Type}
+    (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (self : monty_31.MontyField31 FP) : RustM (monty_31.MontyField31 FP) :=
+  monty_31.MontyField31.mul
+    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst self self
+
+/-- One iteration of the `exp_u64` loop at bit `j` of `power`: multiply
+`product` by `current` when the bit is set, then square `current`. -/
+def monty_31.MontyField31.exp_u64.step {FP : Type}
+    (data_traitsFieldParametersInst : data_traits.FieldParameters FP) (power : Std.U64)
+    (acc : monty_31.MontyField31 FP × monty_31.MontyField31 FP) (j : ℕ) :
+    RustM (monty_31.MontyField31 FP × monty_31.MontyField31 FP) := do
+  let product ←
+    if power.val.testBit j then
+      monty_31.MontyField31.mul
+        data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+        acc.2 acc.1
+    else ok acc.2
+  let current ← monty_31.MontyField31.square data_traitsFieldParametersInst acc.1
+  ok (current, product)
+
+/-- `<MontyField31<FP> as PrimeCharacteristicRing>::exp_u64`, the trait default
+(`field/src/field.rs:219`): square-and-multiply over the `bits_u64(power)` low
+bits of `power`, least significant first.
+
+The loop `for j in 0..bits_u64(power)` is a fold over `j < 64 - leading_zeros(power)`.
+
+Its test `(power >> j) & 1 != 0` is bit `j` of `power`, and the shift cannot fail since `j < 64`. -/
+def monty_31.MontyField31.exp_u64 {FP : Type}
+    (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (self : monty_31.MontyField31 FP) (power : Std.U64) : RustM (monty_31.MontyField31 FP) := do
+  let product ← data_traitsFieldParametersInst.MONTY_ONE
+  let lz ← core.num.U64.leading_zeros power
+  let bits ← 64#u32 - lz
+  let acc ← (List.range bits.val).foldlM
+    (monty_31.MontyField31.exp_u64.step data_traitsFieldParametersInst power) (self, product)
+  ok acc.2
+
+/-- `MontyField31::<FP>::MONTY_POWERS_OF_TWO` (line 115): entry `0` is
+`FP::MONTY_ONE`, entry `i` for `1 <= i < 64` is `new_monty(to_monty_64(1 << i))`. -/
+def monty_31.MontyField31.MONTY_POWERS_OF_TWO {FP : Type}
+    (data_traitsFieldParametersInst : data_traits.FieldParameters FP) :
+    RustM (Array (monty_31.MontyField31 FP) 64#usize) := do
+  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+  let one ← data_traitsFieldParametersInst.MONTY_ONE
+  let rest ← (List.range' 1 63).mapM fun i => do
+    let v ← utils.to_monty_64 mp ⟨BitVec.ofNat 64 (2 ^ i)⟩
+    monty_31.MontyField31.new_monty mp v
+  (if h : (one :: rest).length = 64 then ok ⟨one :: rest, h⟩ else fail .panic :
+    RustM (Array (monty_31.MontyField31 FP) 64#usize))
+
+/-- `<MontyField31<FP> as PrimeCharacteristicRing>::mul_2exp_u64` (line 230):
+`self` for `exp = 0`, `self + self` for `exp = 1`, a multiplication by
+`MONTY_POWERS_OF_TWO[exp]` for `exp < 64`, and by `TWO.exp_u64(exp)` beyond. -/
+def monty_31.MontyField31.mul_2exp_u64 {FP : Type}
+    (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (self : monty_31.MontyField31 FP) (exp : Std.U64) : RustM (monty_31.MontyField31 FP) := do
+  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+  if exp = 0#u64 then ok self
+  else if exp = 1#u64 then monty_31.MontyField31.add mp self self
+  else if exp < 64#u64 then do
+    let table ← monty_31.MontyField31.MONTY_POWERS_OF_TWO data_traitsFieldParametersInst
+    let e ← Array.index_usize table (UScalar.cast .Usize exp)
+    monty_31.MontyField31.mul mp self e
+  else do
+    let two ← data_traitsFieldParametersInst.MONTY_TWO
+    let e ← monty_31.MontyField31.exp_u64 data_traitsFieldParametersInst two exp
+    monty_31.MontyField31.mul mp self e
+
+/-- `<MontyField31<FP> as Field>::try_inverse` (line 458).
+
+- `None` when `self == ZERO`, compared on the stored value as the derived `PartialEq` does.
+- Otherwise `v = gcd_inversion_prime_field_32::<31>(self.value, PRIME)`.
+- Then `monty_reduce(((PRIME as i64) << 30 + v) as u64)`, multiplied by `2^(3 · MONTY_BITS - 60)`.
+
+The `i64` addition is checked, and the cast to `u64` reinterprets the bits. -/
+def monty_31.MontyField31.try_inverse {FP : Type}
+    (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
+    (self : monty_31.MontyField31 FP) : RustM (Option (monty_31.MontyField31 FP)) := do
+  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
+  let zero ← data_traitsFieldParametersInst.MONTY_ZERO
+  if self.value = zero.value then ok none
+  else do
+    let prime ← mp.PRIME
+    let gcd_inverse ← p3_util.gcd_inversion_prime_field_32 31#u32 self.value prime
+    let shifted ← (UScalar.hcast .I64 prime) <<< 30#i32
+    let sum ← shifted + gcd_inverse
+    let pos_inverse := IScalar.hcast .U64 sum
+    let r ← utils.monty_reduce mp pos_inverse
+    let uncorrected_value ← monty_31.MontyField31.new_monty mp r
+    let bits ← mp.MONTY_BITS
+    let three_bits ← 3#u32 * bits
+    let exp ← three_bits - 60#u32
+    let v ← monty_31.MontyField31.mul_2exp_u64 data_traitsFieldParametersInst uncorrected_value
+      (UScalar.cast .U64 exp)
+    ok (some v)
 
 /-- `impl<FP: FieldParameters> PrimeField for MontyField31<FP>`
 (`monty-31/src/monty_31.rs:671`). `PrimeField` has no members here. -/

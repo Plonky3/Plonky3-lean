@@ -19,16 +19,15 @@ variable {MP : Type} {inst : data_traits.MontyParameters MP} {p mu : Std.U32}
 
 /-! ## Montgomery reduction, on natural numbers -/
 
-/-- The quotient `t` of Montgomery reduction cancels the low 32 bits of `x`:
-`t · p ≡ x (mod 2^32)` for `t = x · mu mod 2^32`. -/
+/-- The quotient `t = x · mu mod 2^32` of Montgomery reduction satisfies `t · p ≡ x (mod 2^32)`. -/
 theorem monty_t_cong (x P MU : ℕ) (hinv : P * MU % 2 ^ 32 = 1) :
     (x * MU % 2 ^ 64 % 2 ^ 32) * P % 2 ^ 32 = x % 2 ^ 32 := by
   rw [Nat.mod_mod_of_dvd _ (by norm_num : 2 ^ 32 ∣ 2 ^ 64), Nat.mod_mul_mod, Nat.mul_assoc,
     Nat.mul_mod, Nat.mul_comm MU, hinv, Nat.mul_one, Nat.mod_mod]
 
-/-- Montgomery reduction on naturals: for `x < 2^32 p` and `t · p ≡ x (mod 2^32)`,
-`t < 2^32`, the value `monty_reduce` computes is the canonical `r` with
-`r · 2^32 ≡ x (mod p)`. -/
+/-- Montgomery reduction on naturals, for `x < 2^32 p`, `t < 2^32` and `t · p ≡ x (mod 2^32)`.
+
+The value it computes is the canonical `r` with `r · 2^32 ≡ x (mod p)`. -/
 theorem monty_core (x t P : ℕ) (hP : 0 < P) (hP31 : P < 2 ^ 31) (hx : x < 2 ^ 32 * P)
     (ht : t < 2 ^ 32) (hcong : t * P % 2 ^ 32 = x % 2 ^ 32) :
     let r := ((x + 2 ^ 64 - t * P) % 2 ^ 64 / 2 ^ 32 % 2 ^ 32 +
@@ -65,9 +64,10 @@ theorem monty_core (x t P : ℕ) (hP : 0 < P) (hP31 : P < 2 ^ 31) (hx : x < 2 ^ 
 
 /-! ## The helpers -/
 
-/-- `monty_reduce(x)`, for `x < 2^32 · p`, is the canonical `r` with
-`r · 2^32 ≡ x (mod p)`. It never panics on such an input: the product `t · p`
-is below `2^63`. -/
+/-- `monty_reduce(x)`, for `x < 2^32 · p`, is the canonical `r` with `r · 2^32 ≡ x (mod p)`.
+
+It never panics on such an input: the product `t · p` is below `2^63`. -/
+@[step]
 theorem utils.monty_reduce.spec (hv : Valid inst p mu) (x : Std.U64)
     (hx : x.val < 2 ^ 32 * p.val) :
     utils.monty_reduce inst x ⦃ r => r.val < p.val ∧
@@ -104,22 +104,22 @@ theorem utils.monty_reduce.spec (hv : Valid inst p mu) (x : Std.U64)
     step*
   · simp only [hlt, decide_false, Bool.false_eq_true, if_false, bind_tc_ok]
     step*
-/-- `from_monty(x)` takes `x` out of Montgomery form: the canonical `r` with
-`r · 2^32 ≡ x (mod p)`. Every `u32` is accepted, canonical or not. -/
+/-- `from_monty(x)` takes `x` out of Montgomery form: the canonical `r` with `r · 2^32 ≡ x (mod p)`.
+
+Every `u32` is accepted, canonical or not. -/
+@[step]
 theorem utils.from_monty.spec (hv : Valid inst p mu) (x : Std.U32) :
     utils.from_monty inst x ⦃ r => r.val < p.val ∧ r.val * 2 ^ 32 % p.val = x.val % p.val ⦄ := by
   unfold utils.from_monty
   have hp0 : 0 < p.val := by have := hv.odd; omega
+  have hx : x.val < 2 ^ 32 * p.val :=
+    lt_of_lt_of_le (u32_lt x) (Nat.le_mul_of_pos_right _ hp0)
   step*
-  have hi : i.val = x.val := by rw [i_post, cast_u32_u64_val]
-  refine WP.spec_mono (utils.monty_reduce.spec hv i ?_) ?_
-  · rw [hi]
-    calc x.val < 2 ^ 32 := u32_lt x
-      _ ≤ 2 ^ 32 * p.val := Nat.le_mul_of_pos_right _ hp0
-  · intro r hr; rwa [hi] at hr
 
-/-- `add(a, b)` of canonical `a`, `b` is `(a + b) mod p`. The `u32` sum cannot
-overflow, since `a + b < 2p < 2^32`. -/
+/-- `add(a, b)` of canonical `a`, `b` is `(a + b) mod p`.
+
+The `u32` sum cannot overflow, since `a + b < 2p < 2^32`. -/
+@[step]
 theorem utils.add.spec (hv : Valid inst p mu) (a b : Std.U32) (ha : a.val < p.val)
     (hb : b.val < p.val) :
     utils.add inst a b ⦃ r => r.val = (a.val + b.val) % p.val ⦄ := by
@@ -137,6 +137,7 @@ theorem utils.add.spec (hv : Valid inst p mu) (a b : Std.U32) (ha : a.val < p.va
     · rw [Nat.mod_eq_sub_mod hge, Nat.mod_eq_of_lt (by omega)]; omega
 
 /-- `sub(a, b)` of canonical `a`, `b` is `(a - b) mod p`, as `(a + p - b) mod p`. -/
+@[step]
 theorem utils.sub.spec (hv : Valid inst p mu) (a b : Std.U32) (ha : a.val < p.val)
     (hb : b.val < p.val) :
     utils.sub inst a b ⦃ r => r.val = (a.val + p.val - b.val) % p.val ⦄ := by
@@ -158,8 +159,10 @@ theorem utils.sub.spec (hv : Valid inst p mu) (a b : Std.U32) (ha : a.val < p.va
       Nat.mod_eq_of_lt (by omega : a.val - b.val < p.val)]
     omega
 
-/-- `halve_u32(a)` of a canonical `a` is the canonical `r` with `2r ≡ a (mod p)`:
-`a / 2` when `a` is even, `a / 2 + (p + 1) / 2` when it is odd. -/
+/-- `halve_u32(a)` of a canonical `a` is the canonical `r` with `2r ≡ a (mod p)`.
+
+It is `a / 2` when `a` is even, and `a / 2 + (p + 1) / 2` when it is odd. -/
+@[step]
 theorem utils.halve_u32.spec {FP : Type} {inst : data_traits.FieldParameters FP}
     (hv : FieldValid inst p mu) (a : Std.U32) (ha : a.val < p.val) :
     utils.halve_u32 inst a ⦃ r => r.val < p.val ∧ r.val * 2 % p.val = a.val ⦄ := by
@@ -188,8 +191,10 @@ theorem utils.halve_u32.spec {FP : Type} {inst : data_traits.FieldParameters FP}
     rw [show (a.val / 2 + (p.val + 1) / 2) * 2 = a.val + p.val by omega, Nat.add_mod_right,
       Nat.mod_eq_of_lt ha]
 
-/-- `to_monty(x)` puts any `u32` into Montgomery form: `x · 2^32 mod p`. The
-shift is done in `u64`, where `x · 2^32 < 2^64`. -/
+/-- `to_monty(x)` puts any `u32` into Montgomery form: `x · 2^32 mod p`.
+
+The shift is done in `u64`, where `x · 2^32 < 2^64`. -/
+@[step]
 theorem utils.to_monty.spec (hv : Valid inst p mu) (x : Std.U32) :
     utils.to_monty inst x ⦃ r => r.val = x.val * 2 ^ 32 % p.val ⦄ := by
   unfold utils.to_monty
