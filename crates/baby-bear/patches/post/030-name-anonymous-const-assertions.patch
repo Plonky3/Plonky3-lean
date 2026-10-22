@@ -5,7 +5,8 @@
 # Class:        rename
 # Gap:          docs/extractor-issues.md 5: aeneas names anonymous `const _: ()
 #               = assert!(..)` items `__1`, `__2`, ..., which mathlib's
-#               `linter.style.nameCheck` rejects (one warning each).
+#               `linter.style.nameCheck` rejects: without this patch `lake
+#               build` prints nine warnings, none in known-warnings.txt.
 # Cost:         none. Renames only; the bodies are untouched.
 # Upstreamable: yes: aeneas could generate names without a double underscore.
 # Drop when:    aeneas generates a name without a double underscore.

@@ -8,6 +8,8 @@
 #               unused methods after the merge, which drops the default-method
 #               roots hax adds (`--start-from core::clone::Clone::clone_from`,
 #               `core::cmp::PartialEq::ne`). `--targets` is needed because of 1.
+#               Without this patch `lake build` fails: "Fields missing:
+#               `clone_from`".
 # Cost:         none. Each added field is the body of the CoreModels default
 #               method it stands for (`clone.Clone.clone_from.default`,
 #               `cmp.PartialEq.ne.default`), inlined.

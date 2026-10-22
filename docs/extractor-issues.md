@@ -11,12 +11,15 @@ keeps its number and says so.
    only way through is charon's `--targets`, which leads to 2.
 2. **charon `--targets` drops hax's default-method roots.** Multi-target mode
    forces `--translate-all-methods`, then filters unused methods after the
-   merge, which removes the `clone_from` and `ne` roots hax adds.
-   Post-patch `010-restore-dropped-default-methods` of `baby-bear`,
-   `goldilocks`, `koala-bear`, `mersenne-31` and `monty-31`.
+   merge, which removes the `clone_from` and `ne` roots hax adds. Every derived
+   `Clone` and `PartialEq` then comes out without those fields, and `lake build`
+   fails with "Fields missing: `clone_from`" (and `ne`). Post-patch
+   `010-restore-dropped-default-methods` of `baby-bear`, `goldilocks`,
+   `koala-bear`, `mersenne-31` and `monty-31`.
 3. **aeneas's defining and using runs disagree on default-constant shapes.**
    `N.default (Self : Type) : Usize` in p3-monty-31's run is called as
-   `N.default <inst> : RustM Usize` from p3-baby-bear's. Post-patch
+   `N.default <inst> : RustM Usize` from p3-baby-bear's, and `lake build`
+   fails with application type mismatches. Post-patch
    `020-trait-default-constant-shape` of `baby-bear` and `koala-bear`.
 4. **charon translates some items that aeneas does not emit.** aeneas emits only
    what charon lists in `ordered_decls`: the `--start-from` roots and everything
@@ -26,7 +29,7 @@ keeps its number and says so.
    charon also skips a provided-method override that nothing uses, even when it
    is a `--start-from` root (the pattern matches; no diagnostic), and a pattern
    cannot name one of several impls of a generic trait (`QuotientMap<u32>`,
-   `QuotientMap<i32>`, …). `--translate-all-methods` makes charon translate and
+   `QuotientMap<i32>`, …; see 200). `--translate-all-methods` makes charon translate and
    list such methods, but also pulls in p3-field's trait hierarchy, which aeneas
    rejects (9).
    For p3-mersenne-31 and p3-monty-31, pre-patch `010-extraction-roots` roots the
@@ -37,8 +40,9 @@ keeps its number and says so.
    members that no wrapper can reach (`try_inverse`, `mul_2exp_u64`,
    `div_2exp_u64`, `Sum`, `dot_product`, …), listed in its `gaps.toml`.
 5. **aeneas's `__N` names for anonymous consts** trip mathlib's `nameCheck`
-   linter. Post-patch `030-name-anonymous-const-assertions` of `baby-bear` and
-   `koala-bear`.
+   linter: nine warnings in each of p3-baby-bear's and p3-koala-bear's
+   Poseidon tables. Post-patch `030-name-anonymous-const-assertions` of
+   `baby-bear` and `koala-bear`.
 6. **The seeded `Debug::fmt` signatures do not match `CoreModels`**: aeneas
    adds a `&mut Formatter` back-function that `core.fmt.Debug` lacks. Fixed in
    the hand-written `crates/baby-bear/extraction/P3BabyBear/Assumptions/FunsExternal.lean`.
@@ -67,8 +71,14 @@ keeps its number and says so.
 10. **charon and aeneas cannot lift `-> impl Trait` in trait methods**
     ([charon#1266](https://github.com/AeneasVerif/charon/issues/1266)). rustc
     desugars each into a hidden generic associated type, and p3-field has many.
-    Pre-patches `baby-bear/020`, `030` and `040` hide them behind
-    `cfg(hax_backend_lean)`.
+    aeneas stops on those reachable from p3-baby-bear's roots ("Can not
+    extract trait associated types with parameters", or a mixed recursion
+    group): `RawDataSerializable`'s, reached through `Field`'s supertraits,
+    `PackedValue::unpack_iter` and `Field::prepare_bit_plane_expansion`.
+    `PackedFieldExtension`'s do not change the output, but charon warns on
+    each. Pre-patches `baby-bear/020`, `030` and `040` hide them all behind
+    `cfg(hax_backend_lean)`; `tools/extract/patch-necessity.py` shows each
+    patch is needed.
 
     The matrix trait of p3-matrix returns opaque iterators from every row method.
 
@@ -302,3 +312,11 @@ keeps its number and says so.
     Its integer helpers would extract on their own, but nothing in the crate can be reached until both dependencies compile in that variant.
 
     p3-bus is transcribed instead.
+
+200. **charon's `--start-from` does not accept trait generics.** A pattern such
+    as `{impl p3_field::integers::QuotientMap<u32> for …}::from_int` fails with
+    "`--start-from` does not support trait generics", and charon exits 101.
+    Methods of generic trait impls (`QuotientMap<w>`,
+    `HasTwoAdicBinomialExtension<2>`, `BinomiallyExtendable<3>`) are reached
+    instead through the `010-extraction-roots` pre-patches of p3-mersenne-31 and
+    p3-monty-31.

@@ -4,6 +4,8 @@
 # Hunks:        2
 # Class:        cfg-hide
 # Gap:          docs/extractor-issues.md 10 (charon#1266, as for 020 and 030).
+#               Without this patch aeneas stops on p3-baby-bear: "Can not
+#               extract trait associated types with parameters".
 # Cost:         none in a normal build: the change is behind
 #               cfg(hax_backend_lean). In the extracted variant,
 #               `Field::prepare_bit_plane_expansion` is absent.
@@ -16,7 +18,7 @@
 # `Field::prepare_bit_plane_expansion` returns
 # `Option<impl Fn(&[u64; 64], &mut Vec<Self>) + Send + Sync + 'static>`, so,
 # like the methods 030 hides, it adds a hidden GAT to `Field`, which charon
-# cannot lift and aeneas then rejects (it exits with code 2). Its only callers
+# cannot lift and aeneas then rejects. Its only callers
 # and overrides are in p3-binary-field and p3-multi-stark, neither of which is
 # in p3-baby-bear's graph, so under the cfg it is absent rather than moved.
 #
