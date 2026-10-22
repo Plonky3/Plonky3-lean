@@ -34,6 +34,7 @@ public import Plonky3Lean.Proofs.Field.Binary.LinearSqrt
 public import Plonky3Lean.Proofs.Field.Binary.Conjugate
 public import Plonky3Lean.Proofs.Field.Binary.TowerFrobenius
 public import Plonky3Lean.Proofs.Field.Binary.TowerSqrt
+public import Plonky3Lean.Proofs.Field.Binary.TowerApi
 public import Plonky3Lean.Proofs.Field.Goldilocks.Arith
 public import Plonky3Lean.Proofs.Field.Goldilocks.Basic
 public import Plonky3Lean.Proofs.Field.Goldilocks.Constants

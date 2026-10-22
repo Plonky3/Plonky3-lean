@@ -2,7 +2,7 @@ module
 
 public import Plonky3Lean.Proofs.Field.Binary.Aes
 public import Plonky3Lean.Proofs.Field.Binary.Operators
-public import Plonky3Lean.Proofs.Field.Binary.TowerSqrt
+public import Plonky3Lean.Proofs.Field.Binary.TowerApi
 
 @[expose] public section
 
@@ -616,5 +616,712 @@ theorem tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_
     tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2 a n ⦃ r =>
       r.val < 2 ^ 2 ^ 3 ∧ towerOf 3 r = towerOf 3 a ^ 2 ^ n.val ⦄ :=
   Proofs.Binary.bf8_exp_power_of_2_spec a n
+
+/-! ### The rest of the field API -/
+
+/-- The value `inverse` returns. -/
+theorem field_defaults.BinaryField16.inverse.towerOf (a : tower.BinaryField16) (ha : Spec.BinaryField.towerOf 4 a ≠ 0) :
+    field_defaults.BinaryField16.inverse a ⦃ c =>
+      c.val < 2 ^ 2 ^ 4 ∧ towerOf 4 c = (towerOf 4 a)⁻¹ ⦄ :=
+  Proofs.Binary.bf16_inverse_spec a ha
+
+/-- `inverse` panics. -/
+theorem field_defaults.BinaryField16.inverse.panics (a : tower.BinaryField16) (ha : Spec.BinaryField.towerOf 4 a = 0) :
+    field_defaults.BinaryField16.inverse a = .fail .panic :=
+  Proofs.Binary.bf16_inverse_zero a ha
+
+/-- The value `div` returns. -/
+theorem tower.BinaryField16.Insts.CoreOpsArithDivBinaryField16BinaryField16.div.towerOf (a b : tower.BinaryField16) (hb : Spec.BinaryField.towerOf 4 b ≠ 0) :
+    tower.BinaryField16.Insts.CoreOpsArithDivBinaryField16BinaryField16.div a b ⦃ r =>
+      r.val < 2 ^ 2 ^ 4 ∧ towerOf 4 r = towerOf 4 a / towerOf 4 b ⦄ :=
+  Proofs.Binary.bf16_div_spec a b hb
+
+/-- `div` panics. -/
+theorem tower.BinaryField16.Insts.CoreOpsArithDivBinaryField16BinaryField16.div.panics (a b : tower.BinaryField16) (hb : Spec.BinaryField.towerOf 4 b = 0) :
+    tower.BinaryField16.Insts.CoreOpsArithDivBinaryField16BinaryField16.div a b = .fail .panic :=
+  Proofs.Binary.bf16_div_zero a b hb
+
+/-- The value `mul_assign` returns. -/
+theorem tower.BinaryField16.Insts.CoreOpsArithMulAssign.mul_assign.towerOf (a b : tower.BinaryField16) :
+    tower.BinaryField16.Insts.CoreOpsArithMulAssign.mul_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField16)) a b ⦃ r =>
+      towerOf 4 r = towerOf 4 a * towerOf 4 b ⦄ :=
+  Proofs.Binary.bf16_mul_assign_spec a b
+
+/-- The value `add_assign` returns. -/
+theorem tower.BinaryField16.Insts.CoreOpsArithAddAssign.add_assign.towerOf (a b : tower.BinaryField16) :
+    tower.BinaryField16.Insts.CoreOpsArithAddAssign.add_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField16)) a b ⦃ r =>
+      towerOf 4 r = towerOf 4 a + towerOf 4 b ⦄ :=
+  Proofs.Binary.bf16_add_assign_spec a b
+
+/-- The value `sub_assign` returns. -/
+theorem tower.BinaryField16.Insts.CoreOpsArithSubAssign.sub_assign.towerOf (a b : tower.BinaryField16) :
+    tower.BinaryField16.Insts.CoreOpsArithSubAssign.sub_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField16)) a b ⦃ r =>
+      towerOf 4 r = towerOf 4 a - towerOf 4 b ⦄ :=
+  Proofs.Binary.bf16_sub_assign_spec a b
+
+/-- The value `div_assign` returns. -/
+theorem tower.BinaryField16.Insts.CoreOpsArithDivAssignBinaryField16.div_assign.towerOf (a b : tower.BinaryField16) (hb : Spec.BinaryField.towerOf 4 b ≠ 0) :
+    tower.BinaryField16.Insts.CoreOpsArithDivAssignBinaryField16.div_assign a b ⦃ r =>
+      towerOf 4 r = towerOf 4 a / towerOf 4 b ⦄ :=
+  Proofs.Binary.bf16_div_assign_spec a b hb
+
+/-- The value `eq` returns. -/
+theorem tower.BinaryField16.Insts.CoreCmpPartialEqBinaryField16.eq.towerOf (a b : tower.BinaryField16) :
+    tower.BinaryField16.Insts.CoreCmpPartialEqBinaryField16.eq a b ⦃ r =>
+      (r = true ↔ towerOf 4 a = towerOf 4 b) ⦄ :=
+  Proofs.Binary.bf16_eq_spec a b
+
+/-- The value `bool_check` returns. -/
+theorem tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.towerOf (a : tower.BinaryField16) :
+    tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check a ⦃ r =>
+      towerOf 4 r = towerOf 4 a * towerOf 4 a + towerOf 4 a ⦄ :=
+  Proofs.Binary.bf16_bool_check_spec a
+
+/-- The value `bits` returns. -/
+theorem tower.BinaryField16.Insts.P3_fieldFieldField.bits.val :
+    tower.BinaryField16.Insts.P3_fieldFieldField.bits ⦃ r => r.val = 2 ^ 4 ⦄ :=
+  Proofs.Binary.bf16_bits_spec
+
+/-- The value `from_bool` returns. -/
+theorem tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val (b : Bool) :
+    tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool b ⦃ r =>
+      r.val = b.toNat ⦄ :=
+  Proofs.Binary.bf16_from_bool_spec b
+
+/-- The value `interpolation_node` returns. -/
+theorem tower.BinaryField16.Insts.P3_fieldFieldField.interpolation_node.val (i : Std.Usize) (hi : i.val < 2 ^ 2 ^ 4) :
+    tower.BinaryField16.Insts.P3_fieldFieldField.interpolation_node i ⦃ r => r.val = i.val ⦄ :=
+  Proofs.Binary.bf16_interpolation_node_spec i hi
+
+/-- `interpolation_node` panics. -/
+theorem tower.BinaryField16.Insts.P3_fieldFieldField.interpolation_node.panics (i : Std.Usize) (hi : 2 ^ 2 ^ 4 ≤ i.val) :
+    tower.BinaryField16.Insts.P3_fieldFieldField.interpolation_node i = .fail .panic :=
+  Proofs.Binary.bf16_interpolation_node_fail i hi
+
+/-- The value `inverse` returns. -/
+theorem field_defaults.Gf2.inverse.towerOf (a : gf2.Gf2) (hA : a.val < 2 ^ 2 ^ 0) (ha : Spec.BinaryField.towerOf 0 a ≠ 0) :
+    field_defaults.Gf2.inverse a ⦃ c =>
+      c.val < 2 ^ 2 ^ 0 ∧ towerOf 0 c = (towerOf 0 a)⁻¹ ⦄ :=
+  Proofs.Binary.gf2_inverse_spec a hA ha
+
+/-- `inverse` panics. -/
+theorem field_defaults.Gf2.inverse.panics (a : gf2.Gf2) (hA : a.val < 2 ^ 2 ^ 0) (ha : Spec.BinaryField.towerOf 0 a = 0) :
+    field_defaults.Gf2.inverse a = .fail .panic :=
+  Proofs.Binary.gf2_inverse_zero a hA ha
+
+/-- The value `div` returns. -/
+theorem gf2.Gf2.Insts.CoreOpsArithDivGf2Gf2.div.towerOf (a b : gf2.Gf2) (hA : a.val < 2 ^ 2 ^ 0) (hB : b.val < 2 ^ 2 ^ 0) (hb : Spec.BinaryField.towerOf 0 b ≠ 0) :
+    gf2.Gf2.Insts.CoreOpsArithDivGf2Gf2.div a b ⦃ r =>
+      r.val < 2 ^ 2 ^ 0 ∧ towerOf 0 r = towerOf 0 a / towerOf 0 b ⦄ :=
+  Proofs.Binary.gf2_div_spec a b hA hB hb
+
+/-- `div` panics. -/
+theorem gf2.Gf2.Insts.CoreOpsArithDivGf2Gf2.div.panics (a b : gf2.Gf2) (hB : b.val < 2 ^ 2 ^ 0) (hb : Spec.BinaryField.towerOf 0 b = 0) :
+    gf2.Gf2.Insts.CoreOpsArithDivGf2Gf2.div a b = .fail .panic :=
+  Proofs.Binary.gf2_div_zero a b hB hb
+
+/-- The value `mul_assign` returns. -/
+theorem gf2.Gf2.Insts.CoreOpsArithMulAssign.mul_assign.towerOf (a b : gf2.Gf2) :
+    gf2.Gf2.Insts.CoreOpsArithMulAssign.mul_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket gf2.Gf2)) a b ⦃ r =>
+      towerOf 0 r = towerOf 0 a * towerOf 0 b ⦄ :=
+  Proofs.Binary.gf2_mul_assign_spec a b
+
+/-- The value `add_assign` returns. -/
+theorem gf2.Gf2.Insts.CoreOpsArithAddAssign.add_assign.towerOf (a b : gf2.Gf2) :
+    gf2.Gf2.Insts.CoreOpsArithAddAssign.add_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket gf2.Gf2)) a b ⦃ r =>
+      towerOf 0 r = towerOf 0 a + towerOf 0 b ⦄ :=
+  Proofs.Binary.gf2_add_assign_spec a b
+
+/-- The value `sub_assign` returns. -/
+theorem gf2.Gf2.Insts.CoreOpsArithSubAssign.sub_assign.towerOf (a b : gf2.Gf2) :
+    gf2.Gf2.Insts.CoreOpsArithSubAssign.sub_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket gf2.Gf2)) a b ⦃ r =>
+      towerOf 0 r = towerOf 0 a - towerOf 0 b ⦄ :=
+  Proofs.Binary.gf2_sub_assign_spec a b
+
+/-- The value `div_assign` returns. -/
+theorem gf2.Gf2.Insts.CoreOpsArithDivAssignGf2.div_assign.towerOf (a b : gf2.Gf2) (hB : b.val < 2 ^ 2 ^ 0) (hb : Spec.BinaryField.towerOf 0 b ≠ 0) :
+    gf2.Gf2.Insts.CoreOpsArithDivAssignGf2.div_assign a b ⦃ r =>
+      towerOf 0 r = towerOf 0 a / towerOf 0 b ⦄ :=
+  Proofs.Binary.gf2_div_assign_spec a b hB hb
+
+/-- The value `eq` returns. -/
+theorem gf2.Gf2.Insts.CoreCmpPartialEqGf2.eq.towerOf (a b : gf2.Gf2) (hA : a.val < 2 ^ 2 ^ 0) (hB : b.val < 2 ^ 2 ^ 0) :
+    gf2.Gf2.Insts.CoreCmpPartialEqGf2.eq a b ⦃ r =>
+      (r = true ↔ towerOf 0 a = towerOf 0 b) ⦄ :=
+  Proofs.Binary.gf2_eq_spec a b hA hB
+
+/-- The value `bits` returns. -/
+theorem gf2.Gf2.Insts.P3_fieldFieldField.bits.val :
+    gf2.Gf2.Insts.P3_fieldFieldField.bits ⦃ r => r.val = 2 ^ 0 ⦄ :=
+  Proofs.Binary.gf2_bits_spec
+
+/-- The value `from_bool` returns. -/
+theorem gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val (b : Bool) :
+    gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool b ⦃ r => r.val = b.toNat ⦄ :=
+  Proofs.Binary.gf2_from_bool_spec b
+
+/-- The value `new` returns. -/
+theorem gf2.Gf2.new.val (bit : Std.U8) :
+    gf2.Gf2.new bit ⦃ r => r.val = bit.val % 2 ⦄ :=
+  Proofs.Binary.gf2_new_spec bit
+
+/-- The value `interpolation_node` returns. -/
+theorem gf2.Gf2.Insts.P3_fieldFieldField.interpolation_node.val (i : Std.Usize) (hi : i.val < 2) :
+    gf2.Gf2.Insts.P3_fieldFieldField.interpolation_node i ⦃ r => r.val = i.val ⦄ :=
+  Proofs.Binary.gf2_interpolation_node_spec i hi
+
+/-- `interpolation_node` panics. -/
+theorem gf2.Gf2.Insts.P3_fieldFieldField.interpolation_node.panics (i : Std.Usize) (hi : 2 ≤ i.val) :
+    gf2.Gf2.Insts.P3_fieldFieldField.interpolation_node i = .fail .panic :=
+  Proofs.Binary.gf2_interpolation_node_fail i hi
+
+/-- `halve` panics. -/
+theorem gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.halve.panics (a : gf2.Gf2) :
+    gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.halve a = .fail .panic :=
+  Proofs.Binary.gf2_halve_fail a
+
+/-- `div_2exp_u64` panics. -/
+theorem gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.div_2exp_u64.panics (a : gf2.Gf2) (e : Std.U64) :
+    gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.div_2exp_u64 a e = .fail .panic :=
+  Proofs.Binary.gf2_div_2exp_u64_fail a e
+
+/-- The value `double` returns. -/
+theorem gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.double.towerOf (a : gf2.Gf2) :
+    gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.double a ⦃ r =>
+      towerOf 0 r = towerOf 0 a + towerOf 0 a ⦄ :=
+  Proofs.Binary.gf2_double_spec a
+
+/-- The value `mul_2exp_u64` returns. -/
+theorem gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.mul_2exp_u64.towerOf (a : gf2.Gf2) (e : Std.U64) :
+    gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.mul_2exp_u64 a e ⦃ r =>
+      towerOf 0 r = towerOf 0 a * 2 ^ e.val ⦄ :=
+  Proofs.Binary.gf2_mul_2exp_u64_spec a e
+
+/-- The value `xor` returns. -/
+theorem gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.xor.towerOf (a b : gf2.Gf2) :
+    gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.xor a b ⦃ r =>
+      towerOf 0 r = towerOf 0 a + towerOf 0 b ⦄ :=
+  Proofs.Binary.gf2_xor_spec a b
+
+/-- The value `from_int` returns. -/
+theorem gf2.Gf2.Insts.P3_fieldIntegersQuotientMapU8.from_int.val (n : Std.U8) :
+    gf2.Gf2.Insts.P3_fieldIntegersQuotientMapU8.from_int n ⦃ r => r.val = n.val % 2 ⦄ :=
+  Proofs.Binary.gf2_from_int_u8_spec n
+
+/-- The value `from_int` returns. -/
+theorem gf2.Gf2.Insts.P3_fieldIntegersQuotientMapI8.from_int.val (n : Std.I8) :
+    gf2.Gf2.Insts.P3_fieldIntegersQuotientMapI8.from_int n ⦃ r => (r.val : ℤ) = n.val % 2 ⦄ :=
+  Proofs.Binary.gf2_from_int_i8_spec n
+
+/-- The value `as_canonical_u64` returns. -/
+theorem gf2.Gf2.Insts.P3_fieldFieldPrimeField64.as_canonical_u64.val (a : gf2.Gf2) :
+    gf2.Gf2.Insts.P3_fieldFieldPrimeField64.as_canonical_u64 a ⦃ r => r.val = a.val ⦄ :=
+  Proofs.Binary.gf2_as_canonical_u64_spec a
+
+/-- The value `as_canonical_u32` returns. -/
+theorem gf2.Gf2.Insts.P3_fieldFieldPrimeField32.as_canonical_u32.val (a : gf2.Gf2) :
+    gf2.Gf2.Insts.P3_fieldFieldPrimeField32.as_canonical_u32 a ⦃ r => r.val = a.val ⦄ :=
+  Proofs.Binary.gf2_as_canonical_u32_spec a
+
+/-- The value `from_canonical_checked` returns. -/
+theorem gf2.Gf2.Insts.P3_fieldIntegersQuotientMapU8.from_canonical_checked.val (n : Std.U8) :
+    gf2.Gf2.Insts.P3_fieldIntegersQuotientMapU8.from_canonical_checked n ⦃ r =>
+      (n.val < 2 → ∃ c, r = .Some c ∧ c.val = n.val) ∧ (2 ≤ n.val → r = .None) ⦄ :=
+  Proofs.Binary.gf2_from_canonical_checked_u8_spec n
+
+/-- The value `from_canonical_checked` returns. -/
+theorem gf2.Gf2.Insts.P3_fieldIntegersQuotientMapI8.from_canonical_checked.val (n : Std.I8) :
+    gf2.Gf2.Insts.P3_fieldIntegersQuotientMapI8.from_canonical_checked n ⦃ r =>
+      ((0 ≤ n.val ∧ n.val < 2) → ∃ c, r = .Some c ∧ (c.val : ℤ) = n.val) ∧
+        (¬ (0 ≤ n.val ∧ n.val < 2) → r = .None) ⦄ :=
+  Proofs.Binary.gf2_from_canonical_checked_i8_spec n
+
+/-- The value `inverse` returns. -/
+theorem field_defaults.BinaryField2.inverse.towerOf (a : tower.BinaryField2) (hA : a.val < 2 ^ 2 ^ 1) (ha : Spec.BinaryField.towerOf 1 a ≠ 0) :
+    field_defaults.BinaryField2.inverse a ⦃ c =>
+      c.val < 2 ^ 2 ^ 1 ∧ towerOf 1 c = (towerOf 1 a)⁻¹ ⦄ :=
+  Proofs.Binary.bf2_inverse_spec a hA ha
+
+/-- `inverse` panics. -/
+theorem field_defaults.BinaryField2.inverse.panics (a : tower.BinaryField2) (hA : a.val < 2 ^ 2 ^ 1) (ha : Spec.BinaryField.towerOf 1 a = 0) :
+    field_defaults.BinaryField2.inverse a = .fail .panic :=
+  Proofs.Binary.bf2_inverse_zero a hA ha
+
+/-- The value `div` returns. -/
+theorem tower.BinaryField2.Insts.CoreOpsArithDivBinaryField2BinaryField2.div.towerOf (a b : tower.BinaryField2) (hA : a.val < 2 ^ 2 ^ 1) (hB : b.val < 2 ^ 2 ^ 1) (hb : Spec.BinaryField.towerOf 1 b ≠ 0) :
+    tower.BinaryField2.Insts.CoreOpsArithDivBinaryField2BinaryField2.div a b ⦃ r =>
+      r.val < 2 ^ 2 ^ 1 ∧ towerOf 1 r = towerOf 1 a / towerOf 1 b ⦄ :=
+  Proofs.Binary.bf2_div_spec a b hA hB hb
+
+/-- `div` panics. -/
+theorem tower.BinaryField2.Insts.CoreOpsArithDivBinaryField2BinaryField2.div.panics (a b : tower.BinaryField2) (hB : b.val < 2 ^ 2 ^ 1) (hb : Spec.BinaryField.towerOf 1 b = 0) :
+    tower.BinaryField2.Insts.CoreOpsArithDivBinaryField2BinaryField2.div a b = .fail .panic :=
+  Proofs.Binary.bf2_div_zero a b hB hb
+
+/-- The value `mul_assign` returns. -/
+theorem tower.BinaryField2.Insts.CoreOpsArithMulAssign.mul_assign.towerOf (a b : tower.BinaryField2) :
+    tower.BinaryField2.Insts.CoreOpsArithMulAssign.mul_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField2)) a b ⦃ r =>
+      towerOf 1 r = towerOf 1 a * towerOf 1 b ⦄ :=
+  Proofs.Binary.bf2_mul_assign_spec a b
+
+/-- The value `add_assign` returns. -/
+theorem tower.BinaryField2.Insts.CoreOpsArithAddAssign.add_assign.towerOf (a b : tower.BinaryField2) :
+    tower.BinaryField2.Insts.CoreOpsArithAddAssign.add_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField2)) a b ⦃ r =>
+      towerOf 1 r = towerOf 1 a + towerOf 1 b ⦄ :=
+  Proofs.Binary.bf2_add_assign_spec a b
+
+/-- The value `sub_assign` returns. -/
+theorem tower.BinaryField2.Insts.CoreOpsArithSubAssign.sub_assign.towerOf (a b : tower.BinaryField2) :
+    tower.BinaryField2.Insts.CoreOpsArithSubAssign.sub_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField2)) a b ⦃ r =>
+      towerOf 1 r = towerOf 1 a - towerOf 1 b ⦄ :=
+  Proofs.Binary.bf2_sub_assign_spec a b
+
+/-- The value `div_assign` returns. -/
+theorem tower.BinaryField2.Insts.CoreOpsArithDivAssignBinaryField2.div_assign.towerOf (a b : tower.BinaryField2) (hB : b.val < 2 ^ 2 ^ 1) (hb : Spec.BinaryField.towerOf 1 b ≠ 0) :
+    tower.BinaryField2.Insts.CoreOpsArithDivAssignBinaryField2.div_assign a b ⦃ r =>
+      towerOf 1 r = towerOf 1 a / towerOf 1 b ⦄ :=
+  Proofs.Binary.bf2_div_assign_spec a b hB hb
+
+/-- The value `eq` returns. -/
+theorem tower.BinaryField2.Insts.CoreCmpPartialEqBinaryField2.eq.towerOf (a b : tower.BinaryField2) (hA : a.val < 2 ^ 2 ^ 1) (hB : b.val < 2 ^ 2 ^ 1) :
+    tower.BinaryField2.Insts.CoreCmpPartialEqBinaryField2.eq a b ⦃ r =>
+      (r = true ↔ towerOf 1 a = towerOf 1 b) ⦄ :=
+  Proofs.Binary.bf2_eq_spec a b hA hB
+
+/-- The value `bool_check` returns. -/
+theorem tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.towerOf (a : tower.BinaryField2) :
+    tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check a ⦃ r =>
+      towerOf 1 r = towerOf 1 a * towerOf 1 a + towerOf 1 a ⦄ :=
+  Proofs.Binary.bf2_bool_check_spec a
+
+/-- The value `bits` returns. -/
+theorem tower.BinaryField2.Insts.P3_fieldFieldField.bits.val :
+    tower.BinaryField2.Insts.P3_fieldFieldField.bits ⦃ r => r.val = 2 ^ 1 ⦄ :=
+  Proofs.Binary.bf2_bits_spec
+
+/-- The value `from_bool` returns. -/
+theorem tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val (b : Bool) :
+    tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool b ⦃ r =>
+      r.val = b.toNat ⦄ :=
+  Proofs.Binary.bf2_from_bool_spec b
+
+/-- The value `interpolation_node` returns. -/
+theorem tower.BinaryField2.Insts.P3_fieldFieldField.interpolation_node.val (i : Std.Usize) (hi : i.val < 2 ^ 2 ^ 1) :
+    tower.BinaryField2.Insts.P3_fieldFieldField.interpolation_node i ⦃ r => r.val = i.val ⦄ :=
+  Proofs.Binary.bf2_interpolation_node_spec i hi
+
+/-- `interpolation_node` panics. -/
+theorem tower.BinaryField2.Insts.P3_fieldFieldField.interpolation_node.panics (i : Std.Usize) (hi : 2 ^ 2 ^ 1 ≤ i.val) :
+    tower.BinaryField2.Insts.P3_fieldFieldField.interpolation_node i = .fail .panic :=
+  Proofs.Binary.bf2_interpolation_node_fail i hi
+
+/-- The value `inverse` returns. -/
+theorem field_defaults.BinaryField4.inverse.towerOf (a : tower.BinaryField4) (hA : a.val < 2 ^ 2 ^ 2) (ha : Spec.BinaryField.towerOf 2 a ≠ 0) :
+    field_defaults.BinaryField4.inverse a ⦃ c =>
+      c.val < 2 ^ 2 ^ 2 ∧ towerOf 2 c = (towerOf 2 a)⁻¹ ⦄ :=
+  Proofs.Binary.bf4_inverse_spec a hA ha
+
+/-- `inverse` panics. -/
+theorem field_defaults.BinaryField4.inverse.panics (a : tower.BinaryField4) (hA : a.val < 2 ^ 2 ^ 2) (ha : Spec.BinaryField.towerOf 2 a = 0) :
+    field_defaults.BinaryField4.inverse a = .fail .panic :=
+  Proofs.Binary.bf4_inverse_zero a hA ha
+
+/-- The value `div` returns. -/
+theorem tower.BinaryField4.Insts.CoreOpsArithDivBinaryField4BinaryField4.div.towerOf (a b : tower.BinaryField4) (hA : a.val < 2 ^ 2 ^ 2) (hB : b.val < 2 ^ 2 ^ 2) (hb : Spec.BinaryField.towerOf 2 b ≠ 0) :
+    tower.BinaryField4.Insts.CoreOpsArithDivBinaryField4BinaryField4.div a b ⦃ r =>
+      r.val < 2 ^ 2 ^ 2 ∧ towerOf 2 r = towerOf 2 a / towerOf 2 b ⦄ :=
+  Proofs.Binary.bf4_div_spec a b hA hB hb
+
+/-- `div` panics. -/
+theorem tower.BinaryField4.Insts.CoreOpsArithDivBinaryField4BinaryField4.div.panics (a b : tower.BinaryField4) (hB : b.val < 2 ^ 2 ^ 2) (hb : Spec.BinaryField.towerOf 2 b = 0) :
+    tower.BinaryField4.Insts.CoreOpsArithDivBinaryField4BinaryField4.div a b = .fail .panic :=
+  Proofs.Binary.bf4_div_zero a b hB hb
+
+/-- The value `mul_assign` returns. -/
+theorem tower.BinaryField4.Insts.CoreOpsArithMulAssign.mul_assign.towerOf (a b : tower.BinaryField4) :
+    tower.BinaryField4.Insts.CoreOpsArithMulAssign.mul_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField4)) a b ⦃ r =>
+      towerOf 2 r = towerOf 2 a * towerOf 2 b ⦄ :=
+  Proofs.Binary.bf4_mul_assign_spec a b
+
+/-- The value `add_assign` returns. -/
+theorem tower.BinaryField4.Insts.CoreOpsArithAddAssign.add_assign.towerOf (a b : tower.BinaryField4) :
+    tower.BinaryField4.Insts.CoreOpsArithAddAssign.add_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField4)) a b ⦃ r =>
+      towerOf 2 r = towerOf 2 a + towerOf 2 b ⦄ :=
+  Proofs.Binary.bf4_add_assign_spec a b
+
+/-- The value `sub_assign` returns. -/
+theorem tower.BinaryField4.Insts.CoreOpsArithSubAssign.sub_assign.towerOf (a b : tower.BinaryField4) :
+    tower.BinaryField4.Insts.CoreOpsArithSubAssign.sub_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField4)) a b ⦃ r =>
+      towerOf 2 r = towerOf 2 a - towerOf 2 b ⦄ :=
+  Proofs.Binary.bf4_sub_assign_spec a b
+
+/-- The value `div_assign` returns. -/
+theorem tower.BinaryField4.Insts.CoreOpsArithDivAssignBinaryField4.div_assign.towerOf (a b : tower.BinaryField4) (hB : b.val < 2 ^ 2 ^ 2) (hb : Spec.BinaryField.towerOf 2 b ≠ 0) :
+    tower.BinaryField4.Insts.CoreOpsArithDivAssignBinaryField4.div_assign a b ⦃ r =>
+      towerOf 2 r = towerOf 2 a / towerOf 2 b ⦄ :=
+  Proofs.Binary.bf4_div_assign_spec a b hB hb
+
+/-- The value `eq` returns. -/
+theorem tower.BinaryField4.Insts.CoreCmpPartialEqBinaryField4.eq.towerOf (a b : tower.BinaryField4) (hA : a.val < 2 ^ 2 ^ 2) (hB : b.val < 2 ^ 2 ^ 2) :
+    tower.BinaryField4.Insts.CoreCmpPartialEqBinaryField4.eq a b ⦃ r =>
+      (r = true ↔ towerOf 2 a = towerOf 2 b) ⦄ :=
+  Proofs.Binary.bf4_eq_spec a b hA hB
+
+/-- The value `bool_check` returns. -/
+theorem tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.towerOf (a : tower.BinaryField4) :
+    tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check a ⦃ r =>
+      towerOf 2 r = towerOf 2 a * towerOf 2 a + towerOf 2 a ⦄ :=
+  Proofs.Binary.bf4_bool_check_spec a
+
+/-- The value `bits` returns. -/
+theorem tower.BinaryField4.Insts.P3_fieldFieldField.bits.val :
+    tower.BinaryField4.Insts.P3_fieldFieldField.bits ⦃ r => r.val = 2 ^ 2 ⦄ :=
+  Proofs.Binary.bf4_bits_spec
+
+/-- The value `from_bool` returns. -/
+theorem tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val (b : Bool) :
+    tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool b ⦃ r =>
+      r.val = b.toNat ⦄ :=
+  Proofs.Binary.bf4_from_bool_spec b
+
+/-- The value `interpolation_node` returns. -/
+theorem tower.BinaryField4.Insts.P3_fieldFieldField.interpolation_node.val (i : Std.Usize) (hi : i.val < 2 ^ 2 ^ 2) :
+    tower.BinaryField4.Insts.P3_fieldFieldField.interpolation_node i ⦃ r => r.val = i.val ⦄ :=
+  Proofs.Binary.bf4_interpolation_node_spec i hi
+
+/-- `interpolation_node` panics. -/
+theorem tower.BinaryField4.Insts.P3_fieldFieldField.interpolation_node.panics (i : Std.Usize) (hi : 2 ^ 2 ^ 2 ≤ i.val) :
+    tower.BinaryField4.Insts.P3_fieldFieldField.interpolation_node i = .fail .panic :=
+  Proofs.Binary.bf4_interpolation_node_fail i hi
+
+/-- The value `inverse` returns. -/
+theorem field_defaults.BinaryField8.inverse.towerOf (a : tower.BinaryField8) (ha : Spec.BinaryField.towerOf 3 a ≠ 0) :
+    field_defaults.BinaryField8.inverse a ⦃ c =>
+      c.val < 2 ^ 2 ^ 3 ∧ towerOf 3 c = (towerOf 3 a)⁻¹ ⦄ :=
+  Proofs.Binary.bf8_inverse_spec a ha
+
+/-- `inverse` panics. -/
+theorem field_defaults.BinaryField8.inverse.panics (a : tower.BinaryField8) (ha : Spec.BinaryField.towerOf 3 a = 0) :
+    field_defaults.BinaryField8.inverse a = .fail .panic :=
+  Proofs.Binary.bf8_inverse_zero a ha
+
+/-- The value `div` returns. -/
+theorem tower.BinaryField8.Insts.CoreOpsArithDivBinaryField8BinaryField8.div.towerOf (a b : tower.BinaryField8) (hb : Spec.BinaryField.towerOf 3 b ≠ 0) :
+    tower.BinaryField8.Insts.CoreOpsArithDivBinaryField8BinaryField8.div a b ⦃ r =>
+      r.val < 2 ^ 2 ^ 3 ∧ towerOf 3 r = towerOf 3 a / towerOf 3 b ⦄ :=
+  Proofs.Binary.bf8_div_spec a b hb
+
+/-- `div` panics. -/
+theorem tower.BinaryField8.Insts.CoreOpsArithDivBinaryField8BinaryField8.div.panics (a b : tower.BinaryField8) (hb : Spec.BinaryField.towerOf 3 b = 0) :
+    tower.BinaryField8.Insts.CoreOpsArithDivBinaryField8BinaryField8.div a b = .fail .panic :=
+  Proofs.Binary.bf8_div_zero a b hb
+
+/-- The value `mul_assign` returns. -/
+theorem tower.BinaryField8.Insts.CoreOpsArithMulAssign.mul_assign.towerOf (a b : tower.BinaryField8) :
+    tower.BinaryField8.Insts.CoreOpsArithMulAssign.mul_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField8)) a b ⦃ r =>
+      towerOf 3 r = towerOf 3 a * towerOf 3 b ⦄ :=
+  Proofs.Binary.bf8_mul_assign_spec a b
+
+/-- The value `add_assign` returns. -/
+theorem tower.BinaryField8.Insts.CoreOpsArithAddAssign.add_assign.towerOf (a b : tower.BinaryField8) :
+    tower.BinaryField8.Insts.CoreOpsArithAddAssign.add_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField8)) a b ⦃ r =>
+      towerOf 3 r = towerOf 3 a + towerOf 3 b ⦄ :=
+  Proofs.Binary.bf8_add_assign_spec a b
+
+/-- The value `sub_assign` returns. -/
+theorem tower.BinaryField8.Insts.CoreOpsArithSubAssign.sub_assign.towerOf (a b : tower.BinaryField8) :
+    tower.BinaryField8.Insts.CoreOpsArithSubAssign.sub_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField8)) a b ⦃ r =>
+      towerOf 3 r = towerOf 3 a - towerOf 3 b ⦄ :=
+  Proofs.Binary.bf8_sub_assign_spec a b
+
+/-- The value `div_assign` returns. -/
+theorem tower.BinaryField8.Insts.CoreOpsArithDivAssignBinaryField8.div_assign.towerOf (a b : tower.BinaryField8) (hb : Spec.BinaryField.towerOf 3 b ≠ 0) :
+    tower.BinaryField8.Insts.CoreOpsArithDivAssignBinaryField8.div_assign a b ⦃ r =>
+      towerOf 3 r = towerOf 3 a / towerOf 3 b ⦄ :=
+  Proofs.Binary.bf8_div_assign_spec a b hb
+
+/-- The value `eq` returns. -/
+theorem tower.BinaryField8.Insts.CoreCmpPartialEqBinaryField8.eq.towerOf (a b : tower.BinaryField8) :
+    tower.BinaryField8.Insts.CoreCmpPartialEqBinaryField8.eq a b ⦃ r =>
+      (r = true ↔ towerOf 3 a = towerOf 3 b) ⦄ :=
+  Proofs.Binary.bf8_eq_spec a b
+
+/-- The value `bool_check` returns. -/
+theorem tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.towerOf (a : tower.BinaryField8) :
+    tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check a ⦃ r =>
+      towerOf 3 r = towerOf 3 a * towerOf 3 a + towerOf 3 a ⦄ :=
+  Proofs.Binary.bf8_bool_check_spec a
+
+/-- The value `bits` returns. -/
+theorem tower.BinaryField8.Insts.P3_fieldFieldField.bits.val :
+    tower.BinaryField8.Insts.P3_fieldFieldField.bits ⦃ r => r.val = 2 ^ 3 ⦄ :=
+  Proofs.Binary.bf8_bits_spec
+
+/-- The value `from_bool` returns. -/
+theorem tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val (b : Bool) :
+    tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool b ⦃ r =>
+      r.val = b.toNat ⦄ :=
+  Proofs.Binary.bf8_from_bool_spec b
+
+/-- The value `interpolation_node` returns. -/
+theorem tower.BinaryField8.Insts.P3_fieldFieldField.interpolation_node.val (i : Std.Usize) (hi : i.val < 2 ^ 2 ^ 3) :
+    tower.BinaryField8.Insts.P3_fieldFieldField.interpolation_node i ⦃ r => r.val = i.val ⦄ :=
+  Proofs.Binary.bf8_interpolation_node_spec i hi
+
+/-- `interpolation_node` panics. -/
+theorem tower.BinaryField8.Insts.P3_fieldFieldField.interpolation_node.panics (i : Std.Usize) (hi : 2 ^ 2 ^ 3 ≤ i.val) :
+    tower.BinaryField8.Insts.P3_fieldFieldField.interpolation_node i = .fail .panic :=
+  Proofs.Binary.bf8_interpolation_node_fail i hi
+
+/-- The value `inverse` returns. -/
+theorem field_defaults.BinaryField32.inverse.towerOf (a : tower.BinaryField32) (ha : Spec.BinaryField.towerOf 5 a ≠ 0) :
+    field_defaults.BinaryField32.inverse a ⦃ c =>
+      c.val < 2 ^ 2 ^ 5 ∧ towerOf 5 c = (towerOf 5 a)⁻¹ ⦄ :=
+  Proofs.Binary.bf32_inverse_spec a ha
+
+/-- `inverse` panics. -/
+theorem field_defaults.BinaryField32.inverse.panics (a : tower.BinaryField32) (ha : Spec.BinaryField.towerOf 5 a = 0) :
+    field_defaults.BinaryField32.inverse a = .fail .panic :=
+  Proofs.Binary.bf32_inverse_zero a ha
+
+/-- The value `div` returns. -/
+theorem tower.BinaryField32.Insts.CoreOpsArithDivBinaryField32BinaryField32.div.towerOf (a b : tower.BinaryField32) (hb : Spec.BinaryField.towerOf 5 b ≠ 0) :
+    tower.BinaryField32.Insts.CoreOpsArithDivBinaryField32BinaryField32.div a b ⦃ r =>
+      r.val < 2 ^ 2 ^ 5 ∧ towerOf 5 r = towerOf 5 a / towerOf 5 b ⦄ :=
+  Proofs.Binary.bf32_div_spec a b hb
+
+/-- `div` panics. -/
+theorem tower.BinaryField32.Insts.CoreOpsArithDivBinaryField32BinaryField32.div.panics (a b : tower.BinaryField32) (hb : Spec.BinaryField.towerOf 5 b = 0) :
+    tower.BinaryField32.Insts.CoreOpsArithDivBinaryField32BinaryField32.div a b = .fail .panic :=
+  Proofs.Binary.bf32_div_zero a b hb
+
+/-- The value `mul_assign` returns. -/
+theorem tower.BinaryField32.Insts.CoreOpsArithMulAssign.mul_assign.towerOf (a b : tower.BinaryField32) :
+    tower.BinaryField32.Insts.CoreOpsArithMulAssign.mul_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField32)) a b ⦃ r =>
+      towerOf 5 r = towerOf 5 a * towerOf 5 b ⦄ :=
+  Proofs.Binary.bf32_mul_assign_spec a b
+
+/-- The value `add_assign` returns. -/
+theorem tower.BinaryField32.Insts.CoreOpsArithAddAssign.add_assign.towerOf (a b : tower.BinaryField32) :
+    tower.BinaryField32.Insts.CoreOpsArithAddAssign.add_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField32)) a b ⦃ r =>
+      towerOf 5 r = towerOf 5 a + towerOf 5 b ⦄ :=
+  Proofs.Binary.bf32_add_assign_spec a b
+
+/-- The value `sub_assign` returns. -/
+theorem tower.BinaryField32.Insts.CoreOpsArithSubAssign.sub_assign.towerOf (a b : tower.BinaryField32) :
+    tower.BinaryField32.Insts.CoreOpsArithSubAssign.sub_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField32)) a b ⦃ r =>
+      towerOf 5 r = towerOf 5 a - towerOf 5 b ⦄ :=
+  Proofs.Binary.bf32_sub_assign_spec a b
+
+/-- The value `div_assign` returns. -/
+theorem tower.BinaryField32.Insts.CoreOpsArithDivAssignBinaryField32.div_assign.towerOf (a b : tower.BinaryField32) (hb : Spec.BinaryField.towerOf 5 b ≠ 0) :
+    tower.BinaryField32.Insts.CoreOpsArithDivAssignBinaryField32.div_assign a b ⦃ r =>
+      towerOf 5 r = towerOf 5 a / towerOf 5 b ⦄ :=
+  Proofs.Binary.bf32_div_assign_spec a b hb
+
+/-- The value `eq` returns. -/
+theorem tower.BinaryField32.Insts.CoreCmpPartialEqBinaryField32.eq.towerOf (a b : tower.BinaryField32) :
+    tower.BinaryField32.Insts.CoreCmpPartialEqBinaryField32.eq a b ⦃ r =>
+      (r = true ↔ towerOf 5 a = towerOf 5 b) ⦄ :=
+  Proofs.Binary.bf32_eq_spec a b
+
+/-- The value `bool_check` returns. -/
+theorem tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.towerOf (a : tower.BinaryField32) :
+    tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check a ⦃ r =>
+      towerOf 5 r = towerOf 5 a * towerOf 5 a + towerOf 5 a ⦄ :=
+  Proofs.Binary.bf32_bool_check_spec a
+
+/-- The value `bits` returns. -/
+theorem tower.BinaryField32.Insts.P3_fieldFieldField.bits.val :
+    tower.BinaryField32.Insts.P3_fieldFieldField.bits ⦃ r => r.val = 2 ^ 5 ⦄ :=
+  Proofs.Binary.bf32_bits_spec
+
+/-- The value `from_bool` returns. -/
+theorem tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val (b : Bool) :
+    tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool b ⦃ r =>
+      r.val = b.toNat ⦄ :=
+  Proofs.Binary.bf32_from_bool_spec b
+
+/-- The value `inverse` returns. -/
+theorem field_defaults.BinaryField64.inverse.towerOf (a : tower.BinaryField64) (ha : Spec.BinaryField.towerOf 6 a ≠ 0) :
+    field_defaults.BinaryField64.inverse a ⦃ c =>
+      c.val < 2 ^ 2 ^ 6 ∧ towerOf 6 c = (towerOf 6 a)⁻¹ ⦄ :=
+  Proofs.Binary.bf64_inverse_spec a ha
+
+/-- `inverse` panics. -/
+theorem field_defaults.BinaryField64.inverse.panics (a : tower.BinaryField64) (ha : Spec.BinaryField.towerOf 6 a = 0) :
+    field_defaults.BinaryField64.inverse a = .fail .panic :=
+  Proofs.Binary.bf64_inverse_zero a ha
+
+/-- The value `div` returns. -/
+theorem tower.BinaryField64.Insts.CoreOpsArithDivBinaryField64BinaryField64.div.towerOf (a b : tower.BinaryField64) (hb : Spec.BinaryField.towerOf 6 b ≠ 0) :
+    tower.BinaryField64.Insts.CoreOpsArithDivBinaryField64BinaryField64.div a b ⦃ r =>
+      r.val < 2 ^ 2 ^ 6 ∧ towerOf 6 r = towerOf 6 a / towerOf 6 b ⦄ :=
+  Proofs.Binary.bf64_div_spec a b hb
+
+/-- `div` panics. -/
+theorem tower.BinaryField64.Insts.CoreOpsArithDivBinaryField64BinaryField64.div.panics (a b : tower.BinaryField64) (hb : Spec.BinaryField.towerOf 6 b = 0) :
+    tower.BinaryField64.Insts.CoreOpsArithDivBinaryField64BinaryField64.div a b = .fail .panic :=
+  Proofs.Binary.bf64_div_zero a b hb
+
+/-- The value `mul_assign` returns. -/
+theorem tower.BinaryField64.Insts.CoreOpsArithMulAssign.mul_assign.towerOf (a b : tower.BinaryField64) :
+    tower.BinaryField64.Insts.CoreOpsArithMulAssign.mul_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField64)) a b ⦃ r =>
+      towerOf 6 r = towerOf 6 a * towerOf 6 b ⦄ :=
+  Proofs.Binary.bf64_mul_assign_spec a b
+
+/-- The value `add_assign` returns. -/
+theorem tower.BinaryField64.Insts.CoreOpsArithAddAssign.add_assign.towerOf (a b : tower.BinaryField64) :
+    tower.BinaryField64.Insts.CoreOpsArithAddAssign.add_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField64)) a b ⦃ r =>
+      towerOf 6 r = towerOf 6 a + towerOf 6 b ⦄ :=
+  Proofs.Binary.bf64_add_assign_spec a b
+
+/-- The value `sub_assign` returns. -/
+theorem tower.BinaryField64.Insts.CoreOpsArithSubAssign.sub_assign.towerOf (a b : tower.BinaryField64) :
+    tower.BinaryField64.Insts.CoreOpsArithSubAssign.sub_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField64)) a b ⦃ r =>
+      towerOf 6 r = towerOf 6 a - towerOf 6 b ⦄ :=
+  Proofs.Binary.bf64_sub_assign_spec a b
+
+/-- The value `div_assign` returns. -/
+theorem tower.BinaryField64.Insts.CoreOpsArithDivAssignBinaryField64.div_assign.towerOf (a b : tower.BinaryField64) (hb : Spec.BinaryField.towerOf 6 b ≠ 0) :
+    tower.BinaryField64.Insts.CoreOpsArithDivAssignBinaryField64.div_assign a b ⦃ r =>
+      towerOf 6 r = towerOf 6 a / towerOf 6 b ⦄ :=
+  Proofs.Binary.bf64_div_assign_spec a b hb
+
+/-- The value `eq` returns. -/
+theorem tower.BinaryField64.Insts.CoreCmpPartialEqBinaryField64.eq.towerOf (a b : tower.BinaryField64) :
+    tower.BinaryField64.Insts.CoreCmpPartialEqBinaryField64.eq a b ⦃ r =>
+      (r = true ↔ towerOf 6 a = towerOf 6 b) ⦄ :=
+  Proofs.Binary.bf64_eq_spec a b
+
+/-- The value `bool_check` returns. -/
+theorem tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.towerOf (a : tower.BinaryField64) :
+    tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check a ⦃ r =>
+      towerOf 6 r = towerOf 6 a * towerOf 6 a + towerOf 6 a ⦄ :=
+  Proofs.Binary.bf64_bool_check_spec a
+
+/-- The value `bits` returns. -/
+theorem tower.BinaryField64.Insts.P3_fieldFieldField.bits.val :
+    tower.BinaryField64.Insts.P3_fieldFieldField.bits ⦃ r => r.val = 2 ^ 6 ⦄ :=
+  Proofs.Binary.bf64_bits_spec
+
+/-- The value `from_bool` returns. -/
+theorem tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val (b : Bool) :
+    tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool b ⦃ r =>
+      r.val = b.toNat ⦄ :=
+  Proofs.Binary.bf64_from_bool_spec b
+
+/-- The value `inverse` returns. -/
+theorem field_defaults.BinaryField128.inverse.towerOf (a : tower.BinaryField128) (ha : Spec.BinaryField.towerOf 7 a ≠ 0) :
+    field_defaults.BinaryField128.inverse a ⦃ c =>
+      c.val < 2 ^ 2 ^ 7 ∧ towerOf 7 c = (towerOf 7 a)⁻¹ ⦄ :=
+  Proofs.Binary.bf128_inverse_spec a ha
+
+/-- `inverse` panics. -/
+theorem field_defaults.BinaryField128.inverse.panics (a : tower.BinaryField128) (ha : Spec.BinaryField.towerOf 7 a = 0) :
+    field_defaults.BinaryField128.inverse a = .fail .panic :=
+  Proofs.Binary.bf128_inverse_zero a ha
+
+/-- The value `div` returns. -/
+theorem tower.BinaryField128.Insts.CoreOpsArithDivBinaryField128BinaryField128.div.towerOf (a b : tower.BinaryField128) (hb : Spec.BinaryField.towerOf 7 b ≠ 0) :
+    tower.BinaryField128.Insts.CoreOpsArithDivBinaryField128BinaryField128.div a b ⦃ r =>
+      r.val < 2 ^ 2 ^ 7 ∧ towerOf 7 r = towerOf 7 a / towerOf 7 b ⦄ :=
+  Proofs.Binary.bf128_div_spec a b hb
+
+/-- `div` panics. -/
+theorem tower.BinaryField128.Insts.CoreOpsArithDivBinaryField128BinaryField128.div.panics (a b : tower.BinaryField128) (hb : Spec.BinaryField.towerOf 7 b = 0) :
+    tower.BinaryField128.Insts.CoreOpsArithDivBinaryField128BinaryField128.div a b = .fail .panic :=
+  Proofs.Binary.bf128_div_zero a b hb
+
+/-- The value `mul_assign` returns. -/
+theorem tower.BinaryField128.Insts.CoreOpsArithMulAssign.mul_assign.towerOf (a b : tower.BinaryField128) :
+    tower.BinaryField128.Insts.CoreOpsArithMulAssign.mul_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField128)) a b ⦃ r =>
+      towerOf 7 r = towerOf 7 a * towerOf 7 b ⦄ :=
+  Proofs.Binary.bf128_mul_assign_spec a b
+
+/-- The value `add_assign` returns. -/
+theorem tower.BinaryField128.Insts.CoreOpsArithAddAssign.add_assign.towerOf (a b : tower.BinaryField128) :
+    tower.BinaryField128.Insts.CoreOpsArithAddAssign.add_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField128)) a b ⦃ r =>
+      towerOf 7 r = towerOf 7 a + towerOf 7 b ⦄ :=
+  Proofs.Binary.bf128_add_assign_spec a b
+
+/-- The value `sub_assign` returns. -/
+theorem tower.BinaryField128.Insts.CoreOpsArithSubAssign.sub_assign.towerOf (a b : tower.BinaryField128) :
+    tower.BinaryField128.Insts.CoreOpsArithSubAssign.sub_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket tower.BinaryField128)) a b ⦃ r =>
+      towerOf 7 r = towerOf 7 a - towerOf 7 b ⦄ :=
+  Proofs.Binary.bf128_sub_assign_spec a b
+
+/-- The value `div_assign` returns. -/
+theorem tower.BinaryField128.Insts.CoreOpsArithDivAssignBinaryField128.div_assign.towerOf (a b : tower.BinaryField128) (hb : Spec.BinaryField.towerOf 7 b ≠ 0) :
+    tower.BinaryField128.Insts.CoreOpsArithDivAssignBinaryField128.div_assign a b ⦃ r =>
+      towerOf 7 r = towerOf 7 a / towerOf 7 b ⦄ :=
+  Proofs.Binary.bf128_div_assign_spec a b hb
+
+/-- The value `eq` returns. -/
+theorem tower.BinaryField128.Insts.CoreCmpPartialEqBinaryField128.eq.towerOf (a b : tower.BinaryField128) :
+    tower.BinaryField128.Insts.CoreCmpPartialEqBinaryField128.eq a b ⦃ r =>
+      (r = true ↔ towerOf 7 a = towerOf 7 b) ⦄ :=
+  Proofs.Binary.bf128_eq_spec a b
+
+/-- The value `bool_check` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check a ⦃ r =>
+      towerOf 7 r = towerOf 7 a * towerOf 7 a + towerOf 7 a ⦄ :=
+  Proofs.Binary.bf128_bool_check_spec a
+
+/-- The value `bits` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldField.bits.val :
+    tower.BinaryField128.Insts.P3_fieldFieldField.bits ⦃ r => r.val = 2 ^ 7 ⦄ :=
+  Proofs.Binary.bf128_bits_spec
+
+/-- The value `from_bool` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val (b : Bool) :
+    tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool b ⦃ r =>
+      r.val = b.toNat ⦄ :=
+  Proofs.Binary.bf128_from_bool_spec b
+
+/-- The value `interpolation_node` returns. -/
+theorem tower.BinaryField64.Insts.P3_fieldFieldField.interpolation_node.val (i : Std.Usize) :
+    tower.BinaryField64.Insts.P3_fieldFieldField.interpolation_node i ⦃ r => r.val = i.val ⦄ :=
+  Proofs.Binary.bf64_interpolation_node_spec i
+
+/-- The value `interpolation_node` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldField.interpolation_node.val (i : Std.Usize) :
+    tower.BinaryField128.Insts.P3_fieldFieldField.interpolation_node i ⦃ r => r.val = i.val ⦄ :=
+  Proofs.Binary.bf128_interpolation_node_spec i
+
+/-- The value `interpolation_node` returns. -/
+theorem tower.BinaryField32.Insts.P3_fieldFieldField.interpolation_node.val (i : Std.Usize) (hi : i.val < 2 ^ 2 ^ 5) :
+    tower.BinaryField32.Insts.P3_fieldFieldField.interpolation_node i ⦃ r => r.val = i.val ⦄ :=
+  Proofs.Binary.bf32_interpolation_node_spec i hi
+
+/-- `interpolation_node` panics. -/
+theorem tower.BinaryField32.Insts.P3_fieldFieldField.interpolation_node.panics (i : Std.Usize) (hi : 2 ^ 2 ^ 5 ≤ i.val) :
+    tower.BinaryField32.Insts.P3_fieldFieldField.interpolation_node i = .fail .panic :=
+  Proofs.Binary.bf32_interpolation_node_fail i hi
 
 end Plonky3Lean.Claims.P3BinaryField
