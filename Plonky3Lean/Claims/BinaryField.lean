@@ -3,6 +3,7 @@ module
 public import Plonky3Lean.Proofs.Field.Binary.Aes
 public import Plonky3Lean.Proofs.Field.Binary.Operators
 public import Plonky3Lean.Proofs.Field.Binary.TowerApi
+public import Plonky3Lean.Proofs.Field.Binary.PolyField
 
 @[expose] public section
 
@@ -1323,5 +1324,197 @@ theorem tower.BinaryField32.Insts.P3_fieldFieldField.interpolation_node.val (i :
 theorem tower.BinaryField32.Insts.P3_fieldFieldField.interpolation_node.panics (i : Std.Usize) (hi : 2 ^ 2 ^ 5 ≤ i.val) :
     tower.BinaryField32.Insts.P3_fieldFieldField.interpolation_node i = .fail .panic :=
   Proofs.Binary.bf32_interpolation_node_fail i hi
+
+/-! ### Poly64, Poly192 and Ghash128 -/
+
+/-- The value `square` returns. -/
+theorem poly64.Poly64.Insts.P3_fieldFieldPrimeCharacteristicRing.square.bf64 (a : poly64.Poly64) :
+    poly64.Poly64.Insts.P3_fieldFieldPrimeCharacteristicRing.square a ⦃ r =>
+      bf64 r = bf64 a * bf64 a ⦄ :=
+  Proofs.Binary.poly64_square_bf64 a
+
+/-- The value `invert_or_zero` returns. -/
+theorem poly64.Poly64.invert_or_zero.bf64 (a : poly64.Poly64) :
+    poly64.Poly64.invert_or_zero a ⦃ r => bf64 r = (bf64 a)⁻¹ ⦄ :=
+  Proofs.Binary.poly64_invert_or_zero_bf64 a
+
+/-- The value `is_zero` returns. -/
+theorem field_defaults.Poly64.is_zero.bf64 (a : poly64.Poly64) :
+    field_defaults.Poly64.is_zero a ⦃ b => (b = true ↔ bf64 a = 0) ⦄ :=
+  Proofs.Binary.poly64_is_zero_spec a
+
+/-- The value `try_inverse` returns. -/
+theorem poly64.Poly64.Insts.P3_fieldFieldField.try_inverse.bf64 (a : poly64.Poly64) :
+    poly64.Poly64.Insts.P3_fieldFieldField.try_inverse a ⦃ r =>
+      (bf64 a = 0 → r = .None) ∧ (bf64 a ≠ 0 → ∃ c, r = .Some c ∧ bf64 c = (bf64 a)⁻¹) ⦄ :=
+  Proofs.Binary.poly64_try_inverse_spec a
+
+/-- The value `mul` returns. -/
+theorem poly192.Poly192.Insts.CoreOpsArithMulPoly64Poly192.mul.toExt3 (a : poly192.Poly192) (k : poly64.Poly64) :
+    poly192.Poly192.Insts.CoreOpsArithMulPoly64Poly192.mul a k ⦃ r =>
+      toExt3 r = toExt3 a * algebraMap BF64 BF64.Ext3 (bf64 k) ⦄ :=
+  Proofs.Binary.poly192_mul_poly64_ext a k
+
+/-- The value `try_inverse` returns. -/
+theorem poly192.Poly192.Insts.P3_fieldFieldField.try_inverse.toExt3 (a : poly192.Poly192) :
+    poly192.Poly192.Insts.P3_fieldFieldField.try_inverse a ⦃ r =>
+      (toExt3 a = 0 → r = .None) ∧ (toExt3 a ≠ 0 → ∃ c, r = .Some c ∧ toExt3 c = (toExt3 a)⁻¹) ⦄ :=
+  Proofs.Binary.poly192_try_inverse_spec a
+
+/-- The value `try_sqrt` returns. -/
+theorem poly64.Poly64.Insts.P3_fieldFieldField.try_sqrt.bf64 (a : poly64.Poly64) :
+    poly64.Poly64.Insts.P3_fieldFieldField.try_sqrt a ⦃ r =>
+      ∃ c, r = .Some c ∧ bf64 c * bf64 c = bf64 a ⦄ :=
+  Proofs.Binary.poly64_try_sqrt_bf64 a
+
+/-- The value `try_sqrt` returns. -/
+theorem poly192.Poly192.Insts.P3_fieldFieldField.try_sqrt.toExt3 (a : poly192.Poly192) :
+    poly192.Poly192.Insts.P3_fieldFieldField.try_sqrt a ⦃ r =>
+      ∃ c, r = .Some c ∧ toExt3 c * toExt3 c = toExt3 a ⦄ :=
+  Proofs.Binary.poly192_try_sqrt_spec a
+
+/-- The value `inverse` returns. -/
+theorem field_defaults.Poly64.inverse.bf64 (a : poly64.Poly64) (ha : Spec.BinaryField.bf64 a ≠ 0) :
+    field_defaults.Poly64.inverse a ⦃ c => bf64 c = (bf64 a)⁻¹ ⦄ :=
+  Proofs.Binary.poly64_inverse_bf64 a ha
+
+/-- `inverse` panics. -/
+theorem field_defaults.Poly64.inverse.panics (a : poly64.Poly64) (ha : Spec.BinaryField.bf64 a = 0) :
+    field_defaults.Poly64.inverse a = .fail .panic :=
+  Proofs.Binary.poly64_inverse_zero a ha
+
+/-- The value `div` returns. -/
+theorem poly64.Poly64.Insts.CoreOpsArithDivPoly64Poly64.div.bf64 (a b : poly64.Poly64) (hb : Spec.BinaryField.bf64 b ≠ 0) :
+    poly64.Poly64.Insts.CoreOpsArithDivPoly64Poly64.div a b ⦃ r => bf64 r = bf64 a / bf64 b ⦄ :=
+  Proofs.Binary.poly64_div_bf64 a b hb
+
+/-- `div` panics. -/
+theorem poly64.Poly64.Insts.CoreOpsArithDivPoly64Poly64.div.panics (a b : poly64.Poly64) (hb : Spec.BinaryField.bf64 b = 0) :
+    poly64.Poly64.Insts.CoreOpsArithDivPoly64Poly64.div a b = .fail .panic :=
+  Proofs.Binary.poly64_div_zero a b hb
+
+/-- The value `mul_assign` returns. -/
+theorem poly64.Poly64.Insts.CoreOpsArithMulAssign.mul_assign.bf64 (a b : poly64.Poly64) :
+    poly64.Poly64.Insts.CoreOpsArithMulAssign.mul_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket poly64.Poly64)) a b ⦃ r =>
+      bf64 r = bf64 a * bf64 b ⦄ :=
+  Proofs.Binary.poly64_mul_assign_bf64 a b
+
+/-- The value `add_assign` returns. -/
+theorem poly64.Poly64.Insts.CoreOpsArithAddAssign.add_assign.bf64 (a b : poly64.Poly64) :
+    poly64.Poly64.Insts.CoreOpsArithAddAssign.add_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket poly64.Poly64)) a b ⦃ r =>
+      bf64 r = bf64 a + bf64 b ⦄ :=
+  Proofs.Binary.poly64_add_assign_bf64 a b
+
+/-- The value `sub_assign` returns. -/
+theorem poly64.Poly64.Insts.CoreOpsArithSubAssign.sub_assign.bf64 (a b : poly64.Poly64) :
+    poly64.Poly64.Insts.CoreOpsArithSubAssign.sub_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket poly64.Poly64)) a b ⦃ r =>
+      bf64 r = bf64 a - bf64 b ⦄ :=
+  Proofs.Binary.poly64_sub_assign_bf64 a b
+
+/-- The value `div_assign` returns. -/
+theorem poly64.Poly64.Insts.CoreOpsArithDivAssignPoly64.div_assign.bf64 (a b : poly64.Poly64) (hb : Spec.BinaryField.bf64 b ≠ 0) :
+    poly64.Poly64.Insts.CoreOpsArithDivAssignPoly64.div_assign a b ⦃ r =>
+      bf64 r = bf64 a / bf64 b ⦄ :=
+  Proofs.Binary.poly64_div_assign_bf64 a b hb
+
+/-- The value `eq` returns. -/
+theorem poly64.Poly64.Insts.CoreCmpPartialEqPoly64.eq.bf64 (a b : poly64.Poly64) :
+    poly64.Poly64.Insts.CoreCmpPartialEqPoly64.eq a b ⦃ r => (r = true ↔ bf64 a = bf64 b) ⦄ :=
+  Proofs.Binary.poly64_eq_spec a b
+
+/-- The value `from_bool` returns. -/
+theorem poly64.Poly64.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val (b : Bool) :
+    poly64.Poly64.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool b ⦃ r => r.val = b.toNat ⦄ :=
+  Proofs.Binary.poly64_from_bool_spec b
+
+/-- The value `interpolation_node` returns. -/
+theorem poly64.Poly64.Insts.P3_fieldFieldField.interpolation_node.val (i : Std.Usize) :
+    poly64.Poly64.Insts.P3_fieldFieldField.interpolation_node i ⦃ r => r.val = i.val ⦄ :=
+  Proofs.Binary.poly64_interpolation_node_spec i
+
+/-- The value `square` returns. -/
+theorem poly192.Poly192.Insts.P3_fieldFieldPrimeCharacteristicRing.square.toExt3 (a : poly192.Poly192) :
+    poly192.Poly192.Insts.P3_fieldFieldPrimeCharacteristicRing.square a ⦃ r =>
+      toExt3 r = toExt3 a * toExt3 a ⦄ :=
+  Proofs.Binary.poly192_square_ext a
+
+/-- The value `square` returns. -/
+theorem ghash.Ghash128.Insts.P3_fieldFieldPrimeCharacteristicRing.square.toGhash (a : ghash.Ghash128) :
+    ghash.Ghash128.Insts.P3_fieldFieldPrimeCharacteristicRing.square a ⦃ r =>
+      ghash r = ghash a * ghash a ⦄ :=
+  Proofs.Binary.ghash128_square_ghash a
+
+/-- The value `try_sqrt` returns. -/
+theorem ghash.Ghash128.Insts.P3_fieldFieldField.try_sqrt.toGhash (a : ghash.Ghash128) :
+    ghash.Ghash128.Insts.P3_fieldFieldField.try_sqrt a ⦃ r =>
+      ∃ c, r = .Some c ∧ ghash c * ghash c = ghash a ⦄ :=
+  Proofs.Binary.ghash128_try_sqrt_ghash a
+
+/-- The value `mul_assign` returns. -/
+theorem ghash.Ghash128.Insts.CoreOpsArithMulAssign.mul_assign.toGhash (a b : ghash.Ghash128) :
+    ghash.Ghash128.Insts.CoreOpsArithMulAssign.mul_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket ghash.Ghash128)) a b ⦃ r =>
+      ghash r = ghash a * ghash b ⦄ :=
+  Proofs.Binary.ghash128_mul_assign_ghash a b
+
+/-- The value `add_assign` returns. -/
+theorem ghash.Ghash128.Insts.CoreOpsArithAddAssign.add_assign.toGhash (a b : ghash.Ghash128) :
+    ghash.Ghash128.Insts.CoreOpsArithAddAssign.add_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket ghash.Ghash128)) a b ⦃ r =>
+      ghash r = ghash a + ghash b ⦄ :=
+  Proofs.Binary.ghash128_add_assign_ghash a b
+
+/-- The value `sub_assign` returns. -/
+theorem ghash.Ghash128.Insts.CoreOpsArithSubAssign.sub_assign.toGhash (a b : ghash.Ghash128) :
+    ghash.Ghash128.Insts.CoreOpsArithSubAssign.sub_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket ghash.Ghash128)) a b ⦃ r =>
+      ghash r = ghash a - ghash b ⦄ :=
+  Proofs.Binary.ghash128_sub_assign_ghash a b
+
+/-- The value `interpolation_node` returns. -/
+theorem ghash.Ghash128.Insts.P3_fieldFieldField.interpolation_node.val (i : Std.Usize) :
+    ghash.Ghash128.Insts.P3_fieldFieldField.interpolation_node i ⦃ r => r.val = i.val ⦄ :=
+  Proofs.Binary.ghash128_interpolation_node_spec i
+
+/-- The value `inverse` returns. -/
+theorem field_defaults.Poly192.inverse.toExt3 (a : poly192.Poly192) (ha : Spec.BinaryField.toExt3 a ≠ 0) :
+    field_defaults.Poly192.inverse a ⦃ c => toExt3 c = (toExt3 a)⁻¹ ⦄ :=
+  Proofs.Binary.poly192_inverse_ext a ha
+
+/-- The value `div` returns. -/
+theorem poly192.Poly192.Insts.CoreOpsArithDivPoly192Poly192.div.toExt3 (a b : poly192.Poly192) (hb : Spec.BinaryField.toExt3 b ≠ 0) :
+    poly192.Poly192.Insts.CoreOpsArithDivPoly192Poly192.div a b ⦃ r =>
+      toExt3 r = toExt3 a / toExt3 b ⦄ :=
+  Proofs.Binary.poly192_div_ext a b hb
+
+/-- The value `mul_assign` returns. -/
+theorem poly192.Poly192.Insts.CoreOpsArithMulAssign.mul_assign.toExt3 (a b : poly192.Poly192) :
+    poly192.Poly192.Insts.CoreOpsArithMulAssign.mul_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket poly192.Poly192)) a b ⦃ r =>
+      toExt3 r = toExt3 a * toExt3 b ⦄ :=
+  Proofs.Binary.poly192_mul_assign_ext a b
+
+/-- The value `add_assign` returns. -/
+theorem poly192.Poly192.Insts.CoreOpsArithAddAssign.add_assign.toExt3 (a b : poly192.Poly192) :
+    poly192.Poly192.Insts.CoreOpsArithAddAssign.add_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket poly192.Poly192)) a b ⦃ r =>
+      toExt3 r = toExt3 a + toExt3 b ⦄ :=
+  Proofs.Binary.poly192_add_assign_ext a b
+
+/-- The value `sub_assign` returns. -/
+theorem poly192.Poly192.Insts.CoreOpsArithSubAssign.sub_assign.toExt3 (a b : poly192.Poly192) :
+    poly192.Poly192.Insts.CoreOpsArithSubAssign.sub_assign
+      (core.convert.Into.Blanket (core.convert.From.Blanket poly192.Poly192)) a b ⦃ r =>
+      toExt3 r = toExt3 a - toExt3 b ⦄ :=
+  Proofs.Binary.poly192_sub_assign_ext a b
+
+/-- The value `div_assign` returns. -/
+theorem poly192.Poly192.Insts.CoreOpsArithDivAssignPoly192.div_assign.toExt3 (a b : poly192.Poly192) (hb : Spec.BinaryField.toExt3 b ≠ 0) :
+    poly192.Poly192.Insts.CoreOpsArithDivAssignPoly192.div_assign a b ⦃ r =>
+      toExt3 r = toExt3 a / toExt3 b ⦄ :=
+  Proofs.Binary.poly192_div_assign_ext a b hb
 
 end Plonky3Lean.Claims.P3BinaryField
