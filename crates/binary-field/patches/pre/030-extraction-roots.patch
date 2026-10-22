@@ -15,9 +15,6 @@
 # Test:         lint p3-binary-field unexpected_cfgs
 # Mutation:     the module is gated on a misspelled cfg, so a normal
 #               `cargo check` reports `unexpected_cfgs`.
-#
-# EXPERIMENT: which field-type methods can be extracted.
-#
 diff --git a/binary-field/src/hax_roots.rs b/binary-field/src/hax_roots.rs
 new file mode 100644
 index 00000000..17e21bd6

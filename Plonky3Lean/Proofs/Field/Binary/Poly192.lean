@@ -1,7 +1,7 @@
 module
 
 public import Plonky3Lean.Proofs.Field.Binary.Poly64Sqrt
-public import ToCompPoly.Fields.Binary.Poly192.Basic
+public import ToCompPoly.Fields.Binary.BF64Ext3
 
 @[expose] public section
 
@@ -24,20 +24,32 @@ namespace Plonky3Lean.Proofs.Binary
 
 /-! ## Limbs -/
 
-theorem array3_eq {T : Type} (a : Std.Array T 3#usize) :
-    ∃ x y z, a = ⟨[x, y, z], rfl⟩ := by
-  obtain ⟨l, hl⟩ := a
-  match l, hl with
-  | [x, y, z], _ => exact ⟨x, y, z, rfl⟩
+/-- Every array of three limbs is the literal of its entries. -/
+theorem array3_eq {T : Type} [Inhabited T] (a : Std.Array T 3#usize) :
+    a = Std.Array.make 3#usize [a.val.getD 0 default, a.val.getD 1 default, a.val.getD 2 default] := by
+  apply Std.Array.ext
+  rw [Std.Array.make_val]
+  have h : a.val.length = 3 := by simp
+  apply List.ext_getElem (by simp [h])
+  intro i h1 h2
+  have : i < 3 := by omega
+  interval_cases i <;> simp [List.getD_eq_getElem?_getD]
 
 theorem index_usize_0 {T : Type} (x y z : T) :
-    Std.Array.index_usize (⟨[x, y, z], rfl⟩ : Std.Array T 3#usize) 0#usize = .ok x := rfl
+    Std.Array.index_usize (Std.Array.make 3#usize [x, y, z]) 0#usize = .ok x := by
+  simp [Std.Array.index_usize]
 
 theorem index_usize_1 {T : Type} (x y z : T) :
-    Std.Array.index_usize (⟨[x, y, z], rfl⟩ : Std.Array T 3#usize) 1#usize = .ok y := rfl
+    Std.Array.index_usize (Std.Array.make 3#usize [x, y, z]) 1#usize = .ok y := by
+  simp [Std.Array.index_usize]
 
 theorem index_usize_2 {T : Type} (x y z : T) :
-    Std.Array.index_usize (⟨[x, y, z], rfl⟩ : Std.Array T 3#usize) 2#usize = .ok z := rfl
+    Std.Array.index_usize (Std.Array.make 3#usize [x, y, z]) 2#usize = .ok z := by
+  simp [Std.Array.index_usize]
+
+theorem toExt3_make (x y z : Std.U64) :
+    toExt3 (Std.Array.make 3#usize [x, y, z]) = CompPoly.Extension.Ext.ofVector #v[bf64 x, bf64 y, bf64 z] := by
+  simp [toExt3, Std.Array.make_val]
 
 theorem xor_val {ty : UScalarTy} (x y : UScalar ty) : (x ^^^ y).val = x.val ^^^ y.val := by
   show (x.bv ^^^ y.bv).toNat = _
@@ -56,13 +68,19 @@ theorem toQuot64_reduceLimb (x : Std.U128) :
 theorem map_reduce_64_eq (x y z : Std.U128) :
     core.array.Array.map P.Insts.CoreOpsFunctionFnMutTupleU128U64
       (Std.Array.make 3#usize [x, y, z]) clmul.reduce_64 =
-      .ok ⟨[reduceLimb x, reduceLimb y, reduceLimb z], rfl⟩ := by
+      .ok (Std.Array.make 3#usize [reduceLimb x, reduceLimb y, reduceLimb z]) := by
   unfold core.array.Array.map
   rw [array_map_eq _ _ _ reduceLimb (fun v => by
     show (do let i ← clmul.reduce_64 v; RustM.ok (i, clmul.reduce_64)) = _
-    rw [reduce_64_eq, Aeneas.Std.bind_ok]
+    rw [reduce_64_eq, bind_tc_ok]
     rfl)]
-  rfl
+  congr 1
+
+/-- A reduced limb is the element of `BF64` whose quotient image is its polynomial. -/
+theorem bf64_reduceLimb_eq {X : Std.U128} {e : BF64}
+    (h : AdjoinRoot.mk BF64.basePoly (natPoly X.val) = BF64.toQuot e) : bf64 (reduceLimb X) = e :=
+  BF64.toQuot_injective (by rw [show BF64.toQuot (bf64 (reduceLimb X)) = toQuot64 (reduceLimb X) from rfl,
+    toQuot64_reduceLimb, h])
 
 /-- The limb `Σ` that a combination of carry-less products stands for, in `GF(2^64)`. -/
 theorem mk_natPoly_xor (u v : Std.U128) :
@@ -92,120 +110,83 @@ theorem natPoly_clmulVal (a b : Std.U64) :
     poly_eq_natPoly] at h
   exact h
 
-/-! ## Arithmetic in the extension -/
-
-theorem two_eq_zero_poly192 : (2 : BF64.BF64Quot[X]) = 0 := by
-  rw [show (2 : BF64.BF64Quot[X]) = C 2 from (map_ofNat C 2).symm, two_eq_zero_quot64, map_zero]
-
-/-- The schoolbook product of two elements, with `Y^3 = Y + 1` and `Y^4 = Y^2 + Y`. -/
-theorem ofCoeffs_mul (a₀ a₁ a₂ b₀ b₁ b₂ : BF64.BF64Quot) :
-    Poly192.ofCoeffs a₀ a₁ a₂ * Poly192.ofCoeffs b₀ b₁ b₂ =
-      Poly192.ofCoeffs (a₀ * b₀ + a₁ * b₂ + a₂ * b₁)
-        (a₀ * b₁ + a₁ * b₀ + a₁ * b₂ + a₂ * b₁ + a₂ * b₂)
-        (a₀ * b₂ + a₁ * b₁ + a₂ * b₀ + a₂ * b₂) := by
-  unfold Poly192.ofCoeffs
-  rw [← map_mul, AdjoinRoot.mk_eq_mk]
-  refine ⟨C (a₁ * b₂ + a₂ * b₁) + C (a₂ * b₂) * X, ?_⟩
-  simp only [map_add, map_mul]
-  unfold Poly192.modulus
-  linear_combination (-(C a₁ * C b₂ + C a₂ * C b₁ + C a₂ * C b₂ * X) * (X + 1)) * two_eq_zero_poly192
-
 /-! ## The extracted functions -/
 
-theorem toQuot192_mk (x y z : Std.U64) :
-    toQuot192 ⟨[x, y, z], rfl⟩ = Poly192.ofCoeffs (toQuot64 x) (toQuot64 y) (toQuot64 z) := rfl
+theorem toQuot_bf64 (a : Std.U64) : BF64.toQuot (bf64 a) = toQuot64 a := rfl
 
-theorem poly_mul_192_toQuot_mk (a₀ a₁ a₂ b₀ b₁ b₂ : Std.U64) :
-    clmul.gf192.poly_mul_192 ⟨[a₀, a₁, a₂], rfl⟩ ⟨[b₀, b₁, b₂], rfl⟩ ⦃ r =>
-      toQuot192 r = toQuot192 ⟨[a₀, a₁, a₂], rfl⟩ * toQuot192 ⟨[b₀, b₁, b₂], rfl⟩ ⦄ := by
-  obtain ⟨c₀, e₀, h₀⟩ := clmul_64x64_ok a₀ b₀
-  obtain ⟨c₁, e₁, h₁⟩ := clmul_64x64_ok a₁ b₁
-  obtain ⟨c₂, e₂, h₂⟩ := clmul_64x64_ok a₂ b₂
-  obtain ⟨d₀₁, f₀₁, k₀₁⟩ := clmul_64x64_ok (a₀ ^^^ a₁) (b₀ ^^^ b₁)
-  obtain ⟨d₀₂, f₀₂, k₀₂⟩ := clmul_64x64_ok (a₀ ^^^ a₂) (b₀ ^^^ b₂)
-  obtain ⟨d₁₂, f₁₂, k₁₂⟩ := clmul_64x64_ok (a₁ ^^^ a₂) (b₁ ^^^ b₂)
+/-- Two elements of `Ext3` given by equal coefficients are equal. -/
+theorem ofVector3_congr {x₀ x₁ x₂ y₀ y₁ y₂ : BF64} (h₀ : x₀ = y₀) (h₁ : x₁ = y₁) (h₂ : x₂ = y₂) :
+    (CompPoly.Extension.Ext.ofVector #v[x₀, x₁, x₂] : BF64.Ext3) =
+      CompPoly.Extension.Ext.ofVector #v[y₀, y₁, y₂] := by
+  rw [h₀, h₁, h₂]
+
+theorem poly_mul_192_ext_mk (a₀ a₁ a₂ b₀ b₁ b₂ : Std.U64) :
+    clmul.gf192.poly_mul_192 (Std.Array.make 3#usize [a₀, a₁, a₂]) (Std.Array.make 3#usize [b₀, b₁, b₂])
+      ⦃ r => toExt3 r = toExt3 (Std.Array.make 3#usize [a₀, a₁, a₂]) *
+        toExt3 (Std.Array.make 3#usize [b₀, b₁, b₂]) ⦄ := by
   unfold clmul.gf192.poly_mul_192 clmul.gf192.composed_mul_192 clmul.gf192.mul_unreduced
-  simp only [index_usize_0, index_usize_1, index_usize_2, lift_eq, Aeneas.Std.bind_ok, e₀, e₁, e₂, f₀₁,
-    f₀₂, f₁₂, map_reduce_64_eq, WP.spec_ok]
-  rw [toQuot192_mk, toQuot192_mk, toQuot192_mk, toQuot64_reduceLimb, toQuot64_reduceLimb,
-    toQuot64_reduceLimb, ofCoeffs_mul]
-  simp only [mk_natPoly_xor, h₀, h₁, h₂, k₀₁, k₀₂, k₁₂, map_mul, ← toQuot64_eq, toQuot64_xor]
-  generalize toQuot64 a₀ = A₀, toQuot64 a₁ = A₁, toQuot64 a₂ = A₂, toQuot64 b₀ = B₀,
-    toQuot64 b₁ = B₁, toQuot64 b₂ = B₂
-  rw [show A₀ * B₀ + A₁ * B₁ + A₂ * B₂ + (A₁ + A₂) * (B₁ + B₂) = A₀ * B₀ + A₁ * B₂ + A₂ * B₁ by
-      linear_combination (A₁ * B₁ + A₂ * B₂) * two_eq_zero_quot64,
-    show A₀ * B₀ + (A₀ + A₁) * (B₀ + B₁) + (A₁ + A₂) * (B₁ + B₂) =
-      A₀ * B₁ + A₁ * B₀ + A₁ * B₂ + A₂ * B₁ + A₂ * B₂ by
-      linear_combination (A₀ * B₀ + A₁ * B₁) * two_eq_zero_quot64,
-    show A₀ * B₀ + A₁ * B₁ + (A₀ + A₂) * (B₀ + B₂) = A₀ * B₂ + A₁ * B₁ + A₂ * B₀ + A₂ * B₂ by
-      linear_combination (A₀ * B₀) * two_eq_zero_quot64]
+  simp only [index_usize_0, index_usize_1, index_usize_2, lift_eq, Aeneas.Std.bind_ok,
+    clmul_64x64_eq_clmulVal, map_reduce_64_eq, WP.spec_ok]
+  rw [toExt3_make, toExt3_make, toExt3_make, BF64.ofVector_mul_ofVector]
+  refine ofVector3_congr ?_ ?_ ?_ <;> apply bf64_reduceLimb_eq <;>
+    simp only [mk_natPoly_xor, natPoly_clmulVal, map_mul, ← toQuot64_eq, toQuot64_xor,
+      BF64.toQuot_add, BF64.toQuot_mul, toQuot_bf64] <;>
+    generalize toQuot64 a₀ = A₀, toQuot64 a₁ = A₁, toQuot64 a₂ = A₂, toQuot64 b₀ = B₀,
+      toQuot64 b₁ = B₁, toQuot64 b₂ = B₂
+  · linear_combination (A₁ * B₁ + A₂ * B₂) * two_eq_zero_quot64
+  · linear_combination (A₀ * B₀ + A₁ * B₁) * two_eq_zero_quot64
+  · linear_combination (A₀ * B₀) * two_eq_zero_quot64
 
-/-- `poly_mul_192` never panics and multiplies in `GF(2^64)[Y] / (Y^3 + Y + 1)`. -/
-theorem poly_mul_192_toQuot (a b : Std.Array Std.U64 3#usize) :
-    clmul.gf192.poly_mul_192 a b ⦃ r => toQuot192 r = toQuot192 a * toQuot192 b ⦄ := by
-  obtain ⟨la, hla⟩ := a
-  obtain ⟨lb, hlb⟩ := b
-  match la, hla, lb, hlb with
-  | [a₀, a₁, a₂], _, [b₀, b₁, b₂], _ => exact poly_mul_192_toQuot_mk a₀ a₁ a₂ b₀ b₁ b₂
+/-- `poly_mul_192` never panics and multiplies in CompPoly's `BF64.Ext3`. -/
+theorem poly_mul_192_ext (a b : Std.Array Std.U64 3#usize) :
+    clmul.gf192.poly_mul_192 a b ⦃ r => toExt3 r = toExt3 a * toExt3 b ⦄ := by
+  rw [array3_eq a, array3_eq b]
+  exact poly_mul_192_ext_mk _ _ _ _ _ _
 
-theorem poly_square_192_toQuot_mk (a₀ a₁ a₂ : Std.U64) :
-    clmul.gf192.poly_square_192 ⟨[a₀, a₁, a₂], rfl⟩ ⦃ r =>
-      toQuot192 r = toQuot192 ⟨[a₀, a₁, a₂], rfl⟩ * toQuot192 ⟨[a₀, a₁, a₂], rfl⟩ ⦄ := by
-  obtain ⟨s₀, e₀, h₀⟩ := clmul_64x64_ok a₀ a₀
-  obtain ⟨s₁, e₁, h₁⟩ := clmul_64x64_ok a₁ a₁
-  obtain ⟨s₂, e₂, h₂⟩ := clmul_64x64_ok a₂ a₂
+theorem poly_square_192_ext_mk (a₀ a₁ a₂ : Std.U64) :
+    clmul.gf192.poly_square_192 (Std.Array.make 3#usize [a₀, a₁, a₂])
+      ⦃ r => toExt3 r = toExt3 (Std.Array.make 3#usize [a₀, a₁, a₂]) *
+        toExt3 (Std.Array.make 3#usize [a₀, a₁, a₂]) ⦄ := by
   unfold clmul.gf192.poly_square_192 clmul.gf192.composed_square_192
-  simp only [index_usize_0, index_usize_1, index_usize_2, lift_eq, Aeneas.Std.bind_ok, e₀, e₁, e₂,
-    map_reduce_64_eq, WP.spec_ok]
-  rw [toQuot192_mk, toQuot192_mk, toQuot64_reduceLimb, toQuot64_reduceLimb,
-    toQuot64_reduceLimb, ofCoeffs_mul]
-  simp only [mk_natPoly_xor, h₀, h₁, h₂, map_mul, ← toQuot64_eq]
-  generalize toQuot64 a₀ = A₀, toQuot64 a₁ = A₁, toQuot64 a₂ = A₂
-  rw [show A₀ * A₀ + A₁ * A₂ + A₂ * A₁ = A₀ * A₀ by
-      linear_combination (A₁ * A₂) * two_eq_zero_quot64,
-    show A₀ * A₁ + A₁ * A₀ + A₁ * A₂ + A₂ * A₁ + A₂ * A₂ = A₂ * A₂ by
-      linear_combination (A₀ * A₁ + A₁ * A₂) * two_eq_zero_quot64,
-    show A₀ * A₂ + A₁ * A₁ + A₂ * A₀ + A₂ * A₂ = A₁ * A₁ + A₂ * A₂ by
-      linear_combination (A₀ * A₂) * two_eq_zero_quot64]
+  simp only [index_usize_0, index_usize_1, index_usize_2, lift_eq, Aeneas.Std.bind_ok,
+    clmul_64x64_eq_clmulVal, map_reduce_64_eq, WP.spec_ok]
+  rw [toExt3_make, toExt3_make, BF64.ofVector_mul_ofVector]
+  refine ofVector3_congr ?_ ?_ ?_ <;> apply bf64_reduceLimb_eq <;>
+    simp only [mk_natPoly_xor, natPoly_clmulVal, map_mul, ← toQuot64_eq,
+      BF64.toQuot_add, BF64.toQuot_mul, toQuot_bf64] <;>
+    generalize toQuot64 a₀ = A₀, toQuot64 a₁ = A₁, toQuot64 a₂ = A₂
+  · linear_combination (-(A₁ * A₂)) * two_eq_zero_quot64
+  · linear_combination (-(A₀ * A₁ + A₁ * A₂)) * two_eq_zero_quot64
+  · linear_combination (-(A₀ * A₂)) * two_eq_zero_quot64
 
-/-- `poly_square_192` never panics and squares in `GF(2^64)[Y] / (Y^3 + Y + 1)`. -/
-theorem poly_square_192_toQuot (a : Std.Array Std.U64 3#usize) :
-    clmul.gf192.poly_square_192 a ⦃ r => toQuot192 r = toQuot192 a * toQuot192 a ⦄ := by
-  obtain ⟨la, hla⟩ := a
-  match la, hla with
-  | [a₀, a₁, a₂], _ => exact poly_square_192_toQuot_mk a₀ a₁ a₂
+/-- `poly_square_192` never panics and squares in CompPoly's `BF64.Ext3`. -/
+theorem poly_square_192_ext (a : Std.Array Std.U64 3#usize) :
+    clmul.gf192.poly_square_192 a ⦃ r => toExt3 r = toExt3 a * toExt3 a ⦄ := by
+  rw [array3_eq a]
+  exact poly_square_192_ext_mk _ _ _
 
-theorem val_ofNat_128 {n : ℕ} (h : n < 2 ^ 128) : (⟨BitVec.ofNat 128 n⟩ : Std.U128).val = n := by
-  show (BitVec.ofNat 128 n).toNat = n
-  rw [BitVec.toNat_ofNat, Nat.mod_eq_of_lt h]
-
-theorem poly_mul_192_by_64_toQuot_mk (a₀ a₁ a₂ k : Std.U64) :
-    clmul.gf192.poly_mul_192_by_64 ⟨[a₀, a₁, a₂], rfl⟩ k ⦃ r =>
-      toQuot192 r = toQuot192 ⟨[a₀, a₁, a₂], rfl⟩ * AdjoinRoot.of Poly192.modulus (toQuot64 k) ⦄ := by
+theorem poly_mul_192_by_64_ext_mk (a₀ a₁ a₂ k : Std.U64) :
+    clmul.gf192.poly_mul_192_by_64 (Std.Array.make 3#usize [a₀, a₁, a₂]) k ⦃ r =>
+      toExt3 r = toExt3 (Std.Array.make 3#usize [a₀, a₁, a₂]) * algebraMap BF64 BF64.Ext3 (bf64 k) ⦄ := by
   unfold clmul.gf192.poly_mul_192_by_64 clmul.gf192.composed_mul_192_by_64 core.array.Array.map
   rw [array_map_eq _ _ _ (fun x => reduceLimb (clmulVal x k)) (fun v => by
       show (do
         let i ← clmul.portable.clmul_64x64 v k
         let i1 ← clmul.reduce_64 i
         RustM.ok (i1, k)) = _
-      rw [clmul_64x64_eq_clmulVal, Aeneas.Std.bind_ok, reduce_64_eq, Aeneas.Std.bind_ok]
+      rw [clmul_64x64_eq_clmulVal, bind_tc_ok, reduce_64_eq, bind_tc_ok]
       rfl), WP.spec_ok]
-  show toQuot192 ⟨[_, _, _], rfl⟩ = _
-  rw [toQuot192_mk, toQuot192_mk, toQuot64_reduceLimb, toQuot64_reduceLimb,
-    toQuot64_reduceLimb]
-  simp only [natPoly_clmulVal, map_mul, ← toQuot64_eq]
-  unfold Poly192.ofCoeffs
-  rw [AdjoinRoot.of, RingHom.comp_apply, ← map_mul]
-  congr 1
-  simp only [map_mul]
-  ring
+  rw [toExt3_make, BF64.ofVector_mul_algebraMap]
+  simp only [toExt3, Std.Array.from_val, Std.Array.make_val, List.map_cons, List.map_nil,
+    List.getD_cons_zero, List.getD_cons_succ]
+  refine ofVector3_congr ?_ ?_ ?_ <;> apply bf64_reduceLimb_eq <;>
+    simp only [natPoly_clmulVal, map_mul, ← toQuot64_eq, BF64.toQuot_mul, toQuot_bf64]
 
-/-- `poly_mul_192_by_64` never panics and scales by an element of `GF(2^64)`. -/
-theorem poly_mul_192_by_64_toQuot (a : Std.Array Std.U64 3#usize) (k : Std.U64) :
+/-- `poly_mul_192_by_64` never panics and scales by an element of `GF(2^64)` in `BF64.Ext3`. -/
+theorem poly_mul_192_by_64_ext (a : Std.Array Std.U64 3#usize) (k : Std.U64) :
     clmul.gf192.poly_mul_192_by_64 a k ⦃ r =>
-      toQuot192 r = toQuot192 a * AdjoinRoot.of Poly192.modulus (toQuot64 k) ⦄ := by
-  obtain ⟨la, hla⟩ := a
-  match la, hla with
-  | [a₀, a₁, a₂], _ => exact poly_mul_192_by_64_toQuot_mk a₀ a₁ a₂ k
+      toExt3 r = toExt3 a * algebraMap BF64 BF64.Ext3 (bf64 k) ⦄ := by
+  rw [array3_eq a]
+  exact poly_mul_192_by_64_ext_mk _ _ _ _
 
 end Plonky3Lean.Proofs.Binary

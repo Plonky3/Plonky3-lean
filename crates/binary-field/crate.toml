@@ -2,9 +2,10 @@
 
 lean_lib = "P3BinaryField"
 
-# Only the portable integer kernels are extracted.
-# The field types implement p3-field's trait hierarchy, which aeneas rejects
-# (docs/extractor-issues.md, 9).
+# The portable integer kernels, and the field types' operators (`+`, `-`, `*`,
+# negation) through pre-patch 030's wrappers.
+# The field types' trait methods are not: p3-field's trait hierarchy is what
+# aeneas rejects (docs/extractor-issues.md, 9).
 state = "scoped"
 
 features = []

@@ -2,6 +2,7 @@ module
 
 public import Plonky3Lean.Proofs.Field.Binary.Clmul
 public import Plonky3Lean.Lib.Scalar
+public import Plonky3Lean.Lib.Array
 public import ToCompPoly.Fields.Binary.Tower.NatMul
 
 @[expose] public section
@@ -58,16 +59,17 @@ theorem logL_lt : ∀ x < 256, logL.getD x 0 < 255 := by decide +kernel
 /-- The generator `19`. -/
 def gen8 : F8 := fromNat 19
 
-theorem toNat_lt_256 (x : F8) : x.toNat < 256 := x.isLt
+theorem toNat_lt_256 (x : F8) : x.toNat < 256 := x.toNat_lt
 
 /-- One step of the chain: multiplying by `19` in the field. -/
 theorem fromNat_towerMul {e : ℕ} (he : e < 256) :
     (fromNat (k := 3) (towerMul 3 e 19) : F8) = fromNat e * gen8 := by
   have h := toNat_concrete_mul 3 (fromNat (k := 3) e) gen8
-  rw [toNat_fromNat, gen8, toNat_fromNat] at h
+  rw [ConcreteBTField.toNat_fromNat, gen8, ConcreteBTField.toNat_fromNat] at h
   norm_num [Nat.mod_eq_of_lt he] at h
-  apply BitVec.eq_of_toNat_eq
-  rw [toNat_fromNat, show fromNat e * gen8 = concrete_mul (fromNat e) (fromNat 19) from rfl, h,
+  apply ConcreteBTField.toNat_injective
+  rw [ConcreteBTField.toNat_fromNat,
+    show fromNat e * gen8 = concrete_mul (fromNat e) (fromNat 19) from rfl, h,
     Nat.mod_eq_of_lt (h ▸ toNat_lt_256 _)]
 
 /-- `EXP[i]` is `g^i`. -/
@@ -88,15 +90,15 @@ theorem gen8_pow_255 : gen8 ^ 255 = 1 := by
 
 /-! ## The extracted functions -/
 
-theorem tower8_eq (x : Std.U8) : tower8 x = fromNat x.val := by
-  show x.bv = BitVec.ofNat 8 x.bv.toNat
-  rw [BitVec.ofNat_toNat, BitVec.setWidth_eq]
+theorem tower8_eq (x : Std.U8) : tower8 x = fromNat x.val := rfl
 
 theorem tower8_eq_zero_iff (x : Std.U8) : tower8 x = 0 ↔ x = 0#u8 := by
   constructor
   · intro h
     apply UScalar.eq_of_val_eq
-    have := congrArg BitVec.toNat h
+    have := congrArg ConcreteBTField.toNat h
+    rw [tower8_eq, ConcreteBTField.toNat_fromNat, Nat.mod_eq_of_lt (by
+      have := x.hBounds; rw [UScalarTy.U8_numBits_eq] at this; norm_num; omega)] at this
     exact this
   · rintro rfl
     rfl
@@ -125,7 +127,7 @@ theorem tables_mul_spec (a b : Std.U8) :
   have hexp : exponent.val = logL.getD a.val 0 + logL.getD b.val 0 := by
     simp only [exponent_post, cast_usize_val, val_getElem]
     rfl
-  have hE : ((↑tables.EXP : List Std.U8)[exponent.val]'i9).val =
+  have hE : ((↑tables.EXP : List Std.U8)[exponent.val]'i9_post).val =
       expL.getD (logL.getD a.val 0 + logL.getD b.val 0) 0 := by
     simp only [val_getElem, hexp]
     rfl
@@ -133,7 +135,7 @@ theorem tables_mul_spec (a b : Std.U8) :
   by_cases ha0 : a = 0#u8
   · have : i6.val = 0 := by rw [i6_post, ha0]; rfl
     have h8 : i8.val = 0 := by
-      rw [i8_post1, UScalar.val_and, this, Nat.zero_and]
+      rw [i8_post, UScalar.val_and, this, Nat.zero_and]
     rw [both_nonzero_post, h8, ha0]
     show fromNat _ = fromNat 0 * fromNat b.val
     rw [show (fromNat (k := 3) 0 : F8) = 0 from rfl, zero_mul,
@@ -142,7 +144,7 @@ theorem tables_mul_spec (a b : Std.U8) :
   by_cases hb0 : b = 0#u8
   · have : i7.val = 0 := by rw [i7_post, hb0]; rfl
     have h8 : i8.val = 0 := by
-      rw [i8_post1, UScalar.val_and, this, Nat.and_zero]
+      rw [i8_post, UScalar.val_and, this, Nat.and_zero]
     rw [both_nonzero_post, h8, hb0]
     show fromNat _ = fromNat a.val * fromNat 0
     rw [show (fromNat (k := 3) 0 : F8) = 0 from rfl, mul_zero,
@@ -150,7 +152,7 @@ theorem tables_mul_spec (a b : Std.U8) :
     rfl
   have h6 : i6.val = 1 := by rw [i6_post]; simp [ha0]
   have h7 : i7.val = 1 := by rw [i7_post]; simp [hb0]
-  have h8 : i8.val = 1 := by rw [i8_post1, UScalar.val_and, h6, h7]; rfl
+  have h8 : i8.val = 1 := by rw [i8_post, UScalar.val_and, h6, h7]; rfl
   have ha' : 0 < a.val := by
     rcases Nat.eq_zero_or_pos a.val with h | h
     · exact absurd (UScalar.eq_of_val_eq (by rw [h]; rfl)) ha0
@@ -235,7 +237,7 @@ theorem INVERSE_loop_spec (t : Std.Array Std.U8 256#usize) (i : Std.Usize)
       by_cases hjk : k.val = j
       · subst hjk
         rw [ite_eq_left rfl]
-        simp only [val_getElem, i3_post1, cast_usize_val]
+        simp only [val_getElem, i3_post, cast_usize_val]
         rfl
       · rw [ite_eq_right hjk]
         exact hinv j hj1 (by omega)
@@ -244,16 +246,26 @@ theorem INVERSE_loop_spec (t : Std.Array Std.U8 256#usize) (i : Std.Usize)
     rw [hk] at hinv
     exact ⟨by omega, le_rfl, h0, hinv⟩
 
-theorem tableInv_init (f : ℕ → ℕ) : TableInv f (Std.Array.repeat 256#usize 0#u8) 1 :=
-  ⟨le_rfl, by norm_num, by decide, fun j hj1 hj2 => absurd hj2 (by omega)⟩
+/-- The zero table satisfies the invariant at index `1`. -/
+theorem tableInv_init (f : ℕ → ℕ) (t : Std.Array Std.U8 256#usize) (ht : ∀ y ∈ t.val, y = 0#u8) :
+    TableInv f t 1 := by
+  refine ⟨le_rfl, by norm_num, ?_, fun j hj1 hj2 => absurd hj2 (by omega)⟩
+  have hlen : 0 < t.val.length := by simp
+  rw [List.getD_eq_getElem _ _ (by simp), List.getElem_map,
+    ht _ (List.getElem_mem hlen)]
+  rfl
 
 theorem SQUARE_spec : tables.SQUARE ⦃ r => TableInv (fun e => 2 * e) r 256 ⦄ := by
   unfold tables.SQUARE
-  exact SQUARE_loop_spec _ 1#usize (tableInv_init _)
+  obtain ⟨t, ht, hall⟩ := Lib.array_repeat_eq 256#usize core.U8.Insts.CoreCloneClone (fun _ => rfl) 0#u8
+  rw [ht, bind_ok]
+  exact SQUARE_loop_spec _ 1#usize (tableInv_init _ t hall)
 
 theorem INVERSE_spec : tables.INVERSE ⦃ r => TableInv (fun e => 255 - e) r 256 ⦄ := by
   unfold tables.INVERSE
-  exact INVERSE_loop_spec _ 1#usize (tableInv_init _)
+  obtain ⟨t, ht, hall⟩ := Lib.array_repeat_eq 256#usize core.U8.Insts.CoreCloneClone (fun _ => rfl) 0#u8
+  rw [ht, bind_ok]
+  exact INVERSE_loop_spec _ 1#usize (tableInv_init _ t hall)
 
 /-- `square(a)` is `a · a` in the tower's `GF(2^8)`. -/
 theorem tables_square_spec (a : Std.U8) :
