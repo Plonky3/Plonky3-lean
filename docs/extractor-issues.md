@@ -1,59 +1,51 @@
 # Extractor issues
 
-Bugs and limitations in hax, charon and aeneas found while extracting Plonky3,
-with how each is worked around here. They are the reason for most patches and
-stubs, and each one is worth reporting upstream. Found with hax 0.4.1 (charon
-`nightly-2026.09.02`, aeneas `build-183e4f0`) on p3-baby-bear, in
-[Plonky3/Plonky3#2154](https://github.com/Plonky3/Plonky3/pull/2154). hax 0.4.2
-keeps the same charon and aeneas and produces byte-identical output, so every
-one of them is still present.
+Bugs and limitations in hax, charon and aeneas met while extracting Plonky3 with
+the toolchain `toolchain.toml` pins, with how each is worked around here. They
+are the reason for most patches and stubs, and each one is worth reporting
+upstream. Patch headers cite them by number, so an item that no longer applies
+keeps its number and says so.
 
 1. **hax does not pass `--target` to charon** (`into lean`). Charon also ignores
    `CARGO_BUILD_TARGET`, since it always passes its own `--target <host>`. The
    only way through is charon's `--targets`, which leads to 2.
 2. **charon `--targets` drops hax's default-method roots.** Multi-target mode
    forces `--translate-all-methods`, then filters unused methods after the
-   merge, which removes `clone_from` and `ne` (11 to 2 in the LLBC).
-   Post-patch `010-restore-dropped-default-methods` of `baby-bear` and
-   `monty-31`.
+   merge, which removes the `clone_from` and `ne` roots hax adds.
+   Post-patch `010-restore-dropped-default-methods` of `baby-bear`,
+   `goldilocks`, `koala-bear`, `mersenne-31` and `monty-31`.
 3. **aeneas's defining and using runs disagree on default-constant shapes.**
    `N.default (Self : Type) : Usize` in p3-monty-31's run is called as
    `N.default <inst> : RustM Usize` from p3-baby-bear's. Post-patch
-   `baby-bear/020-trait-default-constant-shape`.
-4. **charon leaves some translated items out of `ordered_decls`**, so aeneas,
-   which emits only what that list orders, silently drops them. No diagnostic
-   is printed, and it happens with and without `--targets`, so it is not 2.
-   Each crate's `extraction/gaps.toml` lists every item it drops, and
-   `STATUS.md` shows them. For p3-monty-31, rooted at the items transcribed in
-   `crates/monty-31/extraction/P3Monty31/Assumptions/Mirror.lean`
-   (`MontyField31::new_array`, `new_2d_array`, `new_monty`, and the `Add`,
-   `Sub`, `Mul` and `Neg` impls), charon translates MontyField31's whole impl
-   family with bodies and drops 66 items: those roots, `ZERO`/`ONE`/…,
-   `try_inverse`, every `QuotientMap::from_int`, `Sum::sum`, `mul_2exp_u64`,
-   and free functions reached only from them (`utils::to_monty_64`,
-   `large_monty_reduce`, `monty_reduce_u128`). Free functions reached from an
-   emitted item, such as `utils::add`, are ordered and extracted.
-   `PrimeCharacteristicRing::halve` is not this issue: the trait provides a
-   default body that MontyField31 overrides, and charon skips a provided method
-   that nothing uses, even when it is a `--start-from` root (the pattern
-   matches; no diagnostic). With `--translate-all-methods` charon translates
-   *and* orders it, but that flag also pulls in p3-field's trait hierarchy,
-   which aeneas rejects (9). It is transcribed in the same file.
+   `020-trait-default-constant-shape` of `baby-bear` and `koala-bear`.
+4. **charon translates some items that aeneas does not emit.** aeneas emits only
+   what charon lists in `ordered_decls`: the `--start-from` roots and everything
+   they reach. charon also translates the other members of an impl it enters,
+   with bodies, without listing them. Each crate's `extraction/gaps.toml` lists
+   these items and `STATUS.md` shows them; for p3-monty-31 they are the
+   MontyField31 impl members no root reaches (`try_inverse`, the `QuotientMap`
+   conversions, `Sum`, `dot_product`, …). No diagnostic is printed.
+   `PrimeCharacteristicRing::halve` is not translated at all: the trait
+   provides a default body that MontyField31 overrides, and charon skips a
+   provided method that nothing uses, even when it is a `--start-from` root (the
+   pattern matches; no diagnostic). `--translate-all-methods` makes charon
+   translate and list it, but also pulls in p3-field's trait hierarchy, which
+   aeneas rejects (9). It is transcribed in
+   `crates/monty-31/extraction/P3Monty31/Assumptions/Mirror.lean`.
    For p3-mersenne-31, pre-patch `010-extraction-roots` roots the run at a
    `cfg(hax_backend_lean)` module of one-line free functions, one per needed
    method. Each method is then reachable from a free function, so charon
-   orders it and aeneas emits its own body, `halve` and the trait-impl
+   lists it and aeneas emits its own body, `halve` and the trait-impl
    `from_int`s included.
 5. **aeneas's `__N` names for anonymous consts** trip mathlib's `nameCheck`
-   linter. Post-patch `baby-bear/030-name-anonymous-const-assertions`.
+   linter. Post-patch `030-name-anonymous-const-assertions` of `baby-bear` and
+   `koala-bear`.
 6. **The seeded `Debug::fmt` signatures do not match `CoreModels`**: aeneas
    adds a `&mut Formatter` back-function that `core.fmt.Debug` lacks. Fixed in
    the hand-written `crates/baby-bear/extraction/P3BabyBear/Assumptions/FunsExternal.lean`.
-7. **charon reports `Type error after transformations` in the scoped
-   p3-monty-31 run**, all in `core`'s own iterator code (slice iterators,
-   `Zip`), which charon translates as a dependency, not in any Plonky3 item.
-   aeneas exits 0, and nothing generated refers to them. The count and sites
-   are in `crates/monty-31/extraction/gaps.toml`.
+7. **No longer applies:** the pinned charon reports no `Type error after
+   transformations` for the scoped p3-monty-31 run. The count and sites, if any
+   appear, are in `crates/monty-31/extraction/gaps.toml`.
 8. **charon splits option values on `,`**, so an impl pattern with two generic
    arguments cannot be written. The patterns omit the generics.
 9. **Neither p3-monty-31 nor p3-mds extracts as a whole crate.** Whole-crate
