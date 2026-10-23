@@ -202,3 +202,7 @@ srcDir = "crates/keccak-air/extraction"
 [[lean_lib]]
 name = "P3BatchStark"
 srcDir = "crates/batch-stark/extraction"
+
+[[lean_lib]]
+name = "P3Bus"
+srcDir = "crates/bus/stub"

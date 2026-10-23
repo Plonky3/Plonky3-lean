@@ -1,0 +1,198 @@
+# p3-bus: the binary-native multiset bus, its grand-product reduction, and its memory arguments.
+
+lean_lib = "P3Bus"
+
+# Nothing is extracted.
+#
+# The crate's dependencies p3-multilinear-util and p3-sumcheck do not compile in the extraction variant (docs/extractor-issues.md 180).
+#
+# Most items are also generic over the field traits or the builder, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# Each item is transcribed in stub/P3Bus/, with the abstractions each file's header lists.
+state = "stub"
+
+features = []
+
+watch = ["bus/src", "bus/Cargo.toml", "security/src/bus.rs", "multilinear-util/src/point.rs", "sumcheck/src/generic_degree"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_bus.mirror.BusDirection"
+rust = "p3_bus::direction::BusDirection"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusDirection.index"
+rust = "p3_bus::direction::BusDirection::index"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusDirection.ALL"
+rust = "p3_bus::direction::BusDirection::ALL"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusNameError"
+rust = "p3_bus::name::BusNameError"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusName.MAX_LEN"
+rust = "p3_bus::name::BusName::MAX_LEN"
+
+[[mirror]]
+lean = "p3_bus.mirror.isAsciiAlphabetic"
+rust = "core::num::u8::is_ascii_alphabetic"
+
+[[mirror]]
+lean = "p3_bus.mirror.isAsciiAlphanumeric"
+rust = "core::num::u8::is_ascii_alphanumeric"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusName.try_new"
+rust = "p3_bus::name::BusName::try_new"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusBoundary"
+rust = "p3_bus::builder::BusBoundary"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusBoundary.contains_row"
+rust = "p3_bus::builder::BusBoundary::contains_row"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusActivation"
+rust = "p3_bus::builder::BusActivation"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusBuilder"
+rust = "p3_bus::builder::BusInteractionRecorder"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusBuilder.push_bus_interaction"
+rust = "p3_bus::builder::BusInteractionBuilder::push_bus_interaction"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.MAX_RAM_BIT_WIDTH"
+rust = "p3_bus::ram::statement::MAX_RAM_BIT_WIDTH"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.MIN_RAM_ACCESS_COUNT"
+rust = "p3_bus::ram::statement::MIN_RAM_ACCESS_COUNT"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamBoundary"
+rust = "p3_bus::ram::statement::RamBoundary"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamBoundary.is_segment"
+rust = "p3_bus::ram::statement::RamBoundary::is_segment"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamBoundary.image_buses"
+rust = "p3_bus::ram::statement::RamBoundary::image_buses"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamStatement"
+rust = "p3_bus::ram::statement::RamStatement"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamError"
+rust = "p3_bus::ram::error::RamError"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamStatement.access_payload_width"
+rust = "p3_bus::ram::statement::RamStatement::access_payload_width"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamStatement.image_payload_width"
+rust = "p3_bus::ram::statement::RamStatement::image_payload_width"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamStatement.validate"
+rust = "p3_bus::ram::statement::RamStatement::validate"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamStatement.leaf_contribution"
+rust = "p3_bus::ram::statement::RamStatement::leaf_contribution"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamLayout"
+rust = "p3_bus::ram::statement::RamLayout"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.checked_add"
+rust = "core::num::usize::checked_add"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.take"
+rust = "p3_bus::ram::statement::RamLayout::new"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamLayout.new"
+rust = "p3_bus::ram::statement::RamLayout::new"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamLayout.access_columns"
+rust = "p3_bus::ram::statement::RamLayout::access_columns"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamLayout.image_columns"
+rust = "p3_bus::ram::statement::RamLayout::image_columns"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamAir"
+rust = "p3_bus::ram::air::RamAir"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamAir.new"
+rust = "p3_bus::ram::air::RamAir::new"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.slice"
+rust = "core::slice::index::Index::index"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.xor"
+rust = "p3_bus::ram::air::xor"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.xor3"
+rust = "p3_bus::ram::air::xor3"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.majority"
+rust = "p3_bus::ram::air::majority"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.or"
+rust = "p3_bus::ram::air::or"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.assert_strict_increase"
+rust = "p3_bus::ram::air::assert_strict_increase"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamAir.eval_booleanity"
+rust = "p3_bus::ram::air::RamAir::eval_booleanity"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamAir.eval_run_start"
+rust = "p3_bus::ram::air::RamAir::eval_run_start"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamAir.eval_order"
+rust = "p3_bus::ram::air::RamAir::eval_order"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamAir.eval_run_marker"
+rust = "p3_bus::ram::air::RamAir::eval_run_marker"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.channel"
+rust = "p3_bus::ram::statement::channel"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamAir.declare"
+rust = "p3_bus::ram::air::RamAir::declare"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamAir.eval"
+rust = "p3_bus::ram::air::RamAir::eval"
