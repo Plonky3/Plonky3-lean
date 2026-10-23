@@ -1,0 +1,21 @@
+# p3-lookup: the LogUp lookup argument over AIRs (Haboeck, eprint 2022/1530).
+
+lean_lib = "P3Lookup"
+
+state = "scoped"
+
+features = []
+
+start_from = [
+  "p3_lookup::count::Count::bounded",
+  "p3_lookup::count::Count::provided",
+  "p3_lookup::count::Count::weight",
+  "p3_lookup::count::Count::into_parts",
+  "p3_lookup::indexed::IndexedLookups::check_columns",
+  "p3_lookup::indexed::IndexedLookups::is_empty",
+  "p3_lookup::indexed::IndexedLookups::reads",
+  "p3_lookup::indexed::IndexedLookups::tables",
+  "p3_lookup::logup::LogUpGadget::new",
+]
+
+watch = ["lookup/src", "lookup/Cargo.toml"]

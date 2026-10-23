@@ -174,3 +174,7 @@ srcDir = "crates/merkle-tree/extraction"
 [[lean_lib]]
 name = "P3Air"
 srcDir = "crates/air/extraction"
+
+[[lean_lib]]
+name = "P3Lookup"
+srcDir = "crates/lookup/extraction"

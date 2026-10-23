@@ -242,6 +242,11 @@ Derived equality on a struct with a `&'static str` field calls it. -/
 def core.Str.Insts.CoreCmpPartialEqStr.eq (self other : Str) : RustM Bool :=
   ok (decide (self = other))
 
+/-- `impl From<&str> for String` (`library/alloc/src/string.rs`): the same bytes, which a `&str` guarantees are UTF-8. -/
+def alloc.string.String.Insts.CoreConvertFromShared0Str.from (s : Str) :
+    RustM alloc.string.String :=
+  ok ((String.fromUTF8? ⟨(s.val.map fun b => b.bv.toNat.toUInt8).toArray⟩).getD "")
+
 /-- A word shifted right by the shift amount modulo the word size.
 
 Aeneas models it as a pure function, and the generated code binds it. -/
