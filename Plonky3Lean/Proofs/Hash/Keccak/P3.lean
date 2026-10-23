@@ -2,6 +2,7 @@ module
 
 public import P3Keccak
 public import Plonky3Lean.Lib.Slice
+public import Plonky3Lean.Lib.Iter
 public import Plonky3Lean.Proofs.Hash.Keccak.Permutation
 public import Plonky3Lean.Proofs.Hash.Keccak.Sponge
 
@@ -224,6 +225,35 @@ theorem permute_u8_spec (b : Std.Array Std.U8 200#usize) :
   rw [write_bytes_bv _ h2, h1, read_lanes_bv,
     ← toBits_wordsOfBytes (b.val.map UScalar.bv) 25 (by simp [hb]), keccakF_toBits _ (by simp [wordsOfBytes]),
     bytesOfBits_toBits]
+
+/-- The impl of the permutation on bytes, field by field. -/
+theorem inst_u8_eq : p3_keccak.KeccakF.Insts.P3_symmetricPermutationPermutationArrayU8200 =
+    { corecloneCloneInst := p3_keccak.KeccakF.Insts.CoreCloneClone,
+      corecloneCloneInst1 := core.Array.Insts.CoreCloneClone 200#usize core.U8.Insts.CoreCloneClone,
+      permute := p3_keccak.KeccakF.Insts.P3_symmetricPermutationPermutationArrayU8200.permute,
+      permute_mut := fun self input => do
+        let t ← (core.Array.Insts.CoreCloneClone 200#usize core.U8.Insts.CoreCloneClone).clone input
+        p3_keccak.KeccakF.Insts.P3_symmetricPermutationPermutationArrayU8200.permute self t } := by
+  unfold p3_keccak.KeccakF.Insts.P3_symmetricPermutationPermutationArrayU8200
+  rfl
+
+theorem array_clone_u8 (a : Std.Array Std.U8 200#usize) :
+    CoreModels.core.Array.Insts.CoreCloneClone.clone core.U8.Insts.CoreCloneClone a = .ok a := by
+  unfold CoreModels.core.Array.Insts.CoreCloneClone.clone CoreModels.core.array.Array.map
+  rw [array_map_eq _ a () id (fun x => by
+    simp only [CoreModels.core.array.CloneArray.clone.closure.Insts.CoreOpsFunctionFnMutTupleTT.call_mut,
+      show core.U8.Insts.CoreCloneClone.clone x = .ok x from rfl, bind_ok, id])]
+  congr 1
+  apply Std.Array.ext
+  simp
+
+/-- `permute_mut` on bytes clones the array and permutes the clone: the same bytes as `permute`. -/
+theorem permute_mut_u8_spec (b : Std.Array Std.U8 200#usize) :
+    ∃ out, p3_keccak.hax_roots.permute_mut_u8 b = .ok out ∧
+      out.val.map UScalar.bv = bytesOfBits (keccakF (bitsOfBytes (b.val.map UScalar.bv))) := by
+  rw [p3_keccak.hax_roots.permute_mut_u8, p3_symmetric.permutation.Permutation.permute_mut.default.eq_1, inst_u8_eq]
+  simp only [array_clone_u8, bind_ok]
+  exact permute_u8_spec b
 
 /-! ## The packed state with one lane -/
 

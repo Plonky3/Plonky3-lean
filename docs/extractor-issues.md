@@ -259,3 +259,23 @@ keeps its number and says so.
     Once `PrimeField::PrimeSubfield` is reached, aeneas also renames the members of `Field` for the whole run, so the other roots stop elaborating against the field stub.
 
     The multi-field challenger is transcribed instead.
+
+90. **hax's lean backend does not pass cargo arguments on to charon.**
+
+    `cargo hax -C --features <f> ; into lean` builds the crate without the features.
+
+    tiny-keccak compiles its permutation only with one of its hash features, and its build script fails without one.
+
+    `extract.sh` copies a crate from outside the workspace before extracting it.
+
+    For such a crate, `tools/extract/default-features.py` writes the `features` of its crate.toml as the copy's default features.
+
+    A workspace crate cannot have features yet, and `extract.sh` refuses one that lists them.
+
+91. **aeneas rejects an array of borrowed slices read in a loop.**
+
+    The errors are "Nested borrows are not supported yet" and "Could not match the contexts".
+
+    p3-keccak's batched hash names each lane's message by a `&[u8]` in a `[&[u8]; VECTOR_LEN]`, and gathers words from them in loops.
+
+    Pre-patch `keccak/020` names each message by its start in the input instead.

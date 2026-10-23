@@ -23,3 +23,17 @@ features = ["keccak"]
 start_from = ["tiny_keccak::RHO", "tiny_keccak::PI", "tiny_keccak::WORDS", "tiny_keccak::keccakf::ROUNDS", "tiny_keccak::keccakf::RC"]
 
 watch = ["Cargo.toml"]
+
+# The permutation, transcribed with its loops: `keccakf` is the function, `rounds`
+# its round loop, and `round` one iteration of that loop.
+[[mirror]]
+lean = "tiny_keccak.keccakf.keccakf"
+rust = "tiny_keccak::keccakf::keccakf"
+
+[[mirror]]
+lean = "tiny_keccak.keccakf.rounds"
+rust = "tiny_keccak::keccakf::keccakf"
+
+[[mirror]]
+lean = "tiny_keccak.keccakf.round"
+rust = "tiny_keccak::keccakf::keccakf"

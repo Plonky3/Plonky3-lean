@@ -27,6 +27,9 @@ public import Plonky3Lean.Proofs.Hash.Blake2s
 public import Plonky3Lean.Proofs.Hash.Blake3.Spec
 public import Plonky3Lean.Proofs.Hash.Blake3.Vectors
 public import Plonky3Lean.Proofs.Hash.Sha256.Vectors
+public import Plonky3Lean.Proofs.Hash.Keccak.Vectors
+public import Plonky3Lean.Proofs.Hash.Keccak.Digest
+public import Plonky3Lean.Proofs.Hash.Keccak.Symmetric
 public import Plonky3Lean.Proofs.Symmetric.Roots
 public import Plonky3Lean.Proofs.Field.BabyBear
 public import Plonky3Lean.Proofs.Field.BabyBear.Arith
