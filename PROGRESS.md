@@ -12,7 +12,7 @@ if it has one.
 
 | Crate | Extraction | Verified | Not yet | Detail |
 |---|---|---|---|---|
-| `baby-bear` | extracted | Constants, constructors, `+ - × neg halve`, conversions, inversion, extension constants (degrees 4, 5, 8) | `dot_product`/`sum`, extension arithmetic, exponentiation, `sqrt`, Poseidon | [crates/baby-bear/PROGRESS.md](crates/baby-bear/PROGRESS.md) |
+| `baby-bear` | extracted | Constants, constructors, `+ - × neg halve`, conversions, inversion, extension constants (degrees 4, 5, 8) | `dot_product`/`sum`, extension arithmetic, exponentiation, `sqrt`, Poseidon | |
 | `monty-31` | scoped | Generic over every valid prime: reductions, `+ - × neg halve`, conversions, inversion (`p ≥ 2^30`) | `dot_product`/`sum_array`/`Sum`; inversion and the power-of-two methods rest on transcriptions | |
 | `koala-bear` | extracted | Constants, the generic monty-31 arithmetic at its prime, extension constants, quintic irreducibility, Frobenius coefficients | Exponentiation, conversions, extension arithmetic, Poseidon | |
 | `goldilocks` | scoped | Scalar arithmetic for every stored `u64`: reductions, `+ - ×`, inversion, sums, dot products, conversions, generators | Exponentiation, `try_sqrt`, extension fields, Poseidon; arithmetic rests partly on transcriptions | |
@@ -27,6 +27,5 @@ if it has one.
 | `mds` | scoped (only what `baby-bear` refers to) | Nothing | The MDS layers | |
 | `poseidon1`, `poseidon2` | stub | Round-constant length assertions (in `baby-bear`) | The permutations | |
 
-**Out of scope so far:** the SIMD backends (AVX2, AVX-512, NEON) of every field,
-see [crates/baby-bear/SIMD.md](crates/baby-bear/SIMD.md); the DFTs, matrices,
+**Out of scope so far:** the SIMD backends (AVX2, AVX-512, NEON) of every field; the DFTs, matrices,
 commitments and the STARK prover.
