@@ -1,0 +1,14 @@
+# Mutation of: _mm256_permute2x128_si256
+# Breaks:      it zeroes on bit 2 instead of bit 3.
+#
+--- a/src/x86_64/avx2.rs
++++ b/src/x86_64/avx2.rs
+@@ -292,7 +292,7 @@
+         let base = 4 * ((control & 1) as usize);
+         let mut l = 0;
+         while l < 4 {
+-            dst[4 * half + l] = if control & 8 == 0 { src[base + l] } else { 0 };
++            dst[4 * half + l] = if control & 4 == 0 { src[base + l] } else { 0 };
+             l += 1;
+         }
+         half += 1;

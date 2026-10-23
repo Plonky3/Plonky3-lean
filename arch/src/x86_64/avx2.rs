@@ -8,7 +8,7 @@
 //! `unsafe` blocks.
 #![allow(clippy::missing_safety_doc)]
 
-use super::types::{__m128i, __m256, __m256i};
+use super::{__m128i, __m256, __m256i};
 
 /// 64-bit element `k` of a 256-bit vector.
 const fn lane64(a: &[u32; 8], k: usize) -> u64 {

@@ -1,0 +1,14 @@
+# Mutation of: _mm256_movehdup_ps
+# Breaks:      it duplicates the even lanes, as `moveldup` does.
+#
+--- a/src/x86_64/avx2.rs
++++ b/src/x86_64/avx2.rs
+@@ -429,7 +429,7 @@
+ #[inline]
+ pub unsafe fn _mm256_movehdup_ps(a: __m256) -> __m256 {
+     __m256([
+-        a.0[1], a.0[1], a.0[3], a.0[3], a.0[5], a.0[5], a.0[7], a.0[7],
++        a.0[0], a.0[0], a.0[2], a.0[2], a.0[4], a.0[4], a.0[6], a.0[6],
+     ])
+ }
+ 

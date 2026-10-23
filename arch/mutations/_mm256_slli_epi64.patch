@@ -1,0 +1,14 @@
+# Mutation of: _mm256_slli_epi64
+# Breaks:      it masks the count instead of zeroing.
+#
+--- a/src/x86_64/avx2.rs
++++ b/src/x86_64/avx2.rs
+@@ -342,7 +342,7 @@
+     let mut dst = [0u32; 8];
+     let mut k = 0;
+     while k < 4 {
+-        let v = if s > 63 { 0 } else { lane64(&a.0, k) << s };
++        let v = lane64(&a.0, k) << (s & 63);
+         let (lo, hi) = split64(v);
+         dst[2 * k] = lo;
+         dst[2 * k + 1] = hi;

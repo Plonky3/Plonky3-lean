@@ -1,0 +1,14 @@
+# Mutation of: _mm256_setr_epi32
+# Breaks:      it orders the lanes as `_mm256_set_epi32` does.
+#
+--- a/src/x86_64/avx2.rs
++++ b/src/x86_64/avx2.rs
+@@ -396,7 +396,7 @@
+     e7: i32,
+ ) -> __m256i {
+     __m256i([
+-        e0 as u32, e1 as u32, e2 as u32, e3 as u32, e4 as u32, e5 as u32, e6 as u32, e7 as u32,
++        e7 as u32, e6 as u32, e5 as u32, e4 as u32, e3 as u32, e2 as u32, e1 as u32, e0 as u32,
+     ])
+ }
+ 
