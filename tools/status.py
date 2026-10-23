@@ -132,7 +132,7 @@ LEAN_QUERY = """\
 import Plonky3Lean
 open Lean Elab Command
 
-partial def closure (env : Environment) (start : Name) : NameSet := Id.run do
+partial def claimClosure (env : Environment) (start : Name) : NameSet := Id.run do
   let mut seen : NameSet := {}
   let mut todo := #[start]
   while h : todo.size > 0 do
@@ -156,7 +156,7 @@ partial def closure (env : Environment) (start : Name) : NameSet := Id.run do
     | none => false
   let opaques := env.constants.toList.filterMap fun (n, ci) =>
     if ci matches .opaqueInfo _ && inLib n && !n.isInternal then some n else none
-  let closures := claims.map (closure env)
+  let closures := claims.map (claimClosure env)
   let count (t : Name) : Nat := (closures.filter (·.contains t)).length
   for n in opaques do
     let doc := (← findDocString? env n).getD ""

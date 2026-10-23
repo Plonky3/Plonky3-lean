@@ -27,6 +27,7 @@ target `thumbv7em-none-eabi`
 | `monty-31` | scoped | 1581 | 327 | 0 | 13 | 29 | 1 / 1 | pre `010` |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 68 | 2 | 4 |  | 0 / 0 |  |
+| `security` | scoped | 1414 | 130 | 6 | 13 | 0 | 2 / 1 | pre `010`, pre `020` |
 | `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
 | `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
 | `util` | scoped | 182 | 56 | 0 | 1 | 0 | 0 / 0 |  |
@@ -334,6 +335,11 @@ charon errors: 0.
 | `p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_int` | `` |  |
 | `p3_monty_31::monty_31::{impl}::HALF` | `` |  |
 
+### `security`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ### `sha2`
 
 charon errors: 0.
@@ -358,7 +364,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 748) whose dependencies include it; reaching one is not using it.
+(of 769) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -378,6 +384,12 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 | `poseidon1` | `p3_poseidon1.internal.PartialRoundConstants` | p3-poseidon1 is a stub, and the extraction never observes this type's layout | 0 |
 | `poseidon2` | `p3_poseidon2.Poseidon2.new` | p3-poseidon2 is a stub, and its body is not modelled | 0 |
 | `poseidon2` | `p3_poseidon2.external.ExternalLayerConstants.new` | because a body with that assertion would make the `ok`-ness of every caller depend on it | 0 |
+| `security` | `budget.report.SecurityReport.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `security` | `budget.report.SecurityTerm.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `security` | `budget.shape.AirShape.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `security` | `budget.shape.InstanceShape.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `security` | `budget.shape.LookupShape.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `security` | `budget.shape.ProtocolParams.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 
 ## Transcriptions
 
@@ -385,7 +397,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 748) whose dependencies include the declaration.
+counts the claims (of 769) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -450,6 +462,19 @@ counts the claims (of 748) whose dependencies include the declaration.
 | `poseidon2` | `p3_poseidon2.external.ExternalLayerConstructor` | `p3_poseidon2::external::ExternalLayerConstructor` | stub | 0 |
 | `poseidon2` | `p3_poseidon2.internal.InternalLayerConstructor` | `p3_poseidon2::internal::InternalLayerConstructor` | stub | 0 |
 | `poseidon2` | `p3_poseidon2.Poseidon2` | `p3_poseidon2::Poseidon2` | stub | 0 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.deepBitsR` | `p3_security::deep::deep_ali_error` | not translated | 2 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.deepFactorR` | `p3_security::deep::deep_ali_error` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.aliBitsR` | `p3_security::air::composition_error` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.listSizeLdrR` | `p3_security::proximity::list_size_ldr_m` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.alphaLdrR` | `p3_security::proximity::alpha_ldr_m` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.queryBitsR` | `p3_security::fri::query_phase_error` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.johnsonLineLogR` | `p3_security::proximity::johnson_exceptional_line_count_log2` | not translated | 2 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.commitLdrBitsR` | `p3_security::fri::commit_phase_error_ldr_m` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.commitUdrBitsR` | `p3_security::fri::commit_phase_error_udr` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.regimeBitsR` | `p3_security::stark::proven_security_regime` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.foldingPowBitsR` | `p3_security::assumption::SecurityAssumption::folding_pow_bits` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.upperX` | `p3_security::proximity::compute_upper_m` | not translated | 2 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.sumBitsR` | `p3_security::error::ErrorBits::sum` | not translated | 1 |
 | `util` | `p3_util.branch_hint` | `p3_util::branch_hint` | not translated | 12 |
 
 ## Patches with a cost
@@ -471,6 +496,8 @@ counts the claims (of 748) whose dependencies include the declaration.
 | `blake3/pre/020-reshape-batch` | none in a normal build: the reshaped driver is compiled only under cfg(hax_backend_lean), as the crate's `batch` module, and under cfg(test), beside the shipped one. The extracted variant hashes on the one-lane backend, which is what the extraction target compiles. |
 | `mersenne-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of `Mersenne31`. No existing body changes. |
 | `monty-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method or constant of `MontyField31`. No existing body changes. |
+| `security/pre/010-budget-folding-round` | None in a normal build, where the new function is compiled but unused. In the extracted variant, the report computes its folding term with it. Its body is the original match, verbatim. |
+| `security/pre/020-budget-binding-index` | None in a normal build, where the two new functions are compiled but unused. In the extracted variant, the binding term is read at the first minimum. That minimum is taken over the seven bit counts. |
 | `sha256/pre/010-reshape-compress` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `Sha256Compress::compress` calls the reshaped body, which a differential test equates with the original. |
 
 Upstream tests (`test-pre-patches.py`): 6715 of Plonky3's 6769 pass as shipped and 6715 with the pre-extraction patches, with 0 divergence(s).
@@ -1215,6 +1242,27 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Mersenne31.mersenne_31.from_u62.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Mersenne31.mersenne_31.partial_reduce.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Mersenne31.mersenne_31.reduce_64.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.binary.field_error_numerator.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.binary.field_security_bits.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.budget.report.SecurityReport.security_level.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.budget.security_report.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.budget.security_report.overstates_composition` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.deep.deep_ali_error.charges_list_once` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.deep.deep_ali_error.l_squared_would_bind` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.error.ErrorBits.sum.le_term` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fixed.bits_per_query.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fixed.ceil_log2.not_rounded_up` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fixed.ceil_log2.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fixed.ceil_log2.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fixed.floor_log2.gt_log2_sub_two` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fixed.floor_log2.le_log2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fixed.floor_log2.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fri.commit_phase_error_ldr_m.max_le_sum` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fri.commit_phase_error_udr.le_paper` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.proximity.compute_upper_m.boundary` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.proximity.compute_upper_m.iff_eta_pos` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.proximity.johnson_exceptional_line_count_log2.eq_dkt26` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.whir.folding_pow_bits.short_of_target` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Sha256.Sha256Compress.compress.abc` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Sha256.Sha256Compress.compress.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Sha256.compress256.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |

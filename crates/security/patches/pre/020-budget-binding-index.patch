@@ -1,0 +1,117 @@
+# Patch:        020-budget-binding-index
+# Phase:        pre
+# Target:       security/src/budget/report.rs
+# Hunks:        2
+# Class:        equiv-rewrite
+# Gap:          docs/extractor-issues.md 18.
+#               aeneas rejects a loop that reassigns a borrow-carrying value.
+#               It also rejects a loop that runs while such a value is borrowed.
+# Cost:         None in a normal build, where the two new functions are compiled but unused.
+#               In the extracted variant, the binding term is read at the first minimum.
+#               That minimum is taken over the seven bit counts.
+# Upstreamable: no: the term-copying loop is the natural Rust.
+# Drop when:    aeneas supports loops over borrow-carrying values.
+# Test:         test p3-security --lib pre_patch_020
+# Mutation:     The first-minimum loop keeps the last minimum on a tie.
+#               It then disagrees with the binding term, and the differential test fails.
+#
+# The binding term is found by a loop that keeps a running term and reassigns it.
+# A term holds a `&'static str`, so aeneas cannot translate that loop.
+#
+# A new function runs the same loop over the seven `u64` bit counts.
+# A second new function feeds it those counts.
+# Both are compiled in every build.
+# Under cfg(hax_backend_lean), the binding term is the term at the returned index.
+#
+# Both selections resolve a tie to the earliest round.
+# The differential test compares the two on 20000 reports.
+# Half of the reports use values in 0..4, to force ties.
+#
+--- a/security/src/budget/report.rs
++++ b/security/src/budget/report.rs
+@@ -61,15 +61,30 @@ impl SecurityReport {
+     /// Ties resolve to the earliest such round, so the reported bottleneck is the one an
+     /// adversary reaches first.
+     pub const fn binding_term(&self) -> SecurityTerm {
+-        let mut binding = self.terms[0];
+-        let mut index = 1;
+-        while index < NUM_TERMS {
+-            if self.terms[index].bits < binding.bits {
+-                binding = self.terms[index];
++        // PATCHED: the selection, only under hax's Lean backend.
++        #[cfg(hax_backend_lean)]
++        return self.terms[self.binding_index()];
++        #[cfg(not(hax_backend_lean))]
++        {
++            let mut binding = self.terms[0];
++            let mut index = 1;
++            while index < NUM_TERMS {
++                if self.terms[index].bits < binding.bits {
++                    binding = self.terms[index];
++                }
++                index += 1;
+             }
+-            index += 1;
++            binding
+         }
+-        binding
++    }
++
++    // PATCHED: the index of the binding round, compiled in every build.
++    // aeneas rejects reassigning a borrow-carrying term inside the loop.
++    // Under cfg(hax_backend_lean), the binding term is read at this index.
++    #[allow(dead_code)]
++    const fn binding_index(&self) -> usize {
++        let t = &self.terms;
++        first_minimum([t[0].bits, t[1].bits, t[2].bits, t[3].bits, t[4].bits, t[5].bits, t[6].bits])
+     }
+ 
+     /// Attained conjectured security, in fixed point.
+@@ -82,3 +97,47 @@ impl SecurityReport {
+         crate::fixed::to_bits(self.attained())
+     }
+ }
++
++// PATCHED: the position of the first minimum, compiled in every build.
++// It is the binding-term loop, run over plain bit counts.
++#[allow(dead_code)]
++const fn first_minimum(bits: [u64; NUM_TERMS]) -> usize {
++    let mut binding = 0;
++    let mut index = 1;
++    while index < NUM_TERMS {
++        if bits[index] < bits[binding] {
++            binding = index;
++        }
++        index += 1;
++    }
++    binding
++}
++
++// PATCHED: a differential test of the index-based selection, in the normal build.
++// It checks that the index picks the same term as the term-copying loop.
++#[cfg(test)]
++mod pre_patch_020 {
++    use super::*;
++
++    #[test]
++    fn binding_index_selects_the_binding_term() {
++        let mut x = 0x9e37_79b9_7f4a_7c15_u64;
++        let mut next = || {
++            x ^= x << 13;
++            x ^= x >> 7;
++            x ^= x << 17;
++            x
++        };
++        const LABELS: [&str; NUM_TERMS] = ["a", "b", "c", "d", "e", "f", "g"];
++        for round in 0..20_000 {
++            // Small values force ties, so the earliest-minimum rule is exercised.
++            let modulus = if round % 2 == 0 { 4 } else { u64::MAX };
++            let mut terms = [SecurityTerm::new("", 0); NUM_TERMS];
++            for (i, term) in terms.iter_mut().enumerate() {
++                *term = SecurityTerm::new(LABELS[i], next() % modulus);
++            }
++            let report = SecurityReport::new(terms);
++            assert_eq!(report.terms()[report.binding_index()], report.binding_term());
++        }
++    }
++}

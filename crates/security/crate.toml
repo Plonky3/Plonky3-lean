@@ -1,0 +1,81 @@
+# p3-security: soundness-parameter arithmetic.
+
+lean_lib = "P3Security"
+
+state = "scoped"
+
+features = []
+
+start_from = [
+  "p3_security::fixed",
+  "p3_security::budget::security_report",
+  "p3_security::budget::report",
+  "p3_security::budget::shape",
+  "p3_security::binary::BinaryPcsRegime::new",
+  "p3_security::binary::BinaryPcsRegime::field_error_numerator",
+  "p3_security::binary::BinaryPcsRegime::field_security_bits",
+  "p3_security::binary::BinaryPcsRegime::max_security_bits",
+  "p3_security::binary::BinaryPcsRegime::queries_are_exhaustive",
+  "p3_security::bus::ProductGkrSecurityProfile::new",
+  "p3_security::bus::BusSecurityModel::new",
+  "p3_security::word::WordIntegerMulSecurityModel::tree_numerator",
+  "p3_security::grinding::GrindingBudget::from_sites",
+  "p3_security::grinding::GrindingBudget::with_fri",
+]
+
+watch = ["security/src", "security/Cargo.toml"]
+
+# aeneas cannot translate the f64 bounds (docs/extractor-issues.md, item 19).
+# Each entry below pairs a Rust function with its transcription over the reals.
+# The transcriptions live in Plonky3Lean/Proofs/Security/Real.lean.
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.deepBitsR"
+rust = "p3_security::deep::deep_ali_error"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.deepFactorR"
+rust = "p3_security::deep::deep_ali_error"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.aliBitsR"
+rust = "p3_security::air::composition_error"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.listSizeLdrR"
+rust = "p3_security::proximity::list_size_ldr_m"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.alphaLdrR"
+rust = "p3_security::proximity::alpha_ldr_m"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.queryBitsR"
+rust = "p3_security::fri::query_phase_error"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.johnsonLineLogR"
+rust = "p3_security::proximity::johnson_exceptional_line_count_log2"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.commitLdrBitsR"
+rust = "p3_security::fri::commit_phase_error_ldr_m"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.commitUdrBitsR"
+rust = "p3_security::fri::commit_phase_error_udr"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.regimeBitsR"
+rust = "p3_security::stark::proven_security_regime"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.foldingPowBitsR"
+rust = "p3_security::assumption::SecurityAssumption::folding_pow_bits"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.upperX"
+rust = "p3_security::proximity::compute_upper_m"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.sumBitsR"
+rust = "p3_security::error::ErrorBits::sum"

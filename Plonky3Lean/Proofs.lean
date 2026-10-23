@@ -1,6 +1,11 @@
 module
 
 public import Plonky3Lean.Lib
+public import Plonky3Lean.Proofs.Security.FixedLog
+public import Plonky3Lean.Proofs.Security.Fixed
+public import Plonky3Lean.Proofs.Security.Budget
+public import Plonky3Lean.Proofs.Security.Binary
+public import Plonky3Lean.Proofs.Security.Real
 public import Plonky3Lean.Proofs.Hash.Blake2s
 public import Plonky3Lean.Proofs.Hash.Blake3.Spec
 public import Plonky3Lean.Proofs.Hash.Blake3.Vectors

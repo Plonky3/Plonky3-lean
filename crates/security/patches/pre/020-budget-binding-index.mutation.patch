@@ -1,0 +1,14 @@
+# Mutation of: 020-budget-binding-index
+# Breaks:      the first-minimum loop keeps the last minimum on a tie.
+#
+--- a/security/src/budget/report.rs
++++ b/security/src/budget/report.rs
+@@ -105,7 +105,7 @@
+     let mut binding = 0;
+     let mut index = 1;
+     while index < NUM_TERMS {
+-        if bits[index] < bits[binding] {
++        if bits[index] <= bits[binding] {
+             binding = index;
+         }
+         index += 1;
