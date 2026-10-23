@@ -1,0 +1,134 @@
+# Patch:        010-budget-folding-round
+# Phase:        pre
+# Target:       security/src/budget/mod.rs
+# Hunks:        3
+# Class:        equiv-rewrite
+# Gap:          docs/extractor-issues.md 18: aeneas rejects a `match` whose
+#               arms join two values carrying a borrow ("nested borrows").
+# Cost:         none in a normal build: `folding_round` is compiled but unused
+#               there. In the extracted variant, `security_report` computes
+#               its folding term by calling `folding_round`, whose body is the
+#               original `match` verbatim.
+# Upstreamable: yes: factoring the folding round into a function is a
+#               behaviour-preserving refactor.
+# Drop when:    aeneas joins borrow-carrying values across match arms.
+# Test:         test p3-security --lib pre_patch_010
+# Mutation:     `folding_round` credits the commit-phase grinding twice, so it
+#               disagrees with the report and the differential test fails.
+#
+# `security_report` builds the folding term in a `match` whose two arms each
+# return a `SecurityTerm`, a struct holding a `&'static str`. aeneas stops at
+# the join, so the whole report came out as `sorry`.
+# `folding_round` is that `match`, moved into its own function (each arm then
+# returns directly), compiled in every build. Under cfg(hax_backend_lean) the
+# report calls it.
+# The differential test compares it with the report's folding term on 20000
+# pseudo-random parameter sets, a third of them drawn from edge values.
+#
+--- a/security/src/budget/mod.rs
++++ b/security/src/budget/mod.rs
+@@ -164,6 +164,10 @@ pub const fn security_report(
+ 
+     // Per folding round the error is at most `(arity − 1) · (n + 1) / |E|`, worst at the first
+     // round where the domain is largest. Doubling the coefficient absorbs the `+ 1`.
++    // PATCHED: the selection, only under hax's Lean backend.
++    #[cfg(hax_backend_lean)]
++    let folding = folding_round(params, instance, cap);
++    #[cfg(not(hax_backend_lean))]
+     let folding = match folding_coefficient(params.log_folding_arity) {
+         Some(coefficient) => round(
+             FOLDING_LABEL,
+@@ -197,6 +201,24 @@ pub const fn security_report(
+     ])
+ }
+ 
++// PATCHED: the folding round as its own function, compiled in every build.
++// aeneas rejects the `match` joining two borrow-carrying terms inside
++// `security_report`; under cfg(hax_backend_lean) it calls this instead.
++#[allow(dead_code)]
++const fn folding_round(params: &ProtocolParams, instance: &InstanceShape, cap: u64) -> SecurityTerm {
++    match folding_coefficient(params.log_folding_arity) {
++        Some(coefficient) => round(
++            FOLDING_LABEL,
++            instance,
++            Some(coefficient),
++            instance.log_max_height.saturating_add(params.log_blowup),
++            params.folding_pow_bits,
++            cap,
++        ),
++        None => SecurityTerm::new(FOLDING_LABEL, 0),
++    }
++}
++
+ /// Coefficient `2 · (2^log_folding_arity − 1)` of the folding round, or `None` when the arity is
+ /// too large to compute it without wrapping.
+ ///
+@@ -648,3 +670,68 @@ mod tests {
+         assert_ne!(report.binding_term().label, DEEP_COMPOSITION_LABEL);
+     }
+ }
++
++// PATCHED: the differential test of the factored folding round against the
++// report's own, in the normal build.
++#[cfg(test)]
++mod pre_patch_010 {
++    use super::*;
++
++    #[test]
++    fn folding_round_agrees_with_the_report() {
++        let mut x = 0x2545_f491_4f6c_dd1d_u64;
++        let mut next = || {
++            x ^= x << 13;
++            x ^= x >> 7;
++            x ^= x << 17;
++            x
++        };
++        let edges = [0u32, 1, 2, 31, 62, 63, 64, u32::MAX];
++        for round in 0..20_000 {
++            let pick = |v: u64| {
++                if round % 3 == 0 {
++                    edges[(v % edges.len() as u64) as usize]
++                } else {
++                    (v % 70) as u32
++                }
++            };
++            let params = ProtocolParams {
++                log_blowup: pick(next()),
++                log_folding_arity: pick(next()),
++                num_queries: pick(next()),
++                query_pow_bits: pick(next()),
++                ood_pow_bits: pick(next()),
++                deep_pow_bits: pick(next()),
++                folding_pow_bits: pick(next()),
++                lookup_pow_bits: pick(next()),
++            };
++            let instance = InstanceShape {
++                log_max_height: pick(next()),
++                field_bits: next() % (fixed::from_bits(300) + 2),
++                collision_resistance: pick(next()),
++            };
++            let air = AirShape {
++                num_composed_constraints: pick(next()),
++                max_constraint_degree: pick(next()),
++                num_quotient_chunks: pick(next()),
++                max_combo: pick(next()),
++                num_deep_terms: None,
++                lookup: None,
++            };
++            let report = security_report(&params, &instance, &air);
++            let folding = report
++                .terms()
++                .iter()
++                .find(|term| term.label == FOLDING_LABEL)
++                .copied()
++                .unwrap();
++            let cap = instance.cap();
++            let expected = if cap == 0 {
++                SecurityTerm::new(FOLDING_LABEL, 0)
++            } else {
++                folding_round(&params, &instance, cap)
++            };
++            assert_eq!(folding, expected);
++        }
++    }
++}

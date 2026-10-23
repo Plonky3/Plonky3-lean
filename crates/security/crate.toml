@@ -1,0 +1,26 @@
+# p3-security: soundness-parameter arithmetic.
+
+lean_lib = "P3Security"
+
+state = "scoped"
+
+features = []
+
+start_from = [
+  "p3_security::fixed",
+  "p3_security::budget::security_report",
+  "p3_security::budget::report",
+  "p3_security::budget::shape",
+  "p3_security::binary::BinaryPcsRegime::new",
+  "p3_security::binary::BinaryPcsRegime::field_error_numerator",
+  "p3_security::binary::BinaryPcsRegime::field_security_bits",
+  "p3_security::binary::BinaryPcsRegime::max_security_bits",
+  "p3_security::binary::BinaryPcsRegime::queries_are_exhaustive",
+  "p3_security::bus::ProductGkrSecurityProfile::new",
+  "p3_security::bus::BusSecurityModel::new",
+  "p3_security::word::WordIntegerMulSecurityModel::tree_numerator",
+  "p3_security::grinding::GrindingBudget::from_sites",
+  "p3_security::grinding::GrindingBudget::with_fri",
+]
+
+watch = ["security/src", "security/Cargo.toml"]

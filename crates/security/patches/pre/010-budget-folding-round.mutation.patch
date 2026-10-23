@@ -1,0 +1,14 @@
+# Mutation of: 010-budget-folding-round
+# Breaks:      `folding_round` credits the commit-phase grinding twice.
+#
+--- a/security/src/budget/mod.rs
++++ b/security/src/budget/mod.rs
+@@ -212,7 +212,7 @@
+             instance,
+             Some(coefficient),
+             instance.log_max_height.saturating_add(params.log_blowup),
+-            params.folding_pow_bits,
++            params.folding_pow_bits.saturating_mul(2),
+             cap,
+         ),
+         None => SecurityTerm::new(FOLDING_LABEL, 0),
