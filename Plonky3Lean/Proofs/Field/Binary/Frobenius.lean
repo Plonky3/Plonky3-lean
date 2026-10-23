@@ -343,4 +343,304 @@ theorem frobenius_columns_spec (K : ℕ) (hK : K ≤ 7) (LOG : Std.Usize) (hL : 
       have : j = 0 := by simpa using hj
       subst this; exact h w hw)
 
+theorem frobenius_columns_spec' (K : ℕ) (hK : K ≤ 7) (BITS : Std.Usize) (hB : BITS.val = 2 ^ K)
+    (LOG : Std.Usize) (hL : 1 ≤ LOG.val) :
+    linear.frobenius_columns BITS LOG ⦃ m =>
+      ∀ j < LOG.val, ∀ w < 2 ^ K, mcell m j w = frobNat K (2 ^ j) (2 ^ w) ⦄ := by
+  have : BITS = widthUsize K := UScalar.eq_of_val_eq (by rw [hB, widthUsize_val hK])
+  subst this
+  exact frobenius_columns_spec K hK LOG hL
+
+/-! ## The nibble tables -/
+
+/-- Entry `w` of row `i` of table `k`, as a natural number (`0` past the end). -/
+noncomputable def tcell {ty : UScalarTy} {E R L : Std.Usize}
+    (t : Std.Array (Std.Array (Std.Array (UScalar ty) E) R) L) (k i w : ℕ) : ℕ :=
+  match t.val[k]? with
+  | some r =>
+    match r.val[i]? with
+    | some e =>
+      match e.val[w]? with
+      | some x => x.val
+      | none => 0
+    | none => 0
+  | none => 0
+
+theorem tcell_set {ty : UScalarTy} {E R L : Std.Usize}
+    (t : Std.Array (Std.Array (Std.Array (UScalar ty) E) R) L) (k i u : Std.Usize) (x : UScalar ty)
+    (hk : k.val < t.length) (hi : i.val < R.val) (hu : u.val < E.val) (k' i' w : ℕ) :
+    tcell (t.set k ((t.val[k.val]'(by simpa using hk)).set i
+      (((t.val[k.val]'(by simpa using hk)).val[i.val]'(by simpa using hi)).set u x))) k' i' w =
+      if k' = k.val ∧ i' = i.val ∧ w = u.val then x.val else tcell t k' i' w := by
+  unfold tcell
+  rw [Std.Array.set_val_eq]
+  by_cases h : k' = k.val
+  · subst h
+    rw [List.getElem?_set_self (by simpa using hk), List.getElem?_eq_getElem (by simpa using hk)]
+    dsimp only
+    rw [Std.Array.set_val_eq]
+    by_cases hi' : i' = i.val
+    · subst hi'
+      rw [List.getElem?_set_self (by simpa using hi), List.getElem?_eq_getElem (by simpa using hi)]
+      dsimp only
+      rw [Std.Array.set_val_eq]
+      by_cases hw : w = u.val
+      · subst hw
+        rw [List.getElem?_set_self (by simpa using hu)]
+        simp
+      · rw [List.getElem?_set_ne (Ne.symm hw)]
+        simp [hw]
+    · rw [List.getElem?_set_ne (Ne.symm hi')]
+      simp [hi']
+  · rw [List.getElem?_set_ne (Ne.symm h)]
+    simp [h]
+
+theorem one_shiftLeft_usize_val {b x : Std.Usize} (hb : b.val < 32)
+    (hx : x.val = 1 <<< b.val % Usize.size) : x.val = 2 ^ b.val := by
+  rw [hx, Nat.one_shiftLeft, Nat.mod_eq_of_lt]
+  rw [show Usize.size = 2 ^ System.Platform.numBits by simp [Usize.size_def, Usize.numBits_def]]
+  exact Nat.pow_lt_pow_right (by norm_num)
+    (by rcases System.Platform.numBits_eq with e | e <;> rw [e] <;> omega)
+
+/-- Setting entry `v | 2^b` to `entry v ^ column`, for an additive image. -/
+theorem nibble_entry {F : ℕ → ℕ} {K : ℕ} (hF : XorMap F K) {v b s : ℕ} (hv : v < 2 ^ b)
+    (hlt : s + b < 2 ^ K) :
+    F (v <<< s) ^^^ F (2 ^ (s + b)) = F ((v ||| 2 ^ b) <<< s) := by
+  rw [or_two_pow_shiftLeft, or_eq_xor_of_and_eq_zero (shiftLeft_and_two_pow hv)]
+  refine (hF.xor _ _ ?_ ?_).symm
+  · exact lt_of_lt_of_le (shiftLeft_lt_two_pow hv) (Nat.pow_le_pow_right (by norm_num) (by omega))
+  · exact Nat.pow_lt_pow_right (by norm_num) hlt
+
+/-- A table filled with copies of rows filled with zeros reads `0` everywhere. -/
+theorem tcell_repeat_zero {ty : UScalarTy} {E R L : Std.Usize}
+    (t : Std.Array (Std.Array (Std.Array (UScalar ty) E) R) L) (r : Std.Array (Std.Array (UScalar ty) E) R)
+    (e : Std.Array (UScalar ty) E) (ht : ∀ y ∈ t.val, y = r) (hr : ∀ y ∈ r.val, y = e)
+    (he : ∀ y ∈ e.val, y.val = 0) (k i w : ℕ) : tcell t k i w = 0 := by
+  unfold tcell
+  split
+  · rename_i r' hr'
+    have := ht r' (List.mem_of_getElem? hr')
+    subst this
+    split
+    · rename_i e' he'
+      have := hr e' (List.mem_of_getElem? he')
+      subst this
+      split
+      · rename_i x hx
+        exact he x (List.mem_of_getElem? hx)
+      · rfl
+    · rfl
+  · rfl
+
+/-! ## `frobenius_16` -/
+
+theorem frob16_inner_spec (cols : Std.Array (Std.Array Std.U128 16#usize) 3#usize)
+    (k i b : Std.Usize) (hk : k.val < 3) (hi : i.val < 4) (hb : b.val < 4)
+    (hcol : mcell cols k.val (4 * i.val + b.val) = frobNat 4 (2 ^ k.val) (2 ^ (4 * i.val + b.val)))
+    (t : Std.Array (Std.Array (Std.Array Std.U16 16#usize) 4#usize) 3#usize) (v : Std.Usize)
+    (hv : v.val ≤ 2 ^ b.val)
+    (hrow : ∀ w < 2 ^ b.val, tcell t k.val i.val w = frobNat 4 (2 ^ k.val) (w <<< (4 * i.val)))
+    (hdone : ∀ w < v.val, tcell t k.val i.val (w ||| 2 ^ b.val) =
+      frobNat 4 (2 ^ k.val) ((w ||| 2 ^ b.val) <<< (4 * i.val))) :
+    linear.frobenius_16.TABLES_loop0_loop0_loop0_loop0 cols t k i b v ⦃ t' =>
+      (∀ w < 2 ^ (b.val + 1), tcell t' k.val i.val w = frobNat 4 (2 ^ k.val) (w <<< (4 * i.val))) ∧
+        ∀ k' i', ¬(k' = k.val ∧ i' = i.val) → ∀ w, tcell t' k' i' w = tcell t k' i' w ⦄ := by
+  unfold linear.frobenius_16.TABLES_loop0_loop0_loop0_loop0
+  refine loop.spec_decr_nat (fun p => 2 ^ b.val - p.2.val)
+    (fun p => p.2.val ≤ 2 ^ b.val ∧
+      (∀ w < 2 ^ b.val, tcell p.1 k.val i.val w = frobNat 4 (2 ^ k.val) (w <<< (4 * i.val))) ∧
+      (∀ w < p.2.val, tcell p.1 k.val i.val (w ||| 2 ^ b.val) =
+        frobNat 4 (2 ^ k.val) ((w ||| 2 ^ b.val) <<< (4 * i.val))) ∧
+      ∀ k' i', ¬(k' = k.val ∧ i' = i.val) → ∀ w, tcell p.1 k' i' w = tcell t k' i' w) _ _ _ ?_
+    ⟨hv, hrow, hdone, fun _ _ _ _ => rfl⟩
+  rintro ⟨tb, n⟩ ⟨hn, hr, hd, ho⟩
+  dsimp only at hn hr hd ho ⊢
+  unfold linear.frobenius_16.TABLES_loop0_loop0_loop0_loop0.body
+  have hbits : b.val < System.Platform.numBits := by
+    rcases System.Platform.numBits_eq with e | e <;> rw [e] <;> omega
+  have h2b : 2 ^ b.val ≤ 8 :=
+    calc 2 ^ b.val ≤ 2 ^ 3 := Nat.pow_le_pow_right (by norm_num) (by omega)
+      _ = 8 := by norm_num
+  step*
+  case h2 =>
+    have hi1 := one_shiftLeft_usize_val (by omega) i1_post
+    have hnb : ¬ n.val < 2 ^ b.val := fun h => by
+      have : n < i1 := by scalar_tac
+      contradiction
+    refine ⟨fun w hw => ?_, ho⟩
+    by_cases hlo : w < 2 ^ b.val
+    · exact hr w hlo
+    · have hw' : w - 2 ^ b.val < 2 ^ b.val := by rw [pow_succ] at hw; omega
+      have := hd (w - 2 ^ b.val) (by omega)
+      rwa [Nat.or_two_pow_eq_add_of_lt hw', Nat.sub_add_cancel (by omega)] at this
+  all_goals have hi1 := one_shiftLeft_usize_val (by omega) i1_post
+  all_goals have hni : n.val < i1.val := by scalar_tac
+  all_goals have hnb : n.val < 2 ^ b.val := by omega
+  all_goals try first
+    | (simp; omega)
+    | (rw [i7_post, UScalar.val_or, hi1, Nat.or_two_pow_eq_add_of_lt hnb]; simp; omega)
+  · have hi7 : i7.val = n.val + 2 ^ b.val := by
+      rw [i7_post, UScalar.val_or, hi1, Nat.or_two_pow_eq_add_of_lt hnb]
+    have hklen : k.val < tb.length := by simpa using a_post
+    have hset : ∀ k' i' w, tcell (index_mut_back (index_mut_back1 a5)) k' i' w =
+        if k' = k.val ∧ i' = i.val ∧ w = i7.val then i8.val else tcell tb k' i' w := by
+      intro k' i' w
+      subst index_mut_back_post index_mut_back1_post a5_post a4_post1 a3_post1
+      exact tcell_set tb k i i7 i8 hklen (by simp; omega) (by simp; omega) k' i' w
+    have hi2 : i2.val = frobNat 4 (2 ^ k.val) (n.val <<< (4 * i.val)) := by
+      rw [← hr n.val hnb]
+      simp only [tcell, List.getElem?_eq_getElem (show k.val < tb.val.length by simpa using a_post),
+        ← a_post1, List.getElem?_eq_getElem (show i.val < a.val.length by simpa using a1_post),
+        ← a1_post1, List.getElem?_eq_getElem (show n.val < a1.val.length by simpa using i2_post),
+        ← i2_post1]
+    have hi5 : i5.val = frobNat 4 (2 ^ k.val) (2 ^ (4 * i.val + b.val)) := by
+      rw [← hcol, ← (show i4.val = 4 * i.val + b.val by rw [i4_post, i3_post])]
+      simp only [mcell, List.getElem?_eq_getElem (show k.val < cols.val.length by simpa using a2_post),
+        ← a2_post1, List.getD_eq_getElem?_getD, List.getElem?_eq_getElem (show i4.val < a2.val.length by
+          simpa using i5_post), ← i5_post1, Option.getD_some]
+    have hi5lt : i5.val < 2 ^ 16 := by
+      rw [hi5]; exact frobNat_lt (K := 4) _ (Nat.pow_lt_pow_right (by norm_num) (by omega))
+    have hi6 : i6.val = i5.val := by
+      rw [i6_post, UScalar.cast_val_eq, UScalarTy.U16_numBits_eq, Nat.mod_eq_of_lt hi5lt]
+    have hi8 : i8.val = frobNat 4 (2 ^ k.val) ((n.val ||| 2 ^ b.val) <<< (4 * i.val)) := by
+      rw [i8_post, UScalar.val_xor, hi2, hi6, hi5,
+        nibble_entry (xorMap_frobNat 4 _) hnb (by omega)]
+    refine ⟨by omega, fun w hw => ?_, fun w hw => ?_, fun k' i' h w => ?_, by omega⟩
+    · rw [hset, ite_eq_right (by omega)]
+      exact hr w hw
+    · rw [hset]
+      by_cases hwn : w = n.val
+      · subst hwn
+        rw [ite_eq_left ⟨rfl, rfl, by rw [hi7, Nat.or_two_pow_eq_add_of_lt hnb]⟩, hi8]
+      · rw [ite_eq_right (by
+          rw [hi7, Nat.or_two_pow_eq_add_of_lt (show w < 2 ^ b.val by omega)]; omega)]
+        exact hd w (by omega)
+    · rw [hset, ite_eq_right (fun h' => h ⟨h'.1, h'.2.1⟩)]
+      exact ho k' i' h w
+
+/-- The loop over bits fills row `i` of table `k`. -/
+theorem frob16_bloop_spec (cols : Std.Array (Std.Array Std.U128 16#usize) 3#usize)
+    (hcols : ∀ k < 3, ∀ j < 16, mcell cols k j = frobNat 4 (2 ^ k) (2 ^ j))
+    (k i : Std.Usize) (hk : k.val < 3) (hi : i.val < 4)
+    (t : Std.Array (Std.Array (Std.Array Std.U16 16#usize) 4#usize) 3#usize) (b : Std.Usize)
+    (hb : b.val ≤ 4)
+    (hrow : ∀ w < 2 ^ b.val, tcell t k.val i.val w = frobNat 4 (2 ^ k.val) (w <<< (4 * i.val))) :
+    linear.frobenius_16.TABLES_loop0_loop0_loop0 cols t k i b ⦃ t' =>
+      (∀ w < 16, tcell t' k.val i.val w = frobNat 4 (2 ^ k.val) (w <<< (4 * i.val))) ∧
+        ∀ k' i', ¬(k' = k.val ∧ i' = i.val) → ∀ w, tcell t' k' i' w = tcell t k' i' w ⦄ := by
+  unfold linear.frobenius_16.TABLES_loop0_loop0_loop0
+  refine loop.spec_decr_nat (fun p => 4 - p.2.val)
+    (fun p => p.2.val ≤ 4 ∧
+      (∀ w < 2 ^ p.2.val, tcell p.1 k.val i.val w = frobNat 4 (2 ^ k.val) (w <<< (4 * i.val))) ∧
+      ∀ k' i', ¬(k' = k.val ∧ i' = i.val) → ∀ w, tcell p.1 k' i' w = tcell t k' i' w) _ _ _ ?_
+    ⟨hb, hrow, fun _ _ _ _ => rfl⟩
+  rintro ⟨tb, n⟩ ⟨hn, hr, ho⟩
+  dsimp only at hn hr ho ⊢
+  unfold linear.frobenius_16.TABLES_loop0_loop0_loop0.body
+  split
+  · rename_i hlt
+    have hn4 : n.val < 4 := hlt
+    refine WP.spec_bind (frob16_inner_spec cols k i n hk hi hn4 (hcols _ hk _ (by omega)) tb
+      0#usize (by simp) hr (fun w hw => absurd hw (by simp))) fun t' ⟨hrow', ho'⟩ => ?_
+    step*
+    refine ⟨by omega, by rw [b1_post]; exact hrow', fun k' i' h w => by rw [ho' k' i' h w, ho k' i' h w],
+      by omega⟩
+  · rename_i hge
+    have hn4 : n.val = 4 := by have : ¬ n.val < 4 := hge; omega
+    rw [WP.spec_ok]
+    exact ⟨fun w hw => hr w (by rw [hn4]; omega), ho⟩
+
+/-- The loop over rows fills table `k`; rows not yet reached are still zero. -/
+theorem frob16_iloop_spec (cols : Std.Array (Std.Array Std.U128 16#usize) 3#usize)
+    (hcols : ∀ k < 3, ∀ j < 16, mcell cols k j = frobNat 4 (2 ^ k) (2 ^ j)) (k : Std.Usize)
+    (hk : k.val < 3) (t : Std.Array (Std.Array (Std.Array Std.U16 16#usize) 4#usize) 3#usize)
+    (i : Std.Usize) (hi : i.val ≤ 4)
+    (hdone : ∀ i' < i.val, ∀ w < 16, tcell t k.val i' w = frobNat 4 (2 ^ k.val) (w <<< (4 * i')))
+    (hzero : ∀ i', i.val ≤ i' → tcell t k.val i' 0 = 0) :
+    linear.frobenius_16.TABLES_loop0_loop0 cols t k i ⦃ t' =>
+      (∀ i' < 4, ∀ w < 16, tcell t' k.val i' w = frobNat 4 (2 ^ k.val) (w <<< (4 * i'))) ∧
+        ∀ k', k' ≠ k.val → ∀ i' w, tcell t' k' i' w = tcell t k' i' w ⦄ := by
+  unfold linear.frobenius_16.TABLES_loop0_loop0
+  refine loop.spec_decr_nat (fun p => 4 - p.2.val)
+    (fun p => p.2.val ≤ 4 ∧
+      (∀ i' < p.2.val, ∀ w < 16, tcell p.1 k.val i' w = frobNat 4 (2 ^ k.val) (w <<< (4 * i'))) ∧
+      (∀ i', p.2.val ≤ i' → tcell p.1 k.val i' 0 = 0) ∧
+      ∀ k', k' ≠ k.val → ∀ i' w, tcell p.1 k' i' w = tcell t k' i' w) _ _ _ ?_
+    ⟨hi, hdone, hzero, fun _ _ _ _ => rfl⟩
+  rintro ⟨tb, n⟩ ⟨hn, hd, hz, ho⟩
+  dsimp only at hn hd hz ho ⊢
+  unfold linear.frobenius_16.TABLES_loop0_loop0.body
+  step*
+  · have hn4 : n.val < 4 := by scalar_tac
+    refine WP.spec_bind (frob16_bloop_spec cols hcols k n hk hn4 tb 0#usize (by simp)
+      (fun w hw => by
+        have : w = 0 := by simpa using hw
+        subst this
+        rw [hz n.val le_rfl, Nat.zero_shiftLeft, frobNat_zero])) fun t' ⟨hrow', ho'⟩ => ?_
+    step*
+    refine ⟨by omega, fun i' hi' w hw => ?_, fun i' hi' => ?_, fun k' hk' i' w => ?_, by omega⟩
+    · by_cases hin : i' = n.val
+      · subst hin; exact hrow' w hw
+      · rw [ho' _ _ (fun h => hin h.2)]; exact hd i' (by omega) w hw
+    · rw [ho' _ _ (fun h => by omega)]; exact hz i' (by omega)
+    · rw [ho' _ _ (fun h => hk' h.1)]; exact ho k' hk' i' w
+
+/-- The loop over tables fills every table; tables not yet reached are still zero. -/
+theorem frob16_kloop_spec (cols : Std.Array (Std.Array Std.U128 16#usize) 3#usize)
+    (hcols : ∀ k < 3, ∀ j < 16, mcell cols k j = frobNat 4 (2 ^ k) (2 ^ j))
+    (t : Std.Array (Std.Array (Std.Array Std.U16 16#usize) 4#usize) 3#usize) (k : Std.Usize)
+    (hk : k.val ≤ 3)
+    (hdone : ∀ k' < k.val, ∀ i < 4, ∀ w < 16, tcell t k' i w = frobNat 4 (2 ^ k') (w <<< (4 * i)))
+    (hzero : ∀ k' i, k.val ≤ k' → tcell t k' i 0 = 0) :
+    linear.frobenius_16.TABLES_loop0 cols t k ⦃ t' =>
+      ∀ k' < 3, ∀ i < 4, ∀ w < 16, tcell t' k' i w = frobNat 4 (2 ^ k') (w <<< (4 * i)) ⦄ := by
+  unfold linear.frobenius_16.TABLES_loop0
+  refine loop.spec_decr_nat (fun p => 3 - p.2.val)
+    (fun p => p.2.val ≤ 3 ∧
+      (∀ k' < p.2.val, ∀ i < 4, ∀ w < 16, tcell p.1 k' i w = frobNat 4 (2 ^ k') (w <<< (4 * i))) ∧
+      ∀ k' i, p.2.val ≤ k' → tcell p.1 k' i 0 = 0) _ _ _ ?_ ⟨hk, hdone, hzero⟩
+  rintro ⟨tb, n⟩ ⟨hn, hd, hz⟩
+  dsimp only at hn hd hz ⊢
+  unfold linear.frobenius_16.TABLES_loop0.body
+  split
+  · rename_i hlt
+    have hn3 : n.val < 3 := hlt
+    refine WP.spec_bind (frob16_iloop_spec cols hcols n hn3 tb 0#usize (by simp)
+      (fun i' hi' => absurd hi' (by simp)) (fun i' _ => hz n.val i' le_rfl))
+      fun t' ⟨hrow', ho'⟩ => ?_
+    step*
+    refine ⟨by omega, fun k' hk' i hi w hw => ?_, fun k' i hk' => ?_, by omega⟩
+    · by_cases hkn : k' = n.val
+      · subst hkn; exact hrow' i hi w hw
+      · rw [ho' k' hkn]; exact hd k' (by omega) i hi w hw
+    · rw [ho' k' (by omega)]; exact hz k' i (by omega)
+  · rename_i hge
+    have hn3 : n.val = 3 := by have : ¬ n.val < 3 := hge
+                               omega
+    rw [WP.spec_ok]
+    exact fun k' hk' i hi w hw => hd k' (by omega) i hi w hw
+
+/-- Entry `w` of row `i` of table `k` is `x ↦ x^(2^(2^k))` applied to `w` placed at nibble `i`. -/
+theorem frobenius_16_TABLES_spec :
+    linear.frobenius_16.TABLES ⦃ T =>
+      ∀ k < 3, ∀ i < 4, ∀ w < 16, tcell T k i w = frobNat 4 (2 ^ k) (w <<< (4 * i)) ⦄ := by
+  unfold linear.frobenius_16.TABLES
+  refine WP.spec_bind (frobenius_columns_spec' 4 (by norm_num) 16#usize (by simp) 3#usize (by simp))
+    fun cols hcols => ?_
+  obtain ⟨a, ha, hav⟩ :=
+    Lib.array_repeat_eq 16#usize core.U16.Insts.CoreCloneClone (fun _ => rfl) 0#u16
+  rw [ha, Aeneas.Std.bind_ok]
+  obtain ⟨a1, ha1, ha1v⟩ := Lib.array_repeat_eq 4#usize
+    (core.Array.Insts.CoreCloneClone 16#usize core.U16.Insts.CoreCloneClone)
+    (array_clone_eq _ (fun _ => rfl)) a
+  rw [ha1, Aeneas.Std.bind_ok]
+  obtain ⟨tb, htb, htbv⟩ := Lib.array_repeat_eq 3#usize
+    (core.Array.Insts.CoreCloneClone 4#usize
+      (core.Array.Insts.CoreCloneClone 16#usize core.U16.Insts.CoreCloneClone))
+    (array_clone_eq _ (array_clone_eq _ (fun _ => rfl))) a1
+  rw [htb, Aeneas.Std.bind_ok]
+  exact frob16_kloop_spec cols (fun k hk j hj => hcols k (by simpa using hk) j (by simpa using hj))
+    tb 0#usize (by simp) (fun k hk => absurd hk (by simp))
+    (fun k i _ => tcell_repeat_zero tb a1 a htbv ha1v (fun y hy => by rw [hav y hy]; rfl) k i 0)
+
 end Plonky3Lean.Proofs.Binary
