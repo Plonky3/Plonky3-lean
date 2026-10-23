@@ -1105,11 +1105,79 @@ name   = "Plonky3Lean.Claims.P3Mersenne31.mersenne_31.Mersenne31.new_array.toFie
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.Proofs.Binary.N128.injective'"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.Proofs.Binary.cantorTower.indep'"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.Proofs.Binary.cantorTower.span'"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.Proofs.Binary.cantorTower.succ'"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.Proofs.Binary.cantorTower.zero'"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.Proofs.Binary.cantorV.even'"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.Proofs.Binary.towerToBF64.injective'"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.Proofs.Binary.towerToGhash.injective'"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.aes.invert_byte.toAesField"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.aes.mul_bytes.toAesField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.clmul.basis.poly_to_tower_128.iso"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.clmul.basis.poly_to_tower_32.iso"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.clmul.basis.poly_to_tower_64.iso"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.clmul.basis.tower_image_128.iso"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.clmul.basis.tower_image_64.iso"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.clmul.basis.tower_to_poly_128.iso"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.clmul.basis.tower_to_poly_32.iso"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.clmul.basis.tower_to_poly_64.iso"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.clmul.clmul_128x128.poly"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -1141,6 +1209,18 @@ name   = "Plonky3Lean.Claims.P3BinaryField.clmul.gf64.poly_square_64.bf64"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.clmul.mul_128.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.clmul.mul_64.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.clmul.mul_pair_64.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.clmul.portable.clmul_64x64.poly"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -1166,6 +1246,14 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.clmul.sqrt.poly_sqrt_128.ghash"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.clmul.square_128.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.clmul.square_64.towerOf"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -1233,6 +1321,14 @@ name   = "Plonky3Lean.Claims.P3BinaryField.field_defaults.Gf2.inverse.towerOf"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.field_defaults.Ghash128.inverse.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.field_defaults.Ghash128.inverse.toGhash"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.field_defaults.Poly192.inverse.toExt3"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -1290,6 +1386,14 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.gf2.Gf2.Insts.CoreOpsArithSubGf2Gf2.sub.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.gf2.Gf2.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.gf2.Gf2.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.towerOf"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -1377,7 +1481,15 @@ name   = "Plonky3Lean.Claims.P3BinaryField.gf2.Gf2.new.val"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.CoreConvertFromBinaryField128.from.toGhash"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithAddAssign.add_assign.toGhash"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithAddBinaryField128Ghash128.add.toGhash"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -1385,7 +1497,27 @@ name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithAddG
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithDivAssignGhash128.div_assign.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithDivAssignGhash128.div_assign.toGhash"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithDivGhash128Ghash128.div.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithDivGhash128Ghash128.div.toGhash"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithMulAssign.mul_assign.toGhash"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithMulBinaryField128Ghash128.mul.toGhash"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -1401,11 +1533,27 @@ name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithSubA
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithSubBinaryField128Ghash128.sub.toGhash"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.CoreOpsArithSubGhash128Ghash128.sub.toGhash"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.P3_binary_fieldTowerTowerLevelU128.cantor_basis.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.P3_binary_fieldTowerTowerLevelU128.cantor_basis.toGhash"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.P3_fieldFieldField.interpolation_node.val"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.P3_fieldFieldField.try_inverse.toGhash"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -1414,6 +1562,10 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.Insts.P3_fieldFieldPrimeCharacteristicRing.square.toGhash"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.ghash.Ghash128.invert_or_zero.toGhash"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -1473,6 +1625,10 @@ name   = "Plonky3Lean.Claims.P3BinaryField.poly64.Poly64.Insts.CoreCmpPartialEqP
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.poly64.Poly64.Insts.CoreConvertFromBinaryField64.from.toQuot64"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.poly64.Poly64.Insts.CoreOpsArithAddAssign.add_assign.bf64"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -1510,6 +1666,14 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.poly64.Poly64.Insts.CoreOpsArithSubPoly64Poly64.sub.bf64"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.poly64.Poly64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.poly64.Poly64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis.toQuot64"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -1569,6 +1733,10 @@ name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField128.Insts.CoreConver
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField128.Insts.CoreConvertFromGhash128.from.toGhash"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithAddAssign.add_assign.towerOf"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -1622,6 +1790,14 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField128.Insts.CoreOpsArithSubBinaryField128BinaryField128.sub.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField128.Insts.P3_binary_fieldTowerTowerLevelU128.cantor_basis.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField128.Insts.P3_binary_fieldTowerTowerLevelU128.cantor_basis.towerOf"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -1721,6 +1897,10 @@ name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField128.Insts.P3_fieldFi
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField128.table_square.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField16.Insts.CoreCmpPartialEqBinaryField16.eq.towerOf"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -1782,6 +1962,14 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField16.Insts.CoreOpsArithSubBinaryField16BinaryField16.sub.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField16.Insts.P3_binary_fieldTowerTowerLevelU16.cantor_basis.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField16.Insts.P3_binary_fieldTowerTowerLevelU16.cantor_basis.towerOf"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -1886,6 +2074,14 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField2.Insts.CoreOpsArithSubBinaryField2BinaryField2.sub.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField2.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField2.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.towerOf"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -1998,6 +2194,14 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField32.Insts.CoreOpsArithSubBinaryField32BinaryField32.sub.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField32.Insts.P3_binary_fieldTowerTowerLevelU32.cantor_basis.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField32.Insts.P3_binary_fieldTowerTowerLevelU32.cantor_basis.towerOf"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -2121,6 +2325,14 @@ name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField4.Insts.CoreOpsArith
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField4.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField4.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField4.Insts.P3_fieldFieldField.bits.val"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -2177,6 +2389,10 @@ name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField64.Insts.CoreConvert
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField64.Insts.CoreConvertFromPoly64.from.toQuot64"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithAddAssign.add_assign.towerOf"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -2230,6 +2446,14 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField64.Insts.CoreOpsArithSubBinaryField64BinaryField64.sub.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis.towerOf"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -2321,6 +2545,10 @@ name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField64.mul_alpha.towerOf
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField64.table_square.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField8.Insts.CoreCmpPartialEqBinaryField8.eq.towerOf"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -2378,6 +2606,14 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithSubBinaryField8BinaryField8.sub.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField8.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField8.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.towerOf"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]

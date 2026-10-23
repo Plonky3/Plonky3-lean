@@ -5,6 +5,7 @@ public import Plonky3Lean.Proofs.Field.Binary.Operators
 public import Plonky3Lean.Proofs.Field.Binary.TowerApi
 public import Plonky3Lean.Proofs.Field.Binary.PolyField
 public import Plonky3Lean.Proofs.Field.Binary.ExtensionMul
+public import Plonky3Lean.Proofs.Field.Binary.CantorSpec
 
 @[expose] public section
 
@@ -33,9 +34,10 @@ Every claim holds for every input, unless it states a hypothesis.
 Not claimed:
 - the trait methods of the field types (`square`, `try_inverse`, `Field`, `ExtensionField`, ...),
   which the extraction cannot reach;
-- the basis conversions, the dot products, the AES and bit-plane code, the challenger and
+- the dot products, the AES and bit-plane code, the challenger and
   transcript, and the packed arithmetic;
-- the hardware kernels (PCLMULQDQ, PMULL, GFNI), which the extraction target does not have.
+- the hardware kernels (PCLMULQDQ, PMULL, GFNI), which the extraction target does not have; the
+  carry-less paths around them are claimed with the portable carry-less multiply in their place.
 -/
 
 open Aeneas Aeneas.Std CoreModels Polynomial
@@ -2012,5 +2014,330 @@ theorem tower.BinaryField64.Insts.CoreOpsArithMulBinaryField128BinaryField128.mu
       towerOf 7 r =
         ConcreteBinaryTower.concreteTowerAlgebraMap 6 7 (by omega) (towerOf 6 a) * towerOf 7 b ⦄ :=
   Proofs.Binary.bf64_bf128_mul_spec a b
+
+/-! ## The basis change between the tower and the polynomial bases -/
+
+/-- `tower_to_poly_128` is the field isomorphism `N` of the tower's `GF(2^128)` onto the polynomial basis. -/
+theorem clmul.basis.tower_to_poly_128.iso (v : Std.U128) :
+    clmul.basis.tower_to_poly_128 v ⦃ r =>
+      AdjoinRoot.mk (Proofs.Binary.modPoly 128 135) (poly r) = Proofs.Binary.N128 (Spec.BinaryField.towerOf 7 v) ⦄ :=
+  by simpa only [Proofs.Binary.poly_eq_natPoly, Proofs.Binary.N128_apply, Proofs.Binary.N64_apply] using Proofs.Binary.tower_to_poly_128_spec v
+
+/-- `poly_to_tower_128` is the inverse of `N`. -/
+theorem clmul.basis.poly_to_tower_128.iso (v : Std.U128) :
+    clmul.basis.poly_to_tower_128 v ⦃ r =>
+      Proofs.Binary.N128 (Spec.BinaryField.towerOf 7 r) = AdjoinRoot.mk (Proofs.Binary.modPoly 128 135) (poly v) ⦄ :=
+  by simpa only [Proofs.Binary.poly_eq_natPoly, Proofs.Binary.N128_apply, Proofs.Binary.N64_apply] using Proofs.Binary.poly_to_tower_128_spec v
+
+/-- `tower_to_poly_64` is the field isomorphism `N` of the tower's `GF(2^64)` onto the polynomial basis. -/
+theorem clmul.basis.tower_to_poly_64.iso (v : Std.U64) :
+    clmul.basis.tower_to_poly_64 v ⦃ r =>
+      AdjoinRoot.mk (Proofs.Binary.modPoly 64 27) (poly r) = Proofs.Binary.N64 (Spec.BinaryField.towerOf 6 v) ⦄ :=
+  by simpa only [Proofs.Binary.poly_eq_natPoly, Proofs.Binary.N128_apply, Proofs.Binary.N64_apply] using Proofs.Binary.tower_to_poly_64_spec v
+
+/-- `poly_to_tower_64` is the inverse of `N`. -/
+theorem clmul.basis.poly_to_tower_64.iso (v : Std.U64) :
+    clmul.basis.poly_to_tower_64 v ⦃ r =>
+      Proofs.Binary.N64 (Spec.BinaryField.towerOf 6 r) = AdjoinRoot.mk (Proofs.Binary.modPoly 64 27) (poly v) ⦄ :=
+  by simpa only [Proofs.Binary.poly_eq_natPoly, Proofs.Binary.N128_apply, Proofs.Binary.N64_apply] using Proofs.Binary.poly_to_tower_64_spec v
+
+/-- `tower_to_poly_32` is the field isomorphism `N` of the tower's `GF(2^32)` onto the polynomial basis. -/
+theorem clmul.basis.tower_to_poly_32.iso (v : Std.U32) :
+    clmul.basis.tower_to_poly_32 v ⦃ r =>
+      AdjoinRoot.mk (Proofs.Binary.modPoly 32 141) (poly r) = Proofs.Binary.towerMap Proofs.Binary.xi32 5 (Spec.BinaryField.towerOf 5 v) ⦄ :=
+  by simpa only [Proofs.Binary.poly_eq_natPoly, Proofs.Binary.N128_apply, Proofs.Binary.N64_apply] using Proofs.Binary.tower_to_poly_32_spec v
+
+/-- `poly_to_tower_32` is the inverse of `N`. -/
+theorem clmul.basis.poly_to_tower_32.iso (v : Std.U32) :
+    clmul.basis.poly_to_tower_32 v ⦃ r =>
+      Proofs.Binary.towerMap Proofs.Binary.xi32 5 (Spec.BinaryField.towerOf 5 r) = AdjoinRoot.mk (Proofs.Binary.modPoly 32 141) (poly v) ⦄ :=
+  by simpa only [Proofs.Binary.poly_eq_natPoly, Proofs.Binary.N128_apply, Proofs.Binary.N64_apply] using Proofs.Binary.poly_to_tower_32_spec v
+
+/-- `N` at 128 bits is injective. -/
+theorem Proofs.Binary.N128.injective' :
+    Function.Injective Proofs.Binary.N128 :=
+  Proofs.Binary.N128_injective
+
+/-- `tower_image_128` is `N` at 128 bits. -/
+theorem clmul.basis.tower_image_128.iso (v : Std.U128) :
+    clmul.basis.tower_image_128 v ⦃ r =>
+      AdjoinRoot.mk (Proofs.Binary.modPoly 128 135) (poly r) = Proofs.Binary.N128 (Spec.BinaryField.towerOf 7 v) ⦄ :=
+  by simpa only [Proofs.Binary.poly_eq_natPoly, Proofs.Binary.N128_apply, Proofs.Binary.N64_apply] using Proofs.Binary.tower_image_128_spec v
+
+/-- `tower_image_64` is `N` at 64 bits. -/
+theorem clmul.basis.tower_image_64.iso (v : Std.U64) :
+    clmul.basis.tower_image_64 v ⦃ r =>
+      AdjoinRoot.mk (Proofs.Binary.modPoly 64 27) (poly r) = Proofs.Binary.N64 (Spec.BinaryField.towerOf 6 v) ⦄ :=
+  by simpa only [Proofs.Binary.poly_eq_natPoly, Proofs.Binary.N128_apply, Proofs.Binary.N64_apply] using Proofs.Binary.tower_image_64_spec v
+
+/-! ## GHASH through the tower -/
+
+/-- `From<BinaryField128> for Ghash128` is the field embedding `towerToGhash`. -/
+theorem ghash.Ghash128.Insts.CoreConvertFromBinaryField128.from.toGhash (t : tower.BinaryField128) :
+    ghash.Ghash128.Insts.CoreConvertFromBinaryField128.from t ⦃ x =>
+      toQuot (ghash x) = Proofs.Binary.towerToGhash (Spec.BinaryField.towerOf 7 t) ⦄ :=
+  Proofs.Binary.ghash128_from_bf128_toQuot t
+
+/-- `From<Ghash128> for BinaryField128` is the inverse of `towerToGhash`. -/
+theorem tower.BinaryField128.Insts.CoreConvertFromGhash128.from.toGhash (x : ghash.Ghash128) :
+    tower.BinaryField128.Insts.CoreConvertFromGhash128.from x ⦃ t =>
+      Proofs.Binary.towerToGhash (Spec.BinaryField.towerOf 7 t) = toQuot (ghash x) ⦄ :=
+  Proofs.Binary.bf128_from_ghash_toQuot x
+
+/-- `towerToGhash` is injective. -/
+theorem Proofs.Binary.towerToGhash.injective' :
+    Function.Injective Proofs.Binary.towerToGhash :=
+  Proofs.Binary.towerToGhash_injective
+
+/-- `invert_or_zero` is the inverse in the GHASH field, with `0⁻¹ = 0`. -/
+theorem ghash.Ghash128.invert_or_zero.toGhash (a : ghash.Ghash128) :
+    ghash.Ghash128.invert_or_zero a ⦃ r => ghash r = (ghash a)⁻¹ ⦄ :=
+  Proofs.Binary.ghash128_invert_or_zero_ghash a
+
+/-- The value `try_inverse` returns. -/
+theorem ghash.Ghash128.Insts.P3_fieldFieldField.try_inverse.toGhash (a : ghash.Ghash128) :
+    ghash.Ghash128.Insts.P3_fieldFieldField.try_inverse a ⦃ r =>
+      (ghash a = 0 → r = .None) ∧ (ghash a ≠ 0 → ∃ c, r = .Some c ∧ ghash c = (ghash a)⁻¹) ⦄ :=
+  Proofs.Binary.ghash128_try_inverse_spec a
+
+/-- `inverse` of a nonzero element. -/
+theorem field_defaults.Ghash128.inverse.toGhash (a : ghash.Ghash128) (ha : ghash a ≠ 0) :
+    field_defaults.Ghash128.inverse a ⦃ c => ghash c = (ghash a)⁻¹ ⦄ :=
+  Proofs.Binary.ghash128_inverse_ghash a ha
+
+/-- `inverse` panics. -/
+theorem field_defaults.Ghash128.inverse.panics (a : ghash.Ghash128) (ha : ghash a = 0) :
+    field_defaults.Ghash128.inverse a = .fail .panic :=
+  Proofs.Binary.ghash128_inverse_zero a ha
+
+/-- `div` by a nonzero element. -/
+theorem ghash.Ghash128.Insts.CoreOpsArithDivGhash128Ghash128.div.toGhash (a b : ghash.Ghash128) (hb : ghash b ≠ 0) :
+    ghash.Ghash128.Insts.CoreOpsArithDivGhash128Ghash128.div a b ⦃ r => ghash r = ghash a / ghash b ⦄ :=
+  Proofs.Binary.ghash128_div_ghash a b hb
+
+/-- `div` panics. -/
+theorem ghash.Ghash128.Insts.CoreOpsArithDivGhash128Ghash128.div.panics (a b : ghash.Ghash128) (hb : ghash b = 0) :
+    ghash.Ghash128.Insts.CoreOpsArithDivGhash128Ghash128.div a b = .fail .panic :=
+  Proofs.Binary.ghash128_div_zero a b hb
+
+/-- `div_assign` by a nonzero element. -/
+theorem ghash.Ghash128.Insts.CoreOpsArithDivAssignGhash128.div_assign.toGhash (a b : ghash.Ghash128) (hb : ghash b ≠ 0) :
+    ghash.Ghash128.Insts.CoreOpsArithDivAssignGhash128.div_assign a b ⦃ r => ghash r = ghash a / ghash b ⦄ :=
+  Proofs.Binary.ghash128_div_assign_ghash a b hb
+
+/-- `div_assign` panics. -/
+theorem ghash.Ghash128.Insts.CoreOpsArithDivAssignGhash128.div_assign.panics (a b : ghash.Ghash128) (hb : ghash b = 0) :
+    ghash.Ghash128.Insts.CoreOpsArithDivAssignGhash128.div_assign a b = .fail .panic :=
+  Proofs.Binary.ghash128_div_assign_zero a b hb
+
+/-- `add` of a GHASH element and a tower element goes through `towerToGhash`. -/
+theorem ghash.Ghash128.Insts.CoreOpsArithAddBinaryField128Ghash128.add.toGhash (a : ghash.Ghash128) (b : tower.BinaryField128) :
+    ghash.Ghash128.Insts.CoreOpsArithAddBinaryField128Ghash128.add a b ⦃ r =>
+      toQuot (ghash r) = toQuot (ghash a) + Proofs.Binary.towerToGhash (Spec.BinaryField.towerOf 7 b) ⦄ :=
+  Proofs.Binary.ghash128_add_bf128 a b
+
+/-- `sub` of a GHASH element and a tower element goes through `towerToGhash`. -/
+theorem ghash.Ghash128.Insts.CoreOpsArithSubBinaryField128Ghash128.sub.toGhash (a : ghash.Ghash128) (b : tower.BinaryField128) :
+    ghash.Ghash128.Insts.CoreOpsArithSubBinaryField128Ghash128.sub a b ⦃ r =>
+      toQuot (ghash r) = toQuot (ghash a) - Proofs.Binary.towerToGhash (Spec.BinaryField.towerOf 7 b) ⦄ :=
+  Proofs.Binary.ghash128_sub_bf128 a b
+
+/-- `mul` of a GHASH element and a tower element goes through `towerToGhash`. -/
+theorem ghash.Ghash128.Insts.CoreOpsArithMulBinaryField128Ghash128.mul.toGhash (a : ghash.Ghash128) (b : tower.BinaryField128) :
+    ghash.Ghash128.Insts.CoreOpsArithMulBinaryField128Ghash128.mul a b ⦃ r =>
+      toQuot (ghash r) = toQuot (ghash a) * Proofs.Binary.towerToGhash (Spec.BinaryField.towerOf 7 b) ⦄ :=
+  Proofs.Binary.ghash128_mul_bf128 a b
+
+/-! ## The carry-less multiplication paths -/
+
+/-- `clmul_128x128` is the carry-less product of two 128-bit polynomials, as low and high halves. -/
+theorem clmul.clmul_128x128.poly (a b : Std.U128) :
+    clmul.clmul_128x128 a b ⦃ p => poly p.1 + X ^ 128 * poly p.2 = poly a * poly b ⦄ :=
+  by simpa only [Proofs.Binary.poly_eq_natPoly, Proofs.Binary.N128_apply, Proofs.Binary.N64_apply] using Proofs.Binary.clmul_128x128_spec a b
+
+/-- The carry-less `mul_128` is the tower product. -/
+theorem clmul.mul_128.towerOf (a b : Std.U128) :
+    clmul.mul_128 a b ⦃ r => Spec.BinaryField.towerOf 7 r = Spec.BinaryField.towerOf 7 a * Spec.BinaryField.towerOf 7 b ⦄ :=
+  Proofs.Binary.mul_128_spec a b
+
+/-- The carry-less `mul_64` is the tower product. -/
+theorem clmul.mul_64.towerOf (a b : Std.U64) :
+    clmul.mul_64 a b ⦃ r => Spec.BinaryField.towerOf 6 r = Spec.BinaryField.towerOf 6 a * Spec.BinaryField.towerOf 6 b ⦄ :=
+  Proofs.Binary.mul_64_spec a b
+
+/-- Both products of `mul_pair_64` are tower products by the scalar. -/
+theorem clmul.mul_pair_64.towerOf (a b s : Std.U64) :
+    clmul.mul_pair_64 a b s ⦃ p =>
+      Spec.BinaryField.towerOf 6 p.1 = Spec.BinaryField.towerOf 6 a * Spec.BinaryField.towerOf 6 s ∧ Spec.BinaryField.towerOf 6 p.2 = Spec.BinaryField.towerOf 6 b * Spec.BinaryField.towerOf 6 s ⦄ :=
+  Proofs.Binary.mul_pair_64_spec a b s
+
+/-- The table `square_64` is the tower square. -/
+theorem clmul.square_64.towerOf (v : Std.U64) :
+    clmul.square_64 v ⦃ r => Spec.BinaryField.towerOf 6 r = Spec.BinaryField.towerOf 6 v ^ 2 ⦄ :=
+  Proofs.Binary.clmul_square_64_spec v
+
+/-- The table `square_128` is the tower square. -/
+theorem clmul.square_128.towerOf (v : Std.U128) :
+    clmul.square_128 v ⦃ r => Spec.BinaryField.towerOf 7 r = Spec.BinaryField.towerOf 7 v ^ 2 ⦄ :=
+  Proofs.Binary.clmul_square_128_spec v
+
+/-- `table_square` is the tower square. -/
+theorem tower.BinaryField64.table_square.towerOf (a : tower.BinaryField64) :
+    tower.BinaryField64.table_square a ⦃ r => Spec.BinaryField.towerOf 6 r = Spec.BinaryField.towerOf 6 a ^ 2 ⦄ :=
+  Proofs.Binary.bf64_table_square_spec a
+
+/-- `table_square` is the tower square. -/
+theorem tower.BinaryField128.table_square.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.table_square a ⦃ r => Spec.BinaryField.towerOf 7 r = Spec.BinaryField.towerOf 7 a ^ 2 ⦄ :=
+  Proofs.Binary.bf128_table_square_spec a
+
+/-! ## `Poly64` and the tower -/
+
+/-- `From<BinaryField64> for Poly64` is the field embedding `towerToBF64`. -/
+theorem poly64.Poly64.Insts.CoreConvertFromBinaryField64.from.toQuot64 (t : tower.BinaryField64) :
+    poly64.Poly64.Insts.CoreConvertFromBinaryField64.from t ⦃ p =>
+      toQuot64 p = Proofs.Binary.towerToBF64 (Spec.BinaryField.towerOf 6 t) ⦄ :=
+  Proofs.Binary.poly64_from_bf64_spec t
+
+/-- `From<Poly64> for BinaryField64` is the inverse of `towerToBF64`. -/
+theorem tower.BinaryField64.Insts.CoreConvertFromPoly64.from.toQuot64 (p : poly64.Poly64) :
+    tower.BinaryField64.Insts.CoreConvertFromPoly64.from p ⦃ t =>
+      Proofs.Binary.towerToBF64 (Spec.BinaryField.towerOf 6 t) = toQuot64 p ⦄ :=
+  Proofs.Binary.bf64_from_poly64_spec p
+
+/-- `towerToBF64` is injective. -/
+theorem Proofs.Binary.towerToBF64.injective' :
+    Function.Injective Proofs.Binary.towerToBF64 :=
+  Proofs.Binary.towerToBF64_injective
+
+/-! ## The Cantor basis -/
+
+/-- Vector `0` of the Cantor basis is `1`. -/
+theorem Proofs.Binary.cantorTower.zero' (k : ℕ) :
+    Proofs.Binary.cantorTower k 0 = 1 :=
+  Proofs.Binary.cantorTower_zero k
+
+/-- `v_i^2 + v_i = v_(i-1)`. -/
+theorem Proofs.Binary.cantorTower.succ' {k : ℕ} (hk : k ≤ 7) {i : ℕ} (hi : i + 1 < 2 ^ k) :
+    Proofs.Binary.cantorTower k (i + 1) ^ 2 + Proofs.Binary.cantorTower k (i + 1) = Proofs.Binary.cantorTower k i :=
+  Proofs.Binary.cantorTower_succ hk hi
+
+/-- Each root is the one whose lowest bit is clear. -/
+theorem Proofs.Binary.cantorV.even' (i : ℕ) (h1 : 1 ≤ i) (h2 : i < 128) :
+    Proofs.Binary.cantorV i % 2 = 0 :=
+  Proofs.Binary.cantorV_even i h1 h2
+
+/-- The first `2^k` vectors span level `k`. -/
+theorem Proofs.Binary.cantorTower.span' {k : ℕ} (hk : k ≤ 7) (x : ConcreteBTField k) :
+    ∃ w < 2 ^ 2 ^ k, x = ∑ i ∈ Finset.range (2 ^ k), if w.testBit i then Proofs.Binary.cantorTower k i else 0 :=
+  Proofs.Binary.cantor_basis_span hk x
+
+/-- The first `2^k` vectors are independent. -/
+theorem Proofs.Binary.cantorTower.indep' {k : ℕ} (hk : k ≤ 7) {w : ℕ} (hw : w < 2 ^ 2 ^ k)
+    (h : (∑ i ∈ Finset.range (2 ^ k), if w.testBit i then Proofs.Binary.cantorTower k i else 0) = 0) :
+    w = 0 :=
+  Proofs.Binary.cantor_basis_indep hk hw h
+
+/-- `cantor_basis i` is vector `i` of the Cantor basis. -/
+theorem gf2.Gf2.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.towerOf (i : Std.Usize) (hi : i.val < 1) :
+    gf2.Gf2.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis i ⦃ r => Spec.BinaryField.towerOf 0 r = Proofs.Binary.cantorTower 0 i.val ⦄ :=
+  Proofs.Binary.gf2_cantor_basis_spec i hi
+
+/-- `cantor_basis` panics past the level's width. -/
+theorem gf2.Gf2.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.panics (i : Std.Usize) (hi : 1 ≤ i.val) :
+    gf2.Gf2.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis i = .fail .panic :=
+  Proofs.Binary.gf2_cantor_basis_panic i hi
+
+/-- `cantor_basis i` is vector `i` of the Cantor basis. -/
+theorem tower.BinaryField2.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.towerOf (i : Std.Usize) (hi : i.val < 2) :
+    tower.BinaryField2.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis i ⦃ r => Spec.BinaryField.towerOf 1 r = Proofs.Binary.cantorTower 1 i.val ⦄ :=
+  Proofs.Binary.bf2_cantor_basis_spec i hi
+
+/-- `cantor_basis` panics past the level's width. -/
+theorem tower.BinaryField2.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.panics (i : Std.Usize) (hi : 2 ≤ i.val) :
+    tower.BinaryField2.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis i = .fail .panic :=
+  Proofs.Binary.bf2_cantor_basis_panic i hi
+
+/-- `cantor_basis i` is vector `i` of the Cantor basis. -/
+theorem tower.BinaryField4.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.towerOf (i : Std.Usize) (hi : i.val < 4) :
+    tower.BinaryField4.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis i ⦃ r => Spec.BinaryField.towerOf 2 r = Proofs.Binary.cantorTower 2 i.val ⦄ :=
+  Proofs.Binary.bf4_cantor_basis_spec i hi
+
+/-- `cantor_basis` panics past the level's width. -/
+theorem tower.BinaryField4.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.panics (i : Std.Usize) (hi : 4 ≤ i.val) :
+    tower.BinaryField4.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis i = .fail .panic :=
+  Proofs.Binary.bf4_cantor_basis_panic i hi
+
+/-- `cantor_basis i` is vector `i` of the Cantor basis. -/
+theorem tower.BinaryField8.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.towerOf (i : Std.Usize) (hi : i.val < 8) :
+    tower.BinaryField8.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis i ⦃ r => Spec.BinaryField.towerOf 3 r = Proofs.Binary.cantorTower 3 i.val ⦄ :=
+  Proofs.Binary.bf8_cantor_basis_spec i hi
+
+/-- `cantor_basis` panics past the level's width. -/
+theorem tower.BinaryField8.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis.panics (i : Std.Usize) (hi : 8 ≤ i.val) :
+    tower.BinaryField8.Insts.P3_binary_fieldTowerTowerLevelU8.cantor_basis i = .fail .panic :=
+  Proofs.Binary.bf8_cantor_basis_panic i hi
+
+/-- `cantor_basis i` is vector `i` of the Cantor basis. -/
+theorem tower.BinaryField16.Insts.P3_binary_fieldTowerTowerLevelU16.cantor_basis.towerOf (i : Std.Usize) (hi : i.val < 16) :
+    tower.BinaryField16.Insts.P3_binary_fieldTowerTowerLevelU16.cantor_basis i ⦃ r => Spec.BinaryField.towerOf 4 r = Proofs.Binary.cantorTower 4 i.val ⦄ :=
+  Proofs.Binary.bf16_cantor_basis_spec i hi
+
+/-- `cantor_basis` panics past the level's width. -/
+theorem tower.BinaryField16.Insts.P3_binary_fieldTowerTowerLevelU16.cantor_basis.panics (i : Std.Usize) (hi : 16 ≤ i.val) :
+    tower.BinaryField16.Insts.P3_binary_fieldTowerTowerLevelU16.cantor_basis i = .fail .panic :=
+  Proofs.Binary.bf16_cantor_basis_panic i hi
+
+/-- `cantor_basis i` is vector `i` of the Cantor basis. -/
+theorem tower.BinaryField32.Insts.P3_binary_fieldTowerTowerLevelU32.cantor_basis.towerOf (i : Std.Usize) (hi : i.val < 32) :
+    tower.BinaryField32.Insts.P3_binary_fieldTowerTowerLevelU32.cantor_basis i ⦃ r => Spec.BinaryField.towerOf 5 r = Proofs.Binary.cantorTower 5 i.val ⦄ :=
+  Proofs.Binary.bf32_cantor_basis_spec i hi
+
+/-- `cantor_basis` panics past the level's width. -/
+theorem tower.BinaryField32.Insts.P3_binary_fieldTowerTowerLevelU32.cantor_basis.panics (i : Std.Usize) (hi : 32 ≤ i.val) :
+    tower.BinaryField32.Insts.P3_binary_fieldTowerTowerLevelU32.cantor_basis i = .fail .panic :=
+  Proofs.Binary.bf32_cantor_basis_panic i hi
+
+/-- `cantor_basis i` is vector `i` of the Cantor basis. -/
+theorem tower.BinaryField64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis.towerOf (i : Std.Usize) (hi : i.val < 64) :
+    tower.BinaryField64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis i ⦃ r => Spec.BinaryField.towerOf 6 r = Proofs.Binary.cantorTower 6 i.val ⦄ :=
+  Proofs.Binary.bf64_cantor_basis_spec i hi
+
+/-- `cantor_basis` panics past the level's width. -/
+theorem tower.BinaryField64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis.panics (i : Std.Usize) (hi : 64 ≤ i.val) :
+    tower.BinaryField64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis i = .fail .panic :=
+  Proofs.Binary.bf64_cantor_basis_panic i hi
+
+/-- `cantor_basis i` is vector `i` of the Cantor basis. -/
+theorem tower.BinaryField128.Insts.P3_binary_fieldTowerTowerLevelU128.cantor_basis.towerOf (i : Std.Usize) (hi : i.val < 128) :
+    tower.BinaryField128.Insts.P3_binary_fieldTowerTowerLevelU128.cantor_basis i ⦃ r => Spec.BinaryField.towerOf 7 r = Proofs.Binary.cantorTower 7 i.val ⦄ :=
+  Proofs.Binary.bf128_cantor_basis_spec i hi
+
+/-- `cantor_basis` panics past the level's width. -/
+theorem tower.BinaryField128.Insts.P3_binary_fieldTowerTowerLevelU128.cantor_basis.panics (i : Std.Usize) (hi : 128 ≤ i.val) :
+    tower.BinaryField128.Insts.P3_binary_fieldTowerTowerLevelU128.cantor_basis i = .fail .panic :=
+  Proofs.Binary.bf128_cantor_basis_panic i hi
+
+/-- `Ghash128::cantor_basis i` is vector `i` of the Cantor basis, through `towerToGhash`. -/
+theorem ghash.Ghash128.Insts.P3_binary_fieldTowerTowerLevelU128.cantor_basis.toGhash (i : Std.Usize) (hi : i.val < 128) :
+    ghash.Ghash128.Insts.P3_binary_fieldTowerTowerLevelU128.cantor_basis i ⦃ r =>
+      toQuot (ghash r) = Proofs.Binary.towerToGhash (Proofs.Binary.cantorTower 7 i.val) ⦄ :=
+  Proofs.Binary.ghash128_cantor_basis_spec i hi
+
+/-- `cantor_basis` panics past 128. -/
+theorem ghash.Ghash128.Insts.P3_binary_fieldTowerTowerLevelU128.cantor_basis.panics (i : Std.Usize) (hi : 128 ≤ i.val) :
+    ghash.Ghash128.Insts.P3_binary_fieldTowerTowerLevelU128.cantor_basis i = .fail .panic :=
+  Proofs.Binary.ghash128_cantor_basis_panic i hi
+
+/-- `Poly64::cantor_basis i` is vector `i` of the Cantor basis, through `towerToBF64`. -/
+theorem poly64.Poly64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis.toQuot64 (i : Std.Usize) (hi : i.val < 64) :
+    poly64.Poly64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis i ⦃ r =>
+      toQuot64 r = Proofs.Binary.towerToBF64 (Proofs.Binary.cantorTower 6 i.val) ⦄ :=
+  Proofs.Binary.poly64_cantor_basis_spec i hi
+
+/-- `cantor_basis` panics past 64. -/
+theorem poly64.Poly64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis.panics (i : Std.Usize) (hi : 64 ≤ i.val) :
+    poly64.Poly64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis i = .fail .panic :=
+  Proofs.Binary.poly64_cantor_basis_panic i hi
 
 end Plonky3Lean.Claims.P3BinaryField
