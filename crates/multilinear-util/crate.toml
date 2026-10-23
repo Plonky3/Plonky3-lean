@@ -1,0 +1,316 @@
+# p3-multilinear-util: multilinear tables over the Boolean cube (Thaler, "Proofs, Arguments, and Zero-Knowledge", Section 3.5).
+
+lean_lib = "P3MultilinearUtil"
+
+# Nothing is extracted.
+#
+# The crate is generic over p3-field's trait hierarchy and over its packed types, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# Each item is transcribed over a field in stub/P3MultilinearUtil/, with the abstractions stub/P3MultilinearUtil/Model.lean lists.
+state = "stub"
+
+features = []
+
+watch = ["multilinear-util/src", "multilinear-util/Cargo.toml", "field/src/packed", "maybe-rayon/src/task_size.rs"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_multilinear_util.point.mirror.Point.split_at"
+rust = "p3_multilinear_util::point::Point::split_at"
+
+[[mirror]]
+lean = "p3_multilinear_util.point.mirror.Point.reversed"
+rust = "p3_multilinear_util::point::Point::reversed"
+
+[[mirror]]
+lean = "p3_multilinear_util.point.mirror.split_by_coordinate"
+rust = "p3_multilinear_util::point::split_by_coordinate"
+
+[[mirror]]
+lean = "p3_multilinear_util.point.mirror.Point.fill_equality_table_serial"
+rust = "p3_multilinear_util::point::Point::fill_equality_table_serial"
+
+[[mirror]]
+lean = "p3_multilinear_util.point.mirror.Point.fill_equality_table_in_chunks"
+rust = "p3_multilinear_util::point::Point::fill_equality_table_in_chunks"
+
+[[mirror]]
+lean = "p3_multilinear_util.point.mirror.Point.fill_equality_table"
+rust = "p3_multilinear_util::point::Point::fill_equality_table"
+
+[[mirror]]
+lean = "p3_multilinear_util.point.mirror.Point.equality_table"
+rust = "p3_multilinear_util::point::Point::equality_table"
+
+[[mirror]]
+lean = "p3_multilinear_util.point.mirror.Point.equality_weights_msb"
+rust = "p3_multilinear_util::point::Point::equality_weights_msb"
+
+[[mirror]]
+lean = "p3_multilinear_util.point.mirror.Point.equality_weights_lsb"
+rust = "p3_multilinear_util::point::Point::equality_weights_lsb"
+
+[[mirror]]
+lean = "p3_multilinear_util.point.mirror.Point.equality_at_vertex"
+rust = "p3_multilinear_util::point::Point::equality_at_vertex"
+
+[[mirror]]
+lean = "p3_multilinear_util.point.mirror.Point.hypercube"
+rust = "p3_multilinear_util::point::Point::hypercube"
+
+[[mirror]]
+lean = "p3_multilinear_util.point.mirror.Point.expand_from_univariate"
+rust = "p3_multilinear_util::point::Point::expand_from_univariate"
+
+[[mirror]]
+lean = "p3_multilinear_util.point.mirror.Point.eval_eq"
+rust = "p3_multilinear_util::point::Point::eval_eq"
+
+[[mirror]]
+lean = "p3_multilinear_util.point.mirror.Point.eval_select"
+rust = "p3_multilinear_util::point::Point::eval_select"
+
+[[mirror]]
+lean = "p3_multilinear_util.point.mirror.Point.eval_next"
+rust = "p3_multilinear_util::point::Point::eval_next"
+
+[[mirror]]
+lean = "p3_multilinear_util.point.mirror.Point.transpose"
+rust = "p3_multilinear_util::point::Point::transpose"
+
+[[mirror]]
+lean = "p3_multilinear_util.eq_batch.mirror.fill_buffer_batch"
+rust = "p3_multilinear_util::eq_batch::fill_buffer_batch"
+
+[[mirror]]
+lean = "p3_multilinear_util.eq_batch.mirror.eval_eq_1_batch"
+rust = "p3_multilinear_util::eq_batch::eval_eq_1_batch"
+
+[[mirror]]
+lean = "p3_multilinear_util.eq_batch.mirror.eval_eq_2_batch"
+rust = "p3_multilinear_util::eq_batch::eval_eq_2_batch"
+
+[[mirror]]
+lean = "p3_multilinear_util.eq_batch.mirror.eval_eq_3_batch"
+rust = "p3_multilinear_util::eq_batch::eval_eq_3_batch"
+
+[[mirror]]
+lean = "p3_multilinear_util.eq_batch.mirror.add_or_set"
+rust = "p3_multilinear_util::eq_batch::add_or_set"
+
+[[mirror]]
+lean = "p3_multilinear_util.eq_batch.mirror.eval_eq_batch_basic"
+rust = "p3_multilinear_util::eq_batch::eval_eq_batch_basic"
+
+[[mirror]]
+lean = "p3_multilinear_util.eq_batch.mirror.packed_eq_poly_batch"
+rust = "p3_multilinear_util::eq_batch::packed_eq_poly_batch"
+
+[[mirror]]
+lean = "p3_multilinear_util.eq_batch.mirror.extEvaluator"
+rust = "{impl p3_multilinear_util::eq_batch::EqualityEvaluator for p3_multilinear_util::eq_batch::ExtFieldEvaluator<F, EF>}"
+
+[[mirror]]
+lean = "p3_multilinear_util.eq_batch.mirror.baseEvaluator"
+rust = "{impl p3_multilinear_util::eq_batch::EqualityEvaluator for p3_multilinear_util::eq_batch::BaseFieldEvaluator<F, EF>}"
+
+[[mirror]]
+lean = "p3_multilinear_util.eq_batch.mirror.eval_eq_packed_batch"
+rust = "p3_multilinear_util::eq_batch::eval_eq_packed_batch"
+
+[[mirror]]
+lean = "p3_multilinear_util.eq_batch.mirror.eval_eq_batch_common"
+rust = "p3_multilinear_util::eq_batch::eval_eq_batch_common"
+
+[[mirror]]
+lean = "p3_multilinear_util.eq_batch.mirror.eval_eq_batch"
+rust = "p3_multilinear_util::eq_batch::eval_eq_batch"
+
+[[mirror]]
+lean = "p3_multilinear_util.eq_batch.mirror.eval_eq_base_batch"
+rust = "p3_multilinear_util::eq_batch::eval_eq_base_batch"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.new"
+rust = "p3_multilinear_util::poly::Poly::new"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.as_constant"
+rust = "p3_multilinear_util::poly::Poly::as_constant"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.zero"
+rust = "p3_multilinear_util::poly::Poly::zero"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.truncate_to_half"
+rust = "p3_multilinear_util::poly::Poly::truncate_to_half"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.pad_zeros"
+rust = "p3_multilinear_util::poly::Poly::pad_zeros"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.new_from_point"
+rust = "p3_multilinear_util::poly::Poly::new_from_point"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.new_next_from_point"
+rust = "p3_multilinear_util::poly::Poly::new_next_from_point"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_mut"
+rust = "p3_multilinear_util::poly::Poly::fix_prefix_var_mut"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.sum_prefix_var_mut"
+rust = "p3_multilinear_util::poly::Poly::sum_prefix_var_mut"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_mut_monomial"
+rust = "p3_multilinear_util::poly::Poly::fix_prefix_var_mut_monomial"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut_whole"
+rust = "p3_multilinear_util::poly::Poly::fix_suffix_var_mut_whole"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut_split"
+rust = "p3_multilinear_util::poly::Poly::fix_suffix_var_mut_split"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut"
+rust = "p3_multilinear_util::poly::Poly::fix_suffix_var_mut"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.fix_prefix_var"
+rust = "p3_multilinear_util::poly::Poly::fix_prefix_var"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_at"
+rust = "p3_multilinear_util::poly::Poly::fix_prefix_var_at"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.fix_suffix_var"
+rust = "p3_multilinear_util::poly::Poly::fix_suffix_var"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_to_packed"
+rust = "p3_multilinear_util::poly::Poly::fix_prefix_var_to_packed"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.pack"
+rust = "p3_multilinear_util::poly::Poly::pack"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.unpack"
+rust = "p3_multilinear_util::poly::Poly::unpack"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.eval_multilinear_recursive"
+rust = "p3_multilinear_util::poly::eval_multilinear_recursive"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.eq_serial"
+rust = "p3_multilinear_util::poly::Poly::new_packed_from_point::eq_serial"
+
+[[mirror]]
+lean = "p3_multilinear_util.poly.mirror.Poly.new_packed_from_point"
+rust = "p3_multilinear_util::poly::Poly::new_packed_from_point"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.EqMaybePacked.new_unpacked"
+rust = "p3_multilinear_util::split_eq::eq::EqMaybePacked::new_unpacked"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.EqMaybePacked.new_packed"
+rust = "p3_multilinear_util::split_eq::eq::EqMaybePacked::new_packed"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.EqMaybePacked.num_scalar_evals"
+rust = "p3_multilinear_util::split_eq::eq::EqMaybePacked::num_scalar_evals"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.EqMaybePacked.num_variables"
+rust = "p3_multilinear_util::split_eq::eq::EqMaybePacked::num_variables"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_base"
+rust = "p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_base"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_ext"
+rust = "p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_ext"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_ext_packed"
+rust = "p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_ext_packed"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.EqMaybePacked.accumulate_scalar_into"
+rust = "p3_multilinear_util::split_eq::eq::EqMaybePacked::accumulate_scalar_into"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.EqMaybePacked.compress_prefix_into"
+rust = "p3_multilinear_util::split_eq::eq::EqMaybePacked::compress_prefix_into"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.packed_basis_dot"
+rust = "p3_multilinear_util::split_eq::packed_kernel::packed_basis_dot"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.compress_hi_dot_packed"
+rust = "p3_multilinear_util::split_eq::packed_kernel::compress_hi_dot_packed"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.EqMaybePacked.compress_suffix_dot"
+rust = "p3_multilinear_util::split_eq::eq::EqMaybePacked::compress_suffix_dot"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_base_shifted"
+rust = "p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_base_shifted"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.EqMaybePacked.last_scalar"
+rust = "p3_multilinear_util::split_eq::eq::EqMaybePacked::last_scalar"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.SplitEq.new_unpacked"
+rust = "p3_multilinear_util::split_eq::SplitEq::new_unpacked"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.SplitEq.new_packed"
+rust = "p3_multilinear_util::split_eq::SplitEq::new_packed"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.SplitEq.num_variables"
+rust = "p3_multilinear_util::split_eq::SplitEq::num_variables"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.SplitEq.eval_base"
+rust = "p3_multilinear_util::split_eq::SplitEq::eval_base"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.SplitEq.eval_ext"
+rust = "p3_multilinear_util::split_eq::SplitEq::eval_ext"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.SplitEq.accumulate_into"
+rust = "p3_multilinear_util::split_eq::SplitEq::accumulate_into"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.SplitEq.materialize"
+rust = "p3_multilinear_util::split_eq::SplitEq::materialize"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.SplitEq.compress_suffix_into"
+rust = "p3_multilinear_util::split_eq::SplitEq::compress_suffix_into"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.Poly.eval_base"
+rust = "p3_multilinear_util::poly::Poly::eval_base"
+
+[[mirror]]
+lean = "p3_multilinear_util.split_eq.mirror.Poly.eval_ext"
+rust = "p3_multilinear_util::poly::Poly::eval_ext"

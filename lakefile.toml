@@ -109,6 +109,10 @@ name = "P3ZkCodes"
 srcDir = "crates/zk-codes/stub"
 
 [[lean_lib]]
+name = "P3MultilinearUtil"
+srcDir = "crates/multilinear-util/stub"
+
+[[lean_lib]]
 name = "P3BinaryField"
 srcDir = "crates/binary-field/extraction"
 
