@@ -9,6 +9,7 @@ public import Plonky3Lean.Spec.Commit
 public import Plonky3Lean.Spec.Dft
 public import Plonky3Lean.Spec.Goldilocks
 public import Plonky3Lean.Spec.KoalaBear
+public import Plonky3Lean.Spec.Lookup
 public import Plonky3Lean.Spec.Matrix
 public import Plonky3Lean.Spec.Mersenne31
 public import Plonky3Lean.Spec.Monty31

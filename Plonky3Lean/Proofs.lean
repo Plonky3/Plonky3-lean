@@ -142,6 +142,8 @@ public import Plonky3Lean.Proofs.Challenger.Duplex
 public import Plonky3Lean.Proofs.Challenger.Grinding
 public import Plonky3Lean.Proofs.Challenger.Fields
 public import Plonky3Lean.Proofs.Challenger.Hash
+public import Plonky3Lean.Proofs.Lookup.Combine
+public import Plonky3Lean.Proofs.Lookup.Extracted
 
 @[expose] public section
 

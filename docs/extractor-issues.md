@@ -279,3 +279,14 @@ keeps its number and says so.
     p3-keccak's batched hash names each lane's message by a `&[u8]` in a `[&[u8]; VECTOR_LEN]`, and gathers words from them in loops.
 
     Pre-patch `keccak/020` names each message by its start in the input instead.
+
+150. **CoreModels has no `String::from(&str)`.**
+
+    p3-lookup's indexed column check copies the table name into its error.
+
+    The generated code calls `alloc.string.String.Insts.CoreConvertFromShared0Str.from`, which CoreModels does not define.
+
+    `HaxExt.lean` models it as decoding the bytes, which a `&str` guarantees are UTF-8.
+151. **aeneas rejects p3-lookup's indexed declaration check**, which returns an error from inside two loops in turn, as in 23.
+
+    The check is transcribed instead, and the column check it calls is extracted.

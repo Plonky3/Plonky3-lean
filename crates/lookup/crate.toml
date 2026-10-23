@@ -2,6 +2,13 @@
 
 lean_lib = "P3Lookup"
 
+# The count record, the indexed column check and the gadget's constructor.
+#
+# Everything else is generic over the field traits or over the builder, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# The indexed declaration check returns from inside a loop (docs/extractor-issues.md 23).
+#
+# It is transcribed in extraction/P3Lookup/Assumptions/Mirror/.
 state = "scoped"
 
 features = []
@@ -18,4 +25,241 @@ start_from = [
   "p3_lookup::logup::LogUpGadget::new",
 ]
 
-watch = ["lookup/src", "lookup/Cargo.toml"]
+watch = ["lookup/src", "lookup/Cargo.toml", "field/src/batch_inverse.rs", "air/src/symbolic"]
+
+# The transcriptions in extraction/P3Lookup/Assumptions/Mirror/.
+# Hashes are pending tools/mirror.
+#
+# The transcribed indexed column check restates the extracted one, and is not yet proven equal to it.
+
+[[mirror]]
+lean = "p3_lookup.mirror.Kind"
+rust = "p3_lookup::types::Kind"
+
+[[mirror]]
+lean = "p3_lookup.mirror.Lookup"
+rust = "p3_lookup::types::Lookup"
+
+[[mirror]]
+lean = "p3_lookup.mirror.Lookup.num_denoms"
+rust = "p3_lookup::types::Lookup::num_denoms"
+
+[[mirror]]
+lean = "p3_lookup.mirror.checked_add_u32"
+rust = "core::num::u32::checked_add"
+
+[[mirror]]
+lean = "p3_lookup.mirror.SymbolicInteraction"
+rust = "p3_lookup::builder::SymbolicInteraction"
+
+[[mirror]]
+lean = "p3_lookup.mirror.SymbolicLocalInteraction"
+rust = "p3_lookup::builder::SymbolicLocalInteraction"
+
+[[mirror]]
+lean = "p3_lookup.mirror.SymbolicExclusiveBranch"
+rust = "p3_lookup::builder::SymbolicExclusiveBranch"
+
+[[mirror]]
+lean = "p3_lookup.mirror.SymbolicExclusiveInteraction"
+rust = "p3_lookup::builder::SymbolicExclusiveInteraction"
+
+[[mirror]]
+lean = "p3_lookup.mirror.assert_uniform_widths"
+rust = "p3_lookup::types::assert_uniform_widths"
+
+[[mirror]]
+lean = "p3_lookup.mirror.assert_uniform_tuple_width"
+rust = "p3_lookup::types::assert_uniform_tuple_width"
+
+[[mirror]]
+lean = "p3_lookup.mirror.from_interactions"
+rust = "p3_lookup::types::Lookups::from_interactions"
+
+[[mirror]]
+lean = "p3_lookup.mirror.bus_widths"
+rust = "p3_lookup::types::bus_widths"
+
+[[mirror]]
+lean = "p3_lookup.mirror.assert_bus_widths"
+rust = "p3_lookup::types::assert_bus_widths"
+
+[[mirror]]
+lean = "p3_lookup.mirror.pack_bus"
+rust = "p3_lookup::types::Lookups::pack_same_bus_with_degree"
+
+[[mirror]]
+lean = "p3_lookup.mirror.pack_same_bus_with_degree"
+rust = "p3_lookup::types::Lookups::pack_same_bus_with_degree"
+
+[[mirror]]
+lean = "p3_lookup.mirror.total_count_weight"
+rust = "p3_lookup::types::Lookups::total_count_weight"
+
+[[mirror]]
+lean = "p3_lookup.mirror.check_bus_widths"
+rust = "p3_lookup::types::check_bus_widths"
+
+[[mirror]]
+lean = "p3_lookup.mirror.check_multiplicity_height_bound"
+rust = "p3_lookup::types::check_multiplicity_height_bound"
+
+[[mirror]]
+lean = "p3_lookup.mirror.PermBuilder"
+rust = "p3_air::air::PermutationAirBuilder"
+
+[[mirror]]
+lean = "p3_lookup.mirror.zip_eq"
+rust = "itertools::Itertools::zip_eq"
+
+[[mirror]]
+lean = "p3_lookup.mirror.combine_elements"
+rust = "p3_lookup::logup::LogUpGadget::combine_elements"
+
+[[mirror]]
+lean = "p3_lookup.mirror.compute_combined_sum_terms"
+rust = "p3_lookup::logup::LogUpGadget::compute_combined_sum_terms"
+
+[[mirror]]
+lean = "p3_lookup.mirror.compute_exclusive_terms"
+rust = "p3_lookup::logup::LogUpGadget::compute_exclusive_terms"
+
+[[mirror]]
+lean = "p3_lookup.mirror.eval_fraction"
+rust = "p3_lookup::logup::LogUpGadget::eval_fraction"
+
+[[mirror]]
+lean = "p3_lookup.mirror.eval_accumulator"
+rust = "p3_lookup::logup::LogUpGadget::eval_accumulator"
+
+[[mirror]]
+lean = "p3_lookup.mirror.eval_all"
+rust = "p3_lookup::protocol::LookupProtocol::eval_all"
+
+[[mirror]]
+lean = "p3_lookup.mirror.verify_terminal_sum"
+rust = "p3_lookup::logup::LogUpGadget::verify_terminal_sum"
+
+[[mirror]]
+lean = "p3_lookup.mirror.constraint_degree_with_transition"
+rust = "p3_lookup::logup::LogUpGadget::constraint_degree_with_transition"
+
+[[mirror]]
+lean = "p3_lookup.mirror.LookupTraceBuilder"
+rust = "p3_lookup::traits::LookupTraceBuilder"
+
+[[mirror]]
+lean = "p3_lookup.mirror.dot_product"
+rust = "p3_field::helpers::dot_product"
+
+[[mirror]]
+lean = "p3_lookup.mirror.combine_tuple"
+rust = "p3_lookup::logup::combine_tuple"
+
+[[mirror]]
+lean = "p3_lookup.mirror.chunks"
+rust = "p3_maybe_rayon::serial::ParallelSliceMut::par_chunks_mut"
+
+[[mirror]]
+lean = "p3_lookup.mirror.batch_multiplicative_inverse"
+rust = "p3_field::batch_inverse::batch_multiplicative_inverse"
+
+[[mirror]]
+lean = "p3_lookup.mirror.lookup_row_terms"
+rust = "p3_lookup::logup::LogUpGadget::generate_permutation"
+
+[[mirror]]
+lean = "p3_lookup.mirror.rowContext"
+rust = "p3_lookup::logup::LogUpGadget::generate_permutation"
+
+[[mirror]]
+lean = "p3_lookup.mirror.process_chunk"
+rust = "p3_lookup::logup::LogUpGadget::generate_permutation"
+
+[[mirror]]
+lean = "p3_lookup.mirror.prefix_sum"
+rust = "p3_lookup::logup::LogUpGadget::generate_permutation"
+
+[[mirror]]
+lean = "p3_lookup.mirror.generate_permutation"
+rust = "p3_lookup::logup::LogUpGadget::generate_permutation"
+
+[[mirror]]
+lean = "p3_lookup.mirror.Challenges.new"
+rust = "p3_lookup::challenges::Challenges::new"
+
+[[mirror]]
+lean = "p3_lookup.mirror.Count.from_i32"
+rust = "p3_lookup::count::Count::from"
+
+[[mirror]]
+lean = "p3_lookup.mirror.Count.neg"
+rust = "p3_lookup::count::Count::neg"
+
+[[mirror]]
+lean = "p3_lookup.mirror.Recorded"
+rust = "p3_lookup::symbolic::InteractionSymbolicBuilder"
+
+[[mirror]]
+lean = "p3_lookup.mirror.Recorded.push_interaction"
+rust = "p3_lookup::symbolic::InteractionSymbolicBuilder::push_interaction"
+
+[[mirror]]
+lean = "p3_lookup.mirror.Recorded.push_exclusive_interaction"
+rust = "p3_lookup::symbolic::InteractionSymbolicBuilder::push_exclusive_interaction"
+
+[[mirror]]
+lean = "p3_lookup.mirror.LookupBus.lookup_key"
+rust = "p3_lookup::bus::LookupBus::lookup_key"
+
+[[mirror]]
+lean = "p3_lookup.mirror.LookupBus.table_entry"
+rust = "p3_lookup::bus::LookupBus::table_entry"
+
+[[mirror]]
+lean = "p3_lookup.mirror.LookupBus.lookup_key_exclusive"
+rust = "p3_lookup::bus::LookupBus::lookup_key_exclusive"
+
+[[mirror]]
+lean = "p3_lookup.mirror.PermutationCheckBus.send"
+rust = "p3_lookup::bus::PermutationCheckBus::send"
+
+[[mirror]]
+lean = "p3_lookup.mirror.PermutationCheckBus.receive"
+rust = "p3_lookup::bus::PermutationCheckBus::receive"
+
+[[mirror]]
+lean = "p3_lookup.mirror.MultiSet.add"
+rust = "p3_lookup::debug_util::MultiSet::add"
+
+[[mirror]]
+lean = "p3_lookup.mirror.MultiSet.assert_empty"
+rust = "p3_lookup::debug_util::MultiSet::assert_empty"
+
+[[mirror]]
+lean = "p3_lookup.mirror.LookupDebugInstance"
+rust = "p3_lookup::debug_util::LookupDebugInstance"
+
+[[mirror]]
+lean = "p3_lookup.mirror.accumulate_lookup"
+rust = "p3_lookup::debug_util::accumulate_lookup"
+
+[[mirror]]
+lean = "p3_lookup.mirror.check_lookups"
+rust = "p3_lookup::debug_util::check_lookups"
+
+[[mirror]]
+lean = "p3_lookup.mirror.TraceWindow"
+rust = "p3_lookup::indexed::TraceWindow"
+
+[[mirror]]
+lean = "p3_lookup.mirror.IndexedLookupError"
+rust = "p3_lookup::indexed::IndexedLookupError"
+
+[[mirror]]
+lean = "p3_lookup.mirror.check_columns"
+rust = "p3_lookup::indexed::IndexedLookups::check_columns"
+
+[[mirror]]
+lean = "p3_lookup.mirror.IndexedLookups.new"
+rust = "p3_lookup::indexed::IndexedLookups::new"

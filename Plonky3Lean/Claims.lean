@@ -11,6 +11,7 @@ public import Plonky3Lean.Claims.BinaryField
 public import Plonky3Lean.Claims.BinaryDft
 public import Plonky3Lean.Claims.Goldilocks
 public import Plonky3Lean.Claims.KoalaBear
+public import Plonky3Lean.Claims.Lookup
 public import Plonky3Lean.Claims.Matrix
 public import Plonky3Lean.Claims.Mersenne31
 public import Plonky3Lean.Claims.Security
