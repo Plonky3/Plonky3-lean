@@ -296,3 +296,147 @@ rust = "p3_bus::product::proof::ProductGkrProof::verify"
 [[mirror]]
 lean = "p3_bus.product.mirror.ProductGkrProof.verify"
 rust = "p3_bus::product::proof::ProductGkrProof::verify"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.log2_ceil_usize"
+rust = "p3_util::log2_ceil_usize"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.checked_next_power_of_two"
+rust = "core::num::usize::checked_next_power_of_two"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.checked_add"
+rust = "core::num::usize::checked_add"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusDomain"
+rust = "p3_bus::plan::BusDomain"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusDomain.identity_bit"
+rust = "p3_bus::plan::BusDomain::identity_bit"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusTupleSlot"
+rust = "p3_bus::plan::BusTupleSlot"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusBlockOwner"
+rust = "p3_bus::plan::BusBlockOwner"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusBlock"
+rust = "p3_bus::plan::BusBlock"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusSecurityGeometry"
+rust = "p3_bus::plan::BusSecurityGeometry"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusPlan"
+rust = "p3_bus::plan::BusPlan"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusPlan.tuple_slot"
+rust = "p3_bus::plan::BusPlan::tuple_slot"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusPlan.blocks"
+rust = "p3_bus::plan::BusPlan::blocks"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.UnsupportedBusAccess"
+rust = "p3_bus::plan::UnsupportedBusAccess"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusExpressionLocation"
+rust = "p3_bus::plan::BusExpressionLocation"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusPlanError"
+rust = "p3_bus::plan::error::BusPlanError"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.SymbolicBusInteraction"
+rust = "p3_bus::builder::SymbolicBusInteraction"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusPlanInput"
+rust = "p3_bus::plan::BusPlanInput"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.leafAccess"
+rust = "p3_bus::plan::validate_expression"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.validateWalk"
+rust = "p3_bus::plan::validate_expression"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.validate_expression"
+rust = "p3_bus::plan::validate_expression"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.validate_interaction"
+rust = "p3_bus::plan::validate_interaction"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.PendingBlock"
+rust = "p3_bus::plan::PendingBlock"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.pendingLe"
+rust = "p3_bus::plan::BusPlan::build"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.collectWidths"
+rust = "p3_bus::plan::BusPlan::build"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.layoutBlocks"
+rust = "p3_bus::plan::BusPlan::build"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusPlan.build"
+rust = "p3_bus::plan::BusPlan::build"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.BusEvaluation"
+rust = "p3_bus::evaluation::BusEvaluation"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.BusNode"
+rust = "p3_bus::evaluation::BusNode"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.BusEvaluationError"
+rust = "p3_bus::evaluation::error::BusEvaluationError"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.compile_leaf"
+rust = "p3_bus::evaluation::compile_leaf"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.compile_expression"
+rust = "p3_bus::evaluation::compile_expression"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.fingerprint_weights"
+rust = "p3_bus::argument::BusChallenges::fingerprint_weights"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.BusFactorPlan"
+rust = "p3_bus::evaluation::BusFactorPlan"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.nodeValue"
+rust = "p3_bus::evaluation::BusFactorPlan::evaluate"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.BusFactorPlan.evaluate"
+rust = "p3_bus::evaluation::BusFactorPlan::evaluate"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.BusPlan.compile_factor"
+rust = "p3_bus::evaluation::BusPlan::compile_factor"

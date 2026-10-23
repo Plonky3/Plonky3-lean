@@ -190,6 +190,7 @@ public import Plonky3Lean.Proofs.Stir.VerifierChecks
 public import Plonky3Lean.Proofs.Bus.Product
 public import Plonky3Lean.Proofs.Bus.Ram
 public import Plonky3Lean.Proofs.Bus.Verify
+public import Plonky3Lean.Proofs.Bus.Evaluation
 
 @[expose] public section
 
