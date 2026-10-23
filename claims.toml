@@ -3895,3 +3895,239 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 [[claim]]
 name   = "Plonky3Lean.Claims.ZkCodes.simulate_matches_encode"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.PeriodicColumns.new.error"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.PeriodicColumns.new.ok_iff"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.PeriodicLdeTable.get.packed"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.PeriodicLdeTable.is_empty"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.PeriodicLdeTable.packed_group_period"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.babyBear.facts"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.babyBear.selectors_on_disjoint_domain"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.build_periodic_lde_table"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.build_periodic_lde_table.nil"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.build_periodic_lde_table.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.commit_quotient"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.coset.contains"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.coset.element"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.coset.exp_power_of_2"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.coset.iter"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.coset.set_shift"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.create_disjoint_domain"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.create_disjoint_domain.disjoint"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.create_disjoint_domain.shape"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.create_disjoint_domain.some_iff"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.default_evaluate_periodic_column_at"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.delegating_defaults"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.encode_batch"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.encode_batch.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.encode_batch_borrowed"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.evaluate_periodic_column_at"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.evaluate_periodic_column_at.panics_long"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.evaluate_periodic_column_at.panics_not_pow"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.evaluate_periodic_columns_at"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.evaluate_polynomial_at"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.mmcs.commit_matrix"
+axioms = ["propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.mmcs.extension"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.mmcs.get_max_height"
+axioms = ["propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.mmcs.reference"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.natural_domain_for_degree"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.natural_domain_for_degree.panics"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.next_point"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.open_with_preprocessing"
+axioms = []
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.paddedLen"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.pcs.binding"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.selectors_at_point"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.selectors_at_point.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.selectors_on_coset"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.selectors_on_coset.at_point"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.selectors_on_coset.disjoint_domain"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.selectors_on_coset.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.split_domains"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.split_domains.partition"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.split_domains.points"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.split_domains.some_iff"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.split_evals"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.split_evals.panics"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.trivial.contract"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.trivial.contract.parallel"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.trivial.get_evaluations_on_domain.height"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.unit_evaluator"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.vanishing_poly_at_point"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.vanishing_poly_at_point.eq_zero"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.verify_with_preprocessing"
+axioms = []
