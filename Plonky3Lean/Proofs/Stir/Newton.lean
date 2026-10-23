@@ -20,21 +20,6 @@ set_option linter.unusedSectionVars false
 
 variable {K : Type _} [Field K] [DecidableEq K]
 
-/-- Updating every slot i < t once, ascending, from its own value. -/
-theorem foldl_set_self (f : ℕ → K → K) :
-    ∀ (t : ℕ) (cs : List K), t ≤ cs.length → ∀ j,
-      ((List.range t).foldl (fun cs i => cs.set i (f i (cs.getD i 0))) cs).getD j 0 =
-        if j < t then f j (cs.getD j 0) else cs.getD j 0 := by
-  intro t
-  induction t with
-  | zero => intro cs _ j; simp
-  | succ t ih =>
-    intro cs hcs j
-    rw [List.range_succ, List.foldl_append, List.foldl_cons, List.foldl_nil, getD_set_eq,
-      length_foldl_set]
-    simp only [ih cs (by omega)]
-    split_ifs <;> first | omega | (casesm* _ ∧ _; subst_vars; rfl) | rfl
-
 /-- The basis update: new[i + 1] += b[i] and new[i] -= b[i] pk, ascending, from zeros. -/
 theorem newBasis_getD (b : List K) (pk : K) (j : ℕ) :
     ((List.range b.length).foldl (fun nb i =>

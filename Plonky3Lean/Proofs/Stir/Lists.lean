@@ -44,4 +44,19 @@ theorem foldl_desc_set (g : ℕ → α → α → α) (d : α) (o : ℕ) (ho : 0
     simp only [getD_set_eq]
     split_ifs <;> first | rfl | omega | (casesm* _ ∧ _; subst_vars; rfl)
 
+/-- Updating every slot i < t once, ascending, from its own value. -/
+theorem foldl_set_self {α : Type _} [Zero α] (f : ℕ → α → α) :
+    ∀ (t : ℕ) (cs : List α), t ≤ cs.length → ∀ j,
+      ((List.range t).foldl (fun cs i => cs.set i (f i (cs.getD i 0))) cs).getD j 0 =
+        if j < t then f j (cs.getD j 0) else cs.getD j 0 := by
+  intro t
+  induction t with
+  | zero => intro cs _ j; simp
+  | succ t ih =>
+    intro cs hcs j
+    rw [List.range_succ, List.foldl_append, List.foldl_cons, List.foldl_nil, getD_set_eq,
+      length_foldl_set]
+    simp only [ih cs (by omega)]
+    split_ifs <;> first | omega | (casesm* _ ∧ _; subst_vars; rfl) | rfl
+
 end Plonky3Lean.Proofs.Stir
