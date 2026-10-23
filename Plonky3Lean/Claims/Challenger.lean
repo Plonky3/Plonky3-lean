@@ -28,7 +28,8 @@ The specification is the duplex construction of Bertoni, Daemen, Peeters and Van
 - The sample after an observation reads the permutation of a block that ends with that observation, so no stale output survives an observation.
 - The length tag separates blocks only when the characteristic exceeds the rate.
   In characteristic `q <= r`, a block collides with its extension by `q` zeros.
-- The low bits of a canonical element are biased by at most `1 / p` per value; proof of work accepts `ceil(p / 2^b)` elements, and no low bit is fixed by the modulus.
+- The low bits of a canonical element are biased by at most `1 / p` per value.
+- Proof of work accepts `ceil(p / 2^b)` elements, and no low bit is fixed by the modulus.
 - The multi-field constructor accepts a BabyBear sampler over a KoalaBear sponge, whose every sample then panics.
 -/
 
@@ -116,7 +117,9 @@ theorem duplex_challenger.DuplexChallenger.finalize.eq_spec {F P : Type} [AddMon
 
 /-! ## The hash challenger, as extracted -/
 
-/-- A flush hashes the pending inputs; the digest becomes both the only pending input and the outputs. -/
+/-- A flush hashes the pending inputs.
+
+The digest becomes both the only pending input and the outputs. -/
 theorem hash_challenger.HashChallenger.flush.eq_spec {T Hs : Type} {N : Std.Usize}
     (cl : core.clone.Clone T) (hcl : ∀ x, cl.clone x = .ok x)
     (hashInst : p3_symmetric.hasher.CryptographicHasher Hs T (Std.Array T N)) (H : List T → Std.Array T N)

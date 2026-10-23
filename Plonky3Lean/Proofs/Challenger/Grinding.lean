@@ -69,7 +69,11 @@ theorem grindState_eq_pad (r w : ℕ) (s inb : List F) (x : F) (hs : s.length = 
     congr 1
     omega
 
-/-- `GrindingChallenger::check_witness` on the list machine: difficulty 0 accepts; otherwise observe the witness, sample, and test the low bits of the canonical value. -/
+/-- `GrindingChallenger::check_witness` on the list machine.
+
+Difficulty 0 accepts.
+
+Otherwise it observes the witness, samples, and tests the low bits of the canonical value. -/
 def checkWitness (f : List F → List F) (r : ℕ) (val : F → ℕ) (st : St F) (bits : ℕ) (x : F) : Bool :=
   bits = 0 || val ((st.observe f r x).sample f r).1 % 2 ^ bits = 0
 

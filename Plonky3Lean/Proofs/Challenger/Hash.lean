@@ -11,7 +11,9 @@ The hash challenger keeps a list of pending inputs and a list of buffered output
 
 A flush hashes the pending inputs, keeps the digest as the only pending input (the chaining value), and buffers the digest as the outputs.
 
-Observing appends to the inputs and clears the outputs; sampling flushes when no output is left and pops the last one.
+Observing appends to the inputs and clears the outputs.
+
+Sampling flushes when no output is left and pops the last one.
 
 The hasher is abstract: it computes a function `H` of the items its iterator yields and never panics.
 
@@ -67,7 +69,9 @@ theorem vec_extend_from_slice_eq {T : Type} (cl : core.clone.Clone T) (hcl : ∀
 
 set_option allowUnsafeReducibility true in
 attribute [local reducible] alloc.vec.Vec rust_primitives.sequence.Seq in
-/-- A flush hashes the pending inputs; the digest becomes both the only pending input and the outputs. -/
+/-- A flush hashes the pending inputs.
+
+The digest becomes both the only pending input and the outputs. -/
 theorem flush_eq {T Hs : Type} {N : Std.Usize} (cl : core.clone.Clone T) (hcl : ∀ x, cl.clone x = .ok x)
     (hashInst : p3_symmetric.hasher.CryptographicHasher Hs T (Std.Array T N)) (H : List T → Std.Array T N)
     (c : p3_challenger.hash_challenger.HashChallenger T Hs N) (hH : HasherComputes hashInst c.hasher H) :

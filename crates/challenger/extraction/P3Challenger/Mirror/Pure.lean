@@ -23,7 +23,9 @@ namespace p3_challenger.mirror
 
 /-- `squeeze_field_order_num_limbs` (`helpers.rs:319`): count the powers of `p` whose product with `p` stays below `q`, minus one.
 
-The loop multiplies by `p > 1`, so it runs at most `log_2 q` times; 256 rounds of fuel cover any `q < 2^256`. -/
+The loop multiplies by `p > 1`, so it runs at most `log_2 q` times.
+
+256 rounds of fuel cover any `q < 2^256`. -/
 def squeezeLoop (p q : ℕ) : ℕ → ℕ → ℕ → ℕ
   | 0, _, count => count
   | fuel + 1, power, count => if power * p < q then squeezeLoop p q fuel (power * p) (count + 1) else count

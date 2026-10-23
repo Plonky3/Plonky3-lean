@@ -130,7 +130,9 @@ theorem extraBytes_budget (p bits : ℕ) (hp : p < 2 ^ bits) :
 
 /-- Base-`2^b` packing of digits below `2^b` is injective on lists of one length.
 
-The multi-field challenger packs scalars this way; when the packed value stays below the sponge field's order, no two pending runs share a rate cell. -/
+The multi-field challenger packs scalars this way.
+
+While the packed value stays below the sponge field's order, no two pending runs share a rate cell. -/
 theorem packing_injective (b : ℕ) (hb : 0 < b) (xs ys : List ℕ) (hl : xs.length = ys.length)
     (hx : ∀ x ∈ xs, x < 2 ^ b) (hy : ∀ y ∈ ys, y < 2 ^ b)
     (h : Nat.ofDigits (2 ^ b) xs = Nat.ofDigits (2 ^ b) ys) : xs = ys :=
