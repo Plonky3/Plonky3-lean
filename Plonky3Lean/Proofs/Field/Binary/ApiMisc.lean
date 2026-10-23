@@ -1,7 +1,7 @@
 module
 
 public import Plonky3Lean.Proofs.Field.Binary.TowerReference
-public import Plonky3Lean.Proofs.Field.Binary.ClmulPaths
+public import Plonky3Lean.Proofs.Field.Binary.BasisSquare
 public import Plonky3Lean.Proofs.Field.Binary.TowerApi
 
 @[expose] public section
@@ -343,5 +343,34 @@ theorem ghash128_bits_spec : ghash.Ghash128.Insts.P3_fieldFieldField.bits ⦃ r 
 theorem poly64_bits_spec : poly64.Poly64.Insts.P3_fieldFieldField.bits ⦃ r => r.val = 64 ⦄ := by
   unfold poly64.Poly64.Insts.P3_fieldFieldField.bits poly64.Poly64.BITS
   rw [WP.spec_ok]; rfl
+
+/-! ## `GF(2^32)`'s reference square -/
+
+theorem bf32_reference_square_spec (a : tower.BinaryField32) :
+    tower.BinaryField32.reference_square a ⦃ r => towerOf 5 r = towerOf 5 a ^ 2 ⦄ := by
+  unfold tower.BinaryField32.reference_square
+  step*
+  have ha : a.val < 2 ^ 2 ^ (4 + 1) := by have := a.hBounds; simpa using this
+  have h0 : a0.val = a.val % 2 ^ 2 ^ 4 := by rw [a0_post, Nat.and_two_pow_sub_one_eq_mod, Nat.mod_mod]
+  have h1 : a1.val = a.val >>> 2 ^ 4 := by
+    rw [a0_post1]; apply Nat.mod_eq_of_lt
+    rw [Nat.shiftRight_eq_div_pow]; exact Nat.div_lt_of_lt_mul (by rw [← pow_add]; simpa using ha)
+  have hb0 : a0.val < 2 ^ 2 ^ 4 := by rw [h0]; exact Nat.mod_lt _ (by positivity)
+  have hb1 : a1.val < 2 ^ 2 ^ 4 := by rw [a0_post1]; exact Nat.mod_lt _ (by positivity)
+  have hs0 : a0_sq.val < 2 ^ 2 ^ 4 := by rw [a0_sq_post]; exact towerMul_lt 4 hb0 hb0
+  have hs1 : a1_sq.val < 2 ^ 2 ^ 4 := by rw [a1_sq_post]; exact towerMul_lt 4 hb1 hb1
+  have hbf : bf.val < 2 ^ 2 ^ 4 := by rw [bf_post]; exact Nat.xor_lt_two_pow hs0 hs1
+  have hbf1 : bf1.val < 2 ^ 2 ^ 4 := by
+    rw [bf1_post]; exact towerMul_lt 4 hs1 (zNat_lt 4)
+  have hr : r.val < 2 ^ 2 ^ (4 + 1) := by have := r.hBounds; simpa using this
+  have er : r.val = bf.val ||| bf1.val <<< 2 ^ 4 := by rw [r_post, Nat.or_comm]
+  rw [towerOf, fromNat_eq_joinSucc hr, towerOf, fromNat_eq_joinSucc ha, ← h0, ← h1, er,
+    or_shiftLeft_mod hbf, or_shiftLeft_shiftRight hbf, joinSucc_sq]
+  have e1 : towerOf 4 a0_sq = towerOf 4 a0 * towerOf 4 a0 := towerOf_mul a0_sq_post
+  have e2 : towerOf 4 a1_sq = towerOf 4 a1 * towerOf 4 a1 := towerOf_mul a1_sq_post
+  have e3 : towerOf 4 bf = towerOf 4 a0_sq + towerOf 4 a1_sq := towerOf_add bf_post
+  have e4 : towerOf 4 bf1 = towerOf 4 a1_sq * Z 4 := towerOf_mul_Z (k := 4) bf1_post
+  simp only [towerOf] at e1 e2 e3 e4
+  rw [e3, e4, e1, e2, _root_.sq, _root_.sq]
 
 end Plonky3Lean.Proofs.Binary
