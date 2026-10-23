@@ -105,6 +105,13 @@ theorem prover_value_eq_quotient {s ω : F} {k : ℕ} (hω : IsPrimitiveRoot ω 
   simp only [map_div₀, map_pow]
   ring
 
+/-! ## The chunk count is p3-air's -/
+
+/-- On a two-adic domain the prover and verifier size the quotient with p3-air's sizing. -/
+theorem get_log_num_quotient_chunks_for_domain_eq (air : Air F) (layout : AirLayout) (n z : ℕ) :
+    get_log_num_quotient_chunks_for_domain air layout n z = get_log_quotient_degree air layout n z :=
+  rfl
+
 /-! ## The out-of-domain check accepts an honest proof -/
 
 variable [DecidableEq K]

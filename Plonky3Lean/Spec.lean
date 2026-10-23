@@ -20,6 +20,7 @@ public import Plonky3Lean.Spec.Sponge
 public import Plonky3Lean.Spec.ZkCodes
 public import Plonky3Lean.Spec.MerkleTree
 public import Plonky3Lean.Spec.Duplex
+public import Plonky3Lean.Spec.UniStark
 public import Plonky3Lean.Spec.Keccak
 
 @[expose] public section
