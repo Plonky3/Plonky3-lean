@@ -5,6 +5,7 @@ public import Plonky3Lean.Proofs.KeccakAir.Complete
 public import Plonky3Lean.Proofs.KeccakAir.Extracted
 public import Plonky3Lean.Proofs.KeccakAir.Binary.Complete
 public import Plonky3Lean.Proofs.KeccakAir.Binary.Degree
+public import Plonky3Lean.Proofs.KeccakAir.Binary.Extracted
 
 @[expose] public section
 
@@ -48,6 +49,7 @@ A row holds 25 one-hot flags, round r < 24 or an output row, and the 1600 state 
 - Every row is one-hot, and a round-0 row starts 24 round rows whose successor holds Keccak-f[1600] of its state.
 - This holds when the AIR states the booleanity of the state, and, without it, when the trace's state cells are bits.
 - The generator's trace satisfies the AIR, with or without the booleanity.
+- The extracted round on words computes Rnd of FIPS 202 below round 24, and panics from round 24.
 -/
 
 open Plonky3Lean.Spec.Air Plonky3Lean.Spec.Keccak Plonky3Lean.Proofs.Air
@@ -181,6 +183,24 @@ open Plonky3Lean.Proofs.KeccakAir.Binary p3_keccak_air.mirror.binary
 /-- The characteristic-2 generator's round on words computes Rnd(A, k) of FIPS 202. -/
 theorem binary.keccak_round.eq_fips (S : LState) {k : ℕ} (hk : k < 24) :
     lanesState (keccak_round S k) = rnd (lanesState S) k := keccak_round_eq S hk
+
+/-- The extracted characteristic-2 round never panics for a round below 24, and computes Rnd(A, k) of FIPS 202 on the state its 25 words hold. -/
+theorem binary.generation.keccak_round.eq_fips (state : Aeneas.Std.Array Aeneas.Std.U64 25#usize)
+    (round : Aeneas.Std.Usize) (hr : round.val < 24) :
+    ∃ out, p3_keccak_air.binary.generation.keccak_round state round = .ok out ∧
+      lanesState (fun j => (out.val[j]!).bv) = rnd (lanesState (fun j => (state.val[j]!).bv)) round.val := by
+  obtain ⟨out, h1, h2⟩ := keccak_round_extracted state round hr
+  refine ⟨out, h1, ?_⟩
+  rw [← keccak_round_eq _ hr]
+  funext x y z
+  simp only [lanesState]
+  rw [h2 _ (by omega)]
+
+/-- For a round of 24 or more, the extracted round panics. -/
+theorem binary.generation.keccak_round.panics (state : Aeneas.Std.Array Aeneas.Std.U64 25#usize)
+    (round : Aeneas.Std.Usize) (hr : 24 ≤ round.val) :
+    p3_keccak_air.binary.generation.keccak_round state round = .fail .panic :=
+  keccak_round_panics state round hr
 
 /-- In a satisfying trace of the AIR with the booleanity, every row's flags are one-hot. -/
 theorem binary.onehot (h2 : (2 : F) = 0) {cb : Bool} {T : Instance F}
