@@ -4962,6 +4962,9 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.Sumcheck.verify.completeness"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.Fri.answer_queries.siblings"
 axioms = ["Quot.sound", "propext"]
 
@@ -4991,6 +4994,10 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.Fri.fold.two_pow"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.fold_matrix.rows"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
