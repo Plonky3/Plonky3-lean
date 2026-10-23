@@ -2,7 +2,7 @@ module
 
 public import CompPoly.Fields.BabyBear
 public import P3BabyBear
-public import ToCompPoly.Fields.BabyBear.Extension
+public import CompPoly.Fields.Extension
 
 @[expose] public section
 
@@ -16,8 +16,8 @@ Two things the BabyBear claims are stated in.
   `a · 2^32 mod p`. `toField` decodes a stored value into CompPoly's
   `BabyBear.Field` (`ZMod p`), the specification every claim compares against,
   and `Canonical` is the invariant the Rust relies on, that the stored value is
-  fully reduced. `toExt` reads an array of coefficients as an element of a
-  binomial extension `F[X] / (X ^ D - w)` (CompPoly's `BabyBear.ofCoeffs`),
+  fully reduced. `toExt` reads an array of coefficients as an element of one of
+  CompPoly's binomial extensions (`CompPoly.Extension.Ext`, e.g. `BabyBear.Ext4`),
   through `toField`. These three
   definitions are the whole of the interpretation: a claim about field
   arithmetic or a field constant says something about `toField` or `toExt` of
@@ -99,17 +99,16 @@ def Canonical (x : Element) : Prop :=
 
 /-! ## What an extension-field element means -/
 
-open Polynomial in
-/-- The element of the degree-`D` binomial extension `F[X] / (X ^ D - w)` that a
-coefficient array stands for, `Σ j, c_j · X ^ j`, with each coefficient read
-through `toField`. This is how Plonky3's `BinomialExtensionField<BabyBear, D>`
-represents an element: its `[BabyBear; D]` of coefficients in the basis
-`1, X, …, X ^ (D - 1)`, with `X ^ D = W`. The degree is the array's length, so
-only a `[BabyBear; D]` is read as an element of the degree-`D` extension. The
-element itself is CompPoly's `BabyBear.ofCoeffs`; only the reading of the
-coefficients is the model's. -/
-noncomputable def toExt {D : Usize} (w : BabyBear.Field) (coeffs : Array Element D) :
-    AdjoinRoot (X ^ D.val - C w) :=
-  BabyBear.ofCoeffs D.val w (coeffs.val.map toField)
+/-- The element of CompPoly's binomial extension `F[X] / (X ^ d - W)` (given by its
+parameters `P`, e.g. `BabyBear.ext4Params` for `BabyBear.Ext4`) that a coefficient array
+stands for, `Σ j, c_j · X ^ j`, with each coefficient read through `toField`. This is how
+Plonky3's `BinomialExtensionField<BabyBear, D>` represents an element: its `[BabyBear; D]` of
+coefficients in the basis `1, X, …, X ^ (D - 1)`. Only an array whose length is the extension's
+degree is read, which the proof `h` (by default `rfl`) checks. The element itself is CompPoly's;
+only the reading of the coefficients is the model's. -/
+def toExt (P : CompPoly.Extension.BinomialParams BabyBear.Field) {D : Usize}
+    (coeffs : Array Element D) (h : D.val = P.d := by rfl) :
+    CompPoly.Extension.Ext P.toExtensionParams :=
+  CompPoly.Extension.Ext.ofVector ⟨(coeffs.val.map toField).toArray, by simp [coeffs.property, h]⟩
 
 end Plonky3Lean.Spec.BabyBear
