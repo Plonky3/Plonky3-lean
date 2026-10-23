@@ -65,6 +65,10 @@ name = "P3Dft"
 srcDir = "crates/dft/stub"
 
 [[lean_lib]]
+name = "P3BinaryDft"
+srcDir = "crates/binary-dft/stub"
+
+[[lean_lib]]
 name = "P3Field"
 srcDir = "crates/field/stub"
 

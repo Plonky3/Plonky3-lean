@@ -1,0 +1,220 @@
+# p3-binary-dft: the additive NTT over F_2-linear subspaces of the binary tower.
+
+lean_lib = "P3BinaryDft"
+
+# Nothing is extracted.
+#
+# Every transform is generic over the tower-level trait of p3-binary-field, whose p3-field supertraits aeneas rejects (docs/extractor-issues.md 9).
+#
+# The transforms also use rayon iterators, raw pointers, SIMD intrinsics and a `const` generic `bool` that picks a kernel (items 12, 14 and 61).
+#
+# Each item is transcribed over a field in stub/P3BinaryDft/, with the abstractions its file header lists.
+#
+# Not transcribed: the staged coset pass and the staging buffers (lch/schedule.rs `run_cosets`, staging.rs), the polynomial-basis transform (poly/), and the SIMD kernels.
+state = "stub"
+
+features = []
+
+watch = ["binary-dft/src", "binary-dft/Cargo.toml", "binary-field/src/tower.rs", "util/src/lib.rs", "commit/src/encoder.rs"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_binary_dft.mirror.Level.cantorBasis"
+rust = "p3_binary_field::tower::TowerLevel::cantor_basis"
+
+[[mirror]]
+lean = "p3_binary_dft.mirror.trailingZeros"
+rust = "core::num::usize::trailing_zeros"
+
+[[mirror]]
+lean = "p3_binary_dft.domain.mirror.domain_point.loop"
+rust = "p3_binary_dft::domain::domain_point"
+
+[[mirror]]
+lean = "p3_binary_dft.domain.mirror.domain_point"
+rust = "p3_binary_dft::domain::domain_point"
+
+[[mirror]]
+lean = "p3_binary_dft.domain.mirror.domain_point_steps"
+rust = "p3_binary_dft::domain::domain_point_steps"
+
+[[mirror]]
+lean = "p3_binary_dft.domain.mirror.subspace_polynomial"
+rust = "p3_binary_dft::domain::subspace_polynomial"
+
+[[mirror]]
+lean = "p3_binary_dft.naive.mirror.vanishing"
+rust = "p3_binary_dft::naive::normalised_subspace_poly"
+
+[[mirror]]
+lean = "p3_binary_dft.naive.mirror.normalised_subspace_poly"
+rust = "p3_binary_dft::naive::normalised_subspace_poly"
+
+[[mirror]]
+lean = "p3_binary_dft.naive.mirror.basisAt"
+rust = "{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_ntt_batch"
+
+[[mirror]]
+lean = "p3_binary_dft.naive.mirror.NaiveAdditiveNtt.shifted_ntt_batch"
+rust = "{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_ntt_batch"
+
+[[mirror]]
+lean = "p3_binary_dft.naive.mirror.blockLoop"
+rust = "{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_intt_batch"
+
+[[mirror]]
+lean = "p3_binary_dft.naive.mirror.NaiveAdditiveNtt.shifted_intt_batch"
+rust = "{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_intt_batch"
+
+[[mirror]]
+lean = "p3_binary_dft.butterfly.mirror.pairOp"
+rust = "p3_binary_dft::butterfly::butterfly_values"
+
+[[mirror]]
+lean = "p3_binary_dft.butterfly.mirror.butterfly_values"
+rust = "p3_binary_dft::butterfly::butterfly_values"
+
+[[mirror]]
+lean = "p3_binary_dft.butterfly.mirror.packed_butterfly"
+rust = "p3_binary_dft::butterfly::packed_butterfly"
+
+[[mirror]]
+lean = "p3_binary_dft.butterfly.mirror.plain_butterfly"
+rust = "p3_binary_dft::butterfly::plain_butterfly"
+
+[[mirror]]
+lean = "p3_binary_dft.butterfly.mirror.typed_butterfly"
+rust = "p3_binary_dft::butterfly::subfield::typed_butterfly"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.Twiddles"
+rust = "p3_binary_dft::lch::twiddles::Twiddles"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.Twiddles.new"
+rust = "p3_binary_dft::lch::twiddles::Twiddles::new"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.Twiddles.at"
+rust = "p3_binary_dft::lch::twiddles::Twiddles::at"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.Twiddles.step"
+rust = "p3_binary_dft::lch::twiddles::Twiddles::step"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.BUTTERFLY_GRAIN"
+rust = "p3_binary_dft::lch::schedule::BUTTERFLY_GRAIN"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.DEEP_TILE_BYTES"
+rust = "p3_binary_dft::lch::schedule::DEEP_TILE_BYTES"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.blockButterfly"
+rust = "p3_binary_dft::lch::schedule::stage_pass"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.walkBlocks"
+rust = "p3_binary_dft::lch::schedule::stage_pass"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.stage_pass"
+rust = "p3_binary_dft::lch::schedule::stage_pass"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.tile_stages"
+rust = "p3_binary_dft::lch::schedule::tile_stages"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.deep_tiles"
+rust = "p3_binary_dft::lch::schedule::deep_tiles"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.Schedule"
+rust = "p3_binary_dft::lch::schedule::Schedule"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.Schedule.for_workers"
+rust = "p3_binary_dft::lch::schedule::Schedule::for_workers"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.Schedule.new"
+rust = "p3_binary_dft::lch::schedule::Schedule::new"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.Cut"
+rust = "p3_binary_dft::lch::schedule::Cut"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.Cut.new"
+rust = "p3_binary_dft::lch::schedule::Cut::new"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.Cut.bounds"
+rust = "p3_binary_dft::lch::schedule::Cut::bounds"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.group_pass"
+rust = "p3_binary_dft::lch::schedule::group_pass"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.forward_below"
+rust = "p3_binary_dft::lch::schedule::forward_below"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.run"
+rust = "p3_binary_dft::lch::schedule::run"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.log2Floor"
+rust = "p3_util::log2_floor_usize"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.log2Ceil"
+rust = "p3_util::log2_ceil_usize"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.transform"
+rust = "p3_binary_dft::lch::transform"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.transform_cosets"
+rust = "p3_binary_dft::lch::transform_cosets"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.LchNtt.shifted_ntt_batch"
+rust = "{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::lch::LchNtt<F>}::shifted_ntt_batch"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.LchNtt.shifted_intt_batch"
+rust = "{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::lch::LchNtt<F>}::shifted_intt_batch"
+
+[[mirror]]
+lean = "p3_binary_dft.lch.mirror.LchNtt.ntt_batch_padded"
+rust = "{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::lch::LchNtt<F>}::ntt_batch_padded"
+
+[[mirror]]
+lean = "p3_binary_dft.traits.mirror.ntt_batch_padded"
+rust = "p3_binary_dft::traits::AdditiveNtt::ntt_batch_padded"
+
+[[mirror]]
+lean = "p3_binary_dft.traits.mirror.padded_len"
+rust = "p3_binary_dft::traits::padded_len"
+
+[[mirror]]
+lean = "p3_binary_dft.traits.mirror.ntt_batch_borrowed"
+rust = "p3_binary_dft::traits::AdditiveNtt::ntt_batch_borrowed"
+
+[[mirror]]
+lean = "p3_binary_dft.traits.mirror.shifted_lde_batch"
+rust = "p3_binary_dft::traits::AdditiveNtt::shifted_lde_batch"
+
+[[mirror]]
+lean = "p3_binary_dft.encoder.mirror.encode_batch"
+rust = "{impl p3_commit::Encoder<BinaryField128> for p3_binary_dft::encoder::AdditiveRsEncoder<BinaryField128, Ntt>}::encode_batch"
+
+[[mirror]]
+lean = "p3_binary_dft.encoder.mirror.encode_batch_padded"
+rust = "{impl p3_commit::Encoder<BinaryField128> for p3_binary_dft::encoder::AdditiveRsEncoder<BinaryField128, Ntt>}::encode_batch_padded"
