@@ -89,8 +89,9 @@ decision goes in the list, with its reason.
 lake build                          # only the warnings in known-warnings.txt
 python3 tools/check-claims.py       # every claim, exactly its allowed axioms
 python3 tools/status.py --check     # STATUS.md is current (or run it to regenerate)
-tools/extract/check-patches.sh      # patch headers, tests and mutations
-tools/extract/extract.sh --check    # if extraction, roots or patches changed
+tools/extract/check-patches.sh      # patch headers, and each pre-patch's recorded mutation file
+tools/extract/extract.sh --check    # if extraction, roots or patches changed; runs each
+                                    # pre-patch's tests and mutation (check-mutations.py)
 ```
 
 CI runs `lake build`, `check-claims.py` and `status.py --check`. The extraction
