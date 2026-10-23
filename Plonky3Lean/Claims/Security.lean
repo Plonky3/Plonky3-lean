@@ -24,10 +24,11 @@ Bugs these claims establish:
 - `ceil_log2` is not an upper bound (`fixed.ceil_log2.not_rounded_up`), and the budget built on it
   reports 100 bits for a round whose error exceeds `2^-100`
   (`budget.security_report.overstates_composition`).
-- `deep_ali_error` charges the list size `L` where the theorems charge `L²`
-  (`deep.deep_ali_error.charges_list_once`); at BabyBear-quartic parameters the proven
-  list-decoding regime reads above 94 bits while the theorem's DEEP error exceeds `2^-92`
-  (`deep.deep_ali_error.overstates`).
+- `deep_ali_error` charges the list size `L` once, as Haböck (eprint 2022/1216) Th. 8 and
+  soundcalc do, where ethSTARK Th. 5 and eprint 2024/1553 Th. 2 charge `L²`
+  (`deep.deep_ali_error.charges_list_once`). Its doc says the difference never binds; at
+  BabyBear-quartic parameters the proven list-decoding regime reads above 94 bits while the
+  `L²` bound exceeds `2^-92` (`deep.deep_ali_error.overstates`).
 - `commit_phase_error_ldr_m` and `folding_pow_bits` take the larger of two errors of one round,
   where the theorems add them (`fri.commit_phase_error_ldr_m.max_not_sum`,
   `whir.folding_pow_bits.short_of_target`).
@@ -127,16 +128,16 @@ theorem binary.field_security_bits.spec (reg : binary.BinaryPcsRegime)
 
 /-! ## The `f64` bounds over ℝ -/
 
-/-- **`deep_ali_error` charges the list size once**; ethSTARK Theorem 5 and eprint 2024/1553
-Theorem 2 charge it squared, so the Rust reads `log2 L` bits too many. -/
+/-- **`deep_ali_error` charges the list size once**, as eprint 2022/1216 Theorem 8 does;
+ethSTARK Theorem 5 and eprint 2024/1553 Theorem 2 charge it squared, `log2 L` bits more. -/
 theorem deep.deep_ali_error.charges_list_once (q L D : ℝ) (hL : 0 < L) (hD : 0 < D) :
     deepBitsR q L D = bits (deepErrPaper q L D) + Real.logb 2 L :=
   deepBitsR_eq q L D hL hD
 
-/-- **A proven level above its source.** Degree-3 AIR, `2^24` trace, blowup 8, 70 queries with 16
+/-- **The `L²` bound binds.** Degree-3 AIR, `2^24` trace, blowup 8, 70 queries with 16
 bits of query grinding, binary folding with 20 bits of commit grinding, a 124-bit field: the
-Rust's list-decoding regime at `m = 3` reads more than 94 bits, while the DEEP error of the
-theorems exceeds `2^-92`. -/
+Rust's list-decoding regime at `m = 3` reads more than 94 bits, while the `L²` DEEP error of
+ethSTARK and eprint 2024/1553 exceeds `2^-92`. -/
 theorem deep.deep_ali_error.overstates :
     94 < regimeBitsR (aliBitsR 124 (listSizeLdrR 3 3) 10)
         (deepBitsR 124 (listSizeLdrR 3 3) (deepFactorR (2 ^ 24) 3 2 2))
