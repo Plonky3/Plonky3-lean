@@ -10,5 +10,6 @@ module
 public import P3Stir.Model
 public import P3Stir.Utils
 public import P3Stir.Verifier
+public import P3Stir.Plan
 
 @[expose] public section

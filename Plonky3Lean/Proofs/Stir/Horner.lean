@@ -17,6 +17,9 @@ set_option linter.unusedSectionVars false
 
 variable {K : Type _} [Field K] [DecidableEq K]
 
+theorem getD_of_le {α : Type _} (l : List α) {i : ℕ} (d : α) (h : l.length ≤ i) : l.getD i d = d := by
+  simp [List.getD_eq_getElem?_getD, List.getElem?_eq_none h]
+
 theorem eval_coeffPoly (l : List K) (x : K) :
     (coeffPoly l).eval x = ∑ i ∈ range l.length, l.getD i 0 * x ^ i := by
   simp [coeffPoly, eval_finsetSum]
