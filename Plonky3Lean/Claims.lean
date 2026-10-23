@@ -4,6 +4,7 @@ public import Plonky3Lean.Claims.Air
 public import Plonky3Lean.Claims.BabyBear
 public import Plonky3Lean.Claims.Blake2s
 public import Plonky3Lean.Claims.Blake3
+public import Plonky3Lean.Claims.Commit
 public import Plonky3Lean.Claims.Dft
 public import Plonky3Lean.Claims.BinaryField
 public import Plonky3Lean.Claims.Goldilocks
