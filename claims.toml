@@ -4889,7 +4889,19 @@ name   = "Plonky3Lean.Claims.KeccakAir.binary.degree_gf2"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.KeccakAir.binary.generation.keccak_round.eq_fips"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KeccakAir.binary.generation.keccak_round.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.KeccakAir.binary.keccak_round.eq_fips"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KeccakAir.binary.num_constraints_gf2"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
