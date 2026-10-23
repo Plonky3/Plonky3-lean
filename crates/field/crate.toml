@@ -31,6 +31,30 @@ lean = "p3_field.field.PrimeField"
 rust = "p3_field::field::PrimeField"
 
 [[mirror]]
+lean = "p3_field.field.Algebra"
+rust = "p3_field::field::Algebra"
+
+[[mirror]]
+lean = "p3_field.integers.QuotientMap"
+rust = "p3_field::integers::QuotientMap"
+
+[[mirror]]
+lean = "p3_field.field.PrimeField64"
+rust = "p3_field::field::PrimeField64"
+
+[[mirror]]
+lean = "p3_field.field.PrimeField32"
+rust = "p3_field::field::PrimeField32"
+
+[[mirror]]
+lean = "p3_field.field.BasedVectorSpace"
+rust = "p3_field::field::BasedVectorSpace"
+
+[[mirror]]
+lean = "p3_field.field.BasedVectorSpace.Blanket"
+rust = "{impl p3_field::field::BasedVectorSpace<F> for F}"
+
+[[mirror]]
 lean = "p3_field.field.UniformSamplingField"
 rust = "p3_field::field::UniformSamplingField"
 

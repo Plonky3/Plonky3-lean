@@ -20,8 +20,9 @@ target `thumbv7em-none-eabi`
 | `blake2s` | scoped | 148 | 51 | 1 | 0 | 0 | 1 / 0 | pre `010` |
 | `blake3` | scoped | 2609 | 40 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
 | `blake3-crate` | stub |  | 26 | 0 | 3 |  | 0 / 0 |  |
+| `challenger` | scoped | 1552 | 39 | 0 | 0 | 6 | 1 / 1 | pre `010` |
 | `dft` | stub |  | 901 | 0 | 67 |  | 0 / 0 |  |
-| `field` | stub |  | 91 | 2 | 6 |  | 0 / 0 |  |
+| `field` | stub |  | 202 | 7 | 12 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
 | `koala-bear` | extracted | 3024 | 121 | 4 | 0 | 0 | 0 / 3 |  |
 | `matrix` | scoped | 1625 | 259 | 0 | 12 | 0 | 3 / 3 | pre `020`, pre `030`, post `020`, post `030` |
@@ -226,6 +227,20 @@ charon errors: 0.
 | `p3_blake3::{impl p3_symmetric::hasher::CryptographicHasher}::hash_iter` | `` |  |
 | `p3_blake3::{impl p3_symmetric::hasher::CryptographicHasher}::hash_iter::BUFLEN` | `` |  |
 
+### `challenger`
+
+charon errors: 0.
+6 item(s) dropped, 0 of them mirrored.
+
+| Item | Source | Mirrored |
+|---|---|---|
+| `p3_challenger::fs::codecs::bytes_to_field::{impl p3_challenger::fs::codecs::codec::Codec}::SECURITY_BITS` | `` |  |
+| `p3_challenger::fs::codecs::bytes_to_field::{impl p3_challenger::fs::codecs::codec::Codec}::sample` | `` |  |
+| `p3_challenger::fs::codecs::bytes_to_field::{impl p3_challenger::fs::codecs::codec::Codec}::wire_len` | `` |  |
+| `p3_challenger::fs::codecs::decode_field::EXTRA_BYTES` | `` |  |
+| `p3_challenger::fs::codecs::decode_field::decode_field_via_extra_bytes` | `` |  |
+| `p3_challenger::fs::codecs::decode_field::required_bytes` | `` |  |
+
 ### `goldilocks`
 
 charon errors: 0.
@@ -408,6 +423,11 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 | `blake2s` | `p3_blake2s.Blake2s256.hash` | its body goes through `blake2`'s incremental `Digest`, whose buffer type aeneas rejects (docs/extractor-issues.md 16) | 3 |
 | `field` | `p3_field.exponentiation.exp_1420470955` | its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here | 1 |
 | `field` | `p3_field.exponentiation.exp_1725656503` | its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here | 1 |
+| `field` | `p3_field.field.Field.unmodelledAlgebra` | no model that builds a `Field` instance projects it | 0 |
+| `field` | `p3_field.field.Field.unmodelledBits` | no model that builds a `Field` instance projects it | 0 |
+| `field` | `p3_field.field.Field.unmodelledCopy` | no model that builds a `Field` instance projects it | 0 |
+| `field` | `p3_field.field.PrimeField.unmodelledField` | no model that builds a `PrimeField` instance projects it | 0 |
+| `field` | `p3_field.field.PrimeField.unmodelledQuotientMapU64` | no model that builds a `PrimeField` instance projects it | 0 |
 | `koala-bear` | `koala_bear.KoalaBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 69 |
 | `koala-bear` | `mds.MDSKoalaBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `koala-bear` | `poseidon1.KoalaBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
@@ -576,6 +596,12 @@ counts the claims (of 972) whose dependencies include the declaration.
 | `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 2 |
 | `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 0 |
 | `field` | `p3_field.field.PrimeField` | `p3_field::field::PrimeField` | stub | 0 |
+| `field` | `p3_field.field.Algebra` | `p3_field::field::Algebra` | stub | 0 |
+| `field` | `p3_field.integers.QuotientMap` | `p3_field::integers::QuotientMap` | stub | 0 |
+| `field` | `p3_field.field.PrimeField64` | `p3_field::field::PrimeField64` | stub | 0 |
+| `field` | `p3_field.field.PrimeField32` | `p3_field::field::PrimeField32` | stub | 0 |
+| `field` | `p3_field.field.BasedVectorSpace` | `p3_field::field::BasedVectorSpace` | stub | 0 |
+| `field` | `p3_field.field.BasedVectorSpace.Blanket` | `{impl p3_field::field::BasedVectorSpace<F> for F}` | stub | 0 |
 | `field` | `p3_field.field.UniformSamplingField` | `p3_field::field::UniformSamplingField` | stub | 0 |
 | `field` | `p3_field.helpers.halve_u32` | `p3_field::helpers::halve_u32` | stub | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreOpsArithSubGoldilocksGoldilocks.sub` | `{impl core::ops::arith::Sub for p3_goldilocks::goldilocks::Goldilocks}::sub` | dropped | 1 |
@@ -694,6 +720,7 @@ counts the claims (of 972) whose dependencies include the declaration.
 | `blake2s/pre/010-reshape-hash-many` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the scalar `hash_many` calls the reshaped body, which a differential test equates with the original. |
 | `blake3/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds one free function, which calls `Blake3::hash_many`. No existing body changes. |
 | `blake3/pre/020-reshape-batch` | none in a normal build: the reshaped driver is compiled only under cfg(hax_backend_lean), as the crate's `batch` module, and under cfg(test), beside the shipped one. The extracted variant hashes on the one-lane backend, which is what the extraction target compiles. |
+| `challenger/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of the crate. No existing body changes. |
 | `matrix/pre/020-cfg-hide-row-iterators` | none in a normal build: every change is behind cfg(hax_lean_matrix), which only p3-matrix's extraction sets. In the extracted variant, the matrix trait keeps only the shape, element access and strided view. |
 | `matrix/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. |
 | `matrix/post/020-trait-default-for-impl-def` | none: the attribute only lets `impl_def` unfold the definition. |

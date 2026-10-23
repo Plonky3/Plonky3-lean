@@ -1,0 +1,18 @@
+# p3-challenger: the Fiat-Shamir challengers.
+
+lean_lib = "P3Challenger"
+
+# The crate is generic over the field, the permutation, the hasher and the inner byte challenger.
+#
+# Rooted at its methods, aeneas emits nothing (docs/extractor-issues.md, 4).
+# Every sampling method that builds its output with a closure over the challenger does not elaborate (docs/extractor-issues.md, 60).
+# The multi-field challenger needs p3-field's `BigUint` surface (docs/extractor-issues.md, 62).
+state = "scoped"
+
+features = []
+
+# One root: the `hax_roots` module that pre-patch 010 adds under cfg(hax_backend_lean).
+# Each of its functions calls one method, with every type parameter left generic.
+start_from = ["p3_challenger::hax_roots"]
+
+watch = ["challenger/src", "challenger/Cargo.toml", "field/src/field.rs", "field/src/helpers.rs"]

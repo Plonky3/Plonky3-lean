@@ -139,6 +139,10 @@ name = "P3Security"
 srcDir = "crates/security/extraction"
 
 [[lean_lib]]
+name = "P3Challenger"
+srcDir = "crates/challenger/extraction"
+
+[[lean_lib]]
 name = "P3Symmetric"
 srcDir = "crates/symmetric/extraction"
 

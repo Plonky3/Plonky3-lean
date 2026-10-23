@@ -227,3 +227,35 @@ keeps its number and says so.
     A vector of row slices, built one matrix at a time, is how a verifier would hand rows of several matrices to one hash.
 
     Pre-patch `merkle-tree/010` hands them over through a small iterator over a range of positions instead.
+
+60. **aeneas gives a closure that captures `&mut self` a back function that CoreModels cannot take.**
+
+    The closure's `call_mut` returns its output, its new state and a back function.
+
+    CoreModels' `FnMut::call_mut` returns the output and the new state, and `FnOnce::call_once` the output alone.
+
+    CoreModels' `map` and `array::from_fn` also drop the closure's final state, so the captured challenger would not advance.
+
+    p3-challenger samples through such closures: the duplex challenger's `sample`, and the provided `sample_array` and `sample_vec`.
+
+    The sampling methods of the duplex and serializing challengers are transcribed instead.
+
+    Post-patch `challenger/010` gives the provided `sample_vec`, which the run emits but no model calls, the pair shape and a loop.
+61. **aeneas garbles a method with a `const` generic `bool` that picks a trait dictionary.**
+
+    `sample_uniform_bits::<RESAMPLE>` passes one of two strategy dictionaries to a generic helper.
+
+    aeneas emits the method under the helper's name, with every trait parameter twice and `RESAMPLE` unbound.
+
+    It also leaves out the two strategy instances, and their types land in different universes, as for 20.
+
+    The uniform bit sampling of the duplex challenger is transcribed instead.
+62. **A sponge field generic over `PrimeField` pulls in p3-field's `BigUint` and `Packable` surface.**
+
+    The multi-field challenger compares `F::order()` and `PF::order()`, which are `num-bigint` values with no model.
+
+    Its packing helpers in p3-field loop over `BigUint` digits.
+
+    Once `PrimeField::PrimeSubfield` is reached, aeneas also renames the members of `Field` for the whole run, so the other roots stop elaborating against the field stub.
+
+    The multi-field challenger is transcribed instead.

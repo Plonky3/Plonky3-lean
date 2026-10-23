@@ -340,4 +340,61 @@ def core.option.OptionShared0T.copied {T : Type _} (_ : core.marker.Copy T)
     (o : core.option.Option T) : RustM (core.option.Option T) :=
   ok o
 
+/-! ## Vectors as iterator sinks and sources
+
+aeneas calls `Vec`'s `Extend` impl and the back end of a `Vec::drain`.
+
+`CoreModels` has neither. -/
+
+/-- One step of `Vec::extend`: push the next item, or stop. -/
+@[rust_loop_body]
+def alloc.vec.Vec.extend_loop.body {T I : Type}
+    (IteratorInst : core.iter.traits.iterator.Iterator I T) (v : alloc.vec.Vec T) (it : I) :
+    RustM (ControlFlow (alloc.vec.Vec T × I) (alloc.vec.Vec T)) := do
+  let (o, it') ← IteratorInst.next it
+  match o with
+  | core.option.Option.Some x =>
+    let v' ← alloc.vec.Vec.push v x
+    ok (cont (v', it'))
+  | core.option.Option.None => ok (done v)
+
+/-- `Vec::extend`'s loop: push every remaining item, in order. -/
+@[rust_loop]
+def alloc.vec.Vec.extend_loop {T I : Type}
+    (IteratorInst : core.iter.traits.iterator.Iterator I T) (v : alloc.vec.Vec T) (it : I) :
+    RustM (alloc.vec.Vec T) :=
+  loop (fun (v1, it1) => alloc.vec.Vec.extend_loop.body IteratorInst v1 it1) (v, it)
+
+/-- `impl Extend<T> for Vec<T>` (`library/alloc/src/vec/mod.rs`): push every item of the iterable, in order. -/
+def alloc.vec.Vec.Insts.CoreIterTraitsCollectExtend.extend {T I J : Type}
+    (IntoIterInst : core.iter.traits.collect.IntoIterator I T J) (self : alloc.vec.Vec T)
+    (iter : I) : RustM (alloc.vec.Vec T) := do
+  let it ← IntoIterInst.into_iter iter
+  alloc.vec.Vec.extend_loop IntoIterInst.iteratorIteratorInst self it
+
+/-- `impl<T: Copy> Extend<&T> for Vec<T>` (`library/alloc/src/vec/mod.rs`): push a copy of every item, in order. -/
+def alloc.vec.Vec.Insts.CoreIterTraitsCollectExtendSharedAT.extend {T I J : Type}
+    (_CopyInst : core.marker.Copy T) (IntoIterInst : core.iter.traits.collect.IntoIterator I T J)
+    (self : alloc.vec.Vec T) (iter : I) : RustM (alloc.vec.Vec T) :=
+  alloc.vec.Vec.Insts.CoreIterTraitsCollectExtend.extend IntoIterInst self iter
+
+/-- `DoubleEndedIterator::next_back` for `vec::Drain` (`library/alloc/src/vec/drain.rs`): remove the last drained item. -/
+def alloc.vec.drain.Drain.Insts.CoreIterTraitsDouble_endedDoubleEndedIterator.next_back
+    {T A : Type} (self : alloc.vec.drain.Drain T A) :
+    RustM (core.option.Option T × alloc.vec.drain.Drain T A) := do
+  let (s, pd) := self
+  let i ← rust_primitives.sequence.seq_len s
+  if i = 0#usize then ok (core.option.Option.None, self)
+  else
+    let j ← i - 1#usize
+    let (res, s1) ← rust_primitives.sequence.seq_remove s j
+    ok (core.option.Option.Some res, (s1, pd))
+
+@[reducible]
+def alloc.vec.drain.Drain.Insts.CoreIterTraitsDouble_endedDoubleEndedIterator (T A : Type) :
+    core.iter.traits.double_ended.DoubleEndedIterator (alloc.vec.drain.Drain T A) T := {
+  iteratorIteratorInst := alloc.vec.drain.Drain.Insts.CoreIterTraitsIteratorIterator T A
+  next_back := alloc.vec.drain.Drain.Insts.CoreIterTraitsDouble_endedDoubleEndedIterator.next_back
+}
+
 end CoreModels

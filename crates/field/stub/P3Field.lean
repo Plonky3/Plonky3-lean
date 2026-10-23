@@ -43,16 +43,127 @@ structure field.PrimeCharacteristicRing (Self : Type) where
   double : Self → RustM Self
   halve : Self → RustM Self
   div_2exp_u64 : Self → Std.U64 → RustM Self
+  ZERO : RustM Self
+  from_u8 : Std.U8 → RustM Self
+  from_u16 : Std.U16 → RustM Self
 
-/-- [p3_field::field::Field], with no members: the extraction only passes
-`Field` instances through (as the `p3_fieldfieldFieldInst` of the Poseidon
-layer-constructor traits) and never projects from one. -/
+/-- [p3_field::field::Algebra], restricted to the members the extraction uses.
+
+Upstream: `field/src/field.rs:711`. -/
+structure field.Algebra (Self F : Type) where
+  PrimeCharacteristicRingInst : field.PrimeCharacteristicRing Self
+  coreopsarithAddInst : core.ops.arith.Add Self F Self
+  coreopsarithAddAssignInst : core.ops.arith.AddAssign Self F
+  coreopsarithMulInst : core.ops.arith.Mul Self F Self
+
+/-- [p3_field::integers::QuotientMap], restricted to the member the extraction uses.
+
+Upstream: `field/src/integers.rs`. -/
+structure integers.QuotientMap (Self Int : Type) where
+  from_canonical_checked : Int → RustM (core.option.Option Self)
+
+instance {Self : Type} : Inhabited (field.Algebra Self Self) :=
+  ⟨{ PrimeCharacteristicRingInst :=
+      { coreopsarithAddInst := ⟨fun _ _ => fail .panic⟩
+        coreopsarithSubInst := ⟨fun _ _ => fail .panic⟩
+        coreopsarithAddAssignInst := ⟨fun _ _ => fail .panic⟩
+        dupDupInst := ⟨fun _ => fail .panic⟩
+        double := fun _ => fail .panic
+        halve := fun _ => fail .panic
+        div_2exp_u64 := fun _ _ => fail .panic
+        ZERO := fail .panic
+        from_u8 := fun _ => fail .panic
+        from_u16 := fun _ => fail .panic }
+     coreopsarithAddInst := ⟨fun _ _ => fail .panic⟩
+     coreopsarithAddAssignInst := ⟨fun _ _ => fail .panic⟩
+     coreopsarithMulInst := ⟨fun _ _ => fail .panic⟩ }⟩
+
+/-- The `Copy` witness of a `Field` whose model does not give one.
+
+Assumed: no model that builds a `Field` instance projects it. -/
+opaque field.Field.unmodelledCopy (Self : Type) : core.marker.Copy Self :=
+  ⟨⟨fun x => ok x, fun _ x => ok x⟩⟩
+
+/-- The `Algebra<Self>` witness of a `Field` whose model does not give one.
+
+Assumed: no model that builds a `Field` instance projects it. -/
+opaque field.Field.unmodelledAlgebra (Self : Type) : field.Algebra Self Self
+
+/-- `Field::bits` of a `Field` whose model does not give it.
+
+Assumed: no model that builds a `Field` instance projects it. -/
+opaque field.Field.unmodelledBits (Self : Type) : RustM Std.Usize := fail .panic
+
+/-- [p3_field::field::Field], restricted to the members the extraction uses.
+
+Upstream: `field/src/field.rs:1059`.
+
+A model that only passes instances through, as p3-monty-31's, builds one with `{}` and leaves every member assumed. -/
 structure field.Field (Self : Type) where
+  coremarkerCopyInst : core.marker.Copy Self := field.Field.unmodelledCopy Self
+  AlgebraInst : field.Algebra Self Self := field.Field.unmodelledAlgebra Self
+  bits : RustM Std.Usize := field.Field.unmodelledBits Self
 
-/-- [p3_field::field::PrimeField], with no members, for the same reason as
-`Field`. Needed only as the `F: PrimeField` bound of `Poseidon1::new` and
-`Poseidon2::new`. -/
+instance {Self : Type} : Inhabited (field.Field Self) := ⟨{}⟩
+
+instance {Self : Type} : Inhabited (integers.QuotientMap Self Std.U64) :=
+  ⟨⟨fun _ => fail .panic⟩⟩
+
+/-- The `Field` supertrait witness of a `PrimeField` whose model does not give one.
+
+Assumed: no model that builds a `PrimeField` instance projects it. -/
+opaque field.PrimeField.unmodelledField (Self : Type) : field.Field Self
+
+/-- The `QuotientMap<u64>` witness of a `PrimeField` whose model does not give one.
+
+Assumed: no model that builds a `PrimeField` instance projects it. -/
+opaque field.PrimeField.unmodelledQuotientMapU64 (Self : Type) : integers.QuotientMap Self Std.U64
+
+/-- [p3_field::field::PrimeField], restricted to the members the extraction uses.
+
+Upstream: `field/src/field.rs:1264`.
+
+A model that only passes instances through builds one with `{}`, as for `Field`. -/
 structure field.PrimeField (Self : Type) where
+  FieldInst : field.Field Self := field.PrimeField.unmodelledField Self
+  integersQuotientMapSelfU64Inst : integers.QuotientMap Self Std.U64 :=
+    field.PrimeField.unmodelledQuotientMapU64 Self
+
+/-- [p3_field::field::PrimeField64], restricted to the members the extraction uses.
+
+Upstream: `field/src/field.rs:1267`. -/
+structure field.PrimeField64 (Self : Type) where
+  PrimeFieldInst : field.PrimeField Self
+  ORDER_U64 : RustM Std.U64
+  as_canonical_u64 : Self → RustM Std.U64
+  to_unique_u64 : Self → RustM Std.U64
+
+/-- [p3_field::field::PrimeField32], restricted to the members the extraction uses.
+
+Upstream: `field/src/field.rs:1289`. -/
+structure field.PrimeField32 (Self : Type) where
+  PrimeField64Inst : field.PrimeField64 Self
+  ORDER_U32 : RustM Std.U32
+  as_canonical_u32 : Self → RustM Std.U32
+  to_unique_u32 : Self → RustM Std.U32
+
+/-- [p3_field::field::BasedVectorSpace], restricted to the members the extraction uses.
+
+Upstream: `field/src/field.rs:445`. -/
+structure field.BasedVectorSpace (Self F : Type) where
+  PrimeCharacteristicRingInst : field.PrimeCharacteristicRing F
+  from_basis_coefficients_fn : forall {Fn : Type}, core.ops.function.FnMut Fn Std.Usize F →
+    Fn → RustM (Self × Fn)
+
+/-- `impl<F: PrimeCharacteristicRing> BasedVectorSpace<F> for F` (`field/src/field.rs:630`).
+
+Its only basis coefficient is the element itself: the closure runs once, at index 0. -/
+@[reducible]
+def field.BasedVectorSpace.Blanket {F : Type} (inst : field.PrimeCharacteristicRing F) :
+    field.BasedVectorSpace F F := {
+  PrimeCharacteristicRingInst := inst
+  from_basis_coefficients_fn := fun FnMutInst c => FnMutInst.call_mut c 0#usize
+}
 
 /-- [p3_field::field::UniformSamplingField]. Upstream: `field/src/field.rs:613`.
 Complete: the trait has exactly these two associated constants. -/
