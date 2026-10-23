@@ -23,6 +23,8 @@ public import Plonky3Lean.Proofs.Commit.Mmcs
 public import Plonky3Lean.Proofs.Commit.Pcs
 public import Plonky3Lean.Proofs.Commit.PeriodicTable
 public import Plonky3Lean.Proofs.MultilinearUtil.Packing
+public import Plonky3Lean.Proofs.Sumcheck.GenericDegree
+public import Plonky3Lean.Proofs.Sumcheck.Prover
 public import Plonky3Lean.Proofs.Hash.Blake2s
 public import Plonky3Lean.Proofs.Hash.Blake3.Spec
 public import Plonky3Lean.Proofs.Hash.Blake3.Vectors
