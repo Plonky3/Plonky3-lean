@@ -13,5 +13,6 @@ public import P3UniStark.Extraction
 public import P3UniStark.Assumptions.Mirror.Folder
 public import P3UniStark.Assumptions.Mirror.Prover
 public import P3UniStark.Assumptions.Mirror.Verifier
+public import P3UniStark.Assumptions.Mirror.Transcript
 
 @[expose] public section
