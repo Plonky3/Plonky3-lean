@@ -181,4 +181,60 @@ theorem clmul_square_64_spec (v : Std.U64) :
   unfold clmul.square_64
   exact tower_square_64_spec v
 
+/-! ## 128 bits -/
+
+theorem joinSucc_sq (k : ℕ) (a b : ConcreteBTField k) :
+    joinSucc k a b ^ 2 = joinSucc k (a ^ 2 + b ^ 2) (b ^ 2 * Z k) := by
+  rw [_root_.sq, joinSucc_mul_joinSucc, ← _root_.sq, ← _root_.sq]
+  congr 1
+  rw [CharTwo.add_self_eq_zero, zero_add]
+
+/-- `square_128`, the table squaring of the tower's `GF(2^128)`. -/
+theorem clmul_square_128_spec (a : Std.U128) :
+    clmul.square_128 a ⦃ r => towerOf 7 r = towerOf 7 a ^ 2 ⦄ := by
+  unfold clmul.square_128
+  step*
+  apply WP.spec_bind (clmul_square_64_spec i)
+  intro low hlow
+  step*
+  apply WP.spec_bind (clmul_square_64_spec i2)
+  intro high hhigh
+  step*
+  unfold CoreModels.core.U128.Insts.CoreConvertFromU64.from
+  step*
+  have h3 : i3.val < 2 ^ 64 := u64_val_lt i3
+  have hs : scaled.val < 2 ^ 64 := u64_val_lt scaled
+  have hc3 : (UScalar.cast UScalarTy.U128 i3).val = i3.val := by
+    rw [UScalar.cast_val_eq, UScalarTy.U128_numBits_eq, Nat.mod_eq_of_lt (by omega)]
+  have hcs : (UScalar.cast UScalarTy.U128 scaled).val = scaled.val := by
+    rw [UScalar.cast_val_eq, UScalarTy.U128_numBits_eq, Nat.mod_eq_of_lt (by omega)]
+  have hi6 : i6.val = scaled.val <<< 64 := by
+    rw [i6_post, hcs, show U128.size = 2 ^ 128 by simp [U128.size, U128.numBits]]
+    apply Nat.mod_eq_of_lt
+    rw [Nat.shiftLeft_eq]
+    calc scaled.val * 2 ^ 64 < 2 ^ 64 * 2 ^ 64 := Nat.mul_lt_mul_of_pos_right hs (by positivity)
+      _ = 2 ^ 128 := by norm_num
+  have hr : (UScalar.cast UScalarTy.U128 i3 ||| i6).val = i3.val ||| scaled.val <<< 64 := by
+    rw [UScalar.val_or, hc3, hi6]
+  have hrl : i3.val ||| scaled.val <<< 64 < 2 ^ 2 ^ (6 + 1) := by
+    rw [← hr]; exact u128_val_lt _
+  have hal : a.val < 2 ^ 2 ^ (6 + 1) := u128_val_lt a
+  have hiv : i.val = a.val % 2 ^ 2 ^ 6 := by
+    rw [i_post, UScalar.cast_val_eq, UScalarTy.U64_numBits_eq]; rfl
+  have hi2v : i2.val = a.val >>> 2 ^ 6 := by
+    rw [i2_post, UScalar.cast_val_eq, UScalarTy.U64_numBits_eq, i1_post]
+    exact Nat.mod_eq_of_lt (shiftRight_64_lt_of_lt (u128_val_lt a))
+  have hbf : towerOf 6 bf = towerOf 6 high := by
+    rw [towerOf, towerOf, bf_post, Nat.mod_eq_of_lt (show high.val < 2 ^ 2 ^ 6 from u64_val_lt high)]
+  have hsc : towerOf 6 scaled = towerOf 6 high * Z 6 := by
+    have e : towerOf 6 scaled = towerOf 6 bf1 := by rw [towerOf, towerOf, scaled_post]
+    rw [e, towerOf_mul_Z (k := 6) bf1_post, hbf]
+  rw [towerOf, hr, fromNat_eq_joinSucc hrl, towerOf, fromNat_eq_joinSucc hal, ← hiv, ← hi2v]
+  simp only [show (2 : ℕ) ^ 6 = 64 from rfl]
+  rw [or_shiftLeft_mod h3, or_shiftLeft_shiftRight h3, joinSucc_sq]
+  have e3 : towerOf 6 i3 = towerOf 6 low + towerOf 6 high :=
+    towerOf_add (by rw [i3_post, UScalar.val_xor])
+  simp only [towerOf] at e3 hlow hhigh hsc
+  rw [e3, hlow, hhigh, hsc, hhigh]
+
 end Plonky3Lean.Proofs.Binary
