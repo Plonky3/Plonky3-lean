@@ -867,4 +867,291 @@ theorem poly64_dot_product_spec {N : Std.Usize} (u v : Std.Array poly64.Poly64 N
     mk_natPoly_reduce64Nat (u128_val_lt _), hp, ← mk_polyDot]
   simp [iterList_iterOfSlice, Std.Array.to_slice, natPoly_zero]
 
+/-! ## Folding `zip(…).map(pair)` -/
+
+/-- `Σ_i ψ (us i) (vs i)`. -/
+def sumList {N : Type} [AddCommMonoid N] (ψ : T → T → N) : List T → List T → N
+  | a :: us, b :: vs => ψ a b + sumList ψ us vs
+  | _, _ => 0
+
+theorem fold_mapzip_spec {B N F G : Type} [AddCommMonoid N] (φ : B → N) (ψ : T → T → N)
+    (pairInst : CoreModels.core.ops.function.FnMut F (T × T) (T × T)) (f : F)
+    (hpair : ∀ a b, pairInst.call_mut f (a, b) = .ok ((a, b), f))
+    (foldInst : CoreModels.core.ops.function.FnMut G (B × (T × T)) B) (g : G)
+    (hfold : ∀ acc a b, foldInst.call_mut g (acc, (a, b)) ⦃ p => p.2 = g ∧ φ p.1 = φ acc + ψ a b ⦄)
+    (it : MapZip T F) (acc : B) (hf : it.f = f)
+    (hlen : (iterList it.iter.it1).length = (iterList it.iter.it2).length) :
+    CoreModels.core.iter.traits.iterator.iter_fold_loop
+      (CoreModels.core.iter.adapters.map.Map.Insts.CoreIterTraitsIteratorIterator
+        (CoreModels.core.iter.adapters.zip.Zip.Insts.CoreIterTraitsIteratorIteratorPair
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT T)
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT T))
+        pairInst) foldInst it g acc ⦃ r =>
+      φ r = φ acc + sumList ψ (iterList it.iter.it1) (iterList it.iter.it2) ⦄ := by
+  unfold CoreModels.core.iter.traits.iterator.iter_fold_loop
+  refine loop.spec_decr_nat (fun s => (iterList s.1.iter.it1).length)
+    (fun s => s.1.f = f ∧ s.2.1 = g ∧
+      (iterList s.1.iter.it1).length = (iterList s.1.iter.it2).length ∧
+      φ acc + sumList ψ (iterList it.iter.it1) (iterList it.iter.it2) =
+        φ s.2.2 + sumList ψ (iterList s.1.iter.it1) (iterList s.1.iter.it2)) _ _ _ ?_
+    ⟨hf, rfl, hlen, rfl⟩
+  rintro ⟨it', g', acc'⟩ ⟨hf', hg', hl', hsum⟩
+  dsimp only at hf' hg' hl' hsum ⊢
+  subst hg'
+  unfold CoreModels.core.iter.traits.iterator.iter_fold_loop.body
+  rcases h1 : iterList it'.iter.it1 with _ | ⟨a, us⟩
+  · rw [mapZip_next_nil_pair _ it' h1]
+    simp only [Aeneas.Std.bind_ok]
+    refine (WP.spec_ok _).mpr ?_
+    show φ acc' = _
+    rw [hsum, h1]
+    exact (_root_.add_zero _).symm
+  · rcases h2 : iterList it'.iter.it2 with _ | ⟨b, vs⟩
+    · rw [h1, h2] at hl'; simp at hl'
+    · obtain ⟨it'', e, hu, hv, hf''⟩ := mapZip_next_cons_pair pairInst f hpair it' hf' h1 h2
+      rw [e]
+      simp only [Aeneas.Std.bind_ok]
+      show (do
+        let (accum1, f1) ← foldInst.call_mut g' (acc', (a, b))
+        RustM.ok (ControlFlow.cont (it'', f1, accum1))) ⦃ _ ⦄
+      apply WP.spec_bind (hfold acc' a b)
+      rintro ⟨acc'', g''⟩ ⟨hg'', hacc''⟩
+      dsimp only at hg'' hacc''
+      refine (WP.spec_ok _).mpr ⟨⟨hf'', hg'', ?_, ?_⟩, ?_⟩
+      · rw [hu, hv]; rw [h1, h2] at hl'; simpa using hl'
+      · rw [hsum, h1, h2, hu, hv, hacc'', sumList, ← _root_.add_assoc]
+      · rw [hu]; simp
+
+theorem hom_dotList {R S : Type} [CommRing R] [CommRing S] (ρ : R →+* S) (φ : T → R) :
+    ∀ us vs : List T, ρ (dotList φ us vs) = sumList (fun a b => ρ (φ a) * ρ (φ b)) us vs
+  | a :: us, b :: vs => by rw [dotList, sumList, map_add, map_mul, hom_dotList ρ φ us vs]
+  | [], _ => by simp [dotList, sumList]
+  | _ :: _, [] => by simp [dotList, sumList]
+
+/-- The carry-less `dot_product_64` on `u.iter().zip(v).map(…)` is the dot product. -/
+theorem clmul_dot_product_64_spec {F : Type}
+    (pairInst : CoreModels.core.ops.function.FnMut F (Std.U64 × Std.U64) (Std.U64 × Std.U64))
+    (f : F) (hpair : ∀ a b, pairInst.call_mut f (a, b) = .ok ((a, b), f))
+    (it : MapZip Std.U64 F) (hf : it.f = f)
+    (hlen : (iterList it.iter.it1).length = (iterList it.iter.it2).length) :
+    clmul.dot_product_64
+      (CoreModels.core.iter.adapters.map.Map.Insts.CoreIterTraitsIteratorIterator
+        (CoreModels.core.iter.adapters.zip.Zip.Insts.CoreIterTraitsIteratorIteratorPair
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U64)
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U64))
+        pairInst) it ⦃ r =>
+      towerOf 6 r = dotList (towerOf 6) (iterList it.iter.it1) (iterList it.iter.it2) ⦄ := by
+  unfold clmul.dot_product_64 core.iter.traits.iterator.Iterator.fold
+    CoreModels.core.iter.traits.iterator.Iterator.fold.default
+    CoreModels.core.iter.traits.iterator.iter_fold
+  apply WP.spec_bind (fold_mapzip_spec (fun acc : Std.U128 =>
+      AdjoinRoot.mk (modPoly 64 27) (natPoly acc.val))
+    (fun a b => N64 (towerOf 6 a) * N64 (towerOf 6 b)) pairInst f hpair _ () ?_ it 0#u128 hf hlen)
+  · intro p hp
+    rw [reduce_64_eq, Aeneas.Std.bind_ok]
+    apply WP.spec_mono (poly_to_tower_64_spec _)
+    intro r hr
+    apply N64_injective
+    rw [N64_apply, hr, val_ofNat_64 (reduce64Nat_lt _), mk_modPoly_64_iff.mpr
+      (mk_natPoly_reduce64Nat (u128_val_lt _)), hp, hom_dotList]
+    simp [natPoly_zero]
+  · intro acc a b
+    show clmul.dot_product_64.closure.Insts.CoreOpsFunctionFnMutPairU128PairU64U64U128.call_mut
+      (CoreModels.core.iter.adapters.map.Map.Insts.CoreIterTraitsIteratorIterator
+        (CoreModels.core.iter.adapters.zip.Zip.Insts.CoreIterTraitsIteratorIteratorPair
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U64)
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U64))
+        pairInst) () (acc, (a, b)) ⦃ _ ⦄
+    unfold clmul.dot_product_64.closure.Insts.CoreOpsFunctionFnMutPairU128PairU64U64U128.call_mut
+    apply WP.spec_bind (tower_to_poly_64_spec a)
+    intro pa ha
+    apply WP.spec_bind (tower_to_poly_64_spec b)
+    intro pb hb
+    rw [clmul_64x64_eq_clmulVal, Aeneas.Std.bind_ok]
+    simp only [lift_eq, Aeneas.Std.bind_ok]
+    refine (WP.spec_ok _).mpr ⟨trivial, ?_⟩
+    show AdjoinRoot.mk _ (natPoly (acc ^^^ clmulVal pa pb).val) = _
+    rw [UScalar.val_xor, natPoly_xor, map_add, natPoly_clmulVal, map_mul, ha, hb, N64_apply,
+      N64_apply]
+
+/-- The carry-less `dot_product_128` on `u.iter().zip(v).map(…)` is the dot product. -/
+theorem clmul_dot_product_128_spec {F : Type}
+    (pairInst : CoreModels.core.ops.function.FnMut F (Std.U128 × Std.U128) (Std.U128 × Std.U128))
+    (f : F) (hpair : ∀ a b, pairInst.call_mut f (a, b) = .ok ((a, b), f))
+    (it : MapZip Std.U128 F) (hf : it.f = f)
+    (hlen : (iterList it.iter.it1).length = (iterList it.iter.it2).length) :
+    clmul.dot_product_128
+      (CoreModels.core.iter.adapters.map.Map.Insts.CoreIterTraitsIteratorIterator
+        (CoreModels.core.iter.adapters.zip.Zip.Insts.CoreIterTraitsIteratorIteratorPair
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U128)
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U128))
+        pairInst) it ⦃ r =>
+      towerOf 7 r = dotList (towerOf 7) (iterList it.iter.it1) (iterList it.iter.it2) ⦄ := by
+  unfold clmul.dot_product_128 core.iter.traits.iterator.Iterator.fold
+    CoreModels.core.iter.traits.iterator.Iterator.fold.default
+    CoreModels.core.iter.traits.iterator.iter_fold
+  apply WP.spec_bind (fold_mapzip_spec (fun acc : Std.U128 × Std.U128 =>
+      AdjoinRoot.mk (modPoly 128 135) (natPoly acc.1.val + Polynomial.X ^ 128 * natPoly acc.2.val))
+    (fun a b => N128 (towerOf 7 a) * N128 (towerOf 7 b)) pairInst f hpair _ () ?_ it
+    (0#u128, 0#u128) hf hlen)
+  · rintro ⟨low, high⟩ hp
+    dsimp only at hp ⊢
+    apply WP.spec_bind (reduce_128_toQuot low high)
+    intro i hi
+    apply WP.spec_mono (poly_to_tower_128_spec i)
+    intro r hr
+    apply N128_injective
+    rw [toQuot_eq_mk, ← mk_modPoly_128_iff] at hi
+    rw [N128_apply, hr, hi, hp, hom_dotList]
+    simp [natPoly_zero]
+  · intro acc a b
+    show clmul.dot_product_128.closure.Insts.CoreOpsFunctionFnMutPairPairU128U128PairU128U128PairU128U128.call_mut
+      (CoreModels.core.iter.adapters.map.Map.Insts.CoreIterTraitsIteratorIterator
+        (CoreModels.core.iter.adapters.zip.Zip.Insts.CoreIterTraitsIteratorIteratorPair
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U128)
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U128))
+        pairInst) () (acc, (a, b)) ⦃ _ ⦄
+    unfold clmul.dot_product_128.closure.Insts.CoreOpsFunctionFnMutPairPairU128U128PairU128U128PairU128U128.call_mut
+    obtain ⟨low, high⟩ := acc
+    apply WP.spec_bind (tower_to_poly_128_spec a)
+    intro pa ha
+    apply WP.spec_bind (tower_to_poly_128_spec b)
+    intro pb hb
+    apply WP.spec_bind (clmul_128x128_spec pa pb)
+    rintro ⟨lo, hi⟩ hlh
+    dsimp only at hlh ⊢
+    simp only [lift_eq, Aeneas.Std.bind_ok]
+    refine (WP.spec_ok _).mpr ⟨trivial, ?_⟩
+    show AdjoinRoot.mk _ (natPoly (low ^^^ lo).val + Polynomial.X ^ 128 * natPoly (high ^^^ hi).val) = _
+    rw [UScalar.val_xor, UScalar.val_xor, natPoly_xor, natPoly_xor, N128_apply, N128_apply, ← ha,
+      ← hb, ← map_mul, ← map_add, ← hlh]
+    ring_nf
+
+theorem clmulVal_lt {x y : Std.U64} {a b : ℕ} (ha : 1 ≤ a) (hb : 1 ≤ b) (hx : x.val < 2 ^ a)
+    (hy : y.val < 2 ^ b) : (clmulVal x y).val < 2 ^ (a + b - 1) := by
+  apply lt_two_pow_of_degree_natPoly_lt
+  rw [natPoly_clmulVal]
+  have h1 := natDegree_natPoly_le (k := a - 1) (by rw [Nat.sub_add_cancel ha]; exact hx)
+  have h2 := natDegree_natPoly_le (k := b - 1) (by rw [Nat.sub_add_cancel hb]; exact hy)
+  have h3 := (Polynomial.natDegree_mul_le (p := natPoly x.val) (q := natPoly y.val)).trans
+    (Nat.add_le_add h1 h2)
+  exact lt_of_le_of_lt (Polynomial.degree_le_of_natDegree_le h3) (by exact_mod_cast (by omega))
+
+/-- One fold modulo `x^n + tail`. -/
+theorem mk_fold_gen {n tail p c : ℕ}
+    (hc : natPoly c = natPoly (p >>> n) * natPoly tail) :
+    AdjoinRoot.mk (modPoly n tail) (natPoly (p % 2 ^ n ^^^ c)) =
+      AdjoinRoot.mk (modPoly n tail) (natPoly p) := by
+  rw [AdjoinRoot.mk_eq_mk]
+  refine ⟨-natPoly (p >>> n), ?_⟩
+  rw [natPoly_xor, hc, natPoly_split p n, modPoly]
+  linear_combination (natPoly (p >>> n) * natPoly tail) *
+    (CharTwo.two_eq_zero : (2 : Polynomial (ZMod 2)) = 0)
+
+/-- `N` at 32 bits, as a ring homomorphism. -/
+noncomputable abbrev N32 : ConcreteBTField 5 →+* AdjoinRoot (modPoly 32 141) :=
+  @towerHom _ _ (charP_modPoly (by norm_num) (by norm_num)) xi32 5 xi32_rel
+
+theorem N32_injective : Function.Injective N32 := by
+  have := nontrivial_modPoly (n := 32) (tail := 141) (by norm_num) (by norm_num)
+  exact N32.injective
+
+theorem clmul_dot_product_32_spec {F : Type}
+    (pairInst : CoreModels.core.ops.function.FnMut F (Std.U32 × Std.U32) (Std.U32 × Std.U32))
+    (f : F) (hpair : ∀ a b, pairInst.call_mut f (a, b) = .ok ((a, b), f))
+    (it : MapZip Std.U32 F) (hf : it.f = f)
+    (hlen : (iterList it.iter.it1).length = (iterList it.iter.it2).length) :
+    clmul.dot_product_32
+      (CoreModels.core.iter.adapters.map.Map.Insts.CoreIterTraitsIteratorIterator
+        (CoreModels.core.iter.adapters.zip.Zip.Insts.CoreIterTraitsIteratorIteratorPair
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U32)
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U32))
+        pairInst) it ⦃ r =>
+      towerOf 5 r = dotList (towerOf 5) (iterList it.iter.it1) (iterList it.iter.it2) ⦄ := by
+  unfold clmul.dot_product_32 core.iter.traits.iterator.Iterator.fold
+    CoreModels.core.iter.traits.iterator.Iterator.fold.default
+    CoreModels.core.iter.traits.iterator.iter_fold
+  apply WP.spec_bind (fold_mapzip_spec (fun acc : Std.U64 =>
+      AdjoinRoot.mk (modPoly 32 141) (natPoly acc.val))
+    (fun a b => N32 (towerOf 5 a) * N32 (towerOf 5 b)) pairInst f hpair _ () ?_ it 0#u64 hf hlen)
+  · intro p hp
+    simp only [clmul_64x64_eq_clmulVal, Aeneas.Std.bind_ok]
+    step*
+    have ht : (UScalar.cast UScalarTy.U64 clmul.basis.TAIL_32).val = 141 := by
+      rw [UScalar.cast_val_eq, TAIL_32_val]; rfl
+    have hp64 := u64_val_lt p
+    have hi : i.val < 2 ^ 32 := by
+      rw [i_post, Nat.shiftRight_eq_div_pow]; exact Nat.div_lt_of_lt_mul (by omega)
+    have hcf := clmulVal_lt (x := i) (y := i1) (a := 32) (b := 8) (by norm_num) (by norm_num) hi
+      (by rw [i1_post, ht]; norm_num)
+    have hf : fold.val = (clmulVal i i1).val := by
+      rw [fold_post, UScalar.cast_val_eq, UScalarTy.U64_numBits_eq]
+      exact Nat.mod_eq_of_lt (lt_of_lt_of_le hcf (by norm_num))
+    have hi3 : i3.val < 2 ^ 7 := by
+      rw [i3_post, Nat.shiftRight_eq_div_pow, hf]; exact Nat.div_lt_of_lt_mul (by omega)
+    have hcs := clmulVal_lt (x := i3) (y := i4) (a := 7) (b := 8) (by norm_num) (by norm_num) hi3
+      (by rw [i4_post, ht]; norm_num)
+    have hs : spill.val = (clmulVal i3 i4).val := by
+      rw [spill_post, UScalar.cast_val_eq, UScalarTy.U32_numBits_eq]
+      exact Nat.mod_eq_of_lt (lt_of_lt_of_le hcs (by norm_num))
+    have h9 : i9.val = p.val % 2 ^ 32 ^^^ (fold.val % 2 ^ 32 ^^^ spill.val) := by
+      rw [i9_post, UScalar.val_xor, i8_post, UScalar.val_xor, i6_post, i7_post, UScalar.cast_val_eq,
+        UScalar.cast_val_eq, UScalarTy.U32_numBits_eq, Nat.xor_assoc]
+    have e1 : AdjoinRoot.mk (modPoly 32 141) (natPoly (fold.val % 2 ^ 32 ^^^ spill.val)) =
+        AdjoinRoot.mk (modPoly 32 141) (natPoly fold.val) :=
+      mk_fold_gen (by rw [hs, natPoly_clmulVal, i3_post, i4_post, ht])
+    have e2 : AdjoinRoot.mk (modPoly 32 141) (natPoly (p.val % 2 ^ 32 ^^^ fold.val)) =
+        AdjoinRoot.mk (modPoly 32 141) (natPoly p.val) :=
+      mk_fold_gen (by rw [hf, natPoly_clmulVal, i_post, i1_post, ht])
+    have e9 : AdjoinRoot.mk (modPoly 32 141) (natPoly i9.val) =
+        AdjoinRoot.mk (modPoly 32 141) (natPoly p.val) := by
+      rw [h9, natPoly_xor, map_add, e1, ← map_add, ← natPoly_xor, e2]
+    apply WP.spec_mono (poly_to_tower_32_spec i9)
+    intro r hr
+    apply N32_injective
+    show towerMap xi32 5 (towerOf 5 r) = _
+    rw [hr, e9, hp, hom_dotList]
+    simp [natPoly_zero]
+  · intro acc a b
+    show clmul.dot_product_32.closure.Insts.CoreOpsFunctionFnMutPairU64PairU32U32U64.call_mut
+      (CoreModels.core.iter.adapters.map.Map.Insts.CoreIterTraitsIteratorIterator
+        (CoreModels.core.iter.adapters.zip.Zip.Insts.CoreIterTraitsIteratorIteratorPair
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U32)
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U32))
+        pairInst) () (acc, (a, b)) ⦃ _ ⦄
+    unfold clmul.dot_product_32.closure.Insts.CoreOpsFunctionFnMutPairU64PairU32U32U64.call_mut
+    show (do
+      let i ← clmul.basis.tower_to_poly_32 a
+      let i1 ← lift (UScalar.cast UScalarTy.U64 i)
+      let i2 ← clmul.basis.tower_to_poly_32 b
+      let i3 ← lift (UScalar.cast UScalarTy.U64 i2)
+      let i4 ← clmul.portable.clmul_64x64 i1 i3
+      let i5 ← lift (UScalar.cast UScalarTy.U64 i4)
+      let i6 ← lift (acc ^^^ i5)
+      RustM.ok (i6, ())) ⦃ _ ⦄
+    apply WP.spec_bind (tower_to_poly_32_spec a)
+    intro pa ha
+    simp only [lift_eq, Aeneas.Std.bind_ok]
+    apply WP.spec_bind (tower_to_poly_32_spec b)
+    intro pb hb
+    simp only [Aeneas.Std.bind_ok, clmul_64x64_eq_clmulVal]
+    refine (WP.spec_ok _).mpr ⟨trivial, ?_⟩
+    have hca : (UScalar.cast UScalarTy.U64 pa).val = pa.val := by
+      rw [UScalar.cast_val_eq, UScalarTy.U64_numBits_eq]
+      exact Nat.mod_eq_of_lt (lt_of_lt_of_le (u32_val_lt pa) (by norm_num))
+    have hcb : (UScalar.cast UScalarTy.U64 pb).val = pb.val := by
+      rw [UScalar.cast_val_eq, UScalarTy.U64_numBits_eq]
+      exact Nat.mod_eq_of_lt (lt_of_lt_of_le (u32_val_lt pb) (by norm_num))
+    have hlt := clmulVal_lt (x := UScalar.cast UScalarTy.U64 pa) (y := UScalar.cast UScalarTy.U64 pb)
+      (a := 32) (b := 32) (by norm_num) (by norm_num) (by rw [hca]; exact u32_val_lt pa)
+      (by rw [hcb]; exact u32_val_lt pb)
+    have hc : (UScalar.cast UScalarTy.U64 (clmulVal (UScalar.cast UScalarTy.U64 pa)
+        (UScalar.cast UScalarTy.U64 pb))).val = (clmulVal (UScalar.cast UScalarTy.U64 pa)
+        (UScalar.cast UScalarTy.U64 pb)).val := by
+      rw [UScalar.cast_val_eq, UScalarTy.U64_numBits_eq]
+      exact Nat.mod_eq_of_lt (lt_of_lt_of_le hlt (by norm_num))
+    show AdjoinRoot.mk _ (natPoly (acc ^^^ _).val) = _
+    rw [UScalar.val_xor, natPoly_xor, map_add, hc, natPoly_clmulVal, map_mul, hca, hcb, ha, hb]
+    rfl
+
 end Plonky3Lean.Proofs.Binary
