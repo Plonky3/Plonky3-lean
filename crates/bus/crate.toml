@@ -500,3 +500,7 @@ rust = "p3_bus::security::BusPlan::security_model"
 [[mirror]]
 lean = "p3_bus.security.mirror.components"
 rust = "p3_security::bus::BusSecurityModel::components"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.layoutStep"
+rust = "p3_bus::plan::BusPlan::build"

@@ -230,4 +230,89 @@ theorem bus_soundness {K : Type _} [Field K] [Fintype K] [DecidableEq K] {p : Bu
     exact Prod.ext h1 h2
   exact perm_of_map_perm hinj (by simpa using h)
 
+/-! ## The block layout -/
+
+theorem pendingLe_trans (a b c : PendingBlock) (h1 : pendingLe a b = true)
+    (h2 : pendingLe b c = true) : pendingLe a c = true := by
+  simp only [pendingLe, Bool.or_eq_true, Bool.and_eq_true, decide_eq_true_eq] at *
+  omega
+
+theorem pendingLe_total (a b : PendingBlock) : (pendingLe a b || pendingLe b a) = true := by
+  simp only [pendingLe, Bool.or_eq_true, Bool.and_eq_true, decide_eq_true_eq]
+  omega
+
+/-- The leaves the blocks of one side already occupy. -/
+def sideSum (done : List PendingBlock) (d : ℕ) : ℕ :=
+  ((done.filter fun x => x.direction.index = d).map fun x => 2 ^ x.log_height).sum
+
+theorem dvd_sideSum {done : List PendingBlock} {d h : ℕ}
+    (hge : ∀ y ∈ done, y.direction.index = d → h ≤ y.log_height) : 2 ^ h ∣ sideSum done d := by
+  unfold sideSum
+  refine List.dvd_sum fun z hz => ?_
+  obtain ⟨y, hy, rfl⟩ := List.mem_map.1 hz
+  obtain ⟨hy, hd⟩ := List.mem_filter.1 hy
+  exact Nat.pow_dvd_pow 2 (hge y hy (by simpa using hd))
+
+theorem sideSum_snoc (done : List PendingBlock) (x : PendingBlock) (d : ℕ) :
+    sideSum (done ++ [x]) d = sideSum done d + if x.direction.index = d then 2 ^ x.log_height else 0 := by
+  unfold sideSum; split_ifs with h <;> simp [List.filter_append, h]
+
+/-- The loop keeps every block aligned, given the earlier blocks of a side are no shorter. -/
+theorem layout_aligned : ∀ (l done : List PendingBlock) (acc : List BusBlock × List BusBlock × ℕ × ℕ)
+    (out : List BusBlock × List BusBlock × ℕ × ℕ),
+    (done ++ l).Pairwise (fun a b => pendingLe a b = true) →
+    acc.2.2.1 = sideSum done 0 → acc.2.2.2 = sideSum done 1 →
+    (∀ blk ∈ acc.1 ++ acc.2.1, 2 ^ blk.log_height ∣ blk.offset) →
+    l.foldlM layoutStep acc = .ok out → ∀ blk ∈ out.1 ++ out.2.1, 2 ^ blk.log_height ∣ blk.offset
+  | [], done, acc, out, _, _, _, ha, h => by
+    simp only [List.foldlM_nil, pure, Except.pure, Except.ok.injEq] at h; subst h; exact ha
+  | x :: l, done, acc, out, hs, h0, h1, ha, h => by
+    rw [List.foldlM_cons] at h
+    obtain ⟨acc', hstep, h⟩ := except_bind_ok h
+    have hge : ∀ y ∈ done, y.direction.index = x.direction.index → x.log_height ≤ y.log_height :=
+      fun y hy hd => by
+        have := (List.pairwise_append.1 hs).2.2 y hy x (List.mem_cons_self ..)
+        simp only [pendingLe, Bool.or_eq_true, Bool.and_eq_true, decide_eq_true_eq] at this
+        omega
+    unfold layoutStep at hstep
+    have hdvd := dvd_sideSum hge
+    have hcons : ∀ (o : ℕ), 2 ^ x.log_height ∣ o → ∀ (L : List BusBlock) (d : BusDirection),
+        (∀ blk ∈ L, 2 ^ blk.log_height ∣ blk.offset) →
+        ∀ blk ∈ L ++ [⟨x.bus, d, x.owner, x.log_height, o⟩], 2 ^ blk.log_height ∣ blk.offset :=
+      fun o ho L d hL blk hb => by
+        rcases List.mem_append.1 hb with hb | hb
+        · exact hL blk hb
+        · rw [List.mem_singleton.1 hb]; exact ho
+    cases hd : x.direction <;>
+      simp only [hd, BusDirection.index, ↓reduceIte, Nat.one_ne_zero, checked_add] at hstep hdvd
+    · split_ifs at hstep with hn
+      · simp only [pure, Except.pure, Except.ok.injEq] at hstep
+        subst hstep
+        refine layout_aligned l (done ++ [x]) _ out (by simpa using hs) ?_ ?_ ?_ h
+        · simp [sideSum_snoc, hd, BusDirection.index, h0]
+        · simp [sideSum_snoc, hd, BusDirection.index, h1]
+        · intro blk hblk
+          rcases List.mem_append.1 hblk with hb | hb
+          · exact hcons _ (h0 ▸ hdvd) _ _ (fun b hb' => ha b (List.mem_append_left _ hb')) blk hb
+          · exact ha blk (List.mem_append_right _ hb)
+    · split_ifs at hstep with hn
+      · simp only [pure, Except.pure, Except.ok.injEq] at hstep
+        subst hstep
+        refine layout_aligned l (done ++ [x]) _ out (by simpa using hs) ?_ ?_ ?_ h
+        · simp [sideSum_snoc, hd, BusDirection.index, h0]
+        · simp [sideSum_snoc, hd, BusDirection.index, h1]
+        · intro blk hblk
+          rcases List.mem_append.1 hblk with hb | hb
+          · exact ha blk (List.mem_append_left _ hb)
+          · exact hcons _ (h1 ▸ hdvd) _ _ (fun b hb' => ha b (List.mem_append_right _ hb')) blk hb
+
+/-- **Every block is aligned.** After sorting by side and decreasing height, each block starts at a multiple of its own height, so the debug assertion of the planner never fails. -/
+theorem layoutBlocks_aligned (pending : List PendingBlock)
+    {out : List BusBlock × List BusBlock × ℕ × ℕ}
+    (h : layoutBlocks (pending.mergeSort pendingLe) = .ok out) :
+    ∀ blk ∈ out.1 ++ out.2.1, 2 ^ blk.log_height ∣ blk.offset := by
+  have hs := List.pairwise_mergeSort pendingLe_trans pendingLe_total pending
+  exact layout_aligned _ [] _ out (by simpa using hs) (by simp [sideSum]) (by simp [sideSum])
+    (by simp) h
+
 end Plonky3Lean.Proofs.Bus

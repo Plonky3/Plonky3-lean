@@ -64,6 +64,12 @@ theorem planner_layout {inputs : List (BusPlanInput F)} {p : BusPlan}
     (h : BusPlan.build inputs = .ok (some p)) : LayoutWF p :=
   build_wf h
 
+/-- **Every block is aligned.** Sorted by side and decreasing height, each block starts at a multiple of its height, so the planner's debug assertion never fails. -/
+theorem blocks_aligned (pending : List PendingBlock) {out : List BusBlock × List BusBlock × ℕ × ℕ}
+    (h : layoutBlocks (pending.mergeSort pendingLe) = .ok out) :
+    ∀ blk ∈ out.1 ++ out.2.1, 2 ^ blk.log_height ∣ blk.offset :=
+  layoutBlocks_aligned pending h
+
 /-- **The layout is injective.** On such a plan, a padded tuple determines its bus and its payload. -/
 theorem layout_injective {p : BusPlan} (hp : LayoutWF p) {b b' : ℕ} (hb : b < p.domains.length)
     (hb' : b' < p.domains.length) {x y : List K} (hx : x.length = p.domains[b].payload_width)

@@ -216,17 +216,21 @@ def collectWidths {F : Type _} (inputs : List (BusPlanInput F)) :
         pure widths
       | none => pure (widths ++ [(interaction.bus_name, interaction.fields.length)])) widths) []
 
-/-- The block layout loop: each block starts where its side's leaves end so far. -/
+/-- One step of the block layout loop: the block starts where its side's leaves end so far. -/
+def layoutStep (acc : List BusBlock × List BusBlock × ℕ × ℕ) (block : PendingBlock) :
+    Except BusPlanError (List BusBlock × List BusBlock × ℕ × ℕ) := do
+  let len := 2 ^ block.log_height
+  let offset := if block.direction.index = 0 then acc.2.2.1 else acc.2.2.2
+  let some next := checked_add offset len | throw (.LeafCountOverflow block.direction)
+  let b : BusBlock := ⟨block.bus, block.direction, block.owner, block.log_height, offset⟩
+  match block.direction with
+  | .Push => pure (acc.1 ++ [b], acc.2.1, next, acc.2.2.2)
+  | .Pull => pure (acc.1, acc.2.1 ++ [b], acc.2.2.1, next)
+
+/-- The block layout loop. -/
 def layoutBlocks (pending : List PendingBlock) :
     Except BusPlanError (List BusBlock × List BusBlock × ℕ × ℕ) :=
-  pending.foldlM (fun (acc : List BusBlock × List BusBlock × ℕ × ℕ) block => do
-    let len := 2 ^ block.log_height
-    let offset := if block.direction.index = 0 then acc.2.2.1 else acc.2.2.2
-    let some next := checked_add offset len | throw (.LeafCountOverflow block.direction)
-    let b : BusBlock := ⟨block.bus, block.direction, block.owner, block.log_height, offset⟩
-    match block.direction with
-    | .Push => pure (acc.1 ++ [b], acc.2.1, next, acc.2.2.2)
-    | .Pull => pure (acc.1, acc.2.1 ++ [b], acc.2.2.1, next)) ([], [], 0, 0)
+  pending.foldlM layoutStep ([], [], 0, 0)
 
 /-- BusPlan::build: the widths, the domains in name order, the tuple dimensions, the sorted blocks and their offsets, then the product shape. -/
 def BusPlan.build {F : Type _} (inputs : List (BusPlanInput F)) :
