@@ -11,9 +11,9 @@ Plonky3 commit pinned in `plonky3/`, under the assumptions in
 [`TRUST.md`](TRUST.md). So far only the portable scalar code paths are modelled.
 "Plonky3 is formally verified" is not a claim this repository makes.
 
-[`PROGRESS.md`](PROGRESS.md) says how far each crate is from done: its shipped
-paths extracted rather than transcribed, and every public function on them
-claimed against a CompPoly specification.
+A crate is done when the code paths it ships are extracted rather than
+transcribed, and every public function on them is claimed against a CompPoly
+specification.
 
 ## Layout
 
@@ -106,8 +106,6 @@ checks need the pinned toolchain and are run locally.
   comment rather than rewriting the description.
 - A PR stacked on another targets `main`, says "stacked on #N", and is rebased as
   soon as its base merges.
-- A PR that changes what is extracted or claimed updates `PROGRESS.md`, and the
-  crate's own `PROGRESS.md` if it has one, in the same PR.
 - [`.github/CODEOWNERS`](.github/CODEOWNERS) assigns `Plonky3Lean/Claims/`,
   `Plonky3Lean/Spec/`, `ToCompPoly/`, `claims.toml`, the pre-patches, `TRUST.md`
   and `toolchain.toml` to the Plonky3 maintainers. A change there needs their review.
