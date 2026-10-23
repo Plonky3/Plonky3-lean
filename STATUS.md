@@ -31,6 +31,7 @@ target `thumbv7em-none-eabi`
 | `security` | scoped | 1414 | 130 | 6 | 13 | 0 | 2 / 1 | pre `010`, pre `020` |
 | `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
 | `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
+| `symmetric` | scoped | 1008 | 38 | 0 | 0 | 5 | 4 / 2 | pre `010`, pre `020`, pre `030`, pre `040` |
 | `util` | scoped | 207 | 70 | 0 | 1 | 0 | 0 / 0 |  |
 
 Generated lines are `extraction/<Lib>/Extraction/{Types,Funs}.lean`. Hand-written
@@ -360,6 +361,19 @@ charon errors: 0.
 |---|---|---|
 | `p3_sha256::{impl core::clone::Clone}::clone` | `` |  |
 
+### `symmetric`
+
+charon errors: 0.
+5 item(s) dropped, 0 of them mirrored.
+
+| Item | Source | Mirrored |
+|---|---|---|
+| `p3_symmetric::compression::PseudoCompressionFunction::LANES` | `` |  |
+| `p3_symmetric::compression::{impl core::clone::Clone}::clone` | `` |  |
+| `p3_symmetric::compression::{impl p3_symmetric::compression::PseudoCompressionFunction}::LANES` | `` |  |
+| `p3_symmetric::hasher::CryptographicHasher::hash_many` | `` |  |
+| `p3_symmetric::sponge::{impl core::clone::Clone}::clone` | `` |  |
+
 ### `util`
 
 charon errors: 0.
@@ -370,7 +384,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 808) whose dependencies include it; reaching one is not using it.
+(of 824) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -403,7 +417,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 808) whose dependencies include the declaration.
+counts the claims (of 824) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -521,6 +535,10 @@ counts the claims (of 808) whose dependencies include the declaration.
 | `security/pre/010-budget-folding-round` | None in a normal build, where the new function is compiled but unused. In the extracted variant, the report computes its folding term with it. Its body is the original match, verbatim. |
 | `security/pre/020-budget-binding-index` | None in a normal build, where the two new functions are compiled but unused. In the extracted variant, the binding term is read at the first minimum. That minimum is taken over the seven bit counts. |
 | `sha256/pre/010-reshape-compress` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `Sha256Compress::compress` calls the reshaped body, which a differential test equates with the original. |
+| `symmetric/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of the crate. No existing body changes. |
+| `symmetric/pre/020-reshape-padding-free-sponge` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `PaddingFreeSponge::hash_iter` calls the reshaped body, which a differential test equates with the original. |
+| `symmetric/pre/030-reshape-pad10-sponge` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `Pad10Sponge::hash_iter` calls the reshaped body, which a differential test equates with the original. |
+| `symmetric/pre/040-reshape-compress-from-hasher` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `CompressionFunctionFromHasher::compress` hands the hasher a vector of the same items, which a differential test equates with the original. |
 
 Upstream tests (`test-pre-patches.py`): 6715 of Plonky3's 6769 pass as shipped and 6715 with the pre-extraction patches, with 0 divergence(s).
 
@@ -1330,6 +1348,22 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Sha256.digest.abc` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Sha256.digest.empty` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Sha256.digest.two_blocks` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.compression.CompressionFunctionFromHasher.compress.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.compression.TruncatedPermutation.compress.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.compression.TruncatedPermutation.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.hash.Hash.from_into` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.hash.MerkleCap.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.pad10Blocks.injective` | `Quot.sound`, `propext` |
+| `P3Symmetric.paddingFree.extend` | `Quot.sound`, `propext` |
+| `P3Symmetric.paddingFree.nil` | `Quot.sound`, `propext` |
+| `P3Symmetric.paddingFree.trailing_zeros` | `Quot.sound`, `propext` |
+| `P3Symmetric.sponge.Increment.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.sponge.Increment.permute.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.sponge.Pad10Sponge.hash_iter.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.sponge.Pad10Sponge.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.sponge.PaddingFreeSponge.hash_iter.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.sponge.PaddingFreeSponge.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.truncated.collision_of_inverse` | `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.cong` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.inverse` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |

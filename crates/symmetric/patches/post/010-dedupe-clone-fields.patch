@@ -1,0 +1,48 @@
+# Patch:        010-dedupe-clone-fields
+# Phase:        post
+# Target:       extraction/P3Symmetric/Extraction/Funs.lean, extraction/P3Symmetric/Extraction/Types.lean
+# Hunks:        3
+# Class:        rename
+# Gap:          docs/extractor-issues.md 24: aeneas names the `Clone` witness
+#               of `Self` and the `Clone` witness of a type parameter
+#               alike, so a trait structure declares one field twice.
+# Cost:         none. Renames only; the bodies are untouched.
+# Upstreamable: yes: aeneas could suffix the witness with its parameter.
+# Drop when:    aeneas names the two witnesses apart.
+#
+# `Permutation<T: Clone>: Clone` and `CryptographicHasher<Item: Clone, Out>: Clone` need both witnesses.
+# Lean rejects the second field of the same name.
+# The second one, the witness for the type parameter, becomes `corecloneCloneInst1`.
+# The one call that reads it, in the default of `permute_mut`, follows.
+#
+--- a/extraction/P3Symmetric/Extraction/Funs.lean
++++ b/extraction/P3Symmetric/Extraction/Funs.lean
+@@ -817,7 +817,7 @@
+   T) (self : Self) (input : T) :
+   RustM T
+   := do
+-  let t ← PermutationInst.corecloneCloneInst.clone input
++  let t ← PermutationInst.corecloneCloneInst1.clone input -- PATCHED: was `corecloneCloneInst`
+   PermutationInst.permute self t
+ 
+ end p3_symmetric
+--- a/extraction/P3Symmetric/Extraction/Types.lean
++++ b/extraction/P3Symmetric/Extraction/Types.lean
+@@ -37,7 +37,7 @@
+     Visibility: public -/
+ structure permutation.Permutation (Self : Type _) (T : Type _) where
+   corecloneCloneInst : core.clone.Clone Self
+-  corecloneCloneInst : core.clone.Clone T
++  corecloneCloneInst1 : core.clone.Clone T -- PATCHED: was a second `corecloneCloneInst`
+   permute : Self → T → RustM T
+   permute_mut : Self → T → RustM T
+ 
+@@ -63,7 +63,7 @@
+   Type _) where
+   LANES : RustM Std.Usize
+   corecloneCloneInst : core.clone.Clone Self
+-  corecloneCloneInst : core.clone.Clone Item
++  corecloneCloneInst1 : core.clone.Clone Item -- PATCHED: was a second `corecloneCloneInst`
+   hash_iter : forall {I : Type} {Clause0_IntoIter : Type}
+     (coreitertraitscollectIntoIteratorInst :
+     core.iter.traits.collect.IntoIterator I Item Clause0_IntoIter), Self → I

@@ -1,0 +1,177 @@
+# Patch:        030-reshape-pad10-sponge
+# Phase:        pre
+# Target:       symmetric/src/hax_reshaped.rs, symmetric/src/sponge.rs
+# Hunks:        4
+# Class:        equiv-rewrite
+# Gap:          docs/extractor-issues.md 23 (aeneas rejects a return or a
+#               continue that leaves a nested loop).
+# Cost:         none in a normal build: only the selection is behind
+#               cfg(hax_backend_lean). In the extracted variant,
+#               `Pad10Sponge::hash_iter` calls the reshaped body, which a
+#               differential test equates with the original.
+# Upstreamable: no: the original is the clearer code; aeneas support for
+#               leaving a nested loop makes the patch unnecessary.
+# Drop when:    aeneas translates a `return` out of a nested loop.
+# Test:         test p3-symmetric --lib hax_reshaped
+# Mutation:     the reshaped body overwrites the first capacity element with
+#               d(0) instead of applying the derangement to it, so it disagrees
+#               on every non-empty multiple of the rate.
+#
+# The original returns from inside its block loop, and peeks to learn whether a full block is the last one.
+# The reshaped body runs one loop over the input.
+# It delays the permutation of a full block until the next element arrives, which is what the peek decides.
+# It pads and permutes at the same points as the original.
+#
+diff --git a/symmetric/src/hax_reshaped.rs b/symmetric/src/hax_reshaped.rs
+index b99c47b..541003a 100644
+--- a/symmetric/src/hax_reshaped.rs
++++ b/symmetric/src/hax_reshaped.rs
+@@ -5,7 +5,7 @@
+ //!
+ //! Each body here runs one loop over the input and performs the same permutation calls, in the same order, as the original.
+ 
+-use crate::permutation::CryptographicPermutation;
++use crate::permutation::{CryptographicPermutation, Derangement};
+ 
+ /// What the padding-free sponge returns on `input`.
+ #[cfg_attr(not(hax_backend_lean), allow(dead_code))]
+@@ -45,13 +45,74 @@ where
+     state[..OUT].try_into().unwrap()
+ }
+ 
++/// What the 10-padded sponge returns on `input`.
++#[cfg_attr(not(hax_backend_lean), allow(dead_code))]
++pub(crate) fn pad10_hash<T, P, D, I, const WIDTH: usize, const RATE: usize, const OUT: usize>(
++    permutation: &P,
++    padding_derangement: &D,
++    input: I,
++) -> [T; OUT]
++where
++    T: Default + Copy,
++    P: CryptographicPermutation<[T; WIDTH]>,
++    D: Derangement<T>,
++    I: IntoIterator<Item = T>,
++{
++    // Start from the all-zero state.
++    let mut state = [T::default(); WIDTH];
++    let mut input = input.into_iter();
++
++    // Rate position the next element overwrites.
++    let mut i = 0;
++
++    // Whether a full block sits in the rate, not yet permuted.
++    //
++    // Its permutation waits for the next element.
++    // With no next element, that block takes the capacity padding instead.
++    let mut full = false;
++    while let Some(x) = input.next() {
++        if full {
++            permutation.permute_mut(&mut state);
++            full = false;
++        }
++        state[i] = x;
++        i += 1;
++        if i == RATE {
++            i = 0;
++            full = true;
++        }
++    }
++
++    if full {
++        // The input ended on a block boundary: apply the derangement to the first capacity element.
++        state[RATE] = padding_derangement.permute(state[RATE]);
++    } else {
++        // A partial block, or the empty input: the sentinel d(0) at position i, then zeros.
++        //
++        //     [a]    RATE = 3  ->  [a, d(0), 0 | cap...]
++        state[i] = padding_derangement.permute(T::default());
++        let mut j = i + 1;
++        while j < RATE {
++            state[j] = T::default();
++            j += 1;
++        }
++    }
++
++    // Permute the padded state and squeeze.
++    permutation.permute_mut(&mut state);
++    state[..OUT].try_into().unwrap()
++}
++
+ #[cfg(test)]
+ mod tests {
+     use alloc::vec::Vec;
+ 
+     use proptest::prelude::*;
+ 
+-    use crate::{CryptographicHasher, CryptographicPermutation, PaddingFreeSponge, Permutation};
++    use crate::{
++        CryptographicHasher, CryptographicPermutation, Increment, Pad10Sponge, PaddingFreeSponge,
++        Permutation,
++    };
+ 
+     /// A position-sensitive, non-linear mixing of the whole state.
+     ///
+@@ -108,4 +169,38 @@ mod tests {
+             check::<12, 8, 4>(&input);
+         }
+     }
++
++    fn check_pad10<const WIDTH: usize, const RATE: usize, const OUT: usize>(input: &[u64]) {
++        // An increment of 5 rather than 1, so the sentinel is not mistaken for a count.
++        let sponge =
++            Pad10Sponge::<u64, Mix, Increment<u64>, WIDTH, RATE, OUT>::new(Mix, Increment::new(5));
++        let original: [u64; OUT] = sponge.hash_iter(input.iter().copied());
++        let reshaped: [u64; OUT] = super::pad10_hash::<u64, Mix, _, _, WIDTH, RATE, OUT>(
++            &Mix,
++            &Increment::new(5),
++            input.iter().copied(),
++        );
++        assert_eq!(original, reshaped, "length {}", input.len());
++    }
++
++    #[test]
++    fn pad10_matches_at_every_length_around_the_rate() {
++        // Same fixture as the padding-free test: every length from 0 to 3 * RATE + 1.
++        let input: Vec<u64> = (1..=40).collect();
++        for len in 0..=13 {
++            check_pad10::<4, 3, 2>(&input[..len]);
++            check_pad10::<4, 1, 1>(&input[..len]);
++            check_pad10::<8, 4, 4>(&input[..len]);
++            check_pad10::<16, 8, 8>(&input[..len]);
++        }
++    }
++
++    proptest! {
++        #[test]
++        fn pad10_matches(input in prop::collection::vec(any::<u64>(), 0..40)) {
++            check_pad10::<4, 3, 2>(&input);
++            check_pad10::<8, 4, 4>(&input);
++            check_pad10::<12, 8, 4>(&input);
++        }
++    }
+ }
+diff --git a/symmetric/src/sponge.rs b/symmetric/src/sponge.rs
+index e6dbf7a..6ec02c7 100644
+--- a/symmetric/src/sponge.rs
++++ b/symmetric/src/sponge.rs
+@@ -363,6 +363,20 @@ where
+     P: CryptographicPermutation<[T; WIDTH]>,
+     D: Derangement<T>,
+ {
++    // PATCHED: the extracted variant takes the same body, reshaped for the extractor.
++    #[cfg(hax_backend_lean)]
++    fn hash_iter<I>(&self, input: I) -> [T; OUT]
++    where
++        I: IntoIterator<Item = T>,
++    {
++        crate::hax_reshaped::pad10_hash::<T, P, D, I, WIDTH, RATE, OUT>(
++            &self.permutation,
++            &self.padding_derangement,
++            input,
++        )
++    }
++
++    #[cfg(not(hax_backend_lean))] // PATCHED
+     fn hash_iter<I>(&self, input: I) -> [T; OUT]
+     where
+         I: IntoIterator<Item = T>,

@@ -167,3 +167,41 @@ keeps its number and says so.
     No proof can then say what they return.
 
     `HaxExt.lean` models word subtraction clamped at 0 again, exposed, and post-patch `matrix/030` calls that model.
+
+23. **aeneas rejects a `return` or a `continue` that leaves a nested loop.**
+
+    The errors are "Returns inside of nested loops are not supported yet" and "Continue to outer loops are not supported yet".
+
+    p3-symmetric's two sponges absorb a block in an inner loop.
+
+    The padding-free sponge leaves both loops with `break 'outer` when the input runs dry.
+
+    The 10-padded sponge returns from inside the inner loop.
+
+    Pre-patches `symmetric/020` and `030` give each one a body with a single loop over the input.
+
+24. **aeneas names two `Clone` witnesses of a trait alike.**
+
+    A trait such as `Permutation<T: Clone>: Clone` needs a `Clone` witness for `Self` and one for `T`.
+
+    aeneas calls both `corecloneCloneInst`, and Lean rejects the structure.
+
+    Post-patch `symmetric/010` renames the witness for the type parameter.
+
+25. **CoreModels' `flatten` needs iterator items.**
+
+    Rust's `Iterator::flatten` takes items that are `IntoIterator`, such as arrays.
+
+    The model of `flatten` asks for an `Iterator` witness of the item type.
+
+    aeneas passes the `IntoIterator` witness of an array, and the call does not elaborate.
+
+    Pre-patch `symmetric/040` gives `CompressionFunctionFromHasher::compress` a body that collects the same items into a vector.
+
+26. **aeneas passes `Vec`'s allocator to a CoreModels witness that has none.**
+
+    The `IntoIterator` witness of `Vec<T>` is generated as applied to `T` and `alloc.alloc.Global`.
+
+    CoreModels declares it over `T` only, so the call does not elaborate.
+
+    Post-patch `symmetric/020` drops the allocator.

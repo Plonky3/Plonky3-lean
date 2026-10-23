@@ -1,0 +1,19 @@
+# p3-symmetric: sponges, compression functions and the hasher traits, over any permutation.
+
+lean_lib = "P3Symmetric"
+
+# The crate is generic over the permutation, the field and the hasher.
+#
+# Rooted at its methods, aeneas emits nothing (docs/extractor-issues.md, 4).
+# The serializing hasher and the cross-field sponges need p3-field's trait
+# dictionaries, which aeneas rejects (docs/extractor-issues.md, 9 and 10).
+state = "scoped"
+
+features = []
+
+# One root: the `hax_roots` module that pre-patch 010 adds under
+# cfg(hax_backend_lean). Each of its functions calls one method, with the
+# permutation, the derangement and the inner hasher left generic.
+start_from = ["p3_symmetric::hax_roots"]
+
+watch = ["symmetric/src", "symmetric/Cargo.toml"]
