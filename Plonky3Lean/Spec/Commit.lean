@@ -153,30 +153,38 @@ The index drops log_2 H - log_2 h low bits, rounding the logarithms up. -/
 def rowIndex (maxHeight height index : ℕ) : ℕ :=
   index / 2 ^ (Nat.clog 2 maxHeight - Nat.clog 2 height)
 
-/-- A mixed matrix commitment scheme over values in T. -/
+/-- A mixed matrix commitment scheme over values in T.
+
+Verify takes the commitment, each matrix's (width, height), the index, the opened rows and the proof. -/
 structure Mmcs (T : Type _) where
   Commitment : Type
   ProverData : Type
   Proof : Type
-  commit : List (Mat T) → Commitment × ProverData
-  open_batch : ℕ → ProverData → List (List T) × Proof
+  commit : List (Mat T) → Option (Commitment × ProverData)
+  open_batch : ℕ → ProverData → Option (List (List T) × Proof)
   get_matrices : ProverData → List (Mat T)
   verify_batch : Commitment → List (ℕ × ℕ) → ℕ → List (List T) → Proof → Option Bool
+
+/-- The tallest height of a batch. -/
+def maxHeight {T : Type _} (ms : List (Mat T)) : ℕ := (ms.map Mat.height).foldr max 0
+
+/-- The rows an opening at a global index returns: each matrix's row at its own index. -/
+def openedRows {T : Type _} (ms : List (Mat T)) (index : ℕ) : List (List T) :=
+  ms.map fun m => (List.finRange m.width).map (m.entry (rowIndex (maxHeight ms) m.height index))
 
 /-- The contract of a mixed matrix commitment scheme.
 
 * The prover data holds the committed matrices.
-* Completeness: opening an index below the tallest height gives each matrix's row at its own index, and verifies against its (width, height) dimensions.
-* Binding: two accepted openings of one index under one commitment agree, unless Broken. -/
+* Completeness: opening an index below the tallest height gives each matrix's row at its own index, and verifies against the matrices' dimensions.
+* Binding: two accepted openings of one index under one commitment agree, unless Broken.
+* Widths: an accepted row has its matrix's width. -/
 structure Mmcs.Contract {T : Type _} (mmcs : Mmcs T) where
   Broken : mmcs.Commitment → Prop
-  get_matrices : ∀ ms, mmcs.get_matrices (mmcs.commit ms).2 = ms
-  completeness : ∀ (ms : List (Mat T)) (index : ℕ), ms ≠ [] →
-      index < (ms.map Mat.height).foldr max 0 →
-      (mmcs.open_batch index (mmcs.commit ms).2).1 = ms.map (fun m =>
-        (List.finRange m.width).map (m.entry (rowIndex ((ms.map Mat.height).foldr max 0) m.height index))) ∧
-      mmcs.verify_batch (mmcs.commit ms).1 (ms.map fun m => (m.width, m.height)) index
-        (mmcs.open_batch index (mmcs.commit ms).2).1 (mmcs.open_batch index (mmcs.commit ms).2).2 =
+  get_matrices : ∀ ms cd, mmcs.commit ms = some cd → mmcs.get_matrices cd.2 = ms
+  completeness : ∀ (ms : List (Mat T)) cd (index : ℕ), mmcs.commit ms = some cd → ms ≠ [] →
+      index < maxHeight ms →
+      ∃ pf, mmcs.open_batch index cd.2 = some (openedRows ms index, pf) ∧
+        mmcs.verify_batch cd.1 (ms.map fun m => (m.width, m.height)) index (openedRows ms index) pf =
           some true
   binding : ∀ cm dims index rows₁ rows₂ pf₁ pf₂,
       mmcs.verify_batch cm dims index rows₁ pf₁ = some true →
