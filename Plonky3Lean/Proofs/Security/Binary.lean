@@ -6,12 +6,24 @@ import all Aeneas.Std.Scalar.SaturatingOps
 @[expose] public section
 
 /-!
-# `p3_security::binary`: the binary PCS schedule
+# p3-security's binary PCS schedule
 
-`BinaryPcsRegime::new` accepts exactly the schedules `Valid` describes. On those,
-`field_error_numerator` is the sum, over the `n` binary folds, of the fold's proximity error
-`N + 1` and its quadratic-sumcheck error `2`, at word lengths `N = 2^(r+1), …, 2^(r+n)`, and
-`field_security_bits` is `K - ⌈log2 numerator⌉`; none of them panics.
+# Overview
+
+A schedule has `n` binary folds, a log inverse rate `r` and a `K`-bit challenge field.
+
+Fold `j` works on words of length `N = 2^(r + j)`, for `j = 1, ..., n`.
+
+It costs two errors:
+
+- the proximity error, `N + 1`;
+- the quadratic-sumcheck error, `2`.
+
+The field-error numerator is their sum over the folds.
+
+The field security bits are `K - ceil(log_2 numerator)`.
+
+On an accepted schedule, none of these functions panics.
 -/
 
 open Aeneas Aeneas.Std CoreModels p3_security
@@ -19,7 +31,7 @@ open Plonky3Lean.Lib
 
 namespace Plonky3Lean.Proofs.Security.Binary
 
-/-- The schedules `BinaryPcsRegime::new` accepts. -/
+/-- The schedules the constructor accepts. -/
 def Valid (K n r f q : ℕ) : Prop :=
   8 ≤ K ∧ K ≤ 128 ∧ K.isPowerOfTwo ∧ n ≠ 0 ∧ r ≠ 0 ∧ n + r < 64 ∧ f ≠ 0 ∧ f ≤ n ∧ q ≠ 0
 
@@ -36,8 +48,9 @@ theorem numeratorSpec_closed (n r : ℕ) :
     have h2 : 2 ^ (r + n + 1) = 2 * 2 ^ (n + r) := by rw [← pow_succ']; congr 1; omega
     rw [this, h2]; omega
 
-/-- `field_error_numerator` never panics when `n + r < 64`, and is the sum of the fold and
-sumcheck errors. -/
+/-- The field-error numerator never panics when `n + r < 64`.
+
+It is the sum of the fold and sumcheck errors. -/
 @[step]
 theorem field_error_numerator_spec (reg : binary.BinaryPcsRegime)
     (h : reg.num_variables.val + reg.log_inv_rate.val < 64) :
@@ -60,7 +73,7 @@ theorem field_error_numerator_spec (reg : binary.BinaryPcsRegime)
     exact Nat.mod_eq_of_lt (by simp; omega)
   step*
 
-/-- `u128::leading_zeros` of a nonzero value is `127 - log2 x`. -/
+/-- The leading zeros of a nonzero 128-bit `x` number `127 - log_2 x`. -/
 @[step]
 theorem leading_zeros128_spec (x : Std.U128) (hx : x.val ≠ 0) :
     CoreModels.core.num.U128.leading_zeros x ⦃ i => i.val = 127 - Nat.log2 x.val ⦄ := by
@@ -93,8 +106,9 @@ theorem numeratorSpec_ge (n r : ℕ) (hn : n ≠ 0) (hr : r ≠ 0) : 7 ≤ numer
       _ ≤ 2 ^ r := Nat.pow_le_pow_right (by norm_num) (by omega)
   omega
 
-/-- The schedule's field error `numerator / 2^K` is at most `2^-bits`, where
-`bits = field_security_bits`, unless `bits = 0`. -/
+/-- The field security bits never panic on an accepted schedule.
+
+The field error `numerator / 2^K` is then at most `2^-bits`, unless `bits = 0`. -/
 theorem field_security_bits_spec (reg : binary.BinaryPcsRegime)
     (h : reg.num_variables.val + reg.log_inv_rate.val < 64) (hr : reg.log_inv_rate.val ≠ 0)
     (hn : reg.num_variables.val ≠ 0) :

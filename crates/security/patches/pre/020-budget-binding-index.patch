@@ -3,26 +3,29 @@
 # Target:       security/src/budget/report.rs
 # Hunks:        2
 # Class:        equiv-rewrite
-# Gap:          docs/extractor-issues.md 18: aeneas rejects a loop that
-#               reassigns a borrow-carrying value, and one that runs while such
-#               a value is borrowed.
-# Cost:         none in a normal build: `binding_index` and `first_minimum` are
-#               compiled but unused there. In the extracted variant,
-#               `binding_term` returns the term at the position of the first
-#               minimum of the seven bit counts.
+# Gap:          docs/extractor-issues.md 18.
+#               aeneas rejects a loop that reassigns a borrow-carrying value.
+#               It also rejects a loop that runs while such a value is borrowed.
+# Cost:         None in a normal build, where the two new functions are compiled but unused.
+#               In the extracted variant, the binding term is read at the first minimum.
+#               That minimum is taken over the seven bit counts.
 # Upstreamable: no: the term-copying loop is the natural Rust.
 # Drop when:    aeneas supports loops over borrow-carrying values.
 # Test:         test p3-security --lib pre_patch_020
-# Mutation:     `first_minimum` keeps the last minimum on a tie, so it disagrees
-#               with `binding_term` and the differential test fails.
+# Mutation:     The first-minimum loop keeps the last minimum on a tie.
+#               It then disagrees with the binding term, and the differential test fails.
 #
-# `binding_term` keeps a running `SecurityTerm` (which holds a `&'static str`)
-# and reassigns it in a loop; aeneas cannot translate that loop.
-# `first_minimum` runs the same loop over the seven `u64` bit counts, and
-# `binding_index` feeds it, both compiled in every build. Under
-# cfg(hax_backend_lean) `binding_term` returns `self.terms[self.binding_index()]`.
-# Ties resolve to the earliest round in both. The differential test compares
-# the two on 20000 reports, half of them with values in 0..4 to force ties.
+# The binding term is found by a loop that keeps a running term and reassigns it.
+# A term holds a `&'static str`, so aeneas cannot translate that loop.
+#
+# A new function runs the same loop over the seven `u64` bit counts.
+# A second new function feeds it those counts.
+# Both are compiled in every build.
+# Under cfg(hax_backend_lean), the binding term is the term at the returned index.
+#
+# Both selections resolve a tie to the earliest round.
+# The differential test compares the two on 20000 reports.
+# Half of the reports use values in 0..4, to force ties.
 #
 --- a/security/src/budget/report.rs
 +++ b/security/src/budget/report.rs
@@ -54,9 +57,9 @@
 -        binding
 +    }
 +
-+    // PATCHED: the index of the binding round, compiled in every build. aeneas
-+    // rejects reassigning a borrow-carrying term inside the loop; under
-+    // cfg(hax_backend_lean) `binding_term` reads the term at this index.
++    // PATCHED: the index of the binding round, compiled in every build.
++    // aeneas rejects reassigning a borrow-carrying term inside the loop.
++    // Under cfg(hax_backend_lean), the binding term is read at this index.
 +    #[allow(dead_code)]
 +    const fn binding_index(&self) -> usize {
 +        let t = &self.terms;
@@ -69,8 +72,8 @@
      }
  }
 +
-+// PATCHED: the position of the first minimum, compiled in every build; the loop of
-+// `binding_term` over plain bit counts, for `binding_index`.
++// PATCHED: the position of the first minimum, compiled in every build.
++// It is the binding-term loop, run over plain bit counts.
 +#[allow(dead_code)]
 +const fn first_minimum(bits: [u64; NUM_TERMS]) -> usize {
 +    let mut binding = 0;
@@ -84,8 +87,8 @@
 +    binding
 +}
 +
-+// PATCHED: the differential test of the index-based selection against the
-+// term-copying one, in the normal build.
++// PATCHED: a differential test of the index-based selection, in the normal build.
++// It checks that the index picks the same term as the term-copying loop.
 +#[cfg(test)]
 +mod pre_patch_020 {
 +    use super::*;

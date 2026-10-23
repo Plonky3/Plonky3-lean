@@ -112,16 +112,28 @@ keeps its number and says so.
     back into it. Pre-patch `blake3/020` gives the extracted variant a copy of
     the driver whose loops take the slice as an argument and whose tree calls
     the generic functions directly, on the one-lane backend.
-18. **aeneas rejects borrow-carrying values joined across `match` arms or
-    reassigned in a loop** ("Found a case of unsupported nested borrows",
-    "Unreachable"), as for 17. p3-security's budget `SecurityTerm` holds a
-    `&'static str` label: `security_report` builds one term in a `match`, and
-    `SecurityReport::binding_term` keeps a running term in a loop. Pre-patches
-    `security/010` and `security/020` move the `match` into its own function
-    and run the loop over the plain `u64` bit counts.
-19. **aeneas has no floating-point arithmetic** ("Invalid inputs for binop" on
-    an `f64` operation). Every `f64` function of p3-security
-    (`proximity::compute_upper_m`, `ErrorBits`, the FRI, DEEP, LogUp and WHIR
-    bounds) comes out without a body, so none is rooted. Their real-number
-    readings are transcribed in `Plonky3Lean/Proofs/Security/`, and the
-    rounding of `f64` itself is checked by Rust tests, not modelled.
+18. **aeneas rejects a borrow-carrying value joined across `match` arms or reassigned in a loop.**
+
+    The errors are "Found a case of unsupported nested borrows" and "Unreachable", as for 17.
+
+    p3-security's budget `SecurityTerm` holds a `&'static str` label.
+
+    `security_report` builds one term in a `match`.
+
+    `SecurityReport::binding_term` keeps a running term in a loop.
+
+    Pre-patch `security/010` moves the `match` into its own function.
+
+    Pre-patch `security/020` runs the loop over the plain `u64` bit counts.
+
+19. **aeneas has no floating-point arithmetic.**
+
+    An `f64` operation fails with "Invalid inputs for binop".
+
+    Every `f64` function of p3-security comes out without a body, so none is rooted.
+
+    These are `proximity::compute_upper_m`, `ErrorBits`, and the FRI, DEEP, LogUp and WHIR bounds.
+
+    Their readings over the reals are transcribed in `Plonky3Lean/Proofs/Security/`.
+
+    The rounding of `f64` itself is checked by Rust tests, not modelled.

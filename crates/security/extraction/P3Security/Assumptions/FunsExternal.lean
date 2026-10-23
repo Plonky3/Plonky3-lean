@@ -1,19 +1,19 @@
 -- [p3_security]: external functions.
 -- HAND-WRITTEN, from hax's seed of Extraction/FunsExternal_Template.lean.
--- The generated code imports it by this module name. extract.sh fails if the
--- regenerated template declares different names than this file does.
+-- The generated code imports it by this module name.
+-- extract.sh fails if the regenerated template declares other names than this file.
 --
--- EDITED: aeneas's template gives `fmt` a `&mut Formatter` back-function in
--- its result, but `CoreModels`' `core.fmt.Debug.fmt` returns only the updated
--- `Formatter`. The signatures below are adjusted to CoreModels' shape.
--- `axiom` -> `opaque`: these are the bodies of derived `Debug` impls, which
--- extract.sh makes opaque on purpose.
+-- EDITED: aeneas's template returns a `&mut Formatter` back-function from `fmt`.
+-- CoreModels' `core.fmt.Debug.fmt` returns only the updated `Formatter`.
+-- The signatures below follow CoreModels' shape.
+-- `axiom` -> `opaque`: these are the bodies of derived `Debug` impls.
+-- extract.sh makes those opaque on purpose.
 module
 
 public import Aeneas
 public import CoreModels
 public import P3Security.Extraction.Types
--- `core` models missing from hax-lean's CoreModels (`HaxExt.lean`).
+-- The `core` models that hax-lean's CoreModels lacks live in `HaxExt.lean`.
 public import HaxExt
 
 @[expose] public section

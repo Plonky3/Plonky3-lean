@@ -8,11 +8,17 @@ import all Aeneas.Std.Scalar.SaturatingOps
 @[expose] public section
 
 /-!
-# `p3_security::fixed`: the extracted fixed-point logarithm
+# p3-security's fixed-point logarithms, as extracted
 
-`floor_log2` computes `FixedLog.flog`, so it never exceeds `2^16 · log2 x`
-(`FixedLog.flog_le`), and panics exactly at `x = 0`. `ceil_log2` is exact on powers of two and
-`floor_log2 x + 1` elsewhere, which falls below `2^16 · log2 x` at `x = 14917`.
+# Overview
+
+The extracted floor logarithm equals the model on the naturals.
+
+So it never exceeds `2^16 * log_2 x`, and it panics exactly at `x = 0`.
+
+The ceiling logarithm is exact on a power of two, and the floor plus one unit elsewhere.
+
+That falls below `2^16 * log_2 x` at `x = 14917`.
 -/
 
 open Aeneas Aeneas.Std CoreModels p3_security
@@ -37,7 +43,9 @@ theorem or_two_pow_of_mul (q k : ℕ) : q * 2 ^ (k + 1) ||| 2 ^ k = q * 2 ^ (k +
     · simp [Nat.testBit_succ]; congr 1; omega
   · simp [hik]; omega
 
-/-- One iteration of the extracted loop body is `FixedLog.step`, and the loop stops after bit 15. -/
+/-- One pass of the extracted loop body is one step of the model.
+
+The loop stops after bit 15. -/
 theorem body_spec (x : ℕ) (r : Std.U64) (m : Std.U128) (b : Std.U32) (hb : b.val ≤ 16)
     (hinv : Inv x b.val (r.val, m.val, b.val)) :
     fixed.floor_log2_loop.body r m b ⦃ c => match c with
@@ -95,7 +103,7 @@ theorem log2_lt_64 (x : Std.U64) : Nat.log2 x.val < 64 := by
   · simp [h]
   · rw [Nat.log2_lt (by omega)]; exact x.hBounds
 
-/-- The loop runs the remaining iterations of `FixedLog.iter` and returns `flog x`. -/
+/-- The loop runs the remaining iterations of the model and returns its result. -/
 theorem loop_spec (x : Std.U64) (hx : 0 < x.val) (r : Std.U64) (m : Std.U128) (b : Std.U32)
     (hb : b.val ≤ 16) (h : (r.val, m.val, b.val) = iter x.val b.val) :
     fixed.floor_log2_loop r m b ⦃ y => y.val = flog x.val ⦄ := by
@@ -119,7 +127,7 @@ theorem loop_spec (x : Std.U64) (hx : 0 < x.val) (r : Std.U64) (m : Std.U128) (b
       rw [flog, ← h16, ← hs]
   · exact ⟨hb, h⟩
 
-/-- `u64::leading_zeros` of a nonzero value is `63 - log2 x`. -/
+/-- The leading zeros of a nonzero 64-bit `x` number `63 - log_2 x`. -/
 @[step]
 theorem leading_zeros_spec (x : Std.U64) (hx : x.val ≠ 0) :
     CoreModels.core.num.U64.leading_zeros x ⦃ i => i.val = 63 - Nat.log2 x.val ⦄ := by
@@ -132,7 +140,7 @@ theorem leading_zeros_spec (x : Std.U64) (hx : x.val ≠ 0) :
   rw [BitVec.toNat_ofNat, UScalar.bv_toNat, Nat.log2_eq_log_two]
   omega
 
-/-- `floor_log2 x` is `flog x` for every nonzero `x`. -/
+/-- The extracted floor logarithm equals the model, for every nonzero `x`. -/
 @[step]
 theorem floor_log2_spec (x : Std.U64) (hx : x.val ≠ 0) :
     fixed.floor_log2 x ⦃ y => y.val = flog x.val ⦄ := by
@@ -184,11 +192,11 @@ theorem floor_log2_spec (x : Std.U64) (hx : x.val ≠ 0) :
     calc _ < 2 ^ 33 := h33
       _ ≤ _ := Nat.pow_le_pow_right (by norm_num) (by simp)
 
-/-- `floor_log2 0` panics. -/
+/-- The floor logarithm of zero panics. -/
 theorem floor_log2_zero : fixed.floor_log2 0#u64 = .fail .panic := by
   simp [fixed.floor_log2, massert]
 
-/-- `u64::is_power_of_two`: the test `x ≠ 0 ∧ x &&& (x - 1) = 0`. -/
+/-- The power-of-two test is `x != 0` and `x &&& (x - 1) = 0`. -/
 @[step]
 theorem is_power_of_two_spec (x : Std.U64) :
     CoreModels.core.num.U64.is_power_of_two x ⦃ b =>
@@ -202,7 +210,7 @@ theorem is_power_of_two_spec (x : Std.U64) :
     simp only [this, ↓reduceIte]
     step*
 
-/-- `u64::trailing_zeros` of `2^k` is `k`. -/
+/-- The trailing zeros of `2^k` number `k`. -/
 @[step]
 theorem trailing_zeros_pow (x : Std.U64) (k : ℕ) (hk : k < 64) (hx : x.val = 2 ^ k) :
     CoreModels.core.num.U64.trailing_zeros x ⦃ i => i.val = k ⦄ := by
@@ -215,14 +223,14 @@ theorem trailing_zeros_pow (x : Std.U64) (k : ℕ) (hk : k < 64) (hx : x.val = 2
   show (BitVec.ofNat 32 k).toNat = k
   rw [BitVec.toNat_ofNat]; omega
 
-/-- `from_bits b = b · 2^16`. -/
+/-- Converting whole bits `b` to fixed point gives `b * 2^16`. -/
 @[step]
 theorem from_bits_spec (b : Std.U32) : fixed.from_bits b ⦃ y => y.val = b.val * 2 ^ 16 ⦄ := by
   unfold fixed.from_bits
   simp only [fixed.FRACTIONAL_BITS]
   step*
 
-/-- `flog x < 64 · 2^16` for a `u64`. -/
+/-- The floor logarithm of a nonzero 64-bit `x` is below `64 * 2^16`. -/
 theorem flog_lt (x : Std.U64) (hx : x.val ≠ 0) : flog x.val < 64 * 2 ^ 16 := by
   have h := flog_le x.val (by omega)
   have hx' : x.val ^ 2 ^ 16 < (2 ^ 64) ^ 2 ^ 16 :=
@@ -230,8 +238,9 @@ theorem flog_lt (x : Std.U64) (hx : x.val ≠ 0) : flog x.val < 64 * 2 ^ 16 := b
   rw [← pow_mul] at hx'
   exact (Nat.pow_lt_pow_iff_right (by norm_num)).mp (lt_of_le_of_lt h hx')
 
-/-- `ceil_log2 x` is `clog x` for every nonzero `x`: exact on a power of two, `floor_log2 x + 1`
-elsewhere. -/
+/-- The extracted ceiling logarithm equals the model, for every nonzero `x`.
+
+It is exact on a power of two, and the floor plus one unit elsewhere. -/
 @[step]
 theorem ceil_log2_spec (x : Std.U64) (h0 : x.val ≠ 0) :
     fixed.ceil_log2 x ⦃ y => y.val = clog x.val ⦄ := by
@@ -254,12 +263,15 @@ theorem ceil_log2_spec (x : Std.U64) (h0 : x.val ≠ 0) :
     step*
     simp [clog, *]
 
-/-- `ceil_log2 0` panics. -/
+/-- The ceiling logarithm of zero panics. -/
 theorem ceil_log2_zero : fixed.ceil_log2 0#u64 = .fail .panic := by
   simp [fixed.ceil_log2, CoreModels.core.num.U64.is_power_of_two, fixed.floor_log2, massert]
 
-/-- **`ceil_log2` does not round up.** At `x = 14917` it returns `908635`, and
-`2^908635 < 14917^(2^16)`: the result is below `2^16 · log2 14917`. -/
+/-- **The ceiling logarithm does not round up.**
+
+At `x = 14917` it returns `908635`, and `2^908635 < 14917^(2^16)`.
+
+So the result is below `2^16 * log_2 14917`. -/
 theorem ceil_log2_14917 :
     fixed.ceil_log2 14917#u64 ⦃ y => y.val = 908635 ∧ 2 ^ y.val < 14917 ^ 2 ^ 16 ⦄ := by
   refine WP.spec_mono (ceil_log2_spec 14917#u64 (by decide)) ?_
@@ -269,7 +281,7 @@ theorem ceil_log2_14917 :
   rw [show (14917#u64 : Std.U64).val = 14917 from rfl, hc] at hy
   exact ⟨hy, hy ▸ log2_14917_bounds.1⟩
 
-/-- `u64::saturating_sub` is truncated subtraction. -/
+/-- Saturating subtraction on 64 bits is truncated subtraction. -/
 @[step]
 theorem u64_saturating_sub_spec (x y : Std.U64) :
     CoreModels.core.num.U64.saturating_sub x y ⦃ z => z.val = x.val - y.val ⦄ := by
@@ -280,7 +292,7 @@ theorem u64_saturating_sub_spec (x y : Std.U64) :
   rw [BitVec.toNat_ofNat]; simp only [Nat.zero_max]
   exact Nat.mod_eq_of_lt (by simp at this ⊢; omega)
 
-/-- `bits_per_query` never panics, and computes `FixedLog.bpq`. -/
+/-- The bits per query never panic, and equal the model on the naturals. -/
 @[step]
 theorem bits_per_query_spec (b : Std.U32) (f : Std.U64) :
     fixed.bits_per_query b f ⦃ y => y.val = bpq b.val f.val ⦄ := by

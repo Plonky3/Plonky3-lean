@@ -6,10 +6,15 @@ import all Aeneas.Std.Scalar.SaturatingOps
 @[expose] public section
 
 /-!
-# `p3_security::budget`: the conjectured round budget
+# p3-security's conjectured round budget
 
-Every round of `security_report` is computed on naturals (`roundM`, `oodM`, `queryM`, …), and
-`security_report` returns those seven values for every input, without panicking.
+# Overview
+
+Each of the seven rounds of the security report is modelled on the naturals.
+
+For every input, the report returns those seven values and does not panic.
+
+All bit counts are in fixed point, with 16 fractional bits.
 -/
 
 open Aeneas Aeneas.Std CoreModels p3_security
@@ -19,13 +24,15 @@ namespace Plonky3Lean.Proofs.Security.Budget
 
 open Plonky3Lean.Proofs.Security.Fixed
 
-/-- The largest supported field size, `u32::MAX` whole bits, in fixed point. -/
+/-- The largest supported field size: `2^32 - 1` whole bits, in fixed point. -/
 def maxField : ℕ := (2 ^ 32 - 1) * 2 ^ 16
 
-/-- `InstanceShape::cap`. -/
+/-- The cap on every round: the collision resistance, at most the field size.
+
+It is zero when the field size is zero or unsupported. -/
 def capM (fb cr : ℕ) : ℕ := if fb = 0 ∨ maxField < fb then 0 else min (cr * 2 ^ 16) fb
 
-/-- `round`: error `c · 2^ls / |E|`, plus `pow` bits of grinding, capped. -/
+/-- A generic round: error `c * 2^ls / |E|`, plus `pow` bits of grinding, then capped. -/
 def roundM (fb cap : ℕ) (c : Option ℕ) (ls pow : ℕ) : ℕ :=
   match c with
   | none => cap
@@ -34,7 +41,15 @@ def roundM (fb cap : ℕ) (c : Option ℕ) (ls pow : ℕ) : ℕ :=
     let e := clog c + ls * 2 ^ 16
     min (if fb ≤ e then pow * 2 ^ 16 else fb - e + pow * 2 ^ 16) cap
 
-/-- `out_of_domain_round`. -/
+/-- The out-of-domain round.
+
+Its error is the identity degree over `|E|`, plus grinding, then capped.
+
+It is zero in three cases:
+
+- the log of the trace height is 64 or more;
+- the chunk count is not a power of two;
+- the identity degree overflows 64 bits. -/
 def oodM (fb lmh d chunks combo pow cap : ℕ) : ℕ :=
   if 64 ≤ lmh ∨ ¬ (chunks ≠ 0 ∧ chunks &&& (chunks - 1) = 0) then 0 else
   let d' := if d = 0 then 1 else d
@@ -43,17 +58,17 @@ def oodM (fb lmh d chunks combo pow cap : ℕ) : ℕ :=
   let size := max (d' * (h + combo' - 1) + (h - 1)) ((chunks + 1) * h + combo' - 1)
   if 2 ^ 64 - 1 < size then 0 else min (fb - clog size + pow * 2 ^ 16) cap
 
-/-- `folding_coefficient`. -/
+/-- The folding coefficient `2 * (2^a - 1)`, or nothing when it would overflow. -/
 def foldCoefM (a : ℕ) : Option ℕ := if 63 ≤ a then none else some (2 * (2 ^ a - 1))
 
-/-- `u32::saturating_add`. -/
+/-- Saturating addition on 32 bits. -/
 def satAdd32 (a b : ℕ) : ℕ := min (a + b) (2 ^ 32 - 1)
 
-/-- `u64::saturating_add` and `u64::saturating_mul`. -/
+/-- Saturating addition and multiplication on 64 bits. -/
 def satAdd64 (a b : ℕ) : ℕ := min (a + b) (2 ^ 64 - 1)
 def satMul64 (a b : ℕ) : ℕ := min (a * b) (2 ^ 64 - 1)
 
-/-- The query round. -/
+/-- The query round: queries times bits per query, plus grinding, then capped. -/
 def queryM (fb lb q pow cap : ℕ) : ℕ := min (satAdd64 (satMul64 q (bpq lb fb)) (pow * 2 ^ 16)) cap
 
 /-! ## Component specs -/
@@ -128,7 +143,7 @@ theorem term_new_spec (l : Str) (b : Std.U64) :
     budget.report.SecurityTerm.new l b ⦃ t => t.label = l ∧ t.bits = b ⦄ := by
   simp [budget.report.SecurityTerm.new]
 
-/-- `round` never panics on a supported field size, and computes `roundM`. -/
+/-- A generic round never panics on a supported field size, and equals its model. -/
 @[step]
 theorem round_spec (l : Str) (i : budget.shape.InstanceShape) (c : core.option.Option Std.U64)
     (ls pow : Std.U32) (cap : Std.U64) (hf : i.field_bits.val ≤ maxField) :
@@ -176,7 +191,7 @@ theorem round_spec (l : Str) (i : budget.shape.InstanceShape) (c : core.option.O
         simp only [he, ↓reduceIte, he']
         step*
 
-/-- `u32::is_power_of_two`. -/
+/-- The power-of-two test on 32 bits is `x != 0` and `x &&& (x - 1) = 0`. -/
 @[step]
 theorem is_power_of_two32_spec (x : Std.U32) :
     CoreModels.core.num.U32.is_power_of_two x ⦃ b =>
@@ -190,7 +205,7 @@ theorem is_power_of_two32_spec (x : Std.U32) :
     simp only [this, ↓reduceIte]
     step*
 
-/-- `out_of_domain_round` never panics on a supported field size, and computes `oodM`. -/
+/-- The out-of-domain round never panics on a supported field size, and equals its model. -/
 @[step]
 theorem ood_spec (i : budget.shape.InstanceShape) (d c k pow : Std.U32) (cap : Std.U64)
     (hf : i.field_bits.val ≤ maxField) :
@@ -271,7 +286,7 @@ theorem ood_spec (i : budget.shape.InstanceShape) (d c k pow : Std.U32) (cap : S
       have hmax64 : (UScalar.cast .U128 core.num.U64.MAX : Std.U128).val = 2 ^ 64 - 1 := by
         simp [core.num.U64.MAX, U64.rMax]
       step as ⟨m7, hm7⟩
-      -- the size of the model
+      -- The size, as the model computes it.
       have hszM : sz.val = max ((if d.val = 0 then 1 else d.val) *
             (H + (if k.val = 0 then 1 else k.val) - 1) + (H - 1))
           ((c.val + 1) * H + (if k.val = 0 then 1 else k.val) - 1) := by
@@ -310,7 +325,7 @@ theorem ood_spec (i : budget.shape.InstanceShape) (d c k pow : Std.U32) (cap : S
       have : ¬ (c.val ≠ 0 ∧ c.val &&& (c.val - 1) = 0) := fun h => hb' (hb.mpr h)
       simp [oodM, *]
 
-/-- The folding round. -/
+/-- The folding round: a generic round with the folding coefficient. -/
 def foldM (fb cap a lmh lb pow : ℕ) : ℕ :=
   match foldCoefM a with
   | none => 0
@@ -355,7 +370,12 @@ theorem folding_round_spec (pr : budget.shape.ProtocolParams) (ins : budget.shap
     step*
     rw [t_post, foldM, ← ho, i_post]
 
-/-- The seven rounds of `security_report`, on naturals, in the order of `SecurityReport::terms`. -/
+/-- The seven rounds of the security report, on the naturals, in the report's order.
+
+```text
+    lookup, composition, out-of-domain, DEEP, folding, query, collision cap
+```
+-/
 def reportM (pr : budget.shape.ProtocolParams) (i : budget.shape.InstanceShape)
     (a : budget.shape.AirShape) : List ℕ :=
   let fb := i.field_bits.val
@@ -375,7 +395,9 @@ def reportM (pr : budget.shape.ProtocolParams) (i : budget.shape.InstanceShape)
     queryM fb pr.log_blowup.val pr.num_queries.val pr.query_pow_bits.val cap,
     cap ]
 
-/-- **`security_report` never panics**, for every input, and its seven rounds are `reportM`. -/
+/-- **The security report never panics.**
+
+For every input, its seven rounds equal the model. -/
 theorem security_report_spec (pr : budget.shape.ProtocolParams) (ins : budget.shape.InstanceShape)
     (a : budget.shape.AirShape) :
     budget.security_report pr ins a ⦃ r => r.terms.val.map (fun t => t.bits.val) = reportM pr ins a ⦄ := by
@@ -416,7 +438,7 @@ theorem security_report_spec (pr : budget.shape.ProtocolParams) (ins : budget.sh
 
 /-! ## The attained level -/
 
-/-- `first_minimum` returns a position whose value is a minimum. -/
+/-- The first-minimum loop returns a position whose value is a minimum. -/
 theorem first_minimum_loop_spec (bits : Std.Array Std.U64 7#usize) (b i : Std.Usize)
     (hb : b.val < i.val) (hi : i.val ≤ 7)
     (hmin : ∀ j < i.val, bits.val[b.val]!.val ≤ bits.val[j]!.val) :
@@ -465,8 +487,7 @@ theorem first_minimum_spec (bits : Std.Array Std.U64 7#usize) :
   unfold budget.report.first_minimum
   apply first_minimum_loop_spec <;> simp
 
-/-- `security_level` is the minimum round, in whole bits (rounded down), when every round is at
-most `maxField`. -/
+/-- Converting fixed point to whole bits divides by `2^16`, rounding down. -/
 @[step]
 theorem to_bits_spec (v : Std.U64) (hv : v.val < 2 ^ 48) :
     fixed.to_bits v ⦃ l => l.val = v.val / 2 ^ 16 ⦄ := by
@@ -478,6 +499,9 @@ theorem to_bits_spec (v : Std.U64) (hv : v.val < 2 ^ 48) :
   rw [hw', UScalarTy.U32_numBits_eq]
   exact Nat.div_lt_of_lt_mul (by omega)
 
+/-- The security level is the minimum round, in whole bits rounded down.
+
+This needs every round to be at most the largest supported field size. -/
 theorem security_level_spec (r : budget.report.SecurityReport)
     (hb : ∀ j < 7, (r.terms.val.map (fun t => t.bits.val))[j]! ≤ maxField) :
     budget.report.SecurityReport.security_level r ⦃ l => ∃ k < 7,
@@ -522,7 +546,7 @@ theorem security_level_spec (r : budget.report.SecurityReport)
   intro l hl
   exact ⟨k.val, hk, by rw [hl, hxv], fun j hj => by rw [hL k.val hk, hL j hj]; exact hkmin j hj⟩
 
-/-! ## A parameter set where the reported level exceeds the bound -/
+/-! ## Parameters where the reported level exceeds the bound -/
 
 /-- Blowup 8, binary folding, 200 queries with 30 bits of query grinding. -/
 def cexParams : budget.shape.ProtocolParams :=
@@ -530,11 +554,11 @@ def cexParams : budget.shape.ProtocolParams :=
     query_pow_bits := 30#u32, ood_pow_bits := 0#u32, deep_pow_bits := 0#u32,
     folding_pow_bits := 0#u32, lookup_pow_bits := 0#u32 }
 
-/-- Trace height 4, `log2|E| = 7462235 / 2^16 ≈ 113.86`, 128-bit hash. -/
+/-- Trace height 4, `log_2 |E| = 7462235 / 2^16` (about 113.86), and a 128-bit hash. -/
 def cexInstance : budget.shape.InstanceShape :=
   { log_max_height := 2#u32, field_bits := 7462235#u64, collision_resistance := 128#u32 }
 
-/-- 14917 constraints, degree 2, two quotient chunks, two opening points. -/
+/-- 14917 constraints of degree 2, two quotient chunks, and two opening points. -/
 def cexAir : budget.shape.AirShape :=
   { num_composed_constraints := 14917#u32, max_constraint_degree := 2#u32,
     num_quotient_chunks := 2#u32, max_combo := 2#u32,
@@ -544,8 +568,9 @@ theorem cex_report : reportM cexParams cexInstance cexAir =
     [7462235, 6553600, 7219722, 7462235, 7069019, 7462235, 7462235] := by
   decide +kernel
 
-/-- **The budget reports 100 bits** at `cexParams`, `cexInstance`, `cexAir`: the binding round is
-the constraint composition, at exactly `100 · 2^16` in fixed point. -/
+/-- **The budget reports 100 bits** at these parameters.
+
+The binding round is the constraint composition, at exactly `100 * 2^16` in fixed point. -/
 theorem cex_level :
     ∃ r, budget.security_report cexParams cexInstance cexAir = .ok r ∧
       budget.report.SecurityReport.security_level r ⦃ l => l.val = 100 ⦄ := by
@@ -559,9 +584,11 @@ theorem cex_level :
     have h1 := hmin 1 (by omega)
     interval_cases k <;> simp_all
 
-/-- The composition round's true error at `cexInstance` and `cexAir` exceeds `2^-100` when
-`|E| = 2^(7462235 / 2^16)`, the largest field the fixed-point size admits: `14917 / |E| > 2^-100`,
-that is `2^7462235 < 2^(100 · 2^16) · 14917^(2^16)`. -/
+/-- The composition round's true error at these parameters exceeds `2^-100`.
+
+Take `|E| = 2^(7462235 / 2^16)`, the largest field the fixed-point size admits.
+
+Then `14917 / |E| > 2^-100`, that is `2^7462235 < 2^(100 * 2^16) * 14917^(2^16)`. -/
 theorem cex_true_bound : 2 ^ 7462235 < 2 ^ (100 * 2 ^ 16) * 14917 ^ 2 ^ 16 := by
   decide +kernel
 

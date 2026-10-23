@@ -1,5 +1,5 @@
 # Mutation of: 010-budget-folding-round
-# Breaks:      `folding_round` credits the commit-phase grinding twice.
+# Breaks:      the factored folding round credits the commit-phase grinding twice.
 #
 --- a/security/src/budget/mod.rs
 +++ b/security/src/budget/mod.rs

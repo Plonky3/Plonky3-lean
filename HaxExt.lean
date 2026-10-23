@@ -200,15 +200,19 @@ def core.ops.range.Range.contains {Idx U : Type} (_ : core.cmp.PartialOrd Idx Id
   core.ops.range.RangeBounds.contains.default
     (core.ops.range.Range.Insts.CoreOpsRangeRangeBounds Idx) IdxU UIdx self item
 
-/-- `u64::trailing_zeros` (`library/core/src/num/uint_macros.rs`): the number of
-trailing zero bits, `64` for zero.
+/-- `u64::trailing_zeros` (`library/core/src/num/uint_macros.rs`).
 
-p3-security's fixed-point `ceil_log2` calls it on a power of two. -/
+It counts the trailing zero bits, and gives `64` for zero.
+
+p3-security's fixed-point ceiling logarithm calls it on a power of two. -/
 def core.num.U64.trailing_zeros (x : Std.U64) : RustM Std.U32 :=
   ok ⟨BitVec.ofNat 32 (((List.range 64).find? fun i => x.val.testBit i).getD 64)⟩
 
-/-- `core::num::nonzero::ZeroablePrimitive` (`library/core/src/num/nonzero.rs`), the
-sealed trait of the primitives `NonZero` wraps. Only the zero test is modelled. -/
+/-- `core::num::nonzero::ZeroablePrimitive` (`library/core/src/num/nonzero.rs`).
+
+It is the sealed trait of the primitives that a nonzero wrapper can hold.
+
+Only the zero test is modelled. -/
 structure core.num.nonzero.ZeroablePrimitive (T : Type) where
   is_zero : T → Bool
 
@@ -217,11 +221,12 @@ def core.U64.Insts.CoreNumNonzeroZeroablePrimitiveNonZeroU64Inner :
     core.num.nonzero.ZeroablePrimitive Std.U64 :=
   { is_zero := fun x => x.val = 0 }
 
-/-- `core::num::NonZero<T>`, represented by its value; `new` is its only
-constructor, so every inhabitant the model builds is nonzero. -/
+/-- `core::num::NonZero<T>`, represented by its value.
+
+Its only constructor checks for zero, so every value the model builds is nonzero. -/
 def core.num.nonzero.NonZero (T : Type) : Type := T
 
-/-- `NonZero::new` (`library/core/src/num/nonzero.rs`): `Some` exactly for a nonzero value. -/
+/-- `NonZero::new` (`library/core/src/num/nonzero.rs`) returns `Some` exactly for a nonzero value. -/
 def core.num.nonzero.NonZero.new {T : Type} (inst : core.num.nonzero.ZeroablePrimitive T)
     (n : T) : RustM (core.option.Option (core.num.nonzero.NonZero T)) :=
   ok (if inst.is_zero n then core.option.Option.None else core.option.Option.Some n)
@@ -231,8 +236,9 @@ def core.num.nonzero.NonZero.get {T : Type} (_ : core.num.nonzero.ZeroablePrimit
     (self : core.num.nonzero.NonZero T) : RustM T :=
   ok self
 
-/-- `impl PartialEq for str` (`library/core/src/str/traits.rs`): byte-wise equality.
-Derived `PartialEq` impls of structs with a `&'static str` field call it. -/
+/-- `impl PartialEq for str` (`library/core/src/str/traits.rs`), byte-wise equality.
+
+Derived equality on a struct with a `&'static str` field calls it. -/
 def core.Str.Insts.CoreCmpPartialEqStr.eq (self other : Str) : RustM Bool :=
   ok (decide (self = other))
 

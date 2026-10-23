@@ -1,5 +1,5 @@
 # Mutation of: 020-budget-binding-index
-# Breaks:      `first_minimum` keeps the last minimum on a tie.
+# Breaks:      the first-minimum loop keeps the last minimum on a tie.
 #
 --- a/security/src/budget/report.rs
 +++ b/security/src/budget/report.rs

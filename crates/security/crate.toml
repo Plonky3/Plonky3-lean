@@ -25,8 +25,9 @@ start_from = [
 
 watch = ["security/src", "security/Cargo.toml"]
 
-# Transcriptions over the reals of the f64 bounds aeneas cannot translate
-# (docs/extractor-issues.md 19), in Plonky3Lean/Proofs/Security/Real.lean.
+# aeneas cannot translate the f64 bounds (docs/extractor-issues.md, item 19).
+# Each entry below pairs a Rust function with its transcription over the reals.
+# The transcriptions live in Plonky3Lean/Proofs/Security/Real.lean.
 [[mirror]]
 lean = "Plonky3Lean.Proofs.Security.Real.deepBitsR"
 rust = "p3_security::deep::deep_ali_error"
