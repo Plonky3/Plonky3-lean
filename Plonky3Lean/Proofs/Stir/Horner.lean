@@ -117,4 +117,16 @@ theorem eval_poly_parallel_eq {c : ℕ} (hc : 0 < c) (poly : List K) (point : K)
     refine sum_congr rfl fun i _ => ?_
     rw [← pow_mul, mul_assoc, ← pow_add, mul_comm c j, add_comm i]
 
+/-- add_polys is the sum of the two polynomials. -/
+theorem add_polys_eq (a b : List K) : coeffPoly (add_polys a b) = coeffPoly a + coeffPoly b := by
+  refine Polynomial.ext fun i => ?_
+  rw [coeff_coeffPoly, coeff_add, coeff_coeffPoly, coeff_coeffPoly]
+  unfold add_polys
+  by_cases hi : i < max a.length b.length
+  · rw [getD_map_range _ _ hi]
+    congr 1
+    · split_ifs with h; rfl; rw [getD_of_le _ _ (by omega)]
+    · split_ifs with h; rfl; rw [getD_of_le _ _ (by omega)]
+  · rw [getD_of_le _ _ (by simp; omega), getD_of_le a _ (by omega), getD_of_le b _ (by omega), add_zero]
+
 end Plonky3Lean.Proofs.Stir

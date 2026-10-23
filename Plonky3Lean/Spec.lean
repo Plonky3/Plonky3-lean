@@ -23,6 +23,7 @@ public import Plonky3Lean.Spec.Duplex
 public import Plonky3Lean.Spec.UniStark
 public import Plonky3Lean.Spec.Keccak
 public import Plonky3Lean.Spec.Fri
+public import Plonky3Lean.Spec.Stir
 
 @[expose] public section
 

@@ -63,4 +63,9 @@ theorem reduce_mod_x_pow_minus_c_eq {n : ℕ} (hn : 0 < n) (poly : List EF) (c :
     getD_map_range _ _ (mem_range.1 hj)]
   refine sum_congr rfl fun i _ => by ring
 
+/-- Reduction modulo X^0 - c panics. -/
+theorem reduce_mod_x_pow_minus_c_panics (poly : List EF) (c : F) :
+    reduce_mod_x_pow_minus_c poly 0 c = none := by
+  simp [reduce_mod_x_pow_minus_c, chunks]
+
 end Plonky3Lean.Proofs.Stir

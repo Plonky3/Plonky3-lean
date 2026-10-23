@@ -156,6 +156,26 @@ public import Plonky3Lean.Proofs.Fri.Robust
 public import Plonky3Lean.Proofs.Fri.Transcript
 public import Plonky3Lean.Proofs.Fri.Hiding
 public import Plonky3Lean.Proofs.Fri.Packed
+public import Plonky3Lean.Proofs.Stir.Horner
+public import Plonky3Lean.Proofs.Stir.Lists
+public import Plonky3Lean.Proofs.Stir.Vanishing
+public import Plonky3Lean.Proofs.Stir.Base
+public import Plonky3Lean.Proofs.Stir.DegCor
+public import Plonky3Lean.Proofs.Stir.FoldAlgebra
+public import Plonky3Lean.Proofs.Stir.Fold
+public import Plonky3Lean.Proofs.Stir.FoldPaper
+public import Plonky3Lean.Proofs.Stir.Lagrange
+public import Plonky3Lean.Proofs.Stir.Virtual
+public import Plonky3Lean.Proofs.Stir.PolyFold
+public import Plonky3Lean.Proofs.Stir.Combine
+public import Plonky3Lean.Proofs.Stir.Interp
+public import Plonky3Lean.Proofs.Stir.NewtonAlgebra
+public import Plonky3Lean.Proofs.Stir.Newton
+public import Plonky3Lean.Proofs.Stir.Ood
+public import Plonky3Lean.Proofs.Stir.Round
+public import Plonky3Lean.Proofs.Stir.QueryFold
+public import Plonky3Lean.Proofs.Stir.Geometry
+public import Plonky3Lean.Proofs.Stir.VerifierChecks
 
 @[expose] public section
 

@@ -176,4 +176,46 @@ theorem fold_queries_seen (G : Gen F) (round : ℕ) (fold_shift : F) (fold_log_d
     · exact h3 j' hjm
     · rw [List.mem_singleton.1 hjm]; exact hj
 
+theorem mapM_pure {α β : Type} (f : α → VM β) :
+    ∀ l : List α, (∀ x ∈ l, ∃ b, f x = pure b) → ∃ bs, l.mapM f = pure bs := by
+  intro l
+  induction l with
+  | nil => intro _; exact ⟨[], rfl⟩
+  | cons x l ih =>
+    intro h
+    obtain ⟨b, hb⟩ := h x (by simp)
+    obtain ⟨bs, hbs⟩ := ih fun y hy => h y (by simp [hy])
+    exact ⟨b :: bs, by rw [List.mapM_cons, hb, hbs]; rfl⟩
+
+/-- Every draw is in the sorted, deduplicated index list the source answers. -/
+theorem mem_unique_of_mem (indices : List ℕ) {j : ℕ} (hj : j ∈ indices) :
+    j ∈ (indices.mergeSort (· ≤ ·)).dedup := by
+  rw [List.mem_dedup, List.mem_mergeSort]; exact hj
+
+/-- Laying the external fibers out in draw order never panics when the source does not. -/
+theorem external_fibers_no_panic (indices : List ℕ) (arity : ℕ) (round : Option ℕ)
+    (source : List ℕ → VM (List (List EF))) (hsrc : ∀ l, (source l).run.isSome) :
+    (external_fibers_in_draw_order indices arity round source).run.isSome := by
+  unfold external_fibers_in_draw_order
+  dsimp only
+  rcases hs : (source (indices.mergeSort (· ≤ ·)).dedup).run with _ | (e | fibers)
+  · have := hsrc (indices.mergeSort (· ≤ ·)).dedup; rw [hs] at this; cases this
+  · have : source (indices.mergeSort (· ≤ ·)).dedup = ExceptT.mk (some (Except.error e)) := by
+      rw [← hs]; rfl
+    rw [this]; rfl
+  · have : source (indices.mergeSort (· ≤ ·)).dedup = pure fibers := by
+      show _ = ExceptT.mk (some (Except.ok fibers)); rw [← hs]; rfl
+    rw [this, pure_bind]
+    split_ifs
+    · rfl
+    · split
+      · rfl
+      · obtain ⟨bs, hbs⟩ := mapM_pure (fun j => match ((indices.mergeSort (· ≤ ·)).dedup).idxOf? j with
+          | some pos => (pure (fibers.getD pos []) : VM (List EF))
+          | none => panic) indices (fun j hj => by
+            obtain ⟨pos, hpos⟩ : ∃ pos, ((indices.mergeSort (· ≤ ·)).dedup).idxOf? j = some pos :=
+              Option.isSome_iff_exists.1 (List.isSome_idxOf?.2 (mem_unique_of_mem indices hj))
+            exact ⟨fibers.getD pos [], by simp only [hpos]⟩)
+        erw [hbs]; rfl
+
 end Plonky3Lean.Proofs.Stir

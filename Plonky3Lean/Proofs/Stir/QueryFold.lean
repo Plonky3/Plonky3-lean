@@ -108,4 +108,44 @@ theorem query_fold_value_virtual (G : Gen F) (hG : GenValid G) {a n : ℕ} (ha :
     rw [lagrange_fiber_eq_fold G hG ha hn h2 hs hj _ hlen f (fun l hl => by
       rw [hf l hl, getD_map_range _ _ hl]) γ, lift_some]
 
+/-- The prover's codeword fold at gamma / s is Definition 4.8's fold of the codeword on s <g>, at every point of L^k. -/
+theorem fold_codeword_fold (G : Gen F) (hG : GenValid G) (hN : GenNested G) (h2 : (2 : EF) ≠ 0)
+    {a n : ℕ} (ha : a ≤ n) (hn : n ≤ G.adicity) (c : List EF) (hc : c.length = 2 ^ n) {shift : F}
+    (hs : shift ≠ 0) (f : EF → EF)
+    (hf : ∀ i < 2 ^ n, f (algebraMap F EF shift * algebraMap F EF (G.gen n) ^ i) = c.getD i 0) (γ : EF) :
+    fold_codeword G c (γ * algebraMap F EF shift⁻¹) a n =
+      some ((List.range (2 ^ (n - a))).map fun j =>
+        Spec.Stir.fold (cosetSet (algebraMap F EF shift) (algebraMap F EF (G.gen n)) n) f (2 ^ a) γ
+          ((algebraMap F EF shift * algebraMap F EF (G.gen n) ^ j) ^ 2 ^ a)) := by
+  rw [fold_codeword_eq G hG hN h2 ha hn c hc]
+  congr 1
+  refine List.map_congr_left fun j hj => ?_
+  rw [map_inv₀, ← div_eq_mul_inv]
+  exact foldIdx_eq_fold ((hG n hn).map_of_injective (algebraMap F EF).injective)
+    (by rw [← pow_add]; congr 1; omega) ((_root_.map_ne_zero _).2 hs) c f hf (List.mem_range.1 hj) γ
+
+/-- The challenge passed to the fold is gamma / shift, and a zero shift panics. -/
+theorem set_gamma_eq (γ : EF) (s : F) :
+    set_gamma γ s = if s = 0 then none else some (γ / algebraMap F EF s) := by
+  unfold set_gamma p3_stir.mirror.inverse
+  split_ifs <;> simp [div_eq_mul_inv, map_inv₀]
+
+/-- The single-fiber fold at gamma / s is Definition 4.8's fold at (s g^j)^(2^a), on L = s <g> of size 2^(m + a). -/
+theorem fold_fiber_eq (G : Gen F) (hG : GenValid G) {a m : ℕ} (hn : m + a ≤ G.adicity)
+    (h2 : (2 : F) ≠ 0) {shift : F} (hs : shift ≠ 0) {j : ℕ} (hj : j < 2 ^ m) (fiber : List EF)
+    (hfib : fiber.length = 2 ^ a) (f : EF → EF)
+    (hf : ∀ l < 2 ^ a, f (algebraMap F EF shift * algebraMap F EF (G.gen (m + a)) ^ (j + l * 2 ^ m)) =
+      fiber.getD l 0) (γ : EF) :
+    fold_fiber G fiber j m a (γ * algebraMap F EF shift⁻¹) =
+      some (Spec.Stir.fold (cosetSet (algebraMap F EF shift) (algebraMap F EF (G.gen (m + a))) (m + a)) f
+        (2 ^ a) γ ((algebraMap F EF shift * algebraMap F EF (G.gen (m + a)) ^ j) ^ 2 ^ a)) := by
+  have hm : m + a - a = m := by omega
+  unfold fold_fiber
+  simp only [hfib, ne_eq, not_true_eq_false, ↓reduceIte, gen_get_of_le G hn, Option.bind_eq_bind,
+    Option.bind_some]
+  have := lagrange_fiber_eq_fold G hG (a := a) (n := m + a) (by omega) hn h2 hs (by rw [hm]; exact hj)
+    fiber hfib f (by rw [hm]; exact hf) γ
+  rw [hm] at this
+  exact this
+
 end Plonky3Lean.Proofs.Stir
