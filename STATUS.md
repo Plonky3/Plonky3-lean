@@ -19,6 +19,7 @@ target `thumbv7em-none-eabi`
 | `blake2s` | scoped | 148 | 51 | 1 | 0 | 0 | 1 / 0 | pre `010` |
 | `blake3` | scoped | 2609 | 40 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
 | `blake3-crate` | stub |  | 26 | 0 | 3 |  | 0 / 0 |  |
+| `dft` | stub |  | 901 | 0 | 67 |  | 0 / 0 |  |
 | `field` | stub |  | 91 | 2 | 6 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
 | `koala-bear` | extracted | 3024 | 121 | 4 | 0 | 0 | 0 / 3 |  |
@@ -384,18 +385,18 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 824) whose dependencies include it; reaching one is not using it.
+(of 872) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
-| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 66 |
+| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 67 |
 | `baby-bear` | `mds.MDSBabyBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon2.BabyBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `blake2s` | `p3_blake2s.Blake2s256.hash` | its body goes through `blake2`'s incremental `Digest`, whose buffer type aeneas rejects (docs/extractor-issues.md 16) | 3 |
 | `field` | `p3_field.exponentiation.exp_1420470955` | its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here | 1 |
 | `field` | `p3_field.exponentiation.exp_1725656503` | its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here | 1 |
-| `koala-bear` | `koala_bear.KoalaBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 68 |
+| `koala-bear` | `koala_bear.KoalaBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 69 |
 | `koala-bear` | `mds.MDSKoalaBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `koala-bear` | `poseidon1.KoalaBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `koala-bear` | `poseidon2.KoalaBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
@@ -417,13 +418,80 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 824) whose dependencies include the declaration.
+counts the claims (of 872) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
 | `blake3-crate` | `blake3.BLOCK_LEN` | `blake3::BLOCK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.CHUNK_LEN` | `blake3::CHUNK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.OUT_LEN` | `blake3::OUT_LEN` | stub | 0 |
+| `dft` | `p3_dft.butterflies.mirror.DitButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DitButterfly<F>}::apply` | stub | 15 |
+| `dft` | `p3_dft.butterflies.mirror.DifButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterfly<F>}::apply` | stub | 6 |
+| `dft` | `p3_dft.butterflies.mirror.DifButterflyZeros.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterflyZeros<F>}::apply` | stub | 0 |
+| `dft` | `p3_dft.butterflies.mirror.TwiddleFreeButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::TwiddleFreeButterfly}::apply` | stub | 17 |
+| `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.new` | `p3_dft::butterflies::ScaledDitButterfly::new` | stub | 5 |
+| `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::ScaledDitButterfly<F>}::apply` | stub | 4 |
+| `dft` | `p3_dft.butterflies.mirror.DitButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DitButterfly<F>}::apply_to_rows` | stub | 1 |
+| `dft` | `p3_dft.butterflies.mirror.DifButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterfly<F>}::apply_to_rows` | stub | 1 |
+| `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::ScaledDitButterfly<F>}::apply_to_rows` | stub | 1 |
+| `dft` | `p3_dft.butterflies.mirror.DifButterflyZeros.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterflyZeros<F>}::apply_to_rows` | stub | 0 |
+| `dft` | `p3_dft.mirror.bitRev` | `p3_util::reverse_bits_len` | stub | 21 |
+| `dft` | `p3_dft.mirror.revIndex` | `p3_util::reverse_slice_index_bits` | stub | 17 |
+| `dft` | `p3_dft.util.mirror.divide_by_height` | `p3_dft::util::divide_by_height` | stub | 4 |
+| `dft` | `p3_dft.util.mirror.coset_shift_cols` | `p3_dft::util::coset_shift_cols` | stub | 5 |
+| `dft` | `p3_dft.naive.mirror.NaiveDft.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::naive::NaiveDft}::dft_batch` | stub | 3 |
+| `dft` | `p3_dft.traits.mirror.coset_dft_batch` | `p3_dft::traits::TwoAdicSubgroupDft::coset_dft_batch` | stub | 1 |
+| `dft` | `p3_dft.traits.mirror.idft_batch` | `p3_dft::traits::TwoAdicSubgroupDft::idft_batch` | stub | 2 |
+| `dft` | `p3_dft.traits.mirror.coset_idft_batch` | `p3_dft::traits::TwoAdicSubgroupDft::coset_idft_batch` | stub | 3 |
+| `dft` | `p3_dft.traits.mirror.coset_lde_batch_with_transform` | `p3_dft::traits::TwoAdicSubgroupDft::coset_lde_batch_with_transform` | stub | 1 |
+| `dft` | `p3_dft.traits.mirror.via_base` | `p3_dft::traits::TwoAdicSubgroupDft::dft_algebra_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_dit.mirror.Radix2Dit.get_or_compute_twiddles` | `p3_dft::radix_2_dit::Radix2Dit::get_or_compute_twiddles` | stub | 4 |
+| `dft` | `p3_dft.radix_2_dit.mirror.dit_layer` | `p3_dft::radix_2_dit::dit_layer` | stub | 4 |
+| `dft` | `p3_dft.radix_2_dit.mirror.Radix2Dit.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit::Radix2Dit<F>}::dft_batch` | stub | 4 |
+| `dft` | `p3_dft.radix_2_dit.mirror.Radix2Dit.coset_lde_batch_with_transform` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit::Radix2Dit<F>}::coset_lde_batch_with_transform` | stub | 1 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.butterfly_layer` | `p3_dft::radix_2_bowers::butterfly_layer` | stub | 7 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.bowers_g` | `p3_dft::radix_2_bowers::bowers_g` | stub | 5 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.bowers_g_t` | `p3_dft::radix_2_bowers::bowers_g_t` | stub | 5 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.Radix2Bowers.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_bowers::Radix2Bowers}::dft_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.Radix2Bowers.idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_bowers::Radix2Bowers}::idft_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.Radix2Bowers.lde_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_bowers::Radix2Bowers}::lde_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.Radix2Bowers.coset_lde_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_bowers::Radix2Bowers}::coset_lde_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.Radix2Bowers.coset_lde_batch_with_transform` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_bowers::Radix2Bowers}::coset_lde_batch_with_transform` | stub | 1 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.bit_reversed_zero_pad` | `p3_matrix::dense::DenseMatrix::bit_reversed_zero_pad` | stub | 3 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.get_or_compute_twiddles` | `p3_dft::radix_2_dit_parallel::Radix2DitParallel::get_or_compute_twiddles` | stub | 1 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.get_or_compute_inverse_twiddles` | `p3_dft::radix_2_dit_parallel::Radix2DitParallel::get_or_compute_inverse_twiddles` | stub | 3 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.get_or_compute_coset_twiddles` | `p3_dft::radix_2_dit_parallel::Radix2DitParallel::get_or_compute_coset_twiddles` | stub | 2 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.dit_layer_twiddle_free` | `p3_dft::radix_2_dit_parallel::dit_layer_twiddle_free` | stub | 4 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.dit_layer_first_one` | `p3_dft::radix_2_dit_parallel::dit_layer_first_one` | stub | 4 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.dit_layer` | `p3_dft::radix_2_dit_parallel::dit_layer` | stub | 2 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.dit_layer_rev` | `p3_dft::radix_2_dit_parallel::dit_layer_rev` | stub | 5 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.first_half` | `p3_dft::radix_2_dit_parallel::first_half` | stub | 4 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.second_half` | `p3_dft::radix_2_dit_parallel::second_half` | stub | 4 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.first_half_general` | `p3_dft::radix_2_dit_parallel::first_half_general` | stub | 2 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.second_half_general` | `p3_dft::radix_2_dit_parallel::second_half_general` | stub | 2 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.coset_dft` | `p3_dft::radix_2_dit_parallel::coset_dft` | stub | 2 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.first_half_general_oop` | `p3_dft::radix_2_dit_parallel::first_half_general_oop` | stub | 1 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.coset_dft_oop` | `p3_dft::radix_2_dit_parallel::coset_dft_oop` | stub | 1 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit_parallel::Radix2DitParallel<F>}::dft_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.coset_dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit_parallel::Radix2DitParallel<F>}::coset_dft_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit_parallel::Radix2DitParallel<F>}::idft_batch` | stub | 2 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.coset_idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit_parallel::Radix2DitParallel<F>}::coset_idft_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.lde_with_consumer` | `p3_dft::radix_2_dit_parallel::Radix2DitParallel::lde_with_consumer` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.roots_of_unity_table` | `p3_dft::radix_2_small_batch::Radix2DFTSmallBatch::roots_of_unity_table` | stub | 2 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.cache` | `p3_dft::radix_2_small_batch::Radix2DFTSmallBatch::update_twiddles` | stub | 2 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.estimate_num_rows_in_l1` | `p3_dft::radix_2_small_batch::estimate_num_rows_in_l1` | stub | 2 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par` | `p3_dft::radix_2_small_batch::dft_layer_par` | stub | 2 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par_double_dit` | `p3_dft::radix_2_small_batch::dft_layer_par_double` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par_triple_dit` | `p3_dft::radix_2_small_batch::dft_layer_par_triple` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par_double_dif` | `{impl p3_dft::radix_2_small_batch::MultiLayerButterfly<F, p3_dft::butterflies::DifButterfly<F>> for p3_dft::radix_2_small_batch::MultiLayerDifButterfly}::apply_2_layers` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par_triple_dif` | `{impl p3_dft::radix_2_small_batch::MultiLayerButterfly<F, p3_dft::butterflies::DifButterfly<F>> for p3_dft::radix_2_small_batch::MultiLayerDifButterfly}::apply_3_layers` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.extra_layers_dit` | `p3_dft::radix_2_small_batch::dft_layer_par_extra_layers` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.remaining_layers` | `p3_dft::radix_2_small_batch::remaining_layers` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.initial_layers` | `p3_dft::radix_2_small_batch::initial_layers` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.par_remaining_layers` | `p3_dft::radix_2_small_batch::par_remaining_layers` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.par_initial_layers` | `p3_dft::radix_2_small_batch::par_initial_layers` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.Radix2DFTSmallBatch.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_small_batch::Radix2DFTSmallBatch<F>}::dft_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.Radix2DFTSmallBatch.idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_small_batch::Radix2DFTSmallBatch<F>}::idft_batch` | stub | 1 |
 | `field` | `p3_field.dup.Dup` | `p3_field::dup::Dup` | stub | 0 |
 | `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 2 |
 | `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 0 |
@@ -458,7 +526,7 @@ counts the claims (of 824) whose dependencies include the declaration.
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_point` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_point` | not translated | 1 |
 | `matrix` | `p3_matrix.interpolation.mirror.recover_coefficients` | `p3_matrix::interpolation::InterpolateArbitrary::recover_coefficients` | not translated | 2 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_lagrange` | `p3_matrix::interpolation::interpolate_lagrange` | not translated | 1 |
-| `matrix` | `p3_matrix.util.mirror.reverse_matrix_index_bits` | `p3_matrix::util::reverse_matrix_index_bits` | not translated | 1 |
+| `matrix` | `p3_matrix.util.mirror.reverse_matrix_index_bits` | `p3_matrix::util::reverse_matrix_index_bits` | not translated | 14 |
 | `matrix` | `p3_matrix.extension.mirror.flat_row_subseq` | `{impl p3_matrix::Matrix<F> for p3_matrix::extension::FlatMatrixView<F, EF, Inner>}::row_subseq_unchecked` | not translated | 1 |
 | `matrix` | `p3_matrix.extension.mirror.flat_iter_take` | `{impl core::iter::traits::iterator::Iterator for p3_matrix::extension::FlatIter<F, I>}::next` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.mersenne_31.Mersenne31.Insts.CoreIterTraitsAccumSumMersenne31.sum` | `{impl core::iter::traits::accum::Sum for p3_mersenne_31::mersenne_31::Mersenne31}::sum` | dropped | 2 |
@@ -549,6 +617,54 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 
 | Claim | Axioms |
 |---|---|
+| `Dft.babyBear.generators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.bitrev_table` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.bowers.coset_lde_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.bowers.coset_lde_batch_with_transform` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.bowers.dft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.bowers.g` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.bowers.g_t` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.bowers.idft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.bowers.lde_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.cooley_tukey` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.cooley_tukey.coset` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.cosetIdft_cosetDft` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.coset_table.first` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.coset_table.second` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.default.algebra` | `Quot.sound`, `propext` |
+| `Dft.default.coset_dft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.default.coset_idft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.default.coset_idft_batch.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.default.coset_lde_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.default.idft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.dft.column` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.dft.linear` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.dif.apply_to_rows` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.dit.apply_to_rows` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.gentleman_sande` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.goldilocks.generators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.idft.interpolant` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.idft_dft` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.koalaBear.generators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.layer.bit_reversed` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.lde.column` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.lde.extends` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.mersenne31Complex.generators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.naive.dft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.naive.dft_batch.panics_not_pow` | `Quot.sound`, `propext` |
+| `Dft.naive.dft_batch.panics_too_big` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.parallel.coset_dft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.parallel.coset_idft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.parallel.dft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.parallel.idft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.parallel.lde` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.radix2Dit.coset_lde_batch_with_transform` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.radix2Dit.dft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.radix2Dit.dft_batch.panics_not_pow` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.radix2Dit.dft_batch.panics_too_big` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.scaled.apply_to_rows` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.smallBatch.dft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.smallBatch.idft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Matrix.barycentric_weights.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Matrix.bitRevRows_bitRevRows` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Matrix.bitRev_bitRev` | `Classical.choice`, `Quot.sound`, `propext` |
