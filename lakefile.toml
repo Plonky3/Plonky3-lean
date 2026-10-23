@@ -121,6 +121,10 @@ name = "P3Sumcheck"
 srcDir = "crates/sumcheck/stub"
 
 [[lean_lib]]
+name = "P3Stir"
+srcDir = "crates/stir/stub"
+
+[[lean_lib]]
 name = "P3BinaryField"
 srcDir = "crates/binary-field/extraction"
 
