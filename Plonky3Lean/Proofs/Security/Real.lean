@@ -404,7 +404,9 @@ theorem johnsonLineLogR_eq (ld lr m : ℕ) (hld : 0 < ld) :
 
 /-! ## The largest admissible `m` -/
 
-/-- The real number whose floor is the largest admissible `m`.
+/-- The real number below which the admissible `m` lie.
+
+The largest admissible `m` is the largest integer strictly below `X`.
 
 ```text
     X = 1 / (2 (sqrt((h + c) / h) - 1))
@@ -443,7 +445,9 @@ theorem lt_upperX_iff (h c n m : ℝ) (hh : 0 < h) (hc : 0 < c) (hn : 0 < n) (hm
 
 /-- At `h = 144` and `c = 25`, the real number `X` is exactly 6.
 
-So `m = 6` sits on the boundary, where `eta = 0` and the Johnson bound gives no list. -/
+So `m = 6` sits on the boundary, where `eta = 0` and the Johnson bound gives no list.
+
+In `f64`, `X` evaluates to 6.000000000000005, so a test for an integer `X` misses it. -/
 theorem upperX_144_25 : upperX 144 25 = 6 := by
   unfold upperX
   rw [show ((144 : ℝ) + 25) / 144 = (13 / 12) ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
