@@ -1,0 +1,84 @@
+# p3-sumcheck: the sumcheck protocol (Thaler, "Proofs, Arguments, and Zero-Knowledge", Section 4.1).
+
+lean_lib = "P3Sumcheck"
+
+# Nothing is extracted.
+#
+# The crate is generic over p3-field's trait hierarchy and over p3-challenger's sponges, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# The verifier core is transcribed over a field in stub/P3Sumcheck/, with the abstractions stub/P3Sumcheck/Model.lean lists.
+state = "stub"
+
+features = []
+
+watch = ["sumcheck/src", "sumcheck/Cargo.toml"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_sumcheck.lagrange.mirror.lagrange_weights_01inf"
+rust = "p3_sumcheck::lagrange::lagrange_weights_01inf"
+
+[[mirror]]
+lean = "p3_sumcheck.lagrange.mirror.lagrange_weights_01inf_multi"
+rust = "p3_sumcheck::lagrange::lagrange_weights_01inf_multi"
+
+[[mirror]]
+lean = "p3_sumcheck.lagrange.mirror.extrapolate_01inf"
+rust = "p3_sumcheck::lagrange::extrapolate_01inf"
+
+[[mirror]]
+lean = "p3_sumcheck.mirror.Basis.reduce_claim"
+rust = "p3_sumcheck::strategy::Basis::reduce_claim"
+
+[[mirror]]
+lean = "p3_sumcheck.mirror.SumcheckShape.seed"
+rust = "p3_sumcheck::transcript::SumcheckShape::domain_separator"
+
+[[mirror]]
+lean = "p3_sumcheck.mirror.VerifierTranscript.round"
+rust = "p3_sumcheck::transcript::VerifierTranscript::round"
+
+[[mirror]]
+lean = "p3_sumcheck.mirror.verify_rounds"
+rust = "p3_sumcheck::data::SumcheckData::verify_rounds"
+
+[[mirror]]
+lean = "p3_sumcheck.mirror.verify_final_sumcheck_rounds"
+rust = "p3_sumcheck::data::verify_final_sumcheck_rounds"
+
+[[mirror]]
+lean = "p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.new"
+rust = "p3_sumcheck::generic_degree::util::RoundPolyInterpolator::new"
+
+[[mirror]]
+lean = "p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.eval"
+rust = "p3_sumcheck::generic_degree::util::RoundPolyInterpolator::eval"
+
+[[mirror]]
+lean = "p3_sumcheck.generic_degree.mirror.GenericDegreeShape.seed"
+rust = "p3_sumcheck::generic_degree::transcript::GenericDegreeShape::domain_separator"
+
+[[mirror]]
+lean = "p3_sumcheck.generic_degree.mirror.VerifierTranscript.round"
+rust = "p3_sumcheck::generic_degree::transcript::VerifierTranscript::round"
+
+[[mirror]]
+lean = "p3_sumcheck.generic_degree.mirror.verify"
+rust = "p3_sumcheck::generic_degree::proof::GenericDegreeProof::verify"
+
+[[mirror]]
+lean = "p3_sumcheck.strategy.mirror.round_reduce"
+rust = "p3_sumcheck::strategy::round_reduce"
+
+[[mirror]]
+lean = "p3_sumcheck.strategy.mirror.round_step"
+rust = "p3_sumcheck::strategy::round_step"
+
+[[mirror]]
+lean = "p3_sumcheck.strategy.mirror.chunk_round_step"
+rust = "p3_sumcheck::strategy::chunk_round_step"
+
+[[mirror]]
+lean = "p3_sumcheck.strategy.mirror.sumcheck_coefficients_prefix"
+rust = "p3_sumcheck::strategy::sumcheck_coefficients_prefix"

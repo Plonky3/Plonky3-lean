@@ -113,6 +113,10 @@ name = "P3MultilinearUtil"
 srcDir = "crates/multilinear-util/stub"
 
 [[lean_lib]]
+name = "P3Sumcheck"
+srcDir = "crates/sumcheck/stub"
+
+[[lean_lib]]
 name = "P3BinaryField"
 srcDir = "crates/binary-field/extraction"
 
