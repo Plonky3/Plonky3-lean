@@ -5,9 +5,12 @@
 # Class:        equiv-rewrite
 # Gap:          docs/extractor-issues.md 9: a call to a default method of
 #               p3-field's traits takes the type's whole `Field` dictionary,
-#               which reaches the mutually recursive trait group; for a
-#               field's `Div` impl, which calls `Field::inverse`, the `Field`
-#               impl and the `Div` impl are themselves mutually recursive.
+#               which reaches the mutually recursive trait group; for a field's
+#               `Div` impl, which calls `Field::inverse`, the `Field` impl and
+#               the `Div` impl are themselves mutually recursive. Without this
+#               patch aeneas stops: "Mixed declaration groups (which contain
+#               both type and function declarations or functions and traits,
+#               for instance) are not supported yet".
 # Cost:         none in a normal build: the copies are compiled but unused
 #               there. In the extracted variant, inherent `inverse`, `is_zero`
 #               and `is_one` shadow the `Field` defaults at every call site on

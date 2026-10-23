@@ -4,7 +4,9 @@
 # Hunks:        4
 # Class:        equiv-rewrite
 # Gap:          docs/extractor-issues.md 14 (no model of a mutable slice
-#               iterator, here `iter_mut().enumerate()`).
+#               iterator, here `iter_mut().enumerate()`). Without this patch
+#               `lake build` fails on the generated `hash_many`: "Unknown
+#               constant `CoreModels.core.slice.iter.IterMut...`".
 # Cost:         none in a normal build: only the selection is behind
 #               cfg(hax_backend_lean). In the extracted variant, the scalar
 #               `hash_many` calls the reshaped body, which a differential test
