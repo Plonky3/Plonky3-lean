@@ -14,6 +14,7 @@ public import Plonky3Lean.Claims.Monty31
 public import Plonky3Lean.Claims.Sha256
 public import Plonky3Lean.Claims.Symmetric
 public import Plonky3Lean.Claims.Util
+public import Plonky3Lean.Claims.ZkCodes
 public import Plonky3Lean.Proofs
 
 @[expose] public section
