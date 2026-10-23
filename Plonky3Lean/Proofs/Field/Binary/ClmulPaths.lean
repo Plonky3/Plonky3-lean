@@ -128,4 +128,83 @@ theorem mul_64_spec (a b : Std.U64) :
     ← map_mul, ← natPoly_clmulVal, mk_modPoly_64_iff]
   exact mk_natPoly_reduce64Nat (u128_val_lt _)
 
+theorem mul_pair_64_call_spec (c : Std.U64) (s : Std.U64)
+    (hc : AdjoinRoot.mk (modPoly 64 27) (natPoly c.val) = N64 (towerOf 6 s)) (x : Std.U64) :
+    clmul.mul_pair_64.closure.Insts.CoreOpsFunctionFnTupleU64U64.call c x ⦃ r =>
+      towerOf 6 r = towerOf 6 x * towerOf 6 s ⦄ := by
+  unfold clmul.mul_pair_64.closure.Insts.CoreOpsFunctionFnTupleU64U64.call
+  apply WP.spec_bind (tower_to_poly_64_spec x)
+  intro px hx
+  rw [clmul_64x64_eq_clmulVal, Aeneas.Std.bind_ok, reduce_64_eq, Aeneas.Std.bind_ok]
+  apply WP.spec_mono (poly_to_tower_64_spec _)
+  intro r hr
+  apply N64_injective
+  rw [map_mul, N64_apply, N64_apply, hr, val_ofNat_64 (reduce64Nat_lt _), ← hx, ← hc,
+    ← map_mul, ← natPoly_clmulVal, mk_modPoly_64_iff]
+  exact mk_natPoly_reduce64Nat (u128_val_lt _)
+
+/-- Both products of the carry-less `mul_pair_64` are tower products by the shared scalar. -/
+theorem mul_pair_64_spec (a b s : Std.U64) :
+    clmul.mul_pair_64 a b s ⦃ p =>
+      towerOf 6 p.1 = towerOf 6 a * towerOf 6 s ∧ towerOf 6 p.2 = towerOf 6 b * towerOf 6 s ⦄ := by
+  unfold clmul.mul_pair_64
+  apply WP.spec_bind (tower_to_poly_64_spec s)
+  intro ps hs
+  apply WP.spec_bind (mul_pair_64_call_spec ps s hs a)
+  intro r1 h1
+  apply WP.spec_bind (mul_pair_64_call_spec ps s hs b)
+  intro r2 h2
+  rw [WP.spec_ok]
+  exact ⟨h1, h2⟩
+
+/-! ## `Poly64` -/
+
+theorem algEquivOfEq_mk {f g : (ZMod 2)[X]} (h : f = g) (p : (ZMod 2)[X]) :
+    AdjoinRoot.algEquivOfEq (ZMod 2) f g h (AdjoinRoot.mk f p) = AdjoinRoot.mk g p := by
+  simp only [AdjoinRoot.coe_algEquivOfEq, AdjoinRoot.algHomOfDvd, AdjoinRoot.mapAlgHom,
+    AlgHom.coe_mk]
+  have e : (AdjoinRoot.map (RingHom.id (ZMod 2)) f g (by rw [Polynomial.map_id, h])).comp
+      (AdjoinRoot.mk f) = AdjoinRoot.mk g := by
+    apply Polynomial.ringHom_ext
+    · intro r
+      simp [AdjoinRoot.mk_C]
+    · simp [AdjoinRoot.mk_X]
+  exact congrArg (fun φ => φ p) e
+
+/-- The basis change `N` at 64 bits, as a field embedding of the tower's `GF(2^64)` into
+CompPoly's `BF64` quotient. -/
+noncomputable def towerToBF64 : ConcreteBTField 6 →+* BF64.BF64Quot :=
+  (AdjoinRoot.algEquivOfEq (ZMod 2) _ _ modPoly_64_basePoly).toRingEquiv.toRingHom.comp N64
+
+theorem towerToBF64_apply (x : ConcreteBTField 6) :
+    towerToBF64 x = AdjoinRoot.algEquivOfEq (ZMod 2) _ _ modPoly_64_basePoly (N64 x) := rfl
+
+theorem towerToBF64_injective : Function.Injective towerToBF64 :=
+  (AdjoinRoot.algEquivOfEq (ZMod 2) _ _ modPoly_64_basePoly).injective.comp N64_injective
+
+/-- `From<BinaryField64> for Poly64` is `towerToBF64`. -/
+theorem poly64_from_bf64_spec (t : tower.BinaryField64) :
+    poly64.Poly64.Insts.CoreConvertFromBinaryField64.from t ⦃ p =>
+      toQuot64 p = towerToBF64 (towerOf 6 t) ⦄ := by
+  unfold poly64.Poly64.Insts.CoreConvertFromBinaryField64.from
+  apply WP.spec_bind (bf64_to_repr_spec t)
+  intro i hi
+  apply WP.spec_bind (tower_to_poly_64_spec i)
+  intro r hr
+  rw [WP.spec_ok, toQuot64_eq, towerToBF64_apply, N64_apply, towerOf, ← hi, ← towerOf, ← hr,
+    algEquivOfEq_mk]
+
+/-- `From<Poly64> for BinaryField64` is the inverse of `towerToBF64`. -/
+theorem bf64_from_poly64_spec (p : poly64.Poly64) :
+    tower.BinaryField64.Insts.CoreConvertFromPoly64.from p ⦃ t =>
+      towerToBF64 (towerOf 6 t) = toQuot64 p ⦄ := by
+  unfold tower.BinaryField64.Insts.CoreConvertFromPoly64.from
+  apply WP.spec_bind (poly_to_tower_64_spec p)
+  intro i hi
+  apply WP.spec_mono (bf64_from_repr_spec i)
+  intro t ht
+  rw [towerToBF64_apply, N64_apply, towerOf, ht,
+    Nat.mod_eq_of_lt (show i.val < 2 ^ 2 ^ 6 from u64_val_lt i), ← towerOf, hi, algEquivOfEq_mk,
+    toQuot64_eq]
+
 end Plonky3Lean.Proofs.Binary
