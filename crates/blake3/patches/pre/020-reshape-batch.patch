@@ -28,6 +28,9 @@
 # Only the one-lane backend is kept, with no run-time dispatch and no hand-scheduled kernel hook.
 # The differential test runs it beside the shipped driver and `blake3::hash` on every block and chunk boundary and on random batches.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 --- a/blake3/src/lib.rs
 +++ b/blake3/src/lib.rs
 @@ -17,8 +17,20 @@
