@@ -237,4 +237,33 @@ theorem clmul_square_128_spec (a : Std.U128) :
   simp only [towerOf] at e3 hlow hhigh hsc
   rw [e3, hlow, hhigh, hsc, hhigh]
 
+/-! ## Whichever path the build picks -/
+
+theorem bf64_table_square_spec (a : tower.BinaryField64) :
+    tower.BinaryField64.table_square a ⦃ r => towerOf 6 r = towerOf 6 a ^ 2 ⦄ := by
+  unfold tower.BinaryField64.table_square
+  exact WP.spec_bind (clmul_square_64_spec a) fun r h => by rw [WP.spec_ok]; exact h
+
+theorem bf128_table_square_spec (a : tower.BinaryField128) :
+    tower.BinaryField128.table_square a ⦃ r => towerOf 7 r = towerOf 7 a ^ 2 ⦄ := by
+  unfold tower.BinaryField128.table_square
+  exact WP.spec_bind (clmul_square_128_spec a) fun r h => by rw [WP.spec_ok]; exact h
+
+/-- Both branches of `GF(2^64)`'s `dispatched_mul` compute the tower product, so the result does
+not depend on whether the target has a carry-less multiply. -/
+theorem bf64_dispatched_mul_either (hw : Bool) (a b : tower.BinaryField64) :
+    (if hw then do let i ← clmul.mul_64 a b; RustM.ok i else tower.BinaryField64.karatsuba_mul a b)
+      ⦃ r => towerOf 6 r = towerOf 6 a * towerOf 6 b ⦄ := by
+  cases hw
+  · exact WP.spec_mono (bf64_core_mul_spec a b) fun r h => towerOf_mul h
+  · exact WP.spec_bind (mul_64_spec a b) fun r h => by rw [WP.spec_ok]; exact h
+
+/-- Both branches of `GF(2^128)`'s `dispatched_mul` compute the tower product. -/
+theorem bf128_dispatched_mul_either (hw : Bool) (a b : tower.BinaryField128) :
+    (if hw then do let i ← clmul.mul_128 a b; RustM.ok i else tower.BinaryField128.karatsuba_mul a b)
+      ⦃ r => towerOf 7 r = towerOf 7 a * towerOf 7 b ⦄ := by
+  cases hw
+  · exact WP.spec_mono (bf128_core_mul_spec a b) fun r h => towerOf_mul h
+  · exact WP.spec_bind (mul_128_spec a b) fun r h => by rw [WP.spec_ok]; exact h
+
 end Plonky3Lean.Proofs.Binary
