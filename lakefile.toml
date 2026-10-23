@@ -178,3 +178,7 @@ srcDir = "crates/air/extraction"
 [[lean_lib]]
 name = "P3Lookup"
 srcDir = "crates/lookup/extraction"
+
+[[lean_lib]]
+name = "P3UniStark"
+srcDir = "crates/uni-stark/extraction"

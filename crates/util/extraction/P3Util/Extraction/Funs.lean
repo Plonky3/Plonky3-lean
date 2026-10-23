@@ -39,6 +39,17 @@ def log2_ceil_usize (n : Std.Usize) : RustM Std.Usize := do
   let i2 ← core.num.Usize.BITS - i1
   ok (UScalar.cast .Usize i2)
 
+/-- [p3_util::checked_pow2]:
+    Source: 'util/src/lib.rs', lines 48:0-54:1
+    Visibility: public -/
+def checked_pow2
+  (log_degree : Std.Usize) : RustM (core.option.Option Std.Usize) := do
+  let i ← lift (UScalar.cast .Usize core.num.Usize.BITS)
+  if log_degree < i
+  then let i1 ← 1#usize <<< log_degree
+       ok (core.option.Option.Some i1)
+  else ok core.option.Option.None
+
 /-- [p3_util::log2_strict_usize]:
     Source: 'util/src/lib.rs', lines 78:0-87:1
     Visibility: public -/
