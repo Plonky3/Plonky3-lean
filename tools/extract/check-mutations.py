@@ -92,14 +92,14 @@ def declared():
         try:
             ts = entries(test)
         except ValueError as e:
-            bad.append(f"{p.name}: {e}")
+            bad.append(f"{pid(p)}: {e}")
             continue
         if not ts:
-            bad.append(f"{p.name}: no `# Test:` entries")
+            bad.append(f"{pid(p)}: no `# Test:` entries")
         if not desc:
-            bad.append(f"{p.name}: no `# Mutation:` description")
+            bad.append(f"{pid(p)}: no `# Mutation:` description")
         if not mut.exists():
-            bad.append(f"{p.name}: no {mut.name}")
+            bad.append(f"{pid(p)}: no {mut.name}")
         out.append((p, ts, desc, mut))
     return out, bad
 
@@ -152,13 +152,18 @@ def cache_key(decl):
     h.update(tpp.sh(["git", "ls-tree", "-r", "HEAD"], cwd=REPO).stdout.encode())
     h.update(tpp.sh(["git", "diff", "HEAD"], cwd=REPO).stdout.encode())
     for p, ts, _, mut in decl:
-        h.update(p.name.encode())
+        h.update(pid(p).encode())
         h.update(tpp.split_header(p.read_text())[1].encode())
         h.update(repr(ts).encode())
         h.update(mut.read_bytes() if mut.exists() else b"")
     h.update(Path(__file__).read_bytes())
     h.update(tpp.sh(["rustc", "--version"], cwd=REPO).stdout.encode())
     return h.hexdigest()[:16]
+
+
+def pid(p):
+    """`<crate>/<patch file>`: patch file names repeat across crates."""
+    return f"{p.parent.parent.parent.name}/{p.name}"
 
 
 def patch(tree, pf, reverse=False):
@@ -172,7 +177,7 @@ def main():
     decl, bad = declared()
     if "--list" in sys.argv:
         for p, ts, desc, mut in decl:
-            print(f"    {p.name}")
+            print(f"    {pid(p)}")
             for t in ts:
                 print(f"      {t[0]:4} {t[1]} {' '.join(t[2]) if t[0] == 'test' else t[2]}")
             print(f"      mutation: {mut.name}{'' if mut.exists() else ' (MISSING)'}: {desc}")
@@ -209,13 +214,13 @@ def main():
                 ok, out = patch(tree, mut, reverse=True)
                 if not ok:
                     sys.exit(f"error: could not revert {mut.name}: {out}")
-            res[str(p)] = r  # crates share patch names, so key by path
+            res[pid(p)] = r
         cache.write_text(json.dumps(res, indent=1))
 
     fail = False
     for p, ts, desc, mut in decl:
-        r = res[str(p)]
-        print(f"    {p.name}")
+        r = res[pid(p)]
+        print(f"    {pid(p)}")
         if "error" in r:
             print(f"      ERROR: {r['error']}")
             fail = True
