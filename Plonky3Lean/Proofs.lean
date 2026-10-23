@@ -189,6 +189,7 @@ public import Plonky3Lean.Proofs.Stir.Geometry
 public import Plonky3Lean.Proofs.Stir.VerifierChecks
 public import Plonky3Lean.Proofs.Bus.Product
 public import Plonky3Lean.Proofs.Bus.Ram
+public import Plonky3Lean.Proofs.Bus.Verify
 
 @[expose] public section
 

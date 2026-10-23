@@ -9,5 +9,6 @@ module
 
 public import P3Bus.Builder
 public import P3Bus.Ram
+public import P3Bus.Product
 
 @[expose] public section

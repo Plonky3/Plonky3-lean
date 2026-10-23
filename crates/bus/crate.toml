@@ -196,3 +196,103 @@ rust = "p3_bus::ram::air::RamAir::declare"
 [[mirror]]
 lean = "p3_bus.ram.mirror.RamAir.eval"
 rust = "p3_bus::ram::air::RamAir::eval"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.combine"
+rust = "p3_bus::product::math::combine"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.interpolate_pair"
+rust = "p3_bus::product::math::interpolate_pair"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.interpolate_quad"
+rust = "p3_bus::product::math::interpolate_quad"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.has_distinct_round_nodes"
+rust = "p3_bus::product::math::has_distinct_round_nodes"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrRootShape"
+rust = "p3_bus::product::shape::ProductGkrRootShape"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrShapeError"
+rust = "p3_bus::product::error::ProductGkrShapeError"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrError"
+rust = "p3_bus::product::error::ProductGkrError"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.USIZE_MAX"
+rust = "core::num::usize::MAX"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrShape"
+rust = "p3_bus::product::shape::ProductGkrShape"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrShape.new"
+rust = "p3_bus::product::shape::ProductGkrShape::new"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrShape.root_message_len"
+rust = "p3_bus::product::shape::ProductGkrShape::root_message_len"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.layersLoop"
+rust = "p3_bus::product::shape::ProductGkrShape::layers"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrShape.layers"
+rust = "p3_bus::product::shape::ProductGkrShape::layers"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrShape.identity_padding_evaluation"
+rust = "p3_bus::product::shape::ProductGkrShape::identity_padding_evaluation"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrRootShape.encode"
+rust = "p3_bus::product::shape::ProductGkrRootShape::encode"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrRootShape.decode"
+rust = "p3_bus::product::shape::ProductGkrRootShape::decode"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrLayerProof"
+rust = "p3_bus::product::proof::ProductGkrLayerProof"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ROUND_POLY_LEN"
+rust = "p3_bus::product::proof::ROUND_POLY_LEN"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrProof"
+rust = "p3_bus::product::proof::ProductGkrProof"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrOutput"
+rust = "p3_bus::product::proof::ProductGkrOutput"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrProof.validate_shape"
+rust = "p3_bus::product::proof::ProductGkrProof::validate_shape"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.VerifierTranscript"
+rust = "p3_bus::product::transcript::ProductGkrVerifierTranscript"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.VerifyState"
+rust = "p3_bus::product::proof::ProductGkrProof::verify"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.verify_layer"
+rust = "p3_bus::product::proof::ProductGkrProof::verify"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrProof.verify"
+rust = "p3_bus::product::proof::ProductGkrProof::verify"
