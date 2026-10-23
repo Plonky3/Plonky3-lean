@@ -688,4 +688,112 @@ theorem mapM_some {α β : Type _} (l : List α) (f : α → Option β) (g : α 
     rw [List.mapM_cons, h a (by simp), ih (fun a ha => h a (by simp [ha]))]
     rfl
 
+/-- The parallel backend's inverse coset transform computes the inverse coset transform, for a nonzero shift. -/
+theorem parallel_coset_idft_batch (G : Gen K) (hG : GenValid G) {k : ℕ} (hk : k ≤ G.adicity)
+    {w : ℕ} {s : K} (hs : s ≠ 0) (hw : w ≠ 0 ∨ s = 1) (x : ℕ → V) :
+    Computes (Radix2DitParallel.coset_idft_batch G w (2 ^ k) s x) (2 ^ k)
+      (cosetIdft s (G.gen k) (2 ^ k) x) :=
+  traits_coset_idft_batch (parallel_idft_batch G hG hk) hs hw x
+
+/-! ## The extension -/
+
+/-- The parallel extension with a transform, for nested generators.
+
+The transform sees the coefficients in bit-reversed order, coefficient j at row rev(j), as the
+bit-reversed layout promises.
+
+The result, read through the bit-reversed view, evaluates the transformed coefficients on the
+coset shift times the subgroup of order 2^(k+a). -/
+theorem parallel_lde (G : Gen K) (hG : GenValid G) (hN : GenNested G) {k a w : ℕ}
+    (hka : k + a ≤ G.adicity) (shift : K) (ha : a < 64) (hlen : w * (2 ^ k * 2 ^ a) < 2 ^ 64)
+    (T : (ℕ → V) → ℕ → V) (x : ℕ → V) :
+    ∃ c : ℕ → V, (∀ i < 2 ^ k, c (rev k i) = idft (G.gen k) (2 ^ k) x i) ∧
+    Computes (Radix2DitParallel.lde_with_consumer G w (2 ^ k) a shift T x) (2 ^ (k + a))
+      (cosetDft shift (G.gen (k + a)) (2 ^ (k + a))
+        (fun j => if j < 2 ^ k then T c (rev k j) else 0)) := by
+  have hk : k ≤ G.adicity := by omega
+  have hmid : (k + 1) / 2 ≤ k := by omega
+  have : NeZero (2 ^ k) := ⟨by positivity⟩
+  have hn0 : ((2 ^ k : ℕ) : K) ≠ 0 := ((hG k hk).neZero').out
+  obtain ⟨y1, hy1, hy1'⟩ := first_half_spec (G.gen k)⁻¹ hmid (revRows k x)
+  obtain ⟨y2, hy2, hy2'⟩ := second_half_some (G.gen k)⁻¹ hmid ((2 ^ k : ℕ) : K)⁻¹ (revRows k y1)
+  have hc : ∀ i < 2 ^ k, y2 (rev k i) = idft (G.gen k) (2 ^ k) x i := by
+    intro i hi
+    rw [hy2' _ (Plonky3Lean.Proofs.Matrix.bitRev_lt k i),
+      second_half_finishes _ hmid (scaleRows ((2 ^ k : ℕ) : K)⁻¹ (revRows k x)) _
+      (fun p hp => by
+        rw [scaleRows, revRows_apply k _ hp, hy1' _ (Plonky3Lean.Proofs.Matrix.bitRev_lt k p),
+          ditNet_smul]
+        rfl) hi, ditNet_smul, scaleRows,
+      ditNet_congr _ k (x' := bitRevVec (rev k) x) (fun p hp => by
+        rw [revRows_apply k x hp, bitRevVec]) k le_rfl i hi,
+      ditNet_eq_dft ((hG k hk).inv) x hi, idft, dft]
+  refine ⟨y2, hc, ?_⟩
+  have htab : ∀ ci ∈ List.range (2 ^ a), get_or_compute_coset_twiddles G k (G.gen (k + a) ^ ci * shift) =
+      some (cosetTbl (G.gen k) (G.gen (k + a) ^ ci * shift) k) := fun ci _ => coset_tables G hk _
+  let Z : K → ℕ → V := fun c' => Classical.choose (coset_dft_oop_spec G hk c' (T y2))
+  have hZ : ∀ c', coset_dft_oop (2 ^ k) (T y2) (cosetTbl (G.gen k) c' k) = some (Z c') ∧
+      ∀ i < 2 ^ k, Z c' (rev k i) = ditNetC c' (G.gen k) k k (T y2) i :=
+    fun c' => Classical.choose_spec (coset_dft_oop_spec G hk c' (T y2))
+  have hrest : ∀ k' ∈ List.range (2 ^ a - 1),
+      coset_dft_oop (2 ^ k) (T y2) (((List.range (2 ^ a)).map fun ci =>
+        cosetTbl (G.gen k) (G.gen (k + a) ^ ci * shift) k).getD (bitRev a (k' + 1)) []) =
+      some (Z (G.gen (k + a) ^ bitRev a (k' + 1) * shift)) := by
+    intro k' hk'
+    have hlt : bitRev a (k' + 1) < 2 ^ a := by
+      rw [bitRev_eq]; exact Plonky3Lean.Proofs.Matrix.bitRev_lt a _
+    rw [List.getD_eq_getElem _ _ (by simpa using hlt), List.getElem_map, List.getElem_range]
+    exact (hZ _).1
+  obtain ⟨f, hf, hf'⟩ := coset_dft_spec G hk shift (T y2)
+  let rest := (List.range (2 ^ a - 1)).map fun k' => Z (G.gen (k + a) ^ bitRev a (k' + 1) * shift)
+  refine ⟨fun r => (if bitRev (k + a) r < 2 ^ k then f (bitRev (k + a) r) else
+      (rest.getD (bitRev (k + a) r / 2 ^ k - 1) (fun _ => 0)) (bitRev (k + a) r % 2 ^ k)),
+    ?_, fun r hr => ?_⟩
+  · simp only [Radix2DitParallel.lde_with_consumer, log2Strict_pow,
+      get_or_compute_inverse_twiddles, gen_get_of_le G hk, Option.bind_eq_bind, Option.bind_some,
+      Option.map_some, hy1, hn0, ↓reduceIte, hy2]
+    rw [ite_eq_left ⟨ha, hlen⟩, gen_get_of_le G hka]
+    simp only [Option.bind_some, mapM_some _ _ _ htab, mapM_some _ _ _ hrest, hf]
+    rfl
+  · simp only [bitRev_eq]
+    have hu : r / 2 ^ a < 2 ^ k := Nat.div_lt_of_lt_mul (by rw [← pow_add, add_comm]; exact hr)
+    have hv : r % 2 ^ a < 2 ^ a := Nat.mod_lt _ (by positivity)
+    have hP : rev (k + a) r = rev a (r % 2 ^ a) * 2 ^ k + rev k (r / 2 ^ a) := by
+      conv_lhs => rw [← Nat.div_add_mod' r (2 ^ a)]
+      rw [show k + a = a + k by ring, rev_split a k _ _ hv]
+    have hq := Plonky3Lean.Proofs.Matrix.bitRev_lt k (r / 2 ^ a)
+    have key : (if rev (k + a) r < 2 ^ k then f (rev (k + a) r) else
+        (rest.getD (rev (k + a) r / 2 ^ k - 1) (fun _ => 0)) (rev (k + a) r % 2 ^ k)) =
+        ditNetC (G.gen (k + a) ^ (r % 2 ^ a) * shift) (G.gen k) k k (T y2) (r / 2 ^ a) := by
+      rw [hP]
+      by_cases hv0 : r % 2 ^ a = 0
+      · rw [hv0, rev_zero, zero_mul, zero_add, ite_eq_left hq, hf' _ hu, pow_zero, one_mul]
+      · have hrv : rev a (r % 2 ^ a) ≠ 0 := fun h => hv0 (by rw [← rev_involutive hv, h, rev_zero])
+        have hrvlt := Plonky3Lean.Proofs.Matrix.bitRev_lt a (r % 2 ^ a)
+        have hge : 2 ^ k ≤ rev a (r % 2 ^ a) * 2 ^ k + rev k (r / 2 ^ a) := by
+          have : 1 * 2 ^ k ≤ rev a (r % 2 ^ a) * 2 ^ k := Nat.mul_le_mul_right _ (by omega)
+          omega
+        rw [ite_eq_right (by omega), dm_div hq, dm_mod hq]
+        have hidx : rev a (r % 2 ^ a) - 1 < 2 ^ a - 1 := by omega
+        simp only [rest]
+        rw [List.getD_eq_getElem _ _ (by simpa using hidx), List.getElem_map, List.getElem_range,
+          bitRev_eq, Nat.sub_add_cancel (by omega), rev_involutive hv]
+        exact (hZ _).2 _ hu
+    rw [key, ditNetC_congr _ _ k (x' := bitRevVec (rev k) (fun j => T y2 (rev k j)))
+      (fun p hp => by simp [bitRevVec, rev_involutive hp]) k le_rfl _ hu,
+      ditNetC_eq_cosetDft (hG k hk) _ hu]
+    unfold cosetDft
+    rw [← sum_subset (s₁ := range (2 ^ k)) (s₂ := range (2 ^ (k + a)))
+      (f := fun j => ((shift * G.gen (k + a) ^ r) ^ j) • (if j < 2 ^ k then T y2 (rev k j) else 0))
+      (Finset.range_mono (Nat.pow_le_pow_right (by norm_num) (by omega)))
+      (fun j _ hj' => by
+        simp only [mem_range, not_lt] at hj'
+        rw [ite_eq_right (by omega), smul_zero])]
+    refine sum_congr rfl fun j hj => ?_
+    rw [ite_eq_left (mem_range.mp hj)]
+    congr 2
+    rw [← nested_pow hN hka]
+    conv_rhs => rw [← Nat.div_add_mod' r (2 ^ a)]
+    ring
+
 end Plonky3Lean.Proofs.Dft
