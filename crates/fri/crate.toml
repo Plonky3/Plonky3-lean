@@ -1,0 +1,340 @@
+# p3-fri: the FRI low-degree test and the two-adic FRI polynomial commitment scheme.
+
+lean_lib = "P3Fri"
+
+# Nothing is extracted.
+#
+# Every item is generic over p3-field's trait hierarchy, the matrix commitment scheme and the challenger, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# The folding, the schedule, the prover, the verifier and the opening reduction are transcribed over a field in stub/P3Fri/, with the abstractions each file lists.
+state = "stub"
+
+features = []
+
+watch = ["fri/src", "fri/Cargo.toml", "util/src/lib.rs", "field/src/helpers.rs"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_fri.config.mirror.FriParameters"
+rust = "p3_fri::config::FriParameters"
+
+[[mirror]]
+lean = "p3_fri.config.mirror.FriProverError"
+rust = "p3_fri::config::FriProverError"
+
+[[mirror]]
+lean = "p3_fri.config.mirror.FriParameters.final_poly_len"
+rust = "p3_fri::config::FriParameters::final_poly_len"
+
+[[mirror]]
+lean = "p3_fri.config.mirror.FriParameters.blowup"
+rust = "p3_fri::config::FriParameters::blowup"
+
+[[mirror]]
+lean = "p3_fri.config.mirror.FriParameters.conjectured_soundness_bits"
+rust = "p3_fri::config::FriParameters::conjectured_soundness_bits"
+
+[[mirror]]
+lean = "p3_fri.config.mirror.FriParameters.validate_input_height"
+rust = "p3_fri::config::FriParameters::validate_input_height"
+
+[[mirror]]
+lean = "p3_fri.config.mirror.compute_log_arity_for_round"
+rust = "p3_fri::config::compute_log_arity_for_round"
+
+[[mirror]]
+lean = "p3_fri.config.mirror.fold_schedule_loop"
+rust = "p3_fri::config::fold_schedule"
+
+[[mirror]]
+lean = "p3_fri.config.mirror.fold_schedule"
+rust = "p3_fri::config::fold_schedule"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.inv"
+rust = "p3_field::Field::inverse"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.batchInv"
+rust = "p3_field::batch_multiplicative_inverse"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.lagrange_interpolate_at"
+rust = "p3_fri::two_adic_pcs::lagrange_interpolate_at"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.foldPair"
+rust = "{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_matrix"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.fold_row"
+rust = "{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_row"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.foldPairs"
+rust = "{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_matrix"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.foldRounds"
+rust = "{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_matrix"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.fold_matrix_scalar"
+rust = "{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_matrix"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.isPow2"
+rust = "core::num::usize::is_power_of_two"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.use_packed_fold"
+rust = "p3_fri::two_adic_pcs::use_packed_fold"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.foldPacked"
+rust = "p3_fri::two_adic_pcs::fold_matrix_packed"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.packedRound"
+rust = "p3_fri::two_adic_pcs::fold_matrix_packed"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.packedRounds"
+rust = "p3_fri::two_adic_pcs::fold_matrix_packed"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.fold_matrix_packed"
+rust = "p3_fri::two_adic_pcs::fold_matrix_packed"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.fold_matrix"
+rust = "{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_matrix"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.bitrevCoset"
+rust = "{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.MatToOpen"
+rust = "{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.compute_inverse_denominators"
+rust = "p3_fri::two_adic_pcs::compute_inverse_denominators"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.reducePoint"
+rust = "{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.reduceMat"
+rust = "{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.reduced_openings"
+rust = "{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open"
+
+[[mirror]]
+lean = "p3_fri.mirror.MmcsOps"
+rust = "p3_commit::Mmcs"
+
+[[mirror]]
+lean = "p3_fri.mirror.CommitPhaseMultiStep"
+rust = "p3_fri::proof::CommitPhaseMultiStep"
+
+[[mirror]]
+lean = "p3_fri.mirror.BatchMultiOpening"
+rust = "p3_fri::proof::BatchMultiOpening"
+
+[[mirror]]
+lean = "p3_fri.mirror.FriProof"
+rust = "p3_fri::proof::FriProof"
+
+[[mirror]]
+lean = "p3_fri.mirror.TranscriptFailure"
+rust = "p3_fri::transcript::TranscriptFailure"
+
+[[mirror]]
+lean = "p3_fri.mirror.ProverTx"
+rust = "p3_fri::transcript::ProverTranscript"
+
+[[mirror]]
+lean = "p3_fri.mirror.VerifierTx"
+rust = "p3_fri::transcript::VerifierTranscript"
+
+[[mirror]]
+lean = "p3_fri.prover.mirror.matOfFlat"
+rust = "p3_matrix::dense::DenseMatrix::new"
+
+[[mirror]]
+lean = "p3_fri.prover.mirror.flatOfMat"
+rust = "p3_matrix::Matrix::to_row_major_matrix"
+
+[[mirror]]
+lean = "p3_fri.prover.mirror.CommitPhaseResult"
+rust = "p3_fri::prover::CommitPhaseResult"
+
+[[mirror]]
+lean = "p3_fri.prover.mirror.Folder"
+rust = "p3_fri::config::FriFoldingStrategy::fold_matrix"
+
+[[mirror]]
+lean = "p3_fri.prover.mirror.commitRound"
+rust = "p3_fri::prover::commit_phase"
+
+[[mirror]]
+lean = "p3_fri.prover.mirror.commit_phase"
+rust = "p3_fri::prover::commit_phase"
+
+[[mirror]]
+lean = "p3_fri.prover.mirror.answer_queries"
+rust = "p3_fri::prover::answer_queries"
+
+[[mirror]]
+lean = "p3_fri.prover.mirror.open_inputs"
+rust = "p3_fri::prover::open_inputs"
+
+[[mirror]]
+lean = "p3_fri.prover.mirror.prove_fri"
+rust = "p3_fri::prover::prove_fri_with_schedule"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.FriError"
+rust = "p3_fri::verifier::FriError"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.FriError.ofTranscript"
+rust = "{impl core::convert::From<p3_fri::transcript::TranscriptFailure> for p3_fri::verifier::FriError<CommitMmcsErr, InputError>}::from"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.Res"
+rust = "p3_fri::verifier::verify_fri"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.crash"
+rust = "p3_fri::verifier::verify_fri"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.lift"
+rust = "p3_fri::verifier::verify_fri"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.Claim"
+rust = "p3_commit::CommitmentWithOpeningPoints"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.check_canonical_pow_witnesses"
+rust = "p3_fri::verifier::check_canonical_pow_witnesses"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.rebuildRow"
+rust = "p3_fri::verifier::fold_query"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.ChainState"
+rust = "p3_fri::verifier::fold_query"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.foldStep"
+rust = "p3_fri::verifier::fold_query"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.badRound"
+rust = "p3_fri::verifier::fold_query"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.fold_query"
+rust = "p3_fri::verifier::fold_query"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.openingPoints"
+rust = "p3_fri::verifier::open_inputs"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.ladderOffsets"
+rust = "p3_fri::verifier::open_inputs"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.queryPoint"
+rust = "p3_fri::verifier::open_inputs"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.pointTerm"
+rust = "p3_fri::verifier::open_inputs"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.RedState"
+rust = "p3_fri::verifier::open_inputs"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.reduceMatrix"
+rust = "p3_fri::verifier::open_inputs"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.reduceQuery"
+rust = "p3_fri::verifier::open_inputs"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.checkBatch"
+rust = "p3_fri::verifier::open_inputs"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.checkDenominators"
+rust = "p3_fri::verifier::open_inputs"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.open_inputs"
+rust = "p3_fri::verifier::open_inputs"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.inputLogHeights"
+rust = "p3_fri::verifier::verify_fri"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.horner"
+rust = "p3_field::HornerIter::horner"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.checkQuery"
+rust = "p3_fri::verifier::verify_fri"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.checkRound"
+rust = "p3_fri::verifier::verify_fri"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.open_inputs'"
+rust = "p3_fri::verifier::verify_fri"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.verify_fri"
+rust = "p3_fri::verifier::verify_fri"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.Step"
+rust = "p3_challenger::fs::Interaction"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.FriShape"
+rust = "p3_fri::transcript::FriShape"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.FriShape.with_schedule"
+rust = "p3_fri::transcript::FriShape::with_schedule"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.FriShape.new"
+rust = "p3_fri::transcript::FriShape::new"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.FriShape.pattern"
+rust = "p3_fri::transcript::FriShape::pattern"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.PcsShape"
+rust = "p3_fri::pcs_transcript::PcsShape"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.PcsShape.pattern"
+rust = "p3_fri::pcs_transcript::PcsShape::pattern"
