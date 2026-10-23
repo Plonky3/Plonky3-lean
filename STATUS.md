@@ -24,6 +24,7 @@ target `thumbv7em-none-eabi`
 | `blake3-crate` | stub |  | 26 | 0 | 3 |  | 0 / 0 |  |
 | `bus` | stub |  | 1284 | 0 | 122 |  | 0 / 0 |  |
 | `challenger` | scoped | 1552 | 200 | 0 | 12 | 6 | 1 / 1 | pre `010` |
+| `circle` | stub |  | 746 | 0 | 49 |  | 0 / 0 |  |
 | `commit` | stub |  | 762 | 0 | 59 |  | 0 / 0 |  |
 | `dft` | stub |  | 901 | 0 | 67 |  | 0 / 0 |  |
 | `field` | stub |  | 305 | 7 | 25 |  | 0 / 0 |  |
@@ -465,7 +466,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1462) whose dependencies include it; reaching one is not using it.
+(of 1498) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -504,7 +505,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1462) whose dependencies include the declaration.
+counts the claims (of 1498) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -814,7 +815,56 @@ counts the claims (of 1462) whose dependencies include the declaration.
 | `challenger` | `p3_challenger.mirror.refill` | `p3_challenger::multi_field_challenger::MultiField32Challenger::refill_f_squeeze_from_inner` | not translated | 1 |
 | `challenger` | `p3_challenger.mirror.sampleFromQueue` | `{impl p3_challenger::CanSample<EF> for p3_challenger::multi_field_challenger::MultiField32Challenger<F, PF, P, WIDTH, RATE>}::sample` | not translated | 1 |
 | `challenger` | `p3_challenger.mirror.grindState` | `{impl p3_challenger::grinding_challenger::GrindingChallenger for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::grind` | not translated | 1 |
-| `commit` | `p3_commit.domain.mirror.LagrangeSelectors` | `p3_commit::domain::LagrangeSelectors` | stub | 14 |
+| `circle` | `p3_circle.point.mirror.Point` | `p3_circle::point::Point` | stub | 23 |
+| `circle` | `p3_circle.point.mirror.tryInverse` | `p3_field::Field::try_inverse` | stub | 4 |
+| `circle` | `p3_circle.point.mirror.Point.new` | `p3_circle::point::Point::new` | stub | 19 |
+| `circle` | `p3_circle.point.mirror.Point.ZERO` | `p3_circle::point::Point::ZERO` | stub | 7 |
+| `circle` | `p3_circle.point.mirror.Point.from_projective_line` | `p3_circle::point::Point::from_projective_line` | stub | 3 |
+| `circle` | `p3_circle.point.mirror.Point.to_projective_line` | `p3_circle::point::Point::to_projective_line` | stub | 1 |
+| `circle` | `p3_circle.point.mirror.Point.double` | `p3_circle::point::Point::double` | stub | 4 |
+| `circle` | `p3_circle.point.mirror.Point.repeated_double` | `p3_circle::point::Point::repeated_double` | stub | 0 |
+| `circle` | `p3_circle.point.mirror.Point.vnStep` | `p3_circle::point::Point::v_n` | stub | 11 |
+| `circle` | `p3_circle.point.mirror.Point.v_n` | `p3_circle::point::Point::v_n` | stub | 5 |
+| `circle` | `p3_circle.point.mirror.Point.vnProdLoop` | `p3_circle::point::Point::v_n_prod` | stub | 4 |
+| `circle` | `p3_circle.point.mirror.Point.v_n_prod` | `p3_circle::point::Point::v_n_prod` | stub | 4 |
+| `circle` | `p3_circle.point.mirror.Point.neg` | `{impl core::ops::Neg for p3_circle::point::Point<F>}::neg` | stub | 7 |
+| `circle` | `p3_circle.point.mirror.Point.add` | `{impl core::ops::Add<p3_circle::point::Point<F>> for p3_circle::point::Point<EF>}::add` | stub | 14 |
+| `circle` | `p3_circle.point.mirror.Point.sub` | `{impl core::ops::Sub<p3_circle::point::Point<F>> for p3_circle::point::Point<EF>}::sub` | stub | 5 |
+| `circle` | `p3_circle.point.mirror.Point.v_tilde_p` | `p3_circle::point::Point::v_tilde_p` | stub | 0 |
+| `circle` | `p3_circle.point.mirror.Point.recip_v_tilde_p_num_den` | `p3_circle::point::Point::recip_v_tilde_p_num_den` | stub | 3 |
+| `circle` | `p3_circle.point.mirror.Point.s_p_at_p` | `p3_circle::point::Point::s_p_at_p` | stub | 4 |
+| `circle` | `p3_circle.point.mirror.Point.v_p` | `p3_circle::point::Point::v_p` | stub | 4 |
+| `circle` | `p3_circle.point.mirror.Point.mulLoop` | `{impl core::ops::Mul<usize> for p3_circle::point::Point<F>}::mul` | stub | 3 |
+| `circle` | `p3_circle.point.mirror.Point.mul` | `{impl core::ops::Mul<usize> for p3_circle::point::Point<F>}::mul` | stub | 3 |
+| `circle` | `p3_circle.point.mirror.Point.generator` | `p3_circle::point::Point::generator` | stub | 10 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain` | `p3_circle::domain::CircleDomain` | stub | 12 |
+| `circle` | `p3_circle.domain.mirror.interleave` | `itertools::Itertools::interleave` | stub | 3 |
+| `circle` | `p3_circle.domain.mirror.chain` | `itertools::iterate` | stub | 8 |
+| `circle` | `p3_circle.domain.mirror.parallel_point_chain` | `p3_circle::domain::parallel_point_chain` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.forward_backward_index` | `p3_circle::domain::forward_backward_index` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.new` | `p3_circle::domain::CircleDomain::new` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.standard` | `p3_circle::domain::CircleDomain::standard` | stub | 5 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.is_standard` | `p3_circle::domain::CircleDomain::is_standard` | stub | 1 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.subgroup_generator` | `p3_circle::domain::CircleDomain::subgroup_generator` | stub | 9 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.coset0` | `p3_circle::domain::CircleDomain::coset0` | stub | 7 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.coset1` | `p3_circle::domain::CircleDomain::coset1` | stub | 3 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.points` | `p3_circle::domain::CircleDomain::points` | stub | 3 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.points_vec` | `p3_circle::domain::CircleDomain::points_vec` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.nth_point` | `p3_circle::domain::CircleDomain::nth_point` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.vanishing_poly` | `p3_circle::domain::CircleDomain::vanishing_poly` | stub | 2 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.size` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::size` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.first_point` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::first_point` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.next_point` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::next_point` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.try_create_disjoint_domain` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::try_create_disjoint_domain` | stub | 1 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.split_domains` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::split_domains` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.split_evals` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::split_evals` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.vanishing_poly_at_point` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::vanishing_poly_at_point` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.selectors_at_point` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::selectors_at_point` | stub | 2 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.selectors_on_coset` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::selectors_on_coset` | stub | 1 |
+| `circle` | `p3_circle.ordering.mirror.cfft_permute_index` | `p3_circle::ordering::cfft_permute_index` | stub | 6 |
+| `circle` | `p3_circle.ordering.mirror.cfft_permute_slice` | `p3_circle::ordering::cfft_permute_slice` | stub | 0 |
+| `circle` | `p3_circle.ordering.mirror.cfft_permute_slice_chunked_in_place` | `p3_circle::ordering::cfft_permute_slice_chunked_in_place` | stub | 1 |
+| `commit` | `p3_commit.domain.mirror.LagrangeSelectors` | `p3_commit::domain::LagrangeSelectors` | stub | 17 |
 | `commit` | `p3_commit.domain.mirror.Coset.size` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::size` | stub | 20 |
 | `commit` | `p3_commit.domain.mirror.Coset.first_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::first_point` | stub | 8 |
 | `commit` | `p3_commit.domain.mirror.Coset.next_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::next_point` | stub | 5 |
@@ -873,8 +923,8 @@ counts the claims (of 1462) whose dependencies include the declaration.
 | `commit` | `p3_commit.encoder.mirror.encode_batch` | `{impl p3_commit::encoder::Encoder<F> for D}::encode_batch` | stub | 3 |
 | `commit` | `p3_commit.encoder.mirror.encode_batch_padded` | `p3_commit::encoder::Encoder::encode_batch_padded` | stub | 1 |
 | `commit` | `p3_commit.encoder.mirror.encode_batch_borrowed` | `p3_commit::encoder::Encoder::encode_batch_borrowed` | stub | 1 |
-| `dft` | `p3_dft.butterflies.mirror.DitButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DitButterfly<F>}::apply` | stub | 18 |
-| `dft` | `p3_dft.butterflies.mirror.DifButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterfly<F>}::apply` | stub | 6 |
+| `dft` | `p3_dft.butterflies.mirror.DitButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DitButterfly<F>}::apply` | stub | 20 |
+| `dft` | `p3_dft.butterflies.mirror.DifButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterfly<F>}::apply` | stub | 7 |
 | `dft` | `p3_dft.butterflies.mirror.DifButterflyZeros.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterflyZeros<F>}::apply` | stub | 0 |
 | `dft` | `p3_dft.butterflies.mirror.TwiddleFreeButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::TwiddleFreeButterfly}::apply` | stub | 20 |
 | `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.new` | `p3_dft::butterflies::ScaledDitButterfly::new` | stub | 6 |
@@ -883,7 +933,7 @@ counts the claims (of 1462) whose dependencies include the declaration.
 | `dft` | `p3_dft.butterflies.mirror.DifButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterfly<F>}::apply_to_rows` | stub | 1 |
 | `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::ScaledDitButterfly<F>}::apply_to_rows` | stub | 1 |
 | `dft` | `p3_dft.butterflies.mirror.DifButterflyZeros.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterflyZeros<F>}::apply_to_rows` | stub | 0 |
-| `dft` | `p3_dft.mirror.bitRev` | `p3_util::reverse_bits_len` | stub | 40 |
+| `dft` | `p3_dft.mirror.bitRev` | `p3_util::reverse_bits_len` | stub | 50 |
 | `dft` | `p3_dft.mirror.revIndex` | `p3_util::reverse_slice_index_bits` | stub | 30 |
 | `dft` | `p3_dft.util.mirror.divide_by_height` | `p3_dft::util::divide_by_height` | stub | 4 |
 | `dft` | `p3_dft.util.mirror.coset_shift_cols` | `p3_dft::util::coset_shift_cols` | stub | 5 |
@@ -1176,16 +1226,16 @@ counts the claims (of 1462) whose dependencies include the declaration.
 | `matrix` | `p3_matrix.extension.mirror.flat_iter_take` | `{impl core::iter::traits::iterator::Iterator for p3_matrix::extension::FlatIter<F, I>}::next` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.mersenne_31.Mersenne31.Insts.CoreIterTraitsAccumSumMersenne31.sum` | `{impl core::iter::traits::accum::Sum for p3_mersenne_31::mersenne_31::Mersenne31}::sum` | dropped | 2 |
 | `mersenne-31` | `p3_mersenne_31.mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.sum_array` | `{impl p3_field::field::PrimeCharacteristicRing for p3_mersenne_31::mersenne_31::Mersenne31}::sum_array` | dropped | 0 |
-| `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS` | `p3_mersenne_31::complex::{impl}::CIRCLE_TWO_ADIC_GENERATORS` | dropped | 2 |
+| `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS` | `p3_mersenne_31::complex::{impl}::CIRCLE_TWO_ADIC_GENERATORS` | dropped | 3 |
 | `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.COMPLEX_GENERATOR` | `p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::COMPLEX_GENERATOR` | dropped | 1 |
-| `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.circle_two_adic_generator` | `p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::circle_two_adic_generator` | dropped | 1 |
+| `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.circle_two_adic_generator` | `p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::circle_two_adic_generator` | dropped | 2 |
 | `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.QUADRATIC_W` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::W` | not translated | 2 |
 | `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.QUADRATIC_DTH_ROOT` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::DTH_ROOT` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.mul_by_w` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::mul_by_w` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.QUADRATIC_EXT_TWO_ADIC_GENERATOR_33` | `{impl p3_field::extension::complex::HasTwoAdicComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::complex_ext_two_adic_generator` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.CUBIC_W` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<3> for p3_mersenne_31::mersenne_31::Mersenne31}::W` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.CUBIC_DTH_ROOT` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<3> for p3_mersenne_31::mersenne_31::Mersenne31}::DTH_ROOT` | not translated | 1 |
-| `mersenne-31` | `p3_mersenne_31.complex.new_complex_new` | `p3_field::extension::complex::Complex::new_complex` | not translated | 2 |
+| `mersenne-31` | `p3_mersenne_31.complex.new_complex_new` | `p3_field::extension::complex::Complex::new_complex` | not translated | 3 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1InternalLayerMonty31` | `p3_monty_31::no_packing::poseidon1::Poseidon1InternalLayerMonty31` | not translated | 0 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1ExternalLayerMonty31` | `p3_monty_31::no_packing::poseidon1::Poseidon1ExternalLayerMonty31` | not translated | 0 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon2.Poseidon2InternalLayerMonty31` | `p3_monty_31::no_packing::poseidon2::Poseidon2InternalLayerMonty31` | not translated | 0 |
@@ -1621,6 +1671,42 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Bus.sorted_trace_consistent` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.strict_increase` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.verifier_total` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.cfft.basis` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.cfft.evaluate` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.cfft.interpolate` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.cfft.twiddles` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.extract_lambda` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.extract_lambda_orthogonal` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.prover_verifier` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.re_im` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.reduce_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.domain.disjoint_domain` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.domain.standard_disjoint` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.domain.standard_nodup` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.domain.standard_points` | `Quot.sound`, `propext` |
+| `Circle.domain.vanishing` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.folding.fold_x` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.folding.fold_y` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.folding.query_twiddles` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.generator.m31_card` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.generator.m31_rust` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.generator.m31_valid` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.generator.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.ordering.chunked` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.ordering.involutive` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.point.double` | `Quot.sound`, `propext` |
+| `Circle.point.from_projective_line` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.point.mul` | `Quot.sound`, `propext` |
+| `Circle.point.projective_line_inverse` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.point.s_p_at_p` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.point.v_n` | `Quot.sound`, `propext` |
+| `Circle.point.v_p` | `Quot.sound`, `propext` |
+| `Circle.selectors.at_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.selectors.at_point_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.selectors.m31_first_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.selectors.m31_last_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.selectors.on_coset` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.selectors.on_domain` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Commit.PeriodicColumns.new.error` | `Quot.sound`, `propext` |
 | `Commit.PeriodicColumns.new.ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Commit.PeriodicLdeTable.get.packed` | `Classical.choice`, `Quot.sound`, `propext` |
