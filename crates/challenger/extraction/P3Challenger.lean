@@ -9,5 +9,6 @@ module
 
 public import P3Challenger.Extraction
 public import P3Challenger.Mirror.Duplex
+public import P3Challenger.Mirror.Pure
 
 @[expose] public section
