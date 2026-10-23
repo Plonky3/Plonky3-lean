@@ -51,7 +51,7 @@ structure PState (F EF Com MP D : Type _) where
   P : List EF
   /-- The current weight table. -/
   Wt : List EF
-  σ : EF
+  claim : EF
   cons : List (Constraint F EF)
   rand : List (List EF)
   h : List (Step F EF)
@@ -86,7 +86,7 @@ def honestRound (P0 : List F) (n : ℕ) (st : PState F EF Com MP D) (t : ℕ) : 
   let rd := PE.commit (codeRows E c st.P nv (t + 1))
   let o := oodProve E.S st.P nv (st.h ++ [.message (E.enc rd.1)]) params.ood_samples
   let wit : F := if params.pow_bits = 0 then 0 else PE.solve o.2.2 params.pow_bits
-  let h := if params.pow_bits = 0 then o.2.2 else o.2.2 ++ [.pow params.pow_bits wit]
+  let h := if params.pow_bits = 0 then o.2.2 else o.2.2 ++ [.pow params.pow_bits (PE.solve o.2.2 params.pow_bits)]
   let site := (c.site t).getD default
   let qi := play_query_indices E.S h site.index_bits site.draws c.stratified_queries site.depths
   let g := E.gen params.log_folded_domain_size
@@ -96,8 +96,8 @@ def honestRound (P0 : List F) (n : ℕ) (st : PState F EF Com MP D) (t : ℕ) : 
   let H := honestSumcheck E.S.toSponge PE.solve params.folding_pow_bits st.P
     (List.zipWith (· + ·) st.Wt (cubeTable (weightAt con) nv)) (qi.2 ++ [.challenge])
     (c.folding_schedule.getD (t + 1) 0)
-  let σ := Plonky3Lean.Proofs.Sumcheck.replay .Evaluation (con.combine_evals st.σ) H.ms H.rs
-  { P := H.f, Wt := H.w, σ := σ,
+  let σ := Plonky3Lean.Proofs.Sumcheck.replay .Evaluation (con.combine_evals st.claim) H.ms H.rs
+  { P := H.f, Wt := H.w, claim := σ,
     cons := st.cons ++ [con], rand := st.rand ++ [H.rs], h := H.h, prevP := st.P, prevNv := nv,
     prevData := some rd.2, prevRoot := rd.1,
     rounds := st.rounds ++ [⟨some rd.1, o.2.1, wit, openPrev E PE c P0 n st t qi.1, (H.ms, H.ws)⟩] }
@@ -122,7 +122,7 @@ def honestProof (P0 : List F) (n : ℕ) (commitment : Com) (h : List (Step F EF)
   let site := (c.site c.n_rounds).getD default
   let h1 := st.h ++ [.message st.P]
   let wit : F := if site.pow_bits = 0 then 0 else PE.solve h1 site.pow_bits
-  let h2 := if site.pow_bits = 0 then h1 else h1 ++ [.pow site.pow_bits wit]
+  let h2 := if site.pow_bits = 0 then h1 else h1 ++ [.pow site.pow_bits (PE.solve h1 site.pow_bits)]
   let qi := play_query_indices E.S h2 site.index_bits site.draws c.stratified_queries site.depths
   let H := honestSumcheck E.S.toSponge PE.solve c.final_folding_pow_bits st.P st.Wt qi.2 c.final_sumcheck_rounds
   ⟨(honestInit E PE c P0 n commitment h).2, st.rounds, some st.P, wit, openPrev E PE c P0 n st c.n_rounds qi.1,

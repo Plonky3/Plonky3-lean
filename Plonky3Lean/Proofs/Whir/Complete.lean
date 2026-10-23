@@ -256,7 +256,7 @@ def kAt (t : ℕ) : ℕ := c.folding_schedule.getD t 0
 structure Inv (P0 : List F) (n : ℕ) (commitment : Com) (t : ℕ) (st : PState F EF Com MP D) : Prop where
   lenP : st.P.length = 2 ^ nvAt c t
   lenW : st.Wt.length = 2 ^ nvAt c t
-  claim : st.σ = ∑ b ∈ range (2 ^ nvAt c t), st.P.getD b 0 * st.Wt.getD b 0
+  claimSum : st.claim = ∑ b ∈ range (2 ^ nvAt c t), st.P.getD b 0 * st.Wt.getD b 0
   weight : ∀ y : List EF, y.length = nvAt c t → mle st.Wt y =
     (st.cons.map fun con => weightAt con
       ((st.rand.flatten ++ y).drop ((st.rand.flatten ++ y).length - con.num_variables))).sum
@@ -442,5 +442,85 @@ theorem stir_honest {P0 : List F} {n : ℕ} {commitment : Com} (hv : Valid c n E
     (by rw [hrlen, kAt]; exact hv.small t ht)]
   simp [two_adic_generator, hv.adicity t ht, g, hrP, map_pow]
   exact ⟨rfl, rfl⟩
+
+/-- The verifier parses the honest round: the root, then the prover's out-of-domain points and answers. -/
+theorem parse_honest (root : Com) (P : List EF) (nv s t : ℕ) (h : List (Step F EF)) (pw : F)
+    (op : QueryOpenings F EF MP) (sc : SumcheckData F EF) :
+    let o := oodProve E.S P nv (h ++ [.message (E.enc root)]) s
+    parse_with_round E ⟨some root, o.2.1, pw, op, sc⟩ nv s t h = .ok (root, ⟨nv, o.1, o.2.1⟩, o.2.2) := by
+  intro o
+  have := ood_loop E.S P nv (h ++ [.message (E.enc root)]) s le_rfl
+  simp only [parse_with_round, oodProve_length, ne_eq, not_true_eq_false, ↓reduceIte, o] at this ⊢
+  rw [this]
+  rfl
+
+theorem new_with_existing_claim_eq (γ : EF) (nv : ℕ) (L : List (Statements F EF))
+    (h : ∀ s ∈ L, s.num_variables = nv) : Constraint.new_with_existing_claim γ nv L = some ⟨nv, L, γ, 1⟩ := by
+  simp only [Constraint.new_with_existing_claim, Constraint.new, List.all_eq_true, beq_iff_eq]
+  split_ifs with hc
+  · rfl
+  · exact absurd h hc
+
+theorem queried_lt {t : ℕ} (ht : t < c.n_rounds) : c.round_parameters[t]? = some (queried c t) := by
+  simp only [queried, ht, ↓reduceIte, List.getD_eq_getElem?_getD]
+  rw [List.getElem?_eq_getElem ht, Option.getD_some]
+
+/-- One honest round: the verifier's round accepts it, and the invariant moves to the next round. -/
+theorem round_honest {P0 : List F} {n : ℕ} {commitment : Com} (hv : Valid c n E.adicity)
+    (hh : Honesty E PE c P0 n commitment) {t : ℕ} (ht : t < c.n_rounds) {st : PState F EF Com MP D}
+    (hinv : Inv E PE c P0 n commitment t st) (proof : WhirProof F EF Com MP)
+    (hp : proof.rounds[t]? = (honestRound E PE c P0 n st t).rounds[t]?) :
+    let st' := honestRound E PE c P0 n st t
+    roundStep E c proof ⟨st.cons, st.rand, st.prevRoot, st.claim, st.h⟩ t =
+      some (.ok ⟨st'.cons, st'.rand, st'.prevRoot, st'.claim, st'.h⟩) ∧ Inv E PE c P0 n commitment (t + 1) st' := by
+  intro st'
+  obtain ⟨s, hs⟩ := Option.isSome_iff_exists.mp (hv.sites t ht.le)
+  obtain ⟨hspow, -⟩ := site_queried c hs
+  simp only [ht, ↓reduceIte] at hspow
+  obtain ⟨r, hr, hrlen, hrP⟩ := hinv.last
+  have hq : c.round_parameters.getD t default = queried c t := by simp [queried, ht]
+  set nv := (queried c t).num_variables
+  set rd := PE.commit (codeRows E c st.P nv (t + 1))
+  set o := oodProve E.S st.P nv (st.h ++ [.message (E.enc rd.1)]) (queried c t).ood_samples
+  set h1 := if s.pow_bits = 0 then o.2.2 else o.2.2 ++ [.pow s.pow_bits (PE.solve o.2.2 s.pow_bits)]
+  set qi := play_query_indices E.S h1 s.index_bits s.draws c.stratified_queries s.depths
+  set g := E.gen (queried c t).log_folded_domain_size
+  set con : Constraint F EF := ⟨nv, [.Eq ⟨nv, o.1, o.2.1⟩,
+    .Select ⟨nv, qi.1.map (g ^ ·), qi.1.map fun i => uni st.P (algebraMap F EF (g ^ i))⟩], E.S.sample qi.2, 1⟩
+  set Wt' := List.zipWith (· + ·) st.Wt (cubeTable (weightAt con) nv)
+  set H := honestSumcheck E.S.toSponge PE.solve (queried c t).folding_pow_bits st.P Wt' (qi.2 ++ [.challenge])
+    (c.folding_schedule.getD (t + 1) 0)
+  have hst' : st' =
+      { P := H.f, Wt := H.w,
+        claim := Plonky3Lean.Proofs.Sumcheck.replay .Evaluation (con.combine_evals st.claim) H.ms H.rs,
+        cons := st.cons ++ [con], rand := st.rand ++ [H.rs], h := H.h, prevP := st.P, prevNv := nv,
+        prevData := some rd.2, prevRoot := rd.1,
+        rounds := st.rounds ++ [⟨some rd.1, o.2.1, if s.pow_bits = 0 then 0 else PE.solve o.2.2 s.pow_bits,
+          openPrev E PE c P0 n st t qi.1, (H.ms, H.ws)⟩] } := by
+    simp only [st', honestRound, hq, hs, Option.getD_some, ← hspow]
+    rfl
+  have hrec : proof.rounds[t]? = some ⟨some rd.1, o.2.1, if s.pow_bits = 0 then 0 else PE.solve o.2.2 s.pow_bits,
+      openPrev E PE c P0 n st t qi.1, (H.ms, H.ws)⟩ := by
+    rw [hp]
+    show st'.rounds[t]? = _
+    rw [hst']
+    simp [hinv.rounds]
+  have hk1 : c.round_folding_factor (t + 1) = some (c.folding_schedule.getD (t + 1) 0) := by
+    simp only [WhirConfig.round_folding_factor, List.getD_eq_getElem?_getD]
+    rw [List.getElem?_eq_getElem (by have := hv.schedule; omega),
+      Option.getD_some]
+  constructor
+  · rw [hst']
+    simp only [roundStep, queried_lt c ht, hrec, Option.bind_eq_bind, Option.bind_some]
+    rw [parse_honest]
+    simp only [hr, Option.bind_some]
+    rw [stir_honest E PE c hv hh ht.le hinv hr hs]
+    simp only [Option.bind_some]
+    rw [new_with_existing_claim_eq _ _ _ (by
+      simp only [List.mem_cons, List.mem_nil_iff, or_false]; rintro _ (rfl | rfl) <;> rfl)]
+    simp only [Option.bind_some, hk1, sumcheck, H, Wt']
+    rw [verify_rounds_honest E.S.toSponge PE.solve hh.solve]
+    rfl
+  · sorry
 
 end Plonky3Lean.Proofs.Whir
