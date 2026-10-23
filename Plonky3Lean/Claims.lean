@@ -26,6 +26,7 @@ public import Plonky3Lean.Proofs
 public import Plonky3Lean.Claims.MerkleTree
 public import Plonky3Lean.Claims.UniStark
 public import Plonky3Lean.Claims.Keccak
+public import Plonky3Lean.Claims.Fri
 
 @[expose] public section
 

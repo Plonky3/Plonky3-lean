@@ -144,6 +144,18 @@ public import Plonky3Lean.Proofs.Challenger.Fields
 public import Plonky3Lean.Proofs.Challenger.Hash
 public import Plonky3Lean.Proofs.Lookup.Combine
 public import Plonky3Lean.Proofs.Lookup.Extracted
+public import Plonky3Lean.Proofs.Fri.Poly
+public import Plonky3Lean.Proofs.Fri.Row
+public import Plonky3Lean.Proofs.Fri.Matrix
+public import Plonky3Lean.Proofs.Fri.Schedule
+public import Plonky3Lean.Proofs.Fri.Query
+public import Plonky3Lean.Proofs.Fri.Final
+public import Plonky3Lean.Proofs.Fri.Res
+public import Plonky3Lean.Proofs.Fri.Reduce
+public import Plonky3Lean.Proofs.Fri.Robust
+public import Plonky3Lean.Proofs.Fri.Transcript
+public import Plonky3Lean.Proofs.Fri.Hiding
+public import Plonky3Lean.Proofs.Fri.Packed
 
 @[expose] public section
 
