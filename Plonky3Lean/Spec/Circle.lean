@@ -120,6 +120,13 @@ def basis (n j : ℕ) (P : C K) : K :=
 def fftEval {V : Type _} [AddCommGroup V] [Module K V] (n : ℕ) (c : ℕ → V) (P : C K) : V :=
   ∑ j ∈ range (2 ^ n), basis n j P • c j
 
+/-- The x-only part of the FFT basis on the projected domain S_j of Section 4.1: x^(k_0) pi(x)^(k_1) ... pi^(m-1)(x)^(k_(m-1)). -/
+def xBasis (m k : ℕ) (x : K) : K := ∏ t ∈ range m, (piX^[t] x) ^ bit k t
+
+/-- The value at x of the function with coefficients d in the x-only basis of order m. -/
+def xEval {V : Type _} [AddCommGroup V] [Module K V] (m : ℕ) (d : ℕ → V) (x : K) : V :=
+  ∑ k ∈ range (2 ^ m), xBasis m k x • d k
+
 /-- The vanishing polynomial v_D(P) = v_n(P) - v_n(Q) of the twin coset D = Q + G_(n-1) ∪ -Q + G_(n-1), equation (7). -/
 def vD (n : ℕ) (Q P : C K) : K := vn n P - vn n Q
 
@@ -128,5 +135,9 @@ def vBlock (x y : K) : K × K := (1 - x, -y)
 
 /-- The single-point vanishing function v_P(x, y) = v(P_x x + P_y y, -P_y x + P_x y) of equation (11), as real and imaginary parts. -/
 def vP (P Q : C K) : K × K := vBlock (P.x * Q.x + P.y * Q.y) (-P.y * Q.x + P.x * Q.y)
+
+/-- The folding of Section 4.2, equations (14) to (19), with the challenge beta: f_0 + beta f_1, where f_0 = (f(P) + f(P'))/2 and f_1 = (f(P) - f(P'))/(2 t) for the fibre {P, P'} and its odd reference function t. -/
+def foldPair {F : Type _} [Field F] {V : Type _} [AddCommGroup V] [Module F V] (t β : F) (lo hi : V) : V :=
+  (2 : F)⁻¹ • (lo + hi) + (β / (2 * t)) • (lo - hi)
 
 end Plonky3Lean.Spec.Circle
