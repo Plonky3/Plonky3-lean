@@ -137,3 +137,7 @@ srcDir = "crates/security/extraction"
 [[lean_lib]]
 name = "P3Symmetric"
 srcDir = "crates/symmetric/extraction"
+
+[[lean_lib]]
+name = "P3MerkleTree"
+srcDir = "crates/merkle-tree/extraction"

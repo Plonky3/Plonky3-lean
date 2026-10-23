@@ -1,0 +1,28 @@
+# Patch:        010-exposed-saturating-sub
+# Phase:        post
+# Target:       extraction/P3Util/Extraction/Funs.lean
+# Hunks:        1
+# Class:        reshape
+# Gap:          docs/extractor-issues.md 22 (Aeneas's `UScalar.saturating_sub`
+#               has no exposed body).
+# Cost:         `core.num.Usize.saturating_sub_exposed` in HaxExt.lean, a model
+#               of `usize::saturating_sub`, trusted as the rest of HaxExt is.
+# Upstreamable: yes: aeneas can mark its saturating operations `@[expose]`.
+# Drop when:    aeneas exposes them.
+#
+# The ceiling logarithm subtracts one from its argument, clamped at 0, before counting leading zeros.
+#
+# The call goes to HaxExt's exposed model of the same operation, as in matrix/030.
+#
+--- a/extraction/P3Util/Extraction/Funs.lean
++++ b/extraction/P3Util/Extraction/Funs.lean
+@@ -33,7 +33,8 @@
+     Source: 'util/src/lib.rs', lines 24:0-26:1
+     Visibility: public -/
+ def log2_ceil_usize (n : Std.Usize) : RustM Std.Usize := do
+-  let i ← core.num.Usize.saturating_sub n 1#usize
++  -- PATCHED: the exposed model of `saturating_sub` (was `core.num.Usize.saturating_sub`)
++  let i ← core.num.Usize.saturating_sub_exposed n 1#usize
+   let i1 ← core.num.Usize.leading_zeros i
+   let i2 ← core.num.Usize.BITS - i1
+   ok (UScalar.cast .Usize i2)

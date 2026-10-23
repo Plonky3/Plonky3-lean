@@ -27,7 +27,7 @@ new file mode 100644
 index 0000000..534d9b9
 --- /dev/null
 +++ b/symmetric/src/hax_roots.rs
-@@ -0,0 +1,139 @@
+@@ -0,0 +1,160 @@
 +//! PATCHED: extraction roots for hax's Lean backend, compiled only under `cfg(hax_backend_lean)`.
 +//!
 +//! Aeneas drops a method that no free function calls (Plonky3-lean, docs/extractor-issues.md, 4).
@@ -166,6 +166,27 @@ index 0000000..534d9b9
 +
 +pub fn merkle_cap_from_hash<F, W, const N: usize>(hash: Hash<F, W, N>) -> MerkleCap<F, [W; N]> {
 +    MerkleCap::from(hash)
++}
++
++// p3-merkle-tree hashes the rows of one height as a sequence of slices.
++pub fn hash_iter_slices<'a, Item: Clone + 'a, Out, H, I>(hasher: &H, input: I) -> Out
++where
++    H: CryptographicHasher<Item, Out>,
++    I: IntoIterator<Item = &'a [Item]>,
++{
++    hasher.hash_iter_slices(input)
++}
++
++pub fn merkle_cap_index<F, Digest>(cap: &MerkleCap<F, Digest>, index: usize) -> &Digest {
++    &cap[index]
++}
++
++// p3-merkle-tree compresses through any compression function.
++pub fn pseudo_compress<T, C: PseudoCompressionFunction<T, N>, const N: usize>(
++    compressor: &C,
++    input: [T; N],
++) -> T {
++    compressor.compress(input)
 +}
 diff --git a/symmetric/src/lib.rs b/symmetric/src/lib.rs
 index 3c96eed..f8ecfd8 100644

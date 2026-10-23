@@ -1,0 +1,14 @@
+# Mutation of: 010-reshape-verifier
+# Breaks:      the injected rows' digest goes in the first slot of the injection.
+#
+--- a/merkle-tree/src/mmcs/hax_reshaped.rs
++++ b/merkle-tree/src/mmcs/hax_reshaped.rs
+@@ -330,7 +330,7 @@
+ 
+                 let mut inject_inputs = [default_digest; N];
+                 inject_inputs[0] = digest;
+-                inject_inputs[1] = next_height_openings_digest;
++                inject_inputs[0] = next_height_openings_digest;
+                 digest = mmcs.compress.compress(inject_inputs);
+             }
+         }

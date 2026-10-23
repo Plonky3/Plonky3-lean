@@ -29,6 +29,16 @@ noncomputable section
 
 namespace p3_util
 
+/-- [p3_util::log2_ceil_usize]:
+    Source: 'util/src/lib.rs', lines 24:0-26:1
+    Visibility: public -/
+def log2_ceil_usize (n : Std.Usize) : RustM Std.Usize := do
+  -- PATCHED: the exposed model of `saturating_sub` (was `core.num.Usize.saturating_sub`)
+  let i ← core.num.Usize.saturating_sub_exposed n 1#usize
+  let i1 ← core.num.Usize.leading_zeros i
+  let i2 ← core.num.Usize.BITS - i1
+  ok (UScalar.cast .Usize i2)
+
 /-- [p3_util::log2_strict_usize]:
     Source: 'util/src/lib.rs', lines 78:0-87:1
     Visibility: public -/

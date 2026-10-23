@@ -17,3 +17,10 @@ features = []
 start_from = ["p3_symmetric::hax_roots"]
 
 watch = ["symmetric/src", "symmetric/Cargo.toml"]
+
+# Passed to charon after toolchain.toml's `charon_args`, for this crate only.
+#
+# The provided body of `hash_iter_slices` flattens an iterator of slices.
+# aeneas stops on the signatures of the iterator adapters it reaches (docs/extractor-issues.md, 30).
+# The body is assumed: a hasher's theorems quantify over its `hash_iter_slices` anyway.
+charon_args = ["--opaque", "p3_symmetric::hasher::CryptographicHasher::hash_iter_slices"]

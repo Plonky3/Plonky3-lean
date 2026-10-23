@@ -29,6 +29,14 @@ noncomputable section
 
 namespace p3_symmetric
 
+/-- [p3_symmetric::compression::PseudoCompressionFunction::LANES]
+    Source: 'symmetric/src/compression.rs', lines 16:4-16:27
+    Visibility: public -/
+@[global_simps, irreducible, trait_default]
+def compression.PseudoCompressionFunction.LANES.default (Self : Type _) (T :
+  Type _) (N : Std.Usize) : Std.Usize :=
+  1#usize
+
 /-- [p3_symmetric::compression::{p3_symmetric::compression::TruncatedPermutation<InnerP, N, CHUNK, WIDTH>}::new]:
     Source: 'symmetric/src/compression.rs', lines 64:4-71:5
     Visibility: public -/
@@ -310,6 +318,17 @@ def hash.MerkleCapFArray.Insts.CoreConvertFromHash.from
       1#usize))
   let ret ← alloc.slice.Slice.into_vec y
   hash.MerkleCap.new F ret
+
+/-- [p3_symmetric::hash::{impl core::ops::index::Index<usize, Digest> for p3_symmetric::hash::MerkleCap<F, Digest>}::index]:
+    Source: 'symmetric/src/hash.rs', lines 156:4-158:5
+    Visibility: public -/
+def hash.MerkleCap.Insts.CoreOpsIndexIndexUsizeDigest.index
+  {F : Type _} {Digest : Type _} (self : hash.MerkleCap F Digest)
+  (index : Std.Usize) :
+  RustM Digest
+  := do
+  alloc.vec.Vec.Insts.CoreOpsIndexIndex.index
+    (core.Usize.Insts.CoreSliceIndexSliceIndexSliceT Digest) self.cap index
 
 /-- [p3_symmetric::hash::{impl core::convert::From<[W; DIGEST_ELEMS]> for p3_symmetric::hash::Hash<F, W, DIGEST_ELEMS>}::from]:
     Source: 'symmetric/src/hash.rs', lines 171:4-176:5
@@ -866,6 +885,44 @@ def hax_roots.merkle_cap_from_hash
   RustM (hash.MerkleCap F (Array W N))
   := do
   hash.MerkleCapFArray.Insts.CoreConvertFromHash.from hash1
+
+/-- [p3_symmetric::hax_roots::hash_iter_slices]:
+    Source: 'symmetric/src/hax_roots.rs', lines 142:0-148:1
+    Visibility: public -/
+def hax_roots.hash_iter_slices
+  {Item : Type _} {Out : Type _} {H : Type _} {I : Type _} {Clause2_IntoIter :
+  Type _} (corecloneCloneInst : core.clone.Clone Item)
+  (hasherCryptographicHasherInst : hasher.CryptographicHasher H Item Out)
+  (coreitertraitscollectIntoIteratorISharedASliceClause2_IntoIterInst :
+  core.iter.traits.collect.IntoIterator I (Slice Item) Clause2_IntoIter)
+  (hasher1 : H) (input : I) :
+  RustM Out
+  := do
+  hasherCryptographicHasherInst.hash_iter_slices
+    coreitertraitscollectIntoIteratorISharedASliceClause2_IntoIterInst hasher1
+    input
+
+/-- [p3_symmetric::hax_roots::merkle_cap_index]:
+    Source: 'symmetric/src/hax_roots.rs', lines 150:0-152:1
+    Visibility: public -/
+def hax_roots.merkle_cap_index
+  {F : Type _} {Digest : Type _} (cap : hash.MerkleCap F Digest)
+  (index : Std.Usize) :
+  RustM Digest
+  := do
+  hash.MerkleCap.Insts.CoreOpsIndexIndexUsizeDigest.index cap index
+
+/-- [p3_symmetric::hax_roots::pseudo_compress]:
+    Source: 'symmetric/src/hax_roots.rs', lines 155:0-160:1
+    Visibility: public -/
+def hax_roots.pseudo_compress
+  {T : Type _} {C : Type _} {N : Std.Usize}
+  (compressionPseudoCompressionFunctionInst :
+  compression.PseudoCompressionFunction C T N) (compressor : C)
+  (input : Array T N) :
+  RustM T
+  := do
+  compressionPseudoCompressionFunctionInst.compress compressor input
 
 /-- [p3_symmetric::permutation::Permutation::permute]:
     Source: 'symmetric/src/permutation.rs', lines 9:4-12:5
