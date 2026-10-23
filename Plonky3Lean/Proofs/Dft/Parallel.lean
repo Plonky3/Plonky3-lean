@@ -114,7 +114,7 @@ theorem foldl_congr_mem {α β : Type _} (l : List α) {f g : β → α → β}
 
 end loops
 
-variable {K : Type _} [Field K] [DecidableEq K] {V : Type _} [AddCommGroup V] [Module K V]
+variable {K : Type} [Field K] [DecidableEq K] {V : Type} [AddCommGroup V] [Module K V]
 
 /-- The natural decimation-in-time layer l of the transform of size 2^k. -/
 abbrev natLayer (ω : K) (k l : ℕ) : (ℕ → V) → ℕ → V :=
@@ -643,5 +643,49 @@ theorem parallel_coset_dft_batch (G : Gen K) (hG : GenValid G) {k : ℕ} (hk : k
   rw [hz' i hi, ditNetC_congr _ _ k (x' := bitRevVec (rev k) x) (fun p hp => by
       rw [revRows_apply k x hp, bitRevVec]) k le_rfl i hi]
   exact ditNetC_eq_cosetDft (hG k hk) x hi
+
+theorem first_half_general_oop_eq (tbl : List (List K)) {k : ℕ} (hk : 1 ≤ k) (src : ℕ → V) :
+    first_half_general_oop (2 ^ k) ((k + 1) / 2) tbl src =
+      first_half_general (2 ^ k) ((k + 1) / 2) tbl src := by
+  simp only [first_half_general_oop, first_half_general, log2Strict_pow, Option.bind_eq_bind,
+    Option.bind_some]
+  congr 1
+  congr 1
+  funext acc c
+  obtain ⟨n, hn⟩ : ∃ n, (k + 1) / 2 = n + 1 := ⟨(k + 1) / 2 - 1, by omega⟩
+  rw [hn, List.range_eq_range', List.range'_succ]
+  simp only [List.foldl_cons, Nat.sub_zero, Bool.not_false, Nat.add_sub_cancel]
+
+/-- The out-of-place coset transform with the coset tables computes what the in-place one does. -/
+theorem coset_dft_oop_spec (G : Gen K) {k : ℕ} (hk : k ≤ G.adicity) (c : K) (src : ℕ → V) :
+    ∃ z, coset_dft_oop (2 ^ k) src (cosetTbl (G.gen k) c k) = some z ∧
+      ∀ i < 2 ^ k, z (rev k i) = ditNetC c (G.gen k) k k src i := by
+  have hvalid : (cosetTbl (G.gen k) c k).length = k ∧ ∀ l < k,
+      ((cosetTbl (G.gen k) c k).getD l []).length = 2 ^ k / 2 ^ (l + 1) := by
+    refine ⟨by simp, fun l hl => ?_⟩
+    rw [List.getD_eq_getElem (d := ([] : List K)) _ (by simp; omega), List.getElem_map,
+      List.getElem_range]
+    split_ifs <;> simp [length_revIndex, shiftedPowersList]
+  by_cases hk0 : k = 0
+  · subst hk0
+    have h1 : log2Strict 1 = some 0 := by simpa using log2Strict_pow 0
+    refine ⟨src, by simp [coset_dft_oop, h1, hvalid], fun i hi => ?_⟩
+    simp at hi; subst hi; simp [ditNetC, Plonky3Lean.Spec.Matrix.bitRev]
+  obtain ⟨z, hz, hz'⟩ := coset_dft_spec G hk c src
+  refine ⟨z, ?_, hz'⟩
+  have hk1 : 1 ≤ k := by omega
+  simp only [coset_dft_oop, log2Strict_pow, Option.bind_eq_bind, Option.bind_some]
+  rw [ite_eq_left hvalid]
+  simp only [hk0, ↓reduceIte, first_half_general_oop_eq _ hk1]
+  simpa only [coset_dft, log2Strict_pow, coset_tables G hk, Option.bind_eq_bind,
+    Option.bind_some] using hz
+
+theorem mapM_some {α β : Type _} (l : List α) (f : α → Option β) (g : α → β)
+    (h : ∀ a ∈ l, f a = some (g a)) : l.mapM f = some (l.map g) := by
+  induction l with
+  | nil => rfl
+  | cons a l ih =>
+    rw [List.mapM_cons, h a (by simp), ih (fun a ha => h a (by simp [ha]))]
+    rfl
 
 end Plonky3Lean.Proofs.Dft
