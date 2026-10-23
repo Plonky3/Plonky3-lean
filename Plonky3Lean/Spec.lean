@@ -4,6 +4,7 @@ public import Plonky3Lean.Spec.Air
 public import Plonky3Lean.Spec.BabyBear
 public import Plonky3Lean.Spec.BinaryField
 public import Plonky3Lean.Spec.Blake3
+public import Plonky3Lean.Spec.Commit
 public import Plonky3Lean.Spec.Dft
 public import Plonky3Lean.Spec.Goldilocks
 public import Plonky3Lean.Spec.KoalaBear

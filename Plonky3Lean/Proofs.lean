@@ -17,6 +17,11 @@ public import Plonky3Lean.Proofs.Dft.Rows
 public import Plonky3Lean.Proofs.Dft.Fields
 public import Plonky3Lean.Proofs.ZkCodes.Properties
 public import Plonky3Lean.Proofs.ZkCodes.Batch
+public import Plonky3Lean.Proofs.Commit.BabyBear
+public import Plonky3Lean.Proofs.Commit.Encoder
+public import Plonky3Lean.Proofs.Commit.Mmcs
+public import Plonky3Lean.Proofs.Commit.Pcs
+public import Plonky3Lean.Proofs.Commit.PeriodicTable
 public import Plonky3Lean.Proofs.Hash.Blake2s
 public import Plonky3Lean.Proofs.Hash.Blake3.Spec
 public import Plonky3Lean.Proofs.Hash.Blake3.Vectors

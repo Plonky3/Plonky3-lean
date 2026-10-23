@@ -3,6 +3,7 @@ module
 public import P3Commit.Testing
 public import Plonky3Lean.Proofs.Commit.PeriodicTable
 public import Plonky3Lean.Proofs.Dft.Lde
+public import Plonky3Lean.Proofs.Dft.Parallel
 public import Plonky3Lean.Spec.Commit
 
 @[expose] public section
@@ -398,6 +399,29 @@ noncomputable def trivialContract (hV : GenValid G) (hidft : IdftComputes G idft
     simp only [List.getD_eq_getElem?_getD, List.getElem?_map, List.getElem?_eq_getElem hm2,
       Option.map_some, Option.getD_some]
     exact flatPolys_commitsTo G hV hidft hR
+
+/-- The parallel radix-2 backend computes the inverse transform. -/
+theorem parallel_idftComputes (hV : GenValid G) :
+    IdftComputes G fun _ h x => p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.idft_batch G h x :=
+  fun _ _ hk x => parallel_idft_batch G hV hk x
+
+/-- The evaluations on a domain of 2^D points have height h 2^(D - log_n), for a committed coefficient matrix of height h. -/
+theorem get_evaluations_on_domain_height
+    (coset_dft : (w : ℕ) → ℕ → K → (ℕ → Fin w → K) → Option (ℕ → Fin w → K))
+    (pd : List (Mat K)) (idx : ℕ) (domain : Coset G) (c : Mat K) (hc : pd[idx]? = some c)
+    (hw : c.width ≠ 0) (out : Mat K)
+    (h : pcs.get_evaluations_on_domain G coset_dft pd idx domain = some out) :
+    out.height = c.height * 2 ^ (domain.log_size - pcs.log_n) := by
+  simp only [TrivialPcs.get_evaluations_on_domain, hc, Option.bind_eq_bind, Option.bind_some] at h
+  split_ifs at h
+  cases hd : coset_dft c.width (c.height * c.width * 2 ^ (domain.log_size - pcs.log_n) / c.width)
+    domain.shift (fun r col => if r < c.height then c.entry r col else 0) with
+  | none => simp [hd] at h
+  | some e =>
+    simp only [hd, Option.bind_some, Option.pure_def, Option.some.injEq] at h
+    subst h
+    show c.height * c.width * 2 ^ _ / c.width = _
+    rw [Nat.mul_right_comm, Nat.mul_div_cancel _ (Nat.pos_of_ne_zero hw)]
 
 end scheme
 

@@ -126,6 +126,18 @@ theorem split_domains_none (c : Coset G) {nc : ℕ} (h : ∀ l, nc = 2 ^ l → c
     have := h l (log2Strict_eq_some hl)
     simp [show ¬ l ≤ c.log_size by omega]
 
+/-- Splitting succeeds exactly for a power-of-two chunk count no larger than the size. -/
+theorem split_domains_isSome (hV : GenValid G) (c : Coset G) (nc : ℕ) :
+    (Coset.split_domains G c nc).isSome ↔ ∃ l, nc = 2 ^ l ∧ l ≤ c.log_size := by
+  constructor
+  · intro h
+    by_contra hc
+    push Not at hc
+    rw [split_domains_none G c fun l hl => hc l hl] at h
+    exact absurd h (by simp)
+  · rintro ⟨l, rfl, hl⟩
+    rw [split_domains_eq G hV c hl]; rfl
+
 /-- Point j of chunk i is point i + 2^l j of the coset. -/
 theorem chunk_point (hV : GenValid G) (hN : GenNested G) (c : Coset G) {l : ℕ}
     (hl : l ≤ c.log_size) (i j : ℕ) :
