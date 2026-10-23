@@ -7,6 +7,10 @@ public import Plonky3Lean.Proofs.Security.Budget
 public import Plonky3Lean.Proofs.Security.Binary
 public import Plonky3Lean.Proofs.Security.Real
 public import Plonky3Lean.Proofs.Matrix.Unsound
+public import Plonky3Lean.Proofs.Dft.Parallel
+public import Plonky3Lean.Proofs.Dft.Lde
+public import Plonky3Lean.Proofs.Dft.Rows
+public import Plonky3Lean.Proofs.Dft.Fields
 public import Plonky3Lean.Proofs.Hash.Blake2s
 public import Plonky3Lean.Proofs.Hash.Blake3.Spec
 public import Plonky3Lean.Proofs.Hash.Blake3.Vectors
