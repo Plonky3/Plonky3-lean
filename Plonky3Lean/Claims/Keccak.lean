@@ -36,16 +36,9 @@ A state array `A[x, y, z]` is read from 25 words with lane `(x, y)` in word `x +
 
 open Aeneas Aeneas.Std CoreModels
 open Plonky3Lean.Spec.Keccak
+open Plonky3Lean.Proofs.Keccak (stateOfWords stateOfWords_eq)
 
 namespace Plonky3Lean.Claims.P3Keccak
-
-/-- The state array of 25 words: lane `(x, y)` is word `x + 5 y`, and `A[x, y, z]` is its bit `z`. -/
-def stateOfWords (w : List Std.U64) : State := fun x y z => (w.getD (x.val + 5 * y.val) 0#u64).bv.getLsbD z.val
-
-private theorem stateOfWords_eq (w : List Std.U64) : stateOfWords w = Proofs.Keccak.ofLanes (w.map UScalar.bv) := by
-  funext x y z
-  rw [Proofs.Keccak.ofLanes_val, Proofs.Keccak.lane, Proofs.Keccak.getD_map_bv]
-  rfl
 
 /-! ## The permutation -/
 

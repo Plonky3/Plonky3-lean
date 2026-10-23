@@ -407,6 +407,14 @@ theorem digestOf_bv (input : Slice Std.U8) (len : ℕ) (d : Std.U8) (j : ℕ) (h
   rw [length_padBytes, hM, Nat.mul_div_cancel_left _ (by decide)]
   rfl
 
+/-- The state array of 25 words: lane `(x, y)` is word `x + 5 y`, and `A[x, y, z]` is its bit `z`. -/
+def stateOfWords (w : List Std.U64) : State := fun x y z => (w.getD (x.val + 5 * y.val) 0#u64).bv.getLsbD z.val
+
+theorem stateOfWords_eq (w : List Std.U64) : stateOfWords w = ofLanes (w.map UScalar.bv) := by
+  funext x y z
+  rw [ofLanes_val, lane, getD_map_bv]
+  rfl
+
 /-! ## The two batched hashes -/
 
 /-- With `n > 0` digests requested and an input of `n * len` bytes, digest `j` is `H` of bytes `j len` to `(j + 1) len - 1`. -/
