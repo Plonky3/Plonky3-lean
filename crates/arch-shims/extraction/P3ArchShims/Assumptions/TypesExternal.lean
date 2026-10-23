@@ -1,0 +1,12 @@
+-- [p3_arch_shims]: external types.
+-- HAND-WRITTEN, from hax's seed of Extraction/TypesExternal_Template.lean.
+-- The generated code imports it by this module name. extract.sh fails if the
+-- regenerated template declares different names than this file does.
+--
+-- The crate refers to no external type, so there is nothing to declare.
+module
+
+public import Aeneas
+public import CoreModels
+
+@[expose] public section
