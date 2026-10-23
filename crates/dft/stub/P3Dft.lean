@@ -11,5 +11,6 @@ public import P3Dft.Model
 public import P3Dft.Butterflies
 public import P3Dft.Transforms
 public import P3Dft.Parallel
+public import P3Dft.SmallBatch
 
 @[expose] public section
