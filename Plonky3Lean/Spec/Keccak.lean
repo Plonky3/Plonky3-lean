@@ -2,6 +2,7 @@ module
 
 public import Mathlib.Data.List.Basic
 public import Mathlib.Logic.Function.Iterate
+public import Batteries.Data.BitVec
 
 @[expose] public section
 
@@ -137,11 +138,9 @@ abbrev Byte := BitVec 8
 /-- B.1: byte `i` gives bits `8 i` to `8 i + 7`, least significant bit first. -/
 def bitsOfBytes (M : List Byte) : List Bool := M.flatMap fun b => List.ofFn fun j : Fin 8 => b.getLsbD j
 
-/-- B.1: the bytes of a bit string whose length is a multiple of 8. -/
-def bytesOfBits : List Bool → List Byte
-  | b₀ :: b₁ :: b₂ :: b₃ :: b₄ :: b₅ :: b₆ :: b₇ :: rest =>
-    BitVec.ofBoolListLE [b₀, b₁, b₂, b₃, b₄, b₅, b₆, b₇] :: bytesOfBits rest
-  | _ => []
+/-- B.1: the bytes of a bit string, byte `i` holding bits `8 i` to `8 i + 7`, least significant first. -/
+def bytesOfBits (S : List Bool) : List Byte :=
+  (List.range (S.length / 8)).map fun i => BitVec.ofFnLE fun j : Fin 8 => S.getD (8 * i + j) false
 
 /-- SHA3-256 of a byte string. -/
 def sha3_256 (M : List Byte) : List Byte := bytesOfBits (sha3_256Bits (bitsOfBytes M))
