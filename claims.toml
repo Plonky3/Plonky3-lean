@@ -225,6 +225,146 @@ name   = "Plonky3Lean.Claims.Air.when_when_accepts"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.IsCantor.independent'"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.IsCantor.map'"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.LchNtt.ntt_batch_padded.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.LchNtt.ntt_batch_padded.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.NaiveAdditiveNtt.panics_height"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.NaiveAdditiveNtt.shifted_intt_batch.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.NaiveAdditiveNtt.shifted_ntt_batch.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.NaiveAdditiveNtt.shifted_ntt_batch.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.Twiddles.new.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.domain_point.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.domain_point_steps.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.encode_batch.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.inetwork_network"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.inetwork_ntt"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.network_inetwork"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.network_ntt"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.normalized.cantor"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.ntt_map"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.ntt_pad"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.pairOp.eq"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.point.step"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.run.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.shifted_lde_batch.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.stage_pass.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.subspace_polynomial.eq"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.towerLevel.cantor"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.towerLevel.transform"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.transform.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.transform_intt"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.transform_ntt"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.twiddle.cantor"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.typed_butterfly.eq"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.vanishing.add"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.vanishing.point_eq_zero"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.vanishing.succ"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BabyBear.baby_bear.BabyBear.new.montgomery_form"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 

@@ -16,6 +16,7 @@ target `thumbv7em-none-eabi`
 |---|---|---:|---:|---:|---:|---:|---|---|
 | `air` | scoped | 364 | 913 | 0 | 67 | 0 | 0 / 1 | post `010` |
 | `baby-bear` | extracted | 2953 | 121 | 4 | 0 | 0 | 4 / 3 | pre `020`, pre `030`, pre `040` |
+| `binary-dft` | stub |  | 528 | 0 | 50 |  | 0 / 0 |  |
 | `binary-field` | scoped | 21777 | 66 | 0 | 0 | 139 | 7 / 2 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050`, pre `060`, pre `070` |
 | `blake2s` | scoped | 148 | 51 | 1 | 0 | 0 | 1 / 0 | pre `010` |
 | `blake3` | scoped | 2609 | 40 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
@@ -436,7 +437,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1162) whose dependencies include it; reaching one is not using it.
+(of 1197) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -475,7 +476,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1162) whose dependencies include the declaration.
+counts the claims (of 1197) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -546,6 +547,56 @@ counts the claims (of 1162) whose dependencies include the declaration.
 | `air` | `p3_air.air.mirror.boundary_io_mismatches` | `p3_air::check_constraints::boundary_io_mismatches` | not translated | 1 |
 | `air` | `p3_air.air.mirror.rowBuilder` | `p3_air::check_constraints::check_constraints` | not translated | 6 |
 | `air` | `p3_air.air.mirror.check_constraints` | `p3_air::check_constraints::check_constraints` | not translated | 1 |
+| `binary-dft` | `p3_binary_dft.mirror.Level.cantorBasis` | `p3_binary_field::tower::TowerLevel::cantor_basis` | stub | 17 |
+| `binary-dft` | `p3_binary_dft.mirror.trailingZeros` | `core::num::usize::trailing_zeros` | stub | 11 |
+| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point.loop` | `p3_binary_dft::domain::domain_point` | stub | 15 |
+| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point` | `p3_binary_dft::domain::domain_point` | stub | 15 |
+| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point_steps` | `p3_binary_dft::domain::domain_point_steps` | stub | 10 |
+| `binary-dft` | `p3_binary_dft.domain.mirror.subspace_polynomial` | `p3_binary_dft::domain::subspace_polynomial` | stub | 1 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.vanishing` | `p3_binary_dft::naive::normalised_subspace_poly` | stub | 4 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.normalised_subspace_poly` | `p3_binary_dft::naive::normalised_subspace_poly` | stub | 4 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.basisAt` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_ntt_batch` | stub | 3 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.NaiveAdditiveNtt.shifted_ntt_batch` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_ntt_batch` | stub | 3 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.blockLoop` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_intt_batch` | stub | 2 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.NaiveAdditiveNtt.shifted_intt_batch` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_intt_batch` | stub | 2 |
+| `binary-dft` | `p3_binary_dft.butterfly.mirror.pairOp` | `p3_binary_dft::butterfly::butterfly_values` | stub | 11 |
+| `binary-dft` | `p3_binary_dft.butterfly.mirror.butterfly_values` | `p3_binary_dft::butterfly::butterfly_values` | stub | 10 |
+| `binary-dft` | `p3_binary_dft.butterfly.mirror.packed_butterfly` | `p3_binary_dft::butterfly::packed_butterfly` | stub | 10 |
+| `binary-dft` | `p3_binary_dft.butterfly.mirror.plain_butterfly` | `p3_binary_dft::butterfly::plain_butterfly` | stub | 10 |
+| `binary-dft` | `p3_binary_dft.butterfly.mirror.typed_butterfly` | `p3_binary_dft::butterfly::subfield::typed_butterfly` | stub | 1 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Twiddles` | `p3_binary_dft::lch::twiddles::Twiddles` | stub | 11 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Twiddles.new` | `p3_binary_dft::lch::twiddles::Twiddles::new` | stub | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Twiddles.at` | `p3_binary_dft::lch::twiddles::Twiddles::at` | stub | 10 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Twiddles.step` | `p3_binary_dft::lch::twiddles::Twiddles::step` | stub | 10 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.BUTTERFLY_GRAIN` | `p3_binary_dft::lch::schedule::BUTTERFLY_GRAIN` | stub | 10 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.DEEP_TILE_BYTES` | `p3_binary_dft::lch::schedule::DEEP_TILE_BYTES` | stub | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.blockButterfly` | `p3_binary_dft::lch::schedule::stage_pass` | stub | 10 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.walkBlocks` | `p3_binary_dft::lch::schedule::stage_pass` | stub | 10 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.stage_pass` | `p3_binary_dft::lch::schedule::stage_pass` | stub | 10 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.tile_stages` | `p3_binary_dft::lch::schedule::tile_stages` | stub | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.deep_tiles` | `p3_binary_dft::lch::schedule::deep_tiles` | stub | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Schedule` | `p3_binary_dft::lch::schedule::Schedule` | stub | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Schedule.for_workers` | `p3_binary_dft::lch::schedule::Schedule::for_workers` | stub | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Schedule.new` | `p3_binary_dft::lch::schedule::Schedule::new` | stub | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Cut` | `p3_binary_dft::lch::schedule::Cut` | stub | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Cut.new` | `p3_binary_dft::lch::schedule::Cut::new` | stub | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Cut.bounds` | `p3_binary_dft::lch::schedule::Cut::bounds` | stub | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.group_pass` | `p3_binary_dft::lch::schedule::group_pass` | stub | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.forward_below` | `p3_binary_dft::lch::schedule::forward_below` | stub | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.run` | `p3_binary_dft::lch::schedule::run` | stub | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.log2Floor` | `p3_util::log2_floor_usize` | stub | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.log2Ceil` | `p3_util::log2_ceil_usize` | stub | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.transform` | `p3_binary_dft::lch::transform` | stub | 8 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.transform_cosets` | `p3_binary_dft::lch::transform_cosets` | stub | 4 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.LchNtt.shifted_ntt_batch` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::lch::LchNtt<F>}::shifted_ntt_batch` | stub | 2 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.LchNtt.shifted_intt_batch` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::lch::LchNtt<F>}::shifted_intt_batch` | stub | 2 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.LchNtt.ntt_batch_padded` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::lch::LchNtt<F>}::ntt_batch_padded` | stub | 4 |
+| `binary-dft` | `p3_binary_dft.traits.mirror.ntt_batch_padded` | `p3_binary_dft::traits::AdditiveNtt::ntt_batch_padded` | stub | 0 |
+| `binary-dft` | `p3_binary_dft.traits.mirror.padded_len` | `p3_binary_dft::traits::padded_len` | stub | 2 |
+| `binary-dft` | `p3_binary_dft.traits.mirror.ntt_batch_borrowed` | `p3_binary_dft::traits::AdditiveNtt::ntt_batch_borrowed` | stub | 0 |
+| `binary-dft` | `p3_binary_dft.traits.mirror.shifted_lde_batch` | `p3_binary_dft::traits::AdditiveNtt::shifted_lde_batch` | stub | 1 |
+| `binary-dft` | `p3_binary_dft.encoder.mirror.encode_batch` | `{impl p3_commit::Encoder<BinaryField128> for p3_binary_dft::encoder::AdditiveRsEncoder<BinaryField128, Ntt>}::encode_batch` | stub | 1 |
+| `binary-dft` | `p3_binary_dft.encoder.mirror.encode_batch_padded` | `{impl p3_commit::Encoder<BinaryField128> for p3_binary_dft::encoder::AdditiveRsEncoder<BinaryField128, Ntt>}::encode_batch_padded` | stub | 0 |
 | `blake3-crate` | `blake3.BLOCK_LEN` | `blake3::BLOCK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.CHUNK_LEN` | `blake3::CHUNK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.OUT_LEN` | `blake3::OUT_LEN` | stub | 0 |
@@ -1006,6 +1057,41 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Air.when_ne_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Air.when_transition_accepts` | `Quot.sound`, `propext` |
 | `Air.when_when_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.IsCantor.independent'` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.IsCantor.map'` | `Quot.sound`, `propext` |
+| `BinaryDft.LchNtt.ntt_batch_padded.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.LchNtt.ntt_batch_padded.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.NaiveAdditiveNtt.panics_height` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.NaiveAdditiveNtt.shifted_intt_batch.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.NaiveAdditiveNtt.shifted_ntt_batch.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.NaiveAdditiveNtt.shifted_ntt_batch.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.Twiddles.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.domain_point.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.domain_point_steps.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.encode_batch.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.inetwork_network` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.inetwork_ntt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.network_inetwork` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.network_ntt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.normalized.cantor` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.ntt_map` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.ntt_pad` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.pairOp.eq` | `Quot.sound`, `propext` |
+| `BinaryDft.point.step` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.run.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.shifted_lde_batch.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.stage_pass.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.subspace_polynomial.eq` | `Quot.sound`, `propext` |
+| `BinaryDft.towerLevel.cantor` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.towerLevel.transform` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.transform.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.transform_intt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.transform_ntt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.twiddle.cantor` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.typed_butterfly.eq` | `Quot.sound`, `propext` |
+| `BinaryDft.vanishing.add` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.vanishing.point_eq_zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.vanishing.succ` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Commit.PeriodicColumns.new.error` | `Quot.sound`, `propext` |
 | `Commit.PeriodicColumns.new.ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Commit.PeriodicLdeTable.get.packed` | `Classical.choice`, `Quot.sound`, `propext` |
