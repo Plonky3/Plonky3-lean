@@ -4,7 +4,7 @@ public import Plonky3Lean.Proofs.Field.Binary.Aes
 public import Plonky3Lean.Proofs.Field.Binary.Operators
 public import Plonky3Lean.Proofs.Field.Binary.TowerApi
 public import Plonky3Lean.Proofs.Field.Binary.PolyField
-public import Plonky3Lean.Proofs.Field.Binary.Extension
+public import Plonky3Lean.Proofs.Field.Binary.ExtensionMul
 
 @[expose] public section
 
@@ -1867,5 +1867,150 @@ theorem tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField32.re
     tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField32.repeated_frobenius a count
       ⦃ r => r.val < 2 ^ 2 ^ 7 ∧ towerOf 7 r = towerOf 7 a ^ 2 ^ (2 ^ 5 * count.val) ⦄ :=
   Proofs.Binary.bf128_bf32_repeated_frobenius_spec a count
+
+/-! ### Products with a lower level
+
+A level is a vector space over each lower level, its coefficients stored as consecutive chunks.
+Multiplying by a lower-level element is multiplying by its embedding. -/
+
+/-- `GF(2^16)` times `GF(2^8)` is the product with the embedding. -/
+theorem tower.BinaryField16.Insts.CoreOpsArithMulBinaryField8BinaryField16.mul.towerOf (a : tower.BinaryField16) (b : tower.BinaryField8) :
+    tower.BinaryField16.Insts.CoreOpsArithMulBinaryField8BinaryField16.mul a b ⦃ r =>
+      towerOf 4 r =
+        towerOf 4 a * ConcreteBinaryTower.concreteTowerAlgebraMap 3 4 (by omega) (towerOf 3 b) ⦄ :=
+  Proofs.Binary.bf16_bf8_mul_spec a b
+
+/-- `GF(2^8)` times `GF(2^16)` is the product with the embedding. -/
+theorem tower.BinaryField8.Insts.CoreOpsArithMulBinaryField16BinaryField16.mul.towerOf (a : tower.BinaryField8) (b : tower.BinaryField16) :
+    tower.BinaryField8.Insts.CoreOpsArithMulBinaryField16BinaryField16.mul a b ⦃ r =>
+      towerOf 4 r =
+        ConcreteBinaryTower.concreteTowerAlgebraMap 3 4 (by omega) (towerOf 3 a) * towerOf 4 b ⦄ :=
+  Proofs.Binary.bf8_bf16_mul_spec a b
+
+/-- `GF(2^32)` times `GF(2^8)` is the product with the embedding. -/
+theorem tower.BinaryField32.Insts.CoreOpsArithMulBinaryField8BinaryField32.mul.towerOf (a : tower.BinaryField32) (b : tower.BinaryField8) :
+    tower.BinaryField32.Insts.CoreOpsArithMulBinaryField8BinaryField32.mul a b ⦃ r =>
+      towerOf 5 r =
+        towerOf 5 a * ConcreteBinaryTower.concreteTowerAlgebraMap 3 5 (by omega) (towerOf 3 b) ⦄ :=
+  Proofs.Binary.bf32_bf8_mul_spec a b
+
+/-- `GF(2^8)` times `GF(2^32)` is the product with the embedding. -/
+theorem tower.BinaryField8.Insts.CoreOpsArithMulBinaryField32BinaryField32.mul.towerOf (a : tower.BinaryField8) (b : tower.BinaryField32) :
+    tower.BinaryField8.Insts.CoreOpsArithMulBinaryField32BinaryField32.mul a b ⦃ r =>
+      towerOf 5 r =
+        ConcreteBinaryTower.concreteTowerAlgebraMap 3 5 (by omega) (towerOf 3 a) * towerOf 5 b ⦄ :=
+  Proofs.Binary.bf8_bf32_mul_spec a b
+
+/-- `GF(2^64)` times `GF(2^8)` is the product with the embedding. -/
+theorem tower.BinaryField64.Insts.CoreOpsArithMulBinaryField8BinaryField64.mul.towerOf (a : tower.BinaryField64) (b : tower.BinaryField8) :
+    tower.BinaryField64.Insts.CoreOpsArithMulBinaryField8BinaryField64.mul a b ⦃ r =>
+      towerOf 6 r =
+        towerOf 6 a * ConcreteBinaryTower.concreteTowerAlgebraMap 3 6 (by omega) (towerOf 3 b) ⦄ :=
+  Proofs.Binary.bf64_bf8_mul_spec a b
+
+/-- `GF(2^8)` times `GF(2^64)` is the product with the embedding. -/
+theorem tower.BinaryField8.Insts.CoreOpsArithMulBinaryField64BinaryField64.mul.towerOf (a : tower.BinaryField8) (b : tower.BinaryField64) :
+    tower.BinaryField8.Insts.CoreOpsArithMulBinaryField64BinaryField64.mul a b ⦃ r =>
+      towerOf 6 r =
+        ConcreteBinaryTower.concreteTowerAlgebraMap 3 6 (by omega) (towerOf 3 a) * towerOf 6 b ⦄ :=
+  Proofs.Binary.bf8_bf64_mul_spec a b
+
+/-- `GF(2^128)` times `GF(2^8)` is the product with the embedding. -/
+theorem tower.BinaryField128.Insts.CoreOpsArithMulBinaryField8BinaryField128.mul.towerOf (a : tower.BinaryField128) (b : tower.BinaryField8) :
+    tower.BinaryField128.Insts.CoreOpsArithMulBinaryField8BinaryField128.mul a b ⦃ r =>
+      towerOf 7 r =
+        towerOf 7 a * ConcreteBinaryTower.concreteTowerAlgebraMap 3 7 (by omega) (towerOf 3 b) ⦄ :=
+  Proofs.Binary.bf128_bf8_mul_spec a b
+
+/-- `GF(2^8)` times `GF(2^128)` is the product with the embedding. -/
+theorem tower.BinaryField8.Insts.CoreOpsArithMulBinaryField128BinaryField128.mul.towerOf (a : tower.BinaryField8) (b : tower.BinaryField128) :
+    tower.BinaryField8.Insts.CoreOpsArithMulBinaryField128BinaryField128.mul a b ⦃ r =>
+      towerOf 7 r =
+        ConcreteBinaryTower.concreteTowerAlgebraMap 3 7 (by omega) (towerOf 3 a) * towerOf 7 b ⦄ :=
+  Proofs.Binary.bf8_bf128_mul_spec a b
+
+/-- `GF(2^32)` times `GF(2^16)` is the product with the embedding. -/
+theorem tower.BinaryField32.Insts.CoreOpsArithMulBinaryField16BinaryField32.mul.towerOf (a : tower.BinaryField32) (b : tower.BinaryField16) :
+    tower.BinaryField32.Insts.CoreOpsArithMulBinaryField16BinaryField32.mul a b ⦃ r =>
+      towerOf 5 r =
+        towerOf 5 a * ConcreteBinaryTower.concreteTowerAlgebraMap 4 5 (by omega) (towerOf 4 b) ⦄ :=
+  Proofs.Binary.bf32_bf16_mul_spec a b
+
+/-- `GF(2^16)` times `GF(2^32)` is the product with the embedding. -/
+theorem tower.BinaryField16.Insts.CoreOpsArithMulBinaryField32BinaryField32.mul.towerOf (a : tower.BinaryField16) (b : tower.BinaryField32) :
+    tower.BinaryField16.Insts.CoreOpsArithMulBinaryField32BinaryField32.mul a b ⦃ r =>
+      towerOf 5 r =
+        ConcreteBinaryTower.concreteTowerAlgebraMap 4 5 (by omega) (towerOf 4 a) * towerOf 5 b ⦄ :=
+  Proofs.Binary.bf16_bf32_mul_spec a b
+
+/-- `GF(2^64)` times `GF(2^16)` is the product with the embedding. -/
+theorem tower.BinaryField64.Insts.CoreOpsArithMulBinaryField16BinaryField64.mul.towerOf (a : tower.BinaryField64) (b : tower.BinaryField16) :
+    tower.BinaryField64.Insts.CoreOpsArithMulBinaryField16BinaryField64.mul a b ⦃ r =>
+      towerOf 6 r =
+        towerOf 6 a * ConcreteBinaryTower.concreteTowerAlgebraMap 4 6 (by omega) (towerOf 4 b) ⦄ :=
+  Proofs.Binary.bf64_bf16_mul_spec a b
+
+/-- `GF(2^16)` times `GF(2^64)` is the product with the embedding. -/
+theorem tower.BinaryField16.Insts.CoreOpsArithMulBinaryField64BinaryField64.mul.towerOf (a : tower.BinaryField16) (b : tower.BinaryField64) :
+    tower.BinaryField16.Insts.CoreOpsArithMulBinaryField64BinaryField64.mul a b ⦃ r =>
+      towerOf 6 r =
+        ConcreteBinaryTower.concreteTowerAlgebraMap 4 6 (by omega) (towerOf 4 a) * towerOf 6 b ⦄ :=
+  Proofs.Binary.bf16_bf64_mul_spec a b
+
+/-- `GF(2^128)` times `GF(2^16)` is the product with the embedding. -/
+theorem tower.BinaryField128.Insts.CoreOpsArithMulBinaryField16BinaryField128.mul.towerOf (a : tower.BinaryField128) (b : tower.BinaryField16) :
+    tower.BinaryField128.Insts.CoreOpsArithMulBinaryField16BinaryField128.mul a b ⦃ r =>
+      towerOf 7 r =
+        towerOf 7 a * ConcreteBinaryTower.concreteTowerAlgebraMap 4 7 (by omega) (towerOf 4 b) ⦄ :=
+  Proofs.Binary.bf128_bf16_mul_spec a b
+
+/-- `GF(2^16)` times `GF(2^128)` is the product with the embedding. -/
+theorem tower.BinaryField16.Insts.CoreOpsArithMulBinaryField128BinaryField128.mul.towerOf (a : tower.BinaryField16) (b : tower.BinaryField128) :
+    tower.BinaryField16.Insts.CoreOpsArithMulBinaryField128BinaryField128.mul a b ⦃ r =>
+      towerOf 7 r =
+        ConcreteBinaryTower.concreteTowerAlgebraMap 4 7 (by omega) (towerOf 4 a) * towerOf 7 b ⦄ :=
+  Proofs.Binary.bf16_bf128_mul_spec a b
+
+/-- `GF(2^64)` times `GF(2^32)` is the product with the embedding. -/
+theorem tower.BinaryField64.Insts.CoreOpsArithMulBinaryField32BinaryField64.mul.towerOf (a : tower.BinaryField64) (b : tower.BinaryField32) :
+    tower.BinaryField64.Insts.CoreOpsArithMulBinaryField32BinaryField64.mul a b ⦃ r =>
+      towerOf 6 r =
+        towerOf 6 a * ConcreteBinaryTower.concreteTowerAlgebraMap 5 6 (by omega) (towerOf 5 b) ⦄ :=
+  Proofs.Binary.bf64_bf32_mul_spec a b
+
+/-- `GF(2^32)` times `GF(2^64)` is the product with the embedding. -/
+theorem tower.BinaryField32.Insts.CoreOpsArithMulBinaryField64BinaryField64.mul.towerOf (a : tower.BinaryField32) (b : tower.BinaryField64) :
+    tower.BinaryField32.Insts.CoreOpsArithMulBinaryField64BinaryField64.mul a b ⦃ r =>
+      towerOf 6 r =
+        ConcreteBinaryTower.concreteTowerAlgebraMap 5 6 (by omega) (towerOf 5 a) * towerOf 6 b ⦄ :=
+  Proofs.Binary.bf32_bf64_mul_spec a b
+
+/-- `GF(2^128)` times `GF(2^32)` is the product with the embedding. -/
+theorem tower.BinaryField128.Insts.CoreOpsArithMulBinaryField32BinaryField128.mul.towerOf (a : tower.BinaryField128) (b : tower.BinaryField32) :
+    tower.BinaryField128.Insts.CoreOpsArithMulBinaryField32BinaryField128.mul a b ⦃ r =>
+      towerOf 7 r =
+        towerOf 7 a * ConcreteBinaryTower.concreteTowerAlgebraMap 5 7 (by omega) (towerOf 5 b) ⦄ :=
+  Proofs.Binary.bf128_bf32_mul_spec a b
+
+/-- `GF(2^32)` times `GF(2^128)` is the product with the embedding. -/
+theorem tower.BinaryField32.Insts.CoreOpsArithMulBinaryField128BinaryField128.mul.towerOf (a : tower.BinaryField32) (b : tower.BinaryField128) :
+    tower.BinaryField32.Insts.CoreOpsArithMulBinaryField128BinaryField128.mul a b ⦃ r =>
+      towerOf 7 r =
+        ConcreteBinaryTower.concreteTowerAlgebraMap 5 7 (by omega) (towerOf 5 a) * towerOf 7 b ⦄ :=
+  Proofs.Binary.bf32_bf128_mul_spec a b
+
+/-- `GF(2^128)` times `GF(2^64)` is the product with the embedding. -/
+theorem tower.BinaryField128.Insts.CoreOpsArithMulBinaryField64BinaryField128.mul.towerOf (a : tower.BinaryField128) (b : tower.BinaryField64) :
+    tower.BinaryField128.Insts.CoreOpsArithMulBinaryField64BinaryField128.mul a b ⦃ r =>
+      towerOf 7 r =
+        towerOf 7 a * ConcreteBinaryTower.concreteTowerAlgebraMap 6 7 (by omega) (towerOf 6 b) ⦄ :=
+  Proofs.Binary.bf128_bf64_mul_spec a b
+
+/-- `GF(2^64)` times `GF(2^128)` is the product with the embedding. -/
+theorem tower.BinaryField64.Insts.CoreOpsArithMulBinaryField128BinaryField128.mul.towerOf (a : tower.BinaryField64) (b : tower.BinaryField128) :
+    tower.BinaryField64.Insts.CoreOpsArithMulBinaryField128BinaryField128.mul a b ⦃ r =>
+      towerOf 7 r =
+        ConcreteBinaryTower.concreteTowerAlgebraMap 6 7 (by omega) (towerOf 6 a) * towerOf 7 b ⦄ :=
+  Proofs.Binary.bf64_bf128_mul_spec a b
 
 end Plonky3Lean.Claims.P3BinaryField
