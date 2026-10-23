@@ -5459,3 +5459,95 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 [[claim]]
 name   = "Plonky3Lean.Claims.Stir.virtual_oracle"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.KoalaBear.fold.row"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.KoalaBear.verify.completeness"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.combine_evals"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.eval_constraints_poly"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.fold.restrict"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.fold.row"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.iteration.claim"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.parse_with_round.history"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.play_query_indices.count"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.play_query_indices.opened"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.play_query_indices.range"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.query_summand_depths.sum"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.round.claim"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.round.weight"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.schedule.later_fold_exceeds"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.stratified_index.stratum"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.sumcheck.rounds"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.two_adic_generator.panics"
+axioms = ["propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.verify.completeness"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.verify.round_count"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.verify.unexpected_final_sumcheck"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.weight.ood"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Whir.weight.query"
+axioms = ["Classical.choice", "Quot.sound", "propext"]

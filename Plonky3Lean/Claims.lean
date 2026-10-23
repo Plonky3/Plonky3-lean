@@ -18,6 +18,7 @@ public import Plonky3Lean.Claims.Security
 public import Plonky3Lean.Claims.Monty31
 public import Plonky3Lean.Claims.MultilinearUtil
 public import Plonky3Lean.Claims.Sumcheck
+public import Plonky3Lean.Claims.Whir
 public import Plonky3Lean.Claims.Sha256
 public import Plonky3Lean.Claims.Symmetric
 public import Plonky3Lean.Claims.Util

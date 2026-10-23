@@ -11,7 +11,7 @@ state = "stub"
 
 features = []
 
-watch = ["sumcheck/src", "sumcheck/Cargo.toml"]
+watch = ["sumcheck/src", "sumcheck/Cargo.toml", "field/src/helpers.rs"]
 
 # The transcriptions. Hashes are pending tools/mirror.
 
@@ -82,3 +82,51 @@ rust = "p3_sumcheck::strategy::chunk_round_step"
 [[mirror]]
 lean = "p3_sumcheck.strategy.mirror.sumcheck_coefficients_prefix"
 rust = "p3_sumcheck::strategy::sumcheck_coefficients_prefix"
+
+[[mirror]]
+lean = "p3_sumcheck.constraints.mirror.dot"
+rust = "p3_field::dot_product"
+
+[[mirror]]
+lean = "p3_sumcheck.constraints.mirror.horner"
+rust = "p3_field::HornerIter::horner"
+
+[[mirror]]
+lean = "p3_sumcheck.constraints.mirror.EqStatement.combine_evals"
+rust = "p3_sumcheck::constraints::statement::eq::EqStatement::combine_evals"
+
+[[mirror]]
+lean = "p3_sumcheck.constraints.mirror.EqStatement.weights_at"
+rust = "p3_sumcheck::constraints::statement::eq::EqStatement::weights_at"
+
+[[mirror]]
+lean = "p3_sumcheck.constraints.mirror.SelectStatement.combine_evals"
+rust = "p3_sumcheck::constraints::statement::select::SelectStatement::combine_evals"
+
+[[mirror]]
+lean = "p3_sumcheck.constraints.mirror.SelectStatement.weights_at"
+rust = "p3_sumcheck::constraints::statement::select::SelectStatement::weights_at"
+
+[[mirror]]
+lean = "p3_sumcheck.constraints.mirror.SelectStatement.verify"
+rust = "p3_sumcheck::constraints::statement::select::SelectStatement::verify"
+
+[[mirror]]
+lean = "p3_sumcheck.constraints.mirror.Constraint.new"
+rust = "p3_sumcheck::constraints::Constraint::new"
+
+[[mirror]]
+lean = "p3_sumcheck.constraints.mirror.Constraint.new_with_existing_claim"
+rust = "p3_sumcheck::constraints::Constraint::new_with_existing_claim"
+
+[[mirror]]
+lean = "p3_sumcheck.constraints.mirror.Constraint.combine_evals"
+rust = "p3_sumcheck::constraints::Constraint::combine_evals"
+
+[[mirror]]
+lean = "p3_sumcheck.constraints.mirror.subpoint"
+rust = "p3_multilinear_util::point::Point::get_subpoint_over_range"
+
+[[mirror]]
+lean = "p3_sumcheck.constraints.mirror.VariableOrder.eval_constraints_poly"
+rust = "p3_sumcheck::strategy::VariableOrder::eval_constraints_poly"

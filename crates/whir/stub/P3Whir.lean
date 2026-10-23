@@ -10,5 +10,6 @@ module
 public import P3Whir.Model
 public import P3Whir.Query
 public import P3Whir.Verifier
+public import P3Whir.Parameters
 
 @[expose] public section

@@ -1,0 +1,82 @@
+# p3-whir: the WHIR polynomial commitment scheme (Arnon, Chiesa, Fenzi and Yogev, eprint 2024/1586).
+
+lean_lib = "P3Whir"
+
+# Nothing is extracted.
+#
+# The crate is generic over p3-field's traits, p3-challenger's sponges and p3-commit's Merkle schemes, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# The verifier, its transcript steps and the integer part of the parameter schedule are transcribed over a field in stub/P3Whir/, with the abstractions stub/P3Whir/Model.lean lists.
+#
+# The prover is modelled, not transcribed: Plonky3Lean/Proofs/Whir/Honest.lean.
+state = "stub"
+
+features = []
+
+watch = ["whir/src", "whir/Cargo.toml"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_whir.mirror.two_adic_generator"
+rust = "p3_field::TwoAdicField::two_adic_generator"
+
+[[mirror]]
+lean = "p3_whir.transcript.mirror.query_draws"
+rust = "p3_whir::transcript::query_draws"
+
+[[mirror]]
+lean = "p3_whir.transcript.mirror.query_summand_depths"
+rust = "p3_whir::transcript::query_summand_depths"
+
+[[mirror]]
+lean = "p3_whir.transcript.mirror.stratified_index"
+rust = "p3_whir::transcript::stratified_index"
+
+[[mirror]]
+lean = "p3_whir.transcript.mirror.play_query_indices"
+rust = "p3_whir::transcript::play_query_indices"
+
+[[mirror]]
+lean = "p3_whir.mirror.WhirConfig.round_folding_factor"
+rust = "p3_whir::parameters::whir::WhirConfig::round_folding_factor"
+
+[[mirror]]
+lean = "p3_whir.mirror.querySite"
+rust = "p3_whir::transcript::WhirShape::new"
+
+[[mirror]]
+lean = "p3_whir.mirror.WhirConfig.site"
+rust = "p3_whir::transcript::WhirShape::query_index_site"
+
+[[mirror]]
+lean = "p3_whir.mirror.query_pow"
+rust = "p3_whir::transcript::WhirVerifierTranscript::query_pow"
+
+[[mirror]]
+lean = "p3_whir.mirror.verify_merkle_proof"
+rust = "p3_whir::pcs::verifier::WhirVerifier::verify_merkle_proof"
+
+[[mirror]]
+lean = "p3_whir.mirror.verify_stir_challenges"
+rust = "p3_whir::pcs::verifier::WhirVerifier::verify_stir_challenges"
+
+[[mirror]]
+lean = "p3_whir.mirror.parse_with_round"
+rust = "p3_whir::pcs::committer::reader::ParsedCommitment::parse_with_round"
+
+[[mirror]]
+lean = "p3_whir.mirror.replay"
+rust = "p3_whir::pcs::verifier::WhirVerifier::replay"
+
+[[mirror]]
+lean = "p3_whir.mirror.verify"
+rust = "p3_whir::pcs::verifier::WhirVerifier::verify"
+
+[[mirror]]
+lean = "p3_whir.parameters.mirror.schedule"
+rust = "p3_whir::parameters::whir::WhirConfig::new_with_max_domain_log"
+
+[[mirror]]
+lean = "p3_whir.parameters.mirror.finalRoundConfig"
+rust = "p3_whir::parameters::whir::WhirConfig::final_round_config"

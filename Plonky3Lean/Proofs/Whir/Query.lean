@@ -81,3 +81,46 @@ theorem opened_le_queries (S : WSponge F EF) (hidx : ∀ h bits count, ∀ i ∈
   split_ifs <;> omega
 
 end Plonky3Lean.Proofs.Whir
+
+namespace Plonky3Lean.Proofs.Whir
+
+open p3_sumcheck.mirror p3_whir.mirror p3_multilinear_util.point.mirror
+
+variable {F EF Com MP : Type _} [Field F] [Field EF] [Algebra F EF] [DecidableEq F] [DecidableEq EF]
+
+set_option linter.unusedSectionVars false
+
+theorem ood_foldl_history (S : WSponge F EF) (nv : ℕ) (ys : List EF) (h : List (Step F EF)) :
+    ∀ k ≤ ys.length, ((List.range k).foldl (fun (acc : List (List EF) × List (Step F EF)) i =>
+        let z := S.sample acc.2
+        let point := Point.expand_from_univariate z nv
+        (acc.1 ++ [point], acc.2 ++ [.challenge, .message [ys.getD i 0]])) ([], h)).2 =
+      h ++ (ys.take k).flatMap fun y => [.challenge, .message [y]]
+  | 0, _ => by simp
+  | k + 1, hk => by
+    rw [List.range_succ, List.foldl_append, List.foldl_cons, List.foldl_nil]
+    simp only
+    rw [ood_foldl_history S nv ys h k (by omega), List.take_add_one,
+      List.getElem?_eq_getElem (by omega), Option.toList_some, List.flatMap_append, List.append_assoc]
+    simp [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem (show k < ys.length by omega)]
+
+/-- A parsed round: its claimed out-of-domain values are the proof's answers, and the history absorbs the root, then each point's challenge and answer, in order. -/
+theorem parse_with_round_history (E : Env F EF Com MP) (rp : WhirRoundProof F EF Com MP) (nv s t : ℕ)
+    (h : List (Step F EF)) {root : Com} {ood : p3_sumcheck.constraints.mirror.EqStatement EF}
+    {h' : List (Step F EF)} (hp : parse_with_round E rp nv s t h = .ok (root, ood, h')) :
+    rp.commitment = some root ∧ ood.evaluations = rp.ood_answers ∧ rp.ood_answers.length = s ∧
+      h' = h ++ [.message (E.enc root)] ++ rp.ood_answers.flatMap fun y => [.challenge, .message [y]] := by
+  unfold parse_with_round at hp
+  rcases hc : rp.commitment with _ | r
+  · simp [hc, throw, throwThe, MonadExceptOf.throw] at hp
+  · simp only [hc] at hp
+    split_ifs at hp with hl
+    · have hl' : rp.ood_answers.length = s := by simpa using hl
+      simp only [pure, Except.pure, Except.ok.injEq, Prod.mk.injEq] at hp
+      obtain ⟨rfl, rfl, rfl⟩ := hp
+      refine ⟨rfl, rfl, hl', ?_⟩
+      have := ood_foldl_history E.S nv rp.ood_answers (h ++ [.message (E.enc r)]) s (by omega)
+      rw [List.take_of_length_le (by omega)] at this
+      exact this
+
+end Plonky3Lean.Proofs.Whir
