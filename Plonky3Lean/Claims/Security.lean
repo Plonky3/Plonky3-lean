@@ -45,9 +45,11 @@ Floating-point rounding is not modelled.
   It reports 100 bits for a round whose error exceeds `2^-100`.
 - The WHIR folding grinding covers only the larger of a round's two errors.
   WHIR, Theorem 5.2, adds the two, so the round can land below its target.
-- The largest admissible `m` is the floor of a real number `X`.
-  When `X` is an integer, `m = X` violates the precondition `eta > 0`.
-  The floating-point code returns that `m`.
+- The largest admissible `m` is the largest integer below a real number `X`.
+  The Rust takes the floor of `X`, and steps down by one when `X` is an integer.
+  The step-down tests the `f64` value of `X`, which rounding can push off the integer.
+  At `h = 144` and `combo = 25`, `X` is exactly 6, but evaluates to 6.000000000000005.
+  So the Rust returns 6, and `m = 6` violates the precondition `eta > 0`.
 - The DEEP round's doc says the choice of list-size bound never binds.
   At BabyBear-quartic parameters it does, as shown below.
 
@@ -100,6 +102,15 @@ theorem fixed.ceil_log2.spec (x : Std.U64) (hx : x.val ≠ 0) :
 theorem fixed.ceil_log2.panics : fixed.ceil_log2 0#u64 = .fail .panic :=
   Fixed.ceil_log2_zero
 
+/-- **The floor logarithm loses less than two units.**
+
+For every nonzero `x` the result `r` satisfies `x^(2^16) < 2^(r + 2)`, that is `2^16 * log_2 x < r + 2`.
+
+Plonky3 main's ceiling logarithm adds two units to it, and this bound is what makes that sound. -/
+theorem fixed.floor_log2.gt_log2_sub_two (x : Std.U64) (hx : x.val ≠ 0) :
+    fixed.floor_log2 x ⦃ y => x.val ^ 2 ^ 16 < 2 ^ (y.val + 2) ⦄ :=
+  WP.spec_mono (Fixed.floor_log2_spec x hx) fun y hy => hy ▸ lt_flog_add_two x.val (by omega)
+
 /-- **The ceiling logarithm does not round up.**
 
 At `x = 14917` it returns `908635`, which is below `2^16 * log_2 14917`.
@@ -108,12 +119,6 @@ Plonky3 main has since fixed it. -/
 theorem fixed.ceil_log2.not_rounded_up :
     fixed.ceil_log2 14917#u64 ⦃ y => y.val = 908635 ∧ 2 ^ y.val < 14917 ^ 2 ^ 16 ⦄ :=
   Fixed.ceil_log2_14917
-
-/-- Round every square and every halving up instead of down.
-
-The resulting ceiling logarithm never falls below `2^16 * log_2 x`. -/
-theorem fixed.ceil_log2.fix_rounds_up (x : ℕ) (hx : 0 < x) : x ^ 2 ^ 16 ≤ 2 ^ cflog x :=
-  le_cflog x hx
 
 /-- The bits of security per query never panic, for every input. -/
 theorem fixed.bits_per_query.never_panics (b : Std.U32) (f : Std.U64) :
@@ -247,17 +252,28 @@ theorem whir.folding_pow_bits.short_of_target (lam a b : ℝ) (ha : 0 < a) (hb :
     bits (a + b) + foldingPowBitsR lam (bits a) (bits b) < lam :=
   foldingPowBitsR_short lam a b ha hb hneed
 
-/-- The largest admissible `m` is the floor of a real number `X`.
+/-- The largest admissible `m` is the largest integer below a real number `X`.
 
-The bound `m < X` is exactly the precondition `eta > 0` of ethSTARK, Theorem 1. -/
+The bound `m < X` is exactly the precondition `eta > 0` of ethSTARK, Theorem 1.
+
+This is the real-number side only: it says nothing about the `f64` evaluation of `X`. -/
 theorem proximity.compute_upper_m.iff_eta_pos (h c n m : ℝ) (hh : 0 < h) (hc : 0 < c)
     (hn : 0 < n) (hm : 0 < m) :
     m < upperX h c ↔ EtaPos h c n m :=
   lt_upperX_iff h c n m hh hc hn hm
 
-/-- At `h = 144` and `combo = 25`, the real number `X` is exactly 6.
+/-- At `h = 144` and `combo = 25`, the real number `X` is exactly 6, and `m = 6` violates `eta > 0`.
 
-Then `m = 6` violates `eta > 0`, and the Rust returns 6. -/
+This covers the real-number side only.
+
+The Rust steps down by one when `X` is an integer, but tests the `f64` value of `X`.
+
+```text
+    real X:    6
+    f64 X:     6.000000000000005    floor 6, not equal to X, so no step-down
+    returned:  6                    the admissible maximum is 5
+```
+-/
 theorem proximity.compute_upper_m.boundary (n : ℝ) (hn : 0 < n) :
     upperX 144 25 = 6 ∧ ¬ EtaPos 144 25 n 6 :=
   ⟨upperX_144_25, not_etaPos_144_25 n hn⟩

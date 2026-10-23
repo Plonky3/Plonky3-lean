@@ -1251,10 +1251,10 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Security.deep.deep_ali_error.l_squared_would_bind` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.error.ErrorBits.sum.le_term` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.fixed.bits_per_query.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Security.fixed.ceil_log2.fix_rounds_up` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.fixed.ceil_log2.not_rounded_up` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.fixed.ceil_log2.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.fixed.ceil_log2.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fixed.floor_log2.gt_log2_sub_two` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.fixed.floor_log2.le_log2` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.fixed.floor_log2.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.fri.commit_phase_error_ldr_m.max_le_sum` | `Classical.choice`, `Quot.sound`, `propext` |

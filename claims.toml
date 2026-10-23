@@ -3037,7 +3037,7 @@ name   = "Plonky3Lean.Claims.P3Security.fixed.bits_per_query.never_panics"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
-name   = "Plonky3Lean.Claims.P3Security.fixed.ceil_log2.fix_rounds_up"
+name   = "Plonky3Lean.Claims.P3Security.fixed.floor_log2.gt_log2_sub_two"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
