@@ -5113,10 +5113,6 @@ name   = "Plonky3Lean.Claims.Fri.verify_fri.never_panics"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
-name   = "Plonky3Lean.Claims.Fri.fold_matrix.rows"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
 name   = "Plonky3Lean.Claims.Lookup.accepts_bus_relation"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
