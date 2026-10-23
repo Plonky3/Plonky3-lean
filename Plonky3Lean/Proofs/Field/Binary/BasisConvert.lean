@@ -141,6 +141,195 @@ theorem poly_to_tower_128_spec (v : Std.U128) :
     lin_congr_cols 128 v.val (fun j hj => hd j hj), lin_two_pow_cols,
     Nat.mod_eq_of_lt (u128_val_lt v)]
 
+theorem u32_val_lt (x : Std.U32) : x.val < 2 ^ 32 := by
+  have := x.hBounds; simpa using this
+
+/-! ## 64 bits -/
+
+/-- The images of the generators of the tower's `GF(2^64)` in
+`GF(2)[x] / (x^64 + x^4 + x^3 + x + 1)`. -/
+noncomputable abbrev xi64 : ℕ → AdjoinRoot (modPoly 64 27) :=
+  xiArr 64 27 (clmul.basis.XI_64.val.map (·.val))
+
+theorem xi64_rel : ∀ k < 6, xi64 k * xi64 k = prevGen xi64 k * xi64 k + 1 :=
+  fun k hk => rels_of_relsOK relsOK_64 xi64 (fun _ => rfl) k (by simpa using hk)
+
+theorem TAIL_64_val : clmul.basis.TAIL_64.val = 27 := by
+  unfold clmul.basis.TAIL_64; rfl
+
+theorem COLUMNS_64_spec : clmul.basis.COLUMNS_64 ⦃ c => ∀ j < 64,
+    aval c j < 2 ^ 64 ∧ AdjoinRoot.mk (modPoly 64 27) (natPoly (aval c j)) = colV xi64 6 j ⦄ := by
+  unfold clmul.basis.COLUMNS_64
+  rw [array_as_slice_eq, Aeneas.Std.bind_ok]
+  have hx : ∀ i < 6, ((Std.Array.to_slice clmul.basis.XI_64).val.getD i 0#u128).val < 2 ^ 64 := by
+    have h : (clmul.basis.XI_64.val.map (·.val)).all (· < 2 ^ 64) = true := by decide +kernel
+    intro i hi
+    rw [Std.Array.val_to_slice]
+    have hlen : i < clmul.basis.XI_64.val.length := by simpa using hi
+    have := List.all_eq_true.mp h _ (List.mem_map_of_mem (f := (·.val)) (List.getElem_mem hlen))
+    rw [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem hlen, Option.getD_some]
+    simpa using this
+  have h := columns_spec 64#usize 6 (by simp) (by norm_num) (by norm_num) clmul.basis.TAIL_64
+    (by rw [TAIL_64_val]; norm_num) (Std.Array.to_slice clmul.basis.XI_64)
+    (by simp [Std.Slice.length, Std.Array.val_to_slice]) hx
+  rw [TAIL_64_val, xiOf_to_slice] at h
+  exact h
+
+theorem linB_lt {cols : ℕ → ℕ} {b : ℕ} (hc : ∀ j < 8 * b, cols j < 2 ^ (8 * b)) {k : ℕ}
+    (hk : k < b) (w : ℕ) : linB cols k w < 2 ^ (8 * b) :=
+  lin_lt _ 8 w (fun j hj => hc _ (by omega))
+
+theorem TOWER_TO_POLY_64_spec : clmul.basis.TOWER_TO_POLY_64 ⦃ T =>
+    ∃ c : ℕ → ℕ, (∀ j < 64, AdjoinRoot.mk (modPoly 64 27) (natPoly (c j)) = colV xi64 6 j) ∧
+      ∀ k < 8, ∀ w < 256, cellOf T k w = linB c k w ⦄ := by
+  unfold clmul.basis.TOWER_TO_POLY_64
+  apply WP.spec_bind COLUMNS_64_spec
+  intro cols hcols
+  apply WP.spec_bind (byte_tables_spec cols 64#usize (by simp))
+  intro T hT
+  apply WP.spec_mono (narrow_spec T)
+  intro N hN
+  refine ⟨aval cols, fun j hj => (hcols j hj).2, fun k hk w hw => ?_⟩
+  rw [hN k hk w hw, hT k (by simpa using hk) w hw,
+    Nat.mod_eq_of_lt (linB_lt (b := 8) (fun j hj => (hcols j hj).1) hk w)]
+
+theorem POLY_TO_TOWER_64_spec : clmul.basis.POLY_TO_TOWER_64 ⦃ T =>
+    ∃ c d : ℕ → ℕ, (∀ j < 64, AdjoinRoot.mk (modPoly 64 27) (natPoly (c j)) = colV xi64 6 j) ∧
+      (∀ j < 64, lin c 64 (d j) = 2 ^ j) ∧
+      ∀ k < 8, ∀ w < 256, cellOf T k w = linB d k w ⦄ := by
+  unfold clmul.basis.POLY_TO_TOWER_64
+  apply WP.spec_bind COLUMNS_64_spec
+  intro cols hcols
+  apply WP.spec_bind (invert_spec cols 64#usize (by simp) (fun c hc => (hcols c hc).1)
+    (fun w hw h0 => lin_injective (by norm_num) (by norm_num) xi64 6 xi64_rel (aval cols)
+      (fun j hj => (hcols j hj).2) hw h0))
+  intro inv hinv
+  apply WP.spec_bind (byte_tables_spec inv 64#usize (by simp))
+  intro T hT
+  apply WP.spec_mono (narrow_spec T)
+  intro N hN
+  refine ⟨aval cols, aval inv, fun j hj => (hcols j hj).2, fun j hj => (hinv j hj).2,
+    fun k hk w hw => ?_⟩
+  rw [hN k hk w hw, hT k (by simpa using hk) w hw,
+    Nat.mod_eq_of_lt (linB_lt (b := 8) (fun j hj => (hinv j hj).1) hk w)]
+
+/-- `tower_to_poly_64` is the field isomorphism `N` at 64 bits. -/
+theorem tower_to_poly_64_spec (v : Std.U64) :
+    clmul.basis.tower_to_poly_64 v ⦃ r =>
+      AdjoinRoot.mk (modPoly 64 27) (natPoly r.val) = towerMap xi64 6 (towerOf 6 v) ⦄ := by
+  unfold clmul.basis.tower_to_poly_64
+  apply WP.spec_bind TOWER_TO_POLY_64_spec
+  rintro T ⟨c, hc, hT⟩
+  apply WP.spec_mono (apply_64_spec T c hT v)
+  intro r hr
+  rw [hr, towerOf]
+  exact lin_eq_towerMap xi64 6 c hc (u64_val_lt v)
+
+/-- `poly_to_tower_64` is the inverse of `N` at 64 bits. -/
+theorem poly_to_tower_64_spec (v : Std.U64) :
+    clmul.basis.poly_to_tower_64 v ⦃ r =>
+      towerMap xi64 6 (towerOf 6 r) = AdjoinRoot.mk (modPoly 64 27) (natPoly v.val) ⦄ := by
+  unfold clmul.basis.poly_to_tower_64
+  apply WP.spec_bind POLY_TO_TOWER_64_spec
+  rintro T ⟨c, d, hc, hd, hT⟩
+  apply WP.spec_mono (apply_64_spec T d hT v)
+  intro r hr
+  rw [towerOf, ← lin_eq_towerMap xi64 6 c hc (u64_val_lt r), show (2 : ℕ) ^ 6 = 64 from rfl, hr,
+    lin_lin,
+    lin_congr_cols 64 v.val (fun j hj => hd j hj), lin_two_pow_cols,
+    Nat.mod_eq_of_lt (u64_val_lt v)]
+
+/-! ## 32 bits -/
+
+/-- The images of the generators of the tower's `GF(2^32)` in
+`GF(2)[x] / (x^32 + x^7 + x^3 + x^2 + 1)`. -/
+noncomputable abbrev xi32 : ℕ → AdjoinRoot (modPoly 32 141) :=
+  xiArr 32 141 (clmul.basis.XI_32.val.map (·.val))
+
+theorem xi32_rel : ∀ k < 5, xi32 k * xi32 k = prevGen xi32 k * xi32 k + 1 :=
+  fun k hk => rels_of_relsOK relsOK_32 xi32 (fun _ => rfl) k (by simpa using hk)
+
+theorem TAIL_32_val : clmul.basis.TAIL_32.val = 141 := by
+  unfold clmul.basis.TAIL_32; rfl
+
+theorem COLUMNS_32_spec : clmul.basis.COLUMNS_32 ⦃ c => ∀ j < 32,
+    aval c j < 2 ^ 32 ∧ AdjoinRoot.mk (modPoly 32 141) (natPoly (aval c j)) = colV xi32 5 j ⦄ := by
+  unfold clmul.basis.COLUMNS_32
+  rw [array_as_slice_eq, Aeneas.Std.bind_ok]
+  have hx : ∀ i < 5, ((Std.Array.to_slice clmul.basis.XI_32).val.getD i 0#u128).val < 2 ^ 32 := by
+    have h : (clmul.basis.XI_32.val.map (·.val)).all (· < 2 ^ 32) = true := by decide +kernel
+    intro i hi
+    rw [Std.Array.val_to_slice]
+    have hlen : i < clmul.basis.XI_32.val.length := by simpa using hi
+    have := List.all_eq_true.mp h _ (List.mem_map_of_mem (f := (·.val)) (List.getElem_mem hlen))
+    rw [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem hlen, Option.getD_some]
+    simpa using this
+  have h := columns_spec 32#usize 5 (by simp) (by norm_num) (by norm_num) clmul.basis.TAIL_32
+    (by rw [TAIL_32_val]; norm_num) (Std.Array.to_slice clmul.basis.XI_32)
+    (by simp [Std.Slice.length, Std.Array.val_to_slice]) hx
+  rw [TAIL_32_val, xiOf_to_slice] at h
+  exact h
+
+theorem TOWER_TO_POLY_32_spec : clmul.basis.TOWER_TO_POLY_32 ⦃ T =>
+    ∃ c : ℕ → ℕ, (∀ j < 32, AdjoinRoot.mk (modPoly 32 141) (natPoly (c j)) = colV xi32 5 j) ∧
+      ∀ k < 4, ∀ w < 256, cellOf T k w = linB c k w ⦄ := by
+  unfold clmul.basis.TOWER_TO_POLY_32
+  apply WP.spec_bind COLUMNS_32_spec
+  intro cols hcols
+  apply WP.spec_bind (byte_tables_spec cols 32#usize (by simp))
+  intro T hT
+  apply WP.spec_mono (narrow_32_spec T)
+  intro N hN
+  refine ⟨aval cols, fun j hj => (hcols j hj).2, fun k hk w hw => ?_⟩
+  rw [hN k hk w hw, hT k (by simpa using hk) w hw,
+    Nat.mod_eq_of_lt (linB_lt (b := 4) (fun j hj => (hcols j hj).1) hk w)]
+
+theorem POLY_TO_TOWER_32_spec : clmul.basis.POLY_TO_TOWER_32 ⦃ T =>
+    ∃ c d : ℕ → ℕ, (∀ j < 32, AdjoinRoot.mk (modPoly 32 141) (natPoly (c j)) = colV xi32 5 j) ∧
+      (∀ j < 32, lin c 32 (d j) = 2 ^ j) ∧
+      ∀ k < 4, ∀ w < 256, cellOf T k w = linB d k w ⦄ := by
+  unfold clmul.basis.POLY_TO_TOWER_32
+  apply WP.spec_bind COLUMNS_32_spec
+  intro cols hcols
+  apply WP.spec_bind (invert_spec cols 32#usize (by simp) (fun c hc => (hcols c hc).1)
+    (fun w hw h0 => lin_injective (by norm_num) (by norm_num) xi32 5 xi32_rel (aval cols)
+      (fun j hj => (hcols j hj).2) hw h0))
+  intro inv hinv
+  apply WP.spec_bind (byte_tables_spec inv 32#usize (by simp))
+  intro T hT
+  apply WP.spec_mono (narrow_32_spec T)
+  intro N hN
+  refine ⟨aval cols, aval inv, fun j hj => (hcols j hj).2, fun j hj => (hinv j hj).2,
+    fun k hk w hw => ?_⟩
+  rw [hN k hk w hw, hT k (by simpa using hk) w hw,
+    Nat.mod_eq_of_lt (linB_lt (b := 4) (fun j hj => (hinv j hj).1) hk w)]
+
+/-- `tower_to_poly_32` is the field isomorphism `N` at 32 bits. -/
+theorem tower_to_poly_32_spec (v : Std.U32) :
+    clmul.basis.tower_to_poly_32 v ⦃ r =>
+      AdjoinRoot.mk (modPoly 32 141) (natPoly r.val) = towerMap xi32 5 (towerOf 5 v) ⦄ := by
+  unfold clmul.basis.tower_to_poly_32
+  apply WP.spec_bind TOWER_TO_POLY_32_spec
+  rintro T ⟨c, hc, hT⟩
+  apply WP.spec_mono (apply_32_spec T c hT v)
+  intro r hr
+  rw [hr, towerOf]
+  exact lin_eq_towerMap xi32 5 c hc (u32_val_lt v)
+
+/-- `poly_to_tower_32` is the inverse of `N` at 32 bits. -/
+theorem poly_to_tower_32_spec (v : Std.U32) :
+    clmul.basis.poly_to_tower_32 v ⦃ r =>
+      towerMap xi32 5 (towerOf 5 r) = AdjoinRoot.mk (modPoly 32 141) (natPoly v.val) ⦄ := by
+  unfold clmul.basis.poly_to_tower_32
+  apply WP.spec_bind POLY_TO_TOWER_32_spec
+  rintro T ⟨c, d, hc, hd, hT⟩
+  apply WP.spec_mono (apply_32_spec T d hT v)
+  intro r hr
+  rw [towerOf, ← lin_eq_towerMap xi32 5 c hc (u32_val_lt r), show (2 : ℕ) ^ 5 = 32 from rfl, hr,
+    lin_lin,
+    lin_congr_cols 32 v.val (fun j hj => hd j hj), lin_two_pow_cols,
+    Nat.mod_eq_of_lt (u32_val_lt v)]
+
 /-- `N` at 128 bits, as a ring homomorphism. -/
 noncomputable abbrev N128 : ConcreteBTField 7 →+* AdjoinRoot (modPoly 128 135) :=
   @towerHom _ _ (charP_modPoly (by norm_num) (by norm_num)) xi128 7 xi128_rel
