@@ -38,6 +38,7 @@ public import Plonky3Lean.Proofs.Field.Binary.TowerApi
 public import Plonky3Lean.Proofs.Field.Binary.PolyField
 public import Plonky3Lean.Proofs.Field.Binary.Frobenius
 public import Plonky3Lean.Proofs.Field.Binary.TowerExp
+public import Plonky3Lean.Proofs.Field.Binary.Extension
 public import Plonky3Lean.Proofs.Field.Goldilocks.Arith
 public import Plonky3Lean.Proofs.Field.Goldilocks.Basic
 public import Plonky3Lean.Proofs.Field.Goldilocks.Constants

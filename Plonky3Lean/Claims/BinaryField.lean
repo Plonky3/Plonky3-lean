@@ -4,7 +4,7 @@ public import Plonky3Lean.Proofs.Field.Binary.Aes
 public import Plonky3Lean.Proofs.Field.Binary.Operators
 public import Plonky3Lean.Proofs.Field.Binary.TowerApi
 public import Plonky3Lean.Proofs.Field.Binary.PolyField
-public import Plonky3Lean.Proofs.Field.Binary.TowerExp
+public import Plonky3Lean.Proofs.Field.Binary.Extension
 
 @[expose] public section
 
@@ -1545,5 +1545,327 @@ theorem tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_powe
     tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2 a n ⦃ r =>
       r.val < 2 ^ 2 ^ 7 ∧ towerOf 7 r = towerOf 7 a ^ 2 ^ n.val ⦄ :=
   Proofs.Binary.bf128_exp_power_of_2_spec a n
+
+/-! ### The tower as an extension of its lower levels -/
+
+/-- The value `frobenius` returns. -/
+theorem tower.BinaryField16.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.frobenius.towerOf (a : tower.BinaryField16) :
+    tower.BinaryField16.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.frobenius a ⦃ r =>
+      r.val < 2 ^ 2 ^ 4 ∧ towerOf 4 r = towerOf 4 a ^ 2 ^ 2 ^ 3 ⦄ :=
+  Proofs.Binary.bf16_bf8_frobenius_spec a
+
+/-- The value `from` returns. -/
+theorem tower.BinaryField16.Insts.CoreConvertFromBinaryField8.from.towerOf (x : tower.BinaryField8) :
+    tower.BinaryField16.Insts.CoreConvertFromBinaryField8.from x ⦃ r =>
+      towerOf 4 r = ConcreteBinaryTower.concreteTowerAlgebraMap 3 4 (by omega) (towerOf 3 x) ⦄ :=
+  Proofs.Binary.bf16_bf8_from_spec x
+
+/-- The value `is_in_basefield` returns. -/
+theorem tower.BinaryField16.Insts.P3_fieldFieldExtensionFieldBinaryField8.is_in_basefield.towerOf (a : tower.BinaryField16) :
+    tower.BinaryField16.Insts.P3_fieldFieldExtensionFieldBinaryField8.is_in_basefield a ⦃ b =>
+      (b = true ↔ ∃ y, towerOf 4 a = ConcreteBinaryTower.concreteTowerAlgebraMap 3 4 (by omega) y) ⦄ :=
+  Proofs.Binary.bf16_bf8_is_in_basefield_spec a
+
+/-- The value `as_base` returns. -/
+theorem tower.BinaryField16.Insts.P3_fieldFieldExtensionFieldBinaryField8.as_base.towerOf (a : tower.BinaryField16) :
+    tower.BinaryField16.Insts.P3_fieldFieldExtensionFieldBinaryField8.as_base a ⦃ r =>
+      ((∃ y, towerOf 4 a = ConcreteBinaryTower.concreteTowerAlgebraMap 3 4 (by omega) y) →
+        ∃ c, r = .Some c ∧ ConcreteBinaryTower.concreteTowerAlgebraMap 3 4 (by omega) (towerOf 3 c) = towerOf 4 a) ∧
+      ((¬∃ y, towerOf 4 a = ConcreteBinaryTower.concreteTowerAlgebraMap 3 4 (by omega) y) → r = .None) ⦄ :=
+  Proofs.Binary.bf16_bf8_as_base_spec a
+
+/-- The value `repeated_frobenius` returns. -/
+theorem tower.BinaryField16.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.repeated_frobenius.towerOf (a : tower.BinaryField16) (count : Std.Usize) :
+    tower.BinaryField16.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.repeated_frobenius a count
+      ⦃ r => r.val < 2 ^ 2 ^ 4 ∧ towerOf 4 r = towerOf 4 a ^ 2 ^ (2 ^ 3 * count.val) ⦄ :=
+  Proofs.Binary.bf16_bf8_repeated_frobenius_spec a count
+
+/-- The value `from` returns. -/
+theorem tower.BinaryField32.Insts.CoreConvertFromBinaryField8.from.towerOf (x : tower.BinaryField8) :
+    tower.BinaryField32.Insts.CoreConvertFromBinaryField8.from x ⦃ r =>
+      towerOf 5 r = ConcreteBinaryTower.concreteTowerAlgebraMap 3 5 (by omega) (towerOf 3 x) ⦄ :=
+  Proofs.Binary.bf32_bf8_from_spec x
+
+/-- The value `is_in_basefield` returns. -/
+theorem tower.BinaryField32.Insts.P3_fieldFieldExtensionFieldBinaryField8.is_in_basefield.towerOf (a : tower.BinaryField32) :
+    tower.BinaryField32.Insts.P3_fieldFieldExtensionFieldBinaryField8.is_in_basefield a ⦃ b =>
+      (b = true ↔ ∃ y, towerOf 5 a = ConcreteBinaryTower.concreteTowerAlgebraMap 3 5 (by omega) y) ⦄ :=
+  Proofs.Binary.bf32_bf8_is_in_basefield_spec a
+
+/-- The value `as_base` returns. -/
+theorem tower.BinaryField32.Insts.P3_fieldFieldExtensionFieldBinaryField8.as_base.towerOf (a : tower.BinaryField32) :
+    tower.BinaryField32.Insts.P3_fieldFieldExtensionFieldBinaryField8.as_base a ⦃ r =>
+      ((∃ y, towerOf 5 a = ConcreteBinaryTower.concreteTowerAlgebraMap 3 5 (by omega) y) →
+        ∃ c, r = .Some c ∧ ConcreteBinaryTower.concreteTowerAlgebraMap 3 5 (by omega) (towerOf 3 c) = towerOf 5 a) ∧
+      ((¬∃ y, towerOf 5 a = ConcreteBinaryTower.concreteTowerAlgebraMap 3 5 (by omega) y) → r = .None) ⦄ :=
+  Proofs.Binary.bf32_bf8_as_base_spec a
+
+/-- The value `frobenius` returns. -/
+theorem tower.BinaryField32.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.frobenius.towerOf (a : tower.BinaryField32) :
+    tower.BinaryField32.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.frobenius a ⦃ r =>
+      r.val < 2 ^ 2 ^ 5 ∧ towerOf 5 r = towerOf 5 a ^ 2 ^ 2 ^ 3 ⦄ :=
+  Proofs.Binary.bf32_bf8_frobenius_spec a
+
+/-- The value `repeated_frobenius` returns. -/
+theorem tower.BinaryField32.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.repeated_frobenius.towerOf (a : tower.BinaryField32) (count : Std.Usize) :
+    tower.BinaryField32.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.repeated_frobenius a count
+      ⦃ r => r.val < 2 ^ 2 ^ 5 ∧ towerOf 5 r = towerOf 5 a ^ 2 ^ (2 ^ 3 * count.val) ⦄ :=
+  Proofs.Binary.bf32_bf8_repeated_frobenius_spec a count
+
+/-- The value `from` returns. -/
+theorem tower.BinaryField32.Insts.CoreConvertFromBinaryField16.from.towerOf (x : tower.BinaryField16) :
+    tower.BinaryField32.Insts.CoreConvertFromBinaryField16.from x ⦃ r =>
+      towerOf 5 r = ConcreteBinaryTower.concreteTowerAlgebraMap 4 5 (by omega) (towerOf 4 x) ⦄ :=
+  Proofs.Binary.bf32_bf16_from_spec x
+
+/-- The value `is_in_basefield` returns. -/
+theorem tower.BinaryField32.Insts.P3_fieldFieldExtensionFieldBinaryField16.is_in_basefield.towerOf (a : tower.BinaryField32) :
+    tower.BinaryField32.Insts.P3_fieldFieldExtensionFieldBinaryField16.is_in_basefield a ⦃ b =>
+      (b = true ↔ ∃ y, towerOf 5 a = ConcreteBinaryTower.concreteTowerAlgebraMap 4 5 (by omega) y) ⦄ :=
+  Proofs.Binary.bf32_bf16_is_in_basefield_spec a
+
+/-- The value `as_base` returns. -/
+theorem tower.BinaryField32.Insts.P3_fieldFieldExtensionFieldBinaryField16.as_base.towerOf (a : tower.BinaryField32) :
+    tower.BinaryField32.Insts.P3_fieldFieldExtensionFieldBinaryField16.as_base a ⦃ r =>
+      ((∃ y, towerOf 5 a = ConcreteBinaryTower.concreteTowerAlgebraMap 4 5 (by omega) y) →
+        ∃ c, r = .Some c ∧ ConcreteBinaryTower.concreteTowerAlgebraMap 4 5 (by omega) (towerOf 4 c) = towerOf 5 a) ∧
+      ((¬∃ y, towerOf 5 a = ConcreteBinaryTower.concreteTowerAlgebraMap 4 5 (by omega) y) → r = .None) ⦄ :=
+  Proofs.Binary.bf32_bf16_as_base_spec a
+
+/-- The value `frobenius` returns. -/
+theorem tower.BinaryField32.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.frobenius.towerOf (a : tower.BinaryField32) :
+    tower.BinaryField32.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.frobenius a ⦃ r =>
+      r.val < 2 ^ 2 ^ 5 ∧ towerOf 5 r = towerOf 5 a ^ 2 ^ 2 ^ 4 ⦄ :=
+  Proofs.Binary.bf32_bf16_frobenius_spec a
+
+/-- The value `repeated_frobenius` returns. -/
+theorem tower.BinaryField32.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.repeated_frobenius.towerOf (a : tower.BinaryField32) (count : Std.Usize) :
+    tower.BinaryField32.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.repeated_frobenius a count
+      ⦃ r => r.val < 2 ^ 2 ^ 5 ∧ towerOf 5 r = towerOf 5 a ^ 2 ^ (2 ^ 4 * count.val) ⦄ :=
+  Proofs.Binary.bf32_bf16_repeated_frobenius_spec a count
+
+/-- The value `from` returns. -/
+theorem tower.BinaryField64.Insts.CoreConvertFromBinaryField32.from.towerOf (x : tower.BinaryField32) :
+    tower.BinaryField64.Insts.CoreConvertFromBinaryField32.from x ⦃ r =>
+      towerOf 6 r = ConcreteBinaryTower.concreteTowerAlgebraMap 5 6 (by omega) (towerOf 5 x) ⦄ :=
+  Proofs.Binary.bf64_bf32_from_spec x
+
+/-- The value `is_in_basefield` returns. -/
+theorem tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField32.is_in_basefield.towerOf (a : tower.BinaryField64) :
+    tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField32.is_in_basefield a ⦃ b =>
+      (b = true ↔ ∃ y, towerOf 6 a = ConcreteBinaryTower.concreteTowerAlgebraMap 5 6 (by omega) y) ⦄ :=
+  Proofs.Binary.bf64_bf32_is_in_basefield_spec a
+
+/-- The value `as_base` returns. -/
+theorem tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField32.as_base.towerOf (a : tower.BinaryField64) :
+    tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField32.as_base a ⦃ r =>
+      ((∃ y, towerOf 6 a = ConcreteBinaryTower.concreteTowerAlgebraMap 5 6 (by omega) y) →
+        ∃ c, r = .Some c ∧ ConcreteBinaryTower.concreteTowerAlgebraMap 5 6 (by omega) (towerOf 5 c) = towerOf 6 a) ∧
+      ((¬∃ y, towerOf 6 a = ConcreteBinaryTower.concreteTowerAlgebraMap 5 6 (by omega) y) → r = .None) ⦄ :=
+  Proofs.Binary.bf64_bf32_as_base_spec a
+
+/-- The value `frobenius` returns. -/
+theorem tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField32.frobenius.towerOf (a : tower.BinaryField64) :
+    tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField32.frobenius a ⦃ r =>
+      r.val < 2 ^ 2 ^ 6 ∧ towerOf 6 r = towerOf 6 a ^ 2 ^ 2 ^ 5 ⦄ :=
+  Proofs.Binary.bf64_bf32_frobenius_spec a
+
+/-- The value `repeated_frobenius` returns. -/
+theorem tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField32.repeated_frobenius.towerOf (a : tower.BinaryField64) (count : Std.Usize) :
+    tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField32.repeated_frobenius a count
+      ⦃ r => r.val < 2 ^ 2 ^ 6 ∧ towerOf 6 r = towerOf 6 a ^ 2 ^ (2 ^ 5 * count.val) ⦄ :=
+  Proofs.Binary.bf64_bf32_repeated_frobenius_spec a count
+
+/-- The value `from` returns. -/
+theorem tower.BinaryField128.Insts.CoreConvertFromBinaryField64.from.towerOf (x : tower.BinaryField64) :
+    tower.BinaryField128.Insts.CoreConvertFromBinaryField64.from x ⦃ r =>
+      towerOf 7 r = ConcreteBinaryTower.concreteTowerAlgebraMap 6 7 (by omega) (towerOf 6 x) ⦄ :=
+  Proofs.Binary.bf128_bf64_from_spec x
+
+/-- The value `is_in_basefield` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField64.is_in_basefield.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField64.is_in_basefield a ⦃ b =>
+      (b = true ↔ ∃ y, towerOf 7 a = ConcreteBinaryTower.concreteTowerAlgebraMap 6 7 (by omega) y) ⦄ :=
+  Proofs.Binary.bf128_bf64_is_in_basefield_spec a
+
+/-- The value `as_base` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField64.as_base.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField64.as_base a ⦃ r =>
+      ((∃ y, towerOf 7 a = ConcreteBinaryTower.concreteTowerAlgebraMap 6 7 (by omega) y) →
+        ∃ c, r = .Some c ∧ ConcreteBinaryTower.concreteTowerAlgebraMap 6 7 (by omega) (towerOf 6 c) = towerOf 7 a) ∧
+      ((¬∃ y, towerOf 7 a = ConcreteBinaryTower.concreteTowerAlgebraMap 6 7 (by omega) y) → r = .None) ⦄ :=
+  Proofs.Binary.bf128_bf64_as_base_spec a
+
+/-- The value `frobenius` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField64.frobenius.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField64.frobenius a ⦃ r =>
+      r.val < 2 ^ 2 ^ 7 ∧ towerOf 7 r = towerOf 7 a ^ 2 ^ 2 ^ 6 ⦄ :=
+  Proofs.Binary.bf128_bf64_frobenius_spec a
+
+/-- The value `repeated_frobenius` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField64.repeated_frobenius.towerOf (a : tower.BinaryField128) (count : Std.Usize) :
+    tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField64.repeated_frobenius a count
+      ⦃ r => r.val < 2 ^ 2 ^ 7 ∧ towerOf 7 r = towerOf 7 a ^ 2 ^ (2 ^ 6 * count.val) ⦄ :=
+  Proofs.Binary.bf128_bf64_repeated_frobenius_spec a count
+
+/-- The value `from` returns. -/
+theorem tower.BinaryField64.Insts.CoreConvertFromBinaryField8.from.towerOf (x : tower.BinaryField8) :
+    tower.BinaryField64.Insts.CoreConvertFromBinaryField8.from x ⦃ r =>
+      towerOf 6 r = ConcreteBinaryTower.concreteTowerAlgebraMap 3 6 (by omega) (towerOf 3 x) ⦄ :=
+  Proofs.Binary.bf64_bf8_from_spec x
+
+/-- The value `is_in_basefield` returns. -/
+theorem tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField8.is_in_basefield.towerOf (a : tower.BinaryField64) :
+    tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField8.is_in_basefield a ⦃ b =>
+      (b = true ↔ ∃ y, towerOf 6 a = ConcreteBinaryTower.concreteTowerAlgebraMap 3 6 (by omega) y) ⦄ :=
+  Proofs.Binary.bf64_bf8_is_in_basefield_spec a
+
+/-- The value `as_base` returns. -/
+theorem tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField8.as_base.towerOf (a : tower.BinaryField64) :
+    tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField8.as_base a ⦃ r =>
+      ((∃ y, towerOf 6 a = ConcreteBinaryTower.concreteTowerAlgebraMap 3 6 (by omega) y) →
+        ∃ c, r = .Some c ∧ ConcreteBinaryTower.concreteTowerAlgebraMap 3 6 (by omega) (towerOf 3 c) = towerOf 6 a) ∧
+      ((¬∃ y, towerOf 6 a = ConcreteBinaryTower.concreteTowerAlgebraMap 3 6 (by omega) y) → r = .None) ⦄ :=
+  Proofs.Binary.bf64_bf8_as_base_spec a
+
+/-- The value `frobenius` returns. -/
+theorem tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.frobenius.towerOf (a : tower.BinaryField64) :
+    tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.frobenius a ⦃ r =>
+      r.val < 2 ^ 2 ^ 6 ∧ towerOf 6 r = towerOf 6 a ^ 2 ^ 2 ^ 3 ⦄ :=
+  Proofs.Binary.bf64_bf8_frobenius_spec a
+
+/-- The value `repeated_frobenius` returns. -/
+theorem tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.repeated_frobenius.towerOf (a : tower.BinaryField64) (count : Std.Usize) :
+    tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.repeated_frobenius a count
+      ⦃ r => r.val < 2 ^ 2 ^ 6 ∧ towerOf 6 r = towerOf 6 a ^ 2 ^ (2 ^ 3 * count.val) ⦄ :=
+  Proofs.Binary.bf64_bf8_repeated_frobenius_spec a count
+
+/-- The value `from` returns. -/
+theorem tower.BinaryField128.Insts.CoreConvertFromBinaryField8.from.towerOf (x : tower.BinaryField8) :
+    tower.BinaryField128.Insts.CoreConvertFromBinaryField8.from x ⦃ r =>
+      towerOf 7 r = ConcreteBinaryTower.concreteTowerAlgebraMap 3 7 (by omega) (towerOf 3 x) ⦄ :=
+  Proofs.Binary.bf128_bf8_from_spec x
+
+/-- The value `is_in_basefield` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField8.is_in_basefield.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField8.is_in_basefield a ⦃ b =>
+      (b = true ↔ ∃ y, towerOf 7 a = ConcreteBinaryTower.concreteTowerAlgebraMap 3 7 (by omega) y) ⦄ :=
+  Proofs.Binary.bf128_bf8_is_in_basefield_spec a
+
+/-- The value `as_base` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField8.as_base.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField8.as_base a ⦃ r =>
+      ((∃ y, towerOf 7 a = ConcreteBinaryTower.concreteTowerAlgebraMap 3 7 (by omega) y) →
+        ∃ c, r = .Some c ∧ ConcreteBinaryTower.concreteTowerAlgebraMap 3 7 (by omega) (towerOf 3 c) = towerOf 7 a) ∧
+      ((¬∃ y, towerOf 7 a = ConcreteBinaryTower.concreteTowerAlgebraMap 3 7 (by omega) y) → r = .None) ⦄ :=
+  Proofs.Binary.bf128_bf8_as_base_spec a
+
+/-- The value `frobenius` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.frobenius.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.frobenius a ⦃ r =>
+      r.val < 2 ^ 2 ^ 7 ∧ towerOf 7 r = towerOf 7 a ^ 2 ^ 2 ^ 3 ⦄ :=
+  Proofs.Binary.bf128_bf8_frobenius_spec a
+
+/-- The value `repeated_frobenius` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.repeated_frobenius.towerOf (a : tower.BinaryField128) (count : Std.Usize) :
+    tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField8.repeated_frobenius a count
+      ⦃ r => r.val < 2 ^ 2 ^ 7 ∧ towerOf 7 r = towerOf 7 a ^ 2 ^ (2 ^ 3 * count.val) ⦄ :=
+  Proofs.Binary.bf128_bf8_repeated_frobenius_spec a count
+
+/-- The value `from` returns. -/
+theorem tower.BinaryField64.Insts.CoreConvertFromBinaryField16.from.towerOf (x : tower.BinaryField16) :
+    tower.BinaryField64.Insts.CoreConvertFromBinaryField16.from x ⦃ r =>
+      towerOf 6 r = ConcreteBinaryTower.concreteTowerAlgebraMap 4 6 (by omega) (towerOf 4 x) ⦄ :=
+  Proofs.Binary.bf64_bf16_from_spec x
+
+/-- The value `is_in_basefield` returns. -/
+theorem tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField16.is_in_basefield.towerOf (a : tower.BinaryField64) :
+    tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField16.is_in_basefield a ⦃ b =>
+      (b = true ↔ ∃ y, towerOf 6 a = ConcreteBinaryTower.concreteTowerAlgebraMap 4 6 (by omega) y) ⦄ :=
+  Proofs.Binary.bf64_bf16_is_in_basefield_spec a
+
+/-- The value `as_base` returns. -/
+theorem tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField16.as_base.towerOf (a : tower.BinaryField64) :
+    tower.BinaryField64.Insts.P3_fieldFieldExtensionFieldBinaryField16.as_base a ⦃ r =>
+      ((∃ y, towerOf 6 a = ConcreteBinaryTower.concreteTowerAlgebraMap 4 6 (by omega) y) →
+        ∃ c, r = .Some c ∧ ConcreteBinaryTower.concreteTowerAlgebraMap 4 6 (by omega) (towerOf 4 c) = towerOf 6 a) ∧
+      ((¬∃ y, towerOf 6 a = ConcreteBinaryTower.concreteTowerAlgebraMap 4 6 (by omega) y) → r = .None) ⦄ :=
+  Proofs.Binary.bf64_bf16_as_base_spec a
+
+/-- The value `frobenius` returns. -/
+theorem tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.frobenius.towerOf (a : tower.BinaryField64) :
+    tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.frobenius a ⦃ r =>
+      r.val < 2 ^ 2 ^ 6 ∧ towerOf 6 r = towerOf 6 a ^ 2 ^ 2 ^ 4 ⦄ :=
+  Proofs.Binary.bf64_bf16_frobenius_spec a
+
+/-- The value `repeated_frobenius` returns. -/
+theorem tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.repeated_frobenius.towerOf (a : tower.BinaryField64) (count : Std.Usize) :
+    tower.BinaryField64.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.repeated_frobenius a count
+      ⦃ r => r.val < 2 ^ 2 ^ 6 ∧ towerOf 6 r = towerOf 6 a ^ 2 ^ (2 ^ 4 * count.val) ⦄ :=
+  Proofs.Binary.bf64_bf16_repeated_frobenius_spec a count
+
+/-- The value `from` returns. -/
+theorem tower.BinaryField128.Insts.CoreConvertFromBinaryField16.from.towerOf (x : tower.BinaryField16) :
+    tower.BinaryField128.Insts.CoreConvertFromBinaryField16.from x ⦃ r =>
+      towerOf 7 r = ConcreteBinaryTower.concreteTowerAlgebraMap 4 7 (by omega) (towerOf 4 x) ⦄ :=
+  Proofs.Binary.bf128_bf16_from_spec x
+
+/-- The value `is_in_basefield` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField16.is_in_basefield.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField16.is_in_basefield a ⦃ b =>
+      (b = true ↔ ∃ y, towerOf 7 a = ConcreteBinaryTower.concreteTowerAlgebraMap 4 7 (by omega) y) ⦄ :=
+  Proofs.Binary.bf128_bf16_is_in_basefield_spec a
+
+/-- The value `as_base` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField16.as_base.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField16.as_base a ⦃ r =>
+      ((∃ y, towerOf 7 a = ConcreteBinaryTower.concreteTowerAlgebraMap 4 7 (by omega) y) →
+        ∃ c, r = .Some c ∧ ConcreteBinaryTower.concreteTowerAlgebraMap 4 7 (by omega) (towerOf 4 c) = towerOf 7 a) ∧
+      ((¬∃ y, towerOf 7 a = ConcreteBinaryTower.concreteTowerAlgebraMap 4 7 (by omega) y) → r = .None) ⦄ :=
+  Proofs.Binary.bf128_bf16_as_base_spec a
+
+/-- The value `frobenius` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.frobenius.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.frobenius a ⦃ r =>
+      r.val < 2 ^ 2 ^ 7 ∧ towerOf 7 r = towerOf 7 a ^ 2 ^ 2 ^ 4 ⦄ :=
+  Proofs.Binary.bf128_bf16_frobenius_spec a
+
+/-- The value `repeated_frobenius` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.repeated_frobenius.towerOf (a : tower.BinaryField128) (count : Std.Usize) :
+    tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField16.repeated_frobenius a count
+      ⦃ r => r.val < 2 ^ 2 ^ 7 ∧ towerOf 7 r = towerOf 7 a ^ 2 ^ (2 ^ 4 * count.val) ⦄ :=
+  Proofs.Binary.bf128_bf16_repeated_frobenius_spec a count
+
+/-- The value `from` returns. -/
+theorem tower.BinaryField128.Insts.CoreConvertFromBinaryField32.from.towerOf (x : tower.BinaryField32) :
+    tower.BinaryField128.Insts.CoreConvertFromBinaryField32.from x ⦃ r =>
+      towerOf 7 r = ConcreteBinaryTower.concreteTowerAlgebraMap 5 7 (by omega) (towerOf 5 x) ⦄ :=
+  Proofs.Binary.bf128_bf32_from_spec x
+
+/-- The value `is_in_basefield` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField32.is_in_basefield.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField32.is_in_basefield a ⦃ b =>
+      (b = true ↔ ∃ y, towerOf 7 a = ConcreteBinaryTower.concreteTowerAlgebraMap 5 7 (by omega) y) ⦄ :=
+  Proofs.Binary.bf128_bf32_is_in_basefield_spec a
+
+/-- The value `as_base` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField32.as_base.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.Insts.P3_fieldFieldExtensionFieldBinaryField32.as_base a ⦃ r =>
+      ((∃ y, towerOf 7 a = ConcreteBinaryTower.concreteTowerAlgebraMap 5 7 (by omega) y) →
+        ∃ c, r = .Some c ∧ ConcreteBinaryTower.concreteTowerAlgebraMap 5 7 (by omega) (towerOf 5 c) = towerOf 7 a) ∧
+      ((¬∃ y, towerOf 7 a = ConcreteBinaryTower.concreteTowerAlgebraMap 5 7 (by omega) y) → r = .None) ⦄ :=
+  Proofs.Binary.bf128_bf32_as_base_spec a
+
+/-- The value `frobenius` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField32.frobenius.towerOf (a : tower.BinaryField128) :
+    tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField32.frobenius a ⦃ r =>
+      r.val < 2 ^ 2 ^ 7 ∧ towerOf 7 r = towerOf 7 a ^ 2 ^ 2 ^ 5 ⦄ :=
+  Proofs.Binary.bf128_bf32_frobenius_spec a
+
+/-- The value `repeated_frobenius` returns. -/
+theorem tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField32.repeated_frobenius.towerOf (a : tower.BinaryField128) (count : Std.Usize) :
+    tower.BinaryField128.Insts.P3_fieldExtensionHasFrobeniusBinaryField32.repeated_frobenius a count
+      ⦃ r => r.val < 2 ^ 2 ^ 7 ∧ towerOf 7 r = towerOf 7 a ^ 2 ^ (2 ^ 5 * count.val) ⦄ :=
+  Proofs.Binary.bf128_bf32_repeated_frobenius_spec a count
 
 end Plonky3Lean.Claims.P3BinaryField
