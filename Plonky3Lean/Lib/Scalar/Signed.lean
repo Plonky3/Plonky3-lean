@@ -122,6 +122,17 @@ theorem core.U32.Insts.CoreCmpOrd.min.spec (x y : Std.U32) :
     CoreModels.core.U32.Insts.CoreCmpOrd.min x y ⦃ r => r.val = min x.val y.val ⦄ :=
   core.cmp.Ord.min.default_u32.spec x y
 
+/-- `x.min(y)` on `usize`s, called as the method of `usize`'s `Ord` instance. -/
+@[step]
+theorem core.Usize.Insts.CoreCmpOrd.min.spec (x y : Std.Usize) :
+    CoreModels.core.Usize.Insts.CoreCmpOrd.min x y ⦃ r => r.val = min x.val y.val ⦄ := by
+  simp only [CoreModels.core.Usize.Insts.CoreCmpOrd.min, CoreModels.core.cmp.Ord.min.default,
+    CoreModels.core.cmp.min, CoreModels.core.Usize.Insts.CoreCmpOrd, CoreModels.core.mkUOrd]
+  rcases Nat.lt_trichotomy x.val y.val with h | h | h
+  · simp [compare_lt_iff_lt.mpr h]; omega
+  · simp [h]
+  · simp [compare_gt_iff_gt.mpr h]; omega
+
 /-- `x.cmp(y)` on `u32`s. -/
 theorem core.U32.Insts.CoreCmpOrd.cmp.eq (x y : Std.U32) :
     CoreModels.core.U32.Insts.CoreCmpOrd.cmp x y =
