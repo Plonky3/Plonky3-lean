@@ -1,0 +1,215 @@
+# p3-circle: Circle STARKs over the circle x^2 + y^2 = 1 (Haböck, Levit, Papini, eprint 2024/278).
+
+lean_lib = "P3Circle"
+
+# Nothing is extracted.
+#
+# Every item is generic over p3-field's trait hierarchy (ComplexExtendable, ExtensionField), which aeneas rejects (docs/extractor-issues.md 9).
+#
+# A wrapper at Mersenne31 does not help: the generic impl it calls still needs the trait dictionary.
+#
+# The points, the domains, the order, the circle FFT, the folding and the DEEP quotient are transcribed over a field in stub/P3Circle/, with the abstractions each file lists.
+state = "stub"
+
+features = []
+
+watch = ["circle/src", "circle/Cargo.toml", "util/src/lib.rs", "field/src/batch_inverse.rs",
+  "mersenne-31/src/complex.rs"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point"
+rust = "p3_circle::point::Point"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.tryInverse"
+rust = "p3_field::Field::try_inverse"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.new"
+rust = "p3_circle::point::Point::new"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.ZERO"
+rust = "p3_circle::point::Point::ZERO"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.from_projective_line"
+rust = "p3_circle::point::Point::from_projective_line"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.to_projective_line"
+rust = "p3_circle::point::Point::to_projective_line"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.double"
+rust = "p3_circle::point::Point::double"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.repeated_double"
+rust = "p3_circle::point::Point::repeated_double"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.vnStep"
+rust = "p3_circle::point::Point::v_n"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.v_n"
+rust = "p3_circle::point::Point::v_n"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.vnProdLoop"
+rust = "p3_circle::point::Point::v_n_prod"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.v_n_prod"
+rust = "p3_circle::point::Point::v_n_prod"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.neg"
+rust = "{impl core::ops::Neg for p3_circle::point::Point<F>}::neg"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.add"
+rust = "{impl core::ops::Add<p3_circle::point::Point<F>> for p3_circle::point::Point<EF>}::add"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.sub"
+rust = "{impl core::ops::Sub<p3_circle::point::Point<F>> for p3_circle::point::Point<EF>}::sub"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.v_tilde_p"
+rust = "p3_circle::point::Point::v_tilde_p"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.recip_v_tilde_p_num_den"
+rust = "p3_circle::point::Point::recip_v_tilde_p_num_den"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.s_p_at_p"
+rust = "p3_circle::point::Point::s_p_at_p"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.v_p"
+rust = "p3_circle::point::Point::v_p"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.mulLoop"
+rust = "{impl core::ops::Mul<usize> for p3_circle::point::Point<F>}::mul"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.mul"
+rust = "{impl core::ops::Mul<usize> for p3_circle::point::Point<F>}::mul"
+
+[[mirror]]
+lean = "p3_circle.point.mirror.Point.generator"
+rust = "p3_circle::point::Point::generator"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain"
+rust = "p3_circle::domain::CircleDomain"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.interleave"
+rust = "itertools::Itertools::interleave"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.chain"
+rust = "itertools::iterate"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.parallel_point_chain"
+rust = "p3_circle::domain::parallel_point_chain"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.forward_backward_index"
+rust = "p3_circle::domain::forward_backward_index"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.new"
+rust = "p3_circle::domain::CircleDomain::new"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.standard"
+rust = "p3_circle::domain::CircleDomain::standard"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.is_standard"
+rust = "p3_circle::domain::CircleDomain::is_standard"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.subgroup_generator"
+rust = "p3_circle::domain::CircleDomain::subgroup_generator"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.coset0"
+rust = "p3_circle::domain::CircleDomain::coset0"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.coset1"
+rust = "p3_circle::domain::CircleDomain::coset1"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.points"
+rust = "p3_circle::domain::CircleDomain::points"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.points_vec"
+rust = "p3_circle::domain::CircleDomain::points_vec"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.nth_point"
+rust = "p3_circle::domain::CircleDomain::nth_point"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.vanishing_poly"
+rust = "p3_circle::domain::CircleDomain::vanishing_poly"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.size"
+rust = "{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::size"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.first_point"
+rust = "{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::first_point"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.next_point"
+rust = "{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::next_point"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.try_create_disjoint_domain"
+rust = "{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::try_create_disjoint_domain"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.split_domains"
+rust = "{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::split_domains"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.split_evals"
+rust = "{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::split_evals"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.vanishing_poly_at_point"
+rust = "{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::vanishing_poly_at_point"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.selectors_at_point"
+rust = "{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::selectors_at_point"
+
+[[mirror]]
+lean = "p3_circle.domain.mirror.CircleDomain.selectors_on_coset"
+rust = "{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::selectors_on_coset"
+
+[[mirror]]
+lean = "p3_circle.ordering.mirror.cfft_permute_index"
+rust = "p3_circle::ordering::cfft_permute_index"
+
+[[mirror]]
+lean = "p3_circle.ordering.mirror.cfft_permute_slice"
+rust = "p3_circle::ordering::cfft_permute_slice"
+
+[[mirror]]
+lean = "p3_circle.ordering.mirror.cfft_permute_slice_chunked_in_place"
+rust = "p3_circle::ordering::cfft_permute_slice_chunked_in_place"
