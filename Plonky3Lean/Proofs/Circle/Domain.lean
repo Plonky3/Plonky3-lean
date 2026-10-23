@@ -109,6 +109,10 @@ theorem nth_point_eq (hV : CircleGenValid G) (n : ℕ) (S : C K) (hn : 1 ≤ n) 
     Option.bind_eq_bind, Option.bind_some, mul_ofC, neg_ofC, add_ofC, twinPoint]
   split_ifs <;> rfl
 
+omit [DecidableEq K] in
+theorem vn_neg (n : ℕ) (P : C K) : vn n (-P) = vn n P := by
+  simp only [vn, smul_neg, C.neg_x]
+
 /-- The vanishing polynomial of a twin coset is v_D of equation (7). -/
 theorem vanishing_poly_eq (n : ℕ) (S P : C K) (hn : 1 ≤ n) :
     CircleDomain.vanishing_poly ⟨n, ofC S⟩ (ofC P) = some (vD n S P) := by

@@ -151,9 +151,6 @@ theorem s_p_at_p_eq_selReg (P : C K) {n : ℕ} (hn : 1 ≤ n) :
 theorem vn_eq_zero_of_y {n : ℕ} {P Q : C K} (hP : vn n P = 0) (hy : (Q - P).y = 0) : vn n Q = 0 := by
   rw [vn_of_vn_zero hP, two_pow_nsmul_y (Q - P), hy]; ring
 
-theorem vn_neg (n : ℕ) (P : C K) : vn n (-P) = vn n P := by
-  simp only [vn, smul_neg, C.neg_x]
-
 open p3_circle.point.mirror p3_circle.domain.mirror p3_commit.domain.mirror in
 /-- Off the trace domain, selectors_at_point returns the selector polynomials of the first and last points, the normalized transition selector, and 1 / v_n.
 

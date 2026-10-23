@@ -10,5 +10,6 @@ module
 public import P3Circle.Point
 public import P3Circle.Domain
 public import P3Circle.Ordering
+public import P3Circle.Cfft
 
 @[expose] public section

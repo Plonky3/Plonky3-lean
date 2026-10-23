@@ -166,6 +166,7 @@ public import Plonky3Lean.Proofs.Fri.Reduce
 public import Plonky3Lean.Proofs.Fri.Robust
 public import Plonky3Lean.Proofs.Circle.Selectors
 public import Plonky3Lean.Proofs.Circle.Ordering
+public import Plonky3Lean.Proofs.Circle.CfftStd
 public import Plonky3Lean.Proofs.Fri.Transcript
 public import Plonky3Lean.Proofs.Fri.Hiding
 public import Plonky3Lean.Proofs.Fri.Packed
