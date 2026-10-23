@@ -1,0 +1,8 @@
+[package]
+name = "p3-arch-shims"
+version = "0.0.0"
+edition = "2024"
+publish = false
+description = "Verification-only models of the core::arch intrinsics Plonky3 uses, over lane arrays."
+
+[dependencies]
