@@ -27,7 +27,7 @@ target `thumbv7em-none-eabi`
 | `monty-31` | scoped | 1581 | 327 | 0 | 13 | 29 | 1 / 1 | pre `010` |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 68 | 2 | 4 |  | 0 / 0 |  |
-| `security` | scoped | 1414 | 127 | 6 | 13 | 0 | 2 / 1 | pre `010`, pre `020` |
+| `security` | scoped | 1414 | 130 | 6 | 13 | 0 | 2 / 1 | pre `010`, pre `020` |
 | `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
 | `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
 | `util` | scoped | 182 | 56 | 0 | 1 | 0 | 0 / 0 |  |
@@ -496,8 +496,8 @@ counts the claims (of 769) whose dependencies include the declaration.
 | `blake3/pre/020-reshape-batch` | none in a normal build: the reshaped driver is compiled only under cfg(hax_backend_lean), as the crate's `batch` module, and under cfg(test), beside the shipped one. The extracted variant hashes on the one-lane backend, which is what the extraction target compiles. |
 | `mersenne-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of `Mersenne31`. No existing body changes. |
 | `monty-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method or constant of `MontyField31`. No existing body changes. |
-| `security/pre/010-budget-folding-round` | none in a normal build: `folding_round` is compiled but unused there. In the extracted variant, `security_report` computes its folding term by calling `folding_round`, whose body is the original `match` verbatim. |
-| `security/pre/020-budget-binding-index` | none in a normal build: `binding_index` and `first_minimum` are compiled but unused there. In the extracted variant, `binding_term` returns the term at the position of the first minimum of the seven bit counts. |
+| `security/pre/010-budget-folding-round` | None in a normal build, where the new function is compiled but unused. In the extracted variant, the report computes its folding term with it. Its body is the original match, verbatim. |
+| `security/pre/020-budget-binding-index` | None in a normal build, where the two new functions are compiled but unused. In the extracted variant, the binding term is read at the first minimum. That minimum is taken over the seven bit counts. |
 | `sha256/pre/010-reshape-compress` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `Sha256Compress::compress` calls the reshaped body, which a differential test equates with the original. |
 
 Upstream tests (`test-pre-patches.py`): 6715 of Plonky3's 6769 pass as shipped and 6715 with the pre-extraction patches, with 0 divergence(s).
@@ -1248,7 +1248,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Security.budget.security_report.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.budget.security_report.overstates_composition` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.deep.deep_ali_error.charges_list_once` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Security.deep.deep_ali_error.overstates` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.deep.deep_ali_error.l_squared_would_bind` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.error.ErrorBits.sum.le_term` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.fixed.bits_per_query.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.fixed.ceil_log2.fix_rounds_up` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -1257,7 +1257,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Security.fixed.ceil_log2.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.fixed.floor_log2.le_log2` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.fixed.floor_log2.panics` | `Classical.choice`, `Quot.sound`, `propext` |
-| `P3Security.fri.commit_phase_error_ldr_m.max_not_sum` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fri.commit_phase_error_ldr_m.max_le_sum` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.fri.commit_phase_error_udr.le_paper` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.proximity.compute_upper_m.boundary` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.proximity.compute_upper_m.iff_eta_pos` | `Classical.choice`, `Quot.sound`, `propext` |
