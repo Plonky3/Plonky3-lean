@@ -250,4 +250,144 @@ theorem flog_14917 : flog 14917 = 908634 := by decide +kernel
 theorem log2_14917_bounds : 2 ^ 908635 < 14917 ^ 2 ^ 16 ∧ 14917 ^ 2 ^ 16 < 2 ^ 908636 := by
   decide +kernel
 
+/-! ## The proposed fix: squaring with every truncation rounded up -/
+
+theorem le_ceil_div_mul (a d : ℕ) (hd : 0 < d) : a ≤ (a + d - 1) / d * d := by
+  have h1 := Nat.div_add_mod (a + d - 1) d
+  have h2 := Nat.mod_lt (a + d - 1) hd
+  rw [mul_comm]; omega
+
+/-- Normalization, rounded up. -/
+def initU (x : ℕ) : ℕ × ℕ × ℕ :=
+  let ip := Nat.log2 x
+  (ip * 2 ^ 16,
+    if 32 ≤ ip then (x + 2 ^ (ip - 32) - 1) / 2 ^ (ip - 32) else x * 2 ^ (32 - ip), 0)
+
+/-- One iteration with the square and the halving rounded up. -/
+def stepU (s : ℕ × ℕ × ℕ) : ℕ × ℕ × ℕ :=
+  let m := (s.2.1 * s.2.1 + 2 ^ 32 - 1) / 2 ^ 32
+  if 2 ^ 33 ≤ m then (s.1 + 2 ^ (15 - s.2.2), (m + 1) / 2, s.2.2 + 1) else (s.1, m, s.2.2 + 1)
+
+def iterU (x : ℕ) : ℕ → ℕ × ℕ × ℕ
+  | 0 => initU x
+  | n + 1 => stepU (iterU x n)
+
+/-- The proposed `ceil_log2`: exact on powers of two, `(iterU x 16).1 + 1` elsewhere. -/
+def cflog (x : ℕ) : ℕ := if x &&& (x - 1) = 0 then Nat.log2 x * 2 ^ 16 else (iterU x 16).1 + 1
+
+/-- The invariant of the rounded-up loop: the mantissa never falls below the true one. -/
+def InvU (x b : ℕ) (s : ℕ × ℕ × ℕ) : Prop :=
+  s.2.2 = b ∧ 2 ^ 32 ≤ s.2.1 ∧ s.2.1 ≤ 2 ^ 33 ∧ ∃ F, F < 2 ^ b ∧
+    s.1 = Nat.log2 x * 2 ^ 16 + F * 2 ^ (16 - b) ∧
+    x ^ 2 ^ 16 * (2 ^ 32) ^ 2 ^ (16 - b) ≤
+      (s.2.1 * 2 ^ F) ^ 2 ^ (16 - b) * 2 ^ (Nat.log2 x * 2 ^ 16)
+
+theorem initU_inv (x : ℕ) (hx : 0 < x) : InvU x 0 (initU x) := by
+  have hlo : 2 ^ Nat.log2 x ≤ x := Nat.log2_self_le (by omega)
+  have hhi : x < 2 ^ (Nat.log2 x + 1) := Nat.lt_log2_self
+  set ip := Nat.log2 x
+  have key : 2 ^ 32 ≤ (initU x).2.1 ∧ (initU x).2.1 ≤ 2 ^ 33 ∧
+      x * 2 ^ 32 ≤ (initU x).2.1 * 2 ^ ip := by
+    simp only [initU]
+    split_ifs with h
+    · have e : 2 ^ ip = 2 ^ (ip - 32) * 2 ^ 32 := by rw [← pow_add]; congr 1; omega
+      have e1 : 2 ^ (ip + 1) = 2 ^ (ip - 32) * 2 ^ 33 := by rw [← pow_add]; congr 1; omega
+      have hp : 0 < 2 ^ (ip - 32) := by positivity
+      set d := 2 ^ (ip - 32)
+      refine ⟨?_, ?_, ?_⟩
+      · rw [Nat.le_div_iff_mul_le hp]; rw [e] at hlo; omega
+      · rw [Nat.div_le_iff_le_mul_add_pred hp]; rw [e1] at hhi; omega
+      · rw [e, ← mul_assoc]
+        exact Nat.mul_le_mul_right _ (le_ceil_div_mul x d hp)
+    · have e : 2 ^ 32 = 2 ^ (32 - ip) * 2 ^ ip := by rw [← pow_add]; congr 1; omega
+      have e1 : 2 ^ 33 = 2 ^ (32 - ip) * 2 ^ (ip + 1) := by rw [← pow_add]; congr 1; omega
+      refine ⟨?_, ?_, ?_⟩
+      · rw [e, mul_comm x]; exact Nat.mul_le_mul_left _ hlo
+      · rw [e1, mul_comm x]; exact Nat.mul_le_mul_left _ hhi.le
+      · rw [e, mul_assoc]
+  obtain ⟨h1, h2, h3⟩ := key
+  refine ⟨rfl, h1, h2, 0, by simp, by simp [initU], ?_⟩
+  simp only [pow_zero, mul_one, Nat.sub_zero]
+  rw [← mul_pow]
+  calc (x * 2 ^ 32) ^ 2 ^ 16 ≤ ((initU x).2.1 * 2 ^ ip) ^ 2 ^ 16 := Nat.pow_le_pow_left h3 _
+    _ = (initU x).2.1 ^ 2 ^ 16 * 2 ^ (ip * 2 ^ 16) := by rw [mul_pow, ← pow_mul]
+
+theorem stepU_inv (x b : ℕ) (hb : b < 16) (s : ℕ × ℕ × ℕ) (h : InvU x b s) :
+    InvU x (b + 1) (stepU s) := by
+  obtain ⟨hb', h1, h2, F, hF, hr, hle⟩ := h
+  set m := s.2.1
+  set m' := (m * m + 2 ^ 32 - 1) / 2 ^ 32
+  set e := 2 ^ (16 - (b + 1))
+  have he : 2 ^ (16 - b) = 2 * e := by
+    simp only [e]; rw [← pow_succ']; congr 1; omega
+  have hm'ge : m * m ≤ m' * 2 ^ 32 := le_ceil_div_mul _ _ (by positivity)
+  have hmm1 := Nat.mul_le_mul h1 h1
+  have hmm2 := Nat.mul_le_mul h2 h2
+  have hm'lo : 2 ^ 32 ≤ m' := by
+    simp only [m']; rw [Nat.le_div_iff_mul_le (by positivity)]; omega
+  have hm'hi : m' ≤ 2 ^ 34 := by
+    simp only [m']; rw [Nat.div_le_iff_le_mul_add_pred (by positivity)]; omega
+  have hsq : x ^ 2 ^ 16 * (2 ^ 32) ^ e ≤
+      (m' * 2 ^ (2 * F)) ^ e * 2 ^ (Nat.log2 x * 2 ^ 16) := by
+    have hA : (m * 2 ^ F) ^ (2 ^ (16 - b)) ≤ (m' * 2 ^ (2 * F)) ^ e * (2 ^ 32) ^ e := by
+      rw [he, pow_mul (m * 2 ^ F) 2 e, ← mul_pow]
+      apply Nat.pow_le_pow_left
+      calc (m * 2 ^ F) ^ 2 = m * m * 2 ^ (2 * F) := by
+            rw [show 2 ^ (2 * F) = 2 ^ F * 2 ^ F by rw [two_mul, pow_add]]; ring
+        _ ≤ m' * 2 ^ 32 * 2 ^ (2 * F) := Nat.mul_le_mul_right _ hm'ge
+        _ = m' * 2 ^ (2 * F) * 2 ^ 32 := by ring
+    have hpos : 0 < (2 ^ 32) ^ e := by positivity
+    have := calc x ^ 2 ^ 16 * (2 ^ 32) ^ e * (2 ^ 32) ^ e
+        = x ^ 2 ^ 16 * (2 ^ 32) ^ 2 ^ (16 - b) := by rw [he, pow_mul']; ring
+      _ ≤ (m * 2 ^ F) ^ 2 ^ (16 - b) * 2 ^ (Nat.log2 x * 2 ^ 16) := hle
+      _ ≤ (m' * 2 ^ (2 * F)) ^ e * (2 ^ 32) ^ e * 2 ^ (Nat.log2 x * 2 ^ 16) :=
+          Nat.mul_le_mul_right _ hA
+      _ = (m' * 2 ^ (2 * F)) ^ e * 2 ^ (Nat.log2 x * 2 ^ 16) * (2 ^ 32) ^ e := by ring
+    exact Nat.le_of_mul_le_mul_right this hpos
+  have hrb : 2 ^ (16 - b) = 2 * 2 ^ (15 - b) := by rw [← pow_succ']; congr 1; omega
+  have h15 : 16 - (b + 1) = 15 - b := by omega
+  simp only [stepU]
+  split_ifs with hc
+  · have hc' : 2 ^ 33 ≤ m' := hc
+    refine ⟨by simp [hb'], ?_, ?_, 2 * F + 1, ?_, ?_, ?_⟩
+    · show 2 ^ 32 ≤ (m' + 1) / 2; omega
+    · show (m' + 1) / 2 ≤ 2 ^ 33; omega
+    · rw [pow_succ]; omega
+    · simp only [hb', hr, hrb, h15]; ring
+    · simp only
+      calc x ^ 2 ^ 16 * (2 ^ 32) ^ e ≤ (m' * 2 ^ (2 * F)) ^ e * 2 ^ (Nat.log2 x * 2 ^ 16) := hsq
+        _ ≤ ((m' + 1) / 2 * 2 ^ (2 * F + 1)) ^ e * 2 ^ (Nat.log2 x * 2 ^ 16) := by
+          apply Nat.mul_le_mul_right; apply Nat.pow_le_pow_left
+          rw [pow_succ, ← mul_assoc, mul_comm _ 2, ← mul_assoc]
+          apply Nat.mul_le_mul_right; omega
+  · have hc' : ¬ 2 ^ 33 ≤ m' := hc
+    refine ⟨by simp [hb'], hm'lo, by show m' ≤ 2 ^ 33; omega, 2 * F, ?_, ?_, hsq⟩
+    · rw [pow_succ]; omega
+    · simp only [hr, hrb, h15]; ring
+
+theorem iterU_inv (x : ℕ) (hx : 0 < x) : ∀ n, n ≤ 16 → InvU x n (iterU x n)
+  | 0, _ => initU_inv x hx
+  | n + 1, h => stepU_inv x n (by omega) _ (iterU_inv x hx n (by omega))
+
+/-- **The proposed `ceil_log2` rounds up**: `x ^ 2^16 ≤ 2 ^ cflog x`, that is
+`cflog x ≥ 2^16 · log2 x`, for every `x > 0`. -/
+theorem le_cflog (x : ℕ) (hx : 0 < x) : x ^ 2 ^ 16 ≤ 2 ^ cflog x := by
+  unfold cflog
+  split_ifs with hp
+  · have h2 := eq_two_pow_of_and x (by omega) hp
+    conv_lhs => rw [h2]
+    rw [← pow_mul]
+  · obtain ⟨-, -, h2, F, -, hr, hle⟩ := iterU_inv x hx 16 le_rfl
+    simp only [Nat.sub_self, pow_zero, pow_one, mul_one] at hr hle
+    rw [hr]
+    have : x ^ 2 ^ 16 * 2 ^ 32 ≤ 2 ^ (Nat.log2 x * 2 ^ 16 + F + 1) * 2 ^ 32 := by
+      calc x ^ 2 ^ 16 * 2 ^ 32 ≤ (iterU x 16).2.1 * 2 ^ F * 2 ^ (Nat.log2 x * 2 ^ 16) := hle
+        _ ≤ 2 ^ 33 * 2 ^ F * 2 ^ (Nat.log2 x * 2 ^ 16) := by gcongr
+        _ = 2 ^ (Nat.log2 x * 2 ^ 16 + F + 1) * 2 ^ 32 := by
+          simp only [pow_add, pow_one]; ring
+    exact Nat.le_of_mul_le_mul_right this (by positivity)
+
+/-- The fix moves `14917` up one unit, to `908636`. -/
+theorem cflog_14917 : cflog 14917 = 908636 := by decide +kernel
+
 end Plonky3Lean.Proofs.Security.FixedLog
