@@ -24,7 +24,9 @@ set_option linter.unusedSectionVars false
 
 variable {F EF : Type _} [Field F] [Field EF] [Algebra F EF] [DecidableEq F] [DecidableEq EF]
 
-/-- RoundVerifier::new: arity 2^a, fold domain (n - a, s^(2^a)), next domain (n - 1, s^(2^a) w); it panics for a > n or n = 0. -/
+/-- The round's geometry: arity 2^a, fold domain (n - a, s^(2^a)), next domain (n - 1, s^(2^a) w).
+
+It panics for a > n or n = 0. -/
 theorem round_geometry_eq (w s : F) (n a : ℕ) :
     round_geometry w s n a =
       if a ≤ n ∧ 1 ≤ n then some (2 ^ a, s ^ 2 ^ a, n - a, n - 1, s ^ 2 ^ a * w) else none := by

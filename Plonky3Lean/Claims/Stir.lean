@@ -145,7 +145,9 @@ theorem geometric_sum (q : EF) (e : ℕ) :
     ∑ l ∈ range (e + 1), q ^ l = if q = 1 then ((e + 1 : ℕ) : EF) else (1 - q ^ (e + 1)) / (1 - q) :=
   geom_sum_closed q e
 
-/-- The degree-correction factor is DegCor(d*, r, f, d) at x, the case x r = 1 included; it never panics. -/
+/-- The degree-correction factor is DegCor(d*, r, f, d) at x, the case x r = 1 included.
+
+It never panics. -/
 theorem eval_degree_correction (f : EF → EF) (x r : EF) (dstar d : ℕ) :
     p3_stir.utils.mirror.eval_degree_correction (f x) x r (dstar - d) = some (degCor dstar d r f x) :=
   eval_degree_correction_degCor f x r dstar d
@@ -280,13 +282,17 @@ theorem fold_point (G : Gen F) (hN : GenNested G) {a n : ℕ} (ha : a ≤ n) (hn
     (s : F) (j : ℕ) : s ^ 2 ^ a * G.gen (n - a) ^ j = (s * G.gen n ^ j) ^ 2 ^ a :=
   fold_point_eq G hN ha hn s j
 
-/-- A round's geometry: arity 2^a, fold domain s^(2^a) <g^(2^a)>, next domain of half the size shifted by w; it panics for a > n or n = 0. -/
+/-- A round's geometry: arity 2^a, fold domain s^(2^a) <g^(2^a)>, next domain of half the size shifted by w.
+
+It panics for a > n or n = 0. -/
 theorem round_geometry (w s : F) (n a : ℕ) :
     p3_stir.verifier.mirror.round_geometry w s n a =
       if a ≤ n ∧ 1 ≤ n then some (2 ^ a, s ^ 2 ^ a, n - a, n - 1, s ^ 2 ^ a * w) else none :=
   round_geometry_eq w s n a
 
-/-- A candidate is kept exactly when, for every excluded coset with l > 0, z^(2^l) != s^(2^l), and it is new; a coset with l = 0 is never excluded. -/
+/-- A candidate is kept exactly when, for every excluded coset with l > 0, z^(2^l) != s^(2^l), and it is new.
+
+A coset with l = 0 is never excluded. -/
 theorem ood_filter (doms : List (F × ℕ)) (h : ∀ d ∈ doms, d.1 ≠ 0) (z : EF) (kept : List EF) :
     ∃ f, OodFilter.new doms = some f ∧
       (f.accepts z kept = true ↔ (∀ i < doms.length, (doms.getD i (1, 0)).2 = 0 ∨

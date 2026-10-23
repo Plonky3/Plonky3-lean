@@ -1,0 +1,180 @@
+# p3-stir: the STIR low-degree test and PCS (Arnon, Chiesa, Fenzi and Yogev, eprint 2024/390).
+
+lean_lib = "P3Stir"
+
+# Nothing is extracted.
+#
+# The crate is generic over p3-field's trait hierarchy, the MMCS and the challenger, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# The round operators, the verifier's query checks and the PCS Combine coefficients are transcribed over a field in stub/P3Stir/.
+#
+# The abstractions are listed in stub/P3Stir/Model.lean.
+#
+# The transcript, the prover's DFT calls, the PCS layer and the f64 parameter schedule are not transcribed.
+state = "stub"
+
+features = []
+
+watch = ["stir/src", "stir/Cargo.toml", "field/src/batch_inverse.rs", "field/src/field.rs"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.eval_poly"
+rust = "p3_stir::utils::eval_poly"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.eval_poly_parallel"
+rust = "p3_stir::utils::eval_poly_parallel"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.divide_by_linear"
+rust = "p3_stir::utils::divide_by_linear"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.add_polys"
+rust = "p3_stir::utils::add_polys"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.eval_degree_correction"
+rust = "p3_stir::utils::eval_degree_correction"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.combine_on_coset"
+rust = "p3_stir::utils::combine_on_coset"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.eval_poly_at_base"
+rust = "p3_stir::utils::eval_poly_at_base"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.reduce_mod_x_pow_minus_c"
+rust = "p3_stir::utils::reduce_mod_x_pow_minus_c"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.vanishing_poly_from_roots"
+rust = "p3_stir::utils::vanishing_poly_from_roots"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.next_domain_shift"
+rust = "p3_stir::utils::next_domain_shift"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.fold_domain_params"
+rust = "p3_stir::utils::fold_domain_params"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.OodFilter"
+rust = "p3_stir::utils::OodFilter"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.OodFilter.new"
+rust = "p3_stir::utils::OodFilter::new"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.OodFilter.accepts"
+rust = "p3_stir::utils::OodFilter::accepts"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.allDistinct"
+rust = "p3_stir::utils::interpolate_poly"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.interpolate_poly"
+rust = "p3_stir::utils::interpolate_poly"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.check_ans_interpolates"
+rust = "p3_stir::utils::check_ans_interpolates"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.fold_codeword"
+rust = "p3_stir::utils::fold_codeword"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.fold_pass"
+rust = "p3_stir::utils::fold_pass"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.fold_poly_coeffs"
+rust = "p3_stir::utils::fold_poly_coeffs"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.fold_fiber"
+rust = "p3_stir::utils::fold_fiber"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.lagrange_eval_at"
+rust = "p3_stir::utils::lagrange_eval_at"
+
+[[mirror]]
+lean = "p3_stir.utils.mirror.lagrange_interpolate_at"
+rust = "p3_stir::utils::lagrange_interpolate_at"
+
+[[mirror]]
+lean = "p3_stir.verifier.mirror.StirError"
+rust = "p3_stir::error::StirError"
+
+[[mirror]]
+lean = "p3_stir.verifier.mirror.VirtualRoundContext"
+rust = "p3_stir::verifier::VirtualRoundContext"
+
+[[mirror]]
+lean = "p3_stir.verifier.mirror.materialize_virtual_fiber"
+rust = "p3_stir::verifier::materialize_virtual_fiber"
+
+[[mirror]]
+lean = "p3_stir.verifier.mirror.query_fold_value"
+rust = "p3_stir::verifier::query_fold_value"
+
+[[mirror]]
+lean = "p3_stir.verifier.mirror.check_ans_length"
+rust = "p3_stir::verifier::check_ans_length"
+
+[[mirror]]
+lean = "p3_stir.verifier.mirror.resolve_ans_polynomial"
+rust = "p3_stir::verifier::resolve_ans_polynomial"
+
+[[mirror]]
+lean = "p3_stir.verifier.mirror.external_fibers_in_draw_order"
+rust = "p3_stir::verifier::external_fibers_in_draw_order"
+
+[[mirror]]
+lean = "p3_stir.verifier.mirror.fetch_committed_rows"
+rust = "p3_stir::verifier::fetch_round_rows"
+
+[[mirror]]
+lean = "p3_stir.verifier.mirror.QueryState"
+rust = "p3_stir::verifier::RoundVerifier"
+
+[[mirror]]
+lean = "p3_stir.verifier.mirror.fold_queries"
+rust = "p3_stir::verifier::RoundVerifier::fetch_and_fold"
+
+[[mirror]]
+lean = "p3_stir.verifier.mirror.all_points_and_values"
+rust = "p3_stir::verifier::RoundVerifier::all_points_and_values"
+
+[[mirror]]
+lean = "p3_stir.verifier.mirror.finish_ctx"
+rust = "p3_stir::verifier::RoundVerifier::finish"
+
+[[mirror]]
+lean = "p3_stir.verifier.mirror.round_geometry"
+rust = "p3_stir::verifier::RoundVerifier::new"
+
+[[mirror]]
+lean = "p3_stir.verifier.mirror.excluded_domains"
+rust = "p3_stir::verifier::RoundVerifier::excluded_domains"
+
+[[mirror]]
+lean = "p3_stir.verifier.mirror.set_gamma"
+rust = "p3_stir::verifier::RoundVerifier::set_gamma"
+
+[[mirror]]
+lean = "p3_stir.verifier.mirror.check_final_queries"
+rust = "p3_stir::verifier::FinalRoundVerifier::fetch_and_check"
+
+[[mirror]]
+lean = "p3_stir.pcs.plan.mirror.combine_coefficients"
+rust = "p3_stir::pcs::plan::combine_coefficients"

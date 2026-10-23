@@ -7,7 +7,7 @@ public import Plonky3Lean.Proofs.Stir.Lists
 @[expose] public section
 
 /-!
-# interpolate_poly
+# Newton interpolation
 
 The table of divided differences, then the Newton expansion into coefficients, then trailing zeros removed.
 -/
@@ -283,7 +283,7 @@ def ddStep (n : ℕ) (dinv : List K) : List K × ℕ → ℕ → List K × ℕ :
     dd.set i ((dd.getD i 0 - dd.getD (i - 1) 0) * inverses.getD (i - k) 0)) st.1
   (dd, st.2 + width)
 
-/-- interpolate_poly with its loops named. -/
+/-- Newton interpolation with its loops named. -/
 theorem interpolate_poly_unfold (points values : List K) :
     interpolate_poly points values =
       if points.length ≠ values.length then none
@@ -297,7 +297,7 @@ theorem interpolate_poly_unfold (points values : List K) :
           ((List.replicate points.length (0 : K)).set 0 (dd.getD 0 0), [1])).1) := by
   rfl
 
-/-- interpolate_poly on distinct points: coefficients of the interpolant of degree below n. -/
+/-- Newton interpolation on distinct points: coefficients of the interpolant of degree below n. -/
 theorem interpolate_poly_eq (points values : List K) (hlen : points.length = values.length)
     (hnd : points.Nodup) (hne : points ≠ []) :
     ∃ cs, interpolate_poly points values = some cs ∧
@@ -339,7 +339,7 @@ theorem interpolate_poly_eq (points values : List K) (hlen : points.length = val
   rw [Nat.sub_add_cancel hn] at this
   rw [← this, interpAB, hIcc]
 
-/-- interpolate_poly panics on lengths that differ and on repeated points. -/
+/-- Newton interpolation panics on lengths that differ and on repeated points. -/
 theorem interpolate_poly_panics (points values : List K)
     (h : points.length ≠ values.length ∨ ¬ points.Nodup) : interpolate_poly points values = none := by
   rw [interpolate_poly_unfold]

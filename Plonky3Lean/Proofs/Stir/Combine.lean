@@ -9,7 +9,7 @@ public import P3Stir
 @[expose] public section
 
 /-!
-# combine_on_coset
+# Combine on a coset
 
 At every point x_p = s g^p of the coset, with step s_p = r x_p, the output is
 
@@ -134,7 +134,7 @@ theorem foldl_set_add {α : Type _} (q : ℕ) (t : α → EF) :
     rw [List.foldl_cons, ih _ (by simpa using hq), List.set_set]
     simp [hq, add_assoc]
 
-/-- combine_on_coset at x_p = s g^p: sum_i r_i v_i[p] sum_{t <= gap_i} (x_p r)^t, the lane with x_p r = 1 included, for every chunk size. -/
+/-- The batched sweep at x_p = s g^p: sum_i r_i v_i[p] sum_{t <= gap_i} (x_p r)^t, the lane with x_p r = 1 included, for every chunk size. -/
 theorem combine_on_coset_eq {c : ℕ} (hc : 0 < c) (G : Gen F) (hG : GenValid G) {log_domain : ℕ}
     (hl : log_domain ≤ G.adicity) (groups : List (EF × ℕ × List EF)) (r_comb : EF) (shift : F)
     (hgroups : ∀ grp ∈ groups, grp.2.2.length = 2 ^ log_domain) :
@@ -291,13 +291,13 @@ theorem combine_coefficients_fold (r : K) (L : ℕ) (logs : List ℕ) (hlogs : �
         simp [List.getD_eq_getElem?_getD, hj']
     · rw [sum_range_succ, hlast, hsum _ le_rfl]; ring
 
-/-- combine_coefficients: Definition 4.11's r_i and the gaps d* - d_i, for class degrees d_i = 2^(log d_i) <= d* = 2^L. -/
+/-- The Combine coefficients are Definition 4.11's r_i and the gaps d* - d_i, for class degrees d_i = 2^(log d_i) <= d* = 2^L. -/
 theorem combine_coefficients_eq (r : K) (L : ℕ) (logs : List ℕ) (hlogs : ∀ l ∈ logs, l ≤ L) :
     combine_coefficients r L logs = some ((List.range logs.length).map fun i =>
       (ri (2 ^ L) (logs.map (2 ^ ·)) r i, 2 ^ L - 2 ^ logs.getD i 0)) := by
   simp only [combine_coefficients, combine_coefficients_fold r L logs hlogs, Option.map_some]
 
-/-- combine_coefficients panics on a class degree above d*. -/
+/-- The Combine coefficients panic on a class degree above d*. -/
 theorem combine_coefficients_panics (r : K) (L : ℕ) (logs : List ℕ) (h : ∃ l ∈ logs, L < l) :
     combine_coefficients r L logs = none := by
   suffices hf : ∀ logs : List ℕ, (∃ l ∈ logs, L < l) →

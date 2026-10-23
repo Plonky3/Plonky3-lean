@@ -73,7 +73,7 @@ theorem eval_interpolate_fiber {k : ℕ} (hk : 0 < k) {v : ℕ → K} (hv : Set.
   simp only [p, polyFold, eval_finsetSum, eval_mul, eval_C, eval_pow, eval_X]
   exact sum_congr rfl fun _ _ => mul_comm _ _
 
-/-- fold_poly_coeffs: the coefficients of PolyFold(f, 2^a, gamma). -/
+/-- The coefficient fold: the coefficients of PolyFold(f, 2^a, gamma). -/
 theorem fold_poly_coeffs_eq (coeffs : List K) (gamma : K) (a : ℕ) :
     ∃ out, fold_poly_coeffs coeffs gamma a = some out ∧
       coeffPoly out = polyFold (coeffPoly coeffs) (2 ^ a) gamma := by

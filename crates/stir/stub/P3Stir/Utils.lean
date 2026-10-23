@@ -206,7 +206,9 @@ def OodFilter.new (excluded_domains : List (F × ℕ)) : Option (OodFilter F) :=
     (inverse shift).map (· ^ 2 ^ log_size)
   some ⟨shift_inv_pows, excluded_domains.map (·.2), (excluded_domains.map (·.2)).foldl max 0⟩
 
-/-- OodFilter::accepts: one squaring chain records z^(2^log_size) for each domain; z is kept when it lies outside every domain of positive log_size and differs from every kept point. -/
+/-- OodFilter::accepts: one squaring chain records z^(2^log_size) for each domain.
+
+z is kept when it lies outside every domain of positive log_size and differs from every kept point. -/
 def OodFilter.accepts (filter : OodFilter F) (candidate : EF) (kept : List EF) : Bool :=
   let z := candidate
   let (z_pows, _) := (List.range (filter.max_log_size + 1)).foldl (fun (st : List EF × EF) l =>

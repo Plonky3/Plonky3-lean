@@ -31,7 +31,9 @@ theorem geom_sum_closed (q : K) (e : ℕ) :
   · simp [h]
   · rw [geom_sum_eq h, ← neg_div_neg_eq, neg_sub, neg_sub]
 
-/-- eval_degree_correction: the value times sum_{l <= gap} (x r)^l, the case x r = 1 included; it never panics. -/
+/-- The degree-correction factor is the value times sum_{l <= gap} (x r)^l, the case x r = 1 included.
+
+It never panics. -/
 theorem eval_degree_correction_eq (value point r_comb : K) (gap : ℕ) :
     eval_degree_correction value point r_comb gap =
       some (value * ∑ l ∈ range (gap + 1), (point * r_comb) ^ l) := by
@@ -42,7 +44,7 @@ theorem eval_degree_correction_eq (value point r_comb : K) (gap : ℕ) :
   · have : (1 : K) - point * r_comb ≠ 0 := sub_ne_zero.2 (Ne.symm h)
     simp [h, inverse, this, div_eq_mul_inv]
 
-/-- eval_degree_correction is DegCor(d*, r, f, d) at x, for gap = d* - d. -/
+/-- The degree-correction factor is DegCor(d*, r, f, d) at x, for gap = d* - d. -/
 theorem eval_degree_correction_degCor (f : K → K) (x r : K) (dstar d : ℕ) :
     eval_degree_correction (f x) x r (dstar - d) = some (degCor dstar d r f x) := by
   rw [eval_degree_correction_eq]; rfl

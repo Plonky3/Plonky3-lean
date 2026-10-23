@@ -54,7 +54,7 @@ theorem natDegree_coeffPoly_lt {l : List K} (hl : l ≠ []) : (coeffPoly l).natD
   · simp [h]; exact List.length_pos_of_ne_nil hl
   · exact (natDegree_lt_iff_degree_lt h).2 this
 
-/-- eval_poly is the value of the coefficient list's polynomial. -/
+/-- Horner's rule is the value of the coefficient list's polynomial. -/
 theorem eval_poly_eq (poly : List K) (point : K) : eval_poly poly point = (coeffPoly poly).eval point := by
   induction poly with
   | nil => simp [eval_poly]
@@ -98,7 +98,7 @@ theorem eval_coeffPoly_blocks (l : List K) (x : K) {c m : ℕ} (hm : l.length �
 theorem length_le_ceil_mul {c : ℕ} (hc : 0 < c) (n : ℕ) : n ≤ (n + c - 1) / c * c := by
   have := Nat.lt_div_mul_add (a := n + c - 1) hc; omega
 
-/-- eval_poly_parallel is eval_poly, for every positive chunk size. -/
+/-- The chunked Horner scheme is Horner's rule, for every positive chunk size. -/
 theorem eval_poly_parallel_eq {c : ℕ} (hc : 0 < c) (poly : List K) (point : K) :
     eval_poly_parallel c poly point = some ((coeffPoly poly).eval point) := by
   unfold eval_poly_parallel
@@ -117,7 +117,7 @@ theorem eval_poly_parallel_eq {c : ℕ} (hc : 0 < c) (poly : List K) (point : K)
     refine sum_congr rfl fun i _ => ?_
     rw [← pow_mul, mul_assoc, ← pow_add, mul_comm c j, add_comm i]
 
-/-- add_polys is the sum of the two polynomials. -/
+/-- Adding coefficient lists is the sum of the two polynomials. -/
 theorem add_polys_eq (a b : List K) : coeffPoly (add_polys a b) = coeffPoly a + coeffPoly b := by
   refine Polynomial.ext fun i => ?_
   rw [coeff_coeffPoly, coeff_add, coeff_coeffPoly, coeff_coeffPoly]

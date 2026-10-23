@@ -16,7 +16,7 @@ set_option linter.unusedSectionVars false
 
 variable {F EF : Type _} [Field F] [Field EF] [Algebra F EF] [DecidableEq F] [DecidableEq EF]
 
-/-- eval_poly_at_base is the value at the base point, read in EF. -/
+/-- Horner's rule at a base point is the value at its image in EF. -/
 theorem eval_poly_at_base_eq (poly : List EF) (point : F) :
     eval_poly_at_base poly point = (coeffPoly poly).eval (algebraMap F EF point) := by
   rw [← eval_poly_eq]; rfl
@@ -47,7 +47,7 @@ theorem reduce_fold_getD (n : ℕ) (c : F) (blocks : List (List EF)) :
     · rfl
     · simp [List.getElem?_eq_none (not_lt.1 h)]
 
-/-- reduce_mod_x_pow_minus_c: n slots whose polynomial agrees with the input at every y with y^n = c, for n > 0. -/
+/-- Reduction modulo X^n - c: n slots whose polynomial agrees with the input at every y with y^n = c, for n > 0. -/
 theorem reduce_mod_x_pow_minus_c_eq {n : ℕ} (hn : 0 < n) (poly : List EF) (c : F) :
     ∃ r, reduce_mod_x_pow_minus_c poly n c = some r ∧ r.length = n ∧
       ∀ y : EF, y ^ n = algebraMap F EF c → (coeffPoly r).eval y = (coeffPoly poly).eval y := by

@@ -82,7 +82,7 @@ section TwoFields
 
 variable {F EF : Type _} [Field F] [Field EF] [Algebra F EF] [DecidableEq F] [DecidableEq EF]
 
-/-- lagrange_interpolate_at on the coset x_0 <zeta> of the 2^k-th roots of unity: the interpolant at the point. -/
+/-- The barycentric formula on the coset x_0 <zeta> of the 2^k-th roots of unity: the interpolant at the point. -/
 theorem lagrange_interpolate_at_eq {ζ x0 : F} {k : ℕ} (hζ : IsPrimitiveRoot ζ (2 ^ k))
     (hn : ((2 ^ k : ℕ) : F) ≠ 0) (hx0 : x0 ≠ 0) (ys : List EF) (hys : ys.length = 2 ^ k)
     (point : EF) :

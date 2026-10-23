@@ -27,7 +27,7 @@ variable {F EF : Type _} [Field F] [Field EF] [Algebra F EF] [DecidableEq F] [De
 theorem throw_ne_pure {α : Type} (e : StirError) (a : α) : (throw e : VM α) ≠ pure a := by
   intro h; cases h
 
-/-- check_ans_length accepts at most max coefficients, and an empty list only when max = 0. -/
+/-- The sent answer polynomial is accepted with at most max coefficients, and an empty list only when max = 0. -/
 theorem check_ans_length_ok (round : ℕ) (ans : List EF) (max : ℕ) :
     check_ans_length round ans max = pure () ↔ ans.length ≤ max ∧ (ans ≠ [] ∨ max = 0) := by
   unfold check_ans_length
@@ -80,7 +80,7 @@ theorem check_ans_length_run (round : ℕ) (ans : List EF) (max : ℕ) :
     (check_ans_length round ans max).run.isSome := by
   unfold check_ans_length; split_ifs <;> rfl
 
-/-- resolve_ans_polynomial never panics: every malformed answer polynomial is an error. -/
+/-- Resolving the answer polynomial never panics: every malformed answer polynomial is an error. -/
 theorem resolve_ans_polynomial_no_panic (round : ℕ) (compact : Bool) (transmitted points values : List EF) :
     (resolve_ans_polynomial round compact transmitted points values).run.isSome := by
   unfold resolve_ans_polynomial

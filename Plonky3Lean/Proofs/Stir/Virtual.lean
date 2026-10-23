@@ -42,7 +42,7 @@ theorem prod_sub_eq_zero_iff (pts : List EF) (x : EF) :
     (pts.map fun y => x - y).prod = 0 ↔ x ∈ pts := by
   simp [List.prod_eq_zero_iff, sub_eq_zero]
 
-/-- materialize_virtual_fiber after a round: none when a fiber point is an interpolation point, else the virtual oracle at every fiber point. -/
+/-- The virtual oracle read on a fiber after a round: none when a fiber point is an interpolation point, else the virtual oracle at every fiber point. -/
 theorem materialize_virtual_fiber_eq {ζ u0 shift : F} {arity : ℕ} (hζ : IsPrimitiveRoot ζ arity)
     (harity : 0 < arity) (row : List EF) (hrow : row.length = arity) (r : EF) (ans pts : List EF) :
     materialize_virtual_fiber row (shiftedPowersList ζ u0 arity) shift

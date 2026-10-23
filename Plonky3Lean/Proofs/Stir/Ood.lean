@@ -103,7 +103,9 @@ theorem mapM_inverse_pow (doms : List (F × ℕ)) :
       · have hall : ¬ ∀ x ∈ d :: ds, x.1 ≠ 0 := fun h' => hds fun x hx => h' x (by simp [hx])
         rw [ite_eq_right hds, ite_eq_right hall]; rfl
 
-/-- OodFilter::new: the shift powers, the log sizes and their maximum; it panics exactly on a zero shift. -/
+/-- The filter holds the shift powers, the log sizes and their maximum.
+
+It panics exactly on a zero shift. -/
 theorem oodFilter_new_eq (doms : List (F × ℕ)) :
     OodFilter.new doms = if ∀ d ∈ doms, d.1 ≠ 0 then
       some ⟨doms.map (fun d => d.1⁻¹ ^ 2 ^ d.2), doms.map (·.2), (doms.map (·.2)).foldl max 0⟩

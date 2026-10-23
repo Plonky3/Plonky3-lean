@@ -7,7 +7,7 @@ public import Plonky3Lean.Proofs.Stir.Lagrange
 /-!
 # The answer polynomial check
 
-check_ans_interpolates compares ans(rho) with the interpolant I of degree below n through the n pairs (y_i, v_i), in barycentric form:
+The check compares ans(rho) with the interpolant I of degree below n through the n pairs (y_i, v_i), in barycentric form:
 
 ```text
     I(rho) = (sum_i w_i v_i / (rho - y_i)) / (sum_i w_i / (rho - y_i)),     w_i = 1 / prod_{j != i} (y_i - y_j)
@@ -51,7 +51,7 @@ theorem injOn_getD_of_nodup {l : List K} (hl : l.Nodup) :
     Option.getD_some] at h
   exact (hl.getElem_inj_iff).1 h
 
-/-- check_ans_interpolates on distinct nodes and rho off them: accept exactly when ans(rho) is the interpolant at rho. -/
+/-- The answer check on distinct nodes and rho off them: accept exactly when ans(rho) is the interpolant at rho. -/
 theorem check_ans_interpolates_eq (ans pts vals : List K) (ρ : K) (hlen : pts.length = vals.length)
     (hne : pts ≠ []) (hnodup : pts.Nodup) (hρ : ρ ∉ pts) :
     check_ans_interpolates ans pts vals ρ = some (decide ((coeffPoly ans).eval ρ =

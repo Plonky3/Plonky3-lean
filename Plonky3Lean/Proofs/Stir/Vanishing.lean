@@ -55,7 +55,7 @@ theorem vanishing_step (coeffs : List K) (root : K) :
     · simp [List.getD_eq_getElem?_getD, List.getElem?_eq_none (by omega : coeffs.length ≤ j + 1),
         List.getElem?_eq_none (by omega : coeffs.length ≤ j)]
 
-/-- vanishing_poly_from_roots: the coefficients of prod_{y in roots} (X - y), with one more entry than roots. -/
+/-- The vanishing polynomial's coefficients of prod_{y in roots} (X - y), with one more entry than roots. -/
 theorem vanishing_poly_from_roots_eq (roots : List K) :
     coeffPoly (vanishing_poly_from_roots roots) = (roots.map fun r => X - C r).prod ∧
       (vanishing_poly_from_roots roots).length = roots.length + 1 := by

@@ -6,11 +6,11 @@ public import Plonky3Lean.Proofs.Dft.Glue
 @[expose] public section
 
 /-!
-# fold_pass and fold_codeword
+# Folding a codeword by arity-2 passes
 
 A codeword of length 2^n is read on the subgroup of order 2^n, entry i at omega^i for omega = G_n.
 
-fold_codeword at beta with arity 2^a returns, at index j < 2^(n - a), the fold of arity 2^a at beta: the interpolant of entries j + l 2^(n - a), l < 2^a, at beta.
+The fold at beta with arity 2^a returns, at index j < 2^(n - a), the fold of arity 2^a at beta: the interpolant of entries j + l 2^(n - a), l < 2^a, at beta.
 -/
 
 namespace Plonky3Lean.Proofs.Stir
@@ -103,7 +103,7 @@ theorem fold_codeword_loop (G : Gen F) :
       congr 1; funext r
       rw [← pow_mul, ← pow_succ']; congr 2; omega
 
-/-- fold_codeword at beta with arity 2^a on a codeword of length 2^n, for a <= n <= adicity: entry j < 2^(n - a) is the fold of arity 2^a at index j. -/
+/-- The codeword fold at beta with arity 2^a on a codeword of length 2^n, for a <= n <= adicity: entry j < 2^(n - a) is the fold of arity 2^a at index j. -/
 theorem fold_codeword_eq (G : Gen F) (hG : GenValid G) (hN : GenNested G) (h2 : (2 : EF) ≠ 0)
     {a n : ℕ} (ha : a ≤ n) (hn : n ≤ G.adicity) (c : List EF) (hc : c.length = 2 ^ n) (β : EF) :
     fold_codeword G c β a n = some ((List.range (2 ^ (n - a))).map fun j =>

@@ -34,7 +34,9 @@ def inverse [Field K] [DecidableEq K] (x : K) : Option K :=
 def batchInv [Field K] [DecidableEq K] (l : List K) : Option (List K) :=
   if 0 ∈ l then none else some (l.map (·⁻¹))
 
-/-- chunks(c): consecutive pieces of c entries, the last one possibly shorter; it panics for c = 0. -/
+/-- chunks(c): consecutive pieces of c entries, the last one possibly shorter.
+
+It panics for c = 0. -/
 def chunks (c : ℕ) (l : List K) : Option (List (List K)) :=
   if c = 0 then none
   else some ((List.range ((l.length + c - 1) / c)).map fun j => (l.drop (j * c)).take c)

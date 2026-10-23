@@ -17,7 +17,9 @@ namespace p3_stir.verifier.mirror
 
 open p3_stir.mirror p3_stir.utils.mirror p3_dft.mirror
 
-/-- The rejections the transcribed steps can raise; a round is a natural number, the final round none. -/
+/-- The rejections the transcribed steps can raise.
+
+A round is a natural number, and the final round is none. -/
 inductive StirError where
   | AnsPolynomialTooLong (round : ℕ) (maximum got : ℕ)
   | MissingAnsPolynomial (round : ℕ) (nodes : ℕ)
