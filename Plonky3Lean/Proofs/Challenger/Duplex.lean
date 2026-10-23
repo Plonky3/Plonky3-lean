@@ -507,4 +507,96 @@ theorem finalize_eq {F P : Type} [AddMonoidWithOne F] [Inhabited F] {W R : Std.U
       simpa [toSt, St.duplexing] using this
     simp [this]
 
+set_option allowUnsafeReducibility true in
+attribute [local reducible] alloc.vec.Vec rust_primitives.sequence.Seq in
+theorem vec_pop_eq {T : Type} [AddMonoidWithOne T] (v : alloc.vec.Vec T) (h : v.val ≠ []) :
+    ∃ v', alloc.vec.Vec.pop v = .ok (.Some (v.val.getLastD 0), v') ∧ v'.val = v.val.dropLast := by
+  have hl : 0 < v.val.length := List.length_pos_of_ne_nil h
+  have hpos : Slice.len v > 0#usize := by scalar_tac
+  obtain ⟨i, ei, hi⟩ : ∃ i : Std.Usize, Slice.len v - 1#usize = RustM.ok i ∧ i.val = v.val.length - 1 := by
+    have : Slice.len v - 1#usize ⦃ z => z.val = (Slice.len v).val - (1#usize : Std.Usize).val ⦄ := by step*
+    obtain ⟨z, e, hz⟩ := Lib.spec_imp_exists this
+    exact ⟨z, e, by simpa [Slice.len] using hz⟩
+  have hrm : rust_primitives.sequence.seq_remove v i =
+      .ok (v.val.getLastD 0, Slice.from v.val.dropLast (by have := v.property; simp; omega)) := by
+    simp only [rust_primitives.sequence.seq_remove]
+    rw [dite_eq_left_of_eq_true (eq_true (by omega))]
+    congr 2
+    · rw [List.getLastD_eq_getLast?, List.getLast?_eq_getElem?]
+      simp [hi, List.getElem?_eq_getElem (show v.val.length - 1 < v.val.length by omega)]
+    · apply Slice.ext
+      simp [hi, List.dropLast_eq_take]
+      omega
+  refine ⟨Slice.from v.val.dropLast (by have := v.property; simp; omega), ?_, by simp⟩
+  unfold alloc.vec.Vec.pop
+  simp only [rust_primitives.sequence.seq_len, bind_ok, hpos, ↓reduceIte, ei]
+  show (do let q ← rust_primitives.sequence.seq_remove v i
+           RustM.ok (core.option.Option.Some q.1, (q.2 : alloc.vec.Vec T))) = _
+  rw [hrm]
+  simp [bind_tc_ok]
+
+theorem vec_is_empty_eq {T : Type} (v : alloc.vec.Vec T) :
+    alloc.vec.Vec.is_empty v = .ok (decide (v.val = [])) := by
+  simp only [alloc.vec.Vec.is_empty, rust_primitives.sequence.seq_len, bind_ok]
+  congr 1
+  by_cases h : v.val = []
+  · simp only [h, decide_true]
+    exact decide_eq_true (UScalar.eq_of_val_eq (by simp [Slice.len, h]))
+  · have : Slice.len v ≠ 0#usize := by
+      intro e; have := congrArg UScalar.val e; simp [Slice.len] at this; exact h this
+    simp [h, this]
+
+set_option allowUnsafeReducibility true in
+attribute [local reducible] alloc.vec.Vec rust_primitives.sequence.Seq in
+/-- Sampling the base field returns the list machine's sample, and never panics, while at most `RATE` inputs are pending. -/
+theorem sample_eq {F P : Type} [AddMonoidWithOne F] {W R : Std.Usize}
+    (copyInst : core.marker.Copy F)
+    (permInst : p3_symmetric.permutation.CryptographicPermutation P (Std.Array F W))
+    (ringInst : p3_field.field.PrimeCharacteristicRing F)
+    (hcopy : CloneIsId copyInst) (hring : RingComputes ringInst) (f : List F → List F)
+    (c : p3_challenger.duplex_challenger.DuplexChallenger F P W R)
+    (hf : PermComputes permInst c.permutation f) (hR : 0 < R.val) (hRW : R.val < W.val)
+    (h255 : R.val ≤ 255) (hin : c.input_buffer.val.length ≤ R.val) :
+    ∃ y c', p3_challenger.duplex_challenger.mirror.sample copyInst permInst ringInst c = .ok (y, c') ∧
+      (y, toSt c') = (toSt c).sample f R.val ∧ c'.permutation = c.permutation := by
+  unfold p3_challenger.duplex_challenger.mirror.sample
+  simp only [vec_is_empty_eq, bind_ok]
+  by_cases hd : c.input_buffer.val ≠ [] ∨ c.output_buffer.val = []
+  · obtain ⟨c1, e1, h1, hp1⟩ := duplexing_eq copyInst permInst ringInst hcopy hring f c hf hRW h255 hin
+    have hs1 : c1.sponge_state.val.length = W.val := by simp
+    have ho1 : c1.output_buffer.val = (c1.sponge_state.val).take R.val := by
+      have := congrArg St.outb h1; have h2 := congrArg St.s h1
+      simp [toSt, St.duplexing] at this h2; rw [this, h2]
+    have hne : c1.output_buffer.val ≠ [] := by
+      rw [ho1]; exact List.ne_nil_of_length_pos (by simp; omega)
+    obtain ⟨v, ev, hv⟩ := vec_pop_eq c1.output_buffer hne
+    have hc1 : (if (!decide (c.input_buffer.val = [])) = true then
+        p3_challenger.duplex_challenger.DuplexChallenger.duplexing copyInst permInst ringInst c
+      else if decide (c.output_buffer.val = []) = true then
+        p3_challenger.duplex_challenger.DuplexChallenger.duplexing copyInst permInst ringInst c
+      else RustM.ok c) = RustM.ok c1 := by
+      rcases hd with h | h
+      · simp [h, e1]
+      · by_cases h' : c.input_buffer.val = []
+        · simp [h', h, e1]
+        · simp [h', e1]
+    refine ⟨c1.output_buffer.val.getLastD 0, ⟨c1.sponge_state, c1.input_buffer, v, c1.permutation⟩, ?_, ?_, hp1⟩
+    · rw [hc1, bind_ok, ev, bind_ok]
+      simp [core.option.Option.expect]
+    · have hst : St.sample f R.val (toSt c) = ((toSt c1).outb.getLastD 0, ⟨(toSt c1).s, (toSt c1).inb, (toSt c1).outb.dropLast⟩) := by
+        have hd' : (toSt c).inb ≠ [] ∨ (toSt c).outb = [] := hd
+        simp only [St.sample, hd', ↓reduceIte, ne_eq]
+        rw [← h1]
+      rw [hst]
+      simp [toSt, hv]
+  · -- An output is buffered and no input is pending: pop it.
+    have hi : c.input_buffer.val = [] := by by_contra h; exact hd (Or.inl h)
+    have ho : c.output_buffer.val ≠ [] := fun h => hd (Or.inr h)
+    obtain ⟨v, ev, hv⟩ := vec_pop_eq c.output_buffer ho
+    refine ⟨c.output_buffer.val.getLastD 0, ⟨c.sponge_state, c.input_buffer, v, c.permutation⟩, ?_, ?_, rfl⟩
+    · simp [hi, ho, ev, core.option.Option.expect]
+    · have hd' : ¬ ((toSt c).inb ≠ [] ∨ (toSt c).outb = []) := hd
+      simp only [St.sample, hd', ↓reduceIte]
+      simp [toSt, hv]
+
 end Plonky3Lean.Proofs.Challenger
