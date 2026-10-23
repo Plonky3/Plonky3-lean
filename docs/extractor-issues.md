@@ -290,3 +290,15 @@ keeps its number and says so.
 151. **aeneas rejects p3-lookup's indexed declaration check**, which returns an error from inside two loops in turn, as in 23.
 
     The check is transcribed instead, and the column check it calls is extracted.
+
+180. **p3-multilinear-util and p3-sumcheck do not compile in the extraction variant.**
+
+    Under `cfg(hax_backend_lean)`, pre-patch `baby-bear/030` moves `to_ext_iter` onto an extension trait, and the binary-field pre-patches hide items p3-sumcheck's ring switch uses.
+
+    p3-multilinear-util calls `to_ext_iter` in five files without importing that trait, and p3-sumcheck's `ring_switch` then fails on the hidden binary-field items.
+
+    p3-bus depends on both, so `cargo check` stops before charon runs.
+
+    Its integer helpers would extract on their own, but nothing in the crate can be reached until both dependencies compile in that variant.
+
+    p3-bus is transcribed instead.

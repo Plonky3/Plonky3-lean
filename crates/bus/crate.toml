@@ -440,3 +440,63 @@ rust = "p3_bus::evaluation::BusFactorPlan::evaluate"
 [[mirror]]
 lean = "p3_bus.evaluation.mirror.BusPlan.compile_factor"
 rust = "p3_bus::evaluation::BusPlan::compile_factor"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.CLOCK_RANGE_BITS"
+rust = "p3_bus::timestamped::CLOCK_RANGE_BITS"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.CLOCK_GAP_BITS"
+rust = "p3_bus::timestamped::CLOCK_GAP_BITS"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.TimestampedMemoryError"
+rust = "p3_bus::timestamped::error::TimestampedMemoryError"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.clock_orbit"
+rust = "p3_bus::timestamped::clock_orbit"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.check_orbit"
+rust = "p3_bus::timestamped::TimestampedMemory::new"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.check_accesses"
+rust = "p3_bus::timestamped::TimestampedMemory::check_against"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.high_step"
+rust = "p3_bus::timestamped::high_step"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.gap_factors"
+rust = "p3_bus::timestamped::TimestampedMemory::gap_factors"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.slot_offset"
+rust = "p3_bus::timestamped::TimestampedMemory::slot_offset"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.ClockRangeAir.low"
+rust = "p3_bus::timestamped::air::ClockRangeAir::low"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.ClockRangeAir.high"
+rust = "p3_bus::timestamped::air::ClockRangeAir::high"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.gap_constraint"
+rust = "p3_bus::timestamped::TimestampedMemoryInteractionBuilder::timestamped_access"
+
+[[mirror]]
+lean = "p3_bus.security.mirror.BusSecurityDims"
+rust = "p3_security::bus::ProductGkrSecurityProfile"
+
+[[mirror]]
+lean = "p3_bus.security.mirror.BusPlan.security_dims"
+rust = "p3_bus::security::BusPlan::security_model"
+
+[[mirror]]
+lean = "p3_bus.security.mirror.components"
+rust = "p3_security::bus::BusSecurityModel::components"

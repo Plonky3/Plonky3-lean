@@ -12,5 +12,7 @@ public import P3Bus.Ram
 public import P3Bus.Product
 public import P3Bus.Plan
 public import P3Bus.Evaluation
+public import P3Bus.Timestamped
+public import P3Bus.Security
 
 @[expose] public section

@@ -4,6 +4,7 @@ public import Plonky3Lean.Claims.Air
 public import Plonky3Lean.Claims.BabyBear
 public import Plonky3Lean.Claims.Blake2s
 public import Plonky3Lean.Claims.Blake3
+public import Plonky3Lean.Claims.Bus
 public import Plonky3Lean.Claims.Commit
 public import Plonky3Lean.Claims.Challenger
 public import Plonky3Lean.Claims.Dft

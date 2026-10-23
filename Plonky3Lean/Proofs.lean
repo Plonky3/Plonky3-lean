@@ -191,6 +191,8 @@ public import Plonky3Lean.Proofs.Bus.Product
 public import Plonky3Lean.Proofs.Bus.Ram
 public import Plonky3Lean.Proofs.Bus.Verify
 public import Plonky3Lean.Proofs.Bus.Evaluation
+public import Plonky3Lean.Proofs.Bus.Timestamped
+public import Plonky3Lean.Proofs.Bus.Security
 
 @[expose] public section
 

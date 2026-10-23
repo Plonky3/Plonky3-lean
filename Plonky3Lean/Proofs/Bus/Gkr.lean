@@ -74,6 +74,38 @@ theorem layers_branches (s : ProductGkrShape) :
 theorem layers_length (s : ProductGkrShape) : s.layers.length = (s.log_height + 1) / 2 := by
   rw [layers_eq]; split <;> simp <;> omega
 
+/-- The sumcheck rounds of all layers: k(k - 1) for a height 2k, and k^2 for a height 2k + 1. -/
+theorem layers_rounds (s : ProductGkrShape) :
+    (s.layers.map (·.2)).sum = if s.log_height % 2 = 0 then
+      (s.log_height / 2) * (s.log_height / 2 - 1) else (s.log_height / 2) ^ 2 := by
+  rw [layers_eq]
+  have key : ∀ (a k : ℕ), ((List.range k).map fun j => a + 2 * j).sum = k * a + k * (k - 1) := by
+    intro a k
+    induction k with
+    | zero => simp
+    | succ k ih =>
+      rw [List.range_succ, List.map_append, List.sum_append, ih]
+      simp only [List.map_cons, List.map_nil, List.sum_cons, List.sum_nil, add_zero]
+      rcases k with _ | k
+      · simp
+      · simp only [Nat.add_sub_cancel]; ring
+  split
+  · simpa [Function.comp_def] using key 0 (s.log_height / 2)
+  · simp only [List.map_cons, List.sum_cons, List.map_map, zero_add]
+    have := key 1 (s.log_height / 2)
+    simp only [Function.comp_def] at this ⊢
+    rw [this]
+    rcases s.log_height / 2 with _ | k
+    · simp
+    · simp only [Nat.add_sub_cancel]; ring
+
+/-- **The security profile is accepted.** The dimensions the bus passes to p3-security satisfy its constructor's checks: the collapse coordinates are the height, and there is no layer exactly when the height is zero. -/
+theorem security_profile_valid (s : ProductGkrShape) :
+    (s.layers.map fun l => Nat.log2 l.1).sum = s.log_height ∧
+      (s.log_height = 0 ↔ s.layers.length = 0) := by
+  refine ⟨layers_branches s, ?_⟩
+  rw [layers_length]; omega
+
 /-! ## The identity padding -/
 
 section Padding
