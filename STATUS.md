@@ -31,6 +31,7 @@ target `thumbv7em-none-eabi`
 | `merkle-tree` | scoped | 1306 | 43 | 0 | 0 | 0 | 2 / 0 | pre `010`, pre `020` |
 | `mersenne-31` | scoped | 1444 | 259 | 0 | 12 | 30 | 1 / 1 | pre `010` |
 | `monty-31` | scoped | 1581 | 327 | 0 | 13 | 29 | 1 / 1 | pre `010` |
+| `multilinear-util` | stub |  | 993 | 0 | 75 |  | 0 / 0 |  |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 68 | 2 | 4 |  | 0 / 0 |  |
 | `security` | scoped | 1414 | 130 | 6 | 13 | 0 | 2 / 1 | pre `010`, pre `020` |
@@ -413,7 +414,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1066) whose dependencies include it; reaching one is not using it.
+(of 1116) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -452,7 +453,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1066) whose dependencies include the declaration.
+counts the claims (of 1116) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -745,6 +746,81 @@ counts the claims (of 1066) whose dependencies include the declaration.
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.exp_u64.step` | `p3_field::field::PrimeCharacteristicRing::exp_u64` | not translated | 4 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.mul_2exp_u64` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::mul_2exp_u64` | dropped | 4 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.try_inverse` | `{impl p3_field::field::Field for p3_monty_31::monty_31::MontyField31<_>}::try_inverse` | dropped | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.split_at` | `p3_multilinear_util::point::Point::split_at` | stub | 0 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.reversed` | `p3_multilinear_util::point::Point::reversed` | stub | 0 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.split_by_coordinate` | `p3_multilinear_util::point::split_by_coordinate` | stub | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.fill_equality_table_serial` | `p3_multilinear_util::point::Point::fill_equality_table_serial` | stub | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.fill_equality_table_in_chunks` | `p3_multilinear_util::point::Point::fill_equality_table_in_chunks` | stub | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.fill_equality_table` | `p3_multilinear_util::point::Point::fill_equality_table` | stub | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_table` | `p3_multilinear_util::point::Point::equality_table` | stub | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_weights_msb` | `p3_multilinear_util::point::Point::equality_weights_msb` | stub | 2 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_weights_lsb` | `p3_multilinear_util::point::Point::equality_weights_lsb` | stub | 2 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_at_vertex` | `p3_multilinear_util::point::Point::equality_at_vertex` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.hypercube` | `p3_multilinear_util::point::Point::hypercube` | stub | 2 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.expand_from_univariate` | `p3_multilinear_util::point::Point::expand_from_univariate` | stub | 2 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_eq` | `p3_multilinear_util::point::Point::eval_eq` | stub | 2 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_select` | `p3_multilinear_util::point::Point::eval_select` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_next` | `p3_multilinear_util::point::Point::eval_next` | stub | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.transpose` | `p3_multilinear_util::point::Point::transpose` | stub | 0 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.fill_buffer_batch` | `p3_multilinear_util::eq_batch::fill_buffer_batch` | stub | 15 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_1_batch` | `p3_multilinear_util::eq_batch::eval_eq_1_batch` | stub | 15 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_2_batch` | `p3_multilinear_util::eq_batch::eval_eq_2_batch` | stub | 15 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_3_batch` | `p3_multilinear_util::eq_batch::eval_eq_3_batch` | stub | 15 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.add_or_set` | `p3_multilinear_util::eq_batch::add_or_set` | stub | 15 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch_basic` | `p3_multilinear_util::eq_batch::eval_eq_batch_basic` | stub | 15 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.packed_eq_poly_batch` | `p3_multilinear_util::eq_batch::packed_eq_poly_batch` | stub | 15 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.extEvaluator` | `{impl p3_multilinear_util::eq_batch::EqualityEvaluator for p3_multilinear_util::eq_batch::ExtFieldEvaluator<F, EF>}` | stub | 14 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.baseEvaluator` | `{impl p3_multilinear_util::eq_batch::EqualityEvaluator for p3_multilinear_util::eq_batch::BaseFieldEvaluator<F, EF>}` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_packed_batch` | `p3_multilinear_util::eq_batch::eval_eq_packed_batch` | stub | 15 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch_common` | `p3_multilinear_util::eq_batch::eval_eq_batch_common` | stub | 15 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch` | `p3_multilinear_util::eq_batch::eval_eq_batch` | stub | 14 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_base_batch` | `p3_multilinear_util::eq_batch::eval_eq_base_batch` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new` | `p3_multilinear_util::poly::Poly::new` | stub | 4 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.as_constant` | `p3_multilinear_util::poly::Poly::as_constant` | stub | 0 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.zero` | `p3_multilinear_util::poly::Poly::zero` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.truncate_to_half` | `p3_multilinear_util::poly::Poly::truncate_to_half` | stub | 0 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.pad_zeros` | `p3_multilinear_util::poly::Poly::pad_zeros` | stub | 0 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_from_point` | `p3_multilinear_util::poly::Poly::new_from_point` | stub | 12 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_next_from_point` | `p3_multilinear_util::poly::Poly::new_next_from_point` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_mut` | `p3_multilinear_util::poly::Poly::fix_prefix_var_mut` | stub | 2 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.sum_prefix_var_mut` | `p3_multilinear_util::poly::Poly::sum_prefix_var_mut` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_mut_monomial` | `p3_multilinear_util::poly::Poly::fix_prefix_var_mut_monomial` | stub | 0 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut_whole` | `p3_multilinear_util::poly::Poly::fix_suffix_var_mut_whole` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut_split` | `p3_multilinear_util::poly::Poly::fix_suffix_var_mut_split` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut` | `p3_multilinear_util::poly::Poly::fix_suffix_var_mut` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var` | `p3_multilinear_util::poly::Poly::fix_prefix_var` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_at` | `p3_multilinear_util::poly::Poly::fix_prefix_var_at` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var` | `p3_multilinear_util::poly::Poly::fix_suffix_var` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_to_packed` | `p3_multilinear_util::poly::Poly::fix_prefix_var_to_packed` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.pack` | `p3_multilinear_util::poly::Poly::pack` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.unpack` | `p3_multilinear_util::poly::Poly::unpack` | stub | 2 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.eval_multilinear_recursive` | `p3_multilinear_util::poly::eval_multilinear_recursive` | stub | 7 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.eq_serial` | `p3_multilinear_util::poly::Poly::new_packed_from_point::eq_serial` | stub | 11 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_packed_from_point` | `p3_multilinear_util::poly::Poly::new_packed_from_point` | stub | 11 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.new_unpacked` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::new_unpacked` | stub | 9 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.new_packed` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::new_packed` | stub | 9 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.num_scalar_evals` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::num_scalar_evals` | stub | 9 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.num_variables` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::num_variables` | stub | 9 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_base` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_base` | stub | 5 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_ext` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_ext` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_ext_packed` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_ext_packed` | stub | 0 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.accumulate_scalar_into` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::accumulate_scalar_into` | stub | 2 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.compress_prefix_into` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::compress_prefix_into` | stub | 0 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.packed_basis_dot` | `p3_multilinear_util::split_eq::packed_kernel::packed_basis_dot` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.compress_hi_dot_packed` | `p3_multilinear_util::split_eq::packed_kernel::compress_hi_dot_packed` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.compress_suffix_dot` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::compress_suffix_dot` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_base_shifted` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_base_shifted` | stub | 0 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.last_scalar` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::last_scalar` | stub | 0 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.new_unpacked` | `p3_multilinear_util::split_eq::SplitEq::new_unpacked` | stub | 0 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.new_packed` | `p3_multilinear_util::split_eq::SplitEq::new_packed` | stub | 9 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.num_variables` | `p3_multilinear_util::split_eq::SplitEq::num_variables` | stub | 9 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.eval_base` | `p3_multilinear_util::split_eq::SplitEq::eval_base` | stub | 5 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.eval_ext` | `p3_multilinear_util::split_eq::SplitEq::eval_ext` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.accumulate_into` | `p3_multilinear_util::split_eq::SplitEq::accumulate_into` | stub | 2 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.materialize` | `p3_multilinear_util::split_eq::SplitEq::materialize` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.compress_suffix_into` | `p3_multilinear_util::split_eq::SplitEq::compress_suffix_into` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.Poly.eval_base` | `p3_multilinear_util::poly::Poly::eval_base` | stub | 3 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.Poly.eval_ext` | `p3_multilinear_util::poly::Poly::eval_ext` | stub | 1 |
 | `poseidon1` | `p3_poseidon1.external.FullRoundLayerConstructor` | `p3_poseidon1::external::FullRoundLayerConstructor` | stub | 0 |
 | `poseidon1` | `p3_poseidon1.internal.PartialRoundLayerConstructor` | `p3_poseidon1::internal::PartialRoundLayerConstructor` | stub | 0 |
 | `poseidon1` | `p3_poseidon1.Poseidon1Constants` | `p3_poseidon1::Poseidon1Constants` | stub | 0 |
@@ -1060,6 +1136,56 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Monty31.utils.to_monty_64.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.utils.to_monty_64_signed.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.utils.to_monty_signed.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.accumulate_into` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.batched_table` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.compress_suffix_into` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eqTable_bottom_bit` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eqTable_top_bit` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.equality_at_vertex` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.equality_weights.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.equality_weights_lsb` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.equality_weights_msb` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_base` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_base.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_base.short` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_eq.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_eq_base_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_eq_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_eq_batch.empty` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_ext` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_multilinear_recursive` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_multilinear_recursive.long` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_multilinear_recursive.short` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_next` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_next.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_select` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.expand_from_univariate` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.expand_from_univariate.univariate` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.fix_prefix_var` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.fix_prefix_var_at` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.fix_prefix_var_mut` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.fix_prefix_var_mut.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.fix_prefix_var_to_packed` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.fix_suffix_var` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.fix_suffix_var_mut` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.hypercube` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.hypercube.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.materialize` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.mle_eval` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.mle_isMultilinear` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.mle_unique` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.mle_vertex` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.new_from_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.new_from_point.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.new_next_from_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.new_packed_from_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.new_packed_from_point.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.nextTable_eval_next` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.pack_unpack` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.split_eval_base` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.split_eval_base.constant` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.sum_prefix_var_mut` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.baby_bear.BabyBear.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.baby_bear.BabyBear.from_monty.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.baby_bear.BabyBear.halve.toField` | `Classical.choice`, `Quot.sound`, `propext` |
