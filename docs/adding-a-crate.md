@@ -19,7 +19,9 @@ the extracted crates that depend on it reference.
 
 1. Set `state = "extracted"`, or `state = "scoped"` with `start_from` roots when
    the whole crate does not extract yet, and fill in `features`, `watch` and
-   `[[oracle]]`.
+   `[[oracle]]`. Only a crate outside the workspace, named by `package`, can
+   list `features`: `extract.sh` makes them the default features of its copy
+   (docs/extractor-issues.md 90).
 2. Run `tools/extract/extract.sh` ([`extracting.md`](extracting.md)). On the
    first run it stops at step 6 and asks for `extraction/<Lib>/Assumptions/`
    `TypesExternal.lean` and `FunsExternal.lean`: write them from the
