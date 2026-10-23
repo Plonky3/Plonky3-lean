@@ -3,7 +3,7 @@
 # Target:       monty-31/src/hax_roots.rs, monty-31/src/lib.rs
 # Hunks:        2
 # Class:        bound
-# Gap:          docs/extractor-issues.md 18 and 4: charon's `--start-from`
+# Gap:          docs/extractor-issues.md 200 and 4: charon's `--start-from`
 #               rejects the methods of the `QuotientMap<uN>` impls, and does
 #               not emit the overrides `halve` (and the other provided-method
 #               overrides wrapped here) even when they are roots, so aeneas
