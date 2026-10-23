@@ -10,6 +10,6 @@ They are transcribed by hand in `P3KeccakAir/Assumptions/Mirror/`.
 module
 
 public import P3KeccakAir.Extraction
-public import P3KeccakAir.Assumptions.Mirror.Generation
+public import P3KeccakAir.Assumptions.Mirror.Binary
 
 @[expose] public section

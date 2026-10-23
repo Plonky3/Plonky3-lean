@@ -94,6 +94,22 @@ theorem propBuilder_ops (env : Var → F) (L : AirLayout) : (propBuilder env L).
 def rowOf (env : Var → F) (L : AirLayout) (o : Fin 2) (i : ℕ) : F :=
   ((List.range L.main_width).map (fun c => env (.main o c))).getD i 0
 
+section ops
+
+variable (env : Var → F) (L : AirLayout) (s : Prop) (a b : F)
+
+@[simp] theorem pb_add : (propBuilder env L).add a b = a + b := rfl
+@[simp] theorem pb_sub : (propBuilder env L).sub a b = a - b := rfl
+@[simp] theorem pb_mul : (propBuilder env L).mul a b = a * b := rfl
+@[simp] theorem pb_const : (propBuilder env L).const a = a := rfl
+@[simp] theorem pb_assert_zero : (propBuilder env L).assert_zero s a = (s ∧ a = 0) := rfl
+@[simp] theorem pb_first : (propBuilder env L).is_first_row s = env .isFirstRow := rfl
+@[simp] theorem pb_current (i : ℕ) :
+    ((propBuilder env L).main s).current.getD i 0 = rowOf env L 0 i := rfl
+@[simp] theorem pb_next (i : ℕ) : ((propBuilder env L).main s).next.getD i 0 = rowOf env L 1 i := rfl
+
+end ops
+
 section steps
 
 variable (env : Var → F) (L : AirLayout) (loc nxt : ℕ → F) (c : F) (s : Prop)
