@@ -572,4 +572,249 @@ theorem round_honest {P0 : List F} {n : ℕ} {commitment : Com} (hv : Valid c n 
         show nv ≤ _
         omega
 
+/-! ## Every round -/
+
+/-- The honest state after the initial fold and t rounds. -/
+def stAt (P0 : List F) (n : ℕ) (commitment : Com) (h : List (Step F EF)) (t : ℕ) : PState F EF Com MP D :=
+  (List.range t).foldl (honestRound E PE c P0 n) (honestInit E PE c P0 n commitment h).1
+
+theorem stAt_succ (P0 : List F) (n : ℕ) (commitment : Com) (h : List (Step F EF)) (t : ℕ) :
+    stAt E PE c P0 n commitment h (t + 1) = honestRound E PE c P0 n (stAt E PE c P0 n commitment h t) t := by
+  simp [stAt, List.range_succ]
+
+theorem honestRound_rounds (P0 : List F) (n : ℕ) (st : PState F EF Com MP D) (t : ℕ) :
+    ∃ rec, (honestRound E PE c P0 n st t).rounds = st.rounds ++ [rec] := ⟨_, rfl⟩
+
+theorem stAt_rounds_prefix (P0 : List F) (n : ℕ) (commitment : Com) (h : List (Step F EF)) (t : ℕ) :
+    ∀ j, ∃ l, (stAt E PE c P0 n commitment h (t + j)).rounds = (stAt E PE c P0 n commitment h t).rounds ++ l
+  | 0 => ⟨[], by simp⟩
+  | j + 1 => by
+    obtain ⟨l, hl⟩ := stAt_rounds_prefix P0 n commitment h t j
+    obtain ⟨rec, hrec⟩ := honestRound_rounds E PE c P0 n (stAt E PE c P0 n commitment h (t + j)) (t + j)
+    exact ⟨l ++ [rec], by rw [← add_assoc, stAt_succ, hrec, hl, List.append_assoc]⟩
+
+/-- The view the verifier's loop keeps of a prover state. -/
+def view (st : PState F EF Com MP D) : LoopState F EF Com := ⟨st.cons, st.rand, st.prevRoot, st.claim, st.h⟩
+
+/-- The verifier's loop over every round runs the honest rounds, and the invariant holds at the end. -/
+theorem loop_honest {P0 : List F} {n : ℕ} {commitment : Com} (hv : Valid c n E.adicity)
+    (hh : Honesty E PE c P0 n commitment) (h : List (Step F EF)) (proof : WhirProof F EF Com MP)
+    (hp : proof.rounds = (stAt E PE c P0 n commitment h c.n_rounds).rounds) :
+    ∀ t ≤ c.n_rounds, (List.range t).foldlM (loopStep E c proof) (.ok (view (stAt E PE c P0 n commitment h 0))) =
+      some (.ok (view (stAt E PE c P0 n commitment h t))) ∧ Inv E PE c P0 n commitment t (stAt E PE c P0 n commitment h t)
+  | 0, _ => ⟨rfl, inv_init E PE c hv hh h⟩
+  | t + 1, ht => by
+    obtain ⟨ih, hinv⟩ := loop_honest hv hh h proof hp t (by omega)
+    have hpt : proof.rounds[t]? = (honestRound E PE c P0 n (stAt E PE c P0 n commitment h t) t).rounds[t]? := by
+      obtain ⟨l, hl⟩ := stAt_rounds_prefix E PE c P0 n commitment h (t + 1) (c.n_rounds - (t + 1))
+      rw [show t + 1 + (c.n_rounds - (t + 1)) = c.n_rounds by omega] at hl
+      obtain ⟨rec, hrec⟩ := honestRound_rounds E PE c P0 n (stAt E PE c P0 n commitment h t) t
+      rw [hp, hl, stAt_succ, hrec]
+      simp [hinv.rounds]
+    obtain ⟨hstep, hinv'⟩ := round_honest E PE c hv hh (show t < c.n_rounds by omega) hinv proof hpt
+    refine ⟨?_, by rw [stAt_succ]; exact hinv'⟩
+    rw [List.range_succ, List.foldlM_append, ih]
+    simp only [List.foldlM_cons, List.foldlM_nil, Option.bind_eq_bind, Option.bind_some, loopStep]
+    rw [show roundStep E c proof (view (stAt E PE c P0 n commitment h t)) t = _ from hstep, stAt_succ]
+    rfl
+
+/-! ## The final phase -/
+
+theorem horner_eq_uni : ∀ (c : List EF) (x : EF), horner c x = uni c x
+  | [], _ => by simp [horner, uni]
+  | a :: c, x => by
+    rw [horner, List.foldr_cons, ← horner, horner_eq_uni c x, uni, uni, List.length_cons, sum_range_succ', mul_sum]
+    simp only [List.getD_cons_succ, List.getD_cons_zero, pow_zero, mul_one, pow_succ]
+    rw [add_comm]
+    congr 1
+    exact sum_congr rfl fun b _ => by ring
+
+/-- The honest round records carry a zero witness wherever the difficulty is zero. -/
+theorem stAt_canonical {P0 : List F} {n : ℕ} {commitment : Com} (hv : Valid c n E.adicity)
+    (h : List (Step F EF)) :
+    ∀ t ≤ c.n_rounds, ∀ i r, (stAt E PE c P0 n commitment h t).rounds[i]? = some r →
+      (queried c i).pow_bits = 0 → r.pow_witness = 0
+  | 0, _, i, r, hr, _ => by simp [stAt, honestInit] at hr
+  | t + 1, ht, i, r, hr, hz => by
+    have hlen : ∀ t, (stAt E PE c P0 n commitment h t).rounds.length = t := by
+      intro t
+      induction t with
+      | zero => simp [stAt, honestInit]
+      | succ t ih =>
+        obtain ⟨rec, hrec⟩ := honestRound_rounds E PE c P0 n (stAt E PE c P0 n commitment h t) t
+        rw [stAt_succ, hrec, List.length_append, ih, List.length_singleton]
+    rw [stAt_succ] at hr
+    by_cases hi : i < t
+    · have : (honestRound E PE c P0 n (stAt E PE c P0 n commitment h t) t).rounds[i]? =
+          (stAt E PE c P0 n commitment h t).rounds[i]? := by
+        obtain ⟨rec, hrec⟩ := honestRound_rounds E PE c P0 n (stAt E PE c P0 n commitment h t) t
+        rw [hrec, List.getElem?_append_left (by rw [hlen]; exact hi)]
+      exact stAt_canonical hv h t (by omega) i r (this ▸ hr) hz
+    · have hit : i = t := by
+        by_contra hne
+        have := hlen (t + 1)
+        rw [stAt_succ] at this
+        rw [List.getElem?_eq_none (by omega)] at hr
+        cases hr
+      subst hit
+      have hq : c.round_parameters.getD i default = queried c i := by
+        simp [queried, show i < c.n_rounds by omega]
+      simp only [honestRound, hq, List.getElem?_append_right (by rw [hlen]), hlen, Nat.sub_self,
+        List.getElem?_cons_zero, Option.some.injEq] at hr
+      rw [← hr]
+      simp [hz]
+
+/-! ## Completeness -/
+
+/-- The final check on the honest final table passes: each queried value is the table's polynomial at its point. -/
+theorem select_verify_honest (P : List EF) (nv : ℕ) (g : F) (idx : List ℕ) :
+    SelectStatement.verify ⟨nv, idx.map (g ^ ·), idx.map fun i => uni P (algebraMap F EF (g ^ i))⟩ P = true := by
+  simp only [SelectStatement.verify, List.all_eq_true]
+  intro ve hve
+  obtain ⟨i, -, rfl⟩ : ∃ i ∈ idx, ve = (g ^ i, uni P (algebraMap F EF (g ^ i))) := by
+    rw [List.zip_map', List.mem_map] at hve
+    obtain ⟨i, hi, rfl⟩ := hve
+    exact ⟨i, hi, rfl⟩
+  simp [horner_eq_uni]
+
+/-- The extension of a table at r is the only entry of its fold at r. -/
+theorem getD_foldTable_full (P r : List EF) {m : ℕ} (hm : r.length = m) :
+    (foldTable P m r).getD 0 0 = mle P r := by
+  subst hm
+  have := mle_foldTable P r []
+  simpa using this
+
+/-- The fields of the honest proof. -/
+theorem honestProof_eq {P0 : List F} {n : ℕ} {commitment : Com} {s : QuerySite} (hs : c.site c.n_rounds = some s)
+    (h : List (Step F EF)) :
+    let st := stAt E PE c P0 n commitment h c.n_rounds
+    let h1 := st.h ++ [.message st.P]
+    let qi := play_query_indices E.S (if s.pow_bits = 0 then h1 else h1 ++ [.pow s.pow_bits (PE.solve h1 s.pow_bits)])
+      s.index_bits s.draws c.stratified_queries s.depths
+    let HF := honestSumcheck E.S.toSponge PE.solve c.final_folding_pow_bits st.P st.Wt qi.2 c.final_sumcheck_rounds
+    honestProof E PE c P0 n commitment h =
+      ⟨(honestInit E PE c P0 n commitment h).2, st.rounds, some st.P,
+        if s.pow_bits = 0 then 0 else PE.solve h1 s.pow_bits, openPrev E PE c P0 n st c.n_rounds qi.1,
+        if 0 < c.final_sumcheck_rounds then some (HF.ms, HF.ws) else none⟩ := by
+  simp only [honestProof, hs, Option.getD_some]
+  rfl
+
+/-- The replay accepts the honest proof. -/
+theorem replay_complete {P0 : List F} {n : ℕ} {commitment : Com} (hv : Valid c n E.adicity)
+    (hh : Honesty E PE c P0 n commitment) (h : List (Step F EF)) :
+    ∃ out, replay E c (honestProof E PE c P0 n commitment h) commitment h = some (.ok out) := by
+  obtain ⟨sN, hsN⟩ := Option.isSome_iff_exists.mp (hv.sites c.n_rounds le_rfl)
+  obtain ⟨hloop, hinv⟩ := loop_honest E PE c hv hh h (honestProof E PE c P0 n commitment h) rfl c.n_rounds le_rfl
+  have hpe := honestProof_eq E PE c (P0 := P0) (n := n) (commitment := commitment) hsN h
+  generalize honestProof E PE c P0 n commitment h = proof at hloop hpe ⊢
+  have hf0 : proof.initial_sumcheck = (honestInit E PE c P0 n commitment h).2 := by rw [hpe]
+  have hf1 : proof.final_poly = some (stAt E PE c P0 n commitment h c.n_rounds).P := by rw [hpe]
+  have hf2 := congrArg WhirProof.final_pow_witness hpe
+  have hf3 := congrArg WhirProof.final_openings hpe
+  have hf4 := congrArg WhirProof.final_sumcheck hpe
+  simp only at hf2 hf3 hf4
+  clear hpe
+  have hk0 : c.round_folding_factor 0 = some (c.folding_schedule.getD 0 0) := by
+    simp only [WhirConfig.round_folding_factor, List.getD_eq_getElem?_getD]
+    rw [List.getElem?_eq_getElem (by have := hv.schedule; omega), Option.getD_some]
+  set H0 := honestSumcheck E.S.toSponge PE.solve c.starting_folding_pow_bits (P0.map (algebraMap F EF))
+    (cubeTable (weightAt (E.initial (E.S.sample (h ++ [E.layoutSeed])))) n) (h ++ [E.layoutSeed, .challenge])
+    (c.folding_schedule.getD 0 0)
+  have hv0 : view (stAt E PE c P0 n commitment h 0) = ⟨[E.initial (E.S.sample (h ++ [E.layoutSeed]))], [H0.rs],
+      commitment, Plonky3Lean.Proofs.Sumcheck.replay .Evaluation
+        ((E.initial (E.S.sample (h ++ [E.layoutSeed]))).combine_evals 0) H0.ms H0.rs, H0.h⟩ := rfl
+  rw [hv0] at hloop
+  simp only [replay, hk0, Option.bind_eq_bind, Option.bind_some, sumcheck, hf0, honestInit,
+    show h ++ [E.layoutSeed] ++ [Step.challenge] = h ++ [E.layoutSeed, .challenge] by simp]
+  rw [verify_rounds_honest E.S.toSponge PE.solve hh.solve]
+  simp only [Except.mapError]
+  simp only [H0] at hloop
+  rw [hloop]
+  set st := stAt E PE c P0 n commitment h c.n_rounds
+  have hqN : queried c c.n_rounds = c.final_round_config := by simp [queried]
+  have hnvN : nvAt c c.n_rounds = c.final_sumcheck_rounds := by rw [nvAt, hqN, hv.final.1]
+  have hlenP : st.P.length = 2 ^ c.final_round_config.num_variables := by rw [hinv.lenP, nvAt, hqN]
+  obtain ⟨r, hr, -, -⟩ := hinv.last
+  simp only [Option.bind_some, view, hf1, hlenP, ne_eq, not_true_eq_false, ↓reduceIte, hr]
+  rw [← hqN, hf2, hf3, stir_honest E PE c hv hh le_rfl hinv hr hsN]
+  simp only [Option.bind_some, select_verify_honest, Bool.not_true, Bool.false_eq_true, ↓reduceIte]
+  generalize (play_query_indices E.S (if sN.pow_bits = 0 then st.h ++ [Step.message st.P]
+      else st.h ++ [Step.message st.P] ++ [Step.pow sN.pow_bits (PE.solve (st.h ++ [Step.message st.P]) sN.pow_bits)])
+      sN.index_bits sN.draws c.stratified_queries sN.depths).2 = qh at hf4 ⊢
+  -- The weight and the table at the closing challenges rf.
+  have hfinal : ∀ rf : List EF, rf.length = nvAt c c.n_rounds →
+      VariableOrder.Prefix.eval_constraints_poly st.cons (st.rand ++ [rf]).flatten = some (mle st.Wt rf) ∧
+      p3_multilinear_util.split_eq.mirror.Poly.eval_ext E.thr E.w E.T st.P rf = some (mle st.P rf) := by
+    intro rf hrf
+    have hflat : (st.rand ++ [rf]).flatten = st.rand.flatten ++ rf := by simp
+    refine ⟨?_, poly_eval_ext_eq _ _ _ _ _ (by rw [hrf, hnvN]; exact hv.final.2) (by rw [hinv.lenP, hrf])⟩
+    rw [hflat, eval_constraints_poly_prefix _ _ fun con hcon => ?_, hinv.weight rf hrf]
+    obtain ⟨hn, hs⟩ := hinv.cons con hcon
+    refine ⟨by rw [List.length_append, hrf]; omega, fun s hs' => ⟨(hs s hs').1, ?_⟩⟩
+    have hd := (hs s hs').2
+    cases s with
+    | Eq s => exact fun p hp => by rw [hd p hp, List.length_drop, List.length_append, hrf]; omega
+    | Select s => trivial
+  have hlenW : st.Wt.length = 2 ^ nvAt c c.n_rounds := hinv.lenW
+  by_cases hR : 0 < c.final_sumcheck_rounds
+  · set HF := honestSumcheck E.S.toSponge PE.solve c.final_folding_pow_bits st.P st.Wt qh c.final_sumcheck_rounds
+    have hR0 : c.final_sumcheck_rounds ≠ 0 := by omega
+    obtain ⟨hrs, -, -, hff, hfw, hrep⟩ := honestSumcheck_spec E.S.toSponge PE.solve c.final_folding_pow_bits st.P
+      st.Wt qh hinv.lenP hlenW (k := c.final_sumcheck_rounds) (by rw [hnvN])
+    obtain ⟨hw, hp⟩ := hfinal HF.rs (by rw [hrs, hnvN])
+    have hclaim : Plonky3Lean.Proofs.Sumcheck.replay .Evaluation st.claim HF.ms HF.rs =
+        mle st.Wt HF.rs * mle st.P HF.rs := by
+      rw [hinv.claimSum, hrep, hnvN, Nat.sub_self, pow_zero, sum_range_one, hff, hfw,
+        getD_foldTable_full _ _ (by rw [hrs, hnvN]), getD_foldTable_full _ _ (by rw [hrs, hnvN]), mul_comm]
+    simp only [HF] at hw hp hclaim
+    simp only [hR, ↓reduceIte, hf4, verify_final_sumcheck_rounds, hR0]
+    rw [verify_rounds_honest E.S.toSponge PE.solve hh.solve]
+    simp only [hw, hp, Option.bind_some, hclaim, not_true_eq_false, ↓reduceIte]
+    exact ⟨_, rfl⟩
+  · have hR0 : c.final_sumcheck_rounds = 0 := by omega
+    obtain ⟨hw, hp⟩ := hfinal [] (by rw [hnvN, hR0]; rfl)
+    have hclaim : st.claim = mle st.Wt [] * mle st.P [] := by
+      rw [hinv.claimSum, hnvN, hR0, pow_zero, sum_range_one, mle_nil, mle_nil, mul_comm]
+    simp only [hR, ↓reduceIte, hw, hp, Option.bind_some, pure, Except.pure, hclaim, not_true_eq_false]
+    exact ⟨_, rfl⟩
+
+/-- Completeness: the verifier accepts the honest proof, and returns the concatenated folding challenges. -/
+theorem verify_complete {P0 : List F} {n : ℕ} {commitment : Com} (hv : Valid c n E.adicity)
+    (hh : Honesty E PE c P0 n commitment) (seed : Step F EF) (h : List (Step F EF)) :
+    ∃ out, verify E c seed (honestProof E PE c P0 n commitment (h ++ [seed])) commitment h = some (.ok out) := by
+  obtain ⟨sN, hsN⟩ := Option.isSome_iff_exists.mp (hv.sites c.n_rounds le_rfl)
+  obtain ⟨hpowN, -⟩ := site_queried c hsN
+  simp only [lt_irrefl, ↓reduceIte] at hpowN
+  obtain ⟨-, hinv⟩ := loop_honest E PE c hv hh (h ++ [seed]) (honestProof E PE c P0 n commitment (h ++ [seed])) rfl
+    c.n_rounds le_rfl
+  have hp := honestProof_eq E PE c (P0 := P0) (n := n) (commitment := commitment) hsN (h ++ [seed])
+  have hrounds : (honestProof E PE c P0 n commitment (h ++ [seed])).rounds.length = c.n_rounds := hinv.rounds
+  have hfind : ((c.round_parameters.zip (honestProof E PE c P0 n commitment (h ++ [seed])).rounds).zipIdx).find?
+      (fun e => e.1.1.pow_bits == 0 && e.1.2.pow_witness != 0) = none := by
+    refine List.find?_eq_none.mpr fun e he => ?_
+    obtain ⟨⟨p, r⟩, i⟩ := e
+    rw [List.mk_mem_zipIdx_iff_getElem?, List.getElem?_zip_eq_some] at he
+    obtain ⟨hp', hr⟩ := he
+    have hi : i < c.n_rounds := (List.getElem?_eq_some_iff.mp hp').1
+    rw [queried_lt c hi, Option.some.injEq] at hp'
+    subst hp'
+    by_cases hz : (queried c i).pow_bits = 0
+    · simp [hz, stAt_canonical E PE c hv (h ++ [seed]) c.n_rounds le_rfl i r hr hz]
+    · simp [hz]
+  have hfinpow : ¬ (c.final_round_config.pow_bits = 0 ∧
+      (honestProof E PE c P0 n commitment (h ++ [seed])).final_pow_witness ≠ 0) := by
+    rintro ⟨hz, hne⟩
+    apply hne
+    rw [hp]
+    simp only
+    rw [hpowN, ← hv.final_pow, hz]
+    rfl
+  have hfinsc : ¬ (c.final_sumcheck_rounds = 0 ∧
+      (honestProof E PE c P0 n commitment (h ++ [seed])).final_sumcheck.isSome) := by
+    rintro ⟨hz, hs⟩
+    rw [hp] at hs
+    simp [hz] at hs
+  simp only [verify, hrounds, ne_eq, not_true_eq_false, ↓reduceIte, hfind, hfinpow, hfinsc]
+  exact replay_complete E PE c hv hh (h ++ [seed])
+
 end Plonky3Lean.Proofs.Whir

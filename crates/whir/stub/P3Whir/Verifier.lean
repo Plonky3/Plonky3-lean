@@ -230,6 +230,13 @@ def roundStep (c : WhirConfig) (proof : WhirProof F EF Com MP) (st : LoopState F
       | .ok (rs, claimed, h) =>
         pure (.ok ⟨st.constraints ++ [constraint], st.randomness ++ [rs], root, claimed, h⟩)
 
+/-- One step of the round loop of replay: an earlier rejection is kept, else the round runs. -/
+def loopStep (c : WhirConfig) (proof : WhirProof F EF Com MP) (acc : Except VerifierError (LoopState F EF Com))
+    (round_index : ℕ) : Option (Except VerifierError (LoopState F EF Com)) :=
+  match acc with
+  | .error e => pure (.error e)
+  | .ok st => roundStep E c proof st round_index
+
 /-- replay: the initial fold, every round, the final polynomial and its queries, the closing fold, and the final identity. -/
 def replay (c : WhirConfig) (proof : WhirProof F EF Com MP) (commitment : Com) (h : List (Step F EF)) :
     Option (Except VerifierError (List EF × List (Step F EF))) := do
@@ -244,10 +251,7 @@ def replay (c : WhirConfig) (proof : WhirProof F EF Com MP) (commitment : Com) (
   | .error e => pure (.error e)
   | .ok (rs0, claimed, h) =>
   let st0 : LoopState F EF Com := ⟨[constraint], [rs0], commitment, claimed, h⟩
-  match ← (List.range c.n_rounds).foldlM (fun (acc : Except VerifierError (LoopState F EF Com)) i =>
-      match acc with
-      | .error e => pure (.error e)
-      | .ok st => roundStep E c proof st i) (.ok st0) with
+  match ← (List.range c.n_rounds).foldlM (loopStep E c proof) (.ok st0) with
   | .error e => pure (.error e)
   | .ok st =>
   match proof.final_poly with
