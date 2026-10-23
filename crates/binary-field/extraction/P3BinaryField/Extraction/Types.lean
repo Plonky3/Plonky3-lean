@@ -25,57 +25,45 @@ set_option maxRecDepth 2048
 
 namespace p3_binary_field
 
+/-- [p3_binary_field::clmul::basis::apply_32::{closure}]
+    Source: 'binary-field/src/clmul/basis.rs', lines 266:38-268:5 -/
+@[reducible]
+def clmul.basis.apply_32.closure := Std.U32
+
 /-- [p3_binary_field::clmul::gf192::composed_mul_192_by_64::{closure}]
     Source: 'binary-field/src/clmul/gf192.rs', lines 159:10-159:42 -/
 @[reducible]
 def clmul.gf192.composed_mul_192_by_64.closure := Std.U64
+
+/-- [p3_binary_field::clmul::gf64::composed_dot_64::{closure}]
+    Source: 'binary-field/src/clmul/gf64.rs', lines 88:28-88:65 -/
+@[reducible]
+def clmul.gf64.composed_dot_64.closure (T0 : Type _) := Unit
 
 /-- [p3_binary_field::clmul::gf64::square_times::{closure}]
     Source: 'binary-field/src/clmul/gf64.rs', lines 120:23-120:47 -/
 @[reducible]
 def clmul.gf64.square_times.closure (K : Std.Usize) := Unit
 
-/-- [p3_binary_field::gf2::Gf2]
-    Source: 'binary-field/src/gf2.rs', lines 81:0-81:19
-    Visibility: public -/
+/-- [p3_binary_field::clmul::mul_pair_64::{closure}]
+    Source: 'binary-field/src/clmul/mod.rs', lines 238:18-243:5 -/
 @[reducible]
-def gf2.Gf2 := Std.U8
+def clmul.mul_pair_64.closure := Std.U64
 
-/-- [p3_binary_field::ghash::Ghash128]
-    Source: 'binary-field/src/ghash.rs', lines 92:0-92:26
-    Visibility: public -/
+/-- [p3_binary_field::clmul::dot_product_32::{closure}]
+    Source: 'binary-field/src/clmul/mod.rs', lines 333:35-338:5 -/
 @[reducible]
-def ghash.Ghash128 := Std.U128
+def clmul.dot_product_32.closure (T0 : Type _) := Unit
 
-/-- [p3_binary_field::tower::BinaryField2]
-    Source: 'binary-field/src/tower.rs', lines 138:8-138:32; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 676:0-686:1
-    Visibility: public -/
+/-- [p3_binary_field::clmul::dot_product_64::{closure}]
+    Source: 'binary-field/src/clmul/mod.rs', lines 347:32-349:5 -/
 @[reducible]
-def tower.BinaryField2 := Std.U8
+def clmul.dot_product_64.closure (T0 : Type _) := Unit
 
-/-- [p3_binary_field::tower::BinaryField4]
-    Source: 'binary-field/src/tower.rs', lines 138:8-138:32; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 687:0-697:1
-    Visibility: public -/
+/-- [p3_binary_field::clmul::dot_product_128::{closure}]
+    Source: 'binary-field/src/clmul/mod.rs', lines 355:41-358:5 -/
 @[reducible]
-def tower.BinaryField4 := Std.U8
-
-/-- [p3_binary_field::tower::BinaryField8]
-    Source: 'binary-field/src/tower.rs', lines 138:8-138:32; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 698:0-708:1
-    Visibility: public -/
-@[reducible]
-def tower.BinaryField8 := Std.U8
-
-/-- [p3_binary_field::tower::BinaryField16]
-    Source: 'binary-field/src/tower.rs', lines 138:8-138:32; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 709:0-719:1
-    Visibility: public -/
-@[reducible]
-def tower.BinaryField16 := Std.U16
-
-/-- [p3_binary_field::tower::BinaryField32]
-    Source: 'binary-field/src/tower.rs', lines 138:8-138:32; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 720:0-730:1
-    Visibility: public -/
-@[reducible]
-def tower.BinaryField32 := Std.U32
+def clmul.dot_product_128.closure (T0 : Type _) := Unit
 
 /-- [p3_binary_field::tower::BinaryField64]
     Source: 'binary-field/src/tower.rs', lines 138:8-138:32; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 731:0-741:1
@@ -83,11 +71,157 @@ def tower.BinaryField32 := Std.U32
 @[reducible]
 def tower.BinaryField64 := Std.U64
 
+/-- [p3_binary_field::tower::BinaryField32]
+    Source: 'binary-field/src/tower.rs', lines 138:8-138:32; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 720:0-730:1
+    Visibility: public -/
+@[reducible]
+def tower.BinaryField32 := Std.U32
+
+/-- [p3_binary_field::tower::BinaryField16]
+    Source: 'binary-field/src/tower.rs', lines 138:8-138:32; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 709:0-719:1
+    Visibility: public -/
+@[reducible]
+def tower.BinaryField16 := Std.U16
+
+/-- [p3_binary_field::tower::BinaryField8]
+    Source: 'binary-field/src/tower.rs', lines 138:8-138:32; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 698:0-708:1
+    Visibility: public -/
+@[reducible]
+def tower.BinaryField8 := Std.U8
+
+/-- [p3_binary_field::tower::BinaryField4]
+    Source: 'binary-field/src/tower.rs', lines 138:8-138:32; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 687:0-697:1
+    Visibility: public -/
+@[reducible]
+def tower.BinaryField4 := Std.U8
+
+/-- [p3_binary_field::tower::BinaryField2]
+    Source: 'binary-field/src/tower.rs', lines 138:8-138:32; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 676:0-686:1
+    Visibility: public -/
+@[reducible]
+def tower.BinaryField2 := Std.U8
+
+/-- [p3_binary_field::gf2::Gf2]
+    Source: 'binary-field/src/gf2.rs', lines 81:0-81:19
+    Visibility: public -/
+@[reducible]
+def gf2.Gf2 := Std.U8
+
+/-- [p3_binary_field::extension::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField8, p3_binary_field::tower::BinaryField16> for p3_binary_field::tower::BinaryField16}::mul::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 61:79-63:17; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 297:0-297:61 -/
+def extension.MulBinaryField16BinaryField8BinaryField16.mul.closure :=
+  tower.BinaryField16 × tower.BinaryField8
+
+/-- [p3_binary_field::extension::{impl p3_field::field::ExtensionField<p3_binary_field::tower::BinaryField8> for p3_binary_field::tower::BinaryField16}::as_base::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 218:26-218:79; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 297:0-297:61 -/
+@[reducible]
+def extension.ExtensionFieldBinaryField16BinaryField8.as_base.closure :=
+  tower.BinaryField16
+
+/-- [p3_binary_field::extension::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField8, p3_binary_field::tower::BinaryField32> for p3_binary_field::tower::BinaryField32}::mul::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 61:79-63:17; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 298:0-298:61 -/
+def extension.MulBinaryField32BinaryField8BinaryField32.mul.closure :=
+  tower.BinaryField32 × tower.BinaryField8
+
+/-- [p3_binary_field::extension::{impl p3_field::field::ExtensionField<p3_binary_field::tower::BinaryField8> for p3_binary_field::tower::BinaryField32}::as_base::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 218:26-218:79; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 298:0-298:61 -/
+@[reducible]
+def extension.ExtensionFieldBinaryField32BinaryField8.as_base.closure :=
+  tower.BinaryField32
+
+/-- [p3_binary_field::extension::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField8, p3_binary_field::tower::BinaryField64> for p3_binary_field::tower::BinaryField64}::mul::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 61:79-63:17; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 299:0-299:61 -/
+def extension.MulBinaryField64BinaryField8BinaryField64.mul.closure :=
+  tower.BinaryField64 × tower.BinaryField8
+
+/-- [p3_binary_field::extension::{impl p3_field::field::ExtensionField<p3_binary_field::tower::BinaryField8> for p3_binary_field::tower::BinaryField64}::as_base::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 218:26-218:79; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 299:0-299:61 -/
+@[reducible]
+def extension.ExtensionFieldBinaryField64BinaryField8.as_base.closure :=
+  tower.BinaryField64
+
 /-- [p3_binary_field::tower::BinaryField128]
     Source: 'binary-field/src/tower.rs', lines 138:8-138:32; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 742:0-752:1
     Visibility: public -/
 @[reducible]
 def tower.BinaryField128 := Std.U128
+
+/-- [p3_binary_field::extension::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField8, p3_binary_field::tower::BinaryField128> for p3_binary_field::tower::BinaryField128}::mul::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 61:79-63:17; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 300:0-300:63 -/
+def extension.MulBinaryField128BinaryField8BinaryField128.mul.closure :=
+  tower.BinaryField128 × tower.BinaryField8
+
+/-- [p3_binary_field::extension::{impl p3_field::field::ExtensionField<p3_binary_field::tower::BinaryField8> for p3_binary_field::tower::BinaryField128}::as_base::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 218:26-218:79; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 300:0-300:63 -/
+@[reducible]
+def extension.ExtensionFieldBinaryField128BinaryField8.as_base.closure :=
+  tower.BinaryField128
+
+/-- [p3_binary_field::extension::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField16, p3_binary_field::tower::BinaryField32> for p3_binary_field::tower::BinaryField32}::mul::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 61:79-63:17; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 301:0-301:63 -/
+def extension.MulBinaryField32BinaryField16BinaryField32.mul.closure :=
+  tower.BinaryField32 × tower.BinaryField16
+
+/-- [p3_binary_field::extension::{impl p3_field::field::ExtensionField<p3_binary_field::tower::BinaryField16> for p3_binary_field::tower::BinaryField32}::as_base::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 218:26-218:79; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 301:0-301:63 -/
+@[reducible]
+def extension.ExtensionFieldBinaryField32BinaryField16.as_base.closure :=
+  tower.BinaryField32
+
+/-- [p3_binary_field::extension::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField16, p3_binary_field::tower::BinaryField64> for p3_binary_field::tower::BinaryField64}::mul::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 61:79-63:17; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 302:0-302:63 -/
+def extension.MulBinaryField64BinaryField16BinaryField64.mul.closure :=
+  tower.BinaryField64 × tower.BinaryField16
+
+/-- [p3_binary_field::extension::{impl p3_field::field::ExtensionField<p3_binary_field::tower::BinaryField16> for p3_binary_field::tower::BinaryField64}::as_base::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 218:26-218:79; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 302:0-302:63 -/
+@[reducible]
+def extension.ExtensionFieldBinaryField64BinaryField16.as_base.closure :=
+  tower.BinaryField64
+
+/-- [p3_binary_field::extension::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField16, p3_binary_field::tower::BinaryField128> for p3_binary_field::tower::BinaryField128}::mul::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 61:79-63:17; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 303:0-303:65 -/
+def extension.MulBinaryField128BinaryField16BinaryField128.mul.closure :=
+  tower.BinaryField128 × tower.BinaryField16
+
+/-- [p3_binary_field::extension::{impl p3_field::field::ExtensionField<p3_binary_field::tower::BinaryField16> for p3_binary_field::tower::BinaryField128}::as_base::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 218:26-218:79; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 303:0-303:65 -/
+@[reducible]
+def extension.ExtensionFieldBinaryField128BinaryField16.as_base.closure :=
+  tower.BinaryField128
+
+/-- [p3_binary_field::extension::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField32, p3_binary_field::tower::BinaryField64> for p3_binary_field::tower::BinaryField64}::mul::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 61:79-63:17; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 304:0-304:63 -/
+def extension.MulBinaryField64BinaryField32BinaryField64.mul.closure :=
+  tower.BinaryField64 × tower.BinaryField32
+
+/-- [p3_binary_field::extension::{impl p3_field::field::ExtensionField<p3_binary_field::tower::BinaryField32> for p3_binary_field::tower::BinaryField64}::as_base::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 218:26-218:79; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 304:0-304:63 -/
+@[reducible]
+def extension.ExtensionFieldBinaryField64BinaryField32.as_base.closure :=
+  tower.BinaryField64
+
+/-- [p3_binary_field::extension::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField32, p3_binary_field::tower::BinaryField128> for p3_binary_field::tower::BinaryField128}::mul::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 61:79-63:17; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 305:0-305:65 -/
+def extension.MulBinaryField128BinaryField32BinaryField128.mul.closure :=
+  tower.BinaryField128 × tower.BinaryField32
+
+/-- [p3_binary_field::extension::{impl p3_field::field::ExtensionField<p3_binary_field::tower::BinaryField32> for p3_binary_field::tower::BinaryField128}::as_base::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 218:26-218:79; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 305:0-305:65 -/
+@[reducible]
+def extension.ExtensionFieldBinaryField128BinaryField32.as_base.closure :=
+  tower.BinaryField128
+
+/-- [p3_binary_field::extension::{impl core::ops::arith::Mul<p3_binary_field::tower::BinaryField64, p3_binary_field::tower::BinaryField128> for p3_binary_field::tower::BinaryField128}::mul::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 61:79-63:17; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 306:0-306:65 -/
+def extension.MulBinaryField128BinaryField64BinaryField128.mul.closure :=
+  tower.BinaryField128 × tower.BinaryField64
+
+/-- [p3_binary_field::extension::{impl p3_field::field::ExtensionField<p3_binary_field::tower::BinaryField64> for p3_binary_field::tower::BinaryField128}::as_base::{closure}]
+    Source: 'binary-field/src/extension.rs', lines 218:26-218:79; this code is generated from a macro invocation at: 'binary-field/src/extension.rs', lines 306:0-306:65 -/
+@[reducible]
+def extension.ExtensionFieldBinaryField128BinaryField64.as_base.closure :=
+  tower.BinaryField128
 
 /-- [p3_binary_field::poly64::Poly64]
     Source: 'binary-field/src/poly64.rs', lines 67:0-67:23
@@ -95,15 +229,273 @@ def tower.BinaryField128 := Std.U128
 @[reducible]
 def poly64.Poly64 := Std.U64
 
-/-- [p3_binary_field::poly192::{impl core::ops::arith::Add<p3_binary_field::poly192::Poly192, p3_binary_field::poly192::Poly192> for p3_binary_field::poly192::Poly192}::add::{closure}]
-    Source: 'binary-field/src/poly192.rs', lines 163:34-163:58 -/
-def poly192.AddPoly192Poly192Poly192.add.closure :=
-  Array poly64.Poly64 3#usize × Array poly64.Poly64 3#usize
-
 /-- [p3_binary_field::poly192::Poly192]
     Source: 'binary-field/src/poly192.rs', lines 53:0-53:37
     Visibility: public -/
 @[reducible]
 def poly192.Poly192 := Array poly64.Poly64 3#usize
+
+/-- [p3_binary_field::ghash::Ghash128]
+    Source: 'binary-field/src/ghash.rs', lines 92:0-92:26
+    Visibility: public -/
+@[reducible]
+def ghash.Ghash128 := Std.U128
+
+/-- [p3_binary_field::gf2::{impl p3_field::integers::QuotientMap<u8> for p3_binary_field::gf2::Gf2}::from_canonical_checked::{closure}]
+    Source: 'binary-field/src/gf2.rs', lines 287:23-287:40 -/
+@[reducible]
+def gf2.QuotientMapGf2U8.from_canonical_checked.closure := Std.U8
+
+/-- [p3_binary_field::gf2::{impl p3_field::integers::QuotientMap<i8> for p3_binary_field::gf2::Gf2}::from_canonical_checked::{closure}]
+    Source: 'binary-field/src/gf2.rs', lines 316:35-316:58 -/
+@[reducible]
+def gf2.QuotientMapGf2I8.from_canonical_checked.closure := Std.I8
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField2}::dot_product::{closure#3}]
+    Source: 'binary-field/src/tower.rs', lines 457:40-457:56; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 676:0-686:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField2.dot_product.closure_3 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField2}::dot_product::{closure#2}]
+    Source: 'binary-field/src/tower.rs', lines 454:44-454:79; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 676:0-686:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField2.dot_product.closure_2 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField2}::dot_product::{closure#1}]
+    Source: 'binary-field/src/tower.rs', lines 450:44-450:77; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 676:0-686:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField2.dot_product.closure_1 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField2}::dot_product::{closure}]
+    Source: 'binary-field/src/tower.rs', lines 446:44-446:77; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 676:0-686:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField2.dot_product.closure (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl core::iter::traits::accum::Sum<p3_binary_field::tower::BinaryField2> for p3_binary_field::tower::BinaryField2}::sum::{closure}]
+    Source: 'field/src/op_assign_macros.rs', lines 46:32-46:44; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 676:0-686:1 -/
+@[reducible]
+def tower.SumBinaryField2BinaryField2.sum.closure (I : Type _) := Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField4}::dot_product::{closure#3}]
+    Source: 'binary-field/src/tower.rs', lines 457:40-457:56; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 687:0-697:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField4.dot_product.closure_3 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField4}::dot_product::{closure#2}]
+    Source: 'binary-field/src/tower.rs', lines 454:44-454:79; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 687:0-697:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField4.dot_product.closure_2 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField4}::dot_product::{closure#1}]
+    Source: 'binary-field/src/tower.rs', lines 450:44-450:77; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 687:0-697:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField4.dot_product.closure_1 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField4}::dot_product::{closure}]
+    Source: 'binary-field/src/tower.rs', lines 446:44-446:77; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 687:0-697:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField4.dot_product.closure (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl core::iter::traits::accum::Sum<p3_binary_field::tower::BinaryField4> for p3_binary_field::tower::BinaryField4}::sum::{closure}]
+    Source: 'field/src/op_assign_macros.rs', lines 46:32-46:44; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 687:0-697:1 -/
+@[reducible]
+def tower.SumBinaryField4BinaryField4.sum.closure (I : Type _) := Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField8}::dot_product::{closure#3}]
+    Source: 'binary-field/src/tower.rs', lines 457:40-457:56; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 698:0-708:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField8.dot_product.closure_3 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField8}::dot_product::{closure#2}]
+    Source: 'binary-field/src/tower.rs', lines 454:44-454:79; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 698:0-708:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField8.dot_product.closure_2 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField8}::dot_product::{closure#1}]
+    Source: 'binary-field/src/tower.rs', lines 450:44-450:77; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 698:0-708:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField8.dot_product.closure_1 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField8}::dot_product::{closure}]
+    Source: 'binary-field/src/tower.rs', lines 446:44-446:77; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 698:0-708:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField8.dot_product.closure (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl core::iter::traits::accum::Sum<p3_binary_field::tower::BinaryField8> for p3_binary_field::tower::BinaryField8}::sum::{closure}]
+    Source: 'field/src/op_assign_macros.rs', lines 46:32-46:44; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 698:0-708:1 -/
+@[reducible]
+def tower.SumBinaryField8BinaryField8.sum.closure (I : Type _) := Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField16}::dot_product::{closure#3}]
+    Source: 'binary-field/src/tower.rs', lines 457:40-457:56; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 709:0-719:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField16.dot_product.closure_3 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField16}::dot_product::{closure#2}]
+    Source: 'binary-field/src/tower.rs', lines 454:44-454:79; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 709:0-719:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField16.dot_product.closure_2 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField16}::dot_product::{closure#1}]
+    Source: 'binary-field/src/tower.rs', lines 450:44-450:77; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 709:0-719:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField16.dot_product.closure_1 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField16}::dot_product::{closure}]
+    Source: 'binary-field/src/tower.rs', lines 446:44-446:77; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 709:0-719:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField16.dot_product.closure (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl core::iter::traits::accum::Sum<p3_binary_field::tower::BinaryField16> for p3_binary_field::tower::BinaryField16}::sum::{closure}]
+    Source: 'field/src/op_assign_macros.rs', lines 46:32-46:44; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 709:0-719:1 -/
+@[reducible]
+def tower.SumBinaryField16BinaryField16.sum.closure (I : Type _) := Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField32}::dot_product::{closure#3}]
+    Source: 'binary-field/src/tower.rs', lines 457:40-457:56; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 720:0-730:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField32.dot_product.closure_3 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField32}::dot_product::{closure#2}]
+    Source: 'binary-field/src/tower.rs', lines 454:44-454:79; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 720:0-730:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField32.dot_product.closure_2 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField32}::dot_product::{closure#1}]
+    Source: 'binary-field/src/tower.rs', lines 450:44-450:77; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 720:0-730:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField32.dot_product.closure_1 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField32}::dot_product::{closure}]
+    Source: 'binary-field/src/tower.rs', lines 446:44-446:77; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 720:0-730:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField32.dot_product.closure (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl core::iter::traits::accum::Sum<p3_binary_field::tower::BinaryField32> for p3_binary_field::tower::BinaryField32}::sum::{closure}]
+    Source: 'field/src/op_assign_macros.rs', lines 46:32-46:44; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 720:0-730:1 -/
+@[reducible]
+def tower.SumBinaryField32BinaryField32.sum.closure (I : Type _) := Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField64}::dot_product::{closure#3}]
+    Source: 'binary-field/src/tower.rs', lines 457:40-457:56; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 731:0-741:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField64.dot_product.closure_3 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField64}::dot_product::{closure#2}]
+    Source: 'binary-field/src/tower.rs', lines 454:44-454:79; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 731:0-741:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField64.dot_product.closure_2 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField64}::dot_product::{closure#1}]
+    Source: 'binary-field/src/tower.rs', lines 450:44-450:77; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 731:0-741:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField64.dot_product.closure_1 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField64}::dot_product::{closure}]
+    Source: 'binary-field/src/tower.rs', lines 446:44-446:77; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 731:0-741:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField64.dot_product.closure (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl core::iter::traits::accum::Sum<p3_binary_field::tower::BinaryField64> for p3_binary_field::tower::BinaryField64}::sum::{closure}]
+    Source: 'field/src/op_assign_macros.rs', lines 46:32-46:44; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 731:0-741:1 -/
+@[reducible]
+def tower.SumBinaryField64BinaryField64.sum.closure (I : Type _) := Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField128}::dot_product::{closure#3}]
+    Source: 'binary-field/src/tower.rs', lines 457:40-457:56; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 742:0-752:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField128.dot_product.closure_3 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField128}::dot_product::{closure#2}]
+    Source: 'binary-field/src/tower.rs', lines 454:44-454:79; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 742:0-752:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField128.dot_product.closure_2 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField128}::dot_product::{closure#1}]
+    Source: 'binary-field/src/tower.rs', lines 450:44-450:77; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 742:0-752:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField128.dot_product.closure_1 (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::tower::BinaryField128}::dot_product::{closure}]
+    Source: 'binary-field/src/tower.rs', lines 446:44-446:77; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 742:0-752:1 -/
+@[reducible]
+def tower.PrimeCharacteristicRingBinaryField128.dot_product.closure (N :
+  Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::tower::{impl core::iter::traits::accum::Sum<p3_binary_field::tower::BinaryField128> for p3_binary_field::tower::BinaryField128}::sum::{closure}]
+    Source: 'field/src/op_assign_macros.rs', lines 46:32-46:44; this code is generated from a macro invocation at: 'binary-field/src/tower.rs', lines 742:0-752:1 -/
+@[reducible]
+def tower.SumBinaryField128BinaryField128.sum.closure (I : Type _) := Unit
+
+/-- [p3_binary_field::poly64::{impl p3_field::field::PrimeCharacteristicRing for p3_binary_field::poly64::Poly64}::dot_product::{closure}]
+    Source: 'binary-field/src/poly64.rs', lines 195:52-195:71 -/
+@[reducible]
+def poly64.PrimeCharacteristicRingPoly64.dot_product.closure (N : Std.Usize) :=
+Unit
+
+/-- [p3_binary_field::poly192::{impl p3_field::field::Field for p3_binary_field::poly192::Poly192}::try_sqrt::{closure}]
+    Source: 'binary-field/src/poly192.rs', lines 360:19-363:9 -/
+@[reducible]
+def poly192.FieldPoly192.try_sqrt.closure := Unit
+
+/-- [p3_binary_field::poly192::{impl core::ops::arith::Add<p3_binary_field::poly192::Poly192, p3_binary_field::poly192::Poly192> for p3_binary_field::poly192::Poly192}::add::{closure}]
+    Source: 'binary-field/src/poly192.rs', lines 163:34-163:58 -/
+def poly192.AddPoly192Poly192Poly192.add.closure :=
+  Array poly64.Poly64 3#usize × Array poly64.Poly64 3#usize
 
 end p3_binary_field

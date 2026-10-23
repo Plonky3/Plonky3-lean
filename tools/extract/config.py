@@ -70,7 +70,7 @@ def main(argv):
             print(f"{name}|{c['lean_lib']}|{c['state']}")
     elif argv[:1] == ["charon-args"] and len(argv) == 2:
         c = dict(crates())[argv[1]]
-        args = ["--targets", toolchain()["target"], *toolchain()["charon_args"]]
+        args = ["--targets", toolchain()["target"], *toolchain()["charon_args"], *c.get("charon_args", [])]
         for root in c.get("start_from", []):
             args += ["--start-from", root]
         args += c.get("charon_args", [])

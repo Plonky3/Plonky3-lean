@@ -1,14 +1,14 @@
 # Patch:        050-poly192-copied-limbs
 # Phase:        pre
 # Target:       binary-field/src/poly192.rs
-# Hunks:        4
+# Hunks:        5
 # Class:        equiv-rewrite
 # Gap:          docs/extractor-issues.md 12: aeneas does not support
 #               dereferencing a raw pointer, and `Poly192::limbs` reborrows
 #               `[Poly64; 3]` as `&[u64; 3]` through one.
 # Cost:         none in a normal build: the copy is compiled but unused there.
-#               In the extracted variant, `Mul` and `Mul<Poly64>` read the
-#               coordinates through `limbs_owned`, which copies each
+#               In the extracted variant, `Mul`, `Mul<Poly64>` and `square`
+#               read the coordinates through `limbs_owned`, which copies each
 #               coordinate's bits, instead of borrowing them in place.
 # Upstreamable: no: the borrow lets vector kernels load in place.
 # Drop when:    aeneas models the raw-pointer reborrow.
@@ -21,7 +21,8 @@
 # aeneas stops at the raw-pointer dereference, so `Poly192`'s products could not
 # be extracted.
 # `limbs_owned` copies the three coordinates' bits, compiled in every build.
-# Under cfg(hax_backend_lean) the two products pass a reference to that copy.
+# Under cfg(hax_backend_lean) the two products and `square` pass a reference to
+# that copy.
 # The differential test compares it with `limbs` on edge values and 10000
 # pseudo-random elements.
 #
@@ -71,7 +72,21 @@
      }
  }
  
-@@ -815,3 +834,30 @@
+@@ -258,7 +277,12 @@
+     #[inline]
+     fn square(&self) -> Self {
+         // Three coordinate squares, the fold of y^4, then three reductions.
+-        Self::from_limbs(clmul::poly_square_192(self.limbs()))
++        #[cfg(not(hax_backend_lean))]
++        let a = self.limbs();
++        // PATCHED: the selection, only under hax's Lean backend.
++        #[cfg(hax_backend_lean)]
++        let a = &self.limbs_owned();
++        Self::from_limbs(clmul::poly_square_192(a))
+     }
+ 
+     /// `x (x - 1) = x^2 + x` in characteristic 2, and squaring is the cheaper product.
+@@ -815,3 +839,30 @@
          }
      }
  }

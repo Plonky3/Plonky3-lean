@@ -28,6 +28,9 @@ namespace Plonky3Lean.Lib
 theorem size_u8 : UScalar.size .U8 = 2 ^ 8 := by
   simp only [UScalar.size, UScalarTy.U8_numBits_eq]
 
+theorem size_u16 : UScalar.size .U16 = 2 ^ 16 := by
+  simp only [UScalar.size, UScalarTy.U16_numBits_eq]
+
 theorem size_u32 : UScalar.size .U32 = 2 ^ 32 := by
   simp only [UScalar.size, UScalarTy.U32_numBits_eq]
 
@@ -201,6 +204,16 @@ theorem core.num.U8.wrapping_sub.spec (x y : Std.U8) :
     U8.wrapping_sub_val_eq, size_u8]
   have := y.hBounds
   rw [UScalarTy.U8_numBits_eq] at this
+  congr 1; omega
+
+@[step]
+theorem core.num.U16.wrapping_sub.spec (x y : Std.U16) :
+    CoreModels.core.num.U16.wrapping_sub x y ⦃ r => r.val = (x.val + 2 ^ 16 - y.val) % 2 ^ 16 ⦄ := by
+  simp only [CoreModels.core.num.U16.wrapping_sub,
+    CoreModels.rust_primitives.arithmetic.wrapping_sub_u16, WP.spec_ok,
+    U16.wrapping_sub_val_eq, size_u16]
+  have := y.hBounds
+  rw [UScalarTy.U16_numBits_eq] at this
   congr 1; omega
 
 @[step]
