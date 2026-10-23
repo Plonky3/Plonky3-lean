@@ -20,3 +20,154 @@ start_from = [
 ]
 
 watch = ["keccak-air/src", "keccak-air/Cargo.toml"]
+
+# The transcriptions in extraction/P3KeccakAir/Assumptions/Mirror/.
+# Hashes are pending tools/mirror.
+#
+# Plonky3Lean/Proofs/KeccakAir/Extracted.lean proves the transcribed tables equal to the extracted ones.
+#
+# Plonky3Lean/Proofs/KeccakAir/Binary/Round.lean proves the transcribed round on words is Rnd of FIPS 202.
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.NUM_ROUNDS"
+rust = "p3_keccak_air::NUM_ROUNDS"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.BITS_PER_LIMB"
+rust = "p3_keccak_air::BITS_PER_LIMB"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.U64_LIMBS"
+rust = "p3_keccak_air::U64_LIMBS"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.R"
+rust = "p3_keccak_air::constants::R"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.RC"
+rust = "p3_keccak_air::constants::RC"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.RC_BITS"
+rust = "p3_keccak_air::constants::RC_BITS"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.NUM_KECCAK_COLS"
+rust = "p3_keccak_air::columns::NUM_KECCAK_COLS"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.KeccakCols"
+rust = "p3_keccak_air::columns::KeccakCols"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.KeccakCols.cells"
+rust = "p3_keccak_air::columns::KeccakCols"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.col.a"
+rust = "p3_keccak_air::columns::KeccakCols"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.b"
+rust = "p3_keccak_air::columns::KeccakCols::b"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.a_prime_prime_prime"
+rust = "p3_keccak_air::columns::KeccakCols::a_prime_prime_prime"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.KeccakCols.a_prime_prime_prime'"
+rust = "p3_keccak_air::columns::KeccakCols::a_prime_prime_prime"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.double"
+rust = "p3_field::PrimeCharacteristicRing::double"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.xor"
+rust = "p3_field::PrimeCharacteristicRing::xor"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.xor3"
+rust = "p3_field::PrimeCharacteristicRing::xor3"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.andn"
+rust = "p3_field::PrimeCharacteristicRing::andn"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.sum"
+rust = "{impl core::iter::Sum<T> for p3_air::symbolic::SymbolicExpr<A>}::sum"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.eval_round_flags"
+rust = "p3_keccak_air::round_flags::eval_round_flags"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.eval"
+rust = "{impl p3_air::air::Air<AB> for p3_keccak_air::air::KeccakAir}::eval"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.u64_to_bits_le"
+rust = "p3_air::utils::u64_to_bits_le"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.u64_to_16_bit_limbs"
+rust = "p3_air::utils::u64_to_16_bit_limbs"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.generate_trace_row_for_round"
+rust = "p3_keccak_air::generation::generate_trace_row_for_round"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.generate_trace_rows_for_perm"
+rust = "p3_keccak_air::generation::generate_trace_rows_for_perm"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.generate_trace_rows"
+rust = "p3_keccak_air::generation::generate_trace_rows"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.KECCAK_BINARY_ROWS_PER_PERM"
+rust = "p3_keccak_air::binary::columns::KECCAK_BINARY_ROWS_PER_PERM"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.NUM_KECCAK_BINARY_COLS"
+rust = "p3_keccak_air::binary::columns::NUM_KECCAK_BINARY_COLS"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.KeccakBinaryCols"
+rust = "p3_keccak_air::binary::columns::KeccakBinaryCols"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.KeccakBinaryCols.cells"
+rust = "p3_keccak_air::binary::columns::KeccakBinaryCols"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.col.a"
+rust = "p3_keccak_air::binary::columns::KeccakBinaryCols"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.rho_pi_source"
+rust = "p3_keccak_air::binary::rho_pi_source"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.eval"
+rust = "{impl p3_air::air::Air<AB> for p3_keccak_air::binary::air::KeccakBinaryAir}::eval"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.keccak_round"
+rust = "p3_keccak_air::binary::generation::keccak_round"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.write_state"
+rust = "p3_keccak_air::binary::generation::write_state"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.generate_perm_rows"
+rust = "p3_keccak_air::binary::generation::generate_perm_rows"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.generate_binary_trace_rows"
+rust = "p3_keccak_air::binary::generation::generate_binary_trace_rows"
