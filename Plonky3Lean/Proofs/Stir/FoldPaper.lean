@@ -103,4 +103,23 @@ theorem foldIdx_eq_fold {ω s : K} {k M n : ℕ} (hω : IsPrimitiveRoot ω (2 ^ 
   refine Lagrange.interpolate_eq_of_values_eq_on _ _ fun l hl => ?_
   simp [hf _ (hidx l (mem_range.1 hl))]
 
+/-- Interpolating the fiber values r_l at omega^(j + l M) and evaluating at gamma / s is Fold(f, k, gamma) at (s omega^j)^k, for any f taking value r_l at s omega^(j + l M). -/
+theorem interp_fiber_eq_fold {ω s : K} {k M n : ℕ} (hω : IsPrimitiveRoot ω (2 ^ n))
+    (hN : k * M = 2 ^ n) (hs : s ≠ 0) (r : ℕ → K) (f : K → K)
+    {j : ℕ} (hj : j < M) (hf : ∀ l < k, f (s * ω ^ (j + l * M)) = r l) (γ : K) :
+    (Lagrange.interpolate (range k) (fun l => ω ^ (j + l * M)) r).eval (γ / s) =
+      Spec.Stir.fold (cosetSet s ω n) f k γ ((s * ω ^ j) ^ k) := by
+  have hidx : ∀ l < k, j + l * M < 2 ^ n := fun l hl => by rw [← hN]; nlinarith
+  have hv : Set.InjOn (fun l => ω ^ (j + l * M)) (range k : Set ℕ) := by
+    intro a ha b hb h
+    have := hω.pow_inj (hidx a (mem_range.1 ha)) (hidx b (mem_range.1 hb)) h
+    exact Nat.eq_of_mul_eq_mul_right (by omega : 0 < M) (by omega)
+  have hsv : Set.InjOn (fun l => s * ω ^ (j + l * M)) (range k : Set ℕ) := fun a ha b hb h =>
+    hv ha hb (mul_left_cancel₀ hs h)
+  unfold Spec.Stir.fold
+  rw [fiber_eq hω hN hs hj, interpolate_image hsv, ← eval_interpolate_scale hv hs]
+  congr 1
+  refine Lagrange.interpolate_eq_of_values_eq_on _ _ fun l hl => ?_
+  simp [hf _ (mem_range.1 hl)]
+
 end Plonky3Lean.Proofs.Stir
