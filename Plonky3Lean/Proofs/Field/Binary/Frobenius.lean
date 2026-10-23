@@ -432,6 +432,49 @@ theorem tcell_repeat_zero {ty : UScalarTy} {E R L : Std.Usize}
     · rfl
   · rfl
 
+/-- Entry `w` of row `i` of one table, as a natural number (`0` past the end). -/
+noncomputable def cell2 {ty : UScalarTy} {E R : Std.Usize}
+    (t : Std.Array (Std.Array (UScalar ty) E) R) (i w : ℕ) : ℕ :=
+  match t.val[i]? with
+  | some e =>
+    match e.val[w]? with
+    | some x => x.val
+    | none => 0
+  | none => 0
+
+theorem tcell_eq_cell2 {ty : UScalarTy} {E R L : Std.Usize}
+    (t : Std.Array (Std.Array (Std.Array (UScalar ty) E) R) L) (k : ℕ) (hk : k < t.val.length)
+    (i w : ℕ) : tcell t k i w = cell2 (t.val[k]) i w := by
+  unfold tcell cell2
+  rw [List.getElem?_eq_getElem hk]
+
+/-- The low `n + 4` bits are the low `n` bits and the next nibble. -/
+theorem mod_two_pow_add_nibble (x n : ℕ) :
+    x % 2 ^ (n + 4) = x % 2 ^ n ^^^ ((x >>> n) % 2 ^ 4) <<< n := by
+  apply Nat.eq_of_testBit_eq
+  intro i
+  simp only [Nat.testBit_mod_two_pow, Nat.testBit_xor, Nat.testBit_shiftLeft,
+    Nat.testBit_shiftRight]
+  by_cases h1 : i < n
+  · simp [h1, show i < n + 4 by omega, show ¬ n ≤ i by omega]
+  · by_cases h2 : i < n + 4
+    · simp [h1, h2, show n ≤ i by omega, show i - n < 4 by omega, show n + (i - n) = i by omega]
+    · simp [h1, h2, show ¬ i - n < 4 by omega]
+
+/-- The low `k + 1` bits of the power. -/
+theorem mod_two_pow_succ_bit (p k : ℕ) :
+    p % 2 ^ (k + 1) = p % 2 ^ k + (if p.testBit k then 2 ^ k else 0) := by
+  rw [Nat.mod_pow_succ]
+  have : p / 2 ^ k % 2 = if p.testBit k then 1 else 0 := by
+    rw [Nat.testBit_eq_decide_div_mod_eq]
+    rcases Nat.mod_two_eq_zero_or_one (p / 2 ^ k) with h | h <;> simp [h]
+  rw [this]
+  split_ifs <;> ring
+
+theorem shiftRight_and_one_eq (b k : ℕ) : (b >>> k) &&& 1 = if b.testBit k then 1 else 0 := by
+  rw [Nat.and_one_is_mod, Nat.shiftRight_eq_div_pow, Nat.testBit_eq_decide_div_mod_eq]
+  rcases Nat.mod_two_eq_zero_or_one (b / 2 ^ k) with h | h <;> simp [h]
+
 /-! ## `frobenius_16` -/
 
 theorem frob16_inner_spec (cols : Std.Array (Std.Array Std.U128 16#usize) 3#usize)
@@ -642,5 +685,157 @@ theorem frobenius_16_TABLES_spec :
   exact frob16_kloop_spec cols (fun k hk j hj => hcols k (by simpa using hk) j (by simpa using hj))
     tb 0#usize (by simp) (fun k hk => absurd hk (by simp))
     (fun k i _ => tcell_repeat_zero tb a1 a htbv ha1v (fun y hy => by rw [hav y hy]; rfl) k i 0)
+
+/-- One table applies `x ↦ x^(2^(2^k))`, a nibble at a time. -/
+theorem frob16_apply_spec (F : ℕ → ℕ) (hF : XorMap F 4)
+    (table : Std.Array (Std.Array Std.U16 16#usize) 4#usize)
+    (hT : ∀ i < 4, ∀ w < 16, cell2 table i w = F (w <<< (4 * i))) (value : Std.U16)
+    (it : CoreModels.core.iter.adapters.enumerate.Enumerate (CoreModels.core.slice.iter.Iter
+      (Std.Array Std.U16 16#usize)))
+    (result : Std.U16) (hit : iterList it.iter = table.val.drop it.count.val)
+    (hc : it.count.val ≤ 4) (hres : result.val = F (value.val % 2 ^ (4 * it.count.val))) :
+    linear.frobenius_16_loop0_loop0 it value result ⦃ r => r.val = F value.val ⦄ := by
+  unfold linear.frobenius_16_loop0_loop0
+  refine loop.spec_decr_nat (fun p => 4 - p.1.count.val)
+    (fun p => iterList p.1.iter = table.val.drop p.1.count.val ∧ p.1.count.val ≤ 4 ∧
+      p.2.val = F (value.val % 2 ^ (4 * p.1.count.val))) _ _ _ ?_ ⟨hit, hc, hres⟩
+  rintro ⟨it, res⟩ ⟨hit, hc, hres⟩
+  unfold linear.frobenius_16_loop0_loop0.body
+  simp only at hit hc hres
+  have hlenT : table.val.length = 4 := by simp
+  by_cases hc4 : it.count.val < 4
+  · have hcons : iterList it.iter = table.val[it.count.val] :: table.val.drop (it.count.val + 1) := by
+      rw [hit, List.drop_eq_getElem_cons (by omega)]
+    obtain ⟨c', hc', hnext⟩ := enumerate_next_cons it hcons (by
+      have : (4 : ℕ) ≤ Usize.max := by scalar_tac
+      omega)
+    dsimp only
+    rw [hnext]
+    simp only [Aeneas.Std.bind_ok]
+    have hc16 : (4 * it.count.val) < 16 := by omega
+    step*
+    · have h3 : i3.val ≤ 15 := by
+        rw [i3_post, UScalar.val_and]; exact Nat.and_le_right
+      rw [i4_post, UScalar.cast_val_eq, Nat.mod_eq_of_lt (by
+        rcases System.Platform.numBits_eq with e | e <;> simp only [UScalarTy.Usize_numBits_eq, e] <;> omega)]
+      simp; omega
+    · have hnib : i3.val = (value.val >>> (4 * it.count.val)) % 2 ^ 4 := by
+        rw [i3_post, UScalar.val_and, i2_post, i1_post, show (15#u16).val = 2 ^ 4 - 1 from rfl,
+          Nat.and_two_pow_sub_one_eq_mod]
+      have h3 : i3.val < 16 := hnib ▸ Nat.mod_lt _ (by norm_num)
+      have hi4 : i4.val = i3.val := by
+        rw [i4_post, UScalar.cast_val_eq, Nat.mod_eq_of_lt (by
+          rcases System.Platform.numBits_eq with e | e <;> simp only [UScalarTy.Usize_numBits_eq, e] <;> omega)]
+      have hi5 : i5.val = F (i3.val <<< (4 * it.count.val)) := by
+        rw [← hi4, ← hT it.count.val hc4 i4.val (by omega)]
+        unfold cell2
+        rw [List.getElem?_eq_getElem (by omega)]
+        dsimp only
+        rw [List.getElem?_eq_getElem i5_post, i5_post1]
+      have hv16 : value.val < 2 ^ 16 := by have := value.hBounds; simpa using this
+      have hx : value.val % 2 ^ (4 * it.count.val) < 2 ^ 2 ^ 4 :=
+        lt_of_lt_of_le (Nat.mod_lt _ (Nat.two_pow_pos _))
+          (Nat.pow_le_pow_right (by norm_num) (by omega))
+      have hy : i3.val <<< (4 * it.count.val) < 2 ^ 2 ^ 4 :=
+        lt_of_lt_of_le (shiftLeft_lt_two_pow (b := 4) (by omega))
+          (Nat.pow_le_pow_right (by norm_num) (by omega))
+      refine ⟨by rw [iterList_iterOf, hc'], by omega, ?_, by omega⟩
+      rw [result1_post, UScalar.val_xor, hres, hi5, hc', ← hF.xor _ _ hx hy, hnib, mul_add, mul_one,
+        mod_two_pow_add_nibble value.val (4 * it.count.val)]
+  · have hnil : iterList it.iter = [] := by rw [hit]; exact List.drop_of_length_le (by omega)
+    dsimp only
+    simp only [CoreModels.core.iter.adapters.enumerate.Enumerate.Insts.CoreIterTraitsIteratorIteratorPairUsizeClause0_Item.next]
+    rw [slice_iter_next_nil it.iter hnil]
+    simp only [Aeneas.Std.bind_ok]
+    have hc4' : it.count.val = 4 := by omega
+    have hv16 : value.val < 2 ^ 16 := by have := value.hBounds; simpa using this
+    step*
+    rw [hres, hc4', Nat.mod_eq_of_lt hv16]
+
+/-- The tables for the set bits of `power` compose to `x ↦ x^(2^power)`. -/
+theorem frob16_loop_spec (T : Std.Array (Std.Array (Std.Array Std.U16 16#usize) 4#usize) 3#usize)
+    (hT : ∀ k < 3, ∀ i < 4, ∀ w < 16, tcell T k i w = frobNat 4 (2 ^ k) (w <<< (4 * i)))
+    (power : Std.Usize) (v0 : Std.U16)
+    (it : CoreModels.core.iter.adapters.enumerate.Enumerate (CoreModels.core.slice.iter.Iter
+      (Std.Array (Std.Array Std.U16 16#usize) 4#usize)))
+    (value : Std.U16) (hit : iterList it.iter = T.val.drop it.count.val) (hc : it.count.val ≤ 3)
+    (hval : value.val = frobNat 4 (power.val % 2 ^ it.count.val) v0.val) :
+    linear.frobenius_16_loop0 it value power ⦃ r =>
+      r.val = frobNat 4 (power.val % 2 ^ 3) v0.val ⦄ := by
+  unfold linear.frobenius_16_loop0
+  refine loop.spec_decr_nat (fun p => 3 - p.1.count.val)
+    (fun p => iterList p.1.iter = T.val.drop p.1.count.val ∧ p.1.count.val ≤ 3 ∧
+      p.2.val = frobNat 4 (power.val % 2 ^ p.1.count.val) v0.val) _ _ _ ?_ ⟨hit, hc, hval⟩
+  rintro ⟨it, val⟩ ⟨hit, hc, hval⟩
+  unfold linear.frobenius_16_loop0.body
+  simp only at hit hc hval
+  have hlenT : T.val.length = 3 := by simp
+  have hv16 : v0.val < 2 ^ 2 ^ 4 := by have := v0.hBounds; simpa using this
+  by_cases hc3 : it.count.val < 3
+  · have hcons : iterList it.iter = T.val[it.count.val] :: T.val.drop (it.count.val + 1) := by
+      rw [hit, List.drop_eq_getElem_cons (by omega)]
+    obtain ⟨c', hc', hnext⟩ := enumerate_next_cons it hcons (by
+      have : (3 : ℕ) ≤ Usize.max := by scalar_tac
+      omega)
+    dsimp only
+    rw [hnext]
+    simp only [Aeneas.Std.bind_ok]
+    have hbits : it.count.val < System.Platform.numBits := by
+      rcases System.Platform.numBits_eq with e | e <;> rw [e] <;> omega
+    step*
+    all_goals have hbit : i1.val = if power.val.testBit it.count.val then 1 else 0 := by rw [i1_post, UScalar.val_and, i_post, show (1#usize : Std.Usize).val = 1 from rfl, shiftRight_and_one_eq]
+    all_goals have hmod := mod_two_pow_succ_bit power.val it.count.val
+    case h1 =>
+      rename_i hne
+      have htb : power.val.testBit it.count.val = true := by
+        by_contra h
+        simp only [Bool.not_eq_true] at h
+        rw [h] at hbit
+        have : i1 = 0#usize := UScalar.eq_of_val_eq (by rw [hbit]; rfl)
+        simp [this] at hne
+      simp only [htb, ↓reduceIte] at hmod
+      rw [array_as_slice_eq, Aeneas.Std.bind_ok, slice_iter_eq, Aeneas.Std.bind_ok,
+        enumerate_default_eq, Aeneas.Std.bind_ok]
+      refine WP.spec_bind (frob16_apply_spec (frobNat 4 (2 ^ it.count.val)) (xorMap_frobNat 4 _)
+        (T.val[it.count.val]) (fun i hi w hw => by
+          rw [← tcell_eq_cell2 T it.count.val (by omega)]; exact hT _ hc3 i hi w hw)
+        val _ 0#u16 (by rw [iterList_iterOfSlice]; simp [Std.Array.to_slice]) (by simp)
+        (by rw [show (0#u16 : Std.U16).val = 0 from rfl, show (0#usize : Std.Usize).val = 0 from rfl,
+          mul_zero, pow_zero, Nat.mod_one, frobNat_zero])) fun r hr => ?_
+      rw [WP.spec_ok]
+      dsimp only
+      refine ⟨by rw [iterList_iterOf, hc'], by omega, ?_, by omega⟩
+      rw [hr, hval, ← frobNat_add, hc', hmod]
+    case h2 =>
+      rename_i heq
+      have htb : power.val.testBit it.count.val = false := by
+        by_contra h
+        simp only [Bool.not_eq_false] at h
+        rw [h] at hbit
+        have : ¬ i1 = 0#usize := fun h0 => by rw [h0] at hbit; exact absurd hbit (by decide)
+        simp [this] at heq
+      rw [htb] at hmod
+      refine ⟨by rw [iterList_iterOf, hc'], by omega, ?_, by omega⟩
+      rw [hval, hc', hmod]
+      simp
+  · have hnil : iterList it.iter = [] := by rw [hit]; exact List.drop_of_length_le (by omega)
+    dsimp only
+    simp only [CoreModels.core.iter.adapters.enumerate.Enumerate.Insts.CoreIterTraitsIteratorIteratorPairUsizeClause0_Item.next]
+    rw [slice_iter_next_nil it.iter hnil]
+    simp only [Aeneas.Std.bind_ok]
+    step*
+    rw [hval, show it.count.val = 3 by omega]
+
+/-- `frobenius_16 v p` is `v^(2^p)` for a power below `8`. -/
+theorem frobenius_16_spec (value : Std.U16) (power : Std.Usize) (hp : power.val < 8) :
+    linear.frobenius_16 value power ⦃ r => r.val = frobNat 4 power.val value.val ⦄ := by
+  unfold linear.frobenius_16
+  refine WP.spec_bind frobenius_16_TABLES_spec fun T hT => ?_
+  rw [array_as_slice_eq, Aeneas.Std.bind_ok, slice_iter_eq, Aeneas.Std.bind_ok,
+    enumerate_default_eq, Aeneas.Std.bind_ok]
+  refine WP.spec_mono (frob16_loop_spec T hT power value _ value
+    (by rw [iterList_iterOfSlice]; simp [Std.Array.to_slice]) (by simp)
+    (by rw [show (0#usize : Std.Usize).val = 0 from rfl, pow_zero, Nat.mod_one]; rfl)) fun r hr => ?_
+  rw [hr, Nat.mod_eq_of_lt (by norm_num; omega)]
 
 end Plonky3Lean.Proofs.Binary
