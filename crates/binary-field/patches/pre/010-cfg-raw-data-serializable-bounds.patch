@@ -25,6 +25,9 @@
 #
 # In a normal build `TowerLevel: Field` implies it, so nothing changes there.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/binary-field/src/challenger.rs b/binary-field/src/challenger.rs
 index a020ba60..9671e60f 100644
 --- a/binary-field/src/challenger.rs

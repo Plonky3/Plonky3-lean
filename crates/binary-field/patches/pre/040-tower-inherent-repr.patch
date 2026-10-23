@@ -35,6 +35,9 @@
 # to `GF(2^16)`, on edge values and 10000 pseudo-random inputs above.
 # The `TowerLevel` imports that the shims leave unused are allowed under the cfg.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 --- a/binary-field/src/clmul/mod.rs
 +++ b/binary-field/src/clmul/mod.rs
 @@ -95,6 +95,8 @@

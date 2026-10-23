@@ -22,6 +22,9 @@
 #
 # The override is absent under the cfg, as the trait method is.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/binary-field/src/ghash.rs b/binary-field/src/ghash.rs
 index 9c0cc77f..e7fdf315 100644
 --- a/binary-field/src/ghash.rs

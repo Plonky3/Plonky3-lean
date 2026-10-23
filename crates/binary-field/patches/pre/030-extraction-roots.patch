@@ -17,6 +17,10 @@
 # Test:         lint p3-binary-field unexpected_cfgs
 # Mutation:     the module is gated on a misspelled cfg, so a normal
 #               `cargo check` reports `unexpected_cfgs`.
+#
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/binary-field/src/hax_roots.rs b/binary-field/src/hax_roots.rs
 new file mode 100644
 index 00000000..17e21bd6
