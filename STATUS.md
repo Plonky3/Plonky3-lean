@@ -38,6 +38,7 @@ target `thumbv7em-none-eabi`
 | `security` | scoped | 1414 | 130 | 6 | 13 | 0 | 2 / 1 | pre `010`, pre `020` |
 | `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
 | `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
+| `sumcheck` | stub |  | 336 | 0 | 17 |  | 0 / 0 |  |
 | `symmetric` | scoped | 1078 | 58 | 1 | 0 | 4 | 4 / 2 | pre `010`, pre `020`, pre `030`, pre `040` |
 | `tiny-keccak` | scoped | 98 | 94 | 0 | 3 | 0 | 0 / 0 |  |
 | `util` | scoped | 217 | 70 | 0 | 1 | 0 | 0 / 1 | post `010` |
@@ -435,7 +436,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1138) whose dependencies include it; reaching one is not using it.
+(of 1162) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -474,7 +475,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1138) whose dependencies include the declaration.
+counts the claims (of 1162) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -734,9 +735,9 @@ counts the claims (of 1138) whose dependencies include the declaration.
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_coset_with_precomputation` | `p3_matrix::interpolation::Interpolate::interpolate_coset_with_precomputation` | not translated | 12 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_coset` | `p3_matrix::interpolation::Interpolate::interpolate_coset` | not translated | 11 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_subgroup` | `p3_matrix::interpolation::Interpolate::interpolate_subgroup` | not translated | 0 |
-| `matrix` | `p3_matrix.interpolation.mirror.barycentric_weights` | `p3_matrix::interpolation::barycentric_weights` | not translated | 2 |
-| `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_with_precomputation` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_with_precomputation` | not translated | 1 |
-| `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_point` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_point` | not translated | 1 |
+| `matrix` | `p3_matrix.interpolation.mirror.barycentric_weights` | `p3_matrix::interpolation::barycentric_weights` | not translated | 5 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_with_precomputation` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_with_precomputation` | not translated | 3 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_point` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_point` | not translated | 3 |
 | `matrix` | `p3_matrix.interpolation.mirror.recover_coefficients` | `p3_matrix::interpolation::InterpolateArbitrary::recover_coefficients` | not translated | 2 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_lagrange` | `p3_matrix::interpolation::interpolate_lagrange` | not translated | 1 |
 | `matrix` | `p3_matrix.util.mirror.reverse_matrix_index_bits` | `p3_matrix::util::reverse_matrix_index_bits` | not translated | 17 |
@@ -803,7 +804,7 @@ counts the claims (of 1138) whose dependencies include the declaration.
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.pad_zeros` | `p3_multilinear_util::poly::Poly::pad_zeros` | stub | 0 |
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_from_point` | `p3_multilinear_util::poly::Poly::new_from_point` | stub | 12 |
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_next_from_point` | `p3_multilinear_util::poly::Poly::new_next_from_point` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_mut` | `p3_multilinear_util::poly::Poly::fix_prefix_var_mut` | stub | 2 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_mut` | `p3_multilinear_util::poly::Poly::fix_prefix_var_mut` | stub | 3 |
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.sum_prefix_var_mut` | `p3_multilinear_util::poly::Poly::sum_prefix_var_mut` | stub | 1 |
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_mut_monomial` | `p3_multilinear_util::poly::Poly::fix_prefix_var_mut_monomial` | stub | 0 |
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut_whole` | `p3_multilinear_util::poly::Poly::fix_suffix_var_mut_whole` | stub | 1 |
@@ -863,6 +864,23 @@ counts the claims (of 1138) whose dependencies include the declaration.
 | `security` | `Plonky3Lean.Proofs.Security.Real.foldingPowBitsR` | `p3_security::assumption::SecurityAssumption::folding_pow_bits` | not translated | 1 |
 | `security` | `Plonky3Lean.Proofs.Security.Real.upperX` | `p3_security::proximity::compute_upper_m` | not translated | 2 |
 | `security` | `Plonky3Lean.Proofs.Security.Real.sumBitsR` | `p3_security::error::ErrorBits::sum` | not translated | 1 |
+| `sumcheck` | `p3_sumcheck.lagrange.mirror.lagrange_weights_01inf` | `p3_sumcheck::lagrange::lagrange_weights_01inf` | stub | 13 |
+| `sumcheck` | `p3_sumcheck.lagrange.mirror.lagrange_weights_01inf_multi` | `p3_sumcheck::lagrange::lagrange_weights_01inf_multi` | stub | 0 |
+| `sumcheck` | `p3_sumcheck.lagrange.mirror.extrapolate_01inf` | `p3_sumcheck::lagrange::extrapolate_01inf` | stub | 13 |
+| `sumcheck` | `p3_sumcheck.mirror.Basis.reduce_claim` | `p3_sumcheck::strategy::Basis::reduce_claim` | stub | 12 |
+| `sumcheck` | `p3_sumcheck.mirror.SumcheckShape.seed` | `p3_sumcheck::transcript::SumcheckShape::domain_separator` | stub | 7 |
+| `sumcheck` | `p3_sumcheck.mirror.VerifierTranscript.round` | `p3_sumcheck::transcript::VerifierTranscript::round` | stub | 7 |
+| `sumcheck` | `p3_sumcheck.mirror.verify_rounds` | `p3_sumcheck::data::SumcheckData::verify_rounds` | stub | 7 |
+| `sumcheck` | `p3_sumcheck.mirror.verify_final_sumcheck_rounds` | `p3_sumcheck::data::verify_final_sumcheck_rounds` | stub | 2 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.new` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::new` | stub | 3 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.eval` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::eval` | stub | 2 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.GenericDegreeShape.seed` | `p3_sumcheck::generic_degree::transcript::GenericDegreeShape::domain_separator` | stub | 1 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.VerifierTranscript.round` | `p3_sumcheck::generic_degree::transcript::VerifierTranscript::round` | stub | 1 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.verify` | `p3_sumcheck::generic_degree::proof::GenericDegreeProof::verify` | stub | 1 |
+| `sumcheck` | `p3_sumcheck.strategy.mirror.round_reduce` | `p3_sumcheck::strategy::round_reduce` | stub | 3 |
+| `sumcheck` | `p3_sumcheck.strategy.mirror.round_step` | `p3_sumcheck::strategy::round_step` | stub | 3 |
+| `sumcheck` | `p3_sumcheck.strategy.mirror.chunk_round_step` | `p3_sumcheck::strategy::chunk_round_step` | stub | 3 |
+| `sumcheck` | `p3_sumcheck.strategy.mirror.sumcheck_coefficients_prefix` | `p3_sumcheck::strategy::sumcheck_coefficients_prefix` | stub | 3 |
 | `tiny-keccak` | `tiny_keccak.keccakf.keccakf` | `tiny_keccak::keccakf::keccakf` | not translated | 14 |
 | `tiny-keccak` | `tiny_keccak.keccakf.rounds` | `tiny_keccak::keccakf::keccakf` | not translated | 14 |
 | `tiny-keccak` | `tiny_keccak.keccakf.round` | `tiny_keccak::keccakf::keccakf` | not translated | 14 |
@@ -2033,6 +2051,30 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Symmetric.sponge.PaddingFreeSponge.hash_iter.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Symmetric.sponge.PaddingFreeSponge.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Symmetric.truncated.collision_of_inverse` | `Quot.sound`, `propext` |
+| `Sumcheck.RoundPolyInterpolator.eval.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.RoundPolyInterpolator.new.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.extrapolate_01inf.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.protocol.completeness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.protocol.soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.reduce_claim.evaluation` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.reduce_claim.projective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.reduce_claim.sum_check` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.sumcheck_coefficients_prefix.honest` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.sumcheck_coefficients_prefix.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.verify.completeness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.verify.soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.verify.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.verify_final_sumcheck_rounds.missing` | `Quot.sound`, `propext` |
+| `Sumcheck.verify_final_sumcheck_rounds.zero` | `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.accept` | `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.completeness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.history` | `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.invalid_witness` | `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.message_before_challenge` | `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.never_missing_witness` | `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.round_count` | `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.witness_count` | `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.cong` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.inverse` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
