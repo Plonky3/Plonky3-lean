@@ -21,6 +21,9 @@
 # The reshaped body copies the halves into a block and writes the words by index.
 # It calls the same `compress256` on the same block and initial state.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/sha256/src/hax_reshaped.rs b/sha256/src/hax_reshaped.rs
 new file mode 100644
 index 00000000..6d150405
