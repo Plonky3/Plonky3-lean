@@ -24,7 +24,7 @@ target `thumbv7em-none-eabi`
 | `koala-bear` | extracted | 3024 | 121 | 4 | 0 | 0 | 0 / 3 |  |
 | `mds` | scoped | 101 | 43 | 0 | 0 | 0 | 0 / 0 |  |
 | `mersenne-31` | scoped | 1444 | 259 | 0 | 12 | 30 | 1 / 1 | pre `010` |
-| `monty-31` | scoped | 831 | 526 | 0 | 25 | 37 | 0 / 1 |  |
+| `monty-31` | scoped | 1581 | 327 | 0 | 13 | 29 | 1 / 1 | pre `010` |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 68 | 2 | 4 |  | 0 / 0 |  |
 | `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
@@ -300,7 +300,7 @@ charon errors: 0.
 ### `monty-31`
 
 charon errors: 0.
-37 item(s) dropped, 2 of them mirrored.
+29 item(s) dropped, 2 of them mirrored.
 
 | Item | Source | Mirrored |
 |---|---|---|
@@ -319,28 +319,20 @@ charon errors: 0.
 | `p3_monty_31::monty_31::{impl core::ops::arith::MulAssign}::mul_assign` | `` |  |
 | `p3_monty_31::monty_31::{impl core::ops::arith::SubAssign}::sub_assign` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::Field}::BENEFITS_FROM_LOCKSTEP_EVALUATION` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::Field}::GENERATOR` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::Field}::order` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::Field}::try_inverse` | `` | yes |
 | `p3_monty_31::monty_31::{impl p3_field::field::Field}::try_inverse::NUM_PRIME_BITS` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::NEG_ONE` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::ONE` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::TWO` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::div_2exp_u64` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::dot_product` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::from_prime_subfield` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::mul_2exp_u64` | `` | yes |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::sum_array` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeField32}::ORDER_U32` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeField32}::as_canonical_u32` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeField64}::ORDER_U64` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeField64}::as_canonical_u64` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeField}::as_canonical_biguint` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_checked` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_int` | `` |  |
 | `p3_monty_31::monty_31::{impl}::HALF` | `` |  |
-| `p3_monty_31::monty_31::{impl}::to_u32` | `` |  |
 
 ### `sha2`
 
@@ -437,7 +429,6 @@ counts the claims (of 748) whose dependencies include the declaration.
 | `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.CUBIC_W` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<3> for p3_mersenne_31::mersenne_31::Mersenne31}::W` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.CUBIC_DTH_ROOT` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<3> for p3_mersenne_31::mersenne_31::Mersenne31}::DTH_ROOT` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.complex.new_complex_new` | `p3_field::extension::complex::Complex::new_complex` | not translated | 2 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.halve` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::halve` | not translated | 2 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1InternalLayerMonty31` | `p3_monty_31::no_packing::poseidon1::Poseidon1InternalLayerMonty31` | not translated | 0 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1ExternalLayerMonty31` | `p3_monty_31::no_packing::poseidon1::Poseidon1ExternalLayerMonty31` | not translated | 0 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon2.Poseidon2InternalLayerMonty31` | `p3_monty_31::no_packing::poseidon2::Poseidon2InternalLayerMonty31` | not translated | 0 |
@@ -451,17 +442,6 @@ counts the claims (of 748) whose dependencies include the declaration.
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.exp_u64.step` | `p3_field::field::PrimeCharacteristicRing::exp_u64` | not translated | 4 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.mul_2exp_u64` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::mul_2exp_u64` | dropped | 4 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.try_inverse` | `{impl p3_field::field::Field for p3_monty_31::monty_31::MontyField31<_>}::try_inverse` | dropped | 3 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU32.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<u32> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_int` | `{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_int` | `{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_int` | `{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_int` | `{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_int` | `{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
 | `poseidon1` | `p3_poseidon1.external.FullRoundLayerConstructor` | `p3_poseidon1::external::FullRoundLayerConstructor` | stub | 0 |
 | `poseidon1` | `p3_poseidon1.internal.PartialRoundLayerConstructor` | `p3_poseidon1::internal::PartialRoundLayerConstructor` | stub | 0 |
 | `poseidon1` | `p3_poseidon1.Poseidon1Constants` | `p3_poseidon1::Poseidon1Constants` | stub | 0 |
@@ -490,6 +470,7 @@ counts the claims (of 748) whose dependencies include the declaration.
 | `blake3/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds one free function, which calls `Blake3::hash_many`. No existing body changes. |
 | `blake3/pre/020-reshape-batch` | none in a normal build: the reshaped driver is compiled only under cfg(hax_backend_lean), as the crate's `batch` module, and under cfg(test), beside the shipped one. The extracted variant hashes on the one-lane backend, which is what the extraction target compiles. |
 | `mersenne-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of `Mersenne31`. No existing body changes. |
+| `monty-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method or constant of `MontyField31`. No existing body changes. |
 | `sha256/pre/010-reshape-compress` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `Sha256Compress::compress` calls the reshaped body, which a differential test equates with the original. |
 
 Upstream tests (`test-pre-patches.py`): 6715 of Plonky3's 6769 pass as shipped and 6715 with the pre-extraction patches, with 0 divergence(s).

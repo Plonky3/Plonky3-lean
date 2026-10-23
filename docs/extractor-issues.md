@@ -22,21 +22,20 @@ keeps its number and says so.
    what charon lists in `ordered_decls`: the `--start-from` roots and everything
    they reach. charon also translates the other members of an impl it enters,
    with bodies, without listing them. Each crate's `extraction/gaps.toml` lists
-   these items and `STATUS.md` shows them; for p3-monty-31 they are the
-   MontyField31 impl members no root reaches (`try_inverse`, the `QuotientMap`
-   conversions, `Sum`, `dot_product`, …). No diagnostic is printed.
-   `PrimeCharacteristicRing::halve` is not translated at all: the trait
-   provides a default body that MontyField31 overrides, and charon skips a
-   provided method that nothing uses, even when it is a `--start-from` root (the
-   pattern matches; no diagnostic). `--translate-all-methods` makes charon
-   translate and list it, but also pulls in p3-field's trait hierarchy, which
-   aeneas rejects (9). It is transcribed in
-   `crates/monty-31/extraction/P3Monty31/Assumptions/Mirror.lean`.
-   For p3-mersenne-31, pre-patch `010-extraction-roots` roots the run at a
-   `cfg(hax_backend_lean)` module of one-line free functions, one per needed
-   method. Each method is then reachable from a free function, so charon
+   these items and `STATUS.md` shows them. No diagnostic is printed.
+   charon also skips a provided-method override that nothing uses, even when it
+   is a `--start-from` root (the pattern matches; no diagnostic), and a pattern
+   cannot name one of several impls of a generic trait (`QuotientMap<u32>`,
+   `QuotientMap<i32>`, …). `--translate-all-methods` makes charon translate and
+   list such methods, but also pulls in p3-field's trait hierarchy, which aeneas
+   rejects (9).
+   For p3-mersenne-31 and p3-monty-31, pre-patch `010-extraction-roots` roots the
+   run at a `cfg(hax_backend_lean)` module of one-line free functions, one per
+   needed method. Each method is then reachable from a free function, so charon
    lists it and aeneas emits its own body, `halve` and the trait-impl
-   `from_int`s included.
+   `from_int`s included. For p3-monty-31 the rest are the MontyField31 impl
+   members that no wrapper can reach (`try_inverse`, `mul_2exp_u64`,
+   `div_2exp_u64`, `Sum`, `dot_product`, …), listed in its `gaps.toml`.
 5. **aeneas's `__N` names for anonymous consts** trip mathlib's `nameCheck`
    linter. Post-patch `030-name-anonymous-const-assertions` of `baby-bear` and
    `koala-bear`.

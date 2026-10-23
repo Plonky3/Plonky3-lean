@@ -1,0 +1,14 @@
+# Mutation of: 010-extraction-roots
+# Breaks:      the module is gated on a misspelled cfg.
+#
+--- a/monty-31/src/lib.rs
++++ b/monty-31/src/lib.rs
+@@ -6,7 +6,7 @@
+ pub mod dft;
+ mod extension;
+ // PATCHED: extraction roots, only under hax's Lean backend.
+-#[cfg(hax_backend_lean)]
++#[cfg(hax_backend_lea)]
+ pub mod hax_roots;
+ mod mds;
+ mod monty_31;

@@ -1,0 +1,160 @@
+# Patch:        010-extraction-roots
+# Phase:        pre
+# Target:       monty-31/src/hax_roots.rs, monty-31/src/lib.rs
+# Hunks:        2
+# Class:        bound
+# Gap:          docs/extractor-issues.md 4: charon cannot root the
+#               `QuotientMap<uN>` impls (a `--start-from` pattern cannot name
+#               a trait's generic argument), and skips a provided-method
+#               override that nothing calls even when it is a root, so aeneas
+#               never emits them.
+# Cost:         none in a normal build: the module exists only under
+#               cfg(hax_backend_lean). In the extracted variant it adds free
+#               functions, each of which calls one method or constant of
+#               `MontyField31`. No existing body changes.
+# Upstreamable: no: the module exists only for the extractor. Charon rooting
+#               trait impls by their generic arguments, and translating a
+#               rooted provided-method override, would make it unnecessary.
+# Drop when:    charon can root `{impl QuotientMap<u32> for ...}::from_int`
+#               and translates a rooted unused provided-method override.
+# Test:         lint p3-monty-31 unexpected_cfgs
+# Mutation:     the module is gated on a misspelled cfg, so a normal
+#               `cargo check` reports `unexpected_cfgs`.
+#
+# Rooted at `p3_monty_31::hax_roots`, every wrapped method is reachable from
+# a root, so its own body is extracted instead of transcribed.
+#
+# Not wrapped:
+#   - `sum_array`, `Sum`/`Product` and `dot_product`: they reach slice and
+#     iterator adapters (`copied`, `chunks`, `zip`, `map`, `sum`) that aeneas
+#     fails on or CoreModels does not model.
+#   - `from_canonical_unchecked`: it is `unsafe`, and a wrapper would add an
+#     `unsafe` block.
+#   - `square`, `exp_u64`: provided by p3-field, which is a stub.
+#   - `mul_2exp_u64`, `div_2exp_u64`, `try_inverse`: for large exponents the
+#     first two call `exp_u64`, a provided method that needs the whole
+#     `PrimeCharacteristicRing` impl dictionary, and `try_inverse` calls
+#     `mul_2exp_u64`. aeneas cannot build that dictionary (issue 9), so the
+#     three stay transcribed in Mirror.lean.
+#
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
+diff --git a/monty-31/src/hax_roots.rs b/monty-31/src/hax_roots.rs
+new file mode 100644
+index 00000000..e1048c4a
+--- /dev/null
++++ b/monty-31/src/hax_roots.rs
+@@ -0,0 +1,98 @@
++//! PATCHED: extraction roots for hax's Lean backend, compiled only under
++//! `cfg(hax_backend_lean)`.
++//!
++//! Some methods of `MontyField31` cannot be named by charon's `--start-from`:
++//! the `QuotientMap<uN>` impls differ only in a generic argument, which a
++//! pattern cannot name, and charon skips a provided-method override that
++//! nothing calls even when it is named. Each function here calls exactly one
++//! such method or constant and does nothing else, so that the method's own
++//! body is extracted.
++
++use p3_field::integers::QuotientMap;
++use p3_field::{Field, PrimeCharacteristicRing, PrimeField32, PrimeField64};
++
++use crate::{FieldParameters, MontyField31};
++
++pub fn halve<FP: FieldParameters>(x: MontyField31<FP>) -> MontyField31<FP> {
++    x.halve()
++}
++
++
++
++
++
++pub fn as_canonical_u32<FP: FieldParameters>(x: MontyField31<FP>) -> u32 {
++    x.as_canonical_u32()
++}
++
++pub fn as_canonical_u64<FP: FieldParameters>(x: MontyField31<FP>) -> u64 {
++    x.as_canonical_u64()
++}
++
++pub fn one<FP: FieldParameters>() -> MontyField31<FP> {
++    MontyField31::<FP>::ONE
++}
++
++pub fn two<FP: FieldParameters>() -> MontyField31<FP> {
++    MontyField31::<FP>::TWO
++}
++
++pub fn neg_one<FP: FieldParameters>() -> MontyField31<FP> {
++    MontyField31::<FP>::NEG_ONE
++}
++
++pub fn generator<FP: FieldParameters>() -> MontyField31<FP> {
++    MontyField31::<FP>::GENERATOR
++}
++
++pub fn order_u32<FP: FieldParameters>() -> u32 {
++    MontyField31::<FP>::ORDER_U32
++}
++
++pub fn from_u32<FP: FieldParameters>(int: u32) -> MontyField31<FP> {
++    <MontyField31<FP> as QuotientMap<u32>>::from_int(int)
++}
++
++pub fn from_canonical_checked_u32<FP: FieldParameters>(int: u32) -> Option<MontyField31<FP>> {
++    <MontyField31<FP> as QuotientMap<u32>>::from_canonical_checked(int)
++}
++
++pub fn from_i32<FP: FieldParameters>(int: i32) -> MontyField31<FP> {
++    <MontyField31<FP> as QuotientMap<i32>>::from_int(int)
++}
++
++pub fn from_canonical_checked_i32<FP: FieldParameters>(int: i32) -> Option<MontyField31<FP>> {
++    <MontyField31<FP> as QuotientMap<i32>>::from_canonical_checked(int)
++}
++
++pub fn from_u64<FP: FieldParameters>(int: u64) -> MontyField31<FP> {
++    <MontyField31<FP> as QuotientMap<u64>>::from_int(int)
++}
++
++pub fn from_canonical_checked_u64<FP: FieldParameters>(int: u64) -> Option<MontyField31<FP>> {
++    <MontyField31<FP> as QuotientMap<u64>>::from_canonical_checked(int)
++}
++
++pub fn from_i64<FP: FieldParameters>(int: i64) -> MontyField31<FP> {
++    <MontyField31<FP> as QuotientMap<i64>>::from_int(int)
++}
++
++pub fn from_canonical_checked_i64<FP: FieldParameters>(int: i64) -> Option<MontyField31<FP>> {
++    <MontyField31<FP> as QuotientMap<i64>>::from_canonical_checked(int)
++}
++
++pub fn from_u128<FP: FieldParameters>(int: u128) -> MontyField31<FP> {
++    <MontyField31<FP> as QuotientMap<u128>>::from_int(int)
++}
++
++pub fn from_canonical_checked_u128<FP: FieldParameters>(int: u128) -> Option<MontyField31<FP>> {
++    <MontyField31<FP> as QuotientMap<u128>>::from_canonical_checked(int)
++}
++
++pub fn from_i128<FP: FieldParameters>(int: i128) -> MontyField31<FP> {
++    <MontyField31<FP> as QuotientMap<i128>>::from_int(int)
++}
++
++pub fn from_canonical_checked_i128<FP: FieldParameters>(int: i128) -> Option<MontyField31<FP>> {
++    <MontyField31<FP> as QuotientMap<i128>>::from_canonical_checked(int)
++}
+diff --git a/monty-31/src/lib.rs b/monty-31/src/lib.rs
+index 1b679bb4..ef49c4a0 100644
+--- a/monty-31/src/lib.rs
++++ b/monty-31/src/lib.rs
+@@ -5,6 +5,9 @@ extern crate alloc;
+ mod data_traits;
+ pub mod dft;
+ mod extension;
++// PATCHED: extraction roots, only under hax's Lean backend.
++#[cfg(hax_backend_lean)]
++pub mod hax_roots;
+ mod mds;
+ mod monty_31;
+ mod poseidon1;
