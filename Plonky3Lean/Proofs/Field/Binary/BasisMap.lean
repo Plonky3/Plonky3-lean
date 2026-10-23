@@ -89,26 +89,29 @@ theorem towerMap_add (ξ : ℕ → F) : ∀ k (x y : ConcreteBTField k),
     rw [towerMap, towerMap, towerMap, low_add, high_add, towerMap_add ξ k, towerMap_add ξ k]
     ring
 
-/-- `towerMap` is multiplicative when every image satisfies the tower's relation. -/
-theorem towerMap_mul (ξ : ℕ → F) (hrel : ∀ k, ξ k * ξ k = prevGen ξ k * ξ k + 1) :
-    ∀ k (x y : ConcreteBTField k), towerMap ξ k (x * y) = towerMap ξ k x * towerMap ξ k y
-  | 0, x, y => by
+/-- `towerMap` is multiplicative on level `k` when the images below `k` satisfy the tower's
+relation. -/
+theorem towerMap_mul (ξ : ℕ → F) : ∀ k, (∀ j < k, ξ j * ξ j = prevGen ξ j * ξ j + 1) →
+    ∀ x y : ConcreteBTField k, towerMap ξ k (x * y) = towerMap ξ k x * towerMap ξ k y
+  | 0, _, x, y => by
     rcases level0_cases x with rfl | rfl <;> rcases level0_cases y with rfl | rfl <;>
       simp [towerMap]
-  | k + 1, x, y => by
+  | k + 1, hrel, x, y => by
+    have ih := towerMap_mul ξ k (fun j hj => hrel j (by omega))
+    have hk := hrel k (by omega)
     conv_lhs => rw [← joinSucc_low_high k x, ← joinSucc_low_high k y, joinSucc_mul_joinSucc]
     rw [towerMap_succ, towerMap, towerMap]
-    simp only [towerMap_add, towerMap_mul ξ hrel k, towerMap_Z]
-    linear_combination (towerMap ξ k (high k x) * towerMap ξ k (high k y)) * hrel k +
+    simp only [towerMap_add, ih, towerMap_Z]
+    linear_combination (towerMap ξ k (high k x) * towerMap ξ k (high k y)) * hk +
       (towerMap ξ k (high k x) * towerMap ξ k (high k y) * (1 + prevGen ξ k * ξ k - ξ k ^ 2)) *
         (CharTwo.two_eq_zero : (2 : F) = 0)
 
 /-- `towerMap`, as a ring homomorphism. -/
-noncomputable def towerHom (ξ : ℕ → F) (hrel : ∀ k, ξ k * ξ k = prevGen ξ k * ξ k + 1) (k : ℕ) :
-    ConcreteBTField k →+* F where
+noncomputable def towerHom (ξ : ℕ → F) (k : ℕ)
+    (hrel : ∀ j < k, ξ j * ξ j = prevGen ξ j * ξ j + 1) : ConcreteBTField k →+* F where
   toFun := towerMap ξ k
   map_one' := towerMap_one ξ k
-  map_mul' := towerMap_mul ξ hrel k
+  map_mul' := towerMap_mul ξ k hrel
   map_zero' := towerMap_zero ξ k
   map_add' := towerMap_add ξ k
 
@@ -289,5 +292,31 @@ theorem columns_loop_spec (bits : Std.Usize) (K : ℕ) (hK : bits.val = 2 ^ K) (
     rw [xiOf, hi4]
   · rw [ite_eq_right hjn]
     exact hd j' (by scalar_tac)
+
+open Aeneas Aeneas.Std CoreModels Polynomial in
+/-- Column `j` of `columns` is the image `∏_{i ∈ bits(j)} ξ_i` of tower basis element `j`. -/
+theorem columns_spec (bits : Std.Usize) (K : ℕ) (hK : bits.val = 2 ^ K) (hK1 : 1 ≤ K)
+    (hK7 : K ≤ 7) (tail : Std.U128) (ht : tail.val < 2 ^ bits.val) (xi : Slice Std.U128)
+    (hxi : xi.length = K) (hxiv : ∀ i < K, (xi.val.getD i 0#u128).val < 2 ^ bits.val) :
+    clmul.basis.columns bits tail xi ⦃ c => ∀ j < bits.val,
+      aval c j < 2 ^ bits.val ∧
+      AdjoinRoot.mk (modPoly bits.val tail.val) (natPoly (aval c j)) =
+        colV (xiOf bits.val tail.val xi) K j ⦄ := by
+  unfold clmul.basis.columns
+  obtain ⟨z, hz, -⟩ :=
+    Lib.array_repeat_eq 128#usize core.U128.Insts.CoreCloneClone (fun _ => rfl) 0#u128
+  rw [hz, Aeneas.Std.bind_ok]
+  have h2 : 2 ≤ bits.val := by
+    rw [hK]; exact le_trans (by norm_num) (Nat.pow_le_pow_right (by norm_num) hK1)
+  step*
+  refine columns_loop_spec bits K hK hK1 hK7 tail ht xi hxi hxiv a 1#usize (by simp)
+    (by simp; omega) (fun j hj => ?_)
+  have hj0 : j = 0 := by simpa using hj
+  subst hj0
+  rw [a_post, aval_set _ _ _ (by simp), ite_eq_left (by rfl)]
+  refine ⟨Nat.one_lt_two_pow (by omega), ?_⟩
+  rw [show ((1#u128 : Std.U128).val) = 1 from rfl, natPoly_one, map_one]
+  unfold colV
+  simp
 
 end Plonky3Lean.Proofs.Binary
