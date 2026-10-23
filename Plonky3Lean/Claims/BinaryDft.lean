@@ -1,6 +1,7 @@
 module
 
 public import Plonky3Lean.Proofs.BinaryDft.Concrete
+public import Plonky3Lean.Proofs.BinaryDft.CompPoly
 
 @[expose] public section
 
@@ -36,6 +37,8 @@ open p3_binary_dft.lch.mirror p3_binary_dft.traits.mirror p3_binary_dft.butterfl
 set_option linter.unusedSectionVars false
 
 namespace Plonky3Lean.Claims.BinaryDft
+
+universe u
 
 /-! ## The subspace polynomials -/
 
@@ -118,6 +121,13 @@ theorem ntt_map {F G : Type _} [Field F] [Field G] (φ : F →+* G) (β : ℕ �
 theorem IsCantor.map' {F G : Type _} [Field F] [Field G] (φ : F →+* G) {β : ℕ → F} {n : ℕ}
     (h : IsCantor β n) : IsCantor (φ ∘ β) n :=
   Proofs.BinaryDft.IsCantor.map φ h
+
+/-- CompPoly's W_i, the product of X - u over the span U_i of an independent basis over GF(2), evaluates to W_i here. -/
+theorem compPoly_W_eval {r : ℕ} [NeZero r] {L : Type u} [Field L] [Fintype L] [DecidableEq L]
+    (𝔽q : Type u) [Field 𝔽q] [Fintype 𝔽q] [Fact (Fintype.card 𝔽q = 2)] [Algebra 𝔽q L]
+    (β : Fin r → L) [Fact (LinearIndependent 𝔽q β)] (i : Fin r) (x : L) :
+    (AdditiveNTT.W 𝔽q β i).eval x = vanishing (extendBasis β) i x :=
+  Proofs.BinaryDft.compPoly_W_eval 𝔽q β i x
 
 /-! ## The domain -/
 

@@ -437,7 +437,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1197) whose dependencies include it; reaching one is not using it.
+(of 1198) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -476,7 +476,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1197) whose dependencies include the declaration.
+counts the claims (of 1198) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -1066,6 +1066,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BinaryDft.NaiveAdditiveNtt.shifted_ntt_batch.eq` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.NaiveAdditiveNtt.shifted_ntt_batch.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.Twiddles.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.compPoly_W_eval` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.domain_point.eq` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.domain_point_steps.eq` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.encode_batch.eq` | `Classical.choice`, `Quot.sound`, `propext` |

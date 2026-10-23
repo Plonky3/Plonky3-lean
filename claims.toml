@@ -261,6 +261,10 @@ name   = "Plonky3Lean.Claims.BinaryDft.Twiddles.new.eq"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.compPoly_W_eval"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.BinaryDft.domain_point.eq"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
