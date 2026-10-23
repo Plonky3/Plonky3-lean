@@ -1,0 +1,56 @@
+# p3-binary-pcs: the multilinear PCS over binary towers (FRI-Binius, eprint 2024/504).
+
+lean_lib = "P3BinaryPcs"
+
+# Nothing is extracted.
+#
+# The crate is generic over the tower-level, challenger and Merkle traits, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# The schedule, the transcript shape, the fold and the verifier are transcribed over fields in stub/P3BinaryPcs/.
+state = "stub"
+
+features = []
+
+watch = ["binary-pcs/src", "binary-pcs/Cargo.toml"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_binary_pcs.params.mirror.try_new_with_folding"
+rust = "p3_binary_pcs::params::BinaryPcsConfig::try_new_with_folding"
+
+[[mirror]]
+lean = "p3_binary_pcs.params.mirror.BinaryPcsConfig.try_with_folding"
+rust = "p3_binary_pcs::params::BinaryPcsConfig::try_with_folding"
+
+[[mirror]]
+lean = "p3_binary_pcs.params.mirror.BinaryPcsConfig.fold_batches"
+rust = "p3_binary_pcs::params::BinaryPcsConfig::fold_batches"
+
+[[mirror]]
+lean = "p3_binary_pcs.params.mirror.BinaryPcsRegime.max_security_bits"
+rust = "p3_security::binary::BinaryPcsRegime::max_security_bits"
+
+[[mirror]]
+lean = "p3_binary_pcs.transcript.mirror.BinaryPcsShape.new"
+rust = "p3_binary_pcs::transcript::BinaryPcsShape::new"
+
+[[mirror]]
+lean = "p3_binary_pcs.fold.mirror.fold_pair"
+rust = "p3_binary_pcs::fold::fold_pair"
+
+[[mirror]]
+lean = "p3_binary_pcs.fold.mirror.fold_round"
+rust = "p3_binary_pcs::fold::fold_round"
+
+[[mirror]]
+lean = "p3_binary_pcs.fold.mirror.fold_coset"
+rust = "p3_binary_pcs::fold::fold_coset"
+
+[[mirror]]
+lean = "p3_binary_pcs.verifier.mirror.verify_query_paths"
+rust = "p3_binary_pcs::verifier::verify_query_paths"
+
+[[mirror]]
+lean = "p3_binary_pcs.verifier.mirror.verify_opening"
+rust = "{impl p3_binary_pcs::pcs::BinaryPcs<F, EF, MT, MX, E>}::verify_opening"
