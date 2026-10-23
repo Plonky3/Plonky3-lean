@@ -111,109 +111,19 @@ theorem leaf_loop_ok (dims : Slice p3_matrix.Dimensions) (order : alloc.vec.Vec 
     rw [ordL_length] at h1
     exact hlt' h1
 
-/-- The same, in the schedule walk. -/
+/-- The same, in the schedule walk, whose loop is the same loop. -/
 theorem sched_leaf_loop_ok (dims : Slice p3_matrix.Dimensions) (order : alloc.vec.Vec Std.Usize)
-    (lnpt : Std.Usize) :
-    ∀ n (pos p1 : Std.Usize), order.val.length - pos.val = n →
-      mmcs.hax_reshaped.arity_schedule_and_proof_levels_loop0 dims order lnpt pos = RustM.ok p1 →
-      p1.val = leafEnd (heightOf dims) (ordL order) lnpt.val pos.val := by
-  intro n
-  induction n using Nat.strong_induction_on with
-  | _ n ih =>
-  intro pos p1 hn h
-  unfold mmcs.hax_reshaped.arity_schedule_and_proof_levels_loop0 at h
-  obtain ⟨r, hr, h⟩ := loop_ok h
-  unfold mmcs.hax_reshaped.arity_schedule_and_proof_levels_loop0.body at hr
-  obtain ⟨l, hl, hr⟩ := bind_tc_eq_ok hr
-  simp only [alloc.vec.Vec.len, rust_primitives.sequence.seq_len] at hl
-  cases ok_inj hl
-  rw [leafEnd]
-  split at hr
-  · rename_i hlt
-    have hlt' : pos.val < order.val.length := by simpa using hlt
-    obtain ⟨i1, hi1, hr⟩ := bind_tc_eq_ok hr
-    obtain ⟨-, hi1v⟩ := vec_index_ok hi1
-    obtain ⟨d, hd, hr⟩ := bind_tc_eq_ok hr
-    obtain ⟨-, hdv⟩ := slice_index_ok hd
-    obtain ⟨i2, hi2, hr⟩ := bind_tc_eq_ok hr
-    have hi2v := (npt_ok hi2).1
-    split at hr
-    · rename_i heq
-      obtain ⟨pos1, hpos1, hr⟩ := bind_tc_eq_ok hr
-      cases ok_inj hr
-      have hp1 : pos1.val = pos.val + 1 := usize_succ_ok hpos1
-      rw [ite_eq_left ⟨by rw [ordL_length]; exact hlt', by
-        rw [ordL_getD hi1v, heightOf_eq hdv, ← hi2v, heq]⟩]
-      rw [← hp1]
-      exact ih _ (by omega) pos1 p1 rfl h
-    · rename_i hne
-      cases ok_inj hr
-      cases h
-      rw [ite_eq_right]
-      rintro ⟨-, h2⟩
-      apply hne
-      apply UScalar.eq_of_val_eq
-      rw [hi2v, ← h2, ordL_getD hi1v, heightOf_eq hdv]
-  · rename_i hlt
-    have hlt' : ¬ pos.val < order.val.length := by simpa using hlt
-    cases ok_inj hr
-    cases h
-    rw [ite_eq_right]
-    rintro ⟨h1, -⟩
-    rw [ordL_length] at h1
-    exact hlt' h1
+    (lnpt pos p1 : Std.Usize)
+    (h : mmcs.hax_reshaped.arity_schedule_and_proof_levels_loop0 dims order lnpt pos = RustM.ok p1) :
+    p1.val = leafEnd (heightOf dims) (ordL order) lnpt.val pos.val :=
+  leaf_loop_ok dims order lnpt _ pos p1 rfl h
 
 theorem sched_advance_ok (dims : Slice p3_matrix.Dimensions) (order : alloc.vec.Vec Std.Usize)
-    (nh : Std.Usize) :
-    ∀ n (pos p1 : Std.Usize), order.val.length - pos.val = n →
-      mmcs.hax_reshaped.arity_schedule_and_proof_levels_loop1_loop0 dims order pos nh = RustM.ok p1 →
-      p1.val = advance (heightOf dims) (ordL order) nh.val pos.val := by
-  intro n
-  induction n using Nat.strong_induction_on with
-  | _ n ih =>
-  intro pos p1 hn h
-  unfold mmcs.hax_reshaped.arity_schedule_and_proof_levels_loop1_loop0 at h
-  obtain ⟨r, hr, h⟩ := loop_ok h
-  unfold mmcs.hax_reshaped.arity_schedule_and_proof_levels_loop1_loop0.body at hr
-  obtain ⟨l, hl, hr⟩ := bind_tc_eq_ok hr
-  simp only [alloc.vec.Vec.len, rust_primitives.sequence.seq_len] at hl
-  cases ok_inj hl
-  rw [advance]
-  split at hr
-  · rename_i hlt
-    have hlt' : pos.val < order.val.length := by simpa using hlt
-    obtain ⟨i1, hi1, hr⟩ := bind_tc_eq_ok hr
-    obtain ⟨-, hi1v⟩ := vec_index_ok hi1
-    obtain ⟨d, hd, hr⟩ := bind_tc_eq_ok hr
-    obtain ⟨-, hdv⟩ := slice_index_ok hd
-    split at hr
-    · rename_i heq
-      obtain ⟨pos1, hpos1, hr⟩ := bind_tc_eq_ok hr
-      cases ok_inj hr
-      have hp1 : pos1.val = pos.val + 1 := usize_succ_ok hpos1
-      rw [ite_eq_left ⟨by rw [ordL_length]; exact hlt', by
-        rw [ordL_getD hi1v, heightOf_eq hdv, heq]⟩]
-      simp only at h
-      rw [← hp1]
-      exact ih _ (by omega) pos1 p1 rfl h
-    · rename_i hne
-      cases ok_inj hr
-      simp only at h
-      subst h
-      rw [ite_eq_right]
-      rintro ⟨-, h2⟩
-      apply hne
-      rw [ordL_getD hi1v, heightOf_eq hdv] at h2
-      exact UScalar.eq_of_val_eq h2
-  · rename_i hlt
-    have hlt' : ¬ pos.val < order.val.length := by simpa using hlt
-    cases ok_inj hr
-    simp only at h
-    subst h
-    rw [ite_eq_right]
-    rintro ⟨h1, -⟩
-    rw [ordL_length] at h1
-    exact hlt' h1
+    (nh pos p1 : Std.Usize)
+    (h : mmcs.hax_reshaped.arity_schedule_and_proof_levels_loop1_loop0 dims order pos nh =
+      RustM.ok p1) :
+    p1.val = advance (heightOf dims) (ordL order) nh.val pos.val :=
+  advance_ok dims order nh _ pos p1 rfl h
 
 /-- The arity choice, as a function of the heights. -/
 theorem select_ok_eq {N curr lnpt from' v : Std.Usize} {dims : Slice p3_matrix.Dimensions}
@@ -370,7 +280,7 @@ theorem sched_loop_run {N lnpt : Std.Usize} {dims : Slice p3_matrix.Dimensions}
       · rename_i heq
         obtain ⟨p1, hp1, hr⟩ := bind_tc_eq_ok hr
         cases ok_inj hr
-        have hp1v := sched_advance_ok dims order d.height _ p p1 rfl hp1
+        have hp1v := sched_advance_ok dims order d.height p p1 hp1
         intro v ⟨f, hf⟩
         obtain ⟨f', hf'⟩ := hinv v ⟨f + 1, hstepeq p1.val f v (by
           rw [ite_eq_left ⟨by rw [ordL_length]; exact hplt', by
@@ -631,7 +541,7 @@ theorem arity_eq {N cap pl : Std.Usize} {dims : Slice p3_matrix.Dimensions}
   obtain ⟨f, hf⟩ := sched_loop_run hs1
   rw [hs0'] at hf
   refine ⟨val, order, curr, lnpt, pos0, f, hr, horder, hcurr, hlnpt,
-    sched_leaf_loop_ok dims order lnpt _ 0#usize pos0 rfl hpos0, hf, ?_⟩
+    sched_leaf_loop_ok dims order lnpt 0#usize pos0 hpos0, hf, ?_⟩
   rw [(usize_sub_ok hi).1]
   have : ech.val = min cap.val (Slice.len s1).val := by
     split at hech

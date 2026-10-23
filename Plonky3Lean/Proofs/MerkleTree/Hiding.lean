@@ -67,52 +67,13 @@ theorem copy_loop_ok (cl : core.clone.Clone F) (hcl : ∀ x, cl.clone x = RustM.
     _ _ h rfl
   exact key
 
-/-- The same, for the salts. -/
+/-- The same, for the salts, whose loop is the same loop. -/
 theorem copy_loop_ok' (cl : core.clone.Clone F) (hcl : ∀ x, cl.clone x = RustM.ok x)
     (src : Slice (alloc.vec.Vec F)) (i : Std.Usize) (row out : alloc.vec.Vec F) (j : Std.Usize)
     (v : alloc.vec.Vec F) (hv : src.val[i.val]? = some v)
     (h : mmcs.hax_reshaped.hiding_verify_batch_loop0_loop1 cl src i row j = RustM.ok out) :
-    out.val = row.val ++ v.val.drop j.val := by
-  unfold mmcs.hax_reshaped.hiding_verify_batch_loop0_loop1 at h
-  have key := loop_inv _
-    (fun x : alloc.vec.Vec F × Std.Usize => x.1.val ++ v.val.drop x.2.val = row.val ++ v.val.drop j.val)
-    (fun r : alloc.vec.Vec F => r.val = row.val ++ v.val.drop j.val)
-    (by
-      rintro ⟨r, k⟩ hinv res hres
-      dsimp only at hinv hres
-      unfold mmcs.hax_reshaped.hiding_verify_batch_loop0_loop1.body at hres
-      obtain ⟨v', hv', hres⟩ := bind_tc_eq_ok hres
-      obtain ⟨-, hv'v⟩ := slice_index_ok hv'
-      rw [hv] at hv'v
-      cases Option.some.inj hv'v
-      obtain ⟨l, hl, hres⟩ := bind_tc_eq_ok hres
-      simp only [alloc.vec.Vec.len, rust_primitives.sequence.seq_len] at hl
-      cases ok_inj hl
-      split at hres
-      · rename_i hlt
-        have hlt' : k.val < v.val.length := by simpa using hlt
-        obtain ⟨t, ht, hres⟩ := bind_tc_eq_ok hres
-        obtain ⟨-, htv⟩ := vec_index_ok ht
-        obtain ⟨t1, ht1, hres⟩ := bind_tc_eq_ok hres
-        rw [hcl] at ht1
-        cases ok_inj ht1
-        obtain ⟨r1, hr1, hres⟩ := bind_tc_eq_ok hres
-        obtain ⟨k1, hk1, hres⟩ := bind_tc_eq_ok hres
-        cases ok_inj hres
-        have hk1v : k1.val = k.val + 1 := usize_succ_ok hk1
-        show r1.val ++ v.val.drop k1.val = _
-        rw [vec_push_ok hr1, hk1v, ← hinv, List.drop_eq_getElem_cons hlt']
-        rw [List.getElem?_eq_getElem hlt'] at htv
-        rw [Option.some.inj htv]
-        simp
-      · rename_i hlt
-        have hlt' : ¬ k.val < v.val.length := by simpa using hlt
-        cases ok_inj hres
-        show r.val = _
-        rw [← hinv, List.drop_of_length_le (by omega)]
-        simp)
-    _ _ h rfl
-  exact key
+    out.val = row.val ++ v.val.drop j.val :=
+  copy_loop_ok cl hcl src i row out j v hv h
 
 /-- The rows, as lists. -/
 def rowsL (o : Slice (alloc.vec.Vec F)) : List (List F) := o.val.map fun v => v.val
