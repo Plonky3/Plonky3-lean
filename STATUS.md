@@ -25,6 +25,7 @@ target `thumbv7em-none-eabi`
 | `koala-bear` | extracted | 3024 | 121 | 4 | 0 | 0 | 0 / 3 |  |
 | `matrix` | scoped | 1625 | 259 | 0 | 12 | 0 | 3 / 3 | pre `020`, pre `030`, post `020`, post `030` |
 | `mds` | scoped | 101 | 43 | 0 | 0 | 0 | 0 / 0 |  |
+| `merkle-tree` | scoped | 1306 | 43 | 0 | 0 | 0 | 2 / 0 | pre `010`, pre `020` |
 | `mersenne-31` | scoped | 1444 | 259 | 0 | 12 | 30 | 1 / 1 | pre `010` |
 | `monty-31` | scoped | 1581 | 327 | 0 | 13 | 29 | 1 / 1 | pre `010` |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
@@ -32,8 +33,8 @@ target `thumbv7em-none-eabi`
 | `security` | scoped | 1414 | 130 | 6 | 13 | 0 | 2 / 1 | pre `010`, pre `020` |
 | `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
 | `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
-| `symmetric` | scoped | 1008 | 38 | 0 | 0 | 5 | 4 / 2 | pre `010`, pre `020`, pre `030`, pre `040` |
-| `util` | scoped | 207 | 70 | 0 | 1 | 0 | 0 / 0 |  |
+| `symmetric` | scoped | 1078 | 58 | 1 | 0 | 4 | 4 / 2 | pre `010`, pre `020`, pre `030`, pre `040` |
+| `util` | scoped | 217 | 70 | 0 | 1 | 0 | 0 / 1 | post `010` |
 | `zk-codes` | stub |  | 234 | 0 | 19 |  | 0 / 0 |  |
 
 Generated lines are `extraction/<Lib>/Extraction/{Types,Funs}.lean`. Hand-written
@@ -269,6 +270,11 @@ Nothing translated is dropped.
 charon errors: 0.
 Nothing translated is dropped.
 
+### `merkle-tree`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ### `mersenne-31`
 
 charon errors: 0.
@@ -366,11 +372,10 @@ charon errors: 0.
 ### `symmetric`
 
 charon errors: 0.
-5 item(s) dropped, 0 of them mirrored.
+4 item(s) dropped, 0 of them mirrored.
 
 | Item | Source | Mirrored |
 |---|---|---|
-| `p3_symmetric::compression::PseudoCompressionFunction::LANES` | `` |  |
 | `p3_symmetric::compression::{impl core::clone::Clone}::clone` | `` |  |
 | `p3_symmetric::compression::{impl p3_symmetric::compression::PseudoCompressionFunction}::LANES` | `` |  |
 | `p3_symmetric::hasher::CryptographicHasher::hash_many` | `` |  |
@@ -386,7 +391,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 902) whose dependencies include it; reaching one is not using it.
+(of 918) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -412,6 +417,7 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 | `security` | `budget.shape.InstanceShape.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `security` | `budget.shape.LookupShape.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `security` | `budget.shape.ProtocolParams.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `symmetric` | `p3_symmetric.hasher.CryptographicHasher.hash_iter_slices.default` | the body is opaque by `charon_args` (crate.toml), because aeneas stops on the iterator adapters it calls (docs/extractor-issues.md 30) | 0 |
 
 ## Transcriptions
 
@@ -419,7 +425,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 902) whose dependencies include the declaration.
+counts the claims (of 918) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -618,6 +624,8 @@ counts the claims (of 902) whose dependencies include the declaration.
 | `matrix/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. |
 | `matrix/post/020-trait-default-for-impl-def` | none: the attribute only lets `impl_def` unfold the definition. |
 | `matrix/post/030-exposed-saturating-sub` | `core.num.Usize.saturating_sub_exposed` in HaxExt.lean, a model of `usize::saturating_sub`, trusted as the rest of HaxExt is. |
+| `merkle-tree/pre/010-reshape-verifier` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the single-index verifier and the hiding verifier call the reshaped bodies, which a differential test equates with the shipped ones. |
+| `merkle-tree/pre/020-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one reshaped body. No existing body changes. |
 | `mersenne-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of `Mersenne31`. No existing body changes. |
 | `monty-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method or constant of `MontyField31`. No existing body changes. |
 | `security/pre/010-budget-folding-round` | None in a normal build, where the new function is compiled but unused. In the extracted variant, the report computes its folding term with it. Its body is the original match, verbatim. |
@@ -627,6 +635,7 @@ counts the claims (of 902) whose dependencies include the declaration.
 | `symmetric/pre/020-reshape-padding-free-sponge` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `PaddingFreeSponge::hash_iter` calls the reshaped body, which a differential test equates with the original. |
 | `symmetric/pre/030-reshape-pad10-sponge` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `Pad10Sponge::hash_iter` calls the reshaped body, which a differential test equates with the original. |
 | `symmetric/pre/040-reshape-compress-from-hasher` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `CompressionFunctionFromHasher::compress` hands the hasher a vector of the same items, which a differential test equates with the original. |
+| `util/post/010-exposed-saturating-sub` | `core.num.Usize.saturating_sub_exposed` in HaxExt.lean, a model of `usize::saturating_sub`, trusted as the rest of HaxExt is. |
 
 Upstream tests (`test-pre-patches.py`): 6715 of Plonky3's 6769 pass as shipped and 6715 with the pre-extraction patches, with 0 divergence(s).
 
@@ -1408,6 +1417,22 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3KoalaBear.poseidon2.const_check_6.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3KoalaBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3KoalaBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.arity_schedule_and_proof_levels.arities` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.arity_schedule_and_proof_levels.never_returns_8_4_2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.hiding_verify_batch.binding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.hiding_verify_batch.salted` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.tallest_first.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.validate_heights.ok_max` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.accepts_inv` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.accepts_of_walk` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.accepts_shape` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.binding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.unread_8_1_cap_2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.salt_hits_le` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.walk.binding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.walk.honest` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Mersenne31.complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Mersenne31.complex.Mersenne31.COMPLEX_GENERATOR.order` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Mersenne31.complex.Mersenne31.circle_two_adic_generator.order` | `Classical.choice`, `Quot.sound`, `propext` |

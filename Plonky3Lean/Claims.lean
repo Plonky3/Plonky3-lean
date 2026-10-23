@@ -16,6 +16,7 @@ public import Plonky3Lean.Claims.Symmetric
 public import Plonky3Lean.Claims.Util
 public import Plonky3Lean.Claims.ZkCodes
 public import Plonky3Lean.Proofs
+public import Plonky3Lean.Claims.MerkleTree
 
 @[expose] public section
 

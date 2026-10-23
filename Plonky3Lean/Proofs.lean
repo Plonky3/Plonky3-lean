@@ -103,6 +103,24 @@ public import Plonky3Lean.Proofs.Field.Monty31.QuotientMap
 public import Plonky3Lean.Proofs.Field.Monty31.Reduce
 public import Plonky3Lean.Proofs.Field.Monty31.Utils
 public import Plonky3Lean.Proofs.Util.GcdInversion
+public import Plonky3Lean.Proofs.MerkleTree.Basic
+public import Plonky3Lean.Proofs.MerkleTree.Access
+public import Plonky3Lean.Proofs.MerkleTree.Walk
+public import Plonky3Lean.Proofs.MerkleTree.Invert
+public import Plonky3Lean.Proofs.MerkleTree.Loop
+public import Plonky3Lean.Proofs.MerkleTree.Geometry
+public import Plonky3Lean.Proofs.MerkleTree.Binding
+public import Plonky3Lean.Proofs.MerkleTree.Verify
+public import Plonky3Lean.Proofs.MerkleTree.Bind
+public import Plonky3Lean.Proofs.MerkleTree.Hiding
+public import Plonky3Lean.Proofs.MerkleTree.Forward
+public import Plonky3Lean.Proofs.MerkleTree.Total
+public import Plonky3Lean.Proofs.MerkleTree.Panics
+public import Plonky3Lean.Proofs.MerkleTree.Complete
+public import Plonky3Lean.Proofs.MerkleTree.Accept
+public import Plonky3Lean.Proofs.MerkleTree.Schedule
+public import Plonky3Lean.Proofs.MerkleTree.Bugs
+public import Plonky3Lean.Proofs.MerkleTree.Edge
 
 @[expose] public section
 
