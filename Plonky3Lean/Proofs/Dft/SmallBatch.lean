@@ -476,4 +476,310 @@ theorem smallBatch_dft_batch (G : Gen K) (hG : GenValid G) (hN : GenNested G) {k
     rw [zero_add] at h3
     exact (congrFun h3 i).trans (ditNet_eq_dft (hG k (by omega)) x hi)
 
+/-! ## The inverse -/
+
+/-- Layer l of the G network at the root g: half blocks of 2^l rows, block sigma with g^(rev_(k-1-l)(sigma) 2^l). -/
+abbrev BL (g : K) (k l : ℕ) : (ℕ → V) → ℕ → V :=
+  layer (fun σ _ => dif (g ^ (rev (k - 1 - l) σ * 2 ^ l))) (2 ^ l) (2 ^ (k - 1 - l))
+
+theorem inv_entry (g : K) {k i b : ℕ} (hb : b < 2 ^ (k - 1 - i)) :
+    (invTable g k i).getD b 0 = g⁻¹ ^ (rev (k - 1 - i) b * 2 ^ i) := by
+  simp only [invTable]
+  rw [getD_revIndex _ hb, getD_powersList _ (Plonky3Lean.Proofs.Matrix.bitRev_lt _ b), inv_pow,
+    inv_pow, ← pow_mul, mul_comm]
+
+theorem flyAt_inv (g : K) {k i b : ℕ} (hb : b < 2 ^ (k - 1 - i)) :
+    flyAt (invTable g k i) p3_dft.butterflies.mirror.DifButterfly.apply b =
+      (dif (g⁻¹ ^ (rev (k - 1 - i) b * 2 ^ i)) : V → V → V × V) := by
+  unfold flyAt
+  split_ifs with h0
+  · subst h0; rw [rev_zero]; simp only [zero_mul, pow_zero]; exact twiddleFree_eq_dif
+  · rw [inv_entry g hb, difButterfly_eq]
+
+theorem sub_inv (g : K) {k i c n m lo : ℕ} (hm : m = 2 ^ i) (hn : 0 < n)
+    (hlo : lo = c * n) (hc : c * n + n ≤ 2 ^ (k - 1 - i)) (x : ℕ → V) :
+    pairLoop (subBlocks lo n m) m
+      (fun b _ => flyAt (invTable g k i) p3_dft.butterflies.mirror.DifButterfly.apply b) x =
+    restrict (n * (2 * m)) c (BL g⁻¹ k i) x := by
+  subst hm hlo
+  exact pairLoop_sub (by positivity) hn hc (fun b _ hb _ _ => flyAt_inv g (by omega)) x
+
+theorem BL_localTo (g : K) {k S C l : ℕ} (hl : l < k) (hdvd : 2 ^ (l + 1) ∣ S) (hCS : C * S = 2 ^ k) :
+    LocalTo S C (BL (V := V) g k l) := by
+  apply layer_localTo _ (by positivity)
+  · rwa [show 2 * 2 ^ l = 2 ^ (l + 1) by ring]
+  · rw [hCS, ← pow_succ', ← pow_add]; congr 1; omega
+
+theorem dft_layer_par_inv (g : K) {k i : ℕ} (hi : i < k) (x : ℕ → V) :
+    dft_layer_par (2 ^ k) (invTable g k i) p3_dft.butterflies.mirror.DifButterfly.apply x =
+      BL g⁻¹ k i x := by
+  unfold dft_layer_par
+  have hh : 2 ^ k / (2 * 2 ^ (k - 1 - i)) = 2 ^ i := by
+    rw [show 2 * 2 ^ (k - 1 - i) = 2 ^ (k - i) by rw [← pow_succ']; congr 1; omega,
+      pow_div_pow' (by omega)]; congr 1; omega
+  rw [length_invTable]
+  dsimp only
+  rw [hh, pairLoop_blocks _ _ (by positivity)]
+  exact layer_op_congr (fun b hb _ _ => by
+    have := flyAt_inv (V := V) g hb
+    unfold flyAt at this
+    exact this) x
+
+theorem triple_dif_inv (g : K) {k i : ℕ} (hi : i + 3 ≤ k) (x : ℕ → V) {r : ℕ} (hr : r < 2 ^ k) :
+    dft_layer_par_triple_dif (2 ^ k) (invTable g k (i + 2)) (invTable g k (i + 1))
+      (invTable g k i) p3_dft.butterflies.mirror.DifButterfly.apply x r =
+    BL g⁻¹ k (i + 2) (BL g⁻¹ k (i + 1) (BL g⁻¹ k i x)) r := by
+  unfold dft_layer_par_triple_dif
+  rw [length_invTable]
+  dsimp only
+  have he : 2 ^ k / (8 * 2 ^ (k - 1 - (i + 2))) = 2 ^ i := by
+    rw [show 8 * 2 ^ (k - 1 - (i + 2)) = 2 ^ (k - i) by
+      rw [show (8 : ℕ) = 2 ^ 3 by norm_num, ← pow_add]; congr 1; omega, pow_div_pow' (by omega)]
+    congr 1; omega
+  have hS3 : 4 * (2 * 2 ^ i) = 2 ^ (i + 3) := by ring
+  have hS2 : 2 * (2 * (2 * 2 ^ i)) = 2 ^ (i + 3) := by ring
+  have hS1 : 1 * (2 * (4 * 2 ^ i)) = 2 ^ (i + 3) := by ring
+  have hC : 2 ^ (k - 1 - (i + 2)) * 2 ^ (i + 3) = 2 ^ k := by rw [← pow_add]; congr 1; omega
+  rw [he]
+  rw [foldl_congr_mem _ (g := fun acc ind =>
+      [BL g⁻¹ k i, BL g⁻¹ k (i + 1), BL g⁻¹ k (i + 2)].foldl
+        (fun acc f => restrict (2 ^ (i + 3)) ind f acc) acc) (fun ind hind acc => by
+      have hind' := List.mem_range.mp hind
+      have hq : 2 ^ (k - 1 - i) = 2 ^ (k - 1 - (i + 2)) * 4 := by
+        rw [show (4 : ℕ) = 2 ^ 2 by norm_num, ← pow_add]; congr 1; omega
+      have hd : 2 ^ (k - 1 - (i + 1)) = 2 ^ (k - 1 - (i + 2)) * 2 := by
+        rw [← pow_succ]; congr 1; omega
+      simp only [List.foldl_cons, List.foldl_nil]
+      rw [sub_inv g (i := i) rfl (by norm_num) (by ring) (by rw [hq]; omega), hS3,
+        sub_inv g (i := i + 1) (by ring) (by norm_num) (by ring) (by rw [hd]; omega), hS2,
+        sub_inv g (i := i + 2) (by ring) (by norm_num) (by ring) (by omega), hS1])]
+  rw [chunked (S := 2 ^ (i + 3)) (C := 2 ^ (k - 1 - (i + 2))) _ (fun f hf => by
+      simp only [List.mem_cons, List.not_mem_nil, or_false] at hf
+      rcases hf with rfl | rfl | rfl
+      · exact BL_localTo _ (by omega) (Nat.pow_dvd_pow 2 (by omega)) hC
+      · exact BL_localTo _ (by omega) (Nat.pow_dvd_pow 2 (by omega)) hC
+      · exact BL_localTo _ (by omega) (Nat.pow_dvd_pow 2 (by omega)) hC) x (by rw [hC]; exact hr)]
+  rfl
+
+theorem double_dif_inv (g : K) {k i : ℕ} (hi : i + 2 ≤ k) (x : ℕ → V) {r : ℕ} (hr : r < 2 ^ k) :
+    dft_layer_par_double_dif (2 ^ k) (invTable g k (i + 1)) (invTable g k i)
+      p3_dft.butterflies.mirror.DifButterfly.apply x r = BL g⁻¹ k (i + 1) (BL g⁻¹ k i x) r := by
+  unfold dft_layer_par_double_dif
+  rw [length_invTable]
+  dsimp only
+  have hq : 2 ^ k / (4 * 2 ^ (k - 1 - (i + 1))) = 2 ^ i := by
+    rw [show 4 * 2 ^ (k - 1 - (i + 1)) = 2 ^ (k - i) by
+      rw [show (4 : ℕ) = 2 ^ 2 by norm_num, ← pow_add]; congr 1; omega, pow_div_pow' (by omega)]
+    congr 1; omega
+  have hS2 : 2 * (2 * 2 ^ i) = 2 ^ (i + 2) := by ring
+  have hS1 : 1 * (2 * (2 * 2 ^ i)) = 2 ^ (i + 2) := by ring
+  have hC : 2 ^ (k - 1 - (i + 1)) * 2 ^ (i + 2) = 2 ^ k := by rw [← pow_add]; congr 1; omega
+  rw [hq]
+  rw [foldl_congr_mem _ (g := fun acc ind =>
+      [BL g⁻¹ k i, BL g⁻¹ k (i + 1)].foldl
+        (fun acc f => restrict (2 ^ (i + 2)) ind f acc) acc) (fun ind hind acc => by
+      have hind' := List.mem_range.mp hind
+      have hd : 2 ^ (k - 1 - i) = 2 ^ (k - 1 - (i + 1)) * 2 := by rw [← pow_succ]; congr 1; omega
+      simp only [List.foldl_cons, List.foldl_nil]
+      rw [sub_inv g (i := i) rfl (by norm_num) (by ring) (by rw [hd]; omega), hS2,
+        sub_inv g (i := i + 1) (by ring) (by norm_num) (by ring) (by omega), hS1])]
+  rw [chunked (S := 2 ^ (i + 2)) (C := 2 ^ (k - 1 - (i + 1))) _ (fun f hf => by
+      simp only [List.mem_cons, List.not_mem_nil, or_false] at hf
+      rcases hf with rfl | rfl
+      · exact BL_localTo _ (by omega) (Nat.pow_dvd_pow 2 (by omega)) hC
+      · exact BL_localTo _ (by omega) (Nat.pow_dvd_pow 2 (by omega)) hC) x (by rw [hC]; exact hr)]
+  rfl
+
+theorem BL_fold_congr (g : K) {k : ℕ} (ls : List ℕ) (hls : ∀ l ∈ ls, l < k)
+    {x x' : ℕ → V} (h : ∀ p < 2 ^ k, x p = x' p) :
+    ∀ i < 2 ^ k, ls.foldl (fun acc l => BL g k l acc) x i = ls.foldl (fun acc l => BL g k l acc) x' i := by
+  induction ls generalizing x x' with
+  | nil => exact h
+  | cons l ls ih =>
+    intro i hi
+    simp only [List.foldl_cons]
+    refine ih (fun l hl => hls l (by simp [hl])) (fun p hp => ?_) i hi
+    have hl := hls l (by simp)
+    have hsz : 2 ^ (k - 1 - l) * (2 * 2 ^ l) = 2 ^ k := by
+      rw [← pow_succ', ← pow_add]; congr 1; omega
+    exact layer_congr _ _ _ (fun q hq => h q (hsz ▸ hq)) (by rw [hsz]; exact hp)
+
+theorem tuples_dif (g : K) {k : ℕ} :
+    ∀ n l0, l0 + n ≤ k → ∀ (x : ℕ → V), ∀ i < 2 ^ k,
+      (tuples3 ((List.range' l0 n).map (invTable g k))).foldl
+        (fun acc t => dft_layer_par_triple_dif (2 ^ k) t.2.2 t.2.1 t.1
+          p3_dft.butterflies.mirror.DifButterfly.apply acc) x i =
+      (List.range' l0 (n / 3 * 3)).foldl (fun acc l => BL g⁻¹ k l acc) x i := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    intro l0 hn x i hi
+    by_cases h3 : n < 3
+    · have hz : n / 3 * 3 = 0 := by omega
+      rw [hz]
+      rcases n with _ | _ | _ | n
+      · rfl
+      · rfl
+      · rfl
+      · omega
+    · obtain ⟨m, rfl⟩ : ∃ m, n = m + 3 := ⟨n - 3, by omega⟩
+      rw [show m + 3 = ((m + 1) + 1) + 1 by ring, List.range'_succ, List.range'_succ,
+        List.range'_succ]
+      simp only [List.map_cons, tuples3, List.foldl_cons]
+      rw [show (m + 1 + 1 + 1) / 3 * 3 = ((m / 3 * 3 + 1) + 1) + 1 by omega, List.range'_succ,
+        List.range'_succ, List.range'_succ]
+      simp only [List.foldl_cons]
+      rw [ih m (by omega) (l0 + 1 + 1 + 1) (by omega) _ i hi]
+      refine BL_fold_congr _ _ (fun l hl => by
+        simp only [List.mem_range'] at hl; omega) (fun p hp => ?_) i hi
+      rw [show l0 + 1 + 1 = l0 + 2 by ring]
+      exact triple_dif_inv g (by omega) x hp
+
+theorem initial_layers_eq (g : K) {k lnpr idx : ℕ} (hl : lnpr ≤ k) (hidx : idx < 2 ^ (k - lnpr))
+    (acc : ℕ → V) :
+    initial_layers (2 ^ lnpr) idx ((List.range lnpr).map (invTable g k)) acc =
+      ((List.range lnpr).map (BL g⁻¹ k)).foldl (fun acc f => restrict (2 ^ lnpr) idx f acc) acc := by
+  unfold initial_layers
+  rw [List.foldl_map, List.length_map, List.length_range]
+  refine foldl_congr_mem _ (fun l hlr acc => ?_) acc
+  have hly := List.mem_range.mp hlr
+  have hget : ((List.range lnpr).map (invTable g k)).getD l [] = invTable g k l := by
+    rw [List.getD_eq_getElem _ _ (by simp; omega), List.getElem_map, List.getElem_range]
+  have hhalf : 2 ^ lnpr / (2 * 2 ^ (lnpr - l - 1)) = 2 ^ l := by
+    rw [show 2 * 2 ^ (lnpr - l - 1) = 2 ^ (lnpr - l) by rw [← pow_succ']; congr 1; omega,
+      pow_div_pow' (by omega)]; congr 1; omega
+  have hS : 2 ^ (lnpr - l - 1) * (2 * 2 ^ l) = 2 ^ lnpr := by
+    rw [← pow_succ', ← pow_add]; congr 1; omega
+  have hc : idx * 2 ^ (lnpr - l - 1) + 2 ^ (lnpr - l - 1) ≤ 2 ^ (k - 1 - l) := by
+    have : (idx + 1) * 2 ^ (lnpr - l - 1) ≤ 2 ^ (k - lnpr) * 2 ^ (lnpr - l - 1) :=
+      Nat.mul_le_mul_right _ hidx
+    rw [← pow_add, show k - lnpr + (lnpr - l - 1) = k - 1 - l by omega] at this; nlinarith
+  dsimp only
+  rw [hget, hhalf]
+  have := pairLoop_sub (V := V) (c := idx) (n := 2 ^ (lnpr - l - 1)) (m := 2 ^ l)
+    (op := fun b _ => p3_dft.butterflies.mirror.DifButterfly.apply ((invTable g k l).getD b 0))
+    (op' := fun σ _ => dif (g⁻¹ ^ (rev (k - 1 - l) σ * 2 ^ l)))
+    (by positivity) (by positivity) hc
+    (fun b _ hb _ _ => by rw [difButterfly_eq, inv_entry g (by omega)]) acc
+  rw [hS] at this
+  exact this
+
+theorem par_initial_eq (g : K) {k lnpr : ℕ} (hl : lnpr ≤ k) (x : ℕ → V) {i : ℕ} (hi : i < 2 ^ k) :
+    par_initial_layers (2 ^ k) (2 ^ lnpr) ((List.range lnpr).map (invTable g k)) k x i =
+      (List.range' 0 lnpr).foldl (fun acc l => BL g⁻¹ k l acc) (scaleRows ((2 : K) ^ k)⁻¹ x) i := by
+  unfold par_initial_layers
+  rw [pow_div_pow' hl]
+  have hloc : ∀ f ∈ scaleRows ((2 : K) ^ k)⁻¹ :: (List.range lnpr).map (BL (V := V) g⁻¹ k),
+      LocalTo (2 ^ lnpr) (2 ^ (k - lnpr)) f := by
+    intro f hf
+    rcases List.mem_cons.mp hf with rfl | hf
+    · intro y y' r _ hy; simp [scaleRows, hy r rfl]
+    · obtain ⟨l, hl', rfl⟩ := List.mem_map.mp hf
+      have := List.mem_range.mp hl'
+      exact BL_localTo _ (by omega) (Nat.pow_dvd_pow 2 (by omega))
+        (by rw [← pow_add]; congr 1; omega)
+  rw [foldl_congr_mem _ (g := fun acc idx =>
+      (scaleRows ((2 : K) ^ k)⁻¹ :: (List.range lnpr).map (BL g⁻¹ k)).foldl
+        (fun acc f => restrict (2 ^ lnpr) idx f acc) acc) (fun idx hidx acc => by
+      funext r
+      simp only [List.foldl_cons]
+      rw [initial_layers_eq g hl (List.mem_range.mp hidx)]
+      simp only [restrict_foldl (by positivity) (List.mem_range.mp hidx) _
+        (fun f hf => hloc f (List.mem_cons_of_mem _ hf))]
+      unfold restrict scaleRows
+      split_ifs <;> rfl)]
+  rw [chunked (S := 2 ^ lnpr) (C := 2 ^ (k - lnpr)) _ hloc x
+    (by rw [← pow_add, show k - lnpr + lnpr = k by omega]; exact hi)]
+  simp only [List.foldl_cons, List.foldl_map, List.range'_eq_map_range, zero_add]
+
+/-- The G network's layers at the root g, on any rows, are the Gentleman-Sande network bit-reversed. -/
+theorem BL_chain (ω : K) {k : ℕ} (y : ℕ → V) :
+    ∀ c ≤ k, ∀ i < 2 ^ k, (List.range c).foldl (fun acc l => BL ω k l acc) y i =
+      difNet ω k c (fun j => y (rev k j)) (rev k i) := by
+  intro c
+  induction c with
+  | zero => intro _ i hi; simp [difNet, rev_involutive hi]
+  | succ c ih =>
+    intro hc i hi
+    rw [List.range_succ, List.foldl_append, List.foldl_cons, List.foldl_nil]
+    obtain ⟨L, hL⟩ : ∃ L, k = L + 1 + c := ⟨k - 1 - c, by omega⟩
+    have hLn : k - 1 - c = L := by omega
+    simp only [BL, difNet, difLayer, hLn]
+    have hi' : i < 2 ^ (L + 1 + c) := hL ▸ hi
+    have := conj_layer (fun t : K => (dif t : V → V → V × V)) (fun s => ω ^ (s * 2 ^ c)) L c
+      (difNet ω k c (fun j => y (rev k j))) hi'
+    rw [← hL] at this
+    rw [this]
+    have hsz : 2 ^ L * (2 * 2 ^ c) = 2 ^ k := by rw [hL]; ring
+    exact layer_congr _ _ _ (fun p hp => ih (by omega) p (hsz ▸ hp)) (by rw [hsz]; exact hi)
+
+theorem drop_map_range {α : Type _} (f : ℕ → α) {k m : ℕ} :
+    ((List.range k).map f).drop m = (List.range' m (k - m)).map f := by
+  apply List.ext_getElem
+  · simp
+  · intro j h1 h2; simp [List.getElem_range']
+
+/-- The small-batch inverse of 2^k rows is the inverse transform at G_k, for nested generators and a cache of any size 2^L >= 2^k. -/
+theorem smallBatch_idft_batch (G : Gen K) (hG : GenValid G) (hN : GenNested G) {k L : ℕ}
+    (hkL : k ≤ L) (hL : L ≤ G.adicity) (c w : ℕ) (x : ℕ → V) :
+    Computes (Radix2DFTSmallBatch.idft_batch G L c w (2 ^ k) x) (2 ^ k) (idft (G.gen k) (2 ^ k) x) := by
+  obtain ⟨fw, inv, hcache, -, hinv⟩ := cache_fw G hG hN hkL hL
+  set g := G.gen k
+  set lnpr := min (Nat.clog 2 (c / w)) k with hlnpr
+  have hl : lnpr ≤ k := min_le_right _ _
+  obtain ⟨cr, hcr⟩ : ∃ cr, cr = (k - lnpr) % 3 := ⟨_, rfl⟩
+  have hcr3 : cr < 3 := by omega
+  let B : ℕ → (ℕ → V) → ℕ → V := fun l acc => BL g⁻¹ k l acc
+  obtain ⟨X1, hX1⟩ : ∃ X1, X1 = par_initial_layers (2 ^ k) (2 ^ lnpr)
+    ((List.range lnpr).map (invTable g k)) k (revRows k x) := ⟨_, rfl⟩
+  have h1 : ∀ i < 2 ^ k, X1 i = (List.range' 0 lnpr).foldl (fun acc l => B l acc)
+      (scaleRows ((2 : K) ^ k)⁻¹ (revRows k x)) i := by
+    intro i hi; rw [hX1]; exact par_initial_eq g hl _ hi
+  have hextra : ∃ X2, extra_layers_dif (2 ^ k) ((List.range' lnpr cr).map (invTable g k)) X1 = some X2 ∧
+      ∀ i < 2 ^ k, X2 i = (List.range' lnpr cr).foldl (fun acc l => B l acc) X1 i := by
+    rcases (show cr = 0 ∨ cr = 1 ∨ cr = 2 by omega) with h | h | h
+    · rw [h]; exact ⟨X1, rfl, fun i _ => rfl⟩
+    · rw [h]
+      refine ⟨_, rfl, fun i hi => ?_⟩
+      simp only [List.range'_one, List.foldl_cons, List.foldl_nil]
+      rw [dft_layer_par_inv g (by omega)]
+    · rw [h]
+      refine ⟨_, rfl, fun i hi => ?_⟩
+      simp only [List.range'_succ, List.range'_zero, List.foldl_cons, List.foldl_nil]
+      exact double_dif_inv g (by omega) X1 hi
+  obtain ⟨X2, hX2, h2⟩ := hextra
+  refine ⟨(tuples3 ((List.range' (lnpr + cr) (k - (lnpr + cr))).map (invTable g k))).foldl
+      (fun acc t => dft_layer_par_triple_dif (2 ^ k) t.2.2 t.2.1 t.1
+        p3_dft.butterflies.mirror.DifButterfly.apply acc) X2, ?_, fun i hi => ?_⟩
+  · simp only [Radix2DFTSmallBatch.idft_batch, log2Strict_pow, Option.bind_eq_bind, Option.bind_some,
+      hcache, estimate_pow, hinv]
+    rw [take_map_range _ hl, drop_map_range _, ← hX1, ← hcr, ← hlnpr]
+    rw [show ((List.range' lnpr (k - lnpr)).map (invTable g k)).take cr =
+        (List.range' lnpr cr).map (invTable g k) by
+      apply List.ext_getElem
+      · simp; omega
+      · intro j h1 h2; simp [List.getElem_range'],
+      hX2, drop_map_range _]
+    simp only [Option.bind_some, Option.pure_def]
+  · have hls : ∀ (s m : ℕ), s + m ≤ k → ∀ l ∈ List.range' s m, l < k := fun s m h l hl' => by
+      simp only [List.mem_range'] at hl'; omega
+    have hdiv : (k - (lnpr + cr)) / 3 * 3 = k - (lnpr + cr) := by omega
+    rw [tuples_dif g _ _ (by omega) X2 i hi, hdiv]
+    have hX2' : ∀ p < 2 ^ k, X2 p = (List.range' 0 (lnpr + cr)).foldl (fun acc l => B l acc)
+        (scaleRows ((2 : K) ^ k)⁻¹ (revRows k x)) p := by
+      intro p hp
+      rw [h2 p hp, BL_fold_congr _ _ (hls _ _ (by omega)) h1 p hp, ← List.foldl_append,
+        range'_append' (by ring)]
+    rw [BL_fold_congr _ _ (hls _ _ (by omega)) hX2' i hi, ← List.foldl_append,
+      range'_append' (by ring), show lnpr + cr + (k - (lnpr + cr)) = k by omega,
+      List.range'_eq_map_range, List.foldl_map]
+    simp only [zero_add]
+    rw [BL_chain g⁻¹ _ k le_rfl i hi, difNet_eq_dft ((hG k (by omega)).inv) _
+      (Plonky3Lean.Proofs.Matrix.bitRev_lt k i), rev_involutive hi]
+    rw [dft_congr _ _ (x' := fun j => ((2 : K) ^ k)⁻¹ • x j) (fun j hj => by
+      simp [scaleRows, revRows_apply k x (Plonky3Lean.Proofs.Matrix.bitRev_lt k j),
+        rev_involutive hj]), dft, idft, smul_sum]
+    push_cast
+    exact sum_congr rfl fun j _ => by rw [smul_comm]
+
 end Plonky3Lean.Proofs.Dft

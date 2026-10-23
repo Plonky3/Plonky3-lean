@@ -226,3 +226,63 @@ rust = "{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit_para
 [[mirror]]
 lean = "p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.lde_with_consumer"
 rust = "p3_dft::radix_2_dit_parallel::Radix2DitParallel::lde_with_consumer"
+
+[[mirror]]
+lean = "p3_dft.radix_2_small_batch.mirror.roots_of_unity_table"
+rust = "p3_dft::radix_2_small_batch::Radix2DFTSmallBatch::roots_of_unity_table"
+
+[[mirror]]
+lean = "p3_dft.radix_2_small_batch.mirror.cache"
+rust = "p3_dft::radix_2_small_batch::Radix2DFTSmallBatch::update_twiddles"
+
+[[mirror]]
+lean = "p3_dft.radix_2_small_batch.mirror.estimate_num_rows_in_l1"
+rust = "p3_dft::radix_2_small_batch::estimate_num_rows_in_l1"
+
+[[mirror]]
+lean = "p3_dft.radix_2_small_batch.mirror.dft_layer_par"
+rust = "p3_dft::radix_2_small_batch::dft_layer_par"
+
+[[mirror]]
+lean = "p3_dft.radix_2_small_batch.mirror.dft_layer_par_double_dit"
+rust = "p3_dft::radix_2_small_batch::dft_layer_par_double"
+
+[[mirror]]
+lean = "p3_dft.radix_2_small_batch.mirror.dft_layer_par_triple_dit"
+rust = "p3_dft::radix_2_small_batch::dft_layer_par_triple"
+
+[[mirror]]
+lean = "p3_dft.radix_2_small_batch.mirror.dft_layer_par_double_dif"
+rust = "{impl p3_dft::radix_2_small_batch::MultiLayerButterfly<F, p3_dft::butterflies::DifButterfly<F>> for p3_dft::radix_2_small_batch::MultiLayerDifButterfly}::apply_2_layers"
+
+[[mirror]]
+lean = "p3_dft.radix_2_small_batch.mirror.dft_layer_par_triple_dif"
+rust = "{impl p3_dft::radix_2_small_batch::MultiLayerButterfly<F, p3_dft::butterflies::DifButterfly<F>> for p3_dft::radix_2_small_batch::MultiLayerDifButterfly}::apply_3_layers"
+
+[[mirror]]
+lean = "p3_dft.radix_2_small_batch.mirror.extra_layers_dit"
+rust = "p3_dft::radix_2_small_batch::dft_layer_par_extra_layers"
+
+[[mirror]]
+lean = "p3_dft.radix_2_small_batch.mirror.remaining_layers"
+rust = "p3_dft::radix_2_small_batch::remaining_layers"
+
+[[mirror]]
+lean = "p3_dft.radix_2_small_batch.mirror.initial_layers"
+rust = "p3_dft::radix_2_small_batch::initial_layers"
+
+[[mirror]]
+lean = "p3_dft.radix_2_small_batch.mirror.par_remaining_layers"
+rust = "p3_dft::radix_2_small_batch::par_remaining_layers"
+
+[[mirror]]
+lean = "p3_dft.radix_2_small_batch.mirror.par_initial_layers"
+rust = "p3_dft::radix_2_small_batch::par_initial_layers"
+
+[[mirror]]
+lean = "p3_dft.radix_2_small_batch.mirror.Radix2DFTSmallBatch.dft_batch"
+rust = "{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_small_batch::Radix2DFTSmallBatch<F>}::dft_batch"
+
+[[mirror]]
+lean = "p3_dft.radix_2_small_batch.mirror.Radix2DFTSmallBatch.idft_batch"
+rust = "{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_small_batch::Radix2DFTSmallBatch<F>}::idft_batch"

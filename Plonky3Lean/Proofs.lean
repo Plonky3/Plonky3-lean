@@ -7,7 +7,7 @@ public import Plonky3Lean.Proofs.Security.Budget
 public import Plonky3Lean.Proofs.Security.Binary
 public import Plonky3Lean.Proofs.Security.Real
 public import Plonky3Lean.Proofs.Matrix.Unsound
-public import Plonky3Lean.Proofs.Dft.Parallel
+public import Plonky3Lean.Proofs.Dft.SmallBatch
 public import Plonky3Lean.Proofs.Dft.Lde
 public import Plonky3Lean.Proofs.Dft.Rows
 public import Plonky3Lean.Proofs.Dft.Fields

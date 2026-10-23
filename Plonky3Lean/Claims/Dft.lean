@@ -1,6 +1,6 @@
 module
 
-public import Plonky3Lean.Proofs.Dft.Parallel
+public import Plonky3Lean.Proofs.Dft.SmallBatch
 public import Plonky3Lean.Proofs.Dft.Lde
 public import Plonky3Lean.Proofs.Dft.Rows
 public import Plonky3Lean.Proofs.Dft.Fields
@@ -32,7 +32,7 @@ rev_k(i) reverses the k low bits of i.
 
 open p3_dft.mirror Plonky3Lean.Spec.Dft Plonky3Lean.Proofs.Dft
 open p3_dft.naive.mirror p3_dft.radix_2_dit.mirror p3_dft.radix_2_bowers.mirror
-open p3_dft.radix_2_dit_parallel.mirror p3_dft.butterflies.mirror
+open p3_dft.radix_2_dit_parallel.mirror p3_dft.butterflies.mirror p3_dft.radix_2_small_batch.mirror
 
 set_option linter.unusedSectionVars false
 
@@ -245,6 +245,22 @@ theorem parallel.lde (G : Gen K) (hG : GenValid G) (hN : GenNested G) {k a w : �
     Computes (Radix2DitParallel.lde_with_consumer G w (2 ^ k) a s T x) (2 ^ (k + a))
       (cosetDft s (G.gen (k + a)) (2 ^ (k + a)) (fun j => if j < 2 ^ k then T c (rev k j) else 0)) :=
   Proofs.Dft.parallel_lde G hG hN hka s ha hlen T x
+
+/-- The small-batch transform of 2^k rows is the transform at G_k, for nested generators.
+
+Its shared cache may hold the tables of any larger size 2^L, built from G_L.
+
+The result holds for every rows-per-chunk estimate c and width w. -/
+theorem smallBatch.dft_batch (G : Gen K) (hG : GenValid G) (hN : GenNested G) {k L : ℕ}
+    (hkL : k ≤ L) (hL : L ≤ G.adicity) (c w : ℕ) (x : ℕ → V) :
+    Computes (Radix2DFTSmallBatch.dft_batch G L c w (2 ^ k) x) (2 ^ k) (dft (G.gen k) (2 ^ k) x) :=
+  Proofs.Dft.smallBatch_dft_batch G hG hN hkL hL c w x
+
+/-- The small-batch inverse of 2^k rows is the inverse transform at G_k, for nested generators and any cache size 2^L >= 2^k. -/
+theorem smallBatch.idft_batch (G : Gen K) (hG : GenValid G) (hN : GenNested G) {k L : ℕ}
+    (hkL : k ≤ L) (hL : L ≤ G.adicity) (c w : ℕ) (x : ℕ → V) :
+    Computes (Radix2DFTSmallBatch.idft_batch G L c w (2 ^ k) x) (2 ^ k) (idft (G.gen k) (2 ^ k) x) :=
+  Proofs.Dft.smallBatch_idft_batch G hG hN hkL hL c w x
 
 end backends
 
