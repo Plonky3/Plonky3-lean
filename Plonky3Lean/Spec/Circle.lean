@@ -48,6 +48,9 @@ def y (P : C K) : K := P.val.2
 
 theorem eq (P : C K) : P.x ^ 2 + P.y ^ 2 = 1 := P.property
 
+instance [DecidableEq K] : DecidableEq (C K) :=
+  inferInstanceAs (DecidableEq {q : K × K // q.1 ^ 2 + q.2 ^ 2 = 1})
+
 @[ext] theorem ext {P Q : C K} (hx : P.x = Q.x) (hy : P.y = Q.y) : P = Q :=
   Subtype.ext (Prod.ext hx hy)
 

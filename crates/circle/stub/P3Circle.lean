@@ -12,5 +12,6 @@ public import P3Circle.Domain
 public import P3Circle.Ordering
 public import P3Circle.Cfft
 public import P3Circle.Folding
+public import P3Circle.DeepQuotient
 
 @[expose] public section
