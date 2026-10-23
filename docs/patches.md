@@ -127,7 +127,12 @@ and shows that the case could fail.
     test runs, and every test passes;
   - `lint <package> <lint>`, e.g. `lint p3-field unexpected_cfgs`:
     `cargo check --all-targets` succeeds without reporting `<lint>` for the
-    package.
+    package;
+  - `xcheck <package> <target> <rustflag>...`, e.g.
+    `xcheck p3-baby-bear x86_64-unknown-linux-gnu -Ctarget-feature=+avx2`:
+    `cargo check` for that target, with those RUSTFLAGS, succeeds. It is for
+    code the host cannot compile, such as another architecture's SIMD backend,
+    and only shows that it compiles.
 - **The mutation.** `NNN-slug.mutation.patch`, beside the patch, is a diff that
   applies on top of the whole pre set and breaks the patch's promise, for
   example by dropping a supertrait the normal build must keep, or by gating a

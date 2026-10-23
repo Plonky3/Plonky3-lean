@@ -1,0 +1,16 @@
+# Mutation of: 020-redirect-avx2-intrinsics
+# Breaks:      a normal build imports the models, which it does not depend on.
+#
+--- a/monty-31/src/x86_64_avx2/packing.rs
++++ b/monty-31/src/x86_64_avx2/packing.rs
+@@ -1,8 +1,8 @@
+ use alloc::vec::Vec;
+ // PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
+-#[cfg(not(hax_backend_lean))]
++#[cfg(hax_backend_lean)]
+ use core::arch::x86_64::{self, __m256i};
+-#[cfg(hax_backend_lean)]
++#[cfg(not(hax_backend_lean))]
+ use p3_arch_shims::x86_64::{self, __m256i};
+ use core::array;
+ use core::iter::{Product, Sum};

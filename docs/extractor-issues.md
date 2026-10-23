@@ -404,3 +404,23 @@ keeps its number and says so.
     `HasTwoAdicBinomialExtension<2>`, `BinomiallyExtendable<3>`) are reached
     instead through the `010-extraction-roots` pre-patches of p3-mersenne-31 and
     p3-monty-31.
+
+210. **The `core::arch` intrinsics have no Rust bodies.** Each is a
+     `#[target_feature]` wrapper around an LLVM builtin, and the models have no
+     definitions for them, so a SIMD backend extracts to calls of undefined
+     functions over opaque vector types. Pre-patch `monty-31/020` imports
+     `p3_arch_shims::x86_64` (`arch/`) in place of `core::arch::x86_64` under the
+     cfg, in every file on BabyBear's AVX2 path: models with the same names and
+     signatures, over lane arrays, each transcribing Intel's pseudocode and
+     tested against the hardware.
+211. **`--exclude` on a type that an extracted type refers to makes aeneas fail**
+     with "Internal error". `--opaque` on the same item works: the type becomes
+     an external declaration. The AVX2 variants make the scalar modules opaque
+     (`opaque` in a `[[variant]]` table) rather than excluding them.
+212. **A run re-declares the traits of an `--opaque` module.** The opaque
+     module's types and functions become externals, but its trait declarations
+     are emitted again, so a second run of the same crate cannot share the first
+     run's namespace. On x86_64 the re-declared `PackedMontyParameters` also
+     differs: it gains the supertrait `MontyParametersAVX2`. Each variant is
+     therefore renamed into its own namespace (`tools/extract/rename-variant.py`),
+     and its `Assumptions/` bind its externals to the crate's own model.
