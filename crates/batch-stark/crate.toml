@@ -1,0 +1,231 @@
+# p3-batch-stark: the multi-table STARK prover and verifier.
+
+lean_lib = "P3BatchStark"
+
+# The integer helpers: the batch's opening count and the shape's two counters.
+#
+# Everything else is generic over the configuration, the field traits and the AIR, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# It is transcribed in extraction/P3BatchStark/Assumptions/Mirror/.
+state = "scoped"
+
+features = []
+
+start_from = [
+  "p3_batch_stark::security::num_batched_openings",
+  "p3_batch_stark::transcript::BatchShape::num_instances",
+  "p3_batch_stark::transcript::BatchShape::has_lookups",
+]
+
+watch = ["batch-stark/src", "batch-stark/Cargo.toml", "lookup/src/protocol.rs", "lookup/src/types.rs", "challenger/src/fs"]
+
+# The transcriptions in extraction/P3BatchStark/Assumptions/Mirror/.
+# Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.BatchShape"
+rust = "p3_batch_stark::transcript::BatchShape"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.BatchShape.num_instances"
+rust = "p3_batch_stark::transcript::BatchShape::num_instances"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.BatchShape.has_lookups"
+rust = "p3_batch_stark::transcript::BatchShape::has_lookups"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.Step"
+rust = "p3_batch_stark::transcript::BatchShape::pattern"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.BatchShape.lookupSteps"
+rust = "p3_batch_stark::transcript::BatchShape::pattern"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.BatchShape.pattern"
+rust = "p3_batch_stark::transcript::BatchShape::pattern"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.DomainSeparator"
+rust = "p3_challenger::fs::DomainSeparator"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.BatchShape.domain_separator"
+rust = "p3_batch_stark::transcript::BatchShape::domain_separator"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.Msg"
+rust = "p3_batch_stark::transcript::BatchVerifierTranscript"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.BatchTranscriptFailure"
+rust = "p3_batch_stark::transcript::BatchTranscriptFailure"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.St"
+rust = "p3_challenger::fs::VerifierState"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.St.step"
+rust = "p3_challenger::fs::VerifierState"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.St.draw"
+rust = "p3_challenger::fs::VerifierState::challenge_extension"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.new"
+rust = "p3_batch_stark::transcript::BatchVerifierTranscript::new"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.instance_bindings"
+rust = "p3_batch_stark::transcript::BatchVerifierTranscript::instance_bindings"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.main_phase"
+rust = "p3_batch_stark::transcript::BatchVerifierTranscript::main_phase"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.preprocessed_phase"
+rust = "p3_batch_stark::transcript::BatchVerifierTranscript::preprocessed_phase"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.observe_pow"
+rust = "p3_challenger::fs::VerifierState::observe_pow"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.LayoutState"
+rust = "p3_batch_stark::transcript::lay_out_lookup_challenges"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.lookupKey"
+rust = "p3_batch_stark::transcript::lay_out_lookup_challenges"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.orInsert"
+rust = "p3_batch_stark::transcript::lay_out_lookup_challenges"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.busId"
+rust = "p3_batch_stark::transcript::lay_out_lookup_challenges"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.busIds"
+rust = "p3_batch_stark::transcript::lay_out_lookup_challenges"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.lay_out_lookup_challenges"
+rust = "p3_batch_stark::transcript::lay_out_lookup_challenges"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.lookup_phase"
+rust = "p3_batch_stark::transcript::BatchVerifierTranscript::lookup_phase"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.permutation_phase"
+rust = "p3_batch_stark::transcript::BatchVerifierTranscript::permutation_phase"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.quotient_phase"
+rust = "p3_batch_stark::transcript::BatchVerifierTranscript::quotient_phase"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.ood_phase"
+rust = "p3_batch_stark::transcript::BatchVerifierTranscript::ood_phase"
+
+[[mirror]]
+lean = "p3_batch_stark.transcript.mirror.delegate"
+rust = "p3_batch_stark::transcript::BatchVerifierTranscript::delegate"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.AirInfo"
+rust = "p3_batch_stark::verifier::verify_batch"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.instInhabitedAirInfo"
+rust = "p3_batch_stark::verifier::verify_batch"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.Config"
+rust = "p3_batch_stark::verifier::verify_batch"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.Config.is_zk"
+rust = "p3_uni_stark::StarkGenericConfig::is_zk"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.CommonData"
+rust = "p3_batch_stark::common::CommonData"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.Opened"
+rust = "p3_batch_stark::proof::OpenedValuesWithLookups"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.instInhabitedOpened"
+rust = "p3_batch_stark::proof::OpenedValuesWithLookups"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.BatchProof"
+rust = "p3_batch_stark::proof::BatchProof"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.BatchError"
+rust = "p3_batch_stark::error::BatchVerificationError"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.validate_degree_bits"
+rust = "p3_uni_stark::verifier::validate_degree_bits"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.preprocessedWidth"
+rust = "p3_batch_stark::verifier::verify_batch"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.Checked"
+rust = "p3_batch_stark::verifier::verify_batch"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.ensure"
+rust = "p3_batch_stark::verifier::verify_batch"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.heightResult"
+rust = "p3_lookup::types::check_multiplicity_height_bound"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.check_instance"
+rust = "p3_batch_stark::verifier::verify_batch"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.check_shape"
+rust = "p3_batch_stark::verifier::verify_batch"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.shapeOf"
+rust = "p3_batch_stark::verifier::verify_batch"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.replay"
+rust = "p3_batch_stark::verifier::verify_batch"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.opening_reads"
+rust = "p3_batch_stark::verifier::commitments_with_opening_points"
+
+[[mirror]]
+lean = "p3_batch_stark.verifier.mirror.verify_batch"
+rust = "p3_batch_stark::verifier::verify_batch"
+
+[[mirror]]
+lean = "p3_batch_stark.checker.mirror.rowBuilder"
+rust = "p3_air::DebugConstraintBuilder::new_with_permutation"
+
+[[mirror]]
+lean = "p3_batch_stark.checker.mirror.eval_air_and_lookups"
+rust = "p3_lookup::LookupProtocol::eval_air_and_lookups"
+
+[[mirror]]
+lean = "p3_batch_stark.checker.mirror.check_constraints"
+rust = "p3_batch_stark::check_constraints::check_constraints"
