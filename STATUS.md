@@ -22,6 +22,7 @@ target `thumbv7em-none-eabi`
 | `blake2s` | scoped | 148 | 51 | 1 | 0 | 0 | 1 / 0 | pre `010` |
 | `blake3` | scoped | 2609 | 40 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
 | `blake3-crate` | stub |  | 26 | 0 | 3 |  | 0 / 0 |  |
+| `bus` | stub |  | 1284 | 0 | 122 |  | 0 / 0 |  |
 | `challenger` | scoped | 1552 | 200 | 0 | 12 | 6 | 1 / 1 | pre `010` |
 | `commit` | stub |  | 762 | 0 | 59 |  | 0 / 0 |  |
 | `dft` | stub |  | 901 | 0 | 67 |  | 0 / 0 |  |
@@ -464,7 +465,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1439) whose dependencies include it; reaching one is not using it.
+(of 1462) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -503,7 +504,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1439) whose dependencies include the declaration.
+counts the claims (of 1462) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -525,19 +526,19 @@ counts the claims (of 1439) whose dependencies include the declaration.
 | `air` | `p3_air.symbolic.mirror.instSymLeafExtLeaf` | `{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression_ext::ExtLeaf<F, EF>}::degree_multiple` | not translated | 4 |
 | `air` | `p3_air.symbolic.mirror.SymbolicExpressionExt.to_base` | `p3_air::symbolic::expression_ext::SymbolicExpressionExt::to_base` | not translated | 1 |
 | `air` | `p3_air.builder.mirror.AirBuilder.is_transition_window` | `p3_air::builder::AirBuilder::is_transition_window` | not translated | 7 |
-| `air` | `p3_air.builder.mirror.AirBuilder.when` | `p3_air::builder::AirBuilder::when` | not translated | 25 |
-| `air` | `p3_air.builder.mirror.AirBuilder.when_ne` | `p3_air::builder::AirBuilder::when_ne` | not translated | 1 |
-| `air` | `p3_air.builder.mirror.AirBuilder.when_first_row` | `p3_air::builder::AirBuilder::when_first_row` | not translated | 16 |
-| `air` | `p3_air.builder.mirror.AirBuilder.when_last_row` | `p3_air::builder::AirBuilder::when_last_row` | not translated | 1 |
-| `air` | `p3_air.builder.mirror.AirBuilder.when_transition` | `p3_air::builder::AirBuilder::when_transition` | not translated | 11 |
+| `air` | `p3_air.builder.mirror.AirBuilder.when` | `p3_air::builder::AirBuilder::when` | not translated | 27 |
+| `air` | `p3_air.builder.mirror.AirBuilder.when_ne` | `p3_air::builder::AirBuilder::when_ne` | not translated | 3 |
+| `air` | `p3_air.builder.mirror.AirBuilder.when_first_row` | `p3_air::builder::AirBuilder::when_first_row` | not translated | 18 |
+| `air` | `p3_air.builder.mirror.AirBuilder.when_last_row` | `p3_air::builder::AirBuilder::when_last_row` | not translated | 3 |
+| `air` | `p3_air.builder.mirror.AirBuilder.when_transition` | `p3_air::builder::AirBuilder::when_transition` | not translated | 13 |
 | `air` | `p3_air.builder.mirror.AirBuilder.when_transition_window` | `p3_air::builder::AirBuilder::when_transition_window` | not translated | 0 |
 | `air` | `p3_air.builder.mirror.AirBuilder.assert_zeros` | `p3_air::builder::AirBuilder::assert_zeros` | not translated | 16 |
-| `air` | `p3_air.builder.mirror.AirBuilder.bool_check` | `p3_field::PrimeCharacteristicRing::bool_check` | not translated | 16 |
+| `air` | `p3_air.builder.mirror.AirBuilder.bool_check` | `p3_field::PrimeCharacteristicRing::bool_check` | not translated | 18 |
 | `air` | `p3_air.builder.mirror.AirBuilder.assert_bools` | `p3_air::builder::AirBuilder::assert_bools` | not translated | 15 |
-| `air` | `p3_air.builder.mirror.AirBuilder.assert_one` | `p3_air::builder::AirBuilder::assert_one` | not translated | 16 |
-| `air` | `p3_air.builder.mirror.AirBuilder.assert_eq` | `p3_air::builder::AirBuilder::assert_eq` | not translated | 2 |
+| `air` | `p3_air.builder.mirror.AirBuilder.assert_one` | `p3_air::builder::AirBuilder::assert_one` | not translated | 18 |
+| `air` | `p3_air.builder.mirror.AirBuilder.assert_eq` | `p3_air::builder::AirBuilder::assert_eq` | not translated | 4 |
 | `air` | `p3_air.builder.mirror.AirBuilder.assert_eq_arrays` | `p3_air::builder::AirBuilder::assert_eq_arrays` | not translated | 0 |
-| `air` | `p3_air.builder.mirror.AirBuilder.assert_bool` | `p3_air::builder::AirBuilder::assert_bool` | not translated | 10 |
+| `air` | `p3_air.builder.mirror.AirBuilder.assert_bool` | `p3_air::builder::AirBuilder::assert_bool` | not translated | 12 |
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_zeros_ext` | `p3_air::builder::ExtensionBuilder::assert_zeros_ext` | not translated | 0 |
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_eq_ext` | `p3_air::builder::ExtensionBuilder::assert_eq_ext` | not translated | 2 |
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_one_ext` | `p3_air::builder::ExtensionBuilder::assert_one_ext` | not translated | 1 |
@@ -679,6 +680,128 @@ counts the claims (of 1439) whose dependencies include the declaration.
 | `blake3-crate` | `blake3.BLOCK_LEN` | `blake3::BLOCK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.CHUNK_LEN` | `blake3::CHUNK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.OUT_LEN` | `blake3::OUT_LEN` | stub | 0 |
+| `bus` | `p3_bus.mirror.BusDirection` | `p3_bus::direction::BusDirection` | stub | 4 |
+| `bus` | `p3_bus.mirror.BusDirection.index` | `p3_bus::direction::BusDirection::index` | stub | 2 |
+| `bus` | `p3_bus.mirror.BusDirection.ALL` | `p3_bus::direction::BusDirection::ALL` | stub | 0 |
+| `bus` | `p3_bus.mirror.BusNameError` | `p3_bus::name::BusNameError` | stub | 3 |
+| `bus` | `p3_bus.mirror.BusName.MAX_LEN` | `p3_bus::name::BusName::MAX_LEN` | stub | 3 |
+| `bus` | `p3_bus.mirror.isAsciiAlphabetic` | `core::num::u8::is_ascii_alphabetic` | stub | 3 |
+| `bus` | `p3_bus.mirror.isAsciiAlphanumeric` | `core::num::u8::is_ascii_alphanumeric` | stub | 3 |
+| `bus` | `p3_bus.mirror.BusName.try_new` | `p3_bus::name::BusName::try_new` | stub | 3 |
+| `bus` | `p3_bus.mirror.BusBoundary` | `p3_bus::builder::BusBoundary` | stub | 4 |
+| `bus` | `p3_bus.mirror.BusBoundary.contains_row` | `p3_bus::builder::BusBoundary::contains_row` | stub | 0 |
+| `bus` | `p3_bus.mirror.BusActivation` | `p3_bus::builder::BusActivation` | stub | 4 |
+| `bus` | `p3_bus.mirror.BusBuilder` | `p3_bus::builder::BusInteractionRecorder` | stub | 2 |
+| `bus` | `p3_bus.mirror.BusBuilder.push_bus_interaction` | `p3_bus::builder::BusInteractionBuilder::push_bus_interaction` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.MAX_RAM_BIT_WIDTH` | `p3_bus::ram::statement::MAX_RAM_BIT_WIDTH` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.MIN_RAM_ACCESS_COUNT` | `p3_bus::ram::statement::MIN_RAM_ACCESS_COUNT` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamBoundary` | `p3_bus::ram::statement::RamBoundary` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamBoundary.is_segment` | `p3_bus::ram::statement::RamBoundary::is_segment` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamBoundary.image_buses` | `p3_bus::ram::statement::RamBoundary::image_buses` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamStatement` | `p3_bus::ram::statement::RamStatement` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamError` | `p3_bus::ram::error::RamError` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamStatement.access_payload_width` | `p3_bus::ram::statement::RamStatement::access_payload_width` | stub | 0 |
+| `bus` | `p3_bus.ram.mirror.RamStatement.image_payload_width` | `p3_bus::ram::statement::RamStatement::image_payload_width` | stub | 0 |
+| `bus` | `p3_bus.ram.mirror.RamStatement.validate` | `p3_bus::ram::statement::RamStatement::validate` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamStatement.leaf_contribution` | `p3_bus::ram::statement::RamStatement::leaf_contribution` | stub | 0 |
+| `bus` | `p3_bus.ram.mirror.RamLayout` | `p3_bus::ram::statement::RamLayout` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.checked_add` | `core::num::usize::checked_add` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.take` | `p3_bus::ram::statement::RamLayout::new` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamLayout.new` | `p3_bus::ram::statement::RamLayout::new` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamLayout.access_columns` | `p3_bus::ram::statement::RamLayout::access_columns` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamLayout.image_columns` | `p3_bus::ram::statement::RamLayout::image_columns` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir` | `p3_bus::ram::air::RamAir` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.new` | `p3_bus::ram::air::RamAir::new` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.slice` | `core::slice::index::Index::index` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.xor` | `p3_bus::ram::air::xor` | stub | 3 |
+| `bus` | `p3_bus.ram.mirror.xor3` | `p3_bus::ram::air::xor3` | stub | 3 |
+| `bus` | `p3_bus.ram.mirror.majority` | `p3_bus::ram::air::majority` | stub | 3 |
+| `bus` | `p3_bus.ram.mirror.or` | `p3_bus::ram::air::or` | stub | 3 |
+| `bus` | `p3_bus.ram.mirror.assert_strict_increase` | `p3_bus::ram::air::assert_strict_increase` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.eval_booleanity` | `p3_bus::ram::air::RamAir::eval_booleanity` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.eval_run_start` | `p3_bus::ram::air::RamAir::eval_run_start` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.eval_order` | `p3_bus::ram::air::RamAir::eval_order` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.eval_run_marker` | `p3_bus::ram::air::RamAir::eval_run_marker` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.channel` | `p3_bus::ram::statement::channel` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.declare` | `p3_bus::ram::air::RamAir::declare` | stub | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.eval` | `p3_bus::ram::air::RamAir::eval` | stub | 2 |
+| `bus` | `p3_bus.product.mirror.combine` | `p3_bus::product::math::combine` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.interpolate_pair` | `p3_bus::product::math::interpolate_pair` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.interpolate_quad` | `p3_bus::product::math::interpolate_quad` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.has_distinct_round_nodes` | `p3_bus::product::math::has_distinct_round_nodes` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrRootShape` | `p3_bus::product::shape::ProductGkrRootShape` | stub | 2 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShapeError` | `p3_bus::product::error::ProductGkrShapeError` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrError` | `p3_bus::product::error::ProductGkrError` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.USIZE_MAX` | `core::num::usize::MAX` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape` | `p3_bus::product::shape::ProductGkrShape` | stub | 8 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape.new` | `p3_bus::product::shape::ProductGkrShape::new` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape.root_message_len` | `p3_bus::product::shape::ProductGkrShape::root_message_len` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.layersLoop` | `p3_bus::product::shape::ProductGkrShape::layers` | stub | 6 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape.layers` | `p3_bus::product::shape::ProductGkrShape::layers` | stub | 6 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape.identity_padding_evaluation` | `p3_bus::product::shape::ProductGkrShape::identity_padding_evaluation` | stub | 2 |
+| `bus` | `p3_bus.product.mirror.ProductGkrRootShape.encode` | `p3_bus::product::shape::ProductGkrRootShape::encode` | stub | 0 |
+| `bus` | `p3_bus.product.mirror.ProductGkrRootShape.decode` | `p3_bus::product::shape::ProductGkrRootShape::decode` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrLayerProof` | `p3_bus::product::proof::ProductGkrLayerProof` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.ROUND_POLY_LEN` | `p3_bus::product::proof::ROUND_POLY_LEN` | stub | 0 |
+| `bus` | `p3_bus.product.mirror.ProductGkrProof` | `p3_bus::product::proof::ProductGkrProof` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrOutput` | `p3_bus::product::proof::ProductGkrOutput` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrProof.validate_shape` | `p3_bus::product::proof::ProductGkrProof::validate_shape` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.VerifierTranscript` | `p3_bus::product::transcript::ProductGkrVerifierTranscript` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.VerifyState` | `p3_bus::product::proof::ProductGkrProof::verify` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.verify_layer` | `p3_bus::product::proof::ProductGkrProof::verify` | stub | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrProof.verify` | `p3_bus::product::proof::ProductGkrProof::verify` | stub | 1 |
+| `bus` | `p3_bus.plan.mirror.log2_ceil_usize` | `p3_util::log2_ceil_usize` | stub | 1 |
+| `bus` | `p3_bus.plan.mirror.checked_next_power_of_two` | `core::num::usize::checked_next_power_of_two` | stub | 1 |
+| `bus` | `p3_bus.plan.mirror.checked_add` | `core::num::usize::checked_add` | stub | 2 |
+| `bus` | `p3_bus.plan.mirror.BusDomain` | `p3_bus::plan::BusDomain` | stub | 4 |
+| `bus` | `p3_bus.plan.mirror.BusDomain.identity_bit` | `p3_bus::plan::BusDomain::identity_bit` | stub | 3 |
+| `bus` | `p3_bus.plan.mirror.BusTupleSlot` | `p3_bus::plan::BusTupleSlot` | stub | 3 |
+| `bus` | `p3_bus.plan.mirror.BusBlockOwner` | `p3_bus::plan::BusBlockOwner` | stub | 2 |
+| `bus` | `p3_bus.plan.mirror.BusBlock` | `p3_bus::plan::BusBlock` | stub | 2 |
+| `bus` | `p3_bus.plan.mirror.BusSecurityGeometry` | `p3_bus::plan::BusSecurityGeometry` | stub | 4 |
+| `bus` | `p3_bus.plan.mirror.BusPlan` | `p3_bus::plan::BusPlan` | stub | 5 |
+| `bus` | `p3_bus.plan.mirror.BusPlan.tuple_slot` | `p3_bus::plan::BusPlan::tuple_slot` | stub | 3 |
+| `bus` | `p3_bus.plan.mirror.BusPlan.blocks` | `p3_bus::plan::BusPlan::blocks` | stub | 0 |
+| `bus` | `p3_bus.plan.mirror.UnsupportedBusAccess` | `p3_bus::plan::UnsupportedBusAccess` | stub | 1 |
+| `bus` | `p3_bus.plan.mirror.BusExpressionLocation` | `p3_bus::plan::BusExpressionLocation` | stub | 1 |
+| `bus` | `p3_bus.plan.mirror.BusPlanError` | `p3_bus::plan::error::BusPlanError` | stub | 2 |
+| `bus` | `p3_bus.plan.mirror.SymbolicBusInteraction` | `p3_bus::builder::SymbolicBusInteraction` | stub | 2 |
+| `bus` | `p3_bus.plan.mirror.BusPlanInput` | `p3_bus::plan::BusPlanInput` | stub | 1 |
+| `bus` | `p3_bus.plan.mirror.leafAccess` | `p3_bus::plan::validate_expression` | stub | 1 |
+| `bus` | `p3_bus.plan.mirror.validateWalk` | `p3_bus::plan::validate_expression` | stub | 1 |
+| `bus` | `p3_bus.plan.mirror.validate_expression` | `p3_bus::plan::validate_expression` | stub | 1 |
+| `bus` | `p3_bus.plan.mirror.validate_interaction` | `p3_bus::plan::validate_interaction` | stub | 1 |
+| `bus` | `p3_bus.plan.mirror.PendingBlock` | `p3_bus::plan::PendingBlock` | stub | 2 |
+| `bus` | `p3_bus.plan.mirror.pendingLe` | `p3_bus::plan::BusPlan::build` | stub | 2 |
+| `bus` | `p3_bus.plan.mirror.collectWidths` | `p3_bus::plan::BusPlan::build` | stub | 1 |
+| `bus` | `p3_bus.plan.mirror.layoutBlocks` | `p3_bus::plan::BusPlan::build` | stub | 2 |
+| `bus` | `p3_bus.plan.mirror.BusPlan.build` | `p3_bus::plan::BusPlan::build` | stub | 1 |
+| `bus` | `p3_bus.evaluation.mirror.BusEvaluation` | `p3_bus::evaluation::BusEvaluation` | stub | 2 |
+| `bus` | `p3_bus.evaluation.mirror.BusNode` | `p3_bus::evaluation::BusNode` | stub | 2 |
+| `bus` | `p3_bus.evaluation.mirror.BusEvaluationError` | `p3_bus::evaluation::error::BusEvaluationError` | stub | 2 |
+| `bus` | `p3_bus.evaluation.mirror.compile_leaf` | `p3_bus::evaluation::compile_leaf` | stub | 2 |
+| `bus` | `p3_bus.evaluation.mirror.compile_expression` | `p3_bus::evaluation::compile_expression` | stub | 2 |
+| `bus` | `p3_bus.evaluation.mirror.fingerprint_weights` | `p3_bus::argument::BusChallenges::fingerprint_weights` | stub | 0 |
+| `bus` | `p3_bus.evaluation.mirror.BusFactorPlan` | `p3_bus::evaluation::BusFactorPlan` | stub | 1 |
+| `bus` | `p3_bus.evaluation.mirror.nodeValue` | `p3_bus::evaluation::BusFactorPlan::evaluate` | stub | 2 |
+| `bus` | `p3_bus.evaluation.mirror.BusFactorPlan.evaluate` | `p3_bus::evaluation::BusFactorPlan::evaluate` | stub | 1 |
+| `bus` | `p3_bus.evaluation.mirror.BusPlan.compile_factor` | `p3_bus::evaluation::BusPlan::compile_factor` | stub | 1 |
+| `bus` | `p3_bus.timestamped.mirror.CLOCK_RANGE_BITS` | `p3_bus::timestamped::CLOCK_RANGE_BITS` | stub | 3 |
+| `bus` | `p3_bus.timestamped.mirror.CLOCK_GAP_BITS` | `p3_bus::timestamped::CLOCK_GAP_BITS` | stub | 2 |
+| `bus` | `p3_bus.timestamped.mirror.TimestampedMemoryError` | `p3_bus::timestamped::error::TimestampedMemoryError` | stub | 1 |
+| `bus` | `p3_bus.timestamped.mirror.clock_orbit` | `p3_bus::timestamped::clock_orbit` | stub | 1 |
+| `bus` | `p3_bus.timestamped.mirror.check_orbit` | `p3_bus::timestamped::TimestampedMemory::new` | stub | 1 |
+| `bus` | `p3_bus.timestamped.mirror.check_accesses` | `p3_bus::timestamped::TimestampedMemory::check_against` | stub | 0 |
+| `bus` | `p3_bus.timestamped.mirror.high_step` | `p3_bus::timestamped::high_step` | stub | 2 |
+| `bus` | `p3_bus.timestamped.mirror.gap_factors` | `p3_bus::timestamped::TimestampedMemory::gap_factors` | stub | 1 |
+| `bus` | `p3_bus.timestamped.mirror.slot_offset` | `p3_bus::timestamped::TimestampedMemory::slot_offset` | stub | 0 |
+| `bus` | `p3_bus.timestamped.mirror.ClockRangeAir.low` | `p3_bus::timestamped::air::ClockRangeAir::low` | stub | 2 |
+| `bus` | `p3_bus.timestamped.mirror.ClockRangeAir.high` | `p3_bus::timestamped::air::ClockRangeAir::high` | stub | 2 |
+| `bus` | `p3_bus.timestamped.mirror.gap_constraint` | `p3_bus::timestamped::TimestampedMemoryInteractionBuilder::timestamped_access` | stub | 0 |
+| `bus` | `p3_bus.security.mirror.BusSecurityDims` | `p3_security::bus::ProductGkrSecurityProfile` | stub | 1 |
+| `bus` | `p3_bus.security.mirror.BusPlan.security_dims` | `p3_bus::security::BusPlan::security_model` | stub | 1 |
+| `bus` | `p3_bus.security.mirror.components` | `p3_security::bus::BusSecurityModel::components` | stub | 1 |
+| `bus` | `p3_bus.plan.mirror.layoutStep` | `p3_bus::plan::BusPlan::build` | stub | 2 |
 | `challenger` | `p3_challenger.duplex_challenger.mirror.sample` | `{impl p3_challenger::CanSample<EF> for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::sample` | not translated | 1 |
 | `challenger` | `p3_challenger.duplex_challenger.mirror.sample_bits` | `{impl p3_challenger::CanSampleBits<usize> for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::sample_bits` | not translated | 0 |
 | `challenger` | `p3_challenger.mirror.squeezeLoop` | `p3_field::helpers::squeeze_field_order_num_limbs` | not translated | 2 |
@@ -1043,9 +1166,9 @@ counts the claims (of 1439) whose dependencies include the declaration.
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_coset_with_precomputation` | `p3_matrix::interpolation::Interpolate::interpolate_coset_with_precomputation` | not translated | 13 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_coset` | `p3_matrix::interpolation::Interpolate::interpolate_coset` | not translated | 12 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_subgroup` | `p3_matrix::interpolation::Interpolate::interpolate_subgroup` | not translated | 0 |
-| `matrix` | `p3_matrix.interpolation.mirror.barycentric_weights` | `p3_matrix::interpolation::barycentric_weights` | not translated | 5 |
-| `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_with_precomputation` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_with_precomputation` | not translated | 3 |
-| `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_point` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_point` | not translated | 3 |
+| `matrix` | `p3_matrix.interpolation.mirror.barycentric_weights` | `p3_matrix::interpolation::barycentric_weights` | not translated | 6 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_with_precomputation` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_with_precomputation` | not translated | 4 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_point` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_point` | not translated | 4 |
 | `matrix` | `p3_matrix.interpolation.mirror.recover_coefficients` | `p3_matrix::interpolation::InterpolateArbitrary::recover_coefficients` | not translated | 2 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_lagrange` | `p3_matrix::interpolation::interpolate_lagrange` | not translated | 1 |
 | `matrix` | `p3_matrix.util.mirror.reverse_matrix_index_bits` | `p3_matrix::util::reverse_matrix_index_bits` | not translated | 17 |
@@ -1088,7 +1211,7 @@ counts the claims (of 1439) whose dependencies include the declaration.
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_at_vertex` | `p3_multilinear_util::point::Point::equality_at_vertex` | stub | 1 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.hypercube` | `p3_multilinear_util::point::Point::hypercube` | stub | 2 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.expand_from_univariate` | `p3_multilinear_util::point::Point::expand_from_univariate` | stub | 9 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_eq` | `p3_multilinear_util::point::Point::eval_eq` | stub | 8 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_eq` | `p3_multilinear_util::point::Point::eval_eq` | stub | 9 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_select` | `p3_multilinear_util::point::Point::eval_select` | stub | 7 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_next` | `p3_multilinear_util::point::Point::eval_next` | stub | 3 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.transpose` | `p3_multilinear_util::point::Point::transpose` | stub | 0 |
@@ -1220,8 +1343,8 @@ counts the claims (of 1439) whose dependencies include the declaration.
 | `sumcheck` | `p3_sumcheck.mirror.VerifierTranscript.round` | `p3_sumcheck::transcript::VerifierTranscript::round` | stub | 12 |
 | `sumcheck` | `p3_sumcheck.mirror.verify_rounds` | `p3_sumcheck::data::SumcheckData::verify_rounds` | stub | 12 |
 | `sumcheck` | `p3_sumcheck.mirror.verify_final_sumcheck_rounds` | `p3_sumcheck::data::verify_final_sumcheck_rounds` | stub | 7 |
-| `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.new` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::new` | stub | 3 |
-| `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.eval` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::eval` | stub | 2 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.new` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::new` | stub | 4 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.eval` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::eval` | stub | 3 |
 | `sumcheck` | `p3_sumcheck.generic_degree.mirror.GenericDegreeShape.seed` | `p3_sumcheck::generic_degree::transcript::GenericDegreeShape::domain_separator` | stub | 1 |
 | `sumcheck` | `p3_sumcheck.generic_degree.mirror.VerifierTranscript.round` | `p3_sumcheck::generic_degree::transcript::VerifierTranscript::round` | stub | 1 |
 | `sumcheck` | `p3_sumcheck.generic_degree.mirror.verify` | `p3_sumcheck::generic_degree::proof::GenericDegreeProof::verify` | stub | 1 |
@@ -1475,6 +1598,29 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BinaryDft.vanishing.add` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.vanishing.point_eq_zero` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.vanishing.succ` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.blocks_aligned` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.bus_soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.clock_orbit_fields` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.factor_is_leaf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.flattening_faithful` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.forged_cycle` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.gap_check` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.gap_factors_digits` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.grand_product_soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.identity_padding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.identity_padding.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.layout_injective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.multiset_identity` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.planner_layout` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.ram_consistent` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.ram_consistent_machine` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.schedule` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.schedule_dimensions` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.security_numerators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.security_profile` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.sorted_trace_consistent` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.strict_increase` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.verifier_total` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Commit.PeriodicColumns.new.error` | `Quot.sound`, `propext` |
 | `Commit.PeriodicColumns.new.ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Commit.PeriodicLdeTable.get.packed` | `Classical.choice`, `Quot.sound`, `propext` |
