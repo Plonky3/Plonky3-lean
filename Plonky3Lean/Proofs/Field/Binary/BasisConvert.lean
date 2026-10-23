@@ -15,7 +15,7 @@ public import Plonky3Lean.Proofs.Field.Binary.BasisIso
 
 open Aeneas Aeneas.Std CoreModels Polynomial
 open ConcreteBinaryTower ConcreteBinaryTower.Coordinates
-open p3_binary_field BinaryField
+open p3_binary_field BinaryField BF128Ghash
 open Plonky3Lean.Lib Plonky3Lean.Spec.BinaryField
 
 namespace Plonky3Lean.Proofs.Binary
@@ -140,5 +140,97 @@ theorem poly_to_tower_128_spec (v : Std.U128) :
   rw [towerOf, ← lin_columns_128 hc (u128_val_lt r), hr, lin_lin,
     lin_congr_cols 128 v.val (fun j hj => hd j hj), lin_two_pow_cols,
     Nat.mod_eq_of_lt (u128_val_lt v)]
+
+/-- `N` at 128 bits, as a ring homomorphism. -/
+noncomputable abbrev N128 : ConcreteBTField 7 →+* AdjoinRoot (modPoly 128 135) :=
+  @towerHom _ _ (charP_modPoly (by norm_num) (by norm_num)) xi128 7 xi128_rel
+
+theorem N128_apply (x : ConcreteBTField 7) : N128 x = towerMap xi128 7 x := rfl
+
+theorem N128_injective : Function.Injective N128 := by
+  have := nontrivial_modPoly (n := 128) (tail := 135) (by norm_num) (by norm_num)
+  exact N128.injective
+
+/-- A polynomial of degree below `n` vanishes modulo `x^n + tail` only if it is zero. -/
+theorem mk_natPoly_eq_zero {n tail x : ℕ} (ht : tail < 2 ^ n) (hx : x < 2 ^ n)
+    (h : AdjoinRoot.mk (modPoly n tail) (natPoly x) = 0) : x = 0 := by
+  rw [AdjoinRoot.mk_eq_zero] at h
+  have hd : (natPoly x).degree < (modPoly n tail).degree := by
+    rw [degree_modPoly ht]; exact degree_natPoly_lt hx
+  have h0 := Polynomial.eq_zero_of_dvd_of_degree_lt h hd
+  exact natPoly_injective (by rw [h0, natPoly_zero])
+
+/-! ## GHASH -/
+
+theorem natPoly_135 : natPoly 135 = X ^ 7 + X ^ 2 + X + 1 := by
+  rw [show (135 : ℕ) = 2 ^ 7 ^^^ 2 ^ 2 ^^^ 2 ^ 1 ^^^ 2 ^ 0 by decide +kernel]
+  simp only [natPoly_xor, natPoly_two_pow, natPoly_two, natPoly_one, pow_one, pow_zero]
+
+theorem modPoly_128_ghash : modPoly 128 135 = ghashPoly := by
+  rw [ghashPoly_eq_X_pow_add_tail, modPoly, natPoly_135, ghashTail]
+
+theorem mk_ghash_eq {p q : (ZMod 2)[X]}
+    (h : AdjoinRoot.mk (modPoly 128 135) p = AdjoinRoot.mk (modPoly 128 135) q) :
+    AdjoinRoot.mk ghashPoly p = AdjoinRoot.mk ghashPoly q := by
+  rw [AdjoinRoot.mk_eq_mk] at h ⊢
+  rwa [modPoly_128_ghash] at h
+
+/-- `From<Ghash128> for BinaryField128` is `N⁻¹`. -/
+theorem bf128_from_ghash_spec (x : ghash.Ghash128) :
+    tower.BinaryField128.Insts.CoreConvertFromGhash128.from x ⦃ t =>
+      N128 (towerOf 7 t) = AdjoinRoot.mk (modPoly 128 135) (natPoly x.val) ⦄ := by
+  unfold tower.BinaryField128.Insts.CoreConvertFromGhash128.from
+  apply WP.spec_bind (poly_to_tower_128_spec x)
+  intro i hi
+  apply WP.spec_mono (bf128_from_repr_spec i)
+  intro t ht
+  rw [N128_apply, ← hi, towerOf, towerOf, ht,
+    Nat.mod_eq_of_lt (show i.val < 2 ^ 2 ^ 7 from u128_val_lt i)]
+
+/-- `From<BinaryField128> for Ghash128` is `N`. -/
+theorem ghash_from_bf128_spec (t : tower.BinaryField128) :
+    ghash.Ghash128.Insts.CoreConvertFromBinaryField128.from t ⦃ x =>
+      AdjoinRoot.mk (modPoly 128 135) (natPoly x.val) = N128 (towerOf 7 t) ⦄ := by
+  unfold ghash.Ghash128.Insts.CoreConvertFromBinaryField128.from
+  apply WP.spec_bind (bf128_to_repr_spec t)
+  intro i hi
+  apply WP.spec_bind (tower_to_poly_128_spec i)
+  intro r hr
+  rw [WP.spec_ok, hr, N128_apply, towerOf, towerOf, hi]
+
+/-- `invert_or_zero` inverts in CompPoly's GHASH field, sending `0` to `0`. -/
+theorem ghash_invert_or_zero_spec (x : ghash.Ghash128) :
+    ghash.invert_or_zero x ⦃ r => ghash r = (ghash x)⁻¹ ⦄ := by
+  unfold ghash.invert_or_zero
+  apply WP.spec_bind (bf128_from_ghash_spec x)
+  intro t ht
+  apply WP.spec_bind (bf128_try_inverse_spec t)
+  intro o ho
+  unfold core.option.Option.map_or
+  by_cases ht0 : towerOf 7 t = 0
+  · rw [ho.1 ht0]
+    rw [WP.spec_ok]
+    have hx0 : x.val = 0 := by
+      apply mk_natPoly_eq_zero (n := 128) (tail := 135) (by norm_num) (u128_val_lt x)
+      rw [← ht, ht0, map_zero]
+    have : x = 0#u128 := UScalar.eq_of_val_eq hx0
+    subst this
+    unfold ghash.Ghash128.Insts.P3_fieldFieldPrimeCharacteristicRing.ZERO
+    rw [show ghash 0#u128 = 0 from rfl, inv_zero]
+  · obtain ⟨c, hc, -, hcinv⟩ := ho.2 ht0
+    rw [hc]
+    dsimp only
+    unfold P.Insts.CoreOpsFunctionFnOnceTupleBinaryField128Ghash128.call_once
+    apply WP.spec_mono (ghash_from_bf128_spec c)
+    intro r hr
+    have hprod : AdjoinRoot.mk (modPoly 128 135) (natPoly r.val * natPoly x.val) =
+        AdjoinRoot.mk (modPoly 128 135) 1 := by
+      rw [map_mul, hr, ← ht, ← map_mul, hcinv, inv_mul_cancel₀ ht0, map_one, map_one]
+    have hq : toQuot (ghash r) * toQuot (ghash x) = 1 := by
+      rw [toQuot_eq_mk, toQuot_eq_mk, ← map_mul, mk_ghash_eq hprod, map_one]
+    have hm : ghash r * ghash x = 1 := by
+      apply toQuot_injective
+      rw [toQuot_mul, hq, toQuot_one]
+    exact eq_inv_of_mul_eq_one_left hm
 
 end Plonky3Lean.Proofs.Binary
