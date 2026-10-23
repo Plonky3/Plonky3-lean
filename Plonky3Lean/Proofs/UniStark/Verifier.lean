@@ -59,6 +59,38 @@ theorem verify_constraints_ok_iff (air : Air F) (trace_local trace_next : List K
       · cases (Option.some.inj h); simp_all
   · simp [hb] at h
 
+/-- The shape checks accept exactly when every documented shape holds. -/
+theorem check_shape_ok_iff (air : Air F) (opens zk : Bool) (D n bits : ℕ) (pv : List F)
+    (tl : List K) (tn : Option (List K)) (qcs : List (List K)) (r : Option (List K)) (rc : Bool)
+    (w : F) :
+    check_shape air opens zk D n bits pv tl tn qcs r rc w = .ok () ↔
+      r.isSome = zk ∧ rc = zk ∧ pv.length = air.num_public_values ∧
+      (if opens then ∃ v, tn = some v ∧ v.length = air.width else tn = none) ∧
+      tl.length = air.width ∧ qcs.length = n ∧ (∀ qc ∈ qcs, qc.length = D) ∧
+      (∀ x ∈ r, x.length = D) ∧ (bits = 0 → w = 0) := by
+  unfold check_shape
+  by_cases h1 : r.isSome ≠ zk ∨ rc ≠ zk
+  · simp only [h1, ↓reduceIte]
+    simp only [ne_eq] at h1
+    constructor
+    · intro h; cases h
+    · rintro ⟨ha, hb, -⟩; tauto
+  · simp only [h1, ↓reduceIte]
+    push Not at h1
+    obtain ⟨ha, hb⟩ := h1
+    cases opens <;> rcases tn with _ | v <;>
+      simp only [ha, hb, bind, Except.bind, throw, throwThe, MonadExceptOf.throw, pure, Except.pure] <;>
+      split_ifs <;> simp_all <;>
+      (intro a b c hr; rename_i h; obtain ⟨x, hx, hn⟩ := h a b c; exact absurd (hr x hx) hn)
+
+/-- Once zeta passes the domain check, the selectors at zeta do not panic. -/
+theorem check_ood_point_ok (hV : GenValid G) (c : Coset G) (ζ : K)
+    (h : check_ood_point G c ζ = .ok ()) : (Coset.selectors_at_point G c ζ).isSome := by
+  rw [Option.isSome_iff_ne_none, Ne, selectors_at_point_none G hV c ζ,
+    ← vanishing_poly_at_point_eq_zero G hV c ζ]
+  intro h0
+  simp [check_ood_point, h0, throw, throwThe, MonadExceptOf.throw] at h
+
 /-- The honest opening of row o of the trace at zeta: column c of the assignment, evaluated at zeta. -/
 noncomputable def openRow (σ : Var → K[X]) (row : ℕ → Var) (w : ℕ) (ζ : K) : List K :=
   (List.range w).map fun c => (σ (row c)).eval ζ

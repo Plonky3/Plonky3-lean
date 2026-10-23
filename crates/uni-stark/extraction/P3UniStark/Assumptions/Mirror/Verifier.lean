@@ -112,4 +112,34 @@ def verify_constraints (air : Air F) (trace_local trace_next : List K)
     return .error .OodEvaluationMismatch
   pure (.ok ())
 
+/-- The shape checks on the proof's opened values, in the verifier's order.
+
+* A randomization opening and commitment are present exactly when the scheme is hiding.
+* There is one public value per declared public value.
+* The next row is present, as wide as the trace, exactly when the AIR reads it.
+* The current row is as wide as the trace, there is one opening per quotient chunk, and each chunk and the randomization opening hold D values.
+* At zero grinding difficulty the grind witness is zero. -/
+def check_shape (air : Air F) (opens_main_next zk : Bool) (D num_quotient_chunks ood_pow_bits : ℕ)
+    (public_values : List F) (trace_local : List K) (trace_next : Option (List K))
+    (quotient_chunks : List (List K)) (random : Option (List K)) (random_commitment : Bool)
+    (ood_pow_witness : F) : Except VerificationError Unit := do
+  if random.isSome ≠ zk ∨ random_commitment ≠ zk then throw .RandomizationError
+  if public_values.length ≠ air.num_public_values then
+    throw (.InvalidProofShape .PublicValuesLengthMismatch)
+  if opens_main_next then
+    if (trace_next.map fun v => decide (v.length ≠ air.width)).getD true then
+      throw (.InvalidProofShape .TraceNextMismatch)
+  else if trace_next.isSome then throw (.InvalidProofShape .UnexpectedTraceNext)
+  let valid_shape := trace_local.length = air.width ∧
+    quotient_chunks.length = num_quotient_chunks ∧ (∀ qc ∈ quotient_chunks, qc.length = D) ∧
+    (∀ r ∈ random, r.length = D)
+  if ¬ valid_shape then throw (.InvalidProofShape .OpenedValuesDimensionMismatch)
+  if ood_pow_bits = 0 ∧ ood_pow_witness ≠ 0 then
+    throw (.InvalidProofShape .NonCanonicalOodPowWitness)
+
+/-- The rejection of a point on the trace domain, before anything divides by its vanishing polynomial. -/
+def check_ood_point (init_trace_domain : Coset G) (zeta : K) : Except VerificationError Unit :=
+  if Coset.vanishing_poly_at_point G init_trace_domain zeta = 0 then throw .OodPointInDomain
+  else pure ()
+
 end p3_uni_stark.verifier.mirror
