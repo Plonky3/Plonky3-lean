@@ -1,6 +1,7 @@
 module
 
 public import Plonky3Lean.Proofs.Hash.Keccak.P3
+public import Plonky3Lean.Lib.Iter
 
 @[expose] public section
 
@@ -329,6 +330,11 @@ def finalL (L : List Std.U64) (input : Slice Std.U8) (p k : ℕ) (d : Std.U8) : 
   let L2 := xorAt L1 w (Aeneas.Std.core.num.U64.from_le_bytes (tailBytes input (p + 8 * w) t) ^^^ marks1)
   if w ≠ 16 then xorAt L2 16 closing else L2
 
+theorem length_finalL (L : List Std.U64) (input : Slice Std.U8) (p k : ℕ) (d : Std.U8) :
+    (finalL L input p k d).length = L.length := by
+  simp only [finalL]
+  split <;> simp [length_xorAt, length_absorbL]
+
 theorem tail_step (input : Slice Std.U8) (starts : Std.Array Std.Usize 1#usize) (s : ℕ) (hs : starts.val = [usz s]) (o w t j : ℕ) (hj : j < t)
     (ht : t ≤ 8) (hp : s + o + 8 * w + t ≤ input.val.length) :
     p3_keccak.hax_reshaped.absorb_final_block_loop0_loop0.body input starts (usz o) (usz w) (usz 0)
@@ -549,5 +555,354 @@ theorem squeeze_lane_eq (st : Std.Array (Std.Array Std.U64 1#usize) 25#usize) :
     unfold p3_keccak.hax_reshaped.squeeze_lane_loop0.body
     rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next, range_stop, bind_ok]
     rfl
+
+/-! ## One group: one message -/
+
+theorem starts_loop (len g : ℕ) (N : Std.Usize) (hN : g * len ≤ N.val) (hg : g ≤ N.val) (hl : len ≤ N.val) :
+    p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop0 { start := usz 0, «end» := usz 1 } (usz len) (usz g)
+        (usz 1) (Std.Array.from (List.replicate (1#usize : Std.Usize).val 0#usize) (by simp)) =
+      .ok (Std.Array.from [usz (g * len)] rfl) := by
+  unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop0
+  refine loop_of_steps _ (fun k => (({ start := usz k, «end» := usz 1 } : CoreModels.core.ops.range.Range Std.Usize),
+    if k = 0 then Std.Array.from (List.replicate (1#usize : Std.Usize).val 0#usize) (by simp)
+    else Std.Array.from [usz (g * len)] rfl)) 1 _ ?_ ?_
+  · intro k hk
+    obtain rfl : k = 0 := by omega
+    show p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop0.body (usz len) (usz g) (usz 1)
+      { start := usz 0, «end» := usz 1 } _ = _
+    unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop0.body
+    rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
+      range_step 0 _ (by rw [usz_val (by decide)]; decide), bind_ok]
+    simp only [Aeneas.Std.uncurry_apply_pair]
+    have hlt : usz 0 < usz 1 := by rw [UScalar.lt_equiv, usz_val (by decide), usz_val (by decide)]; decide
+    simp only [hlt, ite_true, bind_ok]
+    rw [usz_add_le N (by omega), bind_ok, Nat.add_zero, usz_mul_le N hN hg hl, bind_ok,
+      update_eq _ _ _ (by simp [usz_val (show 0 < 2 ^ 32 by decide)]), bind_ok]
+    rfl
+  · show p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop0.body (usz len) (usz g) (usz 1)
+      { start := usz 1, «end» := usz 1 } _ = _
+    unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop0.body
+    rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next, range_stop, bind_ok]
+    rfl
+
+/-- The lanes after the first `k` whole blocks of the message from byte `p`. -/
+def blocksL (input : Slice Std.U8) (p k : ℕ) : List Std.U64 :=
+  (List.range k).foldl (fun L b => tiny_keccak.keccakf.rounds (absorbL L input (p + b * 136) 17))
+    (List.replicate 25 0#u64)
+
+theorem blocksL_succ (input : Slice Std.U8) (p k : ℕ) :
+    blocksL input p (k + 1) = tiny_keccak.keccakf.rounds (absorbL (blocksL input p k) input (p + k * 136) 17) := by
+  rw [blocksL, List.range_succ, List.foldl_append, List.foldl_cons, List.foldl_nil, ← blocksL]
+
+theorem length_blocksL (input : Slice Std.U8) (p k : ℕ) : (blocksL input p k).length = 25 := by
+  induction k with
+  | zero => simp only [blocksL, List.range_zero, List.foldl_nil, List.length_replicate]
+  | succ k ih =>
+    rw [blocksL_succ]
+    exact (rounds_eq _ (by rw [length_absorbL, ih])).2
+
+theorem permute_packed_eq (st : Std.Array (Std.Array Std.U64 1#usize) 25#usize) :
+    p3_keccak.KeccakF.Insts.P3_symmetricPermutationPermutationArrayArrayU64125.permute_mut () st =
+      .ok (pack (tiny_keccak.keccakf.rounds (unpack st))) := by
+  rw [p3_keccak.KeccakF.Insts.P3_symmetricPermutationPermutationArrayArrayU64125.permute_mut.eq_1]
+  exact permute_one_lane_eq st
+
+theorem array_clone_self {T : Type} {N : Std.Usize} (inst : CoreModels.core.clone.Clone T)
+    (hclone : ∀ x, inst.clone x = .ok x) (a : Std.Array T N) :
+    (CoreModels.core.Array.Insts.CoreCloneClone N inst).clone a = .ok a := by
+  show CoreModels.core.Array.Insts.CoreCloneClone.clone inst a = .ok a
+  unfold CoreModels.core.Array.Insts.CoreCloneClone.clone CoreModels.core.array.Array.map
+  rw [array_map_eq _ a () id (fun x => by
+    simp only [CoreModels.core.array.CloneArray.clone.closure.Insts.CoreOpsFunctionFnMutTupleTT.call_mut,
+      hclone, bind_ok, id])]
+  congr 1
+  apply Std.Array.ext
+  simp
+
+theorem zero_state :
+    CoreModels.core.array.repeat 25#usize (CoreModels.core.Array.Insts.CoreCloneClone 1#usize
+        CoreModels.core.U64.Insts.CoreCloneClone) (Std.Array.from (List.replicate (1#usize : Std.Usize).val 0#u64)
+          (by simp)) = .ok (pack (List.replicate 25 0#u64)) := by
+  rw [repeat_eq _ _ _ (array_clone_self _ (fun _ => rfl)) (by decide)]
+  congr 1
+
+theorem blocks_loop (input : Slice Std.U8) (starts : Std.Array Std.Usize 1#usize) (s : ℕ)
+    (hs : starts.val = [usz s]) (fb : ℕ) (hp : s + 136 * fb ≤ input.val.length) :
+    p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop1 (usz 136) { start := usz 0, «end» := usz fb } input
+        starts (pack (List.replicate 25 0#u64)) = .ok (pack (blocksL input s fb)) := by
+  have hN : (Slice.len input).val = input.val.length := by simp
+  unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop1
+  refine loop_of_steps _ (fun k => (({ start := usz k, «end» := usz fb } : CoreModels.core.ops.range.Range Std.Usize),
+    pack (blocksL input s k))) fb _ ?_ ?_
+  · intro k hk
+    show p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop1.body (usz 136) input starts
+      { start := usz k, «end» := usz fb } _ = _
+    unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop1.body
+    rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
+      range_step k _ (by rw [usz_val_le (Slice.len input) (by rw [hN]; omega)]; exact hk), bind_ok]
+    simp only [Aeneas.Std.uncurry_apply_pair]
+    rw [usz_mul_le (Slice.len input) (by rw [hN]; omega) (by rw [hN]; omega) (by rw [hN]; omega), bind_ok,
+      usz_div8 (by decide), bind_ok, absorb_words_eq _ _ _ s hs _ _ (by decide) (by omega), bind_ok,
+      unpack_pack _ (length_blocksL _ _ _), permute_packed_eq,
+      unpack_pack _ (by rw [length_absorbL, length_blocksL]), bind_ok, blocksL_succ]
+  · show p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop1.body (usz 136) input starts
+      { start := usz fb, «end» := usz fb } _ = _
+    unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop1.body
+    rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next, range_stop, bind_ok]
+    rfl
+
+/-- The lanes after the whole blocks and the final block of the `len` bytes from byte `p`, permuted. -/
+def msgLanes (input : Slice Std.U8) (p len : ℕ) (d : Std.U8) : List Std.U64 :=
+  tiny_keccak.keccakf.rounds (finalL (blocksL input p (len / 136)) input (p + len / 136 * 136) (len % 136) d)
+
+/-- The digests after the first `m` groups: the first `m` digests, then what `out` held. -/
+def outAt (out : Slice (Std.Array Std.U8 32#usize)) (D : ℕ → Std.Array Std.U8 32#usize) (m : ℕ) :
+    Slice (Std.Array Std.U8 32#usize) :=
+  Slice.from ((List.range out.val.length).map fun j => if j < m then D j else out.val[j]!) (by simp)
+
+theorem outAt_val (out : Slice (Std.Array Std.U8 32#usize)) (D : ℕ → Std.Array Std.U8 32#usize) (m : ℕ) :
+    (outAt out D m).val = (List.range out.val.length).map fun j => if j < m then D j else out.val[j]! := by
+  simp [outAt]
+
+theorem length_outAt (out : Slice (Std.Array Std.U8 32#usize)) (D : ℕ → Std.Array Std.U8 32#usize) (m : ℕ) :
+    (outAt out D m).val.length = out.val.length := by
+  simp [outAt]
+
+theorem write_loop (out : Slice (Std.Array Std.U8 32#usize)) (D : ℕ → Std.Array Std.U8 32#usize) (g : ℕ)
+    (hg : g < out.val.length) (st : Std.Array (Std.Array Std.U64 1#usize) 25#usize) (hD : D g = digestAt (unpack st) 32) :
+    p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop2 { start := usz 0, «end» := usz 1 } (outAt out D g)
+        (usz g) st = .ok (outAt out D (g + 1)) := by
+  have hN : (Slice.len out).val = out.val.length := by simp
+  unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop2
+  refine loop_of_steps _ (fun k => (({ start := usz k, «end» := usz 1 } : CoreModels.core.ops.range.Range Std.Usize),
+    outAt out D (g + k))) 1 _ ?_ ?_
+  · intro k hk
+    obtain rfl : k = 0 := by omega
+    show p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop2.body (usz g) st
+      { start := usz 0, «end» := usz 1 } _ = _
+    unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop2.body
+    rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
+      range_step 0 _ (by rw [usz_val (by decide)]; decide), bind_ok]
+    simp only [Aeneas.Std.uncurry_apply_pair]
+    rw [squeeze_lane_eq, bind_ok, usz_add_le (Slice.len out) (by rw [hN]; omega), bind_ok,
+      slice_update_eq _ _ _ (by rw [usz_val_le (Slice.len out) (by rw [hN]; omega), length_outAt]; omega), bind_ok]
+    congr 3
+    apply Slice.ext
+    simp only [Slice.from_val, outAt_val, usz_val_le (Slice.len out) (show g + 0 ≤ (Slice.len out).val by rw [hN]; omega)]
+    apply List.ext_getElem (by simp)
+    intro j h1 h2
+    simp only [List.getElem_set, List.getElem_map, List.getElem_range]
+    split_ifs <;> first | omega | rfl | (subst_vars; simp_all)
+  · show p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop2.body (usz g) st
+      { start := usz 1, «end» := usz 1 } _ = _
+    unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop2.body
+    rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next, range_stop, bind_ok]
+    rfl
+
+theorem usz_mul_lit (a c : ℕ) (hc : c < 2 ^ 32) (hc0 : 0 < c) (n : Std.Usize) (h : a * c ≤ n.val) :
+    (usz a * usz c : RustM Std.Usize) = .ok (usz (a * c)) := by
+  · have ha : a ≤ n.val := le_trans (Nat.le_mul_of_pos_right a hc0) h
+    have hmax : (usz a).val * (usz c).val ≤ UScalar.max .Usize := by
+      rw [usz_val_le n ha, usz_val hc]
+      have := n.hBounds; simp only [UScalar.max]; omega
+    obtain ⟨z, hz, hv⟩ := spec_imp_exists (UScalar.mul_spec hmax)
+    rw [hz, eq_usz_le (x := z) n h (by rw [hv, usz_val_le n ha, usz_val hc])]
+
+theorem range0 (e : Std.Usize) : ({ start := 0#usize, «end» := e } : CoreModels.core.ops.range.Range Std.Usize) =
+    { start := usz 0, «end» := e } := by
+  rw [show (0#usize : Std.Usize) = usz 0 from ofNatCore_eq_usz _ _ (by decide)]
+
+theorem repeat_usize (N : Std.Usize) (hN : 0 < N.val) (v : Std.Usize) :
+    CoreModels.core.array.repeat N CoreModels.core.Usize.Insts.CoreCloneClone v =
+      .ok (Std.Array.from (List.replicate N.val v) (by simp)) :=
+  repeat_eq N _ v (fun _ => rfl) hN
+
+/-- Digest `j` of the batch: message `j`, bytes `j len` to `(j + 1) len - 1`. -/
+def digestOf (input : Slice Std.U8) (len : ℕ) (d : Std.U8) (j : ℕ) : Std.Array Std.U8 32#usize :=
+  digestAt (msgLanes input (j * len) len d) 32
+
+theorem group_step (d : Std.U8) (input : Slice Std.U8) (out : Slice (Std.Array Std.U8 32#usize)) (len : ℕ)
+    (hlen : input.val.length = out.val.length * len) (hl : 0 < len) (g : ℕ) (hg : g < out.val.length) :
+    p3_keccak.hax_reshaped.hash_many_with_domain_loop1.body d (usz 136) input (usz len) (usz (len / 136))
+        (usz (len % 136)) (usz out.val.length) { start := usz g, «end» := usz out.val.length }
+        (outAt out (digestOf input len d) g) =
+      .ok (.cont ({ start := usz (g + 1), «end» := usz out.val.length }, outAt out (digestOf input len d) (g + 1))) := by
+  have hN : (Slice.len out).val = out.val.length := by simp
+  have hI : (Slice.len input).val = input.val.length := by simp
+  have hgl : g * len + len ≤ input.val.length := by rw [hlen]; nlinarith
+  have hlI : len ≤ input.val.length := by rw [hlen]; nlinarith
+  have hglI : g * len ≤ input.val.length := by omega
+  unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop1.body
+  rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
+    range_step g _ (by rw [usz_val_le (Slice.len out) (by rw [hN])]; exact hg), bind_ok]
+  simp only [Aeneas.Std.uncurry_apply_pair]
+  rw [VECTOR_LEN_eq, usz_mul_le (Slice.len out) (by rw [hN]; omega) (by rw [hN]; omega) (by rw [hN]; omega), bind_ok,
+    Nat.mul_one, usz_sub_le (Slice.len out) (by omega) (by rw [hN]), bind_ok]
+  have hpres : ¬ usz (out.val.length - g) < usz 1 := by
+    rw [UScalar.lt_equiv, usz_val_le (Slice.len out) (by rw [hN]; omega), usz_val (by decide)]; omega
+  simp only [hpres, ite_false, bind_ok]
+  rw [repeat_usize _ (by decide), bind_ok, range0, starts_loop len g (Slice.len input) (by rw [hI]; omega)
+      (by rw [hI]; nlinarith) (by rw [hI]; omega), bind_ok, repeat_u64 _ (by decide), bind_ok, zero_state, bind_ok,
+    range0, blocks_loop _ _ (g * len) rfl _ (by omega), bind_ok,
+    usz_mul_lit _ _ (by decide) (by decide) (Slice.len input) (by rw [hI]; omega), bind_ok,
+    absorb_final_block_eq _ _ _ _ (g * len) rfl _ _ (by omega) (by omega), bind_ok, permute_packed_eq, bind_ok,
+    write_loop _ _ _ hg _ ?_, bind_ok]
+  rw [unpack_pack _ ((rounds_eq _ (length_unpack _)).2), unpack_pack _ (by rw [length_finalL, length_unpack]),
+    unpack_pack _ (length_blocksL _ _ _)]
+  rfl
+
+theorem outAt_zero (out : Slice (Std.Array Std.U8 32#usize)) (D : ℕ → Std.Array Std.U8 32#usize) :
+    outAt out D 0 = out := by
+  apply Slice.ext
+  rw [outAt_val]
+  apply List.ext_getElem (by simp)
+  intro j h1 h2
+  simp [List.getElem?_eq_getElem h2]
+
+theorem groups_loop (d : Std.U8) (input : Slice Std.U8) (out : Slice (Std.Array Std.U8 32#usize)) (len : ℕ)
+    (hlen : input.val.length = out.val.length * len) (hl : 0 < len) :
+    p3_keccak.hax_reshaped.hash_many_with_domain_loop1 d (usz 136) { start := usz 0, «end» := usz out.val.length }
+        input out (usz len) (usz (len / 136)) (usz (len % 136)) (usz out.val.length) =
+      .ok (outAt out (digestOf input len d) out.val.length) := by
+  have hN : (Slice.len out).val = out.val.length := by simp
+  unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop1
+  have h := loop_of_steps (fun x => match x with
+      | (iter1, out1) => p3_keccak.hax_reshaped.hash_many_with_domain_loop1.body d (usz 136) input (usz len)
+        (usz (len / 136)) (usz (len % 136)) (usz out.val.length) iter1 out1)
+    (fun g => (({ start := usz g, «end» := usz out.val.length } : CoreModels.core.ops.range.Range Std.Usize),
+      outAt out (digestOf input len d) g)) out.val.length _
+    (fun g hg => group_step d input out len hlen hl g hg) (by
+      show p3_keccak.hax_reshaped.hash_many_with_domain_loop1.body _ _ _ _ _ _ _
+        { start := usz out.val.length, «end» := usz out.val.length } _ = _
+      unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop1.body
+      rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next, range_stop, bind_ok]
+      rfl)
+  rw [outAt_zero] at h
+  exact h
+
+theorem fill_loop (out : Slice (Std.Array Std.U8 32#usize)) (digest : Std.Array Std.U8 32#usize) :
+    p3_keccak.hax_reshaped.hash_many_with_domain_loop0 { start := usz 0, «end» := Slice.len out } out digest =
+      .ok (outAt out (fun _ => digest) out.val.length) := by
+  have hN : (Slice.len out).val = out.val.length := by simp
+  unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop0
+  have h := loop_of_steps (fun x => match x with
+      | (iter1, out1) => p3_keccak.hax_reshaped.hash_many_with_domain_loop0.body digest iter1 out1)
+    (fun g => (({ start := usz g, «end» := Slice.len out } : CoreModels.core.ops.range.Range Std.Usize),
+      outAt out (fun _ => digest) g)) out.val.length _
+    (fun g hg => by
+      show p3_keccak.hax_reshaped.hash_many_with_domain_loop0.body digest { start := usz g, «end» := Slice.len out } _ = _
+      unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop0.body
+      rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
+        range_step g _ (by rw [hN]; exact hg), bind_ok]
+      simp only [Aeneas.Std.uncurry_apply_pair]
+      rw [slice_update_eq _ _ _ (by rw [usz_val_le (Slice.len out) (by omega), length_outAt]; exact hg), bind_ok]
+      congr 3
+      apply Slice.ext
+      simp only [Slice.from_val, outAt_val, usz_val_le (Slice.len out) (show g ≤ (Slice.len out).val by omega)]
+      apply List.ext_getElem (by simp)
+      intro j h1 h2
+      simp only [List.getElem_set, List.getElem_map, List.getElem_range]
+      split_ifs <;> first | omega | rfl)
+    (by
+      show p3_keccak.hax_reshaped.hash_many_with_domain_loop0.body digest
+        { start := usz out.val.length, «end» := Slice.len out } _ = _
+      unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop0.body
+      rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
+        range_next_none _ _ (by rw [hN, usz_val_le (Slice.len out) (by omega)]), bind_ok]
+      rfl)
+  rw [outAt_zero] at h
+  exact h
+
+theorem usz_div_lit {a c : ℕ} (n : Std.Usize) (ha : a ≤ n.val) (hc : c < 2 ^ 32) (h0 : c ≠ 0) :
+    (usz a / usz c : RustM Std.Usize) = .ok (usz (a / c)) := by
+  obtain ⟨z, hz, hv⟩ := UScalar.div_spec (usz a) (y := usz c) (by rw [usz_val hc]; exact h0)
+  rw [hz, eq_usz_le (x := z) (k := a / c) n (by have := Nat.div_le_self a c; omega)
+    (by rw [hv, usz_val_le n ha, usz_val hc])]
+
+theorem usz_rem_lit {a c : ℕ} (n : Std.Usize) (ha : a ≤ n.val) (hc : c < 2 ^ 32) (h0 : c ≠ 0) :
+    (usz a % usz c : RustM Std.Usize) = .ok (usz (a % c)) := by
+  obtain ⟨z, hz, hv⟩ := spec_imp_exists
+    (UScalar.rem_spec (usz a) (y := usz c) (by rw [usz_val hc]; exact h0))
+  rw [hz, eq_usz_le (x := z) (k := a % c) n (by have := Nat.mod_le a c; omega)
+    (by rw [hv, usz_val_le n ha, usz_val hc])]
+
+/-! ## The batched hash -/
+
+/-- No digests requested: `out` comes back unchanged, whatever the input. -/
+theorem hash_many_empty (d : Std.U8) (input : Slice Std.U8) (out : Slice (Std.Array Std.U8 32#usize))
+    (h : out.val = []) : p3_keccak.hax_reshaped.hash_many_with_domain d input out = .ok out := by
+  unfold p3_keccak.hax_reshaped.hash_many_with_domain
+  have he : Slice.len out = 0#usize := UScalar.eq_of_val_eq (by simp [h])
+  simp only [CoreModels.core.slice.Slice.is_empty, CoreModels.core.slice.Slice.len,
+    CoreModels.rust_primitives.slice.slice_length, bind_ok, he, decide_true, ite_true]
+
+/-- An input whose length the digest count does not divide panics. -/
+theorem hash_many_ragged (d : Std.U8) (input : Slice Std.U8) (out : Slice (Std.Array Std.U8 32#usize))
+    (hn : 0 < out.val.length) (h : input.val.length % out.val.length ≠ 0) :
+    p3_keccak.hax_reshaped.hash_many_with_domain d input out = .fail .panic := by
+  unfold p3_keccak.hax_reshaped.hash_many_with_domain
+  have hlv : (Slice.len out).val = out.val.length := by simp
+  have hli : (Slice.len input).val = input.val.length := by simp
+  have h0 : (Slice.len out).val ≠ 0 := by rw [hlv]; omega
+  have hne : ¬ Slice.len out = 0#usize := fun e => h0 (by rw [e]; rfl)
+  obtain ⟨m, hm, hmv⟩ := spec_imp_exists (UScalar.rem_spec (Slice.len input) h0)
+  have hm0 : ¬ m = 0#usize := fun e => h (by
+    have := congrArg UScalar.val e; rw [hmv, hli, hlv] at this; simpa using this)
+  simp only [CoreModels.core.slice.Slice.is_empty, CoreModels.core.slice.Slice.len,
+    CoreModels.rust_primitives.slice.slice_length, bind_ok, hne, decide_false, ite_false,
+    CoreModels.core.num.Usize.is_multiple_of, Bool.false_eq_true, hm, hm0,
+    CoreModels.core.fmt.rt.Argument.new_display, CoreModels.core.fmt.Arguments.new]
+
+theorem digestOf_zero (input : Slice Std.U8) (d : Std.U8) (j : ℕ) :
+    digestOf input 0 d j = digestAt (tiny_keccak.keccakf.rounds (finalL (List.replicate 25 0#u64) input 0 0 d)) 32 := by
+  simp [digestOf, msgLanes, blocksL]
+
+/-- `n` digests of messages of `len` bytes: digest `j` is the sponge of bytes `j len` to `(j + 1) len - 1`. -/
+theorem hash_many_eq (d : Std.U8) (input : Slice Std.U8) (out : Slice (Std.Array Std.U8 32#usize)) (len : ℕ)
+    (hn : 0 < out.val.length) (hlen : input.val.length = out.val.length * len) :
+    p3_keccak.hax_reshaped.hash_many_with_domain d input out =
+      .ok (outAt out (digestOf input len d) out.val.length) := by
+  unfold p3_keccak.hax_reshaped.hash_many_with_domain
+  have hlv : (Slice.len out).val = out.val.length := by simp
+  have hli : (Slice.len input).val = input.val.length := by simp
+  have h0 : (Slice.len out).val ≠ 0 := by rw [hlv]; omega
+  have hne : ¬ Slice.len out = 0#usize := fun e => h0 (by rw [e]; rfl)
+  obtain ⟨m, hm, hmv⟩ := spec_imp_exists (UScalar.rem_spec (Slice.len input) h0)
+  have hm0 : m = 0#usize := UScalar.eq_of_val_eq (by rw [hmv, hli, hlv, hlen]; simp)
+  obtain ⟨q, hq, hqv⟩ := UScalar.div_spec (Slice.len input) h0
+  have hql : q = usz len := eq_usz_le (Slice.len input) (by rw [hli, hlen]; nlinarith)
+    (by rw [hqv, hli, hlv, hlen]; exact Nat.mul_div_cancel_left _ hn)
+  simp only [CoreModels.core.slice.Slice.is_empty, CoreModels.core.slice.Slice.len,
+    CoreModels.rust_primitives.slice.slice_length, bind_ok, hne, decide_false, ite_false,
+    CoreModels.core.num.Usize.is_multiple_of]
+  simp only [Bool.false_eq_true, ite_false, hm, bind_ok, hm0, decide_true, ite_true, hq, hql]
+  have hon : Slice.len out = usz out.val.length := eq_usz_le (Slice.len out) (by rw [hlv]) hlv
+  rcases Nat.eq_zero_or_pos len with rfl | hl
+  · rw [show (0#usize : Std.Usize) = usz 0 from ofNatCore_eq_usz _ _ (by decide)]
+    simp only [ite_true]
+    rw [repeat_u64 _ (by decide), bind_ok, zero_state, bind_ok, repeat_usize _ (by decide), bind_ok,
+      absorb_final_block_eq _ _ _ _ 0 (by simp) 0 0 (by decide) (by simp), bind_ok, permute_packed_eq, bind_ok,
+      squeeze_lane_eq, bind_ok, fill_loop]
+    have hD : digestOf input 0 d = fun _ => digestAt (unpack (pack (tiny_keccak.keccakf.rounds (unpack (pack
+        (finalL (unpack (pack (List.replicate 25 0#u64))) input (0 + 0) 0 d)))))) 32 := by
+      funext j
+      rw [digestOf_zero, unpack_pack _ ((rounds_eq _ (length_unpack _)).2),
+        unpack_pack _ (by rw [length_finalL, length_unpack]), unpack_pack _ (by simp)]
+    rw [hD]
+  · have hlI : len ≤ (Slice.len input).val := by rw [hli, hlen]; nlinarith
+    have hne0 : ¬ usz len = 0#usize := by
+      intro e
+      have := congrArg UScalar.val e
+      rw [usz_val_le (Slice.len input) hlI] at this
+      simp at this; omega
+    have h1 : (usz (out.val.length % 1) = 0#usize) := by
+      rw [Nat.mod_one]; exact (ofNatCore_eq_usz _ _ (by decide)).symm
+    simp only [hne0, ite_false]
+    rw [RATE_eq, bind_ok, usz_div_lit _ hlI (by decide) (by decide), bind_ok,
+      usz_rem_lit _ hlI (by decide) (by decide), bind_ok, VECTOR_LEN_eq, hon,
+      usz_rem_lit (Slice.len out) (by rw [hlv]) (by decide) (by decide), bind_ok]
+    simp only [h1, ite_true]
+    rw [usz_div_lit (Slice.len out) (by rw [hlv]) (by decide) (by decide), bind_ok, Nat.div_one, range0]
+    exact groups_loop d input out len hlen hl
 
 end Plonky3Lean.Proofs.Keccak
