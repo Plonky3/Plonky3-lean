@@ -1,0 +1,32 @@
+# Patch:        010-restore-dropped-default-methods
+# Phase:        post
+# Target:       extraction/P3Keccak/Extraction/Funs.lean
+# Hunks:        1
+# Class:        restore
+# Gap:          docs/extractor-issues.md 2: charon's multi-target mode
+#               (`--targets`) drops the default-method roots hax adds
+#               (`--start-from core::clone::Clone::clone_from`).
+# Cost:         none. The added field is the body of the CoreModels default
+#               method it stands for (`clone.Clone.clone_from.default`),
+#               inlined.
+# Upstreamable: yes: charon could keep `--start-from` roots through the
+#               multi-target merge, or hax could pass `--target` to charon's
+#               cargo (issue 1).
+# Drop when:    charon keeps `--start-from` roots through the multi-target
+#               merge.
+#
+# The derived `Clone` of the permutation comes out without `clone_from`, and Lean rejects the structure.
+# The field is added by hand, with the default body:
+#   clone_from := fun _ source => <clone> source
+#
+--- a/extraction/P3Keccak/Extraction/Funs.lean
++++ b/extraction/P3Keccak/Extraction/Funs.lean
+@@ -803,6 +803,8 @@
+ @[reducible]
+ def KeccakF.Insts.CoreCloneClone : core.clone.Clone KeccakF := {
+   clone := KeccakF.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => KeccakF.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- Trait implementation: [p3_keccak::{impl p3_symmetric::permutation::Permutation<[u64; 25usize]> for p3_keccak::KeccakF}]

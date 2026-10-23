@@ -1,0 +1,21 @@
+# p3-keccak: the Keccak-f[1600] permutation, and the Keccak-256 and SHA3-256 hashes.
+#
+# On targets without a vector unit, which the extraction target is, the batched
+# hash runs the portable backend: one lane, which is the scalar permutation.
+
+lean_lib = "P3Keccak"
+
+# The permutation and the batched hashes are extracted.
+#
+# The one-message hashes call tiny-keccak's incremental sponge, which does not
+# extract (crates/tiny-keccak/crate.toml). The vector backends are compiled only
+# for SIMD targets.
+state = "scoped"
+
+features = []
+
+# One root: the `hax_roots` module that pre-patch 010 adds under
+# cfg(hax_backend_lean). Each of its functions calls one method.
+start_from = ["p3_keccak::hax_roots"]
+
+watch = ["keccak/src", "keccak/Cargo.toml"]

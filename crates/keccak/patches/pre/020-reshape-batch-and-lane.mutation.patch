@@ -1,0 +1,14 @@
+# Mutation of: 020-reshape-batch-and-lane
+# Breaks:      every lane of a group reads the group's first message.
+#
+--- a/keccak/src/hax_reshaped.rs
++++ b/keccak/src/hax_reshaped.rs
+@@ -157,7 +157,7 @@
+         let mut starts = [0usize; VECTOR_LEN];
+         for lane in 0..VECTOR_LEN {
+             let index = if lane < present { lane } else { 0 };
+-            starts[lane] = (first + index) * len;
++            starts[lane] = first * len;
+         }
+ 
+         let mut state = [[0u64; VECTOR_LEN]; 25];

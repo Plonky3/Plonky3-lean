@@ -1,0 +1,350 @@
+# Patch:        020-reshape-batch-and-lane
+# Phase:        pre
+# Target:       keccak/src/fallback.rs, keccak/src/hax_reshaped.rs, keccak/src/lib.rs
+# Hunks:        6
+# Class:        equiv-rewrite
+# Gap:          docs/extractor-issues.md 14 (no model of `transmute`, of
+#               `as_chunks_mut` or of a mutable slice iterator) and 91 (an
+#               array of borrowed message slices across a loop).
+# Cost:         none in a normal build: only the selection is behind
+#               cfg(hax_backend_lean). In the extracted variant, the batched
+#               hash and the one-lane permutation call the reshaped bodies,
+#               which a differential test equates with the originals.
+# Upstreamable: no: the originals are the clearer code; extractor models of
+#               the missing items make the patch unnecessary.
+# Drop when:    the extractor translates `transmute` between arrays of the
+#               same layout, `iter_mut().zip(..)`, `as_chunks_mut`, and an
+#               array of slices borrowed across a loop.
+# Test:         test p3-keccak --lib hax_reshaped
+# Mutation:     the reshaped batch reads every lane's message from the start
+#               of its group, so it disagrees with the original whenever a
+#               group holds two different messages.
+#
+# The one-lane permutation transmutes `[[u64; 1]; 25]` to `[u64; 25]`.
+# The reshaped body copies the words out, permutes them, and copies them back.
+#
+# The batched hash names each lane's message by a borrowed slice, and writes words through slice iterators.
+# The reshaped body names each message by its start in the input, and writes every word by index.
+# The constants, the padding marks, the order of the permutations and the assertion are unchanged.
+#
+# The original bodies stay compiled in the normal build, and the test runs them beside the reshaped ones.
+# The one-lane file is compiled only for targets without a vector backend, so the test includes it a second time.
+#
+--- a/keccak/src/fallback.rs
++++ b/keccak/src/fallback.rs
+@@ -1,6 +1,7 @@
+ //! This module should be included only when none of the more target-specific implementations are
+ //! available. It fills in a few things based on a pure Rust implementation of Keccak.
+ 
++#[cfg(not(hax_backend_lean))] // PATCHED
+ use core::mem::transmute;
+ 
+ use p3_symmetric::{CryptographicPermutation, Permutation};
+@@ -10,10 +11,17 @@
+ pub const VECTOR_LEN: usize = 1;
+ 
+ impl Permutation<[[u64; VECTOR_LEN]; 25]> for KeccakF {
++    #[cfg(not(hax_backend_lean))] // PATCHED
+     fn permute_mut(&self, input: &mut [[u64; VECTOR_LEN]; 25]) {
+         let input: &mut [u64; 25] = unsafe { transmute(input) };
+         self.permute_mut(input);
+     }
++
++    // PATCHED: the extracted variant copies the words out and back instead of transmuting.
++    #[cfg(hax_backend_lean)]
++    fn permute_mut(&self, input: &mut [[u64; VECTOR_LEN]; 25]) {
++        crate::hax_reshaped::permute_one_lane(input);
++    }
+ }
+ 
+ impl CryptographicPermutation<[[u64; VECTOR_LEN]; 25]> for KeccakF {}
+--- /dev/null
++++ b/keccak/src/hax_reshaped.rs
+@@ -0,0 +1,259 @@
++//! PATCHED: the batched hash and the one-lane permutation in a shape hax's Lean backend translates.
++//!
++//! The extractor has no model of a mutable slice iterator or of `transmute`.
++//! It also rejects an array of borrowed message slices held across a loop.
++//! Plonky3-lean, docs/extractor-issues.md, 14, 17 and 91.
++//!
++//! Each message is named by its start in the input instead of by a borrowed slice.
++//! Every state word is written by index.
++
++use p3_symmetric::Permutation;
++
++use crate::{CLOSING_MARK, DIGEST_BYTES, KeccakF, LAST_RATE_WORD, RATE, VECTOR_LEN};
++
++/// Permute a one-lane packed state: copy the words out, permute them, and copy them back.
++#[cfg_attr(not(hax_backend_lean), allow(dead_code))]
++pub(crate) fn permute_one_lane(state: &mut [[u64; 1]; 25]) {
++    // The packed state with one lane holds the same 25 words as the plain state.
++    let mut words = [0u64; 25];
++    for i in 0..25 {
++        words[i] = state[i][0];
++    }
++
++    <KeccakF as Permutation<[u64; 25]>>::permute_mut(&KeccakF, &mut words);
++
++    for i in 0..25 {
++        state[i][0] = words[i];
++    }
++}
++
++/// Exclusive-or one value per lane into word `word` of the state.
++fn xor_state_word(state: &mut [[u64; VECTOR_LEN]; 25], word: usize, value: [u64; VECTOR_LEN]) {
++    for lane in 0..VECTOR_LEN {
++        state[word][lane] ^= value[lane];
++    }
++}
++
++/// Read, in every lane, the eight message bytes at `offset` as one little-endian word.
++fn gather_word(input: &[u8], starts: &[usize; VECTOR_LEN], offset: usize) -> [u64; VECTOR_LEN] {
++    let mut word = [0u64; VECTOR_LEN];
++    for lane in 0..VECTOR_LEN {
++        word[lane] = u64::from_le_bytes(input[starts[lane] + offset..][..8].try_into().unwrap());
++    }
++    word
++}
++
++/// Absorb `words` whole state words of every lane's message, starting at `offset` in each.
++fn absorb_words(
++    state: &mut [[u64; VECTOR_LEN]; 25],
++    input: &[u8],
++    starts: &[usize; VECTOR_LEN],
++    offset: usize,
++    words: usize,
++) {
++    debug_assert!(words <= RATE / 8);
++
++    for word_index in 0..words {
++        xor_state_word(state, word_index, gather_word(input, starts, offset + 8 * word_index));
++    }
++}
++
++/// Absorb the final, shorter block of every lane and close it with the padding.
++fn absorb_final_block<const DOMAIN: u8>(
++    state: &mut [[u64; VECTOR_LEN]; 25],
++    input: &[u8],
++    starts: &[usize; VECTOR_LEN],
++    offset: usize,
++    block_len: usize,
++) {
++    debug_assert!(block_len < RATE);
++
++    let words = block_len / 8;
++    let tail = block_len % 8;
++    absorb_words(state, input, starts, offset, words);
++
++    // The first mark follows the last message byte; the second joins it in the closing word.
++    let mut marks = u64::from(DOMAIN) << (8 * tail);
++    if words == LAST_RATE_WORD {
++        marks ^= CLOSING_MARK;
++    }
++    let mut value = [0u64; VECTOR_LEN];
++    for lane in 0..VECTOR_LEN {
++        // The leftover bytes, zero-padded to a word.
++        let mut bytes = [0u8; 8];
++        for i in 0..tail {
++            bytes[i] = input[starts[lane] + offset + 8 * words + i];
++        }
++        value[lane] = u64::from_le_bytes(bytes) ^ marks;
++    }
++    xor_state_word(state, words, value);
++
++    // Otherwise the closing word takes the second mark alone.
++    if words != LAST_RATE_WORD {
++        xor_state_word(state, LAST_RATE_WORD, [CLOSING_MARK; VECTOR_LEN]);
++    }
++}
++
++/// Read the digest of one lane: the leading bytes of the rate, little-endian per word.
++fn squeeze_lane(state: &[[u64; VECTOR_LEN]; 25], lane: usize) -> [u8; DIGEST_BYTES] {
++    let mut digest = [0u8; DIGEST_BYTES];
++    for word_index in 0..DIGEST_BYTES / 8 {
++        let bytes = state[word_index][lane].to_le_bytes();
++        for i in 0..8 {
++            digest[8 * word_index + i] = bytes[i];
++        }
++    }
++    digest
++}
++
++/// Hash a batch of equal-length messages, one message per lane per permutation.
++///
++/// # Panics
++///
++/// Panics if the input length is not a whole multiple of the digest count.
++#[cfg_attr(not(hax_backend_lean), allow(dead_code))]
++pub(crate) fn hash_many_with_domain<const DOMAIN: u8>(input: &[u8], out: &mut [[u8; DIGEST_BYTES]]) {
++    // No digests requested means there is nothing to read from the input.
++    if out.is_empty() {
++        return;
++    }
++
++    // Every message has the same length, so the split is exact by contract.
++    assert!(
++        input.len().is_multiple_of(out.len()),
++        "input length ({}) must be a whole multiple of the digest count ({})",
++        input.len(),
++        out.len()
++    );
++    let len = input.len() / out.len();
++
++    // Empty messages all share the digest of one padding-only block.
++    if len == 0 {
++        let mut state = [[0u64; VECTOR_LEN]; 25];
++        absorb_final_block::<DOMAIN>(&mut state, input, &[0; VECTOR_LEN], 0, 0);
++        KeccakF.permute_mut(&mut state);
++        let digest = squeeze_lane(&state, 0);
++        for i in 0..out.len() {
++            out[i] = digest;
++        }
++        return;
++    }
++
++    // Whole rate blocks are absorbed in lockstep, then one shorter final block.
++    let full_blocks = len / RATE;
++    let final_block = len % RATE;
++
++    // Group `g` holds messages `g * VECTOR_LEN` onwards, one per lane.
++    let count = out.len();
++    for group in 0..(count + VECTOR_LEN - 1) / VECTOR_LEN {
++        let first = group * VECTOR_LEN;
++
++        // A short last group repeats its first message in the spare lanes.
++        let present = if count - first < VECTOR_LEN {
++            count - first
++        } else {
++            VECTOR_LEN
++        };
++        let mut starts = [0usize; VECTOR_LEN];
++        for lane in 0..VECTOR_LEN {
++            let index = if lane < present { lane } else { 0 };
++            starts[lane] = (first + index) * len;
++        }
++
++        let mut state = [[0u64; VECTOR_LEN]; 25];
++        for block in 0..full_blocks {
++            absorb_words(&mut state, input, &starts, block * RATE, RATE / 8);
++            KeccakF.permute_mut(&mut state);
++        }
++        absorb_final_block::<DOMAIN>(&mut state, input, &starts, full_blocks * RATE, final_block);
++        KeccakF.permute_mut(&mut state);
++
++        for lane in 0..present {
++            out[first + lane] = squeeze_lane(&state, lane);
++        }
++    }
++}
++
++/// The one-lane permutation as shipped, which a vector target does not otherwise compile.
++#[cfg(all(
++    test,
++    any(
++        target_arch = "x86_64",
++        all(target_arch = "aarch64", target_feature = "neon"),
++        all(target_arch = "wasm32", target_feature = "simd128")
++    )
++))]
++#[allow(dead_code, unreachable_pub)]
++#[path = "fallback.rs"]
++mod original_fallback;
++
++#[cfg(test)]
++mod tests {
++    extern crate std;
++
++    use alloc::vec;
++    use alloc::vec::Vec;
++
++    use p3_symmetric::Permutation;
++    use proptest::prelude::*;
++
++    use crate::{DIGEST_BYTES, KECCAK_DOMAIN, KeccakF, SHA3_DOMAIN};
++
++    fn check<const DOMAIN: u8>(input: &[u8], count: usize) {
++        // Invariant: the reshaped body writes exactly the digests the shipped one writes.
++        let mut expected = vec![[0u8; DIGEST_BYTES]; count];
++        let mut reshaped = vec![[1u8; DIGEST_BYTES]; count];
++        crate::hash_many_with_domain::<DOMAIN>(input, &mut expected);
++        super::hash_many_with_domain::<DOMAIN>(input, &mut reshaped);
++        assert_eq!(reshaped, expected);
++    }
++
++    #[test]
++    fn reshaped_hash_many_matches_on_block_shapes() {
++        // Fixture state: lengths around the 136-byte rate and the closing word 16.
++        for len in [0, 1, 7, 8, 127, 128, 129, 135, 136, 137, 271, 272, 273] {
++            for count in 0..6 {
++                let input: Vec<u8> = (0..len * count).map(|i| (i * 31 + 7) as u8).collect();
++                check::<KECCAK_DOMAIN>(&input, count);
++                check::<SHA3_DOMAIN>(&input, count);
++            }
++        }
++    }
++
++    #[test]
++    fn reshaped_hash_many_panics_like_the_original() {
++        // Fixture state: 5 bytes cannot split into 2 messages.
++        let ragged = |f: fn(&[u8], &mut [[u8; DIGEST_BYTES]])| {
++            std::panic::catch_unwind(|| f(&[0; 5], &mut [[0; DIGEST_BYTES]; 2])).is_err()
++        };
++        assert!(ragged(crate::hash_many_with_domain::<KECCAK_DOMAIN>));
++        assert!(ragged(super::hash_many_with_domain::<KECCAK_DOMAIN>));
++    }
++
++    #[test]
++    #[cfg(any(
++            target_arch = "x86_64",
++            all(target_arch = "aarch64", target_feature = "neon"),
++            all(target_arch = "wasm32", target_feature = "simd128")
++        ))]
++    fn reshaped_one_lane_permutation_matches() {
++        // Invariant: copying the words out and back equals the transmuting body.
++        for seed in 0..64u64 {
++            let mut shipped: [[u64; 1]; 25] =
++                core::array::from_fn(|i| [seed.wrapping_mul(0x9e37_79b9_7f4a_7c15) ^ (i as u64)]);
++            let mut reshaped = shipped;
++            KeccakF.permute_mut(&mut shipped);
++            super::permute_one_lane(&mut reshaped);
++            assert_eq!(reshaped, shipped);
++        }
++    }
++
++    proptest! {
++        #[test]
++        fn reshaped_hash_many_matches(len in 0usize..300, count in 0usize..7, seed: u8) {
++            let input: Vec<u8> = (0..len * count).map(|i| (i as u8).wrapping_mul(31) ^ seed).collect();
++            check::<KECCAK_DOMAIN>(&input, count);
++            check::<SHA3_DOMAIN>(&input, count);
++        }
++    }
++}
+--- a/keccak/src/lib.rs
++++ b/keccak/src/lib.rs
+@@ -1,6 +1,7 @@
+ //! The Keccak-f permutation, and hash functions built from it.
+ 
+ #![no_std]
++#![cfg_attr(hax_backend_lean, allow(dead_code))] // PATCHED
+ 
+ #[cfg(test)]
+ extern crate alloc;
+@@ -258,6 +259,7 @@
+ /// # Panics
+ ///
+ /// Panics if the input length is not a whole multiple of the digest count.
++#[cfg(not(hax_backend_lean))] // PATCHED
+ #[inline(always)]
+ fn hash_many_with_domain<const DOMAIN: u8>(input: &[u8], out: &mut [[u8; DIGEST_BYTES]]) {
+     // No digests requested means there is nothing to read from the input.
+@@ -674,3 +676,9 @@
+ // PATCHED: extraction roots, only under hax's Lean backend.
+ #[cfg(hax_backend_lean)]
+ pub mod hax_roots;
++
++// PATCHED: the extracted variant takes the batched hash reshaped for the extractor.
++#[cfg(hax_backend_lean)]
++use hax_reshaped::hash_many_with_domain;
++// PATCHED
++mod hax_reshaped;

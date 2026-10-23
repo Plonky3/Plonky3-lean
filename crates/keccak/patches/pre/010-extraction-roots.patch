@@ -1,0 +1,76 @@
+# Patch:        010-extraction-roots
+# Phase:        pre
+# Target:       keccak/src/hax_roots.rs, keccak/src/lib.rs
+# Hunks:        2
+# Class:        bound
+# Gap:          docs/extractor-issues.md 4 (aeneas drops a method that no free
+#               function calls).
+# Cost:         none in a normal build: the module exists only under
+#               cfg(hax_backend_lean). In the extracted variant it adds free
+#               functions, each of which calls one method of the crate.
+#               No existing body changes.
+# Upstreamable: no: the module exists only for the extractor.
+# Drop when:    charon orders `--start-from` methods, and a pattern can name
+#               one of several impls of a generic trait.
+# Test:         lint p3-keccak unexpected_cfgs
+# Mutation:     the module is gated on a misspelled cfg, so a normal
+#               `cargo check` reports `unexpected_cfgs`.
+#
+# The permutation is implemented three times for one type, on `[u64; 25]`, on `[u8; 200]` and on packed states.
+# A charon pattern cannot tell the three impls apart (docs/extractor-issues.md 4 and 8).
+# Rooted at one-line wrappers, each method is reachable, so its own body is extracted.
+#
+diff --git a/keccak/src/hax_roots.rs b/keccak/src/hax_roots.rs
+new file mode 100644
+index 00000000..92f10f27
+--- /dev/null
++++ b/keccak/src/hax_roots.rs
+@@ -0,0 +1,36 @@
++//! PATCHED: extraction roots for hax's Lean backend, compiled only under `cfg(hax_backend_lean)`.
++//!
++//! Aeneas drops a method that no free function calls (Plonky3-lean, docs/extractor-issues.md, 4).
++//! Each function here calls one method and does nothing else, so that the method's own body is extracted.
++
++use p3_symmetric::{CryptographicHasher, Permutation};
++
++use crate::{Keccak256Hash, KeccakF, Sha3_256Hash, VECTOR_LEN};
++
++pub fn permute_u64(state: [u64; 25]) -> [u64; 25] {
++    <KeccakF as Permutation<[u64; 25]>>::permute(&KeccakF, state)
++}
++
++pub fn permute_mut_u64(state: &mut [u64; 25]) {
++    <KeccakF as Permutation<[u64; 25]>>::permute_mut(&KeccakF, state)
++}
++
++pub fn permute_u8(state: [u8; 200]) -> [u8; 200] {
++    <KeccakF as Permutation<[u8; 200]>>::permute(&KeccakF, state)
++}
++
++pub fn permute_mut_u8(state: &mut [u8; 200]) {
++    <KeccakF as Permutation<[u8; 200]>>::permute_mut(&KeccakF, state)
++}
++
++pub fn permute_mut_packed(state: &mut [[u64; VECTOR_LEN]; 25]) {
++    <KeccakF as Permutation<[[u64; VECTOR_LEN]; 25]>>::permute_mut(&KeccakF, state)
++}
++
++pub fn keccak256_hash_many(input: &[u8], out: &mut [[u8; 32]]) {
++    Keccak256Hash.hash_many(input, out)
++}
++
++pub fn sha3_256_hash_many(input: &[u8], out: &mut [[u8; 32]]) {
++    Sha3_256Hash.hash_many(input, out)
++}
+diff --git a/keccak/src/lib.rs b/keccak/src/lib.rs
+index 2bca1ceb..4829d984 100644
+--- a/keccak/src/lib.rs
++++ b/keccak/src/lib.rs
+@@ -670,3 +670,7 @@ mod tests {
+         }
+     }
+ }
++
++// PATCHED: extraction roots, only under hax's Lean backend.
++#[cfg(hax_backend_lean)]
++pub mod hax_roots;
