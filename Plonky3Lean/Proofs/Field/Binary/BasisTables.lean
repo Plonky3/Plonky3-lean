@@ -236,4 +236,287 @@ theorem apply_128_spec (T : Std.Array (Std.Array Std.U128 256#usize) 16#usize) (
   · simp
   · rfl
 
+theorem apply_64_loop_spec (T : Std.Array (Std.Array Std.U64 256#usize) 8#usize)
+    (cols : ℕ → ℕ) (hT : ∀ k < 8, ∀ w < 256, cellOf T k w = linB cols k w) (v : Std.U64)
+    (it : CoreModels.core.iter.adapters.enumerate.Enumerate (CoreModels.core.slice.iter.Iter
+      (Std.Array Std.U64 256#usize)))
+    (acc : Std.U64) (hit : iterList it.iter = T.val.drop it.count.val) (hc : it.count.val ≤ 8)
+    (hacc : acc.val = lin cols (8 * it.count.val) v.val) :
+    clmul.basis.apply_64_loop it v acc ⦃ r => r.val = lin cols 64 v.val ⦄ := by
+  unfold clmul.basis.apply_64_loop
+  refine loop.spec_decr_nat (fun p => 8 - p.1.count.val)
+    (fun p => iterList p.1.iter = T.val.drop p.1.count.val ∧ p.1.count.val ≤ 8 ∧
+      p.2.val = lin cols (8 * p.1.count.val) v.val) _ _ _ ?_ ⟨hit, hc, hacc⟩
+  rintro ⟨it, res⟩ ⟨hit, hc, hres⟩
+  unfold clmul.basis.apply_64_loop.body
+  simp only at hit hc hres
+  have hlenT : T.val.length = 8 := by simp
+  by_cases hc16 : it.count.val < 8
+  · have hcons : iterList it.iter = T.val[it.count.val] :: T.val.drop (it.count.val + 1) := by
+      rw [hit, List.drop_eq_getElem_cons (by omega)]
+    obtain ⟨c', hc', hnext⟩ := enumerate_next_cons it hcons (by
+      have : (8 : ℕ) ≤ Usize.max := by scalar_tac
+      omega)
+    dsimp only
+    rw [hnext]
+    simp only [Aeneas.Std.bind_ok]
+    step*
+    have hi3 : i3.val = (v.val >>> (8 * it.count.val)) % 256 := by
+      rw [i3_post, UScalar.cast_val_eq, i2_post, UScalar.cast_val_eq, i1_post, i_post]
+      have h8 : (v.val >>> (8 * it.count.val)) % 2 ^ 8 < 256 := Nat.mod_lt _ (by norm_num)
+      rw [UScalarTy.U8_numBits_eq, Nat.mod_eq_of_lt (by
+        rcases System.Platform.numBits_eq with e | e <;>
+          simp only [UScalarTy.Usize_numBits_eq, e] <;> omega)]
+      rfl
+    have hi4 : i4.val = linB cols it.count.val ((v.val >>> (8 * it.count.val)) % 256) := by
+      rw [← hi3, ← hT it.count.val hc16 i3.val (by rw [hi3]; exact Nat.mod_lt _ (by norm_num))]
+      unfold cellOf
+      rw [List.getElem?_eq_getElem (by omega)]
+      dsimp only
+      rw [List.getElem?_eq_getElem i4_post, i4_post1]
+    refine ⟨by rw [iterList_iterOf, hc'], by omega, ?_, by omega⟩
+    rw [acc1_post, UScalar.val_xor, hres, hi4, linB_byte, hc', mul_add, mul_one, lin_add]
+  · have hnil : iterList it.iter = [] := by rw [hit]; exact List.drop_of_length_le (by omega)
+    dsimp only
+    simp only [CoreModels.core.iter.adapters.enumerate.Enumerate.Insts.CoreIterTraitsIteratorIteratorPairUsizeClause0_Item.next]
+    rw [slice_iter_next_nil it.iter hnil]
+    simp only [Aeneas.Std.bind_ok]
+    have hc16' : it.count.val = 8 := by omega
+    step*
+
+/-- `apply_64` applies the map whose byte tables it is given. -/
+theorem apply_64_spec (T : Std.Array (Std.Array Std.U64 256#usize) 8#usize) (cols : ℕ → ℕ)
+    (hT : ∀ k < 8, ∀ w < 256, cellOf T k w = linB cols k w) (v : Std.U64) :
+    clmul.basis.apply_64 T v ⦃ r => r.val = lin cols 64 v.val ⦄ := by
+  unfold clmul.basis.apply_64
+  rw [array_as_slice_eq, Aeneas.Std.bind_ok, slice_iter_eq, Aeneas.Std.bind_ok,
+    enumerate_default_eq, Aeneas.Std.bind_ok]
+  apply apply_64_loop_spec T cols hT v
+  · rw [iterList_iterOfSlice]; simp [Std.Array.to_slice]
+  · simp
+  · rfl
+
+/-! ## `narrow` -/
+
+theorem narrow_inner_spec (T : Std.Array (Std.Array Std.U128 256#usize) 16#usize)
+    (byte : Std.Usize) (hb : byte.val < 8) (N : Std.Array (Std.Array Std.U64 256#usize) 8#usize)
+    (j : Std.Usize) (hj : j.val ≤ 256)
+    (hdone : ∀ w < j.val, cellOf N byte.val w = cellOf T byte.val w % 2 ^ 64) :
+    clmul.basis.narrow_loop0_loop0 T N byte j ⦃ N' =>
+      (∀ w < 256, cellOf N' byte.val w = cellOf T byte.val w % 2 ^ 64) ∧
+      ∀ k, k ≠ byte.val → ∀ w, cellOf N' k w = cellOf N k w ⦄ := by
+  unfold clmul.basis.narrow_loop0_loop0
+  refine loop.spec_decr_nat (fun p => 256 - p.2.val)
+    (fun p => p.2.val ≤ 256 ∧ (∀ w < p.2.val, cellOf p.1 byte.val w = cellOf T byte.val w % 2 ^ 64) ∧
+      ∀ k, k ≠ byte.val → ∀ w, cellOf p.1 k w = cellOf N k w) _ _ _ ?_ ?_
+  rotate_left
+  · exact ⟨hj, hdone, fun _ _ _ => rfl⟩
+  rintro ⟨tb, k⟩ ⟨hk, hd, ho⟩
+  unfold clmul.basis.narrow_loop0_loop0.body
+  step*
+  simp only at hk hd ho
+  have hk' : k.val < 256 := by scalar_tac
+  have hlen : byte.val < tb.length := by simpa using hb
+  have hi : i.val = cellOf T byte.val k.val := by
+    subst a_post1
+    rw [i_post1]
+    simp only [cellOf, List.getElem?_eq_getElem a_post, List.getElem?_eq_getElem i_post]
+  have hcell : ∀ k' w, cellOf (index_mut_back a2) k' w =
+      if k' = byte.val ∧ w = k.val then i1.val else cellOf tb k' w := by
+    intro k' w
+    rw [index_mut_back_post, a2_post, a1_post1, cellOf_set _ _ _ _ hlen hk']
+  refine ⟨by omega, ?_, ?_, by omega⟩
+  · intro w hw
+    rw [hcell]
+    by_cases hwk : w = k.val
+    · subst hwk
+      rw [ite_eq_left ⟨rfl, rfl⟩, i1_post, UScalar.cast_val_eq, UScalarTy.U64_numBits_eq, hi]
+    · rw [ite_eq_right (fun h => hwk h.2)]
+      exact hd w (by omega)
+  · intro k' hk'' w
+    rw [hcell, ite_eq_right (fun h => hk'' h.1)]
+    exact ho k' hk'' w
+
+theorem narrow_outer_spec (T : Std.Array (Std.Array Std.U128 256#usize) 16#usize)
+    (N : Std.Array (Std.Array Std.U64 256#usize) 8#usize) (i : Std.Usize) (hi : i.val ≤ 8)
+    (hdone : ∀ k < i.val, ∀ w < 256, cellOf N k w = cellOf T k w % 2 ^ 64) :
+    clmul.basis.narrow_loop0 T N i ⦃ N' =>
+      ∀ k < 8, ∀ w < 256, cellOf N' k w = cellOf T k w % 2 ^ 64 ⦄ := by
+  unfold clmul.basis.narrow_loop0
+  refine loop.spec_decr_nat (fun p => 8 - p.2.val)
+    (fun p => p.2.val ≤ 8 ∧ ∀ k < p.2.val, ∀ w < 256, cellOf p.1 k w = cellOf T k w % 2 ^ 64)
+    _ _ _ ?_ ⟨hi, hdone⟩
+  rintro ⟨tb, k⟩ ⟨hk, hd⟩
+  unfold clmul.basis.narrow_loop0.body
+  step*
+  simp only at hk hd
+  have hk' : k.val < 8 := by scalar_tac
+  refine WP.spec_bind (narrow_inner_spec T k hk' tb 0#usize (by simp)
+    (fun w hw => absurd hw (by simp))) fun t' ⟨hrow, ho⟩ => ?_
+  step*
+  refine ⟨by omega, ?_, by omega⟩
+  intro k' hk'' w hw
+  by_cases h : k' = k.val
+  · subst h; exact hrow w hw
+  · rw [ho k' h w]; exact hd k' (by omega) w hw
+
+theorem narrow_spec (T : Std.Array (Std.Array Std.U128 256#usize) 16#usize) :
+    clmul.basis.narrow T ⦃ N => ∀ k < 8, ∀ w < 256, cellOf N k w = cellOf T k w % 2 ^ 64 ⦄ := by
+  unfold clmul.basis.narrow
+  obtain ⟨a, ha, -⟩ :=
+    Lib.array_repeat_eq 256#usize core.U64.Insts.CoreCloneClone (fun _ => rfl) 0#u64
+  rw [ha, Aeneas.Std.bind_ok]
+  obtain ⟨tb, htb, -⟩ := Lib.array_repeat_eq 8#usize
+    (core.Array.Insts.CoreCloneClone 256#usize core.U64.Insts.CoreCloneClone)
+    (array_clone_eq _ (fun _ => rfl)) a
+  rw [htb, Aeneas.Std.bind_ok]
+  exact narrow_outer_spec T tb 0#usize (by simp) (fun _ h => absurd h (by simp))
+
+theorem narrow_32_inner_spec (T : Std.Array (Std.Array Std.U128 256#usize) 16#usize)
+    (byte : Std.Usize) (hb : byte.val < 4) (N : Std.Array (Std.Array Std.U32 256#usize) 4#usize)
+    (j : Std.Usize) (hj : j.val ≤ 256)
+    (hdone : ∀ w < j.val, cellOf N byte.val w = cellOf T byte.val w % 2 ^ 32) :
+    clmul.basis.narrow_32_loop0_loop0 T N byte j ⦃ N' =>
+      (∀ w < 256, cellOf N' byte.val w = cellOf T byte.val w % 2 ^ 32) ∧
+      ∀ k, k ≠ byte.val → ∀ w, cellOf N' k w = cellOf N k w ⦄ := by
+  unfold clmul.basis.narrow_32_loop0_loop0
+  refine loop.spec_decr_nat (fun p => 256 - p.2.val)
+    (fun p => p.2.val ≤ 256 ∧ (∀ w < p.2.val, cellOf p.1 byte.val w = cellOf T byte.val w % 2 ^ 32) ∧
+      ∀ k, k ≠ byte.val → ∀ w, cellOf p.1 k w = cellOf N k w) _ _ _ ?_ ?_
+  rotate_left
+  · exact ⟨hj, hdone, fun _ _ _ => rfl⟩
+  rintro ⟨tb, k⟩ ⟨hk, hd, ho⟩
+  unfold clmul.basis.narrow_32_loop0_loop0.body
+  step*
+  simp only at hk hd ho
+  have hk' : k.val < 256 := by scalar_tac
+  have hlen : byte.val < tb.length := by simpa using hb
+  have hi : i1.val = cellOf T byte.val k.val := by
+    subst a_post1
+    rw [i1_post1]
+    simp only [cellOf, List.getElem?_eq_getElem a_post, List.getElem?_eq_getElem i1_post]
+  have hcell : ∀ k' w, cellOf (index_mut_back a2) k' w =
+      if k' = byte.val ∧ w = k.val then i2.val else cellOf tb k' w := by
+    intro k' w
+    rw [index_mut_back_post, a2_post, a1_post1, cellOf_set _ _ _ _ hlen hk']
+  refine ⟨by omega, ?_, ?_, by omega⟩
+  · intro w hw
+    rw [hcell]
+    by_cases hwk : w = k.val
+    · subst hwk
+      rw [ite_eq_left ⟨rfl, rfl⟩, i2_post, UScalar.cast_val_eq, UScalarTy.U32_numBits_eq, hi]
+    · rw [ite_eq_right (fun h => hwk h.2)]
+      exact hd w (by omega)
+  · intro k' hk'' w
+    rw [hcell, ite_eq_right (fun h => hk'' h.1)]
+    exact ho k' hk'' w
+
+theorem narrow_32_outer_spec (T : Std.Array (Std.Array Std.U128 256#usize) 16#usize)
+    (N : Std.Array (Std.Array Std.U32 256#usize) 4#usize) (i : Std.Usize) (hi : i.val ≤ 4)
+    (hdone : ∀ k < i.val, ∀ w < 256, cellOf N k w = cellOf T k w % 2 ^ 32) :
+    clmul.basis.narrow_32_loop0 T N i ⦃ N' =>
+      ∀ k < 4, ∀ w < 256, cellOf N' k w = cellOf T k w % 2 ^ 32 ⦄ := by
+  unfold clmul.basis.narrow_32_loop0
+  refine loop.spec_decr_nat (fun p => 4 - p.2.val)
+    (fun p => p.2.val ≤ 4 ∧ ∀ k < p.2.val, ∀ w < 256, cellOf p.1 k w = cellOf T k w % 2 ^ 32)
+    _ _ _ ?_ ⟨hi, hdone⟩
+  rintro ⟨tb, k⟩ ⟨hk, hd⟩
+  unfold clmul.basis.narrow_32_loop0.body
+  step*
+  simp only at hk hd
+  have hk' : k.val < 4 := by scalar_tac
+  refine WP.spec_bind (narrow_32_inner_spec T k hk' tb 0#usize (by simp)
+    (fun w hw => absurd hw (by simp))) fun t' ⟨hrow, ho⟩ => ?_
+  step*
+  refine ⟨by omega, ?_, by omega⟩
+  intro k' hk'' w hw
+  by_cases h : k' = k.val
+  · subst h; exact hrow w hw
+  · rw [ho k' h w]; exact hd k' (by omega) w hw
+
+theorem narrow_32_spec (T : Std.Array (Std.Array Std.U128 256#usize) 16#usize) :
+    clmul.basis.narrow_32 T ⦃ N => ∀ k < 4, ∀ w < 256, cellOf N k w = cellOf T k w % 2 ^ 32 ⦄ := by
+  unfold clmul.basis.narrow_32
+  obtain ⟨a, ha, -⟩ :=
+    Lib.array_repeat_eq 256#usize core.U32.Insts.CoreCloneClone (fun _ => rfl) 0#u32
+  rw [ha, Aeneas.Std.bind_ok]
+  obtain ⟨tb, htb, -⟩ := Lib.array_repeat_eq 4#usize
+    (core.Array.Insts.CoreCloneClone 256#usize core.U32.Insts.CoreCloneClone)
+    (array_clone_eq _ (fun _ => rfl)) a
+  rw [htb, Aeneas.Std.bind_ok]
+  exact narrow_32_outer_spec T tb 0#usize (by simp) (fun _ h => absurd h (by simp))
+
+/-! ## `apply_32` -/
+
+theorem apply_32_loop_spec (T : Std.Array (Std.Array Std.U32 256#usize) 4#usize)
+    (cols : ℕ → ℕ) (hT : ∀ k < 4, ∀ w < 256, cellOf T k w = linB cols k w) (v : Std.U32)
+    (it : CoreModels.core.iter.adapters.enumerate.Enumerate (CoreModels.core.slice.iter.Iter
+      (Std.Array Std.U32 256#usize)))
+    (acc : Std.U32) (hit : iterList it.iter = T.val.drop it.count.val) (hc : it.count.val ≤ 4)
+    (hacc : acc.val = lin cols (8 * it.count.val) v.val) :
+    CoreModels.core.iter.traits.iterator.iter_fold_loop
+      (CoreModels.core.iter.adapters.enumerate.Enumerate.Insts.CoreIterTraitsIteratorIteratorPairUsizeClause0_Item
+        (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT
+          (Std.Array Std.U32 256#usize)))
+      clmul.basis.apply_32.closure.Insts.CoreOpsFunctionFnMutPairU32PairUsizeShared1ArrayU32256U32
+      it v acc ⦃ r => r.val = lin cols 32 v.val ⦄ := by
+  unfold CoreModels.core.iter.traits.iterator.iter_fold_loop
+  refine loop.spec_decr_nat (fun p => 4 - p.1.count.val)
+    (fun p => iterList p.1.iter = T.val.drop p.1.count.val ∧ p.1.count.val ≤ 4 ∧ p.2.1 = v ∧
+      p.2.2.val = lin cols (8 * p.1.count.val) v.val) _ _ _ ?_ ⟨hit, hc, rfl, hacc⟩
+  rintro ⟨it, f, res⟩ ⟨hit, hc, hf, hres⟩
+  simp only at hit hc hf hres
+  subst hf
+  unfold CoreModels.core.iter.traits.iterator.iter_fold_loop.body
+  have hlenT : T.val.length = 4 := by simp
+  by_cases hc4 : it.count.val < 4
+  · have hcons : iterList it.iter = T.val[it.count.val] :: T.val.drop (it.count.val + 1) := by
+      rw [hit, List.drop_eq_getElem_cons (by omega)]
+    obtain ⟨c', hc', hnext⟩ := enumerate_next_cons it hcons (by
+      have : (4 : ℕ) ≤ Usize.max := by scalar_tac
+      omega)
+    dsimp only
+    rw [hnext]
+    simp only [Aeneas.Std.bind_ok]
+    unfold clmul.basis.apply_32.closure.Insts.CoreOpsFunctionFnMutPairU32PairUsizeShared1ArrayU32256U32.call_mut
+    step*
+    rename_i i1 _ i1_post i2 _ i2_post _ i3 _ i3_post i4 _ i4_post i5 _ i5_post i5_post1
+    have hi4 : i4.val = (f.val >>> (8 * it.count.val)) % 256 := by
+      rw [i4_post, UScalar.cast_val_eq, i3_post, UScalar.cast_val_eq, i2_post, i1_post]
+      have h8 : (f.val >>> (8 * it.count.val)) % 2 ^ 8 < 256 := Nat.mod_lt _ (by norm_num)
+      rw [UScalarTy.U8_numBits_eq, Nat.mod_eq_of_lt (by
+        rcases System.Platform.numBits_eq with e | e <;>
+          simp only [UScalarTy.Usize_numBits_eq, e] <;> omega)]
+      rfl
+    have hi5 : i5.val = linB cols it.count.val ((f.val >>> (8 * it.count.val)) % 256) := by
+      rw [← hi4, ← hT it.count.val hc4 i4.val (by rw [hi4]; exact Nat.mod_lt _ (by norm_num))]
+      unfold cellOf
+      rw [List.getElem?_eq_getElem (by omega)]
+      dsimp only
+      rw [List.getElem?_eq_getElem i5_post, i5_post1]
+    refine ⟨by rw [iterList_iterOf, hc'], by omega, ?_, by omega⟩
+    rw [x_post, UScalar.val_xor, hres, hi5, linB_byte, hc', mul_add, mul_one, lin_add]
+  · have hnil : iterList it.iter = [] := by rw [hit]; exact List.drop_of_length_le (by omega)
+    dsimp only
+    simp only [CoreModels.core.iter.adapters.enumerate.Enumerate.Insts.CoreIterTraitsIteratorIteratorPairUsizeClause0_Item.next]
+    rw [slice_iter_next_nil it.iter hnil]
+    simp only [Aeneas.Std.bind_ok]
+    have hc4' : it.count.val = 4 := by omega
+    step*
+
+/-- `apply_32` applies the map whose byte tables it is given. -/
+theorem apply_32_spec (T : Std.Array (Std.Array Std.U32 256#usize) 4#usize) (cols : ℕ → ℕ)
+    (hT : ∀ k < 4, ∀ w < 256, cellOf T k w = linB cols k w) (v : Std.U32) :
+    clmul.basis.apply_32 T v ⦃ r => r.val = lin cols 32 v.val ⦄ := by
+  unfold clmul.basis.apply_32
+  rw [array_as_slice_eq, Aeneas.Std.bind_ok, slice_iter_eq, Aeneas.Std.bind_ok,
+    enumerate_default_eq, Aeneas.Std.bind_ok]
+  unfold CoreModels.core.iter.adapters.enumerate.Enumerate.Insts.CoreIterTraitsIteratorIteratorPairUsizeClause0_Item.fold
+    CoreModels.core.iter.traits.iterator.Iterator.fold.default
+    CoreModels.core.iter.traits.iterator.iter_fold
+  apply apply_32_loop_spec T cols hT v
+  · rw [iterList_iterOfSlice]; simp [Std.Array.to_slice]
+  · simp
+  · rfl
+
 end Plonky3Lean.Proofs.Binary
