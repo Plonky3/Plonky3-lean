@@ -325,4 +325,19 @@ Generated code that needs the value calls this exposed copy instead. -/
 def core.num.Usize.saturating_sub_exposed (x y : Std.Usize) : RustM Std.Usize :=
   ok ⟨BitVec.ofNat _ (x.val - y.val)⟩
 
+/-- Whether some item of a slice iterator satisfies a predicate.
+
+It stops at the first item that does, and returns the iterator past it. -/
+abbrev core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT.any {T F : Type _}
+    (FnInst : core.ops.function.FnMut F T Bool) :=
+  core.iter.traits.iterator.Iterator.any.default
+    (core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT T) FnInst
+
+/-- An optional reference turned into an optional copy.
+
+References are erased in the model, so this is the identity. -/
+def core.option.OptionShared0T.copied {T : Type _} (_ : core.marker.Copy T)
+    (o : core.option.Option T) : RustM (core.option.Option T) :=
+  ok o
+
 end CoreModels

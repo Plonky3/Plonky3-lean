@@ -1,0 +1,54 @@
+# Patch:        010-exposed-saturating-sub
+# Phase:        post
+# Target:       extraction/P3Air/Extraction/Funs.lean
+# Hunks:        3
+# Class:        reshape
+# Gap:          docs/extractor-issues.md 22 (Aeneas's `UScalar.saturating_sub`
+#               has no exposed body).
+# Cost:         `core.num.Usize.saturating_sub_exposed` in HaxExt.lean, a model
+#               of `usize::saturating_sub`, trusted as the rest of HaxExt is.
+# Upstreamable: yes: aeneas can mark its saturating operations `@[expose]`.
+# Drop when:    aeneas exposes them.
+#
+# The polynomial degree of a trace column is the trace length minus 1, clamped at 0.
+#
+# Nothing about the value of Aeneas's clamped subtraction can be proved from an importing module.
+#
+# The calls go to HaxExt's exposed model of the same operation.
+#
+--- a/extraction/P3Air/Extraction/Funs.lean
++++ b/extraction/P3Air/Extraction/Funs.lean
+@@ -216,9 +216,11 @@
+   := do
+   match self.entry with
+   | symbolic.variable.BaseEntry.Preprocessed _ =>
+-    core.num.Usize.saturating_sub trace_len 1#usize
++    -- PATCHED: the exposed model of `saturating_sub` (was `core.num.Usize.saturating_sub`)
++    core.num.Usize.saturating_sub_exposed trace_len 1#usize
+   | symbolic.variable.BaseEntry.Main _ =>
+-    core.num.Usize.saturating_sub trace_len 1#usize
++    -- PATCHED: the exposed model of `saturating_sub` (was `core.num.Usize.saturating_sub`)
++    core.num.Usize.saturating_sub_exposed trace_len 1#usize
+   | symbolic.variable.BaseEntry.Periodic =>
+     let o ←
+       core.slice.Slice.get (core.Usize.Insts.CoreSliceIndexSliceIndexSliceT
+@@ -228,7 +230,8 @@
+     let i ← core.option.Option.unwrap_or o1 trace_len
+     let period ← core.Usize.Insts.CoreCmpOrd.min i trace_len
+     match period.val with
+-    | 0 => core.num.Usize.saturating_sub trace_len 1#usize
++    -- PATCHED: the exposed model of `saturating_sub` (was `core.num.Usize.saturating_sub`)
++    | 0 => core.num.Usize.saturating_sub_exposed trace_len 1#usize
+     | _ => let i1 ← trace_len / period
+            trace_len - i1
+   | symbolic.variable.BaseEntry.Public => ok 0#usize
+@@ -256,7 +259,8 @@
+   := do
+   match self.entry with
+   | symbolic.variable.ExtEntry.Permutation _ =>
+-    core.num.Usize.saturating_sub trace_len 1#usize
++    -- PATCHED: the exposed model of `saturating_sub` (was `core.num.Usize.saturating_sub`)
++    core.num.Usize.saturating_sub_exposed trace_len 1#usize
+   | symbolic.variable.ExtEntry.Challenge => ok 0#usize
+   | symbolic.variable.ExtEntry.PermutationValue => ok 0#usize
+ 
