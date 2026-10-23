@@ -15,6 +15,7 @@ public import Plonky3Lean.Proofs.Dft.SmallBatch
 public import Plonky3Lean.Proofs.Dft.Lde
 public import Plonky3Lean.Proofs.Dft.Rows
 public import Plonky3Lean.Proofs.Dft.Fields
+public import Plonky3Lean.Proofs.BinaryDft.Concrete
 public import Plonky3Lean.Proofs.ZkCodes.Properties
 public import Plonky3Lean.Proofs.ZkCodes.Batch
 public import Plonky3Lean.Proofs.Commit.BabyBear
