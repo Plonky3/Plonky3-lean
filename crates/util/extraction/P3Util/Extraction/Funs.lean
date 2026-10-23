@@ -29,6 +29,30 @@ noncomputable section
 
 namespace p3_util
 
+/-- [p3_util::log2_strict_usize]:
+    Source: 'util/src/lib.rs', lines 78:0-87:1
+    Visibility: public -/
+def log2_strict_usize (n : Std.Usize) : RustM Std.Usize := do
+  let res ← core.num.Usize.trailing_zeros n
+  let i ← core.num.Usize.wrapping_shr n res
+  massert (i = 1#usize)
+  let i1 ← 1#usize <<< res
+  core.hint.assert_unchecked (n = i1)
+  ok (UScalar.cast .Usize res)
+
+/-- [p3_util::reverse_bits_len]:
+    Source: 'util/src/lib.rs', lines 203:0-214:1
+    Visibility: public -/
+def reverse_bits_len
+  (x : Std.Usize) (bit_len : Std.Usize) : RustM Std.Usize := do
+  let i ← lift (UScalar.cast .Usize core.num.Usize.BITS)
+  massert (bit_len <= i)
+  let i1 ← core.num.Usize.reverse_bits x
+  let i2 ← lift (UScalar.cast .U32 bit_len)
+  let i3 ← core.num.Usize.BITS - i2
+  let (i4, _) ← core.num.Usize.overflowing_shr i1 i3
+  ok i4
+
 /-- [p3_util::gcd_inner]: loop body 0:
     Source: 'util/src/lib.rs', lines 767:4-785:5
     Visibility: public -/

@@ -1,0 +1,13 @@
+# Mutation of: 020-cfg-hide-row-iterators
+# Breaks:      `interpolation` is gated on `cfg(hax_lean_matrix)`, so a normal build lacks it.
+#
+diff --git a/matrix/src/lib.rs b/matrix/src/lib.rs
+--- a/matrix/src/lib.rs
++++ b/matrix/src/lib.rs
+@@ -30,5 +30,5 @@
+ pub mod extension;
+ pub mod horizontally_truncated;
+-#[cfg(not(hax_lean_matrix))] // PATCHED: hidden from the extracted variant
++#[cfg(hax_lean_matrix)] // PATCHED: hidden from the extracted variant
+ pub mod interpolation;
+ pub mod row_index_mapped;

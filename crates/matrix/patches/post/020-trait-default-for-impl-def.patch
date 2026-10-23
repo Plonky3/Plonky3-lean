@@ -1,0 +1,53 @@
+# Patch:        020-trait-default-for-impl-def
+# Phase:        post
+# Target:       extraction/P3Matrix/Extraction/Funs.lean
+# Hunks:        3
+# Class:        reshape
+# Gap:          docs/extractor-issues.md 21 (`impl_def` unfolds only
+#               `@[trait_default]` functions, and a default reaches the
+#               instance through a closure's `FnOnce` instance or a function).
+# Cost:         none: the attribute only lets `impl_def` unfold the definition.
+# Upstreamable: yes: aeneas could mark the closure instances and callees of a
+#               default `@[trait_default]`.
+# Drop when:    aeneas marks them, or `impl_def` unfolds through them.
+#
+# The safe read's default calls the unchecked read inside a closure.
+#
+# That closure's call instance takes the matrix impl.
+#
+# The strided view's default calls a constructor that also takes the impl.
+#
+# The recursive impl cannot resolve itself through either, and every matrix impl fails.
+#
+# Marking the three definitions as trait defaults lets it unfold them, and changes no definition.
+#
+--- a/extraction/P3Matrix/Extraction/Funs.lean
++++ b/extraction/P3Matrix/Extraction/Funs.lean
+@@ -252,6 +252,8 @@
+ /-- [p3_matrix::strided::{p3_matrix::strided::VerticallyStridedRowIndexMap}::new_view]:
+     Source: 'matrix/src/strided.rs', lines 35:4-51:5
+     Visibility: public -/
++-- PATCHED: `trait_default`, so that `impl_def` can unfold it
++@[trait_default]
+ def strided.VerticallyStridedRowIndexMap.new_view
+   {T : Type _} {Inner : Type _} (corecloneCloneInst : core.clone.Clone T)
+   (MatrixInst : Matrix Inner T) (inner : Inner) (stride : Std.Usize)
+@@ -279,6 +281,8 @@
+ 
+ /-- [p3_matrix::Matrix::get::{impl core::ops::function::FnOnce<(), T> for p3_matrix::Matrix::get::{closure}<'_0, '_1, '_2, Self, T>}::call_once]:
+     Source: 'matrix/src/lib.rs', lines 98:53-101:9 -/
++-- PATCHED: `trait_default`, so that `impl_def` can unfold it
++@[trait_default]
+ def Matrix.get.closure.Insts.CoreOpsFunctionFnOnceTupleT.call_once
+   {Self : Type _} {T : Type _} (MatrixInst : Matrix Self T)
+   (c : Matrix.get.closure Self T) (_ : Unit) :
+@@ -289,7 +293,8 @@
+ 
+ /-- Trait implementation: [p3_matrix::Matrix::get::{impl core::ops::function::FnOnce<(), T> for p3_matrix::Matrix::get::{closure}<'_0, '_1, '_2, Self, T>}]
+     Source: 'matrix/src/lib.rs', lines 98:53-101:9 -/
+-@[reducible]
++-- PATCHED: `trait_default`, so that `impl_def` can unfold it
++@[reducible, trait_default]
+ def Matrix.get.closure.Insts.CoreOpsFunctionFnOnceTupleT {Self : Type _} {T :
+   Type _} (MatrixInst : Matrix Self T) : core.ops.function.FnOnce
+   (Matrix.get.closure Self T) Unit T := {

@@ -1,0 +1,30 @@
+# Patch:        030-exposed-saturating-sub
+# Phase:        post
+# Target:       extraction/P3Matrix/Extraction/Funs.lean
+# Hunks:        1
+# Class:        reshape
+# Gap:          docs/extractor-issues.md 22 (Aeneas's `UScalar.saturating_sub`
+#               has no exposed body).
+# Cost:         `core.num.Usize.saturating_sub_exposed` in HaxExt.lean, a model
+#               of `usize::saturating_sub`, trusted as the rest of HaxExt is.
+# Upstreamable: yes: aeneas can mark its saturating operations `@[expose]`.
+# Drop when:    aeneas exposes them.
+#
+# The strided view's height subtracts the offset from the height, clamped at 0, then divides by the stride, rounding up.
+#
+# Nothing about the value of Aeneas's clamped subtraction can be proved from an importing module.
+#
+# The call goes to HaxExt's exposed model of the same operation.
+#
+--- a/extraction/P3Matrix/Extraction/Funs.lean
++++ b/extraction/P3Matrix/Extraction/Funs.lean
+@@ -262,7 +262,8 @@
+     strided.VerticallyStridedRowIndexMap Inner)
+   := do
+   let i ← MatrixInst.height inner
+-  let i1 ← core.num.Usize.saturating_sub i offset
++  -- PATCHED: the exposed model of `saturating_sub` (was `core.num.Usize.saturating_sub`)
++  let i1 ← core.num.Usize.saturating_sub_exposed i offset
+   let height ← core.num.Usize.div_ceil i1 stride
+   ok { index_map := { height, stride, offset }, inner }
+ 

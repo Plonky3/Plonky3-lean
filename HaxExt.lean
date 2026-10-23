@@ -242,4 +242,87 @@ Derived equality on a struct with a `&'static str` field calls it. -/
 def core.Str.Insts.CoreCmpPartialEqStr.eq (self other : Str) : RustM Bool :=
   ok (decide (self = other))
 
+/-- A word shifted right by the shift amount modulo the word size.
+
+Aeneas models it as a pure function, and the generated code binds it. -/
+def core.num.Usize.wrapping_shr (x : Std.Usize) (s : Std.U32) : RustM Std.Usize :=
+  ok (Aeneas.Std.core.num.Usize.wrapping_shr x s)
+
+/-- The wrapped right shift, with a flag set when the amount is at least the word size. -/
+def core.num.Usize.overflowing_shr (x : Std.Usize) (s : Std.U32) :
+    RustM (Std.Usize × Bool) :=
+  ok (Aeneas.Std.core.num.Usize.wrapping_shr x s, decide (UScalarTy.Usize.numBits ≤ s.val))
+
+/-- A word with its bits in reverse order: bit i moves to bit w - 1 - i. -/
+def core.num.Usize.reverse_bits (x : Std.Usize) : RustM Std.Usize :=
+  ok ⟨x.bv.reverse⟩
+
+/-- A vector borrowed as a slice.
+
+The model stores a vector as its elements, so this is the identity. -/
+def alloc.vec.Vec.Insts.CoreBorrowBorrowSlice (T : Type _) :
+    core.borrow.Borrow (alloc.vec.Vec T) (Slice T) :=
+  { borrow := rust_primitives.sequence.seq_to_slice }
+
+/-- A shared reference borrowed as its target.
+
+Aeneas erases shared references, so this is the identity. -/
+def core.Shared0T.Insts.CoreBorrowBorrow (T : Type _) : core.borrow.Borrow T T :=
+  { borrow := fun x => ok x }
+
+/-- Mutable borrowing.
+
+It returns the borrow and the function that writes it back, as aeneas encodes a mutable result. -/
+structure core.borrow.BorrowMut (Self : Type _) (Borrowed : Type _) where
+  coreborrowBorrowSelfBorrowedInst : core.borrow.Borrow Self Borrowed
+  borrow_mut : Self → RustM (Borrowed × (Borrowed → Self))
+
+/-- A vector borrowed mutably as a slice, the identity on the modelled elements. -/
+def alloc.vec.Vec.Insts.CoreBorrowBorrowMutSlice (T : Type _) (_A : Type _) :
+    core.borrow.BorrowMut (alloc.vec.Vec T) (Slice T) :=
+  { coreborrowBorrowSelfBorrowedInst := alloc.vec.Vec.Insts.CoreBorrowBorrowSlice T
+    borrow_mut := rust_primitives.sequence.seq_to_slice_mut }
+
+/-- The smallest power of two at least x, so 1 for 0.
+
+Rust panics on overflow in a debug build and returns 0 in a release build.
+
+This is the debug build, as for every arithmetic operation of the model. -/
+def core.num.Usize.next_power_of_two (x : Std.Usize) : RustM Std.Usize :=
+  if x.val.nextPowerOfTwo < 2 ^ UScalarTy.Usize.numBits then
+    ok ⟨BitVec.ofNat _ x.val.nextPowerOfTwo⟩
+  else fail .panic
+
+/-- The larger of two words, the second one on a tie. -/
+def core.Usize.Insts.CoreCmpOrd.max (self other : Std.Usize) : RustM Std.Usize :=
+  ok (if other < self then self else other)
+
+/-- The exact length of an iterator.
+
+The model reads the iterator's own length. -/
+def core.iter.traits.exact_size.ExactSizeIterator.len.default {Self Item : Type _}
+    (inst : core.iter.traits.exact_size.ExactSizeIterator Self Item) (self : Self) :
+    RustM Std.Usize :=
+  inst.len self
+
+/-- Exchanges the contents of two slices, and panics unless their lengths are equal. -/
+def core.slice.Slice.swap_with_slice {T : Type _} (a b : Slice T) : RustM (Slice T × Slice T) :=
+  if a.length = b.length then ok (b, a) else fail .panic
+
+/-- The length of a range of words: end - start, or 0 when start >= end. -/
+def core.ops.range.RangeUsize.Insts.CoreIterTraitsExact_sizeExactSizeIteratorUsize :
+    core.iter.traits.exact_size.ExactSizeIterator (core.ops.range.Range Std.Usize) Std.Usize := {
+  iteratorIteratorInst :=
+    core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator core.Usize.Insts.CoreIterRangeStep
+  len := fun r => ok ⟨BitVec.ofNat _ (r.«end».val - r.start.val)⟩
+}
+
+/-- Word subtraction clamped at 0.
+
+The Aeneas model of this operation has no exposed body, so nothing can be proved about it.
+
+Generated code that needs the value calls this exposed copy instead. -/
+def core.num.Usize.saturating_sub_exposed (x y : Std.Usize) : RustM Std.Usize :=
+  ok ⟨BitVec.ofNat _ (x.val - y.val)⟩
+
 end CoreModels

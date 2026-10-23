@@ -4,7 +4,7 @@
 
 lean_lib = "P3Util"
 
-# Only the inversions are extracted.
+# Only the inversions and the bit-reversal helpers p3-matrix calls are extracted.
 #
 # The rest is transposes and iterator helpers, which no field claim needs.
 #
@@ -17,7 +17,13 @@ features = []
 # Monty31 inversion calls the 32-bit routine with 31-bit fields.
 #
 # Goldilocks inversion calls `gcd_inner` twice.
-start_from = ["p3_util::gcd_inversion_prime_field_32", "p3_util::gcd_inner"]
+start_from = [
+  "p3_util::gcd_inversion_prime_field_32",
+  "p3_util::gcd_inner",
+  # p3-matrix's bit-reversed view.
+  "p3_util::reverse_bits_len",
+  "p3_util::log2_strict_usize",
+]
 
 watch = ["util/src", "util/Cargo.toml"]
 
