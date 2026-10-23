@@ -24,3 +24,57 @@ start_from = [
 ]
 
 watch = ["security/src", "security/Cargo.toml"]
+
+# Transcriptions over the reals of the f64 bounds aeneas cannot translate
+# (docs/extractor-issues.md 19), in Plonky3Lean/Proofs/Security/Real.lean.
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.deepBitsR"
+rust = "p3_security::deep::deep_ali_error"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.deepFactorR"
+rust = "p3_security::deep::deep_ali_error"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.aliBitsR"
+rust = "p3_security::air::composition_error"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.listSizeLdrR"
+rust = "p3_security::proximity::list_size_ldr_m"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.alphaLdrR"
+rust = "p3_security::proximity::alpha_ldr_m"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.queryBitsR"
+rust = "p3_security::fri::query_phase_error"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.johnsonLineLogR"
+rust = "p3_security::proximity::johnson_exceptional_line_count_log2"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.commitLdrBitsR"
+rust = "p3_security::fri::commit_phase_error_ldr_m"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.commitUdrBitsR"
+rust = "p3_security::fri::commit_phase_error_udr"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.regimeBitsR"
+rust = "p3_security::stark::proven_security_regime"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.foldingPowBitsR"
+rust = "p3_security::assumption::SecurityAssumption::folding_pow_bits"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.upperX"
+rust = "p3_security::proximity::compute_upper_m"
+
+[[mirror]]
+lean = "Plonky3Lean.Proofs.Security.Real.sumBitsR"
+rust = "p3_security::error::ErrorBits::sum"
