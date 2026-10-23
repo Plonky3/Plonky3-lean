@@ -16,6 +16,7 @@ target `thumbv7em-none-eabi`
 |---|---|---:|---:|---:|---:|---:|---|---|
 | `air` | scoped | 364 | 913 | 0 | 67 | 0 | 0 / 1 | post `010` |
 | `baby-bear` | extracted | 2953 | 121 | 4 | 0 | 0 | 4 / 3 | pre `020`, pre `030`, pre `040` |
+| `batch-stark` | scoped | 116 | 664 | 0 | 52 | 0 | 0 / 0 |  |
 | `binary-dft` | stub |  | 528 | 0 | 50 |  | 0 / 0 |  |
 | `binary-field` | scoped | 21777 | 66 | 0 | 0 | 139 | 7 / 2 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050`, pre `060`, pre `070` |
 | `blake2s` | scoped | 148 | 51 | 1 | 0 | 0 | 1 / 0 | pre `010` |
@@ -69,6 +70,11 @@ charon errors: 0.
 Nothing translated is dropped.
 
 ### `baby-bear`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `batch-stark`
 
 charon errors: 0.
 Nothing translated is dropped.
@@ -458,7 +464,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1416) whose dependencies include it; reaching one is not using it.
+(of 1439) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -497,7 +503,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1416) whose dependencies include the declaration.
+counts the claims (of 1439) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -518,8 +524,8 @@ counts the claims (of 1416) whose dependencies include the declaration.
 | `air` | `p3_air.symbolic.mirror.instSymLeafBaseLeaf` | `{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression::BaseLeaf<F>}::degree_multiple` | not translated | 28 |
 | `air` | `p3_air.symbolic.mirror.instSymLeafExtLeaf` | `{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression_ext::ExtLeaf<F, EF>}::degree_multiple` | not translated | 4 |
 | `air` | `p3_air.symbolic.mirror.SymbolicExpressionExt.to_base` | `p3_air::symbolic::expression_ext::SymbolicExpressionExt::to_base` | not translated | 1 |
-| `air` | `p3_air.builder.mirror.AirBuilder.is_transition_window` | `p3_air::builder::AirBuilder::is_transition_window` | not translated | 6 |
-| `air` | `p3_air.builder.mirror.AirBuilder.when` | `p3_air::builder::AirBuilder::when` | not translated | 24 |
+| `air` | `p3_air.builder.mirror.AirBuilder.is_transition_window` | `p3_air::builder::AirBuilder::is_transition_window` | not translated | 7 |
+| `air` | `p3_air.builder.mirror.AirBuilder.when` | `p3_air::builder::AirBuilder::when` | not translated | 25 |
 | `air` | `p3_air.builder.mirror.AirBuilder.when_ne` | `p3_air::builder::AirBuilder::when_ne` | not translated | 1 |
 | `air` | `p3_air.builder.mirror.AirBuilder.when_first_row` | `p3_air::builder::AirBuilder::when_first_row` | not translated | 16 |
 | `air` | `p3_air.builder.mirror.AirBuilder.when_last_row` | `p3_air::builder::AirBuilder::when_last_row` | not translated | 1 |
@@ -535,7 +541,7 @@ counts the claims (of 1416) whose dependencies include the declaration.
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_zeros_ext` | `p3_air::builder::ExtensionBuilder::assert_zeros_ext` | not translated | 0 |
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_eq_ext` | `p3_air::builder::ExtensionBuilder::assert_eq_ext` | not translated | 2 |
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_one_ext` | `p3_air::builder::ExtensionBuilder::assert_one_ext` | not translated | 1 |
-| `air` | `p3_air.builder.mirror.ExtensionBuilder.when` | `{impl p3_air::builder::ExtensionBuilder for p3_air::filtered::FilteredAirBuilder<'_, AB>}::assert_zero_ext` | not translated | 2 |
+| `air` | `p3_air.builder.mirror.ExtensionBuilder.when` | `{impl p3_air::builder::ExtensionBuilder for p3_air::filtered::FilteredAirBuilder<'_, AB>}::assert_zero_ext` | not translated | 3 |
 | `air` | `p3_air.builder.mirror.PairCol.get` | `p3_air::virtual_column::PairCol::get` | not translated | 2 |
 | `air` | `p3_air.builder.mirror.VirtualPairCol.new` | `p3_air::virtual_column::VirtualPairCol::new` | not translated | 0 |
 | `air` | `p3_air.builder.mirror.VirtualPairCol.new_preprocessed` | `p3_air::virtual_column::VirtualPairCol::new_preprocessed` | not translated | 0 |
@@ -551,8 +557,8 @@ counts the claims (of 1416) whose dependencies include the declaration.
 | `air` | `p3_air.builder.mirror.VirtualPairCol.apply` | `p3_air::virtual_column::VirtualPairCol::apply` | not translated | 2 |
 | `air` | `p3_air.air.mirror.BoundaryPublic.row` | `p3_air::boundary::BoundaryPublic::row` | not translated | 3 |
 | `air` | `p3_air.air.mirror.validate` | `p3_air::boundary::validate` | not translated | 3 |
-| `air` | `p3_air.air.mirror.Air.periodic_values` | `p3_air::air::BaseAir::periodic_values` | not translated | 9 |
-| `air` | `p3_air.air.mirror.resolve` | `p3_air::symbolic::expression::SymbolicExpression::resolve` | not translated | 5 |
+| `air` | `p3_air.air.mirror.Air.periodic_values` | `p3_air::air::BaseAir::periodic_values` | not translated | 10 |
+| `air` | `p3_air.air.mirror.resolve` | `p3_air::symbolic::expression::SymbolicExpression::resolve` | not translated | 6 |
 | `air` | `p3_air.air.mirror.AirLayout.from_air` | `p3_air::symbolic::builder::AirLayout::from_air` | not translated | 29 |
 | `air` | `p3_air.air.mirror.AirLayout.validate_against_air` | `p3_air::symbolic::builder::AirLayout::validate_against_air` | not translated | 10 |
 | `air` | `p3_air.air.mirror.symbolicBuilder` | `p3_air::symbolic::builder::SymbolicAirBuilder::new` | not translated | 17 |
@@ -561,13 +567,65 @@ counts the claims (of 1416) whose dependencies include the declaration.
 | `air` | `p3_air.air.mirror.get_max_constraint_degree` | `p3_air::symbolic::builder::get_max_constraint_degree_extension` | not translated | 5 |
 | `air` | `p3_air.air.mirror.log2_ceil_usize` | `p3_util::log2_ceil_usize` | not translated | 7 |
 | `air` | `p3_air.air.mirror.get_log_quotient_degree` | `p3_uni_stark::symbolic::get_log_quotient_degree_extension` | not translated | 5 |
-| `air` | `p3_air.air.mirror.DebugState.assert_zero` | `{impl p3_air::named::NamedAirBuilder for p3_air::check_constraints::DebugConstraintBuilder<'_, F, EF>}::assert_zero_named` | not translated | 22 |
-| `air` | `p3_air.air.mirror.debugBuilder` | `p3_air::check_constraints::DebugConstraintBuilder::new` | not translated | 22 |
-| `air` | `p3_air.air.mirror.debugExtBuilder` | `{impl p3_air::named::NamedExtensionBuilder for p3_air::check_constraints::DebugConstraintBuilder<'_, F, EF>}::assert_zero_ext_named` | not translated | 6 |
+| `air` | `p3_air.air.mirror.DebugState.assert_zero` | `{impl p3_air::named::NamedAirBuilder for p3_air::check_constraints::DebugConstraintBuilder<'_, F, EF>}::assert_zero_named` | not translated | 23 |
+| `air` | `p3_air.air.mirror.debugBuilder` | `p3_air::check_constraints::DebugConstraintBuilder::new` | not translated | 23 |
+| `air` | `p3_air.air.mirror.debugExtBuilder` | `{impl p3_air::named::NamedExtensionBuilder for p3_air::check_constraints::DebugConstraintBuilder<'_, F, EF>}::assert_zero_ext_named` | not translated | 7 |
 | `air` | `p3_air.air.mirror.assert_periodic_column_shapes` | `p3_air::check_constraints::assert_periodic_column_shapes` | not translated | 2 |
 | `air` | `p3_air.air.mirror.boundary_io_mismatches` | `p3_air::check_constraints::boundary_io_mismatches` | not translated | 2 |
 | `air` | `p3_air.air.mirror.rowBuilder` | `p3_air::check_constraints::check_constraints` | not translated | 7 |
 | `air` | `p3_air.air.mirror.check_constraints` | `p3_air::check_constraints::check_constraints` | not translated | 2 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.BatchShape` | `p3_batch_stark::transcript::BatchShape` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.BatchShape.num_instances` | `p3_batch_stark::transcript::BatchShape::num_instances` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.BatchShape.has_lookups` | `p3_batch_stark::transcript::BatchShape::has_lookups` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.Step` | `p3_batch_stark::transcript::BatchShape::pattern` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.BatchShape.lookupSteps` | `p3_batch_stark::transcript::BatchShape::pattern` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.BatchShape.pattern` | `p3_batch_stark::transcript::BatchShape::pattern` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.DomainSeparator` | `p3_challenger::fs::DomainSeparator` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.BatchShape.domain_separator` | `p3_batch_stark::transcript::BatchShape::domain_separator` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.Msg` | `p3_batch_stark::transcript::BatchVerifierTranscript` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.BatchTranscriptFailure` | `p3_batch_stark::transcript::BatchTranscriptFailure` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.St` | `p3_challenger::fs::VerifierState` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.St.step` | `p3_challenger::fs::VerifierState` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.St.draw` | `p3_challenger::fs::VerifierState::challenge_extension` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.new` | `p3_batch_stark::transcript::BatchVerifierTranscript::new` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.instance_bindings` | `p3_batch_stark::transcript::BatchVerifierTranscript::instance_bindings` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.main_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::main_phase` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.preprocessed_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::preprocessed_phase` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.observe_pow` | `p3_challenger::fs::VerifierState::observe_pow` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.LayoutState` | `p3_batch_stark::transcript::lay_out_lookup_challenges` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.lookupKey` | `p3_batch_stark::transcript::lay_out_lookup_challenges` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.orInsert` | `p3_batch_stark::transcript::lay_out_lookup_challenges` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.busId` | `p3_batch_stark::transcript::lay_out_lookup_challenges` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.busIds` | `p3_batch_stark::transcript::lay_out_lookup_challenges` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.lay_out_lookup_challenges` | `p3_batch_stark::transcript::lay_out_lookup_challenges` | not translated | 6 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.lookup_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::lookup_phase` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.permutation_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::permutation_phase` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.quotient_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::quotient_phase` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.ood_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::ood_phase` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.delegate` | `p3_batch_stark::transcript::BatchVerifierTranscript::delegate` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.AirInfo` | `p3_batch_stark::verifier::verify_batch` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.instInhabitedAirInfo` | `p3_batch_stark::verifier::verify_batch` | not translated | 6 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.Config` | `p3_batch_stark::verifier::verify_batch` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.Config.is_zk` | `p3_uni_stark::StarkGenericConfig::is_zk` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.CommonData` | `p3_batch_stark::common::CommonData` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.Opened` | `p3_batch_stark::proof::OpenedValuesWithLookups` | not translated | 7 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.instInhabitedOpened` | `p3_batch_stark::proof::OpenedValuesWithLookups` | not translated | 6 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.BatchProof` | `p3_batch_stark::proof::BatchProof` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.BatchError` | `p3_batch_stark::error::BatchVerificationError` | not translated | 7 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.validate_degree_bits` | `p3_uni_stark::verifier::validate_degree_bits` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.preprocessedWidth` | `p3_batch_stark::verifier::verify_batch` | not translated | 7 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.Checked` | `p3_batch_stark::verifier::verify_batch` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.ensure` | `p3_batch_stark::verifier::verify_batch` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.heightResult` | `p3_lookup::types::check_multiplicity_height_bound` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.check_instance` | `p3_batch_stark::verifier::verify_batch` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.check_shape` | `p3_batch_stark::verifier::verify_batch` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.shapeOf` | `p3_batch_stark::verifier::verify_batch` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.replay` | `p3_batch_stark::verifier::verify_batch` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.opening_reads` | `p3_batch_stark::verifier::commitments_with_opening_points` | not translated | 2 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.verify_batch` | `p3_batch_stark::verifier::verify_batch` | not translated | 2 |
+| `batch-stark` | `p3_batch_stark.checker.mirror.rowBuilder` | `p3_air::DebugConstraintBuilder::new_with_permutation` | not translated | 1 |
+| `batch-stark` | `p3_batch_stark.checker.mirror.eval_air_and_lookups` | `p3_lookup::LookupProtocol::eval_air_and_lookups` | not translated | 1 |
+| `batch-stark` | `p3_batch_stark.checker.mirror.check_constraints` | `p3_batch_stark::check_constraints::check_constraints` | not translated | 1 |
 | `binary-dft` | `p3_binary_dft.mirror.Level.cantorBasis` | `p3_binary_field::tower::TowerLevel::cantor_basis` | stub | 17 |
 | `binary-dft` | `p3_binary_dft.mirror.trailingZeros` | `core::num::usize::trailing_zeros` | stub | 11 |
 | `binary-dft` | `p3_binary_dft.domain.mirror.domain_point.loop` | `p3_binary_dft::domain::domain_point` | stub | 15 |
@@ -923,33 +981,33 @@ counts the claims (of 1416) whose dependencies include the declaration.
 | `keccak-air` | `p3_keccak_air.mirror.binary.num_constraints` | `{impl p3_air::air::BaseAir<F> for p3_keccak_air::binary::air::KeccakBinaryAir}::num_constraints` | not translated | 1 |
 | `keccak-air` | `p3_keccak_air.mirror.binary.NUM_FLAG_CONSTRAINTS` | `p3_keccak_air::binary::air::NUM_FLAG_CONSTRAINTS` | not translated | 1 |
 | `keccak-air` | `p3_keccak_air.mirror.binary.NUM_STATE_BITS` | `p3_keccak_air::binary::air::NUM_STATE_BITS` | not translated | 1 |
-| `lookup` | `p3_lookup.mirror.Kind` | `p3_lookup::types::Kind` | not translated | 1 |
-| `lookup` | `p3_lookup.mirror.Lookup` | `p3_lookup::types::Lookup` | not translated | 7 |
+| `lookup` | `p3_lookup.mirror.Kind` | `p3_lookup::types::Kind` | not translated | 9 |
+| `lookup` | `p3_lookup.mirror.Lookup` | `p3_lookup::types::Lookup` | not translated | 21 |
 | `lookup` | `p3_lookup.mirror.Lookup.num_denoms` | `p3_lookup::types::Lookup::num_denoms` | not translated | 0 |
 | `lookup` | `p3_lookup.mirror.checked_add_u32` | `core::num::u32::checked_add` | not translated | 1 |
 | `lookup` | `p3_lookup.mirror.SymbolicInteraction` | `p3_lookup::builder::SymbolicInteraction` | not translated | 0 |
 | `lookup` | `p3_lookup.mirror.SymbolicLocalInteraction` | `p3_lookup::builder::SymbolicLocalInteraction` | not translated | 1 |
 | `lookup` | `p3_lookup.mirror.SymbolicExclusiveBranch` | `p3_lookup::builder::SymbolicExclusiveBranch` | not translated | 0 |
 | `lookup` | `p3_lookup.mirror.SymbolicExclusiveInteraction` | `p3_lookup::builder::SymbolicExclusiveInteraction` | not translated | 0 |
-| `lookup` | `p3_lookup.mirror.assert_uniform_widths` | `p3_lookup::types::assert_uniform_widths` | not translated | 0 |
-| `lookup` | `p3_lookup.mirror.assert_uniform_tuple_width` | `p3_lookup::types::assert_uniform_tuple_width` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.assert_uniform_widths` | `p3_lookup::types::assert_uniform_widths` | not translated | 8 |
+| `lookup` | `p3_lookup.mirror.assert_uniform_tuple_width` | `p3_lookup::types::assert_uniform_tuple_width` | not translated | 8 |
 | `lookup` | `p3_lookup.mirror.from_interactions` | `p3_lookup::types::Lookups::from_interactions` | not translated | 0 |
 | `lookup` | `p3_lookup.mirror.bus_widths` | `p3_lookup::types::bus_widths` | not translated | 0 |
 | `lookup` | `p3_lookup.mirror.assert_bus_widths` | `p3_lookup::types::assert_bus_widths` | not translated | 0 |
 | `lookup` | `p3_lookup.mirror.pack_bus` | `p3_lookup::types::Lookups::pack_same_bus_with_degree` | not translated | 0 |
 | `lookup` | `p3_lookup.mirror.pack_same_bus_with_degree` | `p3_lookup::types::Lookups::pack_same_bus_with_degree` | not translated | 0 |
-| `lookup` | `p3_lookup.mirror.total_count_weight` | `p3_lookup::types::Lookups::total_count_weight` | not translated | 2 |
+| `lookup` | `p3_lookup.mirror.total_count_weight` | `p3_lookup::types::Lookups::total_count_weight` | not translated | 7 |
 | `lookup` | `p3_lookup.mirror.check_bus_widths` | `p3_lookup::types::check_bus_widths` | not translated | 0 |
-| `lookup` | `p3_lookup.mirror.check_multiplicity_height_bound` | `p3_lookup::types::check_multiplicity_height_bound` | not translated | 2 |
-| `lookup` | `p3_lookup.mirror.PermBuilder` | `p3_air::air::PermutationAirBuilder` | not translated | 2 |
-| `lookup` | `p3_lookup.mirror.zip_eq` | `itertools::Itertools::zip_eq` | not translated | 3 |
-| `lookup` | `p3_lookup.mirror.combine_elements` | `p3_lookup::logup::LogUpGadget::combine_elements` | not translated | 4 |
-| `lookup` | `p3_lookup.mirror.compute_combined_sum_terms` | `p3_lookup::logup::LogUpGadget::compute_combined_sum_terms` | not translated | 2 |
-| `lookup` | `p3_lookup.mirror.compute_exclusive_terms` | `p3_lookup::logup::LogUpGadget::compute_exclusive_terms` | not translated | 2 |
-| `lookup` | `p3_lookup.mirror.eval_fraction` | `p3_lookup::logup::LogUpGadget::eval_fraction` | not translated | 1 |
-| `lookup` | `p3_lookup.mirror.eval_accumulator` | `p3_lookup::logup::LogUpGadget::eval_accumulator` | not translated | 1 |
-| `lookup` | `p3_lookup.mirror.eval_all` | `p3_lookup::protocol::LookupProtocol::eval_all` | not translated | 0 |
-| `lookup` | `p3_lookup.mirror.verify_terminal_sum` | `p3_lookup::logup::LogUpGadget::verify_terminal_sum` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.check_multiplicity_height_bound` | `p3_lookup::types::check_multiplicity_height_bound` | not translated | 7 |
+| `lookup` | `p3_lookup.mirror.PermBuilder` | `p3_air::air::PermutationAirBuilder` | not translated | 3 |
+| `lookup` | `p3_lookup.mirror.zip_eq` | `itertools::Itertools::zip_eq` | not translated | 4 |
+| `lookup` | `p3_lookup.mirror.combine_elements` | `p3_lookup::logup::LogUpGadget::combine_elements` | not translated | 5 |
+| `lookup` | `p3_lookup.mirror.compute_combined_sum_terms` | `p3_lookup::logup::LogUpGadget::compute_combined_sum_terms` | not translated | 3 |
+| `lookup` | `p3_lookup.mirror.compute_exclusive_terms` | `p3_lookup::logup::LogUpGadget::compute_exclusive_terms` | not translated | 3 |
+| `lookup` | `p3_lookup.mirror.eval_fraction` | `p3_lookup::logup::LogUpGadget::eval_fraction` | not translated | 2 |
+| `lookup` | `p3_lookup.mirror.eval_accumulator` | `p3_lookup::logup::LogUpGadget::eval_accumulator` | not translated | 2 |
+| `lookup` | `p3_lookup.mirror.eval_all` | `p3_lookup::protocol::LookupProtocol::eval_all` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.verify_terminal_sum` | `p3_lookup::logup::LogUpGadget::verify_terminal_sum` | not translated | 3 |
 | `lookup` | `p3_lookup.mirror.constraint_degree_with_transition` | `p3_lookup::logup::LogUpGadget::constraint_degree_with_transition` | not translated | 1 |
 | `lookup` | `p3_lookup.mirror.LookupTraceBuilder` | `p3_lookup::traits::LookupTraceBuilder` | not translated | 1 |
 | `lookup` | `p3_lookup.mirror.dot_product` | `p3_field::helpers::dot_product` | not translated | 4 |
@@ -961,7 +1019,7 @@ counts the claims (of 1416) whose dependencies include the declaration.
 | `lookup` | `p3_lookup.mirror.process_chunk` | `p3_lookup::logup::LogUpGadget::generate_permutation` | not translated | 1 |
 | `lookup` | `p3_lookup.mirror.prefix_sum` | `p3_lookup::logup::LogUpGadget::generate_permutation` | not translated | 1 |
 | `lookup` | `p3_lookup.mirror.generate_permutation` | `p3_lookup::logup::LogUpGadget::generate_permutation` | not translated | 1 |
-| `lookup` | `p3_lookup.mirror.Challenges.new` | `p3_lookup::challenges::Challenges::new` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.Challenges.new` | `p3_lookup::challenges::Challenges::new` | not translated | 7 |
 | `lookup` | `p3_lookup.mirror.Count.from_i32` | `p3_lookup::count::Count::from` | not translated | 1 |
 | `lookup` | `p3_lookup.mirror.Count.neg` | `p3_lookup::count::Count::neg` | not translated | 1 |
 | `lookup` | `p3_lookup.mirror.Recorded` | `p3_lookup::symbolic::InteractionSymbolicBuilder` | not translated | 2 |
@@ -1358,6 +1416,29 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Air.when_ne_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Air.when_transition_accepts` | `Quot.sound`, `propext` |
 | `Air.when_when_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.accepted_height_bound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.batch_opening_count` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.bus_ids` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.challenge_layout` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.checker_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.combiner_is_bus_denominator` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.cross_table_soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.fiat_shamir_order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.instCharPExt4FieldSize_plonky3Lean` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.layout_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.opening_count_sum` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.permutation_round_order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.randomization_mismatch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.replay_never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.seed_binds_shape` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.selector_count_balance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.selector_count_pin` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.selector_count_row0` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.table_shape` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.uni_stark_opening_count` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.verify_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.verify_never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.wrong_table_count` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.IsCantor.independent'` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.IsCantor.map'` | `Quot.sound`, `propext` |
 | `BinaryDft.LchNtt.ntt_batch_padded.eq` | `Classical.choice`, `Quot.sound`, `propext` |
