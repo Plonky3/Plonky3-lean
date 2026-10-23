@@ -69,6 +69,10 @@ name = "P3KoalaBear"
 srcDir = "crates/koala-bear/extraction"
 
 [[lean_lib]]
+name = "P3Matrix"
+srcDir = "crates/matrix/extraction"
+
+[[lean_lib]]
 name = "P3Mds"
 srcDir = "crates/mds/extraction"
 

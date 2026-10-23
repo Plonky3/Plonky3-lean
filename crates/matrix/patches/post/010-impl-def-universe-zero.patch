@@ -1,0 +1,79 @@
+# Patch:        010-impl-def-universe-zero
+# Phase:        post
+# Target:       extraction/P3Matrix/Extraction/Funs.lean
+# Hunks:        5
+# Class:        reshape
+# Gap:          docs/extractor-issues.md 18 (aeneas emits universe-polymorphic
+#               binders for an `impl_def` whose trait defaults are in `Type`).
+# Cost:         none
+# Upstreamable: yes: aeneas could emit `Type` binders, or let `impl_def`
+#               unify the universes, for impls whose defaults are monomorphic.
+# Drop when:    aeneas's `impl_def` elaborates universe-polymorphic impls.
+#
+# Two matrix defaults build a closure or a view, which aeneas places in the lowest universe.
+#
+# Each recursive matrix impl binds its type parameters in a polymorphic universe instead.
+#
+# The default then does not typecheck against the impl being defined.
+#
+# The parameters move to the lowest universe, where every use instantiates them.
+#
+--- a/extraction/P3Matrix/Extraction/Funs.lean
++++ b/extraction/P3Matrix/Extraction/Funs.lean
+@@ -371,7 +371,8 @@
+ /-- Trait implementation: [p3_matrix::dense::{impl p3_matrix::Matrix<T> for p3_matrix::dense::DenseMatrix<T, S>}]
+     Source: 'matrix/src/dense.rs', lines 425:0-610:1 -/
+ @[reducible]
+-impl_def dense.DenseMatrix.Insts.P3_matrixMatrix {T : Type _} {S : Type _}
++-- PATCHED: the type parameters are in `Type`, as the trait defaults it uses are (was `Type _`)
++impl_def dense.DenseMatrix.Insts.P3_matrixMatrix {T : Type} {S : Type}
+   (corecloneCloneInst1 : core.clone.Clone T) (DenseStorageInst :
+   dense.DenseStorage S T) : Matrix (dense.DenseMatrix T S) T := {
+   corecloneCloneInst := corecloneCloneInst1
+@@ -891,8 +892,9 @@
+ /-- Trait implementation: [p3_matrix::row_index_mapped::{impl p3_matrix::Matrix<T> for p3_matrix::row_index_mapped::RowIndexMappedView<IndexMap, Inner>}]
+     Source: 'matrix/src/row_index_mapped.rs', lines 65:0-233:1 -/
+ @[reducible]
+-impl_def row_index_mapped.RowIndexMappedView.Insts.P3_matrixMatrix {T : Type _}
+-  {IndexMap : Type _} {Inner : Type _} (corecloneCloneInst1 : core.clone.Clone
++-- PATCHED: the type parameters are in `Type`, as the trait defaults it uses are (was `Type _`)
++impl_def row_index_mapped.RowIndexMappedView.Insts.P3_matrixMatrix {T : Type}
++  {IndexMap : Type} {Inner : Type} (corecloneCloneInst1 : core.clone.Clone
+   T) (RowIndexMapInst : row_index_mapped.RowIndexMap IndexMap) (MatrixInst :
+   Matrix Inner T) : Matrix (row_index_mapped.RowIndexMappedView IndexMap Inner)
+   T := {
+@@ -1164,8 +1166,9 @@
+ /-- Trait implementation: [p3_matrix::horizontally_truncated::{impl p3_matrix::Matrix<T> for p3_matrix::horizontally_truncated::HorizontallyTruncated<T, Inner>}]
+     Source: 'matrix/src/horizontally_truncated.rs', lines 62:0-163:1 -/
+ @[reducible]
++-- PATCHED: the type parameters are in `Type`, as the trait defaults it uses are (was `Type _`)
+ impl_def horizontally_truncated.HorizontallyTruncated.Insts.P3_matrixMatrix {T
+-  : Type _} {Inner : Type _} (corecloneCloneInst1 : core.clone.Clone T)
++  : Type} {Inner : Type} (corecloneCloneInst1 : core.clone.Clone T)
+   (MatrixInst : Matrix Inner T) : Matrix
+   (horizontally_truncated.HorizontallyTruncated T Inner) T := {
+   corecloneCloneInst := corecloneCloneInst1
+@@ -1307,8 +1310,9 @@
+ /-- Trait implementation: [p3_matrix::stack::{impl p3_matrix::Matrix<T> for p3_matrix::stack::VerticalPair<Top, Bottom>}]
+     Source: 'matrix/src/stack.rs', lines 93:0-183:1 -/
+ @[reducible]
+-impl_def stack.VerticalPair.Insts.P3_matrixMatrix {T : Type _} {Top : Type _}
+-  {Bottom : Type _} (corecloneCloneInst1 : core.clone.Clone T) (MatrixInst :
++-- PATCHED: the type parameters are in `Type`, as the trait defaults it uses are (was `Type _`)
++impl_def stack.VerticalPair.Insts.P3_matrixMatrix {T : Type} {Top : Type}
++  {Bottom : Type} (corecloneCloneInst1 : core.clone.Clone T) (MatrixInst :
+   Matrix Top T) (MatrixInst1 : Matrix Bottom T) : Matrix (stack.VerticalPair
+   Top Bottom) T := {
+   corecloneCloneInst := corecloneCloneInst1
+@@ -1447,8 +1451,9 @@
+ /-- Trait implementation: [p3_matrix::stack::{impl p3_matrix::Matrix<T> for p3_matrix::stack::HorizontalPair<Left, Right>}]
+     Source: 'matrix/src/stack.rs', lines 185:0-244:1 -/
+ @[reducible]
+-impl_def stack.HorizontalPair.Insts.P3_matrixMatrix {T : Type _} {Left :
+-  Type _} {Right : Type _} (corecloneCloneInst1 : core.clone.Clone T)
++-- PATCHED: the type parameters are in `Type`, as the trait defaults it uses are (was `Type _`)
++impl_def stack.HorizontalPair.Insts.P3_matrixMatrix {T : Type} {Left :
++  Type} {Right : Type} (corecloneCloneInst1 : core.clone.Clone T)
+   (MatrixInst : Matrix Left T) (MatrixInst1 : Matrix Right T) : Matrix
+   (stack.HorizontalPair Left Right) T := {
+   corecloneCloneInst := corecloneCloneInst1

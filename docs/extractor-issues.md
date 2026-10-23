@@ -69,6 +69,14 @@ keeps its number and says so.
     desugars each into a hidden generic associated type, and p3-field has many.
     Pre-patches `baby-bear/020`, `030` and `040` hide them behind
     `cfg(hax_backend_lean)`.
+
+    The matrix trait of p3-matrix returns opaque iterators from every row method.
+
+    Charon translates those, but aeneas stops on the trait declaration ("Unimplemented").
+
+    The associated types they desugar to are generic over a lifetime.
+
+    Pre-patch `matrix/020` hides the row methods from p3-matrix's own run, behind a cfg only that run sets.
 11. **A scoped extraction of p3-poseidon1 fails** with an aeneas internal error
     in `core::iter`, and one of p3-poseidon2 fails on the body of
     `Poseidon2::new`. Both crates are stubs.
@@ -137,3 +145,25 @@ keeps its number and says so.
     Their readings over the reals are transcribed in `Plonky3Lean/Proofs/Security/`.
 
     The rounding of `f64` itself is checked by Rust tests, not modelled.
+
+20. **aeneas binds the type parameters of a recursive impl in a polymorphic universe.**
+
+    The trait defaults the impl passes itself to live in the lowest universe.
+
+    A default whose body builds a closure or a view lives there, so the impl fails to elaborate.
+
+    Post-patch `matrix/010` puts the parameters in the lowest universe.
+21. **aeneas resolves a recursive impl only through functions marked as trait defaults.**
+
+    A default may pass the impl to a closure's call instance, or to another function.
+
+    Two matrix defaults do, so every matrix impl is left unresolved.
+
+    Post-patch `matrix/020` marks those three definitions.
+22. **The saturating operations of aeneas have no exposed body.**
+
+    They are declared without exposing their definitions, so an importing module sees only their signatures.
+
+    No proof can then say what they return.
+
+    `HaxExt.lean` models word subtraction clamped at 0 again, exposed, and post-patch `matrix/030` calls that model.

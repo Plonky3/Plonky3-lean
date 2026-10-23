@@ -1,0 +1,16 @@
+# Mutation of: 010-declare-hax-lean-matrix-cfg
+# Breaks:      the check-cfg declaration of `hax_lean_matrix` is removed.
+#
+diff --git a/Cargo.toml b/Cargo.toml
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -60,8 +60,7 @@ rust.rust_2018_idioms = { level = "deny", priority = -1 }
+ rust.unused_must_use = "deny"
+ rust.rust_2024_incompatible_pat = "warn"
+ # PATCHED: hax's Lean backend compiles with `--cfg hax_backend_lean`.
+-# PATCHED: p3-matrix's extraction also compiles with `--cfg hax_lean_matrix`.
+-rust.unexpected_cfgs = { level = "warn", check-cfg = ["cfg(hax_backend_lean)", "cfg(hax_lean_matrix)"] }
++rust.unexpected_cfgs = { level = "warn", check-cfg = ["cfg(hax_backend_lean)"] }
+ rustdoc.all = "warn"
+ 
+ [workspace.lints.clippy]
