@@ -1,0 +1,134 @@
+# p3-commit: polynomial domains, commitment-scheme traits and periodic columns.
+
+lean_lib = "P3Commit"
+
+# Nothing is extracted.
+#
+# Every item is generic over p3-field's trait hierarchy, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# The coset's polynomial space, the periodic columns, the trait defaults and the trivial scheme are transcribed over a field in stub/P3Commit/.
+#
+# The scheme traits themselves are contracts, stated in Plonky3Lean/Spec/Commit.lean.
+state = "stub"
+
+features = []
+
+watch = ["commit/src", "commit/Cargo.toml", "field/src/coset.rs", "matrix/src/interpolation.rs", "util/src/lib.rs"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_commit.domain.mirror.LagrangeSelectors"
+rust = "p3_commit::domain::LagrangeSelectors"
+
+[[mirror]]
+lean = "p3_commit.domain.mirror.Coset.size"
+rust = "{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::size"
+
+[[mirror]]
+lean = "p3_commit.domain.mirror.Coset.first_point"
+rust = "{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::first_point"
+
+[[mirror]]
+lean = "p3_commit.domain.mirror.Coset.next_point"
+rust = "{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::next_point"
+
+[[mirror]]
+lean = "p3_commit.domain.mirror.Coset.try_create_disjoint_domain"
+rust = "{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::try_create_disjoint_domain"
+
+[[mirror]]
+lean = "p3_commit.domain.mirror.Coset.create_disjoint_domain"
+rust = "p3_commit::domain::PolynomialSpace::create_disjoint_domain"
+
+[[mirror]]
+lean = "p3_commit.domain.mirror.Coset.split_domains"
+rust = "{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::split_domains"
+
+[[mirror]]
+lean = "p3_commit.domain.mirror.Coset.split_evals"
+rust = "{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::split_evals"
+
+[[mirror]]
+lean = "p3_commit.domain.mirror.Coset.vanishing_poly_at_point"
+rust = "{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::vanishing_poly_at_point"
+
+[[mirror]]
+lean = "p3_commit.domain.mirror.Coset.selectors_at_point"
+rust = "{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::selectors_at_point"
+
+[[mirror]]
+lean = "p3_commit.domain.mirror.Coset.selectors_on_coset"
+rust = "{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::selectors_on_coset"
+
+[[mirror]]
+lean = "p3_commit.domain.mirror.Coset.evaluate_polynomial_at"
+rust = "{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::evaluate_polynomial_at"
+
+[[mirror]]
+lean = "p3_commit.domain.mirror.Coset.default_evaluate_periodic_column_at"
+rust = "p3_commit::domain::PolynomialSpace::evaluate_periodic_column_at"
+
+[[mirror]]
+lean = "p3_commit.domain.mirror.Coset.evaluate_periodic_column_at"
+rust = "{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::evaluate_periodic_column_at"
+
+[[mirror]]
+lean = "p3_commit.domain.mirror.Coset.default_evaluate_periodic_columns_at"
+rust = "p3_commit::domain::PolynomialSpace::evaluate_periodic_columns_at"
+
+[[mirror]]
+lean = "p3_commit.domain.mirror.Coset.evaluate_periodic_columns_at"
+rust = "{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::evaluate_periodic_columns_at"
+
+[[mirror]]
+lean = "p3_commit.periodic.mirror.PeriodicColumnShapeError"
+rust = "p3_commit::periodic::PeriodicColumnShapeError"
+
+[[mirror]]
+lean = "p3_commit.periodic.mirror.PeriodicColumns"
+rust = "p3_commit::periodic::PeriodicColumns"
+
+[[mirror]]
+lean = "p3_commit.periodic.mirror.PeriodicColumns.new"
+rust = "p3_commit::periodic::PeriodicColumns::new"
+
+[[mirror]]
+lean = "p3_commit.periodic.mirror.PeriodicColumns.max_period"
+rust = "p3_commit::periodic::PeriodicColumns::max_period"
+
+[[mirror]]
+lean = "p3_commit.periodic.mirror.PeriodicLdeTable"
+rust = "p3_commit::periodic::PeriodicLdeTable"
+
+[[mirror]]
+lean = "p3_commit.periodic.mirror.PeriodicLdeTable.new"
+rust = "p3_commit::periodic::PeriodicLdeTable::new"
+
+[[mirror]]
+lean = "p3_commit.periodic.mirror.PeriodicLdeTable.empty"
+rust = "p3_commit::periodic::PeriodicLdeTable::empty"
+
+[[mirror]]
+lean = "p3_commit.periodic.mirror.PeriodicLdeTable.is_empty"
+rust = "p3_commit::periodic::PeriodicLdeTable::is_empty"
+
+[[mirror]]
+lean = "p3_commit.periodic.mirror.PeriodicLdeTable.packed_group_period"
+rust = "p3_commit::periodic::PeriodicLdeTable::packed_group_period"
+
+[[mirror]]
+lean = "p3_commit.periodic.mirror.PeriodicLdeTable.get"
+rust = "p3_commit::periodic::PeriodicLdeTable::get"
+
+[[mirror]]
+lean = "p3_commit.periodic.mirror.unitEvalOnLde"
+rust = "{impl p3_commit::periodic::PeriodicEvaluator<F, D> for ()}::eval_on_lde"
+
+[[mirror]]
+lean = "p3_commit.periodic.mirror.unitEvalAtPoint"
+rust = "{impl p3_commit::periodic::PeriodicEvaluator<F, D> for ()}::eval_at_point"
+
+[[mirror]]
+lean = "p3_commit.periodic.mirror.build_periodic_lde_table"
+rust = "p3_commit::pcs::univariate::UnivariateStarkPcs::build_periodic_lde_table"
