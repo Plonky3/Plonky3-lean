@@ -1613,6 +1613,10 @@ name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField128.Insts.P3_fieldFi
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -1686,6 +1690,10 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -1861,6 +1869,10 @@ name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField32.Insts.P3_fieldFie
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -2022,6 +2034,10 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.towerOf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BinaryField.tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]

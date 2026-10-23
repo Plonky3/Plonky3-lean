@@ -4,6 +4,7 @@ public import Plonky3Lean.Proofs.Field.Binary.Aes
 public import Plonky3Lean.Proofs.Field.Binary.Operators
 public import Plonky3Lean.Proofs.Field.Binary.TowerApi
 public import Plonky3Lean.Proofs.Field.Binary.PolyField
+public import Plonky3Lean.Proofs.Field.Binary.TowerExp
 
 @[expose] public section
 
@@ -1516,5 +1517,33 @@ theorem poly192.Poly192.Insts.CoreOpsArithDivAssignPoly192.div_assign.toExt3 (a 
     poly192.Poly192.Insts.CoreOpsArithDivAssignPoly192.div_assign a b ⦃ r =>
       toExt3 r = toExt3 a / toExt3 b ⦄ :=
   Proofs.Binary.poly192_div_assign_ext a b hb
+
+/-! ### Powers `x^(2^n)` from `GF(2^16)` up
+
+`exp_power_of_2` applies `linear.rs`'s Frobenius tables. -/
+
+/-- `exp_power_of_2 a n` is `a^(2^n)` in level `4` of the tower. -/
+theorem tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf (a : tower.BinaryField16) (n : Std.Usize) :
+    tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2 a n ⦃ r =>
+      r.val < 2 ^ 2 ^ 4 ∧ towerOf 4 r = towerOf 4 a ^ 2 ^ n.val ⦄ :=
+  Proofs.Binary.bf16_exp_power_of_2_spec a n
+
+/-- `exp_power_of_2 a n` is `a^(2^n)` in level `5` of the tower. -/
+theorem tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf (a : tower.BinaryField32) (n : Std.Usize) :
+    tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2 a n ⦃ r =>
+      r.val < 2 ^ 2 ^ 5 ∧ towerOf 5 r = towerOf 5 a ^ 2 ^ n.val ⦄ :=
+  Proofs.Binary.bf32_exp_power_of_2_spec a n
+
+/-- `exp_power_of_2 a n` is `a^(2^n)` in level `6` of the tower. -/
+theorem tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf (a : tower.BinaryField64) (n : Std.Usize) :
+    tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2 a n ⦃ r =>
+      r.val < 2 ^ 2 ^ 6 ∧ towerOf 6 r = towerOf 6 a ^ 2 ^ n.val ⦄ :=
+  Proofs.Binary.bf64_exp_power_of_2_spec a n
+
+/-- `exp_power_of_2 a n` is `a^(2^n)` in level `7` of the tower. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2.towerOf (a : tower.BinaryField128) (n : Std.Usize) :
+    tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.exp_power_of_2 a n ⦃ r =>
+      r.val < 2 ^ 2 ^ 7 ∧ towerOf 7 r = towerOf 7 a ^ 2 ^ n.val ⦄ :=
+  Proofs.Binary.bf128_exp_power_of_2_spec a n
 
 end Plonky3Lean.Claims.P3BinaryField
