@@ -3,9 +3,10 @@
 # Target:       binary-field/src/poly192.rs
 # Hunks:        5
 # Class:        equiv-rewrite
-# Gap:          docs/extractor-issues.md 12: aeneas does not support
-#               dereferencing a raw pointer, and `Poly192::limbs` reborrows
-#               `[Poly64; 3]` as `&[u64; 3]` through one.
+# Gap:          docs/extractor-issues.md 12: `Poly192::limbs` reborrows
+#               `[Poly64; 3]` as `&[u64; 3]` through a raw pointer. Without this
+#               patch aeneas stops: "Aeneas does not yet support dereferencing
+#               raw pointers".
 # Cost:         none in a normal build: the copy is compiled but unused there.
 #               In the extracted variant, `Mul`, `Mul<Poly64>` and `square`
 #               read the coordinates through `limbs_owned`, which copies each

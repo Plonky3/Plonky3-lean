@@ -3,8 +3,10 @@
 # Target:       binary-field/src/ghash.rs, binary-field/tests/pre_patch_020.rs
 # Hunks:        2
 # Class:        cfg-hide
-# Gap:          docs/extractor-issues.md 10 (charon#1266, as for baby-bear's
-#               pre 040).
+# Gap:          docs/extractor-issues.md 10 (charon#1266): baby-bear's pre 040
+#               hides `Field::prepare_bit_plane_expansion` in the extraction
+#               build. Without this patch the patched tree does not compile
+#               there: the method "is not a member of trait `Field`".
 # Cost:         none in a normal build: the change is behind
 #               cfg(hax_backend_lean). In the extracted variant,
 #               `Ghash128::prepare_bit_plane_expansion` is absent.
