@@ -1,5 +1,6 @@
 module
 
+public import Plonky3Lean.Spec.Air
 public import Plonky3Lean.Spec.BabyBear
 public import Plonky3Lean.Spec.BinaryField
 public import Plonky3Lean.Spec.Blake3

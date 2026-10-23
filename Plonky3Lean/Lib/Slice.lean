@@ -39,6 +39,24 @@ theorem slice_index_eq {α : Type} (s : Slice α) (i : Std.Usize) (h : i.val < s
   simp only [Slice.index_usize]
   rw [show s[i]? = some (s.val[i.val]) from List.getElem?_eq_getElem h]
 
+/-- `s.get(i)` returns the entry at `i`, or nothing past the end. -/
+theorem slice_get_usize_eq {α : Type} (s : Slice α) (i : Std.Usize) :
+    CoreModels.core.slice.Slice.get (CoreModels.core.Usize.Insts.CoreSliceIndexSliceIndexSliceT α)
+      s i = .ok (match s.val[i.val]? with
+        | some x => .Some x
+        | none => .None) := by
+  simp only [CoreModels.core.slice.Slice.get,
+    CoreModels.core.Usize.Insts.CoreSliceIndexSliceIndexSliceT.get,
+    CoreModels.rust_primitives.slice.slice_length, CoreModels.rust_primitives.slice.slice_index,
+    bind_ok]
+  by_cases h : i.val < s.val.length
+  · have : i < s.len := by scalar_tac
+    simp only [this, ↓reduceIte]
+    rw [slice_index_eq s i h, bind_ok, List.getElem?_eq_getElem h]
+  · have : ¬ i < s.len := by scalar_tac
+    simp only [this, ↓reduceIte]
+    rw [List.getElem?_eq_none (by omega)]
+
 /-- A slice of length `N` converts to the array of its elements. -/
 theorem try_from_eq {T : Type} [Inhabited T] (N : Std.Usize) (inst : CoreModels.core.marker.Copy T)
     (x : Slice T) (h : x.val.length = N.val) (hN : N.val < 2 ^ 32) :
