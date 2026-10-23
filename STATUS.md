@@ -42,11 +42,12 @@ target `thumbv7em-none-eabi`
 | `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
 | `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
 | `stir` | stub |  | 624 | 0 | 40 |  | 0 / 0 |  |
-| `sumcheck` | stub |  | 336 | 0 | 17 |  | 0 / 0 |  |
+| `sumcheck` | stub |  | 479 | 0 | 29 |  | 0 / 0 |  |
 | `symmetric` | scoped | 1078 | 58 | 1 | 0 | 4 | 4 / 2 | pre `010`, pre `020`, pre `030`, pre `040` |
 | `tiny-keccak` | scoped | 98 | 94 | 0 | 3 | 0 | 0 / 0 |  |
 | `uni-stark` | scoped | 252 | 500 | 0 | 30 | 0 | 0 / 0 |  |
 | `util` | scoped | 228 | 70 | 0 | 1 | 0 | 0 / 1 | post `010` |
+| `whir` | stub |  | 544 | 0 | 20 |  | 0 / 0 |  |
 | `zk-codes` | stub |  | 234 | 0 | 19 |  | 0 / 0 |  |
 
 Generated lines are `extraction/<Lib>/Extraction/{Types,Funs}.lean`. Hand-written
@@ -451,7 +452,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1363) whose dependencies include it; reaching one is not using it.
+(of 1392) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -490,7 +491,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1363) whose dependencies include the declaration.
+counts the claims (of 1392) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -983,32 +984,32 @@ counts the claims (of 1363) whose dependencies include the declaration.
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_weights_lsb` | `p3_multilinear_util::point::Point::equality_weights_lsb` | stub | 2 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_at_vertex` | `p3_multilinear_util::point::Point::equality_at_vertex` | stub | 1 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.hypercube` | `p3_multilinear_util::point::Point::hypercube` | stub | 2 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.expand_from_univariate` | `p3_multilinear_util::point::Point::expand_from_univariate` | stub | 2 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_eq` | `p3_multilinear_util::point::Point::eval_eq` | stub | 2 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_select` | `p3_multilinear_util::point::Point::eval_select` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.expand_from_univariate` | `p3_multilinear_util::point::Point::expand_from_univariate` | stub | 9 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_eq` | `p3_multilinear_util::point::Point::eval_eq` | stub | 8 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_select` | `p3_multilinear_util::point::Point::eval_select` | stub | 7 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_next` | `p3_multilinear_util::point::Point::eval_next` | stub | 3 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.transpose` | `p3_multilinear_util::point::Point::transpose` | stub | 0 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.fill_buffer_batch` | `p3_multilinear_util::eq_batch::fill_buffer_batch` | stub | 15 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_1_batch` | `p3_multilinear_util::eq_batch::eval_eq_1_batch` | stub | 15 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_2_batch` | `p3_multilinear_util::eq_batch::eval_eq_2_batch` | stub | 15 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_3_batch` | `p3_multilinear_util::eq_batch::eval_eq_3_batch` | stub | 15 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.add_or_set` | `p3_multilinear_util::eq_batch::add_or_set` | stub | 15 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch_basic` | `p3_multilinear_util::eq_batch::eval_eq_batch_basic` | stub | 15 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.packed_eq_poly_batch` | `p3_multilinear_util::eq_batch::packed_eq_poly_batch` | stub | 15 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.extEvaluator` | `{impl p3_multilinear_util::eq_batch::EqualityEvaluator for p3_multilinear_util::eq_batch::ExtFieldEvaluator<F, EF>}` | stub | 14 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.fill_buffer_batch` | `p3_multilinear_util::eq_batch::fill_buffer_batch` | stub | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_1_batch` | `p3_multilinear_util::eq_batch::eval_eq_1_batch` | stub | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_2_batch` | `p3_multilinear_util::eq_batch::eval_eq_2_batch` | stub | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_3_batch` | `p3_multilinear_util::eq_batch::eval_eq_3_batch` | stub | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.add_or_set` | `p3_multilinear_util::eq_batch::add_or_set` | stub | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch_basic` | `p3_multilinear_util::eq_batch::eval_eq_batch_basic` | stub | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.packed_eq_poly_batch` | `p3_multilinear_util::eq_batch::packed_eq_poly_batch` | stub | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.extEvaluator` | `{impl p3_multilinear_util::eq_batch::EqualityEvaluator for p3_multilinear_util::eq_batch::ExtFieldEvaluator<F, EF>}` | stub | 19 |
 | `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.baseEvaluator` | `{impl p3_multilinear_util::eq_batch::EqualityEvaluator for p3_multilinear_util::eq_batch::BaseFieldEvaluator<F, EF>}` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_packed_batch` | `p3_multilinear_util::eq_batch::eval_eq_packed_batch` | stub | 15 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch_common` | `p3_multilinear_util::eq_batch::eval_eq_batch_common` | stub | 15 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch` | `p3_multilinear_util::eq_batch::eval_eq_batch` | stub | 14 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_packed_batch` | `p3_multilinear_util::eq_batch::eval_eq_packed_batch` | stub | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch_common` | `p3_multilinear_util::eq_batch::eval_eq_batch_common` | stub | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch` | `p3_multilinear_util::eq_batch::eval_eq_batch` | stub | 19 |
 | `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_base_batch` | `p3_multilinear_util::eq_batch::eval_eq_base_batch` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new` | `p3_multilinear_util::poly::Poly::new` | stub | 4 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new` | `p3_multilinear_util::poly::Poly::new` | stub | 9 |
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.as_constant` | `p3_multilinear_util::poly::Poly::as_constant` | stub | 0 |
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.zero` | `p3_multilinear_util::poly::Poly::zero` | stub | 1 |
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.truncate_to_half` | `p3_multilinear_util::poly::Poly::truncate_to_half` | stub | 0 |
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.pad_zeros` | `p3_multilinear_util::poly::Poly::pad_zeros` | stub | 0 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_from_point` | `p3_multilinear_util::poly::Poly::new_from_point` | stub | 12 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_from_point` | `p3_multilinear_util::poly::Poly::new_from_point` | stub | 17 |
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_next_from_point` | `p3_multilinear_util::poly::Poly::new_next_from_point` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_mut` | `p3_multilinear_util::poly::Poly::fix_prefix_var_mut` | stub | 3 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_mut` | `p3_multilinear_util::poly::Poly::fix_prefix_var_mut` | stub | 6 |
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.sum_prefix_var_mut` | `p3_multilinear_util::poly::Poly::sum_prefix_var_mut` | stub | 1 |
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_mut_monomial` | `p3_multilinear_util::poly::Poly::fix_prefix_var_mut_monomial` | stub | 0 |
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut_whole` | `p3_multilinear_util::poly::Poly::fix_suffix_var_mut_whole` | stub | 1 |
@@ -1020,15 +1021,15 @@ counts the claims (of 1363) whose dependencies include the declaration.
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_to_packed` | `p3_multilinear_util::poly::Poly::fix_prefix_var_to_packed` | stub | 1 |
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.pack` | `p3_multilinear_util::poly::Poly::pack` | stub | 1 |
 | `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.unpack` | `p3_multilinear_util::poly::Poly::unpack` | stub | 2 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.eval_multilinear_recursive` | `p3_multilinear_util::poly::eval_multilinear_recursive` | stub | 7 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.eq_serial` | `p3_multilinear_util::poly::Poly::new_packed_from_point::eq_serial` | stub | 11 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_packed_from_point` | `p3_multilinear_util::poly::Poly::new_packed_from_point` | stub | 11 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.new_unpacked` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::new_unpacked` | stub | 9 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.new_packed` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::new_packed` | stub | 9 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.num_scalar_evals` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::num_scalar_evals` | stub | 9 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.num_variables` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::num_variables` | stub | 9 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.eval_multilinear_recursive` | `p3_multilinear_util::poly::eval_multilinear_recursive` | stub | 12 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.eq_serial` | `p3_multilinear_util::poly::Poly::new_packed_from_point::eq_serial` | stub | 16 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_packed_from_point` | `p3_multilinear_util::poly::Poly::new_packed_from_point` | stub | 16 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.new_unpacked` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::new_unpacked` | stub | 14 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.new_packed` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::new_packed` | stub | 14 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.num_scalar_evals` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::num_scalar_evals` | stub | 14 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.num_variables` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::num_variables` | stub | 14 |
 | `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_base` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_base` | stub | 5 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_ext` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_ext` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_ext` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_ext` | stub | 6 |
 | `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_ext_packed` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_ext_packed` | stub | 0 |
 | `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.accumulate_scalar_into` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::accumulate_scalar_into` | stub | 2 |
 | `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.compress_prefix_into` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::compress_prefix_into` | stub | 0 |
@@ -1038,15 +1039,15 @@ counts the claims (of 1363) whose dependencies include the declaration.
 | `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_base_shifted` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_base_shifted` | stub | 0 |
 | `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.last_scalar` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::last_scalar` | stub | 0 |
 | `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.new_unpacked` | `p3_multilinear_util::split_eq::SplitEq::new_unpacked` | stub | 0 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.new_packed` | `p3_multilinear_util::split_eq::SplitEq::new_packed` | stub | 9 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.num_variables` | `p3_multilinear_util::split_eq::SplitEq::num_variables` | stub | 9 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.new_packed` | `p3_multilinear_util::split_eq::SplitEq::new_packed` | stub | 14 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.num_variables` | `p3_multilinear_util::split_eq::SplitEq::num_variables` | stub | 14 |
 | `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.eval_base` | `p3_multilinear_util::split_eq::SplitEq::eval_base` | stub | 5 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.eval_ext` | `p3_multilinear_util::split_eq::SplitEq::eval_ext` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.eval_ext` | `p3_multilinear_util::split_eq::SplitEq::eval_ext` | stub | 6 |
 | `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.accumulate_into` | `p3_multilinear_util::split_eq::SplitEq::accumulate_into` | stub | 2 |
 | `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.materialize` | `p3_multilinear_util::split_eq::SplitEq::materialize` | stub | 1 |
 | `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.compress_suffix_into` | `p3_multilinear_util::split_eq::SplitEq::compress_suffix_into` | stub | 1 |
 | `multilinear-util` | `p3_multilinear_util.split_eq.mirror.Poly.eval_base` | `p3_multilinear_util::poly::Poly::eval_base` | stub | 3 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.Poly.eval_ext` | `p3_multilinear_util::poly::Poly::eval_ext` | stub | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.Poly.eval_ext` | `p3_multilinear_util::poly::Poly::eval_ext` | stub | 6 |
 | `poseidon1` | `p3_poseidon1.external.FullRoundLayerConstructor` | `p3_poseidon1::external::FullRoundLayerConstructor` | stub | 0 |
 | `poseidon1` | `p3_poseidon1.internal.PartialRoundLayerConstructor` | `p3_poseidon1::internal::PartialRoundLayerConstructor` | stub | 0 |
 | `poseidon1` | `p3_poseidon1.Poseidon1Constants` | `p3_poseidon1::Poseidon1Constants` | stub | 0 |
@@ -1108,23 +1109,35 @@ counts the claims (of 1363) whose dependencies include the declaration.
 | `stir` | `p3_stir.verifier.mirror.set_gamma` | `p3_stir::verifier::RoundVerifier::set_gamma` | stub | 1 |
 | `stir` | `p3_stir.verifier.mirror.check_final_queries` | `p3_stir::verifier::FinalRoundVerifier::fetch_and_check` | stub | 0 |
 | `stir` | `p3_stir.pcs.plan.mirror.combine_coefficients` | `p3_stir::pcs::plan::combine_coefficients` | stub | 2 |
-| `sumcheck` | `p3_sumcheck.lagrange.mirror.lagrange_weights_01inf` | `p3_sumcheck::lagrange::lagrange_weights_01inf` | stub | 13 |
+| `sumcheck` | `p3_sumcheck.lagrange.mirror.lagrange_weights_01inf` | `p3_sumcheck::lagrange::lagrange_weights_01inf` | stub | 19 |
 | `sumcheck` | `p3_sumcheck.lagrange.mirror.lagrange_weights_01inf_multi` | `p3_sumcheck::lagrange::lagrange_weights_01inf_multi` | stub | 0 |
-| `sumcheck` | `p3_sumcheck.lagrange.mirror.extrapolate_01inf` | `p3_sumcheck::lagrange::extrapolate_01inf` | stub | 13 |
-| `sumcheck` | `p3_sumcheck.mirror.Basis.reduce_claim` | `p3_sumcheck::strategy::Basis::reduce_claim` | stub | 12 |
-| `sumcheck` | `p3_sumcheck.mirror.SumcheckShape.seed` | `p3_sumcheck::transcript::SumcheckShape::domain_separator` | stub | 7 |
-| `sumcheck` | `p3_sumcheck.mirror.VerifierTranscript.round` | `p3_sumcheck::transcript::VerifierTranscript::round` | stub | 7 |
-| `sumcheck` | `p3_sumcheck.mirror.verify_rounds` | `p3_sumcheck::data::SumcheckData::verify_rounds` | stub | 7 |
-| `sumcheck` | `p3_sumcheck.mirror.verify_final_sumcheck_rounds` | `p3_sumcheck::data::verify_final_sumcheck_rounds` | stub | 2 |
+| `sumcheck` | `p3_sumcheck.lagrange.mirror.extrapolate_01inf` | `p3_sumcheck::lagrange::extrapolate_01inf` | stub | 19 |
+| `sumcheck` | `p3_sumcheck.mirror.Basis.reduce_claim` | `p3_sumcheck::strategy::Basis::reduce_claim` | stub | 18 |
+| `sumcheck` | `p3_sumcheck.mirror.SumcheckShape.seed` | `p3_sumcheck::transcript::SumcheckShape::domain_separator` | stub | 12 |
+| `sumcheck` | `p3_sumcheck.mirror.VerifierTranscript.round` | `p3_sumcheck::transcript::VerifierTranscript::round` | stub | 12 |
+| `sumcheck` | `p3_sumcheck.mirror.verify_rounds` | `p3_sumcheck::data::SumcheckData::verify_rounds` | stub | 12 |
+| `sumcheck` | `p3_sumcheck.mirror.verify_final_sumcheck_rounds` | `p3_sumcheck::data::verify_final_sumcheck_rounds` | stub | 7 |
 | `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.new` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::new` | stub | 3 |
 | `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.eval` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::eval` | stub | 2 |
 | `sumcheck` | `p3_sumcheck.generic_degree.mirror.GenericDegreeShape.seed` | `p3_sumcheck::generic_degree::transcript::GenericDegreeShape::domain_separator` | stub | 1 |
 | `sumcheck` | `p3_sumcheck.generic_degree.mirror.VerifierTranscript.round` | `p3_sumcheck::generic_degree::transcript::VerifierTranscript::round` | stub | 1 |
 | `sumcheck` | `p3_sumcheck.generic_degree.mirror.verify` | `p3_sumcheck::generic_degree::proof::GenericDegreeProof::verify` | stub | 1 |
-| `sumcheck` | `p3_sumcheck.strategy.mirror.round_reduce` | `p3_sumcheck::strategy::round_reduce` | stub | 3 |
-| `sumcheck` | `p3_sumcheck.strategy.mirror.round_step` | `p3_sumcheck::strategy::round_step` | stub | 3 |
-| `sumcheck` | `p3_sumcheck.strategy.mirror.chunk_round_step` | `p3_sumcheck::strategy::chunk_round_step` | stub | 3 |
-| `sumcheck` | `p3_sumcheck.strategy.mirror.sumcheck_coefficients_prefix` | `p3_sumcheck::strategy::sumcheck_coefficients_prefix` | stub | 3 |
+| `sumcheck` | `p3_sumcheck.strategy.mirror.round_reduce` | `p3_sumcheck::strategy::round_reduce` | stub | 4 |
+| `sumcheck` | `p3_sumcheck.strategy.mirror.round_step` | `p3_sumcheck::strategy::round_step` | stub | 4 |
+| `sumcheck` | `p3_sumcheck.strategy.mirror.chunk_round_step` | `p3_sumcheck::strategy::chunk_round_step` | stub | 4 |
+| `sumcheck` | `p3_sumcheck.strategy.mirror.sumcheck_coefficients_prefix` | `p3_sumcheck::strategy::sumcheck_coefficients_prefix` | stub | 4 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.dot` | `p3_field::dot_product` | stub | 9 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.horner` | `p3_field::HornerIter::horner` | stub | 5 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.EqStatement.combine_evals` | `p3_sumcheck::constraints::statement::eq::EqStatement::combine_evals` | stub | 7 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.EqStatement.weights_at` | `p3_sumcheck::constraints::statement::eq::EqStatement::weights_at` | stub | 6 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.SelectStatement.combine_evals` | `p3_sumcheck::constraints::statement::select::SelectStatement::combine_evals` | stub | 7 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.SelectStatement.weights_at` | `p3_sumcheck::constraints::statement::select::SelectStatement::weights_at` | stub | 6 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.SelectStatement.verify` | `p3_sumcheck::constraints::statement::select::SelectStatement::verify` | stub | 5 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.Constraint.new` | `p3_sumcheck::constraints::Constraint::new` | stub | 5 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.Constraint.new_with_existing_claim` | `p3_sumcheck::constraints::Constraint::new_with_existing_claim` | stub | 5 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.Constraint.combine_evals` | `p3_sumcheck::constraints::Constraint::combine_evals` | stub | 7 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.subpoint` | `p3_multilinear_util::point::Point::get_subpoint_over_range` | stub | 6 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.VariableOrder.eval_constraints_poly` | `p3_sumcheck::strategy::VariableOrder::eval_constraints_poly` | stub | 6 |
 | `tiny-keccak` | `tiny_keccak.keccakf.keccakf` | `tiny_keccak::keccakf::keccakf` | not translated | 14 |
 | `tiny-keccak` | `tiny_keccak.keccakf.rounds` | `tiny_keccak::keccakf::keccakf` | not translated | 14 |
 | `tiny-keccak` | `tiny_keccak.keccakf.round` | `tiny_keccak::keccakf::keccakf` | not translated | 14 |
@@ -1159,6 +1172,26 @@ counts the claims (of 1363) whose dependencies include the declaration.
 | `uni-stark` | `p3_uni_stark.transcript.mirror.constraint_phase` | `p3_uni_stark::transcript::StarkVerifierTranscript::constraint_phase` | not translated | 2 |
 | `uni-stark` | `p3_uni_stark.transcript.mirror.ood_phase` | `p3_uni_stark::transcript::StarkVerifierTranscript::ood_phase` | not translated | 2 |
 | `util` | `p3_util.branch_hint` | `p3_util::branch_hint` | not translated | 12 |
+| `whir` | `p3_whir.mirror.two_adic_generator` | `p3_field::TwoAdicField::two_adic_generator` | stub | 6 |
+| `whir` | `p3_whir.transcript.mirror.query_draws` | `p3_whir::transcript::query_draws` | stub | 7 |
+| `whir` | `p3_whir.transcript.mirror.query_summand_depths` | `p3_whir::transcript::query_summand_depths` | stub | 10 |
+| `whir` | `p3_whir.transcript.mirror.stratified_index` | `p3_whir::transcript::stratified_index` | stub | 9 |
+| `whir` | `p3_whir.transcript.mirror.play_query_indices` | `p3_whir::transcript::play_query_indices` | stub | 8 |
+| `whir` | `p3_whir.mirror.WhirConfig.round_folding_factor` | `p3_whir::parameters::whir::WhirConfig::round_folding_factor` | stub | 6 |
+| `whir` | `p3_whir.mirror.querySite` | `p3_whir::transcript::WhirShape::new` | stub | 6 |
+| `whir` | `p3_whir.mirror.WhirConfig.site` | `p3_whir::transcript::WhirShape::query_index_site` | stub | 6 |
+| `whir` | `p3_whir.mirror.query_pow` | `p3_whir::transcript::WhirVerifierTranscript::query_pow` | stub | 5 |
+| `whir` | `p3_whir.mirror.verify_merkle_proof` | `p3_whir::pcs::verifier::WhirVerifier::verify_merkle_proof` | stub | 5 |
+| `whir` | `p3_whir.mirror.verify_stir_challenges` | `p3_whir::pcs::verifier::WhirVerifier::verify_stir_challenges` | stub | 5 |
+| `whir` | `p3_whir.mirror.parse_with_round` | `p3_whir::pcs::committer::reader::ParsedCommitment::parse_with_round` | stub | 6 |
+| `whir` | `p3_whir.mirror.replay` | `p3_whir::pcs::verifier::WhirVerifier::replay` | stub | 5 |
+| `whir` | `p3_whir.mirror.verify` | `p3_whir::pcs::verifier::WhirVerifier::verify` | stub | 5 |
+| `whir` | `p3_whir.parameters.mirror.schedule` | `p3_whir::parameters::whir::WhirConfig::new_with_max_domain_log` | stub | 2 |
+| `whir` | `p3_whir.parameters.mirror.finalRoundConfig` | `p3_whir::parameters::whir::WhirConfig::final_round_config` | stub | 2 |
+| `whir` | `p3_whir.utils.mirror.eval_ze_star_n` | `p3_whir::utils::eval_ze_star_n` | stub | 4 |
+| `whir` | `p3_whir.utils.mirror.par_eval_ze_star_n` | `p3_whir::utils::par_eval_ze_star_n` | stub | 0 |
+| `whir` | `p3_whir.utils.mirror.par_add_scaled_powers` | `p3_whir::utils::par_add_scaled_powers` | stub | 0 |
+| `whir` | `p3_whir.utils.mirror.padded_ood_t1` | `p3_whir::utils::padded_ood_t1` | stub | 3 |
 | `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.new` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::new` | stub | 3 |
 | `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.evaluation_point` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::evaluation_point` | stub | 7 |
 | `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.message_row_iter` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::message_row_iter` | stub | 2 |
@@ -2559,6 +2592,35 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Util.gcd_inversion_prime_field_32.pos_inverse_small_prime` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.wrong_of_large_a` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.KoalaBear.fold.row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.KoalaBear.verify.completeness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.combine_evals` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.eval_constraints_poly` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.fold.restrict` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.fold.row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.iteration.claim` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.parse_with_round.history` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.play_query_indices.count` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.play_query_indices.opened` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.play_query_indices.range` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.query_summand_depths.sum` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.round.claim` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.round.weight` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.schedule.later_fold_exceeds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.schedule.valid` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.stratified_index.stratum` | `Quot.sound`, `propext` |
+| `Whir.sumcheck.rounds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.two_adic_generator.panics` | `propext` |
+| `Whir.verify.completeness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.verify.no_panic` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.verify.round_count` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.verify.unexpected_final_sumcheck` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.weight.ood` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.weight.query` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.zk.eval_ze_star_n` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.zk.padded_ood` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.zk.padded_ood_bijective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.zk.padded_ood_zero` | `Classical.choice`, `Quot.sound`, `propext` |
 | `ZkCodes.accessors` | `Quot.sound`, `propext` |
 | `ZkCodes.beyond_adicity` | `Classical.choice`, `Quot.sound`, `propext` |
 | `ZkCodes.default_encode_batch_with_randomness` | `Classical.choice`, `Quot.sound`, `propext` |
