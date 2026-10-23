@@ -1,0 +1,14 @@
+# Mutation of: _mm256_unpacklo_epi64
+# Breaks:      it puts `b` first.
+#
+--- a/src/x86_64/avx2.rs
++++ b/src/x86_64/avx2.rs
+@@ -240,7 +240,7 @@
+ #[inline]
+ pub unsafe fn _mm256_unpacklo_epi64(a: __m256i, b: __m256i) -> __m256i {
+     __m256i([
+-        a.0[0], a.0[1], b.0[0], b.0[1], a.0[4], a.0[5], b.0[4], b.0[5],
++        b.0[0], b.0[1], a.0[0], a.0[1], b.0[4], b.0[5], a.0[4], a.0[5],
+     ])
+ }
+ 

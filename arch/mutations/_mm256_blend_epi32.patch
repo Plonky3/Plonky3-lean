@@ -1,0 +1,14 @@
+# Mutation of: _mm256_blend_epi32
+# Breaks:      it inverts the selector.
+#
+--- a/src/x86_64/avx2.rs
++++ b/src/x86_64/avx2.rs
+@@ -265,7 +265,7 @@
+     let mut dst = [0u32; 8];
+     let mut j = 0;
+     while j < 8 {
+-        dst[j] = if (imm8(IMM8) >> j) & 1 == 1 {
++        dst[j] = if (imm8(IMM8) >> j) & 1 == 0 {
+             b.0[j]
+         } else {
+             a.0[j]

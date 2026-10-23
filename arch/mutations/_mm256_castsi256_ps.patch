@@ -1,0 +1,14 @@
+# Mutation of: _mm256_castsi256_ps
+# Breaks:      it swaps lanes 0 and 1.
+#
+--- a/src/x86_64/avx2.rs
++++ b/src/x86_64/avx2.rs
+@@ -412,7 +412,7 @@
+ /// compilation and does not generate any instructions, thus it has zero latency."
+ #[inline]
+ pub unsafe fn _mm256_castsi256_ps(a: __m256i) -> __m256 {
+-    __m256(a.0)
++    __m256([a.0[1], a.0[0], a.0[2], a.0[3], a.0[4], a.0[5], a.0[6], a.0[7]])
+ }
+ 
+ /// `_mm256_castps_si256`: a reinterpretation, no instruction (as for `_mm256_castsi256_ps`).

@@ -1,0 +1,12 @@
+# Mutation of: _mm_set1_epi32
+# Breaks:      it leaves the last lane zero.
+#
+--- a/src/x86_64/avx2.rs
++++ b/src/x86_64/avx2.rs
+@@ -481,5 +481,5 @@
+ /// `FOR j := 0 to 3; i := j*32; dst[i+31:i] := a[31:0]; ENDFOR`
+ #[inline]
+ pub unsafe fn _mm_set1_epi32(a: i32) -> __m128i {
+-    __m128i([a as u32; 4])
++    __m128i([a as u32, a as u32, a as u32, 0])
+ }
