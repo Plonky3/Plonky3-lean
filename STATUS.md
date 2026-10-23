@@ -25,6 +25,7 @@ target `thumbv7em-none-eabi`
 | `dft` | stub |  | 901 | 0 | 67 |  | 0 / 0 |  |
 | `field` | stub |  | 305 | 7 | 25 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
+| `keccak` | scoped | 1109 | 39 | 0 | 0 | 6 | 2 / 2 | pre `010`, pre `020` |
 | `koala-bear` | extracted | 3024 | 121 | 4 | 0 | 0 | 0 / 3 |  |
 | `matrix` | scoped | 1625 | 259 | 0 | 12 | 0 | 3 / 3 | pre `020`, pre `030`, post `020`, post `030` |
 | `mds` | scoped | 101 | 43 | 0 | 0 | 0 | 0 / 0 |  |
@@ -38,6 +39,7 @@ target `thumbv7em-none-eabi`
 | `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
 | `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
 | `symmetric` | scoped | 1078 | 58 | 1 | 0 | 4 | 4 / 2 | pre `010`, pre `020`, pre `030`, pre `040` |
+| `tiny-keccak` | scoped | 98 | 94 | 0 | 3 | 0 | 0 / 0 |  |
 | `util` | scoped | 217 | 70 | 0 | 1 | 0 | 0 / 1 | post `010` |
 | `zk-codes` | stub |  | 234 | 0 | 19 |  | 0 / 0 |  |
 
@@ -278,6 +280,20 @@ charon errors: 0.
 | `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `` | yes |
 | `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_int` | `` | yes |
 
+### `keccak`
+
+charon errors: 0.
+6 item(s) dropped, 0 of them mirrored.
+
+| Item | Source | Mirrored |
+|---|---|---|
+| `p3_keccak::finalize_iter` | `` |  |
+| `p3_keccak::finalize_iter::BUFLEN` | `` |  |
+| `p3_keccak::finalize_slices` | `` |  |
+| `p3_keccak::{impl core::clone::Clone}::clone` | `` |  |
+| `p3_keccak::{impl p3_symmetric::hasher::CryptographicHasher}::LANES` | `` |  |
+| `p3_keccak::{impl p3_symmetric::hasher::CryptographicHasher}::hash_iter` | `` |  |
+
 ### `koala-bear`
 
 charon errors: 0.
@@ -404,6 +420,11 @@ charon errors: 0.
 | `p3_symmetric::hasher::CryptographicHasher::hash_many` | `` |  |
 | `p3_symmetric::sponge::{impl core::clone::Clone}::clone` | `` |  |
 
+### `tiny-keccak`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ### `util`
 
 charon errors: 0.
@@ -414,7 +435,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1116) whose dependencies include it; reaching one is not using it.
+(of 1138) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -453,7 +474,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1116) whose dependencies include the declaration.
+counts the claims (of 1138) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -842,6 +863,9 @@ counts the claims (of 1116) whose dependencies include the declaration.
 | `security` | `Plonky3Lean.Proofs.Security.Real.foldingPowBitsR` | `p3_security::assumption::SecurityAssumption::folding_pow_bits` | not translated | 1 |
 | `security` | `Plonky3Lean.Proofs.Security.Real.upperX` | `p3_security::proximity::compute_upper_m` | not translated | 2 |
 | `security` | `Plonky3Lean.Proofs.Security.Real.sumBitsR` | `p3_security::error::ErrorBits::sum` | not translated | 1 |
+| `tiny-keccak` | `tiny_keccak.keccakf.keccakf` | `tiny_keccak::keccakf::keccakf` | not translated | 14 |
+| `tiny-keccak` | `tiny_keccak.keccakf.rounds` | `tiny_keccak::keccakf::keccakf` | not translated | 14 |
+| `tiny-keccak` | `tiny_keccak.keccakf.round` | `tiny_keccak::keccakf::keccakf` | not translated | 14 |
 | `util` | `p3_util.branch_hint` | `p3_util::branch_hint` | not translated | 12 |
 | `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.new` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::new` | stub | 3 |
 | `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.evaluation_point` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::evaluation_point` | stub | 7 |
@@ -882,6 +906,8 @@ counts the claims (of 1116) whose dependencies include the declaration.
 | `blake3/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds one free function, which calls `Blake3::hash_many`. No existing body changes. |
 | `blake3/pre/020-reshape-batch` | none in a normal build: the reshaped driver is compiled only under cfg(hax_backend_lean), as the crate's `batch` module, and under cfg(test), beside the shipped one. The extracted variant hashes on the one-lane backend, which is what the extraction target compiles. |
 | `challenger/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of the crate. No existing body changes. |
+| `keccak/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of the crate. No existing body changes. |
+| `keccak/pre/020-reshape-batch-and-lane` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the batched hash and the one-lane permutation call the reshaped bodies, which a differential test equates with the originals. |
 | `matrix/pre/020-cfg-hide-row-iterators` | none in a normal build: every change is behind cfg(hax_lean_matrix), which only p3-matrix's extraction sets. In the extracted variant, the matrix trait keeps only the shape, element access and strided view. |
 | `matrix/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. |
 | `matrix/post/020-trait-default-for-impl-def` | none: the attribute only lets `impl_def` unfold the definition. |
@@ -1799,6 +1825,28 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Goldilocks.goldilocks.Goldilocks.two_adic_generator.order` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Goldilocks.goldilocks.Goldilocks.two_adic_generator.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Goldilocks.goldilocks.reduce128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.Keccak256Hash.hash_many.empty` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.Keccak256Hash.hash_many.eq_keccak256` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.Keccak256Hash.hash_many.ragged` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.KeccakF.perm_computes` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.KeccakF.permute_mut_packed.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.KeccakF.permute_mut_u64.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.KeccakF.permute_mut_u8.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.KeccakF.permute_u64.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.KeccakF.permute_u8.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.Sha3_256Hash.hash_many.empty` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.Sha3_256Hash.hash_many.eq_sha3_256` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.Sha3_256Hash.hash_many.ragged` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.keccak256.abc` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.keccak256.empty` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.keccakP.zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.sha3_256.abc` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.sha3_256.empty` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.tiny_keccak.PI.eq_walk` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.tiny_keccak.RHO.eq_triangular` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.tiny_keccak.keccakf.RC.eq_lfsr` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.tiny_keccak.keccakf.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.tiny_keccak.keccakf.zero` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3KoalaBear.koala_bear.KoalaBear.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3KoalaBear.koala_bear.KoalaBear.from_monty.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3KoalaBear.koala_bear.KoalaBear.halve.toField` | `Classical.choice`, `Quot.sound`, `propext` |
