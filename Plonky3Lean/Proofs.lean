@@ -55,6 +55,7 @@ public import Plonky3Lean.Proofs.Field.Binary.CantorSpec
 public import Plonky3Lean.Proofs.Field.Binary.DotProduct
 public import Plonky3Lean.Proofs.Field.Binary.TowerReference
 public import Plonky3Lean.Proofs.Field.Binary.ApiMisc
+public import Plonky3Lean.Proofs.Field.Binary.Poly192Misc
 public import Plonky3Lean.Proofs.Field.Goldilocks.Arith
 public import Plonky3Lean.Proofs.Field.Goldilocks.Basic
 public import Plonky3Lean.Proofs.Field.Goldilocks.Constants
