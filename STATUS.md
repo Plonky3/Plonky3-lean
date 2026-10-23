@@ -28,6 +28,7 @@ target `thumbv7em-none-eabi`
 | `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
 | `keccak` | scoped | 1109 | 39 | 0 | 0 | 6 | 2 / 2 | pre `010`, pre `020` |
 | `koala-bear` | extracted | 3024 | 121 | 4 | 0 | 0 | 0 / 3 |  |
+| `lookup` | scoped | 275 | 801 | 0 | 58 | 0 | 0 / 0 |  |
 | `matrix` | scoped | 1625 | 259 | 0 | 12 | 0 | 3 / 3 | pre `020`, pre `030`, post `020`, post `030` |
 | `mds` | scoped | 101 | 43 | 0 | 0 | 0 | 0 / 0 |  |
 | `merkle-tree` | scoped | 1306 | 43 | 0 | 0 | 0 | 2 / 0 | pre `010`, pre `020` |
@@ -301,6 +302,11 @@ charon errors: 0.
 charon errors: 0.
 Nothing translated is dropped.
 
+### `lookup`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ### `matrix`
 
 charon errors: 0.
@@ -480,13 +486,13 @@ counts the claims (of 1198) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
-| `air` | `p3_air.symbolic.mirror.SymbolicVariable.degree_multiple` | `p3_air::symbolic::variable::SymbolicVariable::degree_multiple` | not translated | 16 |
-| `air` | `p3_air.symbolic.mirror.SymbolicVariable.poly_degree` | `p3_air::symbolic::variable::SymbolicVariable::poly_degree` | not translated | 16 |
+| `air` | `p3_air.symbolic.mirror.SymbolicVariable.degree_multiple` | `p3_air::symbolic::variable::SymbolicVariable::degree_multiple` | not translated | 17 |
+| `air` | `p3_air.symbolic.mirror.SymbolicVariable.poly_degree` | `p3_air::symbolic::variable::SymbolicVariable::poly_degree` | not translated | 17 |
 | `air` | `p3_air.symbolic.mirror.SymbolicVariableExt.degree_multiple` | `p3_air::symbolic::variable::SymbolicVariableExt::degree_multiple` | not translated | 5 |
 | `air` | `p3_air.symbolic.mirror.SymbolicVariableExt.poly_degree` | `p3_air::symbolic::variable::SymbolicVariableExt::poly_degree` | not translated | 5 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_multiple` | `p3_air::symbolic::SymbolicExpr::degree_multiple` | not translated | 14 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_with` | `p3_air::symbolic::SymbolicExpr::degree_memo` | not translated | 10 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_multiple_with_transition` | `p3_air::symbolic::SymbolicExpr::degree_multiple_with_transition` | not translated | 4 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_multiple` | `p3_air::symbolic::SymbolicExpr::degree_multiple` | not translated | 15 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_with` | `p3_air::symbolic::SymbolicExpr::degree_memo` | not translated | 11 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_multiple_with_transition` | `p3_air::symbolic::SymbolicExpr::degree_multiple_with_transition` | not translated | 5 |
 | `air` | `p3_air.symbolic.mirror.SymbolicExpr.poly_degree` | `p3_air::symbolic::SymbolicExpr::poly_degree` | not translated | 9 |
 | `air` | `p3_air.symbolic.mirror.SymbolicExpr.as_const` | `p3_air::symbolic::SymbolicExpr::as_const` | not translated | 12 |
 | `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_add` | `p3_air::symbolic::SymbolicExpr::sym_add` | not translated | 7 |
@@ -494,11 +500,11 @@ counts the claims (of 1198) whose dependencies include the declaration.
 | `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_sub` | `p3_air::symbolic::SymbolicExpr::sym_sub` | not translated | 7 |
 | `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_mul` | `p3_air::symbolic::SymbolicExpr::sym_mul` | not translated | 7 |
 | `air` | `p3_air.symbolic.mirror.SymbolicExpr.const` | `{impl p3_field::PrimeCharacteristicRing for p3_air::symbolic::SymbolicExpr<A>}::from_prime_subfield` | not translated | 5 |
-| `air` | `p3_air.symbolic.mirror.instSymLeafBaseLeaf` | `{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression::BaseLeaf<F>}::degree_multiple` | not translated | 15 |
+| `air` | `p3_air.symbolic.mirror.instSymLeafBaseLeaf` | `{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression::BaseLeaf<F>}::degree_multiple` | not translated | 16 |
 | `air` | `p3_air.symbolic.mirror.instSymLeafExtLeaf` | `{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression_ext::ExtLeaf<F, EF>}::degree_multiple` | not translated | 4 |
 | `air` | `p3_air.symbolic.mirror.SymbolicExpressionExt.to_base` | `p3_air::symbolic::expression_ext::SymbolicExpressionExt::to_base` | not translated | 1 |
-| `air` | `p3_air.builder.mirror.AirBuilder.is_transition_window` | `p3_air::builder::AirBuilder::is_transition_window` | not translated | 2 |
-| `air` | `p3_air.builder.mirror.AirBuilder.when` | `p3_air::builder::AirBuilder::when` | not translated | 8 |
+| `air` | `p3_air.builder.mirror.AirBuilder.is_transition_window` | `p3_air::builder::AirBuilder::is_transition_window` | not translated | 6 |
+| `air` | `p3_air.builder.mirror.AirBuilder.when` | `p3_air::builder::AirBuilder::when` | not translated | 9 |
 | `air` | `p3_air.builder.mirror.AirBuilder.when_ne` | `p3_air::builder::AirBuilder::when_ne` | not translated | 1 |
 | `air` | `p3_air.builder.mirror.AirBuilder.when_first_row` | `p3_air::builder::AirBuilder::when_first_row` | not translated | 1 |
 | `air` | `p3_air.builder.mirror.AirBuilder.when_last_row` | `p3_air::builder::AirBuilder::when_last_row` | not translated | 1 |
@@ -514,7 +520,7 @@ counts the claims (of 1198) whose dependencies include the declaration.
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_zeros_ext` | `p3_air::builder::ExtensionBuilder::assert_zeros_ext` | not translated | 0 |
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_eq_ext` | `p3_air::builder::ExtensionBuilder::assert_eq_ext` | not translated | 2 |
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_one_ext` | `p3_air::builder::ExtensionBuilder::assert_one_ext` | not translated | 1 |
-| `air` | `p3_air.builder.mirror.ExtensionBuilder.when` | `{impl p3_air::builder::ExtensionBuilder for p3_air::filtered::FilteredAirBuilder<'_, AB>}::assert_zero_ext` | not translated | 1 |
+| `air` | `p3_air.builder.mirror.ExtensionBuilder.when` | `{impl p3_air::builder::ExtensionBuilder for p3_air::filtered::FilteredAirBuilder<'_, AB>}::assert_zero_ext` | not translated | 2 |
 | `air` | `p3_air.builder.mirror.PairCol.get` | `p3_air::virtual_column::PairCol::get` | not translated | 2 |
 | `air` | `p3_air.builder.mirror.VirtualPairCol.new` | `p3_air::virtual_column::VirtualPairCol::new` | not translated | 0 |
 | `air` | `p3_air.builder.mirror.VirtualPairCol.new_preprocessed` | `p3_air::virtual_column::VirtualPairCol::new_preprocessed` | not translated | 0 |
@@ -531,7 +537,7 @@ counts the claims (of 1198) whose dependencies include the declaration.
 | `air` | `p3_air.air.mirror.BoundaryPublic.row` | `p3_air::boundary::BoundaryPublic::row` | not translated | 2 |
 | `air` | `p3_air.air.mirror.validate` | `p3_air::boundary::validate` | not translated | 2 |
 | `air` | `p3_air.air.mirror.Air.periodic_values` | `p3_air::air::BaseAir::periodic_values` | not translated | 6 |
-| `air` | `p3_air.air.mirror.resolve` | `p3_air::symbolic::expression::SymbolicExpression::resolve` | not translated | 1 |
+| `air` | `p3_air.air.mirror.resolve` | `p3_air::symbolic::expression::SymbolicExpression::resolve` | not translated | 5 |
 | `air` | `p3_air.air.mirror.AirLayout.from_air` | `p3_air::symbolic::builder::AirLayout::from_air` | not translated | 6 |
 | `air` | `p3_air.air.mirror.AirLayout.validate_against_air` | `p3_air::symbolic::builder::AirLayout::validate_against_air` | not translated | 4 |
 | `air` | `p3_air.air.mirror.symbolicBuilder` | `p3_air::symbolic::builder::SymbolicAirBuilder::new` | not translated | 5 |
@@ -540,9 +546,9 @@ counts the claims (of 1198) whose dependencies include the declaration.
 | `air` | `p3_air.air.mirror.get_max_constraint_degree` | `p3_air::symbolic::builder::get_max_constraint_degree_extension` | not translated | 3 |
 | `air` | `p3_air.air.mirror.log2_ceil_usize` | `p3_util::log2_ceil_usize` | not translated | 4 |
 | `air` | `p3_air.air.mirror.get_log_quotient_degree` | `p3_uni_stark::symbolic::get_log_quotient_degree_extension` | not translated | 3 |
-| `air` | `p3_air.air.mirror.DebugState.assert_zero` | `{impl p3_air::named::NamedAirBuilder for p3_air::check_constraints::DebugConstraintBuilder<'_, F, EF>}::assert_zero_named` | not translated | 19 |
-| `air` | `p3_air.air.mirror.debugBuilder` | `p3_air::check_constraints::DebugConstraintBuilder::new` | not translated | 19 |
-| `air` | `p3_air.air.mirror.debugExtBuilder` | `{impl p3_air::named::NamedExtensionBuilder for p3_air::check_constraints::DebugConstraintBuilder<'_, F, EF>}::assert_zero_ext_named` | not translated | 4 |
+| `air` | `p3_air.air.mirror.DebugState.assert_zero` | `{impl p3_air::named::NamedAirBuilder for p3_air::check_constraints::DebugConstraintBuilder<'_, F, EF>}::assert_zero_named` | not translated | 21 |
+| `air` | `p3_air.air.mirror.debugBuilder` | `p3_air::check_constraints::DebugConstraintBuilder::new` | not translated | 21 |
+| `air` | `p3_air.air.mirror.debugExtBuilder` | `{impl p3_air::named::NamedExtensionBuilder for p3_air::check_constraints::DebugConstraintBuilder<'_, F, EF>}::assert_zero_ext_named` | not translated | 6 |
 | `air` | `p3_air.air.mirror.assert_periodic_column_shapes` | `p3_air::check_constraints::assert_periodic_column_shapes` | not translated | 1 |
 | `air` | `p3_air.air.mirror.boundary_io_mismatches` | `p3_air::check_constraints::boundary_io_mismatches` | not translated | 1 |
 | `air` | `p3_air.air.mirror.rowBuilder` | `p3_air::check_constraints::check_constraints` | not translated | 6 |
@@ -782,6 +788,64 @@ counts the claims (of 1198) whose dependencies include the declaration.
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_unchecked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked` | dropped | 2 |
+| `lookup` | `p3_lookup.mirror.Kind` | `p3_lookup::types::Kind` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.Lookup` | `p3_lookup::types::Lookup` | not translated | 7 |
+| `lookup` | `p3_lookup.mirror.Lookup.num_denoms` | `p3_lookup::types::Lookup::num_denoms` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.checked_add_u32` | `core::num::u32::checked_add` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.SymbolicInteraction` | `p3_lookup::builder::SymbolicInteraction` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.SymbolicLocalInteraction` | `p3_lookup::builder::SymbolicLocalInteraction` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.SymbolicExclusiveBranch` | `p3_lookup::builder::SymbolicExclusiveBranch` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.SymbolicExclusiveInteraction` | `p3_lookup::builder::SymbolicExclusiveInteraction` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.assert_uniform_widths` | `p3_lookup::types::assert_uniform_widths` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.assert_uniform_tuple_width` | `p3_lookup::types::assert_uniform_tuple_width` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.from_interactions` | `p3_lookup::types::Lookups::from_interactions` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.bus_widths` | `p3_lookup::types::bus_widths` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.assert_bus_widths` | `p3_lookup::types::assert_bus_widths` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.pack_bus` | `p3_lookup::types::Lookups::pack_same_bus_with_degree` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.pack_same_bus_with_degree` | `p3_lookup::types::Lookups::pack_same_bus_with_degree` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.total_count_weight` | `p3_lookup::types::Lookups::total_count_weight` | not translated | 2 |
+| `lookup` | `p3_lookup.mirror.check_bus_widths` | `p3_lookup::types::check_bus_widths` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.check_multiplicity_height_bound` | `p3_lookup::types::check_multiplicity_height_bound` | not translated | 2 |
+| `lookup` | `p3_lookup.mirror.PermBuilder` | `p3_air::air::PermutationAirBuilder` | not translated | 2 |
+| `lookup` | `p3_lookup.mirror.zip_eq` | `itertools::Itertools::zip_eq` | not translated | 3 |
+| `lookup` | `p3_lookup.mirror.combine_elements` | `p3_lookup::logup::LogUpGadget::combine_elements` | not translated | 4 |
+| `lookup` | `p3_lookup.mirror.compute_combined_sum_terms` | `p3_lookup::logup::LogUpGadget::compute_combined_sum_terms` | not translated | 2 |
+| `lookup` | `p3_lookup.mirror.compute_exclusive_terms` | `p3_lookup::logup::LogUpGadget::compute_exclusive_terms` | not translated | 2 |
+| `lookup` | `p3_lookup.mirror.eval_fraction` | `p3_lookup::logup::LogUpGadget::eval_fraction` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.eval_accumulator` | `p3_lookup::logup::LogUpGadget::eval_accumulator` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.eval_all` | `p3_lookup::protocol::LookupProtocol::eval_all` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.verify_terminal_sum` | `p3_lookup::logup::LogUpGadget::verify_terminal_sum` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.constraint_degree_with_transition` | `p3_lookup::logup::LogUpGadget::constraint_degree_with_transition` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.LookupTraceBuilder` | `p3_lookup::traits::LookupTraceBuilder` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.dot_product` | `p3_field::helpers::dot_product` | not translated | 4 |
+| `lookup` | `p3_lookup.mirror.combine_tuple` | `p3_lookup::logup::combine_tuple` | not translated | 3 |
+| `lookup` | `p3_lookup.mirror.chunks` | `p3_maybe_rayon::serial::ParallelSliceMut::par_chunks_mut` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.batch_multiplicative_inverse` | `p3_field::batch_inverse::batch_multiplicative_inverse` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.lookup_row_terms` | `p3_lookup::logup::LogUpGadget::generate_permutation` | not translated | 2 |
+| `lookup` | `p3_lookup.mirror.rowContext` | `p3_lookup::logup::LogUpGadget::generate_permutation` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.process_chunk` | `p3_lookup::logup::LogUpGadget::generate_permutation` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.prefix_sum` | `p3_lookup::logup::LogUpGadget::generate_permutation` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.generate_permutation` | `p3_lookup::logup::LogUpGadget::generate_permutation` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.Challenges.new` | `p3_lookup::challenges::Challenges::new` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.Count.from_i32` | `p3_lookup::count::Count::from` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.Count.neg` | `p3_lookup::count::Count::neg` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.Recorded` | `p3_lookup::symbolic::InteractionSymbolicBuilder` | not translated | 2 |
+| `lookup` | `p3_lookup.mirror.Recorded.push_interaction` | `p3_lookup::symbolic::InteractionSymbolicBuilder::push_interaction` | not translated | 2 |
+| `lookup` | `p3_lookup.mirror.Recorded.push_exclusive_interaction` | `p3_lookup::symbolic::InteractionSymbolicBuilder::push_exclusive_interaction` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.LookupBus.lookup_key` | `p3_lookup::bus::LookupBus::lookup_key` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.LookupBus.table_entry` | `p3_lookup::bus::LookupBus::table_entry` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.LookupBus.lookup_key_exclusive` | `p3_lookup::bus::LookupBus::lookup_key_exclusive` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.PermutationCheckBus.send` | `p3_lookup::bus::PermutationCheckBus::send` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.PermutationCheckBus.receive` | `p3_lookup::bus::PermutationCheckBus::receive` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.MultiSet.add` | `p3_lookup::debug_util::MultiSet::add` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.MultiSet.assert_empty` | `p3_lookup::debug_util::MultiSet::assert_empty` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.LookupDebugInstance` | `p3_lookup::debug_util::LookupDebugInstance` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.accumulate_lookup` | `p3_lookup::debug_util::accumulate_lookup` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.check_lookups` | `p3_lookup::debug_util::check_lookups` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.TraceWindow` | `p3_lookup::indexed::TraceWindow` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.IndexedLookupError` | `p3_lookup::indexed::IndexedLookupError` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.check_columns` | `p3_lookup::indexed::IndexedLookups::check_columns` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.IndexedLookups.new` | `p3_lookup::indexed::IndexedLookups::new` | not translated | 0 |
 | `matrix` | `p3_matrix.interpolation.mirror.compute_adjusted_weights` | `p3_matrix::interpolation::compute_adjusted_weights` | not translated | 11 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_coset_with_precomputation` | `p3_matrix::interpolation::Interpolate::interpolate_coset_with_precomputation` | not translated | 12 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_coset` | `p3_matrix::interpolation::Interpolate::interpolate_coset` | not translated | 11 |
@@ -1200,6 +1264,52 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Dft.scaled.apply_to_rows` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Dft.smallBatch.dft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Dft.smallBatch.idft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.accepts_bus_relation` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.accumulator_trace` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.air_soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.bus_soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.bus_soundness_security` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.challenge_table` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.combine_elements_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.combined_sum_terms_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.constant_count_weight` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.denominator_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.exclusive_idle` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.exclusive_selects` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.exclusive_terms_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.extracted_bounded` | `Quot.sound`, `propext` |
+| `Lookup.extracted_provided` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.fingerprint_injective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.fingerprint_width_alias` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.fraction_pin_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.height_bound` | `Quot.sound`, `propext` |
+| `Lookup.height_bound_soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.honest_pinned` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.honest_running_sum` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.horner` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.instCharPExt4FieldSize_plonky3Lean` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.integer_balance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.local_weight_exact` | `Quot.sound`, `propext` |
+| `Lookup.logDeriv_eq_zero_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.overflow` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.permutation` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.pin_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.pin_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.pole_blocks_prover` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.pole_pair_frees` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.pole_zero_count_frees` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.prover_combiner` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.prover_fraction_honest` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.prover_pairs` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.prover_rejects_periodic` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.query_without_entry` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.receive_weight` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.reported_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.set_inclusion` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.table_entry_weight` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.terminal_height_one` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.terminal_is_sum` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.terminal_sum` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Matrix.barycentric_weights.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Matrix.bitRevRows_bitRevRows` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Matrix.bitRev_bitRev` | `Classical.choice`, `Quot.sound`, `propext` |
