@@ -3,6 +3,8 @@ module
 public import Plonky3Lean.Proofs.Whir.Iteration
 public import Plonky3Lean.Proofs.Whir.Query
 public import Plonky3Lean.Proofs.Whir.Parameters
+public import Plonky3Lean.Proofs.Whir.Robust
+public import Plonky3Lean.Proofs.Whir.Zk
 public import CompPoly.Fields.BabyBear.Ext4
 public import ToCompPoly.Fields.KoalaBear.Extension
 
@@ -32,7 +34,7 @@ The Merkle scheme, the grinding solver and the layout that batches the opening c
 
 open Finset Plonky3Lean.Spec.MultilinearUtil Plonky3Lean.Spec.Whir Plonky3Lean.Proofs.Whir
 open p3_sumcheck.mirror p3_sumcheck.constraints.mirror p3_whir.mirror p3_whir.transcript.mirror
-open p3_whir.parameters.mirror p3_multilinear_util.point.mirror
+open p3_whir.parameters.mirror p3_whir.utils.mirror p3_multilinear_util.point.mirror
 
 set_option linter.unusedSectionVars false
 
@@ -118,6 +120,15 @@ theorem verify.completeness {P0 : List F} {n : ℕ} {commitment : Com} (hv : Val
     ∃ out, verify E c seed (honestProof E PE c P0 n commitment (h ++ [seed])) commitment h = some (.ok out) :=
   verify_complete E PE c hv hh seed h
 
+/-- The verifier never panics: on a consistent configuration, a layout of the polynomial's variable count and a Merkle scheme that checks row widths, every proof is accepted or rejected with an error.
+
+Consistency includes that every folded domain fits the two-adicity, which the configuration does not check. -/
+theorem verify.no_panic {n : ℕ} (hv : Valid c n E.adicity) (hw : Widths E.mmcs)
+    (hlay : ∀ α, (E.initial α).num_variables = n ∧ ∀ s ∈ (E.initial α).statements, s.Dim n)
+    (seed : Step F EF) (proof : WhirProof F EF Com MP) (commitment : Com) (h : List (Step F EF)) :
+    (verify E c seed proof commitment h).isSome :=
+  verify_some E c hv hw hlay seed proof commitment h
+
 /-- A proof with another number of rounds is rejected before any transcript step. -/
 theorem verify.round_count (seed : Step F EF) (proof : WhirProof F EF Com MP) (commitment : Com)
     (h : List (Step F EF)) (hn : proof.rounds.length ≠ c.n_rounds) :
@@ -183,6 +194,26 @@ theorem play_query_indices.opened (hidx : ∀ h bits count, ∀ i ∈ S.indices 
   opened_le_queries S hidx hlen h hq0 hq stratified
 
 end Queries
+
+/-! ## Zero knowledge -/
+
+/-- The private out-of-domain answer of a hiding round is the polynomial of the message followed by the randomness. -/
+theorem zk.padded_ood (point : F) (msg rand : List EF) :
+    padded_ood_t1 point msg rand = uni (msg ++ rand) (algebraMap F EF point) :=
+  padded_ood_t1_eq point msg rand
+
+/-- Lemma 9.3 of eprint 2026/391 at r = 1: at a nonzero point, the answer is a bijection of the one randomness coefficient, whatever the message. -/
+theorem zk.padded_ood_bijective {point : F} (hp : point ≠ 0) (msg : List EF) :
+    Function.Bijective fun x : EF => padded_ood_t1 point msg [x] :=
+  padded_ood_t1_bijective hp msg
+
+/-- At the point zero the answer is the message's constant coefficient, whatever the randomness. -/
+theorem zk.padded_ood_zero (a : EF) (msg rand : List EF) : padded_ood_t1 (0 : F) (a :: msg) rand = a :=
+  padded_ood_t1_zero a msg rand
+
+/-- eval_ze_star_n is the polynomial with the given coefficients at the point. -/
+theorem zk.eval_ze_star_n (point : F) (c : List EF) : eval_ze_star_n point c = uni c (algebraMap F EF point) :=
+  eval_ze_star_n_eq point c
 
 /-! ## Parameters -/
 

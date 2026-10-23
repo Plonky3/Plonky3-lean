@@ -11,5 +11,6 @@ public import P3Whir.Model
 public import P3Whir.Query
 public import P3Whir.Verifier
 public import P3Whir.Parameters
+public import P3Whir.Utils
 
 @[expose] public section

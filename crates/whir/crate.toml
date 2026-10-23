@@ -80,3 +80,19 @@ rust = "p3_whir::parameters::whir::WhirConfig::new_with_max_domain_log"
 [[mirror]]
 lean = "p3_whir.parameters.mirror.finalRoundConfig"
 rust = "p3_whir::parameters::whir::WhirConfig::final_round_config"
+
+[[mirror]]
+lean = "p3_whir.utils.mirror.eval_ze_star_n"
+rust = "p3_whir::utils::eval_ze_star_n"
+
+[[mirror]]
+lean = "p3_whir.utils.mirror.par_eval_ze_star_n"
+rust = "p3_whir::utils::par_eval_ze_star_n"
+
+[[mirror]]
+lean = "p3_whir.utils.mirror.par_add_scaled_powers"
+rust = "p3_whir::utils::par_add_scaled_powers"
+
+[[mirror]]
+lean = "p3_whir.utils.mirror.padded_ood_t1"
+rust = "p3_whir::utils::padded_ood_t1"
