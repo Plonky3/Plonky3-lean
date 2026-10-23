@@ -236,7 +236,8 @@ if [ -s "$PRE_LIST" ]; then
     echo "    WARNING: patching Rust source changes the artifact under" >&2
     echo "             verification. See docs/patches.md." >&2
 fi
-packages="$(printf '%s\n' "$CRATES" | cut -d'|' -f1 | sed 's/^/-p p3-/' | tr '\n' ' ')"
+packages="$(printf '%s\n' "$CRATES" | cut -d'|' -f1 | while read -r c; do
+    printf -- '-p %s ' "$("$CONFIG" package "$c")"; done)"
 check() {   # check <log>: cargo check of the extracted crates in the variant charon sees
     (cd "$RUST" && env RUSTUP_TOOLCHAIN="$CHARON_TOOLCHAIN" \
         RUSTFLAGS="$EXTRACT_RUSTFLAGS" CARGO_TARGET_DIR="$WORK/target-check" \
@@ -285,9 +286,17 @@ printf '%s\n' "$CRATES" | while IFS='|' read -r crate lib state; do
     out="$WORK/out/$crate"
     mkdir -p "$out"
     args="$("$CONFIG" charon-args "$crate")"
+    # A dependency outside the workspace is extracted from a copy of the source
+    # Cargo resolves it to, so that nothing is written into Cargo's registry.
+    src="$("$CONFIG" source "$crate")"
+    case "$src" in
+        "$RUST"/*) ;;
+        *) mkdir -p "$WORK/src"; rm -rf "${WORK:?}/src/$crate"
+           cp -R "$src" "$WORK/src/$crate"; src="$WORK/src/$crate" ;;
+    esac
     # hax's output also goes to a per-crate log, which gap-report.py reads for
     # charon's diagnostics.
-    (cd "$RUST/$crate" && RUSTFLAGS="$EXTRACT_RUSTFLAGS" CARGO_TARGET_DIR="$WORK/target-hax" \
+    (cd "$src" && RUSTFLAGS="$("$CONFIG" rustflags "$crate")" CARGO_TARGET_DIR="$WORK/target-hax" \
         "$HAX_BIN" hax into --output-dir "$out" lean --charon-args="$args" 2>&1 \
         | tee "$WORK/hax-$crate.log"; exit "${PIPESTATUS[0]}")
 done

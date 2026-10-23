@@ -1,0 +1,15 @@
+# Mutation of: 020-reshape-batch
+# Breaks:      the partial word of a last block is not masked, so bytes past
+#              the tail, the next message's, enter the digest.
+#
+--- a/blake3/src/hax_reshaped/mod.rs
++++ b/blake3/src/hax_reshaped/mod.rs
+@@ -312,7 +312,7 @@
+ /// Zero every byte of `words` past the first `tail`.
+ fn mask_tail<V: Word, const G: usize>(words: &mut Block<V, G>, tail: usize) {
+     if tail < BLOCK_LEN {
+-        for w in tail / 4..BLOCK_WORDS {
++        for w in tail / 4 + 1..BLOCK_WORDS {
+             let kept_bytes = tail.saturating_sub(4 * w);
+             let mask = V::splat(!(u32::MAX << (8 * kept_bytes)));
+             for g in 0..G {

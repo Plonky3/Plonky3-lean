@@ -209,12 +209,12 @@ def main():
                 ok, out = patch(tree, mut, reverse=True)
                 if not ok:
                     sys.exit(f"error: could not revert {mut.name}: {out}")
-            res[p.name] = r
+            res[str(p)] = r  # crates share patch names, so key by path
         cache.write_text(json.dumps(res, indent=1))
 
     fail = False
     for p, ts, desc, mut in decl:
-        r = res[p.name]
+        r = res[str(p)]
         print(f"    {p.name}")
         if "error" in r:
             print(f"      ERROR: {r['error']}")

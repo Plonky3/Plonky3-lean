@@ -95,3 +95,25 @@ srcDir = "crates/util/extraction"
 [[lean_lib]]
 name = "P3BinaryField"
 srcDir = "crates/binary-field/extraction"
+
+[[lean_lib]]
+name = "P3Sha256"
+srcDir = "crates/sha256/extraction"
+
+# Not a Plonky3 crate: the dependency p3-sha256 compresses with (crates/sha2/crate.toml).
+[[lean_lib]]
+name = "Sha2"
+srcDir = "crates/sha2/extraction"
+
+[[lean_lib]]
+name = "P3Blake2s"
+srcDir = "crates/blake2s/extraction"
+
+[[lean_lib]]
+name = "P3Blake3"
+srcDir = "crates/blake3/extraction"
+
+# Not a Plonky3 crate: the constants p3-blake3 takes from `blake3` (crates/blake3-crate/crate.toml).
+[[lean_lib]]
+name = "Blake3Crate"
+srcDir = "crates/blake3-crate/stub"

@@ -69,6 +69,11 @@ which does not define it. -/
 def core.U32.Insts.CoreCmpOrd.min (self other : Std.U32) : RustM Std.U32 :=
   core.cmp.Ord.min.default core.U32.Insts.CoreCmpOrd self other
 
+/-- `<usize as Ord>::min`, the provided method `Ord::min` at `usize`.
+p3-blake3's `chunk` clamps a chunk's end to the message length with it. -/
+def core.Usize.Insts.CoreCmpOrd.min (self other : Std.Usize) : RustM Std.Usize :=
+  core.cmp.Ord.min.default core.Usize.Insts.CoreCmpOrd self other
+
 /-- `bool::then` (`library/core/src/bool.rs`):
 `if self { Some(f()) } else { None }`. -/
 def core.bool.Bool.then {T F : Type} (FnOnceInst : core.ops.function.FnOnce F Unit T)
@@ -111,5 +116,14 @@ The cast reinterprets the bits of `rhs`.
 p3-monty-31's signed conversions into Montgomery form use it. -/
 def core.num.U32.wrapping_add_signed (self : Std.U32) (rhs : Std.I32) : RustM Std.U32 :=
   ok (self.wrapping_add (IScalar.hcast .U32 rhs))
+
+/-- `fmt::rt::Argument::new_display` (`library/core/src/fmt/rt.rs`): one argument
+of a formatted message. `fmt.Arguments` is `Unit`, so what an argument displays is
+not modelled; only the panic it reaches is.
+
+p3-blake2s's scalar `hash_many` formats its `assert!` message with it. -/
+def core.fmt.rt.Argument.new_display {T : Type} (_displayInst : core.fmt.Display T) (_x : T) :
+    RustM core.fmt.rt.Argument :=
+  ok ⟨.Placeholder ()⟩
 
 end CoreModels

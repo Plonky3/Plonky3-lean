@@ -1,0 +1,24 @@
+# sha2: RustCrypto's SHA-2, which p3-sha256 calls for the compression function.
+#
+# Not a Plonky3 crate: `package` names the crates.io dependency, and the run
+# extracts the source Cargo resolves it to for the Plonky3 workspace.
+
+lean_lib = "Sha2"
+
+package = "sha2"
+
+state = "scoped"
+
+features = []
+
+# Only the SHA-256 compression function is extracted.
+start_from = ["sha2::sha256::compress256"]
+
+# The compact portable backend, which sha2 selects with this cfg.
+#
+# A default build for the extraction target compiles the unrolled backend instead.
+# aeneas runs out of memory on its 64 inlined rounds, and its round-constant reads go
+# through raw pointers (docs/extractor-issues.md 12 and 13).
+rustflags = ["--cfg", "sha2_backend_soft=\"compact\""]
+
+watch = ["Cargo.toml"]

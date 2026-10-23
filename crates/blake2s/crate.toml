@@ -1,0 +1,22 @@
+# p3-blake2s: BLAKE2s-256 as a hash.
+#
+# On targets without a vector unit, which the extraction target is, `hash_many`
+# hashes one message at a time with the `blake2` crate.
+
+lean_lib = "P3Blake2s"
+
+# Only `hash_many` is extracted.
+#
+# Each message's digest is `blake2`'s incremental `Digest`, whose types aeneas
+# rejects (docs/extractor-issues.md 16), so `Blake2s256::hash` is assumed.
+# The vector backends are compiled only for x86_64 and aarch64.
+state = "scoped"
+
+features = []
+
+start_from = ["p3_blake2s::batch::hash_many"]
+
+# `Blake2s256::hash` is the `blake2` call; charon's `_` matches its inherent impl.
+charon_args = ["--opaque", "p3_blake2s::_::hash"]
+
+watch = ["blake2s/src", "blake2s/Cargo.toml"]

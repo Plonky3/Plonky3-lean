@@ -16,6 +16,9 @@ target `thumbv7em-none-eabi`
 |---|---|---:|---:|---:|---:|---:|---|---|
 | `baby-bear` | extracted | 2953 | 121 | 4 | 0 | 0 | 4 / 3 | pre `020`, pre `030`, pre `040` |
 | `binary-field` | scoped | 3228 | 66 | 0 | 0 | 0 | 5 / 1 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050` |
+| `blake2s` | scoped | 148 | 51 | 1 | 0 | 0 | 1 / 0 | pre `010` |
+| `blake3` | scoped | 2609 | 40 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
+| `blake3-crate` | stub |  | 26 | 0 | 3 |  | 0 / 0 |  |
 | `field` | stub |  | 91 | 2 | 6 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
 | `koala-bear` | extracted | 3024 | 121 | 4 | 0 | 0 | 0 / 3 |  |
@@ -24,6 +27,8 @@ target `thumbv7em-none-eabi`
 | `monty-31` | scoped | 831 | 526 | 0 | 25 | 37 | 0 / 1 |  |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 68 | 2 | 4 |  | 0 / 0 |  |
+| `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
+| `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
 | `util` | scoped | 182 | 56 | 0 | 1 | 0 | 0 / 0 |  |
 
 Generated lines are `extraction/<Lib>/Extraction/{Types,Funs}.lean`. Hand-written
@@ -47,6 +52,25 @@ Nothing translated is dropped.
 
 charon errors: 0.
 Nothing translated is dropped.
+
+### `blake2s`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `blake3`
+
+charon errors: 0.
+6 item(s) dropped, 0 of them mirrored.
+
+| Item | Source | Mirrored |
+|---|---|---|
+| `p3_blake3::LANES` | `` |  |
+| `p3_blake3::batch::lanes::LANES` | `` |  |
+| `p3_blake3::{impl core::clone::Clone}::clone` | `` |  |
+| `p3_blake3::{impl p3_symmetric::hasher::CryptographicHasher}::LANES` | `` |  |
+| `p3_blake3::{impl p3_symmetric::hasher::CryptographicHasher}::hash_iter` | `` |  |
+| `p3_blake3::{impl p3_symmetric::hasher::CryptographicHasher}::hash_iter::BUFLEN` | `` |  |
 
 ### `goldilocks`
 
@@ -176,6 +200,20 @@ charon errors: 0.
 | `p3_monty_31::monty_31::{impl}::HALF` | `` |  |
 | `p3_monty_31::monty_31::{impl}::to_u32` | `` |  |
 
+### `sha2`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `sha256`
+
+charon errors: 0.
+1 item(s) dropped, 0 of them mirrored.
+
+| Item | Source | Mirrored |
+|---|---|---|
+| `p3_sha256::{impl core::clone::Clone}::clone` | `` |  |
+
 ### `util`
 
 charon errors: 0.
@@ -186,7 +224,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 348) whose dependencies include it; reaching one is not using it.
+(of 367) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -194,6 +232,7 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 | `baby-bear` | `mds.MDSBabyBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon2.BabyBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `blake2s` | `p3_blake2s.Blake2s256.hash` | its body goes through `blake2`'s incremental `Digest`, whose buffer type aeneas rejects (docs/extractor-issues.md 16) | 3 |
 | `field` | `p3_field.exponentiation.exp_1420470955` | its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here | 1 |
 | `field` | `p3_field.exponentiation.exp_1725656503` | its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here | 1 |
 | `koala-bear` | `koala_bear.KoalaBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 68 |
@@ -212,10 +251,13 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 348) whose dependencies include the declaration.
+counts the claims (of 367) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
+| `blake3-crate` | `blake3.BLOCK_LEN` | `blake3::BLOCK_LEN` | stub | 4 |
+| `blake3-crate` | `blake3.CHUNK_LEN` | `blake3::CHUNK_LEN` | stub | 4 |
+| `blake3-crate` | `blake3.OUT_LEN` | `blake3::OUT_LEN` | stub | 0 |
 | `field` | `p3_field.dup.Dup` | `p3_field::dup::Dup` | stub | 0 |
 | `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 2 |
 | `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 0 |
@@ -300,7 +342,11 @@ counts the claims (of 348) whose dependencies include the declaration.
 | `binary-field/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of a field type. No existing body changes. |
 | `binary-field/pre/040-tower-inherent-repr` | none in a normal build: the copies are compiled but unused there. In the extracted variant, inherent `from_repr`, `to_repr` and `mul_alpha` shadow the `TowerLevel` methods at every call site on a concrete level, and call copies with the trait methods' bodies. `Gf2`'s copies build the value directly: `from_bool((r & 1) == 1)` is `Self(r & 1)`, and `u8::from(self.is_one())` is `(self.0 == 1) as u8`. |
 | `binary-field/pre/050-poly192-copied-limbs` | none in a normal build: the copy is compiled but unused there. In the extracted variant, `Mul` and `Mul<Poly64>` read the coordinates through `limbs_owned`, which copies each coordinate's bits, instead of borrowing them in place. |
+| `blake2s/pre/010-reshape-hash-many` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the scalar `hash_many` calls the reshaped body, which a differential test equates with the original. |
+| `blake3/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds one free function, which calls `Blake3::hash_many`. No existing body changes. |
+| `blake3/pre/020-reshape-batch` | none in a normal build: the reshaped driver is compiled only under cfg(hax_backend_lean), as the crate's `batch` module, and under cfg(test), beside the shipped one. The extracted variant hashes on the one-lane backend, which is what the extraction target compiles. |
 | `mersenne-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of `Mersenne31`. No existing body changes. |
+| `sha256/pre/010-reshape-compress` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `Sha256Compress::compress` calls the reshaped body, which a differential test equates with the original. |
 
 Upstream tests (`test-pre-patches.py`): 6715 of Plonky3's 6769 pass as shipped and 6715 with the pre-extraction patches, with 0 divergence(s).
 
@@ -487,6 +533,19 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3BinaryField.tower.BinaryField8.Insts.CoreOpsArithSubBinaryField8BinaryField8.sub.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField8.from_repr.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.tower.BinaryField8.mul_alpha.towerOf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Blake2s.batch.hash_many.empty` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Blake2s.batch.hash_many.eq_hash` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Blake2s.batch.hash_many.ragged` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Blake3.Blake3.hash_many.empty` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Blake3.Blake3.hash_many.eq_digest` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Blake3.Blake3.hash_many.kat_1025` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Blake3.Blake3.hash_many.ragged` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Blake3.digest.kat_0` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Blake3.digest.kat_1` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Blake3.digest.kat_1024` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Blake3.digest.kat_1025` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Blake3.digest.kat_2049` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Blake3.digest.kat_65` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Goldilocks.goldilocks.Goldilocks.GENERATOR.generates` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Goldilocks.goldilocks.Goldilocks.NEG_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Goldilocks.goldilocks.Goldilocks.ORDER_U64.eq_fieldSize` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -650,6 +709,12 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Mersenne31.mersenne_31.from_u62.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Mersenne31.mersenne_31.partial_reduce.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Mersenne31.mersenne_31.reduce_64.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Sha256.Sha256Compress.compress.abc` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Sha256.Sha256Compress.compress.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Sha256.compress256.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Sha256.digest.abc` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Sha256.digest.empty` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Sha256.digest.two_blocks` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.cong` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.inverse` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |

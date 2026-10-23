@@ -1,0 +1,17 @@
+# Mutation of: 010-reshape-compress
+# Breaks:      the reshaped body swaps the two halves, so it no longer equals
+#              the original on inputs whose halves differ.
+#
+--- a/sha256/src/hax_reshaped.rs
++++ b/sha256/src/hax_reshaped.rs
+@@ -11,8 +11,8 @@
+     // The two halves, in order, as one 64-byte block.
+     let mut block = [0u8; 64];
+     for i in 0..32 {
+-        block[i] = input[0][i];
+-        block[32 + i] = input[1][i];
++        block[i] = input[1][i];
++        block[32 + i] = input[0][i];
+     }
+ 
+     let mut state = H256_256;

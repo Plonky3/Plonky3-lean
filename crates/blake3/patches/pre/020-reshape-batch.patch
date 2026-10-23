@@ -1,0 +1,778 @@
+# Patch:        020-reshape-batch
+# Phase:        pre
+# Target:       blake3/src/lib.rs, blake3/src/hax_reshaped/mod.rs, blake3/src/hax_reshaped/compress.rs, blake3/src/hax_reshaped/lanes/mod.rs, blake3/src/hax_reshaped/lanes/portable.rs
+# Hunks:        5
+# Class:        equiv-rewrite
+# Gap:          docs/extractor-issues.md 14 (no model of `IterMut`,
+#               `as_chunks` or `as_chunks_mut`), 12 (raw-pointer reads) and 17
+#               (loops under a borrowed `&Lanes`; the backend trait recursing
+#               with the tree).
+# Cost:         none in a normal build: the reshaped driver is compiled only
+#               under cfg(hax_backend_lean), as the crate's `batch` module, and
+#               under cfg(test), beside the shipped one. The extracted variant
+#               hashes on the one-lane backend, which is what the extraction
+#               target compiles.
+# Upstreamable: no: the shipped driver is the clearer and faster code; models
+#               of the slice iterators and a region-join fix in aeneas make the
+#               patch unnecessary.
+# Drop when:    the extractor translates the shipped driver.
+# Test:         test p3-blake3 --lib batch_reshaped
+# Mutation:     the partial word of a last block is not masked, so a digest
+#               whose last block is partial takes the next message's bytes.
+#
+# The reshaped driver is the shipped `batch/` with the same algorithm in a translatable shape.
+# Loops over groups, lanes and words are index loops instead of iterator zips and chunk views.
+# Blocks are copied byte by byte from the batch instead of read through a raw pointer, and the loads take the slice as an argument.
+# The tree calls `subtree`, `chunk` and `parent` directly instead of through the backend trait, which loses the per-backend target features and nothing else.
+# Only the one-lane backend is kept, with no run-time dispatch and no hand-scheduled kernel hook.
+# The differential test runs it beside the shipped driver and `blake3::hash` on every block and chunk boundary and on random batches.
+#
+--- a/blake3/src/lib.rs
++++ b/blake3/src/lib.rs
+@@ -17,8 +17,20 @@
+ #[cfg(test)]
+ mod tests;
+ 
++#[cfg(not(hax_backend_lean))] // PATCHED
+ mod batch;
+ 
++// PATCHED: the extracted variant takes the batched driver reshaped for the extractor, on its one-lane backend.
++#[cfg(hax_backend_lean)]
++#[path = "hax_reshaped/mod.rs"]
++mod batch;
++
++// PATCHED: the reshaped driver, compiled beside the shipped one so a differential test compares them.
++#[cfg(test)]
++#[allow(dead_code, unreachable_pub, unused_imports)]
++#[path = "hax_reshaped/mod.rs"]
++mod batch_reshaped;
++
+ use blake3::OUT_LEN;
+ use p3_symmetric::CryptographicHasher;
+ 
+--- /dev/null
++++ b/blake3/src/hax_reshaped/mod.rs
+@@ -0,0 +1,394 @@
++//! PATCHED: the batched driver of `batch/`, on its one-lane backend, in a shape hax's Lean backend translates.
++//!
++//! The extractor has no model of a mutable slice iterator, of `as_chunks`, of a raw-pointer read or of a function pointer.
++//! Plonky3-lean, docs/extractor-issues.md, 14.
++//!
++//! Aeneas rejects a loop that runs while a struct holding a shared slice is borrowed, and the driver's backend trait recurses with the tree.
++//! Plonky3-lean, docs/extractor-issues.md, 17.
++//!
++//! The vector backends and the run-time dispatch are left out: the extraction target compiles only the one-lane backend.
++
++mod compress;
++mod lanes;
++
++use blake3::{BLOCK_LEN, CHUNK_LEN, OUT_LEN};
++
++pub(crate) use self::compress::IV;
++use self::compress::{BLOCK_WORDS, CHUNK_END, CHUNK_START, PARENT, ROOT, STATE_WORDS, compress};
++pub(crate) use self::lanes::LANES;
++use self::lanes::{Backend, Word};
++
++/// Chaining values of every lane of `G` register groups of `V`.
++type State<V, const G: usize> = [[V; STATE_WORDS]; G];
++
++/// Message words of every lane of `G` register groups of `V`.
++type Block<V, const G: usize> = [[V; BLOCK_WORDS]; G];
++
++/// Where the message of every lane of `G` register groups of `W` lanes starts in the batch.
++struct Lanes<'a, const W: usize, const G: usize> {
++    /// Every message of the batch, back to back.
++    batch: &'a [u8],
++    /// Byte offset of each lane's message in `batch`.
++    starts: [[usize; W]; G],
++    /// The largest start, so one bounds check covers the same read in every lane.
++    last: usize,
++}
++
++/// The key and domain flags every compression of a hash carries.
++///
++/// Plain hashing is the initialization vector with no flags.
++///
++/// The keyed and key-derivation modes only change these two values.
++#[derive(Clone, Copy)]
++pub(crate) struct Mode {
++    /// The key words, which every chunk and parent starts from.
++    pub(crate) key: [u32; STATE_WORDS],
++    /// Flags added to every compression.
++    pub(crate) flags: u32,
++}
++
++impl Mode {
++    /// Plain unkeyed hashing.
++    pub(crate) const HASH: Self = Self { key: IV, flags: 0 };
++
++    /// The key in every lane, where every chunk and parent starts.
++    #[inline(always)]
++    fn state<V: Word, const G: usize>(self) -> State<V, G> {
++        [core::array::from_fn(|i| V::splat(self.key[i])); G]
++    }
++}
++
++/// Hash equal-length messages of `len` bytes laid end to end in `input`.
++///
++/// The one-lane backend does the work.
++///
++/// The caller guarantees `input.len() == len * out.len()`.
++pub(crate) fn hash_many(mode: Mode, input: &[u8], len: usize, out: &mut [[u8; OUT_LEN]]) {
++    // SAFETY: the one-lane backend runs on every CPU.
++    unsafe { hash_many_with::<u32, 1, 1>(mode, input, len, out) }
++}
++
++/// Hash equal-length messages with backend `V`, in groups of `G` registers of `W` lanes.
++///
++/// The caller guarantees `input.len() == len * out.len()`.
++///
++/// # Safety
++///
++/// The running CPU has the target features of `V`.
++unsafe fn hash_many_with<V: Backend<W>, const W: usize, const G: usize>(
++    mode: Mode,
++    input: &[u8],
++    len: usize,
++    out: &mut [[u8; OUT_LEN]],
++) {
++    let n = out.len();
++    let registers = n / W;
++    let groups = registers / G;
++    for index in 0..groups {
++        let first = index * W * G;
++        let starts = core::array::from_fn(|g| core::array::from_fn(|l| (first + g * W + l) * len));
++        let lanes = Lanes { batch: input, starts, last: (first + W * G - 1) * len };
++        let mut digests = [[[0u8; OUT_LEN]; W]; G];
++        unsafe { hash_group::<V, W, G>(mode, &lanes, len, &mut digests) };
++        for g in 0..G {
++            for l in 0..W {
++                out[first + g * W + l] = digests[g][l];
++            }
++        }
++    }
++    let mut first = groups * W * G;
++    for _ in 0..registers % G {
++        let lanes = Lanes { batch: input, starts: [core::array::from_fn(|l| (first + l) * len)], last: (first + W - 1) * len };
++        let mut digests = [[[0u8; OUT_LEN]; W]];
++        unsafe { hash_group::<V, W, 1>(mode, &lanes, len, &mut digests) };
++        for l in 0..W {
++            out[first + l] = digests[0][l];
++        }
++        first += W;
++    }
++    let rest = n % W;
++    if rest != 0 {
++        let lanes = Lanes { batch: input, starts: [core::array::from_fn(|l| (first + l % rest) * len)], last: (first + rest - 1) * len };
++        let mut digests = [[[0u8; OUT_LEN]; W]];
++        unsafe { hash_group::<V, W, 1>(mode, &lanes, len, &mut digests) };
++        for l in 0..rest {
++            out[first + l] = digests[0][l];
++        }
++    }
++}
++
++/// Hash the `len`-byte message of every lane.
++///
++/// # Safety
++///
++/// The running CPU has the target features of `V`.
++#[inline(always)]
++unsafe fn hash_group<V: Backend<W>, const W: usize, const G: usize>(
++    mode: Mode,
++    lanes: &Lanes<'_, W, G>,
++    len: usize,
++    out: &mut [[[u8; OUT_LEN]; W]; G],
++) {
++    // One chunk is its own root, and more chunks fold into a tree.
++    let state = if len <= CHUNK_LEN {
++        chunk::<V, W, G>(mode, lanes, len, 0, ROOT)
++    } else {
++        // SAFETY: the caller runs this on a CPU with the features of `V`.
++        unsafe { subtree::<V, W, G>(mode, lanes, len, 0, len.div_ceil(CHUNK_LEN), ROOT) }
++    };
++
++    store_all::<V, W, G>(&state, out);
++}
++
++/// The chaining value of `chunks` consecutive chunks, starting at chunk `first`.
++///
++/// The left child takes the largest power of two chunks that leaves the right one non-empty.
++///
++/// For 5 chunks, the root joins chunks 0 to 3 with chunk 4.
++///
++/// `root` is `ROOT` for the top of the tree and zero for every node below it.
++///
++/// # Safety
++///
++/// The running CPU has the target features of `V`.
++#[inline(always)]
++unsafe fn subtree<V: Backend<W>, const W: usize, const G: usize>(
++    mode: Mode,
++    lanes: &Lanes<'_, W, G>,
++    len: usize,
++    first: usize,
++    chunks: usize,
++    root: u32,
++) -> State<V, G> {
++    // SAFETY (every call below): the caller runs this on a CPU with the features of `V`.
++    if chunks == 1 {
++        return chunk::<V, W, G>(mode, lanes, len, first, root);
++    }
++
++    // Largest power of two strictly below `chunks`.
++    let left_chunks = 1 << (usize::BITS - 1 - (chunks - 1).leading_zeros());
++    let left = unsafe { subtree::<V, W, G>(mode, lanes, len, first, left_chunks, 0) };
++    let right = unsafe {
++        subtree::<V, W, G>(
++            mode,
++            lanes,
++            len,
++            first + left_chunks,
++            chunks - left_chunks,
++            0,
++        )
++    };
++
++    parent::<V, G>(mode, &left, &right, root)
++}
++
++/// The chaining value of a parent node over two children.
++#[inline(always)]
++fn parent<V: Word, const G: usize>(
++    mode: Mode,
++    left: &State<V, G>,
++    right: &State<V, G>,
++    root: u32,
++) -> State<V, G> {
++    // A parent block is the left chaining value, then the right one.
++    //
++    // Both already sit in lane order, so no transpose is needed.
++    let mut block = [[V::splat(0); BLOCK_WORDS]; G];
++    for g in 0..G {
++        for i in 0..STATE_WORDS {
++            block[g][i] = left[g][i];
++            block[g][STATE_WORDS + i] = right[g][i];
++        }
++    }
++
++    // Parents always have a full block and a zero counter.
++    let mut state = mode.state();
++    compress(
++        &mut state,
++        &block,
++        0,
++        BLOCK_LEN as u32,
++        mode.flags | PARENT | root,
++    );
++    state
++}
++
++/// The chaining value of chunk `index` in every lane.
++///
++/// `root` is `ROOT` when this chunk is the whole message.
++#[inline(always)]
++fn chunk<V: Backend<W>, const W: usize, const G: usize>(
++    mode: Mode,
++    lanes: &Lanes<'_, W, G>,
++    len: usize,
++    index: usize,
++    root: u32,
++) -> State<V, G> {
++    let start = index * CHUNK_LEN;
++    let end = len.min(start + CHUNK_LEN);
++
++    // The last block is flagged, so it is held back even when full.
++    //
++    // - 130 bytes: two plain blocks, then a last block of 2 bytes.
++    // - 128 bytes: one plain block, then a last block of 64 bytes.
++    // - 0 bytes: one last block of no bytes at all.
++    let plain_blocks = (end - start).saturating_sub(1) / BLOCK_LEN;
++
++    // Every block of a chunk carries the chunk index as its counter.
++    let counter = index as u64;
++    let mut state = mode.state();
++    compress_plain::<V, W, G>(mode, lanes.batch, &lanes.starts, lanes.last, start, plain_blocks, counter, &mut state);
++
++    // The last block holds up to 64 message bytes, zero padded.
++    let offset = start + plain_blocks * BLOCK_LEN;
++    let tail = end - offset;
++    let words = last_block::<V, W, G>(lanes, offset, tail);
++
++    let first = if plain_blocks == 0 { CHUNK_START } else { 0 };
++    let flags = mode.flags | first | CHUNK_END | root;
++    compress(&mut state, &words, counter, tail as u32, flags);
++    state
++}
++
++/// Load the last block of a chunk: `tail` bytes at `offset`, zero padded to a full block.
++#[inline(always)]
++fn last_block<V: Backend<W>, const W: usize, const G: usize>(
++    lanes: &Lanes<'_, W, G>,
++    offset: usize,
++    tail: usize,
++) -> Block<V, G> {
++    let mut words = if lanes.last + offset + BLOCK_LEN <= lanes.batch.len() {
++        load_parts::<V, W, G>(lanes.batch, &lanes.starts, lanes.last, offset)
++    } else {
++        spill_parts::<V, W, G>(lanes.batch, &lanes.starts, offset, tail)
++    };
++    mask_tail::<V, G>(&mut words, tail);
++    words
++}
++
++/// The block at byte `offset` of every lane's message, read from the batch's parts.
++fn load_parts<V: Backend<W>, const W: usize, const G: usize>(
++    batch: &[u8],
++    starts: &[[usize; W]; G],
++    last: usize,
++    offset: usize,
++) -> Block<V, G> {
++    assert!(last + offset + BLOCK_LEN <= batch.len());
++    let mut block = [[V::splat(0); BLOCK_WORDS]; G];
++    for g in 0..G {
++        let mut rows = [[0u8; BLOCK_LEN]; W];
++        for l in 0..W {
++            let at = starts[g][l] + offset;
++            for b in 0..BLOCK_LEN {
++                rows[l][b] = batch[at + b];
++            }
++        }
++        block[g] = V::load_block(&rows.each_ref());
++    }
++    block
++}
++
++/// The first `tail` bytes at `offset` of every lane's message, zero padded to a block.
++fn spill_parts<V: Backend<W>, const W: usize, const G: usize>(
++    batch: &[u8],
++    starts: &[[usize; W]; G],
++    offset: usize,
++    tail: usize,
++) -> Block<V, G> {
++    let mut block = [[V::splat(0); BLOCK_WORDS]; G];
++    for g in 0..G {
++        let mut spill = [[0u8; BLOCK_LEN]; W];
++        for l in 0..W {
++            let start = starts[g][l];
++            for b in 0..tail {
++                spill[l][b] = batch[start + offset + b];
++            }
++        }
++        block[g] = V::load_block(&spill.each_ref());
++    }
++    block
++}
++
++/// Zero every byte of `words` past the first `tail`.
++fn mask_tail<V: Word, const G: usize>(words: &mut Block<V, G>, tail: usize) {
++    if tail < BLOCK_LEN {
++        for w in tail / 4..BLOCK_WORDS {
++            let kept_bytes = tail.saturating_sub(4 * w);
++            let mask = V::splat(!(u32::MAX << (8 * kept_bytes)));
++            for g in 0..G {
++                words[g][w] = words[g][w].and(mask);
++            }
++        }
++    }
++}
++
++/// Write the digests of every group.
++fn store_all<V: Backend<W>, const W: usize, const G: usize>(
++    state: &State<V, G>,
++    out: &mut [[[u8; OUT_LEN]; W]; G],
++) {
++    for g in 0..G {
++        let mut digests = out[g];
++        V::store_digests(&state[g], &mut digests);
++        out[g] = digests;
++    }
++}
++
++/// Compress the plain blocks of a chunk into `state`.
++#[allow(clippy::too_many_arguments)]
++fn compress_plain<V: Backend<W>, const W: usize, const G: usize>(
++    mode: Mode,
++    batch: &[u8],
++    starts: &[[usize; W]; G],
++    last: usize,
++    start: usize,
++    plain_blocks: usize,
++    counter: u64,
++    state: &mut State<V, G>,
++) {
++    for block in 0..plain_blocks {
++        let words = load_parts::<V, W, G>(batch, starts, last, start + block * BLOCK_LEN);
++        let flags = if block == 0 { CHUNK_START } else { 0 };
++        compress(state, &words, counter, BLOCK_LEN as u32, mode.flags | flags);
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use alloc::vec;
++    use alloc::vec::Vec;
++
++    use blake3::OUT_LEN;
++    use proptest::prelude::*;
++
++    use super::Mode;
++
++    /// The reshaped driver against the shipped one and against `blake3::hash`, message by message.
++    fn check(len: usize, count: usize, seed: u8) {
++        let input: Vec<u8> = (0..len * count).map(|i| (i as u8).wrapping_mul(31) ^ seed).collect();
++        let mut reshaped = vec![[1u8; OUT_LEN]; count];
++        super::hash_many(Mode::HASH, &input, len, &mut reshaped);
++        let mut shipped = vec![[2u8; OUT_LEN]; count];
++        crate::batch::hash_many(crate::batch::Mode::HASH, &input, len, &mut shipped);
++        assert_eq!(reshaped, shipped);
++        for (i, digest) in reshaped.iter().enumerate() {
++            assert_eq!(digest, blake3::hash(&input[i * len..][..len]).as_bytes());
++        }
++    }
++
++    #[test]
++    fn reshaped_hash_many_matches_on_block_and_chunk_edges() {
++        for len in [0, 1, 3, 4, 5, 63, 64, 65, 127, 128, 129, 1023, 1024, 1025, 2048, 2049, 3072, 3073, 4097, 5000] {
++            for count in [1, 2, 3] {
++                check(len, count, 7);
++            }
++        }
++    }
++
++    proptest! {
++        #[test]
++        fn reshaped_hash_many_matches(len in 0usize..3000, count in 1usize..4, seed: u8) {
++            check(len, count, seed);
++        }
++    }
++}
+--- /dev/null
++++ b/blake3/src/hax_reshaped/compress.rs
+@@ -0,0 +1,201 @@
++//! The BLAKE3 compression function, on vectors of lanes.
++
++use super::lanes::Word;
++
++/// Words in one message block.
++pub(super) const BLOCK_WORDS: usize = 16;
++
++/// Words in a chaining value.
++pub(super) const STATE_WORDS: usize = 8;
++
++/// Rounds in one compression.
++const ROUNDS: usize = 7;
++
++/// The initialization vector, the same eight words SHA-256 starts from.
++///
++/// It is the key of the plain hash mode.
++pub(crate) const IV: [u32; STATE_WORDS] = [
++    0x6A09_E667,
++    0xBB67_AE85,
++    0x3C6E_F372,
++    0xA54F_F53A,
++    0x510E_527F,
++    0x9B05_688C,
++    0x1F83_D9AB,
++    0x5BE0_CD19,
++];
++
++/// Flag on the first block of a chunk.
++pub(super) const CHUNK_START: u32 = 1 << 0;
++
++/// Flag on the last block of a chunk.
++pub(super) const CHUNK_END: u32 = 1 << 1;
++
++/// Flag on a compression that merges two child chaining values.
++pub(super) const PARENT: u32 = 1 << 2;
++
++/// Flag on the one compression whose chaining value is the digest.
++pub(super) const ROOT: u32 = 1 << 3;
++
++/// Where message word `i` moves between two rounds.
++const PERMUTATION: [usize; BLOCK_WORDS] = [2, 6, 3, 10, 7, 0, 4, 13, 1, 11, 12, 5, 9, 14, 15, 8];
++
++/// Which message word each G input reads, in every round.
++///
++/// Round `r` reads the block permuted `r` times.
++///
++/// - Round 0 reads word `i` at position `i`.
++/// - Round `r + 1` reads `SCHEDULE[r][PERMUTATION[i]]` at position `i`.
++const SCHEDULE: [[usize; BLOCK_WORDS]; ROUNDS] = {
++    let mut schedule = [[0; BLOCK_WORDS]; ROUNDS];
++    let mut i = 0;
++    while i < BLOCK_WORDS {
++        schedule[0][i] = i;
++        i += 1;
++    }
++    let mut r = 1;
++    while r < ROUNDS {
++        let mut i = 0;
++        while i < BLOCK_WORDS {
++            schedule[r][i] = schedule[r - 1][PERMUTATION[i]];
++            i += 1;
++        }
++        r += 1;
++    }
++    schedule
++};
++
++/// Advance every lane of every group by one block.
++///
++/// All lanes share the counter, the block length and the flags.
++///
++/// That holds because they hash the same block of equal-length messages.
++///
++/// The new chaining value is the first half of the compression output:
++///
++/// ```text
++///     h'[i] = v[i] ^ v[i + 8]
++/// ```
++#[inline(always)]
++pub(super) fn compress<V: Word, const G: usize>(
++    h: &mut [[V; STATE_WORDS]; G],
++    m: &[[V; BLOCK_WORDS]; G],
++    counter: u64,
++    block_len: u32,
++    flags: u32,
++) {
++    // The second half of the working vector, the same in every lane.
++    let params = [
++        IV[0],
++        IV[1],
++        IV[2],
++        IV[3],
++        counter as u32,
++        (counter >> 32) as u32,
++        block_len,
++        flags,
++    ];
++    let mut v = working_vector(h, &params);
++
++    // Seven literal rounds, so every schedule index is a constant.
++    //
++    // Constant indices keep the working vector in registers instead of memory.
++    round::<0, V, G>(&mut v, m);
++    round::<1, V, G>(&mut v, m);
++    round::<2, V, G>(&mut v, m);
++    round::<3, V, G>(&mut v, m);
++    round::<4, V, G>(&mut v, m);
++    round::<5, V, G>(&mut v, m);
++    round::<6, V, G>(&mut v, m);
++
++    for g in 0..G {
++        for i in 0..STATE_WORDS {
++            h[g][i] = v[g][i].xor(v[g][i + STATE_WORDS]);
++        }
++    }
++}
++
++/// The chaining value, then the parameters of this compression.
++///
++/// - `v[0..8]` is `h`.
++/// - `v[8..12]` is `IV[0..4]`.
++/// - `v[12..14]` is the counter, low word first.
++/// - `v[14]` is the block length in bytes.
++/// - `v[15]` is the flags.
++#[inline(always)]
++fn working_vector<V: Word, const G: usize>(
++    h: &[[V; STATE_WORDS]; G],
++    params: &[u32; STATE_WORDS],
++) -> [[V; BLOCK_WORDS]; G] {
++    let second: [V; STATE_WORDS] = core::array::from_fn(|i| V::splat(params[i]));
++    core::array::from_fn(|g| {
++        core::array::from_fn(|i| {
++            if i < STATE_WORDS {
++                h[g][i]
++            } else {
++                second[i - STATE_WORDS]
++            }
++        })
++    })
++}
++
++/// One round on every group: four column mixes, then four diagonal mixes.
++#[inline(always)]
++fn round<const R: usize, V: Word, const G: usize>(
++    v: &mut [[V; BLOCK_WORDS]; G],
++    m: &[[V; BLOCK_WORDS]; G],
++) {
++    // The message schedule of this round, fixed at compile time.
++    let s = const { SCHEDULE[R] };
++
++    // Columns.
++    mix(v, m, [0, 4, 8, 12], [s[0], s[1]]);
++    mix(v, m, [1, 5, 9, 13], [s[2], s[3]]);
++    mix(v, m, [2, 6, 10, 14], [s[4], s[5]]);
++    mix(v, m, [3, 7, 11, 15], [s[6], s[7]]);
++
++    // Diagonals.
++    mix(v, m, [0, 5, 10, 15], [s[8], s[9]]);
++    mix(v, m, [1, 6, 11, 12], [s[10], s[11]]);
++    mix(v, m, [2, 7, 8, 13], [s[12], s[13]]);
++    mix(v, m, [3, 4, 9, 14], [s[14], s[15]]);
++}
++
++/// The mixing function G on every group, with the rotation distances 16, 12, 8 and 7.
++///
++/// Each step runs across all groups before the next one.
++///
++/// Groups share no data, so their steps fill each other's latency.
++#[inline(always)]
++fn mix<V: Word, const G: usize>(
++    v: &mut [[V; BLOCK_WORDS]; G],
++    m: &[[V; BLOCK_WORDS]; G],
++    [a, b, c, d]: [usize; 4],
++    [x, y]: [usize; 2],
++) {
++    // The message word is added first, so that addition sits off the dependency chain.
++    for g in 0..G {
++        v[g][a] = v[g][a].add(m[g][x]).add(v[g][b]);
++    }
++    for g in 0..G {
++        v[g][d] = v[g][d].xor(v[g][a]).rotr_16();
++    }
++    for g in 0..G {
++        v[g][c] = v[g][c].add(v[g][d]);
++    }
++    for g in 0..G {
++        v[g][b] = v[g][b].xor(v[g][c]).rotr_12();
++    }
++    for g in 0..G {
++        v[g][a] = v[g][a].add(m[g][y]).add(v[g][b]);
++    }
++    for g in 0..G {
++        v[g][d] = v[g][d].xor(v[g][a]).rotr_8();
++    }
++    for g in 0..G {
++        v[g][c] = v[g][c].add(v[g][d]);
++    }
++    for g in 0..G {
++        v[g][b] = v[g][b].xor(v[g][c]).rotr_7();
++    }
++}
+--- /dev/null
++++ b/blake3/src/hax_reshaped/lanes/mod.rs
+@@ -0,0 +1,49 @@
++//! The lane arithmetic of the batched compression, with the one-lane backend only.
++
++mod portable;
++
++use blake3::{BLOCK_LEN, OUT_LEN};
++
++use super::compress::{BLOCK_WORDS, STATE_WORDS};
++
++/// Messages one batched compression advances at once.
++pub(crate) const LANES: usize = 1;
++
++/// The arithmetic the compression function needs, on every lane at once.
++pub(super) trait Word: Copy {
++    /// The same word in every lane.
++    fn splat(value: u32) -> Self;
++
++    /// Lane-wise addition modulo 2^32.
++    fn add(self, rhs: Self) -> Self;
++
++    /// Lane-wise bitwise and.
++    fn and(self, rhs: Self) -> Self;
++
++    /// Lane-wise exclusive or.
++    fn xor(self, rhs: Self) -> Self;
++
++    /// Lane-wise rotation right by 16 bits.
++    fn rotr_16(self) -> Self;
++
++    /// Lane-wise rotation right by 12 bits.
++    fn rotr_12(self) -> Self;
++
++    /// Lane-wise rotation right by 8 bits.
++    fn rotr_8(self) -> Self;
++
++    /// Lane-wise rotation right by 7 bits.
++    fn rotr_7(self) -> Self;
++}
++
++/// A register of `W` lanes, loaded from and stored to the batch's bytes.
++pub(super) trait Backend<const W: usize>: Word {
++    /// Transpose one block from each lane into sixteen message words.
++    ///
++    /// - `rows[l]` is one block of lane `l`.
++    /// - Word `w` of the result holds word `w` of every lane.
++    fn load_block(rows: &[&[u8; BLOCK_LEN]; W]) -> [Self; BLOCK_WORDS];
++
++    /// Write the chaining value of every lane as a digest.
++    fn store_digests(state: &[Self; STATE_WORDS], out: &mut [[u8; OUT_LEN]; W]);
++}
+--- /dev/null
++++ b/blake3/src/hax_reshaped/lanes/portable.rs
+@@ -0,0 +1,70 @@
++//! One lane per plain `u32`, for targets without a vector backend.
++
++use blake3::{BLOCK_LEN, OUT_LEN};
++
++use super::{Backend, Word};
++use super::super::compress::{BLOCK_WORDS, STATE_WORDS};
++
++/// Lanes in one register.
++const WIDTH: usize = 1;
++
++impl Word for u32 {
++    #[inline(always)]
++    fn splat(value: u32) -> Self {
++        value
++    }
++
++    #[inline(always)]
++    fn add(self, rhs: Self) -> Self {
++        self.wrapping_add(rhs)
++    }
++
++    #[inline(always)]
++    fn and(self, rhs: Self) -> Self {
++        self & rhs
++    }
++
++    #[inline(always)]
++    fn xor(self, rhs: Self) -> Self {
++        self ^ rhs
++    }
++
++    #[inline(always)]
++    fn rotr_16(self) -> Self {
++        self.rotate_right(16)
++    }
++
++    #[inline(always)]
++    fn rotr_12(self) -> Self {
++        self.rotate_right(12)
++    }
++
++    #[inline(always)]
++    fn rotr_8(self) -> Self {
++        self.rotate_right(8)
++    }
++
++    #[inline(always)]
++    fn rotr_7(self) -> Self {
++        self.rotate_right(7)
++    }
++}
++
++impl Backend<WIDTH> for u32 {
++    /// Read one block as sixteen little-endian words.
++    #[inline(always)]
++    fn load_block([row]: &[&[u8; BLOCK_LEN]; WIDTH]) -> [Self; BLOCK_WORDS] {
++        core::array::from_fn(|w| Self::from_le_bytes([row[4 * w], row[4 * w + 1], row[4 * w + 2], row[4 * w + 3]]))
++    }
++
++    /// Write one chaining value as a little-endian digest.
++    #[inline(always)]
++    fn store_digests(state: &[Self; STATE_WORDS], [out]: &mut [[u8; OUT_LEN]; WIDTH]) {
++        for i in 0..STATE_WORDS {
++            let bytes = state[i].to_le_bytes();
++            for j in 0..4 {
++                out[4 * i + j] = bytes[j];
++            }
++        }
++    }
++}

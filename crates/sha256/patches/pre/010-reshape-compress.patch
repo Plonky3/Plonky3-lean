@@ -1,0 +1,119 @@
+# Patch:        010-reshape-compress
+# Phase:        pre
+# Target:       sha256/src/hax_reshaped.rs, sha256/src/lib.rs
+# Hunks:        4
+# Class:        equiv-rewrite
+# Gap:          docs/extractor-issues.md 14 (no model of `transmute`,
+#               `slice::from_ref`, `as_chunks_mut` or a zip over `IterMut`).
+# Cost:         none in a normal build: only the selection is behind
+#               cfg(hax_backend_lean). In the extracted variant,
+#               `Sha256Compress::compress` calls the reshaped body, which a
+#               differential test equates with the original.
+# Upstreamable: no: the original is the clearer code; an extractor model of
+#               the missing items makes the patch unnecessary.
+# Drop when:    the extractor translates `transmute` between arrays of bytes
+#               and the chunked iterators the original body uses.
+# Test:         test p3-sha256 --lib hax_reshaped
+# Mutation:     the reshaped body places the second half first, so it
+#               disagrees with the original on every input with distinct halves.
+#
+# The original body reinterprets the two halves as one block with `transmute`, then writes each state word through `as_chunks_mut` zipped with the state.
+# The reshaped body copies the halves into a block and writes the words by index.
+# It calls the same `compress256` on the same block and initial state.
+#
+diff --git a/sha256/src/hax_reshaped.rs b/sha256/src/hax_reshaped.rs
+new file mode 100644
+index 00000000..6d150405
+--- /dev/null
++++ b/sha256/src/hax_reshaped.rs
+@@ -0,0 +1,58 @@
++//! PATCHED: the body of `Sha256Compress::compress` in a shape hax's Lean backend translates.
++//!
++//! The extractor has no model of `transmute` or of the chunked iterators the original uses.
++//! Plonky3-lean, docs/extractor-issues.md, 14.
++
++use crate::H256_256;
++
++/// The compression of `input` from the initial hash value: what `Sha256Compress::compress` returns.
++#[cfg_attr(not(hax_backend_lean), allow(dead_code))]
++pub(crate) fn compress(input: [[u8; 32]; 2]) -> [u8; 32] {
++    // The two halves, in order, as one 64-byte block.
++    let mut block = [0u8; 64];
++    for i in 0..32 {
++        block[i] = input[0][i];
++        block[32 + i] = input[1][i];
++    }
++
++    let mut state = H256_256;
++    sha2::block_api::compress256(&mut state, &[block]);
++
++    // Each state word, big-endian.
++    let mut output = [0u8; 32];
++    for i in 0..8 {
++        let bytes = state[i].to_be_bytes();
++        for j in 0..4 {
++            output[4 * i + j] = bytes[j];
++        }
++    }
++    output
++}
++
++#[cfg(test)]
++mod tests {
++    use p3_symmetric::PseudoCompressionFunction;
++    use proptest::prelude::*;
++
++    use crate::Sha256Compress;
++
++    fn check(input: [[u8; 32]; 2]) {
++        assert_eq!(super::compress(input), Sha256Compress.compress(input));
++    }
++
++    #[test]
++    fn reshaped_compress_matches_on_edge_inputs() {
++        check([[0; 32]; 2]);
++        check([[0xff; 32]; 2]);
++        check([[0; 32], [0xff; 32]]);
++        check([[0xff; 32], [0; 32]]);
++        check(core::array::from_fn(|h| core::array::from_fn(|i| (32 * h + i) as u8)));
++    }
++
++    proptest! {
++        #[test]
++        fn reshaped_compress_matches(input in any::<[[u8; 32]; 2]>()) {
++            prop_assert_eq!(super::compress(input), Sha256Compress.compress(input));
++        }
++    }
++}
+diff --git a/sha256/src/lib.rs b/sha256/src/lib.rs
+index b298e44a..373a5bd4 100644
+--- a/sha256/src/lib.rs
++++ b/sha256/src/lib.rs
+@@ -168,6 +168,7 @@ impl PseudoCompressionFunction<[u8; 32], 2> for Sha256Compress {
+     ))]
+     const LANES: usize = many::LANES;
+ 
++    #[cfg(not(hax_backend_lean))] // PATCHED
+     fn compress(&self, input: [[u8; 32]; 2]) -> [u8; 32] {
+         let mut state = H256_256;
+         // [[u8; 32]; 2] has same memory layout as [u8; 64]
+@@ -181,6 +182,12 @@ impl PseudoCompressionFunction<[u8; 32], 2> for Sha256Compress {
+         output
+     }
+ 
++    // PATCHED: the extracted variant takes the same body, reshaped for the extractor.
++    #[cfg(hax_backend_lean)]
++    fn compress(&self, input: [[u8; 32]; 2]) -> [u8; 32] {
++        hax_reshaped::compress(input)
++    }
++
+     #[cfg(any(
+         all(target_arch = "wasm32", target_feature = "simd128"),
+         all(
+@@ -892,3 +899,6 @@ mod tests {
+         }
+     }
+ }
++
++// PATCHED
++mod hax_reshaped;

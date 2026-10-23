@@ -1,6 +1,10 @@
 module
 
 public import Plonky3Lean.Lib
+public import Plonky3Lean.Proofs.Hash.Blake2s
+public import Plonky3Lean.Proofs.Hash.Blake3.Spec
+public import Plonky3Lean.Proofs.Hash.Blake3.Vectors
+public import Plonky3Lean.Proofs.Hash.Sha256.Vectors
 public import Plonky3Lean.Proofs.Field.BabyBear
 public import Plonky3Lean.Proofs.Field.BabyBear.Arith
 public import Plonky3Lean.Proofs.Field.BabyBear.Constants
@@ -55,7 +59,6 @@ public import Plonky3Lean.Proofs.Field.Monty31.QuotientMap
 public import Plonky3Lean.Proofs.Field.Monty31.Reduce
 public import Plonky3Lean.Proofs.Field.Monty31.Utils
 public import Plonky3Lean.Proofs.Util.GcdInversion
-public import Plonky3Lean.Spec
 
 @[expose] public section
 
