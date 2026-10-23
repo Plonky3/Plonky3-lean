@@ -320,4 +320,31 @@ theorem radix2Dit_dft_batch_too_big (G : Gen K) {k : ℕ} (hk : G.adicity < k) (
   simp [p3_dft.radix_2_dit.mirror.Radix2Dit.dft_batch, log2Strict_pow,
     p3_dft.radix_2_dit.mirror.Radix2Dit.get_or_compute_twiddles, gen_get_of_lt G hk]
 
+/-- The radix-2 decimation-in-time extension with a transform.
+
+The transform sees the coefficients in natural order, coefficient j at row j.
+
+The result evaluates the transformed coefficients, padded with zeros, on the coset shift times the
+subgroup of order 2^(k+a). -/
+theorem radix2Dit_coset_lde_batch_with_transform (G : Gen K) (hG : GenValid G) {k a w : ℕ}
+    (hka : k + a ≤ G.adicity) (shift : K) (hw : w ≠ 0 ∨ shift = 1) (ha : a < 64)
+    (hlen : w * 2 ^ (k + a) < 2 ^ 64) (T : (ℕ → V) → ℕ → V) (x : ℕ → V) :
+    ∃ c : ℕ → V, (∀ i < 2 ^ k, c i = idft (G.gen k) (2 ^ k) x i) ∧
+    Computes (p3_dft.radix_2_dit.mirror.Radix2Dit.coset_lde_batch_with_transform G w (2 ^ k) a
+      shift T x) (2 ^ (k + a))
+      (cosetDft shift (G.gen (k + a)) (2 ^ (k + a)) (fun j => if j < 2 ^ k then T c j else 0)) := by
+  have hk : k ≤ G.adicity := by omega
+  obtain ⟨c, hc1, hc2⟩ := traits_idft_batch (hG k hk).pow_eq_one
+    (radix2Dit_dft_batch G hG hk) x
+  refine ⟨c, hc2, ?_⟩
+  obtain ⟨z, hz1, hz2⟩ := radix2Dit_dft_batch G hG hka
+    (fun i => if i < 2 ^ k then (fun i => if i < 2 ^ k then (shift ^ i) • T c i else T c i) i else 0)
+  refine ⟨z, ?_, fun i hi => ?_⟩
+  · simp only [p3_dft.radix_2_dit.mirror.Radix2Dit.coset_lde_batch_with_transform, hc1,
+      Option.bind_eq_bind, Option.bind_some, coset_shift_cols_eq shift _ hw, ← pow_add]
+    simp only [ha, hlen, true_and, ↓reduceIte]
+    exact hz1
+  · rw [hz2 i hi, cosetDft_eq]
+    exact dft_congr _ _ (fun j _ => by split_ifs <;> simp_all) _
+
 end Plonky3Lean.Proofs.Dft
