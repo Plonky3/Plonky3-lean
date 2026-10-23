@@ -1,0 +1,174 @@
+# Patch:        020-reshape-padding-free-sponge
+# Phase:        pre
+# Target:       symmetric/src/hax_reshaped.rs, symmetric/src/lib.rs, symmetric/src/sponge.rs
+# Hunks:        3
+# Class:        equiv-rewrite
+# Gap:          docs/extractor-issues.md 23 (aeneas rejects a return that
+#               leaves a nested loop).
+# Cost:         none in a normal build: only the selection is behind
+#               cfg(hax_backend_lean). In the extracted variant,
+#               `PaddingFreeSponge::hash_iter` calls the reshaped body, which a
+#               differential test equates with the original.
+# Upstreamable: no: the original is the clearer code; aeneas support for
+#               leaving a nested loop makes the patch unnecessary.
+# Drop when:    aeneas translates `break 'outer` out of a nested loop.
+# Test:         test p3-symmetric --lib hax_reshaped
+# Mutation:     the reshaped body permutes once more when the input ends on a
+#               block boundary, so it disagrees on the empty input and on every
+#               multiple of the rate.
+#
+# The original absorbs a block in an inner loop and leaves both loops with `break 'outer` when the input runs dry.
+# The reshaped body runs one loop over the input and keeps the rate position in a counter.
+# It overwrites the same positions and calls the permutation at the same points.
+#
+diff --git a/symmetric/src/hax_reshaped.rs b/symmetric/src/hax_reshaped.rs
+new file mode 100644
+index 0000000..b99c47b
+--- /dev/null
++++ b/symmetric/src/hax_reshaped.rs
+@@ -0,0 +1,111 @@
++//! PATCHED: sponge bodies in a shape hax's Lean backend translates.
++//!
++//! Aeneas rejects a return or a continue that leaves a nested loop.
++//! Plonky3-lean, docs/extractor-issues.md, 23.
++//!
++//! Each body here runs one loop over the input and performs the same permutation calls, in the same order, as the original.
++
++use crate::permutation::CryptographicPermutation;
++
++/// What the padding-free sponge returns on `input`.
++#[cfg_attr(not(hax_backend_lean), allow(dead_code))]
++pub(crate) fn padding_free_hash<T, P, I, const WIDTH: usize, const RATE: usize, const OUT: usize>(
++    permutation: &P,
++    input: I,
++) -> [T; OUT]
++where
++    T: Default + Copy,
++    P: CryptographicPermutation<[T; WIDTH]>,
++    I: IntoIterator<Item = T>,
++{
++    // Start from the all-zero state.
++    let mut state = [T::default(); WIDTH];
++    let mut input = input.into_iter();
++
++    // Rate position the next element overwrites.
++    let mut i = 0;
++    while let Some(x) = input.next() {
++        state[i] = x;
++        i += 1;
++
++        // A full block is permuted at once, before the next element is read.
++        if i == RATE {
++            permutation.permute_mut(&mut state);
++            i = 0;
++        }
++    }
++
++    // A partial block is permuted too.
++    // An input that ends on a block boundary, or an empty one, has nothing left to permute.
++    if i != 0 {
++        permutation.permute_mut(&mut state);
++    }
++
++    // Squeeze the first OUT elements.
++    state[..OUT].try_into().unwrap()
++}
++
++#[cfg(test)]
++mod tests {
++    use alloc::vec::Vec;
++
++    use proptest::prelude::*;
++
++    use crate::{CryptographicHasher, CryptographicPermutation, PaddingFreeSponge, Permutation};
++
++    /// A position-sensitive, non-linear mixing of the whole state.
++    ///
++    /// Two states that differ anywhere map to different outputs on every test input seen so far.
++    /// That is all a differential test needs: any difference in the absorbed state shows up.
++    #[derive(Clone)]
++    struct Mix;
++
++    impl<const WIDTH: usize> Permutation<[u64; WIDTH]> for Mix {
++        fn permute_mut(&self, state: &mut [u64; WIDTH]) {
++            let old = *state;
++            for (j, out) in state.iter_mut().enumerate() {
++                let mut acc = 0x9e37_79b9_7f4a_7c15u64.wrapping_mul(j as u64 + 1);
++                for (k, &x) in old.iter().enumerate() {
++                    let y = x.wrapping_add(k as u64 + 1);
++                    acc = acc.rotate_left(7) ^ y.wrapping_mul(y).wrapping_add(j as u64);
++                }
++                *out = acc;
++            }
++        }
++    }
++
++    impl<const WIDTH: usize> CryptographicPermutation<[u64; WIDTH]> for Mix {}
++
++    fn check<const WIDTH: usize, const RATE: usize, const OUT: usize>(input: &[u64]) {
++        let sponge = PaddingFreeSponge::<Mix, WIDTH, RATE, OUT>::new(Mix);
++        let original: [u64; OUT] = sponge.hash_iter(input.iter().copied());
++        let reshaped: [u64; OUT] =
++            super::padding_free_hash::<u64, Mix, _, WIDTH, RATE, OUT>(&Mix, input.iter().copied());
++        assert_eq!(original, reshaped, "length {}", input.len());
++    }
++
++    #[test]
++    fn padding_free_matches_at_every_length_around_the_rate() {
++        // Fixture state: inputs 1, 2, 3, ... of every length from 0 to 3 * RATE + 1.
++        //
++        //     RATE = 3:  0 | 1 2 | 3 | 4 5 | 6 | 7 | ... | 10
++        //                ^   ^    ^    ^    ^
++        //             empty  partial  full  partial  two full
++        let input: Vec<u64> = (1..=40).collect();
++        for len in 0..=13 {
++            check::<4, 3, 2>(&input[..len]);
++            check::<4, 1, 1>(&input[..len]);
++            check::<8, 4, 4>(&input[..len]);
++            check::<16, 8, 8>(&input[..len]);
++        }
++    }
++
++    proptest! {
++        #[test]
++        fn padding_free_matches(input in prop::collection::vec(any::<u64>(), 0..40)) {
++            check::<4, 3, 2>(&input);
++            check::<8, 4, 4>(&input);
++            check::<12, 8, 4>(&input);
++        }
++    }
++}
+diff --git a/symmetric/src/lib.rs b/symmetric/src/lib.rs
+index f8ecfd8..d0ac751 100644
+--- a/symmetric/src/lib.rs
++++ b/symmetric/src/lib.rs
+@@ -13,6 +13,8 @@ pub mod hax_roots;
+ mod permutation;
+ mod serializing_hasher;
+ mod sponge;
++// PATCHED
++mod hax_reshaped;
+ 
+ pub use compression::*;
+ pub use hash::*;
+diff --git a/symmetric/src/sponge.rs b/symmetric/src/sponge.rs
+index eab6e9a..e6dbf7a 100644
+--- a/symmetric/src/sponge.rs
++++ b/symmetric/src/sponge.rs
+@@ -195,6 +195,16 @@ where
+     T: Default + Copy,
+     P: CryptographicPermutation<[T; WIDTH]>,
+ {
++    // PATCHED: the extracted variant takes the same body, reshaped for the extractor.
++    #[cfg(hax_backend_lean)]
++    fn hash_iter<I>(&self, input: I) -> [T; OUT]
++    where
++        I: IntoIterator<Item = T>,
++    {
++        crate::hax_reshaped::padding_free_hash::<T, P, I, WIDTH, RATE, OUT>(&self.permutation, input)
++    }
++
++    #[cfg(not(hax_backend_lean))] // PATCHED
+     fn hash_iter<I>(&self, input: I) -> [T; OUT]
+     where
+         I: IntoIterator<Item = T>,

@@ -1,0 +1,31 @@
+# Patch:        020-drop-vec-allocator
+# Phase:        post
+# Target:       extraction/P3Symmetric/Extraction/Funs.lean
+# Hunks:        1
+# Class:        reshape
+# Gap:          docs/extractor-issues.md 26: aeneas passes the allocator
+#               `Global` to the `IntoIterator` witness of `Vec`, which
+#               CoreModels declares without one.
+# Cost:         none. The referent is unchanged; only the argument CoreModels
+#               does not take is dropped.
+# Upstreamable: yes: aeneas or CoreModels could agree on the allocator
+#               parameter.
+# Drop when:    the generated witness elaborates against CoreModels.
+#
+# Pre-patch 040 hands the hasher a `Vec`, so the generated call names its `IntoIterator` witness.
+# aeneas applies that witness to the allocator, as `Vec<T, A>` has one.
+# CoreModels' `Vec` has no allocator parameter.
+#
+--- a/extraction/P3Symmetric/Extraction/Funs.lean
++++ b/extraction/P3Symmetric/Extraction/Funs.lean
+@@ -212,8 +212,8 @@
+     core.Array.Insts.CoreIterTraitsCollectIntoIteratorTIntoIter.into_iter input
+   let items1 ← hax_reshaped.compress_from_hasher_loop0 iter items
+   hasherCryptographicHasherHTArrayInst.hash_iter
+-    (alloc.vec.Vec.Insts.CoreIterTraitsCollectIntoIteratorTIntoIter T
+-    alloc.alloc.Global) hasher1 items1
++    (alloc.vec.Vec.Insts.CoreIterTraitsCollectIntoIteratorTIntoIter T) -- PATCHED: dropped the allocator `alloc.alloc.Global`
++    hasher1 items1
+ 
+ /-- [p3_symmetric::compression::{impl p3_symmetric::compression::PseudoCompressionFunction<[T; CHUNK], N> for p3_symmetric::compression::CompressionFunctionFromHasher<H, N, CHUNK>}::compress]:
+     Source: 'symmetric/src/compression.rs', lines 116:4-118:5

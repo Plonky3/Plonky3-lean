@@ -1,0 +1,15 @@
+# Mutation of: 040-reshape-compress-from-hasher
+# Breaks:      the reshaped body hands the chunks over last first.
+#
+diff --git a/symmetric/src/hax_reshaped.rs b/symmetric/src/hax_reshaped.rs
+--- a/symmetric/src/hax_reshaped.rs
++++ b/symmetric/src/hax_reshaped.rs
+@@ -121,7 +121,7 @@ where
+     //
+     //     [[a, b], [c, d]]  ->  [a, b, c, d]
+     let mut items = Vec::new();
+-    for chunk in input {
++    for chunk in input.into_iter().rev() {
+         for x in chunk {
+             items.push(x);
+         }

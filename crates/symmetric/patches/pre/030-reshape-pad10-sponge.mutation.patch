@@ -1,0 +1,15 @@
+# Mutation of: 030-reshape-pad10-sponge
+# Breaks:      the reshaped body overwrites the first capacity element with d(0).
+#
+diff --git a/symmetric/src/hax_reshaped.rs b/symmetric/src/hax_reshaped.rs
+--- a/symmetric/src/hax_reshaped.rs
++++ b/symmetric/src/hax_reshaped.rs
+@@ -88,7 +88,7 @@ where
+ 
+     if full {
+         // The input ended on a block boundary: apply the derangement to the first capacity element.
+-        state[RATE] = padding_derangement.permute(state[RATE]);
++        state[RATE] = padding_derangement.permute(T::default());
+     } else {
+         // A partial block, or the empty input: the sentinel d(0) at position i, then zeros.
+         //

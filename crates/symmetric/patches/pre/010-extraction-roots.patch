@@ -1,0 +1,183 @@
+# Patch:        010-extraction-roots
+# Phase:        pre
+# Target:       symmetric/src/hax_roots.rs, symmetric/src/lib.rs
+# Hunks:        2
+# Class:        bound
+# Gap:          docs/extractor-issues.md 4 (aeneas drops a method that no free
+#               function calls).
+# Cost:         none in a normal build: the module exists only under
+#               cfg(hax_backend_lean). In the extracted variant it adds free
+#               functions, each of which calls one method of the crate.
+#               No existing body changes.
+# Upstreamable: no: the module exists only for the extractor.
+# Drop when:    charon orders `--start-from` methods, so that the methods
+#               themselves can be roots.
+# Test:         lint p3-symmetric unexpected_cfgs
+# Mutation:     the module is gated on a misspelled cfg, so a normal
+#               `cargo check` reports `unexpected_cfgs`.
+#
+# Rooted at the trait methods themselves, aeneas emits nothing for them.
+# Rooted at one-line wrappers, each method is reachable, so its own body is extracted.
+#
+# The wrappers keep the permutation, the derangement and the inner hasher generic.
+# The Lean model then takes each as an argument, and its theorems hold for every one.
+#
+diff --git a/symmetric/src/hax_roots.rs b/symmetric/src/hax_roots.rs
+new file mode 100644
+index 0000000..534d9b9
+--- /dev/null
++++ b/symmetric/src/hax_roots.rs
+@@ -0,0 +1,139 @@
++//! PATCHED: extraction roots for hax's Lean backend, compiled only under `cfg(hax_backend_lean)`.
++//!
++//! Aeneas drops a method that no free function calls (Plonky3-lean, docs/extractor-issues.md, 4).
++//! Each function here calls one method and does nothing else, so that the method's own body is extracted.
++//!
++//! The permutation, the padding derangement and the inner hasher stay generic.
++//! The Lean model then quantifies over every one of them.
++
++use crate::{
++    CompressionFunctionFromHasher, CryptographicHasher, CryptographicPermutation, Derangement,
++    Hash, Increment, MerkleCap, Pad10Sponge, PaddingFreeSponge, Permutation,
++    PseudoCompressionFunction, TruncatedPermutation,
++};
++
++pub fn padding_free_sponge_new<P, const WIDTH: usize, const RATE: usize, const OUT: usize>(
++    permutation: P,
++) -> PaddingFreeSponge<P, WIDTH, RATE, OUT> {
++    PaddingFreeSponge::new(permutation)
++}
++
++pub fn padding_free_sponge_hash<
++    T: Default + Copy,
++    P: CryptographicPermutation<[T; WIDTH]>,
++    const WIDTH: usize,
++    const RATE: usize,
++    const OUT: usize,
++    const LEN: usize,
++>(
++    sponge: &PaddingFreeSponge<P, WIDTH, RATE, OUT>,
++    input: [T; LEN],
++) -> [T; OUT] {
++    sponge.hash_iter(input)
++}
++
++pub fn pad10_sponge_new<T, P, D, const WIDTH: usize, const RATE: usize, const OUT: usize>(
++    permutation: P,
++    padding_derangement: D,
++) -> Pad10Sponge<T, P, D, WIDTH, RATE, OUT> {
++    Pad10Sponge::new(permutation, padding_derangement)
++}
++
++pub fn pad10_sponge_hash<
++    T: Default + Copy,
++    P: CryptographicPermutation<[T; WIDTH]>,
++    D: Derangement<T>,
++    const WIDTH: usize,
++    const RATE: usize,
++    const OUT: usize,
++    const LEN: usize,
++>(
++    sponge: &Pad10Sponge<T, P, D, WIDTH, RATE, OUT>,
++    input: [T; LEN],
++) -> [T; OUT] {
++    sponge.hash_iter(input)
++}
++
++pub fn increment_new<T: Default + PartialEq>(inc: T) -> Increment<T> {
++    Increment::new(inc)
++}
++
++pub fn increment_permute<T: Clone + Sync + Send + core::ops::Add<Output = T>>(
++    increment: &Increment<T>,
++    input: T,
++) -> T {
++    increment.permute(input)
++}
++
++pub fn truncated_permutation_new<
++    InnerP,
++    const N: usize,
++    const CHUNK: usize,
++    const WIDTH: usize,
++>(
++    inner_permutation: InnerP,
++) -> TruncatedPermutation<InnerP, N, CHUNK, WIDTH> {
++    TruncatedPermutation::new(inner_permutation)
++}
++
++pub fn truncated_permutation_compress<
++    T: Copy + Default,
++    InnerP: CryptographicPermutation<[T; WIDTH]>,
++    const N: usize,
++    const CHUNK: usize,
++    const WIDTH: usize,
++>(
++    compressor: &TruncatedPermutation<InnerP, N, CHUNK, WIDTH>,
++    input: [[T; CHUNK]; N],
++) -> [T; CHUNK] {
++    compressor.compress(input)
++}
++
++
++pub fn compression_from_hasher_new<H, const N: usize, const CHUNK: usize>(
++    hasher: H,
++) -> CompressionFunctionFromHasher<H, N, CHUNK> {
++    CompressionFunctionFromHasher::new(hasher)
++}
++
++pub fn compression_from_hasher_compress<
++    T: Clone,
++    H: CryptographicHasher<T, [T; CHUNK]>,
++    const N: usize,
++    const CHUNK: usize,
++>(
++    compressor: &CompressionFunctionFromHasher<H, N, CHUNK>,
++    input: [[T; CHUNK]; N],
++) -> [T; CHUNK] {
++    compressor.compress(input)
++}
++
++
++
++pub fn hash_from_array<F, W, const N: usize>(value: [W; N]) -> Hash<F, W, N> {
++    Hash::from(value)
++}
++
++pub fn hash_into_array<F, W, const N: usize>(hash: Hash<F, W, N>) -> [W; N] {
++    hash.into()
++}
++
++pub fn hash_eq_array<F, W: PartialEq, const N: usize>(hash: &Hash<F, W, N>, other: &[W; N]) -> bool {
++    hash == other
++}
++
++pub fn merkle_cap_new<F, Digest>(cap: alloc::vec::Vec<Digest>) -> MerkleCap<F, Digest> {
++    MerkleCap::new(cap)
++}
++
++pub fn merkle_cap_num_roots<F, Digest>(cap: &MerkleCap<F, Digest>) -> usize {
++    cap.num_roots()
++}
++
++pub fn merkle_cap_height<F, Digest>(cap: &MerkleCap<F, Digest>) -> usize {
++    cap.height()
++}
++
++pub fn merkle_cap_from_hash<F, W, const N: usize>(hash: Hash<F, W, N>) -> MerkleCap<F, [W; N]> {
++    MerkleCap::from(hash)
++}
+diff --git a/symmetric/src/lib.rs b/symmetric/src/lib.rs
+index 3c96eed..f8ecfd8 100644
+--- a/symmetric/src/lib.rs
++++ b/symmetric/src/lib.rs
+@@ -7,6 +7,9 @@ extern crate alloc;
+ mod compression;
+ mod hash;
+ mod hasher;
++// PATCHED: extraction roots, only under hax's Lean backend.
++#[cfg(hax_backend_lean)]
++pub mod hax_roots;
+ mod permutation;
+ mod serializing_hasher;
+ mod sponge;
