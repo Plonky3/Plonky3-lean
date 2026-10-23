@@ -5554,95 +5554,6 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.Stir.virtual_oracle"
-name   = "Plonky3Lean.Claims.Bus.multiset_identity"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.grand_product_soundness"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.planner_layout"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.blocks_aligned"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.layout_injective"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.bus_soundness"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.factor_is_leaf"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.flattening_faithful"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.schedule"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.schedule_dimensions"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.identity_padding"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.identity_padding.panics"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.verifier_total"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.security_numerators"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.security_profile"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.sorted_trace_consistent"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.strict_increase"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.ram_consistent"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.ram_consistent_machine"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.gap_factors_digits"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.gap_check"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.forged_cycle"
-axioms = ["Classical.choice", "Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Bus.clock_orbit_fields"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -5851,4 +5762,96 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.BatchStark.wrong_table_count"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.multiset_identity"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.grand_product_soundness"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.planner_layout"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.blocks_aligned"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.layout_injective"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.bus_soundness"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.factor_is_leaf"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.flattening_faithful"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.schedule"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.schedule_dimensions"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.identity_padding"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.identity_padding.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.verifier_total"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.security_numerators"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.security_profile"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.sorted_trace_consistent"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.strict_increase"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.ram_consistent"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.ram_consistent_machine"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.gap_factors_digits"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.gap_check"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.forged_cycle"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.clock_orbit_fields"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
