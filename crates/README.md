@@ -26,6 +26,16 @@ import the same library name either way.
 A stub stands in for the crate it is named after, not for the crate that uses
 it. Two crates that depend on `field` share `crates/field/stub/`.
 
+A crate may also have **variants**: the same package extracted again for another
+target, such as a SIMD backend, each in `variants/<name>/` with its own library
+and namespace (`P3Monty31Avx2`, `p3_monty_31_avx2`), declared by a `[[variant]]`
+table in `crate.toml` ([`docs/extracting.md`](../docs/extracting.md#variants)).
+A variant's library sits beside the crate's and imports it: the portable types
+and functions it reuses are bound, not copied.
+
+`arch-shims` is not a Plonky3 crate but this repository's `arch/`, the models of
+the `core::arch` intrinsics the variants call (`path` in its `crate.toml`).
+
 ## Inside `extraction/`
 
 `extraction/` is laid out as hax lays out its own output directory, so the
@@ -90,6 +100,7 @@ crates/<crate>/
   patches/pre/NNN-slug.mutation.patch
                                its recorded mutation, which its tests must catch
   patches/post/NNN-slug.patch  Lean-side, applied to extraction/ after hax
+  variants/<name>/             one [[variant]]: its own extraction/ and patches/post/
 ```
 
 Patch conventions are in [`docs/patches.md`](../docs/patches.md).
