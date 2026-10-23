@@ -521,6 +521,55 @@ theorem round_honest {P0 : List F} {n : ℕ} {commitment : Com} (hv : Valid c n 
     simp only [Option.bind_some, hk1, sumcheck, H, Wt']
     rw [verify_rounds_honest E.S.toSponge PE.solve hh.solve]
     rfl
-  · sorry
+  · rw [hst']
+    have hvars : nv = nvAt c (t + 1) + c.folding_schedule.getD (t + 1) 0 := hv.vars t ht
+    have hP : st.P.length = 2 ^ nv := hinv.lenP
+    have hWt : st.Wt.length = 2 ^ nv := hinv.lenW
+    have hW : Wt'.length = 2 ^ nv := by
+      simp only [Wt', List.length_zipWith, length_cubeTable, hWt, min_self]
+    obtain ⟨hrs, hlf, hlw, hff, hfw, hrep⟩ := honestSumcheck_spec E.S.toSponge PE.solve
+      (queried c t).folding_pow_bits st.P Wt' (qi.2 ++ [.challenge]) hP hW
+      (k := c.folding_schedule.getD (t + 1) 0) (by omega)
+    have hnv' : nv - c.folding_schedule.getD (t + 1) 0 = nvAt c (t + 1) := by omega
+    rw [hnv'] at hlf hlw hrep
+    have hrs' : H.rs.length = c.folding_schedule.getD (t + 1) 0 := hrs
+    have hnvt : nvAt c t = nv := rfl
+    obtain ⟨hooh, hood⟩ := oodProve_honest E.S st.P nv (st.h ++ [.message (E.enc rd.1)]) (queried c t).ood_samples
+    have hcon : ∀ s ∈ con.statements, s.WF ∧ s.Dim nv ∧ s.Honest st.P := by
+      simp only [con, List.mem_cons, List.mem_nil_iff, or_false]
+      rintro _ (rfl | rfl)
+      · exact ⟨((congrArg List.length hooh).trans (List.length_map _)).symm, hood, hooh⟩
+      · exact ⟨by simp [Statements.WF], trivial, by simp [Statements.Honest, Function.comp]⟩
+    refine ⟨hlf, hlw, ?_, ?_, ?_, ⟨H.rs, by simp, hrs, hff⟩, hP, hvars, fun h => absurd h (by omega),
+      fun _ => ⟨rfl, rfl⟩, by simp [hinv.rounds]⟩
+    · rw [← hrep, combine_evals_honest con st.P hP st.claim hcon, hinv.claimSum]
+      show Plonky3Lean.Proofs.Sumcheck.replay .Evaluation (∑ b ∈ range (2 ^ nv), st.P.getD b 0 * st.Wt.getD b 0 +
+        ∑ b ∈ range (2 ^ nv), st.P.getD b 0 * (cubeTable (weightAt con) nv).getD b 0) H.ms H.rs = _
+      rw [← sum_add_distrib]
+      congr 1
+      exact sum_congr rfl fun b _ => by rw [getD_zipWith_add (by simp [hWt]), mul_add]
+    · intro y hy
+      rw [hfw, mle_fold_weight _ _ _ (by rw [hrs, hy]; omega), mle_add_tables (by simp [hWt]),
+        hinv.weight _ (by rw [List.length_append, hrs, hy]; omega),
+        isML_weightAt con (fun s hs => (hcon s hs).2.1) _ (by rw [List.length_append, hrs, hy]; omega)]
+      simp only [List.flatten_append, List.flatten_cons, List.flatten_nil, List.append_nil, List.map_append,
+        List.map_cons, List.map_nil, List.sum_append, List.sum_cons, List.sum_nil, add_zero, List.append_assoc]
+      congr 1
+      rw [List.length_append, List.length_append, hrs, hy, show con.num_variables = nv from rfl,
+        show st.rand.flatten.length + (c.folding_schedule.getD (t + 1) 0 + nvAt c (t + 1)) - nv =
+          st.rand.flatten.length by omega,
+        List.drop_left]
+    · intro c' hc'
+      rcases List.mem_append.mp hc' with hc' | hc'
+      · obtain ⟨h1, h2⟩ := hinv.cons c' hc'
+        refine ⟨?_, h2⟩
+        simp only [List.flatten_append, List.flatten_cons, List.flatten_nil, List.append_nil, List.length_append]
+        omega
+      · simp only [List.mem_singleton] at hc'
+        subst hc'
+        refine ⟨?_, fun s hs => ⟨(hcon s hs).1, (hcon s hs).2.1⟩⟩
+        simp only [List.flatten_append, List.flatten_cons, List.flatten_nil, List.append_nil, List.length_append]
+        show nv ≤ _
+        omega
 
 end Plonky3Lean.Proofs.Whir
