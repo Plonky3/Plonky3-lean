@@ -6,6 +6,8 @@ public import Plonky3Lean.Proofs.Field.Binary.TowerApi
 public import Plonky3Lean.Proofs.Field.Binary.PolyField
 public import Plonky3Lean.Proofs.Field.Binary.ExtensionMul
 public import Plonky3Lean.Proofs.Field.Binary.CantorSpec
+public import Plonky3Lean.Proofs.Field.Binary.DotProduct
+public import Plonky3Lean.Proofs.Field.Binary.Poly192Misc
 
 @[expose] public section
 
@@ -34,7 +36,7 @@ Every claim holds for every input, unless it states a hypothesis.
 Not claimed:
 - the trait methods of the field types (`square`, `try_inverse`, `Field`, `ExtensionField`, ...),
   which the extraction cannot reach;
-- the dot products, the AES and bit-plane code, the challenger and
+ the AES and bit-plane code, the challenger and
   transcript, and the packed arithmetic;
 - the hardware kernels (PCLMULQDQ, PMULL, GFNI), which the extraction target does not have; the
   carry-less paths around them are claimed with the portable carry-less multiply in their place.
@@ -2339,5 +2341,401 @@ theorem poly64.Poly64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis.toQuo
 theorem poly64.Poly64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis.panics (i : Std.Usize) (hi : 64 ≤ i.val) :
     poly64.Poly64.Insts.P3_binary_fieldTowerTowerLevelU64.cantor_basis i = .fail .panic :=
   Proofs.Binary.poly64_cantor_basis_panic i hi
+
+/-! ## Dot products -/
+
+/-- `dot_product` is the sum of the products of matching entries. -/
+theorem tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product.towerOf {N : Std.Usize} (u v : Std.Array tower.BinaryField2 N) :
+    tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product u v ⦃ r =>
+      Spec.BinaryField.towerOf 1 r = Proofs.Binary.dotList (Spec.BinaryField.towerOf 1) u.val v.val ⦄ :=
+  Proofs.Binary.bf2_dot_product_spec u v
+
+/-- `dot_product` is the sum of the products of matching entries. -/
+theorem tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product.towerOf {N : Std.Usize} (u v : Std.Array tower.BinaryField4 N) :
+    tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product u v ⦃ r =>
+      Spec.BinaryField.towerOf 2 r = Proofs.Binary.dotList (Spec.BinaryField.towerOf 2) u.val v.val ⦄ :=
+  Proofs.Binary.bf4_dot_product_spec u v
+
+/-- `dot_product` is the sum of the products of matching entries. -/
+theorem tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product.towerOf {N : Std.Usize} (u v : Std.Array tower.BinaryField8 N) :
+    tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product u v ⦃ r =>
+      Spec.BinaryField.towerOf 3 r = Proofs.Binary.dotList (Spec.BinaryField.towerOf 3) u.val v.val ⦄ :=
+  Proofs.Binary.bf8_dot_product_spec u v
+
+/-- `dot_product` is the sum of the products of matching entries. -/
+theorem tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product.towerOf {N : Std.Usize} (u v : Std.Array tower.BinaryField16 N) :
+    tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product u v ⦃ r =>
+      Spec.BinaryField.towerOf 4 r = Proofs.Binary.dotList (Spec.BinaryField.towerOf 4) u.val v.val ⦄ :=
+  Proofs.Binary.bf16_dot_product_spec u v
+
+/-- `dot_product` is the sum of the products of matching entries. -/
+theorem tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product.towerOf {N : Std.Usize} (u v : Std.Array tower.BinaryField32 N) :
+    tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product u v ⦃ r =>
+      Spec.BinaryField.towerOf 5 r = Proofs.Binary.dotList (Spec.BinaryField.towerOf 5) u.val v.val ⦄ :=
+  Proofs.Binary.bf32_dot_product_spec u v
+
+/-- `dot_product` is the sum of the products of matching entries. -/
+theorem tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product.towerOf {N : Std.Usize} (u v : Std.Array tower.BinaryField64 N) :
+    tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product u v ⦃ r =>
+      Spec.BinaryField.towerOf 6 r = Proofs.Binary.dotList (Spec.BinaryField.towerOf 6) u.val v.val ⦄ :=
+  Proofs.Binary.bf64_dot_product_spec u v
+
+/-- `dot_product` is the sum of the products of matching entries. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product.towerOf {N : Std.Usize} (u v : Std.Array tower.BinaryField128 N) :
+    tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product u v ⦃ r =>
+      Spec.BinaryField.towerOf 7 r = Proofs.Binary.dotList (Spec.BinaryField.towerOf 7) u.val v.val ⦄ :=
+  Proofs.Binary.bf128_dot_product_spec u v
+
+/-- `dot_product` is the sum of the products of matching entries. -/
+theorem poly64.Poly64.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product.bf64 {N : Std.Usize} (u v : Std.Array poly64.Poly64 N) :
+    poly64.Poly64.Insts.P3_fieldFieldPrimeCharacteristicRing.dot_product u v ⦃ r =>
+      bf64 r = Proofs.Binary.dotList bf64 u.val v.val ⦄ :=
+  Proofs.Binary.poly64_dot_product_spec u v
+
+/-- The carry-less `dot_product_32` over `u.iter().zip(v)` is the dot product. -/
+theorem clmul.dot_product_32.towerOf {F : Type}
+    (pairInst : CoreModels.core.ops.function.FnMut F (Std.U32 × Std.U32) (Std.U32 × Std.U32))
+    (f : F) (hpair : ∀ a b, pairInst.call_mut f (a, b) = .ok ((a, b), f))
+    (it : Proofs.Binary.MapZip Std.U32 F) (hf : it.f = f)
+    (hlen : (Proofs.Binary.iterList it.iter.it1).length = (Proofs.Binary.iterList it.iter.it2).length) :
+    clmul.dot_product_32
+      (CoreModels.core.iter.adapters.map.Map.Insts.CoreIterTraitsIteratorIterator
+        (CoreModels.core.iter.adapters.zip.Zip.Insts.CoreIterTraitsIteratorIteratorPair
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U32)
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U32))
+        pairInst) it ⦃ r =>
+      Spec.BinaryField.towerOf 5 r = Proofs.Binary.dotList (Spec.BinaryField.towerOf 5) (Proofs.Binary.iterList it.iter.it1) (Proofs.Binary.iterList it.iter.it2) ⦄ :=
+  Proofs.Binary.clmul_dot_product_32_spec pairInst f hpair it hf hlen
+
+/-- The carry-less `dot_product_64` over `u.iter().zip(v)` is the dot product. -/
+theorem clmul.dot_product_64.towerOf {F : Type}
+    (pairInst : CoreModels.core.ops.function.FnMut F (Std.U64 × Std.U64) (Std.U64 × Std.U64))
+    (f : F) (hpair : ∀ a b, pairInst.call_mut f (a, b) = .ok ((a, b), f))
+    (it : Proofs.Binary.MapZip Std.U64 F) (hf : it.f = f)
+    (hlen : (Proofs.Binary.iterList it.iter.it1).length = (Proofs.Binary.iterList it.iter.it2).length) :
+    clmul.dot_product_64
+      (CoreModels.core.iter.adapters.map.Map.Insts.CoreIterTraitsIteratorIterator
+        (CoreModels.core.iter.adapters.zip.Zip.Insts.CoreIterTraitsIteratorIteratorPair
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U64)
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U64))
+        pairInst) it ⦃ r =>
+      Spec.BinaryField.towerOf 6 r = Proofs.Binary.dotList (Spec.BinaryField.towerOf 6) (Proofs.Binary.iterList it.iter.it1) (Proofs.Binary.iterList it.iter.it2) ⦄ :=
+  Proofs.Binary.clmul_dot_product_64_spec pairInst f hpair it hf hlen
+
+/-- The carry-less `dot_product_128` over `u.iter().zip(v)` is the dot product. -/
+theorem clmul.dot_product_128.towerOf {F : Type}
+    (pairInst : CoreModels.core.ops.function.FnMut F (Std.U128 × Std.U128) (Std.U128 × Std.U128))
+    (f : F) (hpair : ∀ a b, pairInst.call_mut f (a, b) = .ok ((a, b), f))
+    (it : Proofs.Binary.MapZip Std.U128 F) (hf : it.f = f)
+    (hlen : (Proofs.Binary.iterList it.iter.it1).length = (Proofs.Binary.iterList it.iter.it2).length) :
+    clmul.dot_product_128
+      (CoreModels.core.iter.adapters.map.Map.Insts.CoreIterTraitsIteratorIterator
+        (CoreModels.core.iter.adapters.zip.Zip.Insts.CoreIterTraitsIteratorIteratorPair
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U128)
+          (CoreModels.core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT Std.U128))
+        pairInst) it ⦃ r =>
+      Spec.BinaryField.towerOf 7 r = Proofs.Binary.dotList (Spec.BinaryField.towerOf 7) (Proofs.Binary.iterList it.iter.it1) (Proofs.Binary.iterList it.iter.it2) ⦄ :=
+  Proofs.Binary.clmul_dot_product_128_spec pairInst f hpair it hf hlen
+
+/-! ## Reference products, byte decoding and the embedding of `GF(2)` -/
+
+/-- `reference_mul` is the tower product. -/
+theorem tower.BinaryField8.reference_mul.towerOf (a b : tower.BinaryField8) :
+    tower.BinaryField8.reference_mul a b ⦃ r => Spec.BinaryField.towerOf 3 r = Spec.BinaryField.towerOf 3 a * Spec.BinaryField.towerOf 3 b ⦄ :=
+  WP.spec_mono (Proofs.Binary.bf8_reference_mul_spec a b) fun _ h => Proofs.Binary.towerOf_mul h
+
+/-- `reference_mul` is the tower product. -/
+theorem tower.BinaryField16.reference_mul.towerOf (a b : tower.BinaryField16) :
+    tower.BinaryField16.reference_mul a b ⦃ r => Spec.BinaryField.towerOf 4 r = Spec.BinaryField.towerOf 4 a * Spec.BinaryField.towerOf 4 b ⦄ :=
+  WP.spec_mono (Proofs.Binary.bf16_reference_mul_spec a b) fun _ h => Proofs.Binary.towerOf_mul h
+
+/-- `reference_mul` is the tower product. -/
+theorem tower.BinaryField32.reference_mul.towerOf (a b : tower.BinaryField32) :
+    tower.BinaryField32.reference_mul a b ⦃ r => Spec.BinaryField.towerOf 5 r = Spec.BinaryField.towerOf 5 a * Spec.BinaryField.towerOf 5 b ⦄ :=
+  WP.spec_mono (Proofs.Binary.bf32_reference_mul_spec a b) fun _ h => Proofs.Binary.towerOf_mul h
+
+/-- `reference_mul` is the tower product. -/
+theorem tower.BinaryField64.reference_mul.towerOf (a b : tower.BinaryField64) :
+    tower.BinaryField64.reference_mul a b ⦃ r => Spec.BinaryField.towerOf 6 r = Spec.BinaryField.towerOf 6 a * Spec.BinaryField.towerOf 6 b ⦄ :=
+  WP.spec_mono (Proofs.Binary.bf64_reference_mul_spec a b) fun _ h => Proofs.Binary.towerOf_mul h
+
+/-- `reference_mul` is the tower product. -/
+theorem tower.BinaryField128.reference_mul.towerOf (a b : tower.BinaryField128) :
+    tower.BinaryField128.reference_mul a b ⦃ r => Spec.BinaryField.towerOf 7 r = Spec.BinaryField.towerOf 7 a * Spec.BinaryField.towerOf 7 b ⦄ :=
+  WP.spec_mono (Proofs.Binary.bf128_reference_mul_spec a b) fun _ h => Proofs.Binary.towerOf_mul h
+
+/-- `reference_square` is the tower square. -/
+theorem tower.BinaryField32.reference_square.towerOf (a : tower.BinaryField32) :
+    tower.BinaryField32.reference_square a ⦃ r => Spec.BinaryField.towerOf 5 r = Spec.BinaryField.towerOf 5 a ^ 2 ⦄ :=
+  Proofs.Binary.bf32_reference_square_spec a
+
+/-- `from_repr` keeps the level's low bits. -/
+theorem tower.BinaryField2.Insts.P3_binary_fieldTowerTowerLevelU8.from_repr.val (x : Std.U8) :
+    tower.BinaryField2.Insts.P3_binary_fieldTowerTowerLevelU8.from_repr x ⦃ r => r.val = x.val % 2 ^ 2 ^ 1 ⦄ :=
+  Proofs.Binary.bf2_from_repr_level_spec x
+
+/-- `from_le_bytes` reads little-endian bytes. -/
+theorem tower.BinaryField2.from_le_bytes.towerOf (bytes : Std.Array Std.U8 1#usize) :
+    tower.BinaryField2.from_le_bytes bytes ⦃ r => Spec.BinaryField.towerOf 1 r = ConcreteBinaryTower.fromNat (Proofs.Binary.leNat bytes.val) ⦄ :=
+  Proofs.Binary.bf2_from_le_bytes_spec bytes
+
+/-- `from_prime_subfield` embeds `GF(2)`. -/
+theorem tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val (f : gf2.Gf2) :
+    tower.BinaryField2.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield f ⦃ r =>
+      r.val = (decide (f.val = 1)).toNat ⦄ :=
+  Proofs.Binary.bf2_from_prime_subfield_spec f
+
+/-- `from_repr` keeps the level's low bits. -/
+theorem tower.BinaryField4.Insts.P3_binary_fieldTowerTowerLevelU8.from_repr.val (x : Std.U8) :
+    tower.BinaryField4.Insts.P3_binary_fieldTowerTowerLevelU8.from_repr x ⦃ r => r.val = x.val % 2 ^ 2 ^ 2 ⦄ :=
+  Proofs.Binary.bf4_from_repr_level_spec x
+
+/-- `from_le_bytes` reads little-endian bytes. -/
+theorem tower.BinaryField4.from_le_bytes.towerOf (bytes : Std.Array Std.U8 1#usize) :
+    tower.BinaryField4.from_le_bytes bytes ⦃ r => Spec.BinaryField.towerOf 2 r = ConcreteBinaryTower.fromNat (Proofs.Binary.leNat bytes.val) ⦄ :=
+  Proofs.Binary.bf4_from_le_bytes_spec bytes
+
+/-- `from_prime_subfield` embeds `GF(2)`. -/
+theorem tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val (f : gf2.Gf2) :
+    tower.BinaryField4.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield f ⦃ r =>
+      r.val = (decide (f.val = 1)).toNat ⦄ :=
+  Proofs.Binary.bf4_from_prime_subfield_spec f
+
+/-- `from_repr` keeps the level's low bits. -/
+theorem tower.BinaryField8.Insts.P3_binary_fieldTowerTowerLevelU8.from_repr.val (x : Std.U8) :
+    tower.BinaryField8.Insts.P3_binary_fieldTowerTowerLevelU8.from_repr x ⦃ r => r.val = x.val % 2 ^ 2 ^ 3 ⦄ :=
+  Proofs.Binary.bf8_from_repr_level_spec x
+
+/-- `from_le_bytes` reads little-endian bytes. -/
+theorem tower.BinaryField8.from_le_bytes.towerOf (bytes : Std.Array Std.U8 1#usize) :
+    tower.BinaryField8.from_le_bytes bytes ⦃ r => Spec.BinaryField.towerOf 3 r = ConcreteBinaryTower.fromNat (Proofs.Binary.leNat bytes.val) ⦄ :=
+  Proofs.Binary.bf8_from_le_bytes_spec bytes
+
+/-- `from_prime_subfield` embeds `GF(2)`. -/
+theorem tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val (f : gf2.Gf2) :
+    tower.BinaryField8.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield f ⦃ r =>
+      r.val = (decide (f.val = 1)).toNat ⦄ :=
+  Proofs.Binary.bf8_from_prime_subfield_spec f
+
+/-- `from_repr` keeps the level's low bits. -/
+theorem tower.BinaryField16.Insts.P3_binary_fieldTowerTowerLevelU16.from_repr.val (x : Std.U16) :
+    tower.BinaryField16.Insts.P3_binary_fieldTowerTowerLevelU16.from_repr x ⦃ r => r.val = x.val % 2 ^ 2 ^ 4 ⦄ :=
+  Proofs.Binary.bf16_from_repr_level_spec x
+
+/-- `from_le_bytes` reads little-endian bytes. -/
+theorem tower.BinaryField16.from_le_bytes.towerOf (bytes : Std.Array Std.U8 2#usize) :
+    tower.BinaryField16.from_le_bytes bytes ⦃ r => Spec.BinaryField.towerOf 4 r = ConcreteBinaryTower.fromNat (Proofs.Binary.leNat bytes.val) ⦄ :=
+  Proofs.Binary.bf16_from_le_bytes_spec bytes
+
+/-- `from_prime_subfield` embeds `GF(2)`. -/
+theorem tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val (f : gf2.Gf2) :
+    tower.BinaryField16.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield f ⦃ r =>
+      r.val = (decide (f.val = 1)).toNat ⦄ :=
+  Proofs.Binary.bf16_from_prime_subfield_spec f
+
+/-- `from_repr` keeps the level's low bits. -/
+theorem tower.BinaryField32.Insts.P3_binary_fieldTowerTowerLevelU32.from_repr.val (x : Std.U32) :
+    tower.BinaryField32.Insts.P3_binary_fieldTowerTowerLevelU32.from_repr x ⦃ r => r.val = x.val % 2 ^ 2 ^ 5 ⦄ :=
+  Proofs.Binary.bf32_from_repr_level_spec x
+
+/-- `from_le_bytes` reads little-endian bytes. -/
+theorem tower.BinaryField32.from_le_bytes.towerOf (bytes : Std.Array Std.U8 4#usize) :
+    tower.BinaryField32.from_le_bytes bytes ⦃ r => Spec.BinaryField.towerOf 5 r = ConcreteBinaryTower.fromNat (Proofs.Binary.leNat bytes.val) ⦄ :=
+  Proofs.Binary.bf32_from_le_bytes_spec bytes
+
+/-- `from_prime_subfield` embeds `GF(2)`. -/
+theorem tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val (f : gf2.Gf2) :
+    tower.BinaryField32.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield f ⦃ r =>
+      r.val = (decide (f.val = 1)).toNat ⦄ :=
+  Proofs.Binary.bf32_from_prime_subfield_spec f
+
+/-- `from_repr` keeps the level's low bits. -/
+theorem tower.BinaryField64.Insts.P3_binary_fieldTowerTowerLevelU64.from_repr.val (x : Std.U64) :
+    tower.BinaryField64.Insts.P3_binary_fieldTowerTowerLevelU64.from_repr x ⦃ r => r.val = x.val % 2 ^ 2 ^ 6 ⦄ :=
+  Proofs.Binary.bf64_from_repr_level_spec x
+
+/-- `from_le_bytes` reads little-endian bytes. -/
+theorem tower.BinaryField64.from_le_bytes.towerOf (bytes : Std.Array Std.U8 8#usize) :
+    tower.BinaryField64.from_le_bytes bytes ⦃ r => Spec.BinaryField.towerOf 6 r = ConcreteBinaryTower.fromNat (Proofs.Binary.leNat bytes.val) ⦄ :=
+  Proofs.Binary.bf64_from_le_bytes_spec bytes
+
+/-- `from_prime_subfield` embeds `GF(2)`. -/
+theorem tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val (f : gf2.Gf2) :
+    tower.BinaryField64.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield f ⦃ r =>
+      r.val = (decide (f.val = 1)).toNat ⦄ :=
+  Proofs.Binary.bf64_from_prime_subfield_spec f
+
+/-- `from_repr` keeps the level's low bits. -/
+theorem tower.BinaryField128.Insts.P3_binary_fieldTowerTowerLevelU128.from_repr.val (x : Std.U128) :
+    tower.BinaryField128.Insts.P3_binary_fieldTowerTowerLevelU128.from_repr x ⦃ r => r.val = x.val % 2 ^ 2 ^ 7 ⦄ :=
+  Proofs.Binary.bf128_from_repr_level_spec x
+
+/-- `from_le_bytes` reads little-endian bytes. -/
+theorem tower.BinaryField128.from_le_bytes.towerOf (bytes : Std.Array Std.U8 16#usize) :
+    tower.BinaryField128.from_le_bytes bytes ⦃ r => Spec.BinaryField.towerOf 7 r = ConcreteBinaryTower.fromNat (Proofs.Binary.leNat bytes.val) ⦄ :=
+  Proofs.Binary.bf128_from_le_bytes_spec bytes
+
+/-- `from_prime_subfield` embeds `GF(2)`. -/
+theorem tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val (f : gf2.Gf2) :
+    tower.BinaryField128.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield f ⦃ r =>
+      r.val = (decide (f.val = 1)).toNat ⦄ :=
+  Proofs.Binary.bf128_from_prime_subfield_spec f
+
+/-- The value it returns. -/
+theorem ghash.Ghash128.from_le_bytes.val (bytes : Std.Array Std.U8 16#usize) :
+    ghash.Ghash128.from_le_bytes bytes ⦃ r => r.val = Proofs.Binary.leNat bytes.val ⦄ :=
+  Proofs.Binary.ghash128_from_le_bytes_spec bytes
+
+/-- The value it returns. -/
+theorem poly64.Poly64.from_le_bytes.val (bytes : Std.Array Std.U8 8#usize) :
+    poly64.Poly64.from_le_bytes bytes ⦃ r => r.val = Proofs.Binary.leNat bytes.val ⦄ :=
+  Proofs.Binary.poly64_from_le_bytes_spec bytes
+
+/-- The value it returns. -/
+theorem gf2.Gf2.from_le_bytes.val (bytes : Std.Array Std.U8 1#usize) :
+    gf2.Gf2.from_le_bytes bytes ⦃ r => r.val = Proofs.Binary.leNat bytes.val % 2 ⦄ :=
+  Proofs.Binary.gf2_from_le_bytes_spec bytes
+
+/-- The value it returns. -/
+theorem field_defaults.Gf2.is_one.val (f : gf2.Gf2) :
+    field_defaults.Gf2.is_one f ⦃ b => b = decide (f.val = 1) ⦄ :=
+  Proofs.Binary.gf2_is_one_spec f
+
+/-- The value it returns. -/
+theorem gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val (f : gf2.Gf2) :
+    gf2.Gf2.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield f ⦃ r => r = f ⦄ :=
+  Proofs.Binary.gf2_from_prime_subfield_spec f
+
+/-- The value it returns. -/
+theorem poly64.Poly64.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val (f : gf2.Gf2) :
+    poly64.Poly64.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield f ⦃ r =>
+      r.val = (decide (f.val = 1)).toNat ⦄ :=
+  Proofs.Binary.poly64_from_prime_subfield_spec f
+
+/-- The value it returns. -/
+theorem ghash.Ghash128.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.val (f : gf2.Gf2) :
+    ghash.Ghash128.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield f ⦃ r =>
+      r.val = (decide (f.val = 1)).toNat ⦄ :=
+  Proofs.Binary.ghash128_from_prime_subfield_spec f
+
+/-- The value it returns. -/
+theorem ghash.Ghash128.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool.val (b : Bool) :
+    ghash.Ghash128.Insts.P3_fieldFieldPrimeCharacteristicRing.from_bool b ⦃ r => r.val = b.toNat ⦄ :=
+  Proofs.Binary.ghash128_from_bool_spec b
+
+/-- The value it returns. -/
+theorem ghash.Ghash128.Insts.CoreCmpPartialEqGhash128.eq.toGhash (a b : ghash.Ghash128) :
+    ghash.Ghash128.Insts.CoreCmpPartialEqGhash128.eq a b ⦃ r => (r = true ↔ ghash a = ghash b) ⦄ :=
+  Proofs.Binary.ghash128_eq_spec a b
+
+/-- The value it returns. -/
+theorem ghash.Ghash128.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.toGhash (a : ghash.Ghash128) :
+    ghash.Ghash128.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check a ⦃ r =>
+      ghash r = ghash a * ghash a + ghash a ⦄ :=
+  Proofs.Binary.ghash128_bool_check_spec a
+
+/-- The value it returns. -/
+theorem ghash.Ghash128.Insts.P3_fieldFieldField.bits.val :
+    ghash.Ghash128.Insts.P3_fieldFieldField.bits ⦃ r => r.val = 128 ⦄ :=
+  Proofs.Binary.ghash128_bits_spec
+
+/-- The value it returns. -/
+theorem poly64.Poly64.Insts.P3_fieldFieldField.bits.val :
+    poly64.Poly64.Insts.P3_fieldFieldField.bits ⦃ r => r.val = 64 ⦄ :=
+  Proofs.Binary.poly64_bits_spec
+
+/-! ## `GF(2^192)` -/
+
+/-- The value it returns. -/
+theorem poly192.Poly192.Insts.P3_fieldExtensionHasFrobeniusPoly64.frobenius.toExt3 (a : poly192.Poly192) :
+    poly192.Poly192.Insts.P3_fieldExtensionHasFrobeniusPoly64.frobenius a ⦃ r =>
+      toExt3 r = toExt3 a ^ 2 ^ 64 ⦄ :=
+  Proofs.Binary.poly192_frobenius_ext a
+
+/-- The value it returns. -/
+theorem poly192.Poly192.Insts.P3_fieldExtensionHasFrobeniusPoly64.repeated_frobenius.toExt3 (a : poly192.Poly192) (count : Std.Usize) :
+    poly192.Poly192.Insts.P3_fieldExtensionHasFrobeniusPoly64.repeated_frobenius a count ⦃ r =>
+      toExt3 r = toExt3 a ^ (2 ^ 64) ^ count.val ⦄ :=
+  Proofs.Binary.poly192_repeated_frobenius_ext a count
+
+/-- The value it returns. -/
+theorem poly192.Poly192.composed_mul.toExt3 (a b : poly192.Poly192) :
+    poly192.Poly192.composed_mul a b ⦃ r => toExt3 r = toExt3 a * toExt3 b ⦄ :=
+  Proofs.Binary.poly192_composed_mul_ext a b
+
+/-- The value it returns. -/
+theorem poly192.Poly192.Insts.CoreCmpPartialEqPoly192.eq.toExt3 (a b : poly192.Poly192) :
+    poly192.Poly192.Insts.CoreCmpPartialEqPoly192.eq a b ⦃ r => (r = true ↔ toExt3 a = toExt3 b) ⦄ :=
+  Proofs.Binary.poly192_eq_ext a b
+
+/-- The value it returns. -/
+theorem poly192.Poly192.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check.toExt3 (a : poly192.Poly192) :
+    poly192.Poly192.Insts.P3_fieldFieldPrimeCharacteristicRing.bool_check a ⦃ r =>
+      toExt3 r = toExt3 a * toExt3 a + toExt3 a ⦄ :=
+  Proofs.Binary.poly192_bool_check_ext a
+
+/-- The value it returns. -/
+theorem poly192.Poly192.embed.toExt3 (v : poly64.Poly64) :
+    poly192.Poly192.embed v ⦃ r => toExt3 r = algebraMap BF64 BF64.Ext3 (bf64 v) ⦄ :=
+  Proofs.Binary.poly192_embed_ext v
+
+/-- The value it returns. -/
+theorem poly192.Poly192.Insts.CoreConvertFromPoly64.from.toExt3 (v : poly64.Poly64) :
+    poly192.Poly192.Insts.CoreConvertFromPoly64.from v ⦃ r =>
+      toExt3 r = algebraMap BF64 BF64.Ext3 (bf64 v) ⦄ :=
+  Proofs.Binary.poly192_from_poly64_ext v
+
+/-- The value it returns. -/
+theorem poly192.Poly192.Insts.P3_fieldFieldPrimeCharacteristicRing.ZERO.toExt3 :
+    poly192.Poly192.Insts.P3_fieldFieldPrimeCharacteristicRing.ZERO ⦃ r => toExt3 r = 0 ⦄ :=
+  Proofs.Binary.poly192_ZERO_ext
+
+/-- The value it returns. -/
+theorem poly192.Poly192.new.val (c : Std.Array poly64.Poly64 3#usize) :
+    poly192.Poly192.new c ⦃ r => r = c ⦄ :=
+  Proofs.Binary.poly192_new_spec c
+
+/-- The value it returns. -/
+theorem poly192.Poly192.coefficients.val (a : poly192.Poly192) :
+    poly192.Poly192.coefficients a ⦃ r => r = a ⦄ :=
+  Proofs.Binary.poly192_coefficients_spec a
+
+/-- The value it returns. -/
+theorem poly192.Poly192.invert_or_zero.toExt3 (a : poly192.Poly192) :
+    poly192.Poly192.invert_or_zero a ⦃ r => toExt3 r = (toExt3 a)⁻¹ ⦄ :=
+  Proofs.Binary.poly192_invert_or_zero_ext a
+
+/-- The value it returns. -/
+theorem poly192.Poly192.Insts.P3_fieldFieldExtensionFieldPoly64.is_in_basefield.bf64 (a : poly192.Poly192) :
+    poly192.Poly192.Insts.P3_fieldFieldExtensionFieldPoly64.is_in_basefield a ⦃ b =>
+      (b = true ↔ bf64 (a.val.getD 1 default) = 0 ∧ bf64 (a.val.getD 2 default) = 0) ⦄ :=
+  Proofs.Binary.poly192_is_in_basefield_ext a
+
+/-- The value it returns. -/
+theorem poly192.Poly192.Insts.P3_fieldFieldExtensionFieldPoly64.as_base.toExt3 (a : poly192.Poly192) :
+    poly192.Poly192.Insts.P3_fieldFieldExtensionFieldPoly64.as_base a ⦃ r =>
+      ((bf64 (a.val.getD 1 default) = 0 ∧ bf64 (a.val.getD 2 default) = 0) →
+        r = .Some (a.val.getD 0 default) ∧
+        toExt3 a = algebraMap BF64 BF64.Ext3 (bf64 (a.val.getD 0 default))) ∧
+      (¬ (bf64 (a.val.getD 1 default) = 0 ∧ bf64 (a.val.getD 2 default) = 0) → r = .None) ⦄ :=
+  Proofs.Binary.poly192_as_base_ext a
+
+/-- The value it returns. -/
+theorem poly192.Poly192.Insts.P3_fieldFieldField.bits.val :
+    poly192.Poly192.Insts.P3_fieldFieldField.bits ⦃ r => r.val = 192 ⦄ :=
+  Proofs.Binary.poly192_bits_spec
+
+/-- The value it returns. -/
+theorem poly192.Poly192.Insts.P3_fieldFieldField.interpolation_node.toExt3 (i : Std.Usize) :
+    poly192.Poly192.Insts.P3_fieldFieldField.interpolation_node i ⦃ r =>
+      ∃ p : Std.U64, p.val = i.val ∧ toExt3 r = algebraMap BF64 BF64.Ext3 (bf64 p) ⦄ :=
+  Proofs.Binary.poly192_interpolation_node_ext i
+
+/-- The value it returns. -/
+theorem poly192.Poly192.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield.toExt3 (f : gf2.Gf2) :
+    poly192.Poly192.Insts.P3_fieldFieldPrimeCharacteristicRing.from_prime_subfield f ⦃ r =>
+      ∃ p : Std.U64, p.val = (decide (f.val = 1)).toNat ∧
+        toExt3 r = algebraMap BF64 BF64.Ext3 (bf64 p) ⦄ :=
+  Proofs.Binary.poly192_from_prime_subfield_ext f
 
 end Plonky3Lean.Claims.P3BinaryField
