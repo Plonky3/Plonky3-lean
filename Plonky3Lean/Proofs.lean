@@ -52,6 +52,7 @@ public import Plonky3Lean.Proofs.Field.Binary.ClmulPaths
 public import Plonky3Lean.Proofs.Field.Binary.BasisSquare
 public import Plonky3Lean.Proofs.Field.Binary.Cantor
 public import Plonky3Lean.Proofs.Field.Binary.CantorSpec
+public import Plonky3Lean.Proofs.Field.Binary.DotProduct
 public import Plonky3Lean.Proofs.Field.Goldilocks.Arith
 public import Plonky3Lean.Proofs.Field.Goldilocks.Basic
 public import Plonky3Lean.Proofs.Field.Goldilocks.Constants
