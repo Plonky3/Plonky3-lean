@@ -419,4 +419,92 @@ theorem duplexing_eq {F P : Type} [AddMonoidWithOne F] {W R : Std.Usize}
           show ((0#usize : Std.Usize) : ℕ) = 0 from rfl, List.take_zero, List.nil_append, Nat.zero_add]
       simp [toSt, St.duplexing, hv2, ha2, hsetv]
 
+/-- Observing a value returns the list machine's observation, and never panics, while fewer than `RATE` inputs are pending. -/
+theorem observe_eq {F P : Type} [AddMonoidWithOne F] {W R : Std.Usize}
+    (copyInst : core.marker.Copy F)
+    (ringInst : p3_field.field.PrimeCharacteristicRing F)
+    (permInst : p3_symmetric.permutation.CryptographicPermutation P (Std.Array F W))
+    (hcopy : CloneIsId copyInst) (hring : RingComputes ringInst) (f : List F → List F)
+    (c : p3_challenger.duplex_challenger.DuplexChallenger F P W R)
+    (hf : PermComputes permInst c.permutation f) (hRW : R.val < W.val) (h255 : R.val ≤ 255)
+    (hin : c.input_buffer.val.length < R.val) (x : F) :
+    ∃ c', p3_challenger.duplex_challenger.DuplexChallenger.Insts.P3_challengerCanObserve.observe
+        copyInst ringInst permInst c x = .ok c' ∧
+      toSt c' = (toSt c).observe f R.val x ∧ c'.permutation = c.permutation := by
+  have hclear : alloc.vec.Vec.clear c.output_buffer = .ok (vnil F) := by
+    simp [alloc.vec.Vec.clear, rust_primitives.sequence.seq_empty, vnil]
+  obtain ⟨v1, ev1, hv1⟩ := vec_push_eq c.input_buffer x (by scalar_tac)
+  unfold p3_challenger.duplex_challenger.DuplexChallenger.Insts.P3_challengerCanObserve.observe
+  simp only [hclear, ev1, bind_ok, alloc.vec.Vec.len, rust_primitives.sequence.seq_len]
+  by_cases hfull : c.input_buffer.val.length + 1 = R.val
+  · have hR : Slice.len v1 = R := UScalar.eq_of_val_eq (by simp [Slice.len, hv1]; omega)
+    obtain ⟨c', e', h', hp'⟩ := duplexing_eq copyInst permInst ringInst hcopy hring f
+      ⟨c.sponge_state, v1, vnil F, c.permutation⟩ hf hRW h255 (by simp [hv1]; omega)
+    refine ⟨c', ?_, ?_, hp'⟩
+    · simp only [hR, ↓reduceIte]
+      exact e'
+    · rw [h']
+      simp [toSt, St.observe, St.duplexing, hv1, hfull]
+  · have hR : ¬ Slice.len v1 = R := fun h => hfull (by
+      have := congrArg UScalar.val h; simp [Slice.len, hv1] at this; omega)
+    refine ⟨⟨c.sponge_state, v1, vnil F, c.permutation⟩, ?_, ?_, rfl⟩
+    · simp only [hR, ↓reduceIte]
+    · simp [toSt, St.observe, hv1, hfull]
+
+/-- The constructor panics exactly when `0 < RATE < WIDTH` or `RATE <= 255` fails.
+
+Otherwise the sponge is `WIDTH` copies of the default value and both buffers are empty. -/
+theorem new_eq {F P : Type} {W : Std.Usize} (R : Std.Usize) (copyInst : core.marker.Copy F)
+    (permInst : p3_symmetric.permutation.CryptographicPermutation P (Std.Array F W))
+    (defInst : core.default.Default F) (hcopy : CloneIsId copyInst) (z : F)
+    (hz : defInst.default = .ok z) (p : P) :
+    (¬ (0 < R.val ∧ R.val < W.val ∧ R.val ≤ 255) →
+      p3_challenger.duplex_challenger.DuplexChallenger.new R copyInst permInst defInst p = .fail .panic) ∧
+    (0 < R.val ∧ R.val < W.val ∧ R.val ≤ 255 →
+      ∃ c, p3_challenger.duplex_challenger.DuplexChallenger.new R copyInst permInst defInst p = .ok c ∧
+        toSt c = ⟨List.replicate W.val z, [], []⟩ ∧ c.permutation = p) := by
+  obtain ⟨a, ea, ha⟩ := Lib.array_repeat_eq W copyInst.cloneCloneInst hcopy z
+  unfold p3_challenger.duplex_challenger.DuplexChallenger.new
+  constructor
+  · intro h
+    by_cases h1 : R > 0#usize
+    · by_cases h2 : R < W
+      · have h3 : ¬ R ≤ 255#usize := by
+          intro h3; apply h; refine ⟨?_, ?_, ?_⟩ <;> scalar_tac
+        simp [massert, h1, h2, h3]
+      · simp [massert, h1, h2]
+    · simp [massert, h1]
+  · rintro ⟨h1, h2, h3⟩
+    have h1' : R > 0#usize := by scalar_tac
+    have h2' : R < W := by scalar_tac
+    have h3' : R ≤ 255#usize := by scalar_tac
+    refine ⟨⟨a, Slice.new F, Slice.new F, p⟩, ?_, ?_, rfl⟩
+    · simp [massert, h1', h2', h3', hz, ea, alloc.vec.Vec.new, rust_primitives.sequence.seq_empty]
+      rw [@Std.bind_ok (alloc.vec.Vec F) _ (Slice.new F)]
+    · simp only [toSt, St.mk.injEq]
+      refine ⟨List.eq_replicate_iff.2 ⟨by simp, ha⟩, rfl, rfl⟩
+
+/-- Finalizing duplexes once more and returns the first `RATE` cells of the new state. -/
+theorem finalize_eq {F P : Type} [AddMonoidWithOne F] [Inhabited F] {W R : Std.Usize}
+    (copyInst : core.marker.Copy F)
+    (ringInst : p3_field.field.PrimeCharacteristicRing F)
+    (permInst : p3_symmetric.permutation.CryptographicPermutation P (Std.Array F W))
+    (hcopy : CloneIsId copyInst) (hring : RingComputes ringInst) (f : List F → List F)
+    (c : p3_challenger.duplex_challenger.DuplexChallenger F P W R)
+    (hf : PermComputes permInst c.permutation f) (hRW : R.val < W.val) (h255 : R.val ≤ 255)
+    (hin : c.input_buffer.val.length ≤ R.val) :
+    ∃ out, p3_challenger.duplex_challenger.DuplexChallenger.Insts.P3_challengerCanFinalizeDigestArray.finalize
+        copyInst ringInst permInst c = .ok out ∧
+      out.val = (f (pad R.val c.sponge_state.val c.input_buffer.val)).take R.val := by
+  obtain ⟨c', e', h', _⟩ := duplexing_eq copyInst permInst ringInst hcopy hring f c hf hRW h255 hin
+  have hl : c'.sponge_state.val.length = W.val := by simp
+  refine ⟨Std.Array.from (c'.sponge_state.val.take R.val) (by simp; omega), ?_, ?_⟩
+  · unfold p3_challenger.duplex_challenger.DuplexChallenger.Insts.P3_challengerCanFinalizeDigestArray.finalize
+    rw [e', bind_ok]
+    exact squeeze_eq R copyInst c'.sponge_state (by omega)
+  · have : c'.sponge_state.val = f (pad R.val c.sponge_state.val c.input_buffer.val) := by
+      have := congrArg St.s h'
+      simpa [toSt, St.duplexing] using this
+    simp [this]
+
 end Plonky3Lean.Proofs.Challenger
