@@ -164,24 +164,15 @@ theorem output_eq_keccakP {m : ℕ} (hm : 24 * m + 24 ≤ T.height) (x y : Fin 5
     simp
   rw [output_eq h hp (by omega) hflag x.isLt y.isLt limb.isLt, hP, stateLimb_toState]
 
-/-- Soundness: on the rows of each whole permutation, the output limbs are those of Keccak-f[1600] of the state the preimage limbs hold. -/
-theorem sound {m : ℕ} (hm : 24 * m + 24 ≤ T.height) :
-    ∃ A : State,
-      (∀ k < 24, ∀ x y : Fin 5, ∀ limb : Fin 4,
-        T.main (24 * m + k) (col.preimage y x limb) = (stateLimb A x y limb : F)) ∧
-      ∀ x y : Fin 5, ∀ limb : Fin 4,
-        a_prime_prime_prime (T.main (24 * m + 23)) y x limb =
-          (stateLimb (keccakP 24 A) x y limb : F) := by
-  refine ⟨toState (inB (cur T (24 * m))), fun k hk x y limb => ?_, fun x y limb => ?_⟩
-  · have hc : col.preimage y x limb < NUM_KECCAK_COLS := by
-      simp only [col.preimage, NUM_KECCAK_COLS]; omega
-    rw [← cur_eq T _ hc, preimage_const hp hT hm hk x.isLt y.isLt limb.isLt,
-      preimage_eq hp hT hm]
-  · rw [← output_eq_keccakP hp hT hm]
-    unfold a_prime_prime_prime
-    split_ifs
-    · exact (cur_eq T _ (by simp only [col.a_prime_prime_prime_0_0_limbs, NUM_KECCAK_COLS]; omega)).symm
-    · exact (cur_eq T _ (by simp only [col.a_prime_prime, NUM_KECCAK_COLS]; omega)).symm
+/-- The input limbs of row 24 m + k are those of Rnd^k of the permutation's input state. -/
+theorem input_limbs {m k : ℕ} (hm : 24 * m + 24 ≤ T.height) (hk : k < 24) (x y : Fin 5)
+    (limb : Fin 4) :
+    T.main (24 * m + k) (col.a y x limb) =
+      (stateLimb ((List.range k).foldl (fun A r => rnd A r) (toState (inB (cur T (24 * m))))) x y
+        limb : F) := by
+  have h := rowSpec_of_satisfies hT (by omega : 24 * m + k < T.height)
+  rw [← cur_eq T _ (by simp only [col.a, NUM_KECCAK_COLS]; omega), a_eq h x.isLt y.isLt limb.isLt,
+    ← input_iter hp hT hm hk, stateLimb_toState]
 
 end block
 

@@ -39,6 +39,11 @@ public import Plonky3Lean.Proofs.Hash.Sha256.Vectors
 public import Plonky3Lean.Proofs.Hash.Keccak.Vectors
 public import Plonky3Lean.Proofs.Hash.Keccak.Digest
 public import Plonky3Lean.Proofs.Hash.Keccak.Symmetric
+public import Plonky3Lean.Proofs.KeccakAir.Fields
+public import Plonky3Lean.Proofs.KeccakAir.Complete
+public import Plonky3Lean.Proofs.KeccakAir.Extracted
+public import Plonky3Lean.Proofs.KeccakAir.Binary.Complete
+public import Plonky3Lean.Proofs.KeccakAir.Binary.Degree
 public import Plonky3Lean.Proofs.Symmetric.Roots
 public import Plonky3Lean.Proofs.Field.BabyBear
 public import Plonky3Lean.Proofs.Field.BabyBear.Arith

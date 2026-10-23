@@ -278,4 +278,30 @@ theorem perm_sound {i : ℕ} (hi : i < T.height) (hf : OneHot (curB cb T i) 0) :
 
 end perm
 
+/-! ## In terms of the trace's cells -/
+
+theorem curB_eq {cb : Bool} (T : Instance F) (i : ℕ) {c : ℕ} (hc : c < NUM_KECCAK_BINARY_COLS) :
+    curB cb T i c = T.main i c := rowOf_getD _ _ 0 hc
+
+/-- The state a row of the trace holds: bit (x, y, z) is whether its cell is 1. -/
+def traceState (T : Instance F) (i : ℕ) : State :=
+  fun x y z => decide (T.main i (binary.col.a y.val x.val z.val) = 1)
+
+theorem stateOf_curB {cb : Bool} (T : Instance F) (i : ℕ) : stateOf (curB cb T i) = traceState T i := by
+  funext x y z
+  simp only [stateOf, traceState, bv]
+  rw [curB_eq T i (by simp only [binary.col.a, NUM_KECCAK_BINARY_COLS]; omega)]
+
+theorem onehot_curB {cb : Bool} (T : Instance F) (i k : ℕ) :
+    OneHot (curB cb T i) k ↔ ∀ r < 25, T.main i r = if r = k then 1 else 0 := by
+  refine forall₂_congr fun r hr => ?_
+  rw [curB_eq T i (by simp only [col.round_flags, NUM_KECCAK_BINARY_COLS]; omega)]
+  rfl
+
+/-- With the booleanity stated, every state cell of a satisfying trace is a bit. -/
+theorem bits_of_constrained {T : Instance F} (hT : Satisfies (constraints (binaryAir true)) T) :
+    ∀ i < T.height, ∀ y < 5, ∀ x < 5, ∀ z < 64,
+      curB true T i (binary.col.a y x z) * (curB true T i (binary.col.a y x z) - 1) = 0 :=
+  fun _ hi => (rowSpecB_of_satisfies hT hi).bools rfl
+
 end Plonky3Lean.Proofs.KeccakAir.Binary
