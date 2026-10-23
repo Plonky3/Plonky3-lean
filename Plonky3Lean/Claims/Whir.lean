@@ -223,6 +223,13 @@ theorem schedule.later_fold_exceeds (cs : Counts) :
       (c.round_parameters.map (·.log_folded_domain_size)) = [22, 28] :=
   Plonky3Lean.Proofs.Whir.later_fold_exceeds cs
 
+/-- An accepted schedule meets every hypothesis of completeness and of the absence of panics, once its later folded domains fit the two-adicity, which the configuration does not check. -/
+theorem schedule.valid {cs : Counts} {n rate0 : ℕ} {folding rates : List ℕ} {max_log : ℕ} {c : WhirConfig}
+    (hok : schedule cs n rate0 folding rates max_log = .ok c) (hne : folding ≠ []) (hsum : folding.sum ≤ n)
+    {adicity : ℕ} (had : ∀ t ≤ c.n_rounds, (queried c t).log_folded_domain_size ≤ adicity) :
+    Valid c n adicity :=
+  valid_of_schedule hok hne hsum had
+
 /-- Past the two-adicity the generator does not exist, and the verifier panics. -/
 theorem two_adic_generator.panics (gen : ℕ → F) {adicity bits : ℕ} (h : adicity < bits) :
     two_adic_generator adicity gen bits = none := by
