@@ -509,8 +509,8 @@ theorem finalize_eq {F P : Type} [AddMonoidWithOne F] [Inhabited F] {W R : Std.U
 
 set_option allowUnsafeReducibility true in
 attribute [local reducible] alloc.vec.Vec rust_primitives.sequence.Seq in
-theorem vec_pop_eq {T : Type} [AddMonoidWithOne T] (v : alloc.vec.Vec T) (h : v.val ≠ []) :
-    ∃ v', alloc.vec.Vec.pop v = .ok (.Some (v.val.getLastD 0), v') ∧ v'.val = v.val.dropLast := by
+theorem vec_pop_eq {T : Type} (d : T) (v : alloc.vec.Vec T) (h : v.val ≠ []) :
+    ∃ v', alloc.vec.Vec.pop v = .ok (.Some (v.val.getLastD d), v') ∧ v'.val = v.val.dropLast := by
   have hl : 0 < v.val.length := List.length_pos_of_ne_nil h
   have hpos : Slice.len v > 0#usize := by scalar_tac
   obtain ⟨i, ei, hi⟩ : ∃ i : Std.Usize, Slice.len v - 1#usize = RustM.ok i ∧ i.val = v.val.length - 1 := by
@@ -518,7 +518,7 @@ theorem vec_pop_eq {T : Type} [AddMonoidWithOne T] (v : alloc.vec.Vec T) (h : v.
     obtain ⟨z, e, hz⟩ := Lib.spec_imp_exists this
     exact ⟨z, e, by simpa [Slice.len] using hz⟩
   have hrm : rust_primitives.sequence.seq_remove v i =
-      .ok (v.val.getLastD 0, Slice.from v.val.dropLast (by have := v.property; simp; omega)) := by
+      .ok (v.val.getLastD d, Slice.from v.val.dropLast (by have := v.property; simp; omega)) := by
     simp only [rust_primitives.sequence.seq_remove]
     rw [dite_eq_left_of_eq_true (eq_true (by omega))]
     congr 2
@@ -569,7 +569,7 @@ theorem sample_eq {F P : Type} [AddMonoidWithOne F] {W R : Std.Usize}
       simp [toSt, St.duplexing] at this h2; rw [this, h2]
     have hne : c1.output_buffer.val ≠ [] := by
       rw [ho1]; exact List.ne_nil_of_length_pos (by simp; omega)
-    obtain ⟨v, ev, hv⟩ := vec_pop_eq c1.output_buffer hne
+    obtain ⟨v, ev, hv⟩ := vec_pop_eq 0 c1.output_buffer hne
     have hc1 : (if (!decide (c.input_buffer.val = [])) = true then
         p3_challenger.duplex_challenger.DuplexChallenger.duplexing copyInst permInst ringInst c
       else if decide (c.output_buffer.val = []) = true then
@@ -592,7 +592,7 @@ theorem sample_eq {F P : Type} [AddMonoidWithOne F] {W R : Std.Usize}
   · -- An output is buffered and no input is pending: pop it.
     have hi : c.input_buffer.val = [] := by by_contra h; exact hd (Or.inl h)
     have ho : c.output_buffer.val ≠ [] := fun h => hd (Or.inr h)
-    obtain ⟨v, ev, hv⟩ := vec_pop_eq c.output_buffer ho
+    obtain ⟨v, ev, hv⟩ := vec_pop_eq 0 c.output_buffer ho
     refine ⟨c.output_buffer.val.getLastD 0, ⟨c.sponge_state, c.input_buffer, v, c.permutation⟩, ?_, ?_, rfl⟩
     · simp [hi, ho, ev, core.option.Option.expect]
     · have hd' : ¬ ((toSt c).inb ≠ [] ∨ (toSt c).outb = []) := hd

@@ -15,6 +15,7 @@ public import Plonky3Lean.Spec.Sha256
 public import Plonky3Lean.Spec.Sponge
 public import Plonky3Lean.Spec.ZkCodes
 public import Plonky3Lean.Spec.MerkleTree
+public import Plonky3Lean.Spec.Duplex
 
 @[expose] public section
 

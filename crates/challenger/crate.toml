@@ -16,3 +16,53 @@ features = []
 start_from = ["p3_challenger::hax_roots"]
 
 watch = ["challenger/src", "challenger/Cargo.toml", "field/src/field.rs", "field/src/helpers.rs"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_challenger.duplex_challenger.mirror.sample"
+rust = "{impl p3_challenger::CanSample<EF> for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::sample"
+
+[[mirror]]
+lean = "p3_challenger.duplex_challenger.mirror.sample_bits"
+rust = "{impl p3_challenger::CanSampleBits<usize> for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::sample_bits"
+
+[[mirror]]
+lean = "p3_challenger.mirror.squeezeLoop"
+rust = "p3_field::helpers::squeeze_field_order_num_limbs"
+
+[[mirror]]
+lean = "p3_challenger.mirror.squeeze_field_order_num_limbs"
+rust = "p3_field::helpers::squeeze_field_order_num_limbs"
+
+[[mirror]]
+lean = "p3_challenger.mirror.maxPackedLoop"
+rust = "p3_field::helpers::max_packed_injective_limbs_with_max_digit"
+
+[[mirror]]
+lean = "p3_challenger.mirror.absorb_radix_bits"
+rust = "p3_field::helpers::absorb_radix_bits"
+
+[[mirror]]
+lean = "p3_challenger.mirror.max_absorb_injective_limbs"
+rust = "p3_field::helpers::max_absorb_injective_limbs"
+
+[[mirror]]
+lean = "p3_challenger.mirror.MultiField32Challenger.new"
+rust = "p3_challenger::multi_field_challenger::MultiField32Challenger::new"
+
+[[mirror]]
+lean = "p3_challenger.mirror.split_pf_to_field_order_limbs"
+rust = "p3_field::helpers::split_pf_to_field_order_limbs"
+
+[[mirror]]
+lean = "p3_challenger.mirror.refill"
+rust = "p3_challenger::multi_field_challenger::MultiField32Challenger::refill_f_squeeze_from_inner"
+
+[[mirror]]
+lean = "p3_challenger.mirror.sampleFromQueue"
+rust = "{impl p3_challenger::CanSample<EF> for p3_challenger::multi_field_challenger::MultiField32Challenger<F, PF, P, WIDTH, RATE>}::sample"
+
+[[mirror]]
+lean = "p3_challenger.mirror.grindState"
+rust = "{impl p3_challenger::grinding_challenger::GrindingChallenger for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::grind"
