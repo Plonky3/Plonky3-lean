@@ -115,3 +115,18 @@ rust = "p3_field::coset::TwoAdicMultiplicativeCoset::element"
 [[mirror]]
 lean = "p3_field.coset.mirror.TwoAdicMultiplicativeCoset.iter"
 rust = "p3_field::coset::TwoAdicMultiplicativeCoset::iter"
+
+# The AVX2 helpers BabyBear's AVX2 path calls, extracted for x86_64 with AVX2
+# against the intrinsic models (pre-patch monty-31/020). The crate itself stays a
+# stub; this variant extracts only these functions, which name no trait.
+[[variant]]
+name = "x86_64-avx2"
+target = "x86_64-unknown-linux-gnu"
+target_features = ["avx2"]
+lean_lib = "P3FieldAvx2"
+# The stub's namespace: the monty-31 variant refers to these by their absolute names.
+namespace = "p3_field"
+start_from = [
+  "p3_field::packed::x86_64_avx::mm256_mod_add",
+  "p3_field::packed::x86_64_avx::mm256_mod_sub",
+]

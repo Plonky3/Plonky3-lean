@@ -136,3 +136,27 @@ rust = "{impl p3_field::field::Field for p3_monty_31::monty_31::MontyField31<_>}
 
 
 
+
+# `PackedMontyField31AVX2`'s arithmetic, extracted for x86_64 with AVX2 against
+# the intrinsic models (pre-patch 020). The scalar modules are opaque: the
+# variant takes `MontyField31` and its functions from P3Monty31, by the
+# bindings in variants/x86_64-avx2/extraction/P3Monty31Avx2/Assumptions/.
+# Its own namespace, since the run re-declares the parameter traits, and on
+# x86_64 `PackedMontyParameters` has the supertrait `MontyParametersAVX2`.
+[[variant]]
+name = "x86_64-avx2"
+target = "x86_64-unknown-linux-gnu"
+target_features = ["avx2"]
+lean_lib = "P3Monty31Avx2"
+namespace = "p3_monty_31_avx2"
+start_from = [
+  "{impl core::ops::arith::Add for p3_monty_31::x86_64_avx2::packing::PackedMontyField31AVX2<_>}::add",
+  "{impl core::ops::arith::Sub for p3_monty_31::x86_64_avx2::packing::PackedMontyField31AVX2<_>}::sub",
+  "{impl core::ops::arith::Neg for p3_monty_31::x86_64_avx2::packing::PackedMontyField31AVX2<_>}::neg",
+  "{impl core::ops::arith::Mul for p3_monty_31::x86_64_avx2::packing::PackedMontyField31AVX2<_>}::mul",
+  "p3_monty_31::x86_64_avx2::utils::halve_avx2",
+]
+opaque = [
+  "p3_monty_31::monty_31",
+  "p3_monty_31::utils",
+]
