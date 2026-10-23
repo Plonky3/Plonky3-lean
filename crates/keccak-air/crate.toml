@@ -171,3 +171,15 @@ rust = "p3_keccak_air::binary::generation::generate_perm_rows"
 [[mirror]]
 lean = "p3_keccak_air.mirror.binary.generate_binary_trace_rows"
 rust = "p3_keccak_air::binary::generation::generate_binary_trace_rows"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.num_constraints"
+rust = "{impl p3_air::air::BaseAir<F> for p3_keccak_air::binary::air::KeccakBinaryAir}::num_constraints"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.NUM_FLAG_CONSTRAINTS"
+rust = "p3_keccak_air::binary::air::NUM_FLAG_CONSTRAINTS"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.NUM_STATE_BITS"
+rust = "p3_keccak_air::binary::air::NUM_STATE_BITS"

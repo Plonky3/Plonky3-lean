@@ -94,6 +94,17 @@ def eval (constrain_booleanity : Bool) {S : Type} (B : AirBuilder F E S) (s : S)
         B.add round_map rc_bit
       else round_map)) s) s
 
+/-- The number of state bits in a row. -/
+def NUM_STATE_BITS : ℕ := 1600
+
+/-- The round-flag constraints: 25 on the first row, 23 round steps, the wrap, and exclusivity. -/
+def NUM_FLAG_CONSTRAINTS : ℕ := KECCAK_BINARY_ROWS_PER_PERM + (NUM_ROUNDS - 1) + 2
+
+/-- The number of constraints the AIR reports: the flags, the booleanity if stated, and the round map. -/
+def num_constraints (constrain_booleanity : Bool) : Option ℕ :=
+  let booleanity := if constrain_booleanity then NUM_STATE_BITS else 0
+  some (NUM_FLAG_CONSTRAINTS + booleanity + NUM_STATE_BITS)
+
 /-! ## The round on words -/
 
 /-- A state of 25 words, indexed by lane 5 y + x. -/

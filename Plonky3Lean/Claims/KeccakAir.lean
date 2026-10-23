@@ -251,6 +251,13 @@ theorem binary.degree_gf2 (cb : Bool) :
       e.degree_multiple ≤ 3 ∧ transitionCount e ≤ 1 :=
   binary_constraints_bounded (top_binary_gf2 cb)
 
+/-- Over GF(2), the AIR asserts exactly the number of constraints it reports, with or without the booleanity. -/
+theorem binary.num_constraints_gf2 (cb : Bool) :
+    some ((binaryAir (F := ZMod 2) cb).eval
+        (symbolicBuilder (AirLayout.from_air (binaryAir (F := ZMod 2) cb))) []).length =
+      p3_keccak_air.mirror.binary.num_constraints cb :=
+  count_binary_gf2 cb
+
 end binary
 
 end Plonky3Lean.Claims.KeccakAir
