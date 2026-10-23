@@ -205,3 +205,25 @@ keeps its number and says so.
     CoreModels declares it over `T` only, so the call does not elaborate.
 
     Post-patch `symmetric/020` drops the allocator.
+
+30. **aeneas stops on the signatures of the iterator adapters it reaches.**
+
+    The internal error points at the declaration of `core::iter::Iterator`.
+
+    It shows up as soon as a translated body calls an adapter such as `filter`, `any`, `max`, `flatten` or the `itertools` ones.
+
+    p3-merkle-tree's verifier sorts and walks the matrices with `sorted_by_key`, `peekable` and `peeking_take_while`.
+
+    Pre-patch `merkle-tree/010` gives the single-index and the hiding verifiers bodies with indexed loops.
+
+    The provided body of `CryptographicHasher::hash_iter_slices` flattens its slices.
+
+    `crates/symmetric/crate.toml` makes that body opaque, and no claim reads it.
+
+31. **aeneas rejects a loop that pushes shared slices into a vector.**
+
+    The error is "Found an already registered mapping", at the loop.
+
+    A vector of row slices, built one matrix at a time, is how a verifier would hand rows of several matrices to one hash.
+
+    Pre-patch `merkle-tree/010` hands them over through a small iterator over a range of positions instead.

@@ -28,3 +28,14 @@ set_option maxHeartbeats 1000000
 set_option maxRecDepth 2048
 open p3_symmetric
 
+/-- [p3_symmetric::hasher::CryptographicHasher::hash_iter_slices]:
+    Source: 'symmetric/src/hasher.rs', lines 32:4-38:5
+    Visibility: public -/
+@[trait_default]
+axiom hasher.CryptographicHasher.hash_iter_slices.default
+  {Self : Type _} {Item : Type _} {Out : Type _} {I : Type _} {Clause1_IntoIter
+  : Type _} (CryptographicHasherInst : hasher.CryptographicHasher Self Item
+  Out) (coreitertraitscollectIntoIteratorISharedASliceClause1_IntoIterInst :
+  core.iter.traits.collect.IntoIterator I (Slice Item) Clause1_IntoIter) :
+  Self → I → RustM Out
+

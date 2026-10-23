@@ -25,6 +25,15 @@ set_option maxRecDepth 2048
 
 namespace p3_symmetric
 
+/-- Trait declaration: [p3_symmetric::compression::PseudoCompressionFunction]
+    Source: 'symmetric/src/compression.rs', lines 9:0-51:1
+    Visibility: public -/
+structure compression.PseudoCompressionFunction (Self : Type _) (T : Type _) (N
+  : Std.Usize) where
+  LANES : RustM Std.Usize
+  corecloneCloneInst : core.clone.Clone Self
+  compress : Self → Array T N → RustM T
+
 /-- [p3_symmetric::compression::TruncatedPermutation]
     Source: 'symmetric/src/compression.rs', lines 57:0-59:1
     Visibility: public -/
@@ -68,6 +77,10 @@ structure hasher.CryptographicHasher (Self : Type _) (Item : Type _) (Out :
     (coreitertraitscollectIntoIteratorInst :
     core.iter.traits.collect.IntoIterator I Item Clause0_IntoIter), Self → I
     → RustM Out
+  hash_iter_slices : forall {I : Type} {Clause0_IntoIter : Type}
+    (coreitertraitscollectIntoIteratorPSharedSlicePInst :
+    core.iter.traits.collect.IntoIterator I (Slice Item) Clause0_IntoIter),
+    Self → I → RustM Out
 
 /-- [p3_symmetric::hash::Hash]
     Source: 'symmetric/src/hash.rs', lines 15:0-18:1

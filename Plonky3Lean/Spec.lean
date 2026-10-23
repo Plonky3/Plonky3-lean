@@ -12,6 +12,7 @@ public import Plonky3Lean.Spec.Monty31
 public import Plonky3Lean.Spec.Sha256
 public import Plonky3Lean.Spec.Sponge
 public import Plonky3Lean.Spec.ZkCodes
+public import Plonky3Lean.Spec.MerkleTree
 
 @[expose] public section
 

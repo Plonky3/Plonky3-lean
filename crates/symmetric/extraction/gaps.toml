@@ -7,10 +7,6 @@ errors = 0
 error_sites = []
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_symmetric::compression::PseudoCompressionFunction::LANES"
-source = ""
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_symmetric::compression::{impl core::clone::Clone}::clone"
 source = ""
 

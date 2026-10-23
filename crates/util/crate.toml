@@ -23,6 +23,8 @@ start_from = [
   # p3-matrix's bit-reversed view.
   "p3_util::reverse_bits_len",
   "p3_util::log2_strict_usize",
+  # p3-merkle-tree's height ladder.
+  "p3_util::log2_ceil_usize",
 ]
 
 watch = ["util/src", "util/Cargo.toml"]
