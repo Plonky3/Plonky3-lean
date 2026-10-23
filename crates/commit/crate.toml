@@ -13,7 +13,7 @@ state = "stub"
 
 features = []
 
-watch = ["commit/src", "commit/Cargo.toml", "field/src/coset.rs", "matrix/src/interpolation.rs", "util/src/lib.rs"]
+watch = ["commit/src", "commit/Cargo.toml", "field/src/coset.rs", "field/src/field.rs", "matrix/src/interpolation.rs", "util/src/lib.rs"]
 
 # The transcriptions. Hashes are pending tools/mirror.
 
@@ -132,3 +132,123 @@ rust = "{impl p3_commit::periodic::PeriodicEvaluator<F, D> for ()}::eval_at_poin
 [[mirror]]
 lean = "p3_commit.periodic.mirror.build_periodic_lde_table"
 rust = "p3_commit::pcs::univariate::UnivariateStarkPcs::build_periodic_lde_table"
+
+[[mirror]]
+lean = "p3_commit.pcs.univariate.mirror.PointOpening"
+rust = "p3_commit::pcs::univariate::PointOpening"
+
+[[mirror]]
+lean = "p3_commit.pcs.univariate.mirror.MatrixOpening"
+rust = "p3_commit::pcs::univariate::MatrixOpening"
+
+[[mirror]]
+lean = "p3_commit.pcs.univariate.mirror.CommitmentOpening"
+rust = "p3_commit::pcs::univariate::CommitmentOpening"
+
+[[mirror]]
+lean = "p3_commit.pcs.univariate.mirror.commit_preprocessing"
+rust = "p3_commit::pcs::univariate::UnivariateStarkPcs::commit_preprocessing"
+
+[[mirror]]
+lean = "p3_commit.pcs.univariate.mirror.commit_quotient"
+rust = "p3_commit::pcs::univariate::UnivariateStarkPcs::commit_quotient"
+
+[[mirror]]
+lean = "p3_commit.pcs.univariate.mirror.get_evaluations_on_domain_no_random"
+rust = "p3_commit::pcs::univariate::UnivariateStarkPcs::get_evaluations_on_domain_no_random"
+
+[[mirror]]
+lean = "p3_commit.pcs.univariate.mirror.open_with_preprocessing"
+rust = "p3_commit::pcs::univariate::UnivariateStarkPcs::open_with_preprocessing"
+
+[[mirror]]
+lean = "p3_commit.pcs.univariate.mirror.verify_with_preprocessing"
+rust = "p3_commit::pcs::univariate::UnivariateStarkPcs::verify_with_preprocessing"
+
+[[mirror]]
+lean = "p3_commit.pcs.univariate.mirror.get_opt_randomization_poly_commitment"
+rust = "p3_commit::pcs::univariate::UnivariateStarkPcs::get_opt_randomization_poly_commitment"
+
+[[mirror]]
+lean = "p3_commit.testing.mirror.TrivialPcs"
+rust = "p3_commit::testing::TrivialPcs"
+
+[[mirror]]
+lean = "p3_commit.testing.mirror.eval_coeffs_at_pt"
+rust = "p3_commit::testing::eval_coeffs_at_pt"
+
+[[mirror]]
+lean = "p3_commit.testing.mirror.natural_domain_for_degree"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_commit::testing::TrivialPcs<Val, Dft>}::natural_domain_for_degree"
+
+[[mirror]]
+lean = "p3_commit.testing.mirror.TrivialPcs.commit"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_commit::testing::TrivialPcs<Val, Dft>}::commit"
+
+[[mirror]]
+lean = "p3_commit.testing.mirror.TrivialPcs.open"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_commit::testing::TrivialPcs<Val, Dft>}::open"
+
+[[mirror]]
+lean = "p3_commit.testing.mirror.TrivialPcs.verify"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_commit::testing::TrivialPcs<Val, Dft>}::verify"
+
+[[mirror]]
+lean = "p3_commit.testing.mirror.TrivialPcs.get_evaluations_on_domain"
+rust = "{impl p3_commit::pcs::univariate::UnivariateStarkPcs<Challenge, Challenger> for p3_commit::testing::TrivialPcs<Val, Dft>}::get_evaluations_on_domain"
+
+[[mirror]]
+lean = "p3_commit.mmcs.mirror.commit_matrix"
+rust = "p3_commit::mmcs::Mmcs::commit_matrix"
+
+[[mirror]]
+lean = "p3_commit.mmcs.mirror.commit_vec"
+rust = "p3_commit::mmcs::Mmcs::commit_vec"
+
+[[mirror]]
+lean = "p3_commit.mmcs.mirror.get_matrix_heights"
+rust = "p3_commit::mmcs::Mmcs::get_matrix_heights"
+
+[[mirror]]
+lean = "p3_commit.mmcs.mirror.get_max_height"
+rust = "p3_commit::mmcs::Mmcs::get_max_height"
+
+[[mirror]]
+lean = "p3_commit.adapters.extension_mmcs.mirror.commit"
+rust = "{impl p3_commit::mmcs::Mmcs<EF> for p3_commit::adapters::extension_mmcs::ExtensionMmcs<F, EF, InnerMmcs>}::commit"
+
+[[mirror]]
+lean = "p3_commit.adapters.extension_mmcs.mirror.open_batch"
+rust = "{impl p3_commit::mmcs::Mmcs<EF> for p3_commit::adapters::extension_mmcs::ExtensionMmcs<F, EF, InnerMmcs>}::open_batch"
+
+[[mirror]]
+lean = "p3_commit.adapters.extension_mmcs.mirror.get_matrices"
+rust = "{impl p3_commit::mmcs::Mmcs<EF> for p3_commit::adapters::extension_mmcs::ExtensionMmcs<F, EF, InnerMmcs>}::get_matrices"
+
+[[mirror]]
+lean = "p3_commit.adapters.extension_mmcs.mirror.verify_batch"
+rust = "{impl p3_commit::mmcs::Mmcs<EF> for p3_commit::adapters::extension_mmcs::ExtensionMmcs<F, EF, InnerMmcs>}::verify_batch"
+
+[[mirror]]
+lean = "p3_commit.adapters.extension_mmcs.mirror.flatten_to_base"
+rust = "p3_field::field::BasedVectorSpace::flatten_to_base"
+
+[[mirror]]
+lean = "p3_commit.adapters.extension_mmcs.mirror.reconstitute_from_base"
+rust = "p3_field::field::BasedVectorSpace::reconstitute_from_base"
+
+[[mirror]]
+lean = "p3_commit.encoder.mirror.zero_padded"
+rust = "p3_commit::encoder::zero_padded"
+
+[[mirror]]
+lean = "p3_commit.encoder.mirror.encode_batch"
+rust = "{impl p3_commit::encoder::Encoder<F> for D}::encode_batch"
+
+[[mirror]]
+lean = "p3_commit.encoder.mirror.encode_batch_padded"
+rust = "p3_commit::encoder::Encoder::encode_batch_padded"
+
+[[mirror]]
+lean = "p3_commit.encoder.mirror.encode_batch_borrowed"
+rust = "p3_commit::encoder::Encoder::encode_batch_borrowed"

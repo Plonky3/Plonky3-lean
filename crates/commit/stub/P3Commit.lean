@@ -11,5 +11,8 @@ public import P3Commit.Types
 public import P3Commit.Domain
 public import P3Commit.Periodic
 public import P3Commit.Testing
+public import P3Commit.Pcs
+public import P3Commit.Mmcs
+public import P3Commit.Encoder
 
 @[expose] public section
