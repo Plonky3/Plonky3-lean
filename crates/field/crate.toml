@@ -37,3 +37,57 @@ rust = "p3_field::field::UniformSamplingField"
 [[mirror]]
 lean = "p3_field.helpers.halve_u32"
 rust = "p3_field::helpers::halve_u32"
+
+# The two-adic coset, in stub/P3Field/Coset.lean.
+
+[[mirror]]
+lean = "p3_field.coset.mirror.TwoAdicMultiplicativeCoset"
+rust = "p3_field::coset::TwoAdicMultiplicativeCoset"
+
+[[mirror]]
+lean = "p3_field.coset.mirror.TwoAdicMultiplicativeCoset.new"
+rust = "p3_field::coset::TwoAdicMultiplicativeCoset::new"
+
+[[mirror]]
+lean = "p3_field.coset.mirror.TwoAdicMultiplicativeCoset.subgroup_generator"
+rust = "p3_field::coset::TwoAdicMultiplicativeCoset::subgroup_generator"
+
+[[mirror]]
+lean = "p3_field.coset.mirror.TwoAdicMultiplicativeCoset.shift_inverse"
+rust = "p3_field::coset::TwoAdicMultiplicativeCoset::shift_inverse"
+
+[[mirror]]
+lean = "p3_field.coset.mirror.TwoAdicMultiplicativeCoset.size"
+rust = "p3_field::coset::TwoAdicMultiplicativeCoset::size"
+
+[[mirror]]
+lean = "p3_field.coset.mirror.TwoAdicMultiplicativeCoset.shrink_coset"
+rust = "p3_field::coset::TwoAdicMultiplicativeCoset::shrink_coset"
+
+[[mirror]]
+lean = "p3_field.coset.mirror.TwoAdicMultiplicativeCoset.exp_power_of_2"
+rust = "p3_field::coset::TwoAdicMultiplicativeCoset::exp_power_of_2"
+
+[[mirror]]
+lean = "p3_field.coset.mirror.TwoAdicMultiplicativeCoset.set_shift"
+rust = "p3_field::coset::TwoAdicMultiplicativeCoset::set_shift"
+
+[[mirror]]
+lean = "p3_field.coset.mirror.TwoAdicMultiplicativeCoset.shift_by"
+rust = "p3_field::coset::TwoAdicMultiplicativeCoset::shift_by"
+
+[[mirror]]
+lean = "p3_field.coset.mirror.TwoAdicMultiplicativeCoset.contains"
+rust = "p3_field::coset::TwoAdicMultiplicativeCoset::contains"
+
+[[mirror]]
+lean = "p3_field.coset.mirror.TwoAdicMultiplicativeCoset.generator_exp"
+rust = "p3_field::coset::TwoAdicMultiplicativeCoset::generator_exp"
+
+[[mirror]]
+lean = "p3_field.coset.mirror.TwoAdicMultiplicativeCoset.element"
+rust = "p3_field::coset::TwoAdicMultiplicativeCoset::element"
+
+[[mirror]]
+lean = "p3_field.coset.mirror.TwoAdicMultiplicativeCoset.iter"
+rust = "p3_field::coset::TwoAdicMultiplicativeCoset::iter"
