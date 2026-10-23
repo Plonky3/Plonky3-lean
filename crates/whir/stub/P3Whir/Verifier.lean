@@ -25,6 +25,7 @@ structure RoundConfig where
   folding_factor : ℕ
   domain_size : ℕ
   log_folded_domain_size : ℕ
+  deriving Inhabited
 
 /-- The fields of WhirConfig the verifier reads. -/
 structure WhirConfig where
@@ -50,6 +51,7 @@ structure QuerySite where
   index_bits : ℕ
   draws : ℕ
   depths : List ℕ
+  deriving Inhabited
 
 /-- The query site of a round: the folded domain, its draws and their width, which asserts the folded size is a power of two. -/
 def querySite (domain_size folding num_queries pow_bits : ℕ) : Option QuerySite :=
