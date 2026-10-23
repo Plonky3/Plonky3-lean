@@ -505,6 +505,146 @@ name   = "Plonky3Lean.Claims.P3BabyBear.p3_monty_31.utils.sub.spec"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.bytes_to_field.bias"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.bytes_to_field.budget"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.duplex_challenger.DuplexChallenger.duplexing.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.duplex_challenger.DuplexChallenger.finalize.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.duplex_challenger.DuplexChallenger.new.eq"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.duplex_challenger.DuplexChallenger.observe.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.duplex_challenger.DuplexChallenger.sample.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.grinding.DuplexChallenger.grind.accepts_iff_check"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.grinding.accept_count"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.grinding.check_witness.zero"
+axioms = ["propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.grinding.no_fixed_low_bit"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.hash_challenger.HashChallenger.flush.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.hash_challenger.HashChallenger.observe.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.hash_challenger.HashChallenger.sample_after_observe.fresh"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.multi_field.new_accepts_babybear_in_koalabear"
+axioms = ["propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.multi_field.packing_injective"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.multi_field.sample_panics_without_limbs"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.multi_field.squeeze_limbs_31"
+axioms = []
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.multi_field.squeeze_limbs_goldilocks"
+axioms = []
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.pad.collision_of_charP"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.pad.injective"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.pad.lengths_distinct"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.sample_after_observe.fresh"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.sample_bits.bias"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.sample_bits.count"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.sample_uniform_bits.rejected"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.sample_uniform_bits.uniform"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.serializing.mask_uniform"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.transcript.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.uniform_sampling.halves_fit"
+axioms = ["propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.uniform_sampling.m_babybear"
+axioms = ["propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.uniform_sampling.m_goldilocks"
+axioms = ["propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.uniform_sampling.m_koalabear"
+axioms = ["propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.uniform_sampling.m_mersenne31"
+axioms = ["propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3Challenger.uniform_sampling.rejected_at_max"
+axioms = ["propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.Util.gcd_inversion_prime_field_32.cong"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
