@@ -53,6 +53,16 @@ theorem CLOSING_MARK_eq : p3_keccak.CLOSING_MARK = .ok (0x8000000000000000#u64) 
     bind_ok, usz_mul (by decide) (by decide) (by decide), bind_ok, u64_shl_usz _ _ (by decide)]
   rfl
 
+/-- A loop over the range `0..1`: one step, then the exit. -/
+theorem loop_once {S : Type}
+    (body : CoreModels.core.ops.range.Range Std.Usize × S →
+      RustM (ControlFlow (CoreModels.core.ops.range.Range Std.Usize × S) S)) (x y : S)
+    (h0 : body ({ start := usz 0, «end» := usz 1 }, x) = .ok (.cont ({ start := usz 1, «end» := usz 1 }, y)))
+    (h1 : body ({ start := usz 1, «end» := usz 1 }, y) = .ok (.done y)) :
+    loop body ({ start := usz 0, «end» := usz 1 }, x) = .ok y :=
+  loop_of_steps body (fun k => ({ start := usz k, «end» := usz 1 }, if k = 0 then x else y)) 1 y
+    (fun k hk => by obtain rfl : k = 0 := (by omega); simpa using h0) (by simpa using h1)
+
 /-! ## One state word -/
 
 theorem single_val (x : Std.U64) : (single x).val = [x] := by simp [single]
@@ -95,11 +105,8 @@ theorem xor_state_word_eq (st : Std.Array (Std.Array Std.U64 1#usize) 25#usize) 
   have hv := v.property
   unfold p3_keccak.hax_reshaped.xor_state_word p3_keccak.hax_reshaped.xor_state_word_loop
   rw [VECTOR_LEN_eq, show (0#usize : Std.Usize) = usz 0 from ofNatCore_eq_usz _ _ (by decide)]
-  refine loop_of_steps _ (fun k => (({ start := usz k, «end» := usz 1 } : CoreModels.core.ops.range.Range Std.Usize),
-    if k = 0 then st else pack (xorAt (unpack st) w (v.val.getD 0 0#u64)))) 1 _ ?_ ?_
-  · intro k hk
-    obtain rfl : k = 0 := by omega
-    show p3_keccak.hax_reshaped.xor_state_word_loop.body (usz w) v { start := usz 0, «end» := usz 1 } st = _
+  refine loop_once _ st _ ?_ ?_
+  · show p3_keccak.hax_reshaped.xor_state_word_loop.body (usz w) v { start := usz 0, «end» := usz 1 } st = _
     unfold p3_keccak.hax_reshaped.xor_state_word_loop.body
     rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
       range_step 0 _ (by rw [usz_val (by decide)]; decide), bind_ok]
@@ -115,7 +122,6 @@ theorem xor_state_word_eq (st : Std.Array (Std.Array Std.U64 1#usize) 25#usize) 
     simp only [bind_tc_ok, bind_ok, Aeneas.Std.uncurry_apply_pair]
     rw [update_eq _ _ _ (by rw [h0, (st.val[(usz w).val]'hlt).property]; decide), bind_ok]
     congr 3
-    simp only [Nat.add_eq_zero_iff, one_ne_zero, and_false, ite_false]
     rw [set_single _ _ h0]
     apply Std.Array.ext
     rw [Std.Array.set_val_eq]
@@ -222,12 +228,8 @@ theorem gather_word_eq (input : Slice Std.U8) (starts : Std.Array Std.Usize 1#us
   unfold p3_keccak.hax_reshaped.gather_word p3_keccak.hax_reshaped.gather_word_loop
   rw [repeat_u64 _ (by decide), bind_ok, VECTOR_LEN_eq,
     show (0#usize : Std.Usize) = usz 0 from ofNatCore_eq_usz _ _ (by decide)]
-  refine loop_of_steps _ (fun k => (({ start := usz k, «end» := usz 1 } : CoreModels.core.ops.range.Range Std.Usize),
-    if k = 0 then Std.Array.from (List.replicate (1#usize : Std.Usize).val 0#u64) (by simp)
-    else single (Aeneas.Std.core.num.U64.from_le_bytes (bytes8 input (s + o))))) 1 _ ?_ ?_
-  · intro k hk
-    obtain rfl : k = 0 := by omega
-    show p3_keccak.hax_reshaped.gather_word_loop.body input starts (usz o) { start := usz 0, «end» := usz 1 } _ = _
+  refine loop_once _ _ _ ?_ ?_
+  · show p3_keccak.hax_reshaped.gather_word_loop.body input starts (usz o) { start := usz 0, «end» := usz 1 } _ = _
     unfold p3_keccak.hax_reshaped.gather_word_loop.body
     rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
       range_step 0 _ (by rw [usz_val (by decide)]; decide), bind_ok]
@@ -237,7 +239,6 @@ theorem gather_word_eq (input : Slice Std.U8) (starts : Std.Array Std.Usize 1#us
     have hN : (Slice.len input).val = input.val.length := by simp
     have hsv0 : starts.val[(usz 0).val]'(by rw [h0, hst]; decide) = usz s := by simp [hs, h0]
     rw [hsv0, usz_add_le (Slice.len input) (by rw [hN]; omega), bind_ok, read_word _ _ hp]
-    simp only [ite_true, Nat.add_eq_zero_iff, one_ne_zero, and_false, ite_false]
     rw [update_eq _ _ _ (by simp [h0]), bind_ok]
     congr 3
   · show p3_keccak.hax_reshaped.gather_word_loop.body input starts (usz o) { start := usz 1, «end» := usz 1 } _ = _
@@ -400,13 +401,8 @@ theorem value_loop (input : Slice Std.U8) (starts : Std.Array Std.Usize 1#usize)
       .ok (single (Aeneas.Std.core.num.U64.from_le_bytes
         (tailBytes input (s + o + 8 * w) t) ^^^ marks)) := by
   unfold p3_keccak.hax_reshaped.absorb_final_block_loop0
-  refine loop_of_steps _ (fun k => (({ start := usz k, «end» := usz 1 } : CoreModels.core.ops.range.Range Std.Usize),
-    if k = 0 then Std.Array.from (List.replicate (1#usize : Std.Usize).val 0#u64) (by simp)
-    else single (Aeneas.Std.core.num.U64.from_le_bytes
-      (tailBytes input (s + o + 8 * w) t) ^^^ marks))) 1 _ ?_ ?_
-  · intro k hk
-    obtain rfl : k = 0 := by omega
-    show p3_keccak.hax_reshaped.absorb_final_block_loop0.body input starts (usz o) (usz w) (usz t) marks
+  refine loop_once _ _ _ ?_ ?_
+  · show p3_keccak.hax_reshaped.absorb_final_block_loop0.body input starts (usz o) (usz w) (usz t) marks
       { start := usz 0, «end» := usz 1 } _ = _
     unfold p3_keccak.hax_reshaped.absorb_final_block_loop0.body
     rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
@@ -415,7 +411,7 @@ theorem value_loop (input : Slice Std.U8) (starts : Std.Array Std.Usize 1#usize)
     rw [repeat_u8 _ (by decide), bind_ok, ← tailBytes_zero input (s + o + 8 * w),
       show (0#usize : Std.Usize) = usz 0 from ofNatCore_eq_usz _ _ (by decide), tail_loop input starts s hs o w t ht hp, bind_ok]
     simp only [CoreModels.core.num.U64.from_le_bytes, CoreModels.rust_primitives.arithmetic.from_le_bytes_u64,
-      bind_ok, lift_eq, ite_true, Nat.add_eq_zero_iff, one_ne_zero, and_false, ite_false]
+      bind_ok, lift_eq]
     rw [update_eq _ _ _ (by simp [usz_val (show 0 < 2 ^ 32 by decide)]), bind_ok]
     rfl
   · show p3_keccak.hax_reshaped.absorb_final_block_loop0.body input starts (usz o) (usz w) (usz t) marks
@@ -563,12 +559,8 @@ theorem starts_loop (len g : ℕ) (N : Std.Usize) (hN : g * len ≤ N.val) (hg :
         (usz 1) (Std.Array.from (List.replicate (1#usize : Std.Usize).val 0#usize) (by simp)) =
       .ok (Std.Array.from [usz (g * len)] rfl) := by
   unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop0
-  refine loop_of_steps _ (fun k => (({ start := usz k, «end» := usz 1 } : CoreModels.core.ops.range.Range Std.Usize),
-    if k = 0 then Std.Array.from (List.replicate (1#usize : Std.Usize).val 0#usize) (by simp)
-    else Std.Array.from [usz (g * len)] rfl)) 1 _ ?_ ?_
-  · intro k hk
-    obtain rfl : k = 0 := by omega
-    show p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop0.body (usz len) (usz g) (usz 1)
+  refine loop_once _ _ _ ?_ ?_
+  · show p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop0.body (usz len) (usz g) (usz 1)
       { start := usz 0, «end» := usz 1 } _ = _
     unfold p3_keccak.hax_reshaped.hash_many_with_domain_loop1_loop0.body
     rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next,
