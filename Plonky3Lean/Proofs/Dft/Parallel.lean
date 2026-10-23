@@ -385,4 +385,116 @@ theorem parallel_dft_batch (G : Gen K) (hG : GenValid G) {k : ℕ} (hk : k ≤ G
       rw [revRows_apply k x hp, bitRevVec]) k le_rfl i hi]
   exact ditNet_eq_dft (hG k hk) x hi
 
+/-! ## Scaling -/
+
+theorem layer_dit_smul (tw : ℕ → ℕ → K) (m nb : ℕ) (c : K) (x : ℕ → V) :
+    layer (fun b t => dit (tw b t)) m nb (scaleRows c x) = scaleRows c (layer (fun b t => dit (tw b t)) m nb x) := by
+  funext i
+  unfold layer scaleRows dit
+  by_cases h1 : i < nb * (2 * m) <;> by_cases h2 : i % (2 * m) < m <;>
+    simp [h1, h2, smul_add, smul_sub, smul_comm c]
+
+theorem ditNet_smul (ω : K) (k : ℕ) (c : K) (x : ℕ → V) :
+    ∀ L, ditNet ω k L (scaleRows c x) = scaleRows c (ditNet ω k L x) := by
+  intro L
+  induction L with
+  | zero => rfl
+  | succ L ih => simp only [ditNet, ditLayer, ih, layer_dit_smul]
+
+/-- The scaled butterfly is the plain one on scaled inputs. -/
+theorem layer_scaled (tw : ℕ → K) (m nb : ℕ) (c : K) (x : ℕ → V) {i : ℕ} (hi : i < nb * (2 * m)) :
+    layer (fun b _ => (p3_dft.butterflies.mirror.ScaledDitButterfly.new (tw b) c).apply) m nb x i =
+      layer (fun b _ => dit (tw b)) m nb (scaleRows c x) i := by
+  unfold layer scaleRows
+  simp only [hi, ↓reduceIte, p3_dft.butterflies.mirror.ScaledDitButterfly.apply,
+    p3_dft.butterflies.mirror.ScaledDitButterfly.new, dit, mul_smul]
+
+/-- With a scale s, the second half runs the bit-reversed layers mid to k - 1 on the scaled rows. -/
+theorem second_half_some (g : K) {k mid : ℕ} (hmid : mid ≤ k) (c : K) (z : ℕ → V) :
+    ∃ y, second_half (2 ^ k) mid (revIndex (2 ^ k / 2) (powersList g (2 ^ k / 2))) (some c) z = some y ∧
+      ∀ i < 2 ^ k, y i = (List.range (k - mid)).foldl (fun acc i => revL (Tdft g k) k (mid + i) acc)
+        (scaleRows c z) i := by
+  refine ⟨_, by simp only [second_half, log2Strict_pow, Option.bind_eq_bind, Option.bind_some]; rfl,
+    fun i hi => ?_⟩
+  rw [show 2 ^ k / 2 ^ (k - mid) = 2 ^ mid by rw [pow_div_pow' (by omega)]; congr 1; omega]
+  by_cases hlt : mid < k
+  · obtain ⟨n, hn⟩ : ∃ n, k - mid = n + 1 := ⟨k - mid - 1, by omega⟩
+    let Φ : ℕ → (ℕ → V) → ℕ → V := fun j =>
+      if j = 0 then fun x => revL (Tdft g k) k mid (scaleRows c x) else revL (Tdft g k) k (mid + j)
+    rw [foldl_congr_mem _ (g := fun acc t =>
+        ((List.range (k - mid)).map Φ).foldl (fun acc f => restrict (2 ^ (k - mid)) t f acc) acc)
+      (fun t ht acc => by
+        simp only [hlt, ↓reduceIte]
+        rw [foldl_flag _ (fun j acc => restrict (2 ^ (k - mid)) t (Φ j) acc) _
+          (fun j hj bw => funext fun acc => by
+            have hj' := List.mem_range.mp hj
+            by_cases hj0 : j = 0
+            · subst hj0
+              simp only [↓reduceIte, Φ, add_zero]
+              rw [second_half_step (le_refl mid) hlt (List.mem_range.mp ht)]
+              funext r
+              unfold restrict
+              split_ifs with hr
+              · have hrk : r < 2 ^ mid * (2 * 2 ^ (k - 1 - mid)) := by
+                  have := Nat.lt_mul_of_div_lt (show r / 2 ^ (k - mid) < 2 ^ mid by
+                    rw [hr]; exact List.mem_range.mp ht) (by positivity)
+                  rwa [show 2 ^ mid * (2 * 2 ^ (k - 1 - mid)) = 2 ^ mid * 2 ^ (k - mid) by
+                    rw [← pow_succ']; congr 2; omega]
+                rw [layer_scaled _ _ _ _ _ hrk]
+                exact congrFun (layer_op_congr (fun b hb _ _ => by
+                  rw [bitrev_table_layer g hlt hb]) _) r
+              · rfl
+            · simp only [hj0, ↓reduceIte, Φ]
+              rw [second_half_step_dit g (by omega) (by omega) (List.mem_range.mp ht)]), List.foldl_map])]
+    rw [chunked _ (fun f hf => by
+        obtain ⟨j, hj, rfl⟩ := List.mem_map.mp hf
+        have hj' := List.mem_range.mp hj
+        by_cases hj0 : j = 0
+        · subst hj0
+          simp only [↓reduceIte, Φ]
+          intro x x' r hr hx
+          exact revL_localTo _ (le_refl mid) hlt _ _ r hr (fun p hp => by simp [scaleRows, hx p hp])
+        · simp only [hj0, ↓reduceIte, Φ]
+          exact revL_localTo _ (by omega) (by omega)) z
+      (by rw [← pow_add, show mid + (k - mid) = k by omega]; exact hi), List.foldl_map]
+    rw [hn, List.range_succ_eq_map, List.foldl_cons, List.foldl_cons,
+      List.foldl_map, List.foldl_map]
+    simp [Φ]
+  · have hmk : mid = k := by omega
+    subst hmk
+    simp only [lt_irrefl, ↓reduceIte, Nat.sub_self, List.range_zero, List.foldl_nil]
+    have := chunked (S := 1) (C := 2 ^ mid) [scaleRows c] (fun f hf => by
+      simp at hf; subst hf
+      intro x x' r _ hx; simp [scaleRows, hx r rfl]) z (by simpa using hi)
+    simp only [List.foldl_cons, List.foldl_nil, pow_zero] at this ⊢
+    rw [← this]
+    rfl
+
+/-- The parallel backend's inverse computes the inverse transform. -/
+theorem parallel_idft_batch (G : Gen K) (hG : GenValid G) {k : ℕ} (hk : k ≤ G.adicity) (x : ℕ → V) :
+    Computes (Radix2DitParallel.idft_batch G (2 ^ k) x) (2 ^ k) (idft (G.gen k) (2 ^ k) x) := by
+  by_cases hk0 : k = 0
+  · subst hk0
+    refine ⟨x, by simp [Radix2DitParallel.idft_batch], fun i hi => ?_⟩
+    simp at hi; subst hi; simp [idft]
+  have hmid : (k + 1) / 2 ≤ k := by omega
+  have h1 : (2 : ℕ) ^ k ≠ 1 := by
+    intro h; exact hk0 ((Nat.pow_eq_one).mp h |>.resolve_left (by norm_num))
+  obtain ⟨y1, hy1, hy1'⟩ := first_half_spec (G.gen k)⁻¹ hmid (revRows k x)
+  obtain ⟨y2, hy2, hy2'⟩ := second_half_some (G.gen k)⁻¹ hmid ((2 : K) ^ k)⁻¹ (revRows k y1)
+  refine ⟨_, by simp only [Radix2DitParallel.idft_batch, h1, ↓reduceIte, log2Strict_pow,
+    get_or_compute_inverse_twiddles, gen_get_of_le G hk, Option.bind_eq_bind, Option.bind_some,
+    Option.map_some, hy1, hy2]; rfl, fun i hi => ?_⟩
+  rw [revRows_apply k _ hi, hy2' _ (Plonky3Lean.Proofs.Matrix.bitRev_lt k i),
+    second_half_finishes _ hmid (scaleRows ((2 : K) ^ k)⁻¹ (revRows k x)) _
+    (fun p hp => by
+      rw [scaleRows, revRows_apply k _ hp, hy1' _ (Plonky3Lean.Proofs.Matrix.bitRev_lt k p),
+        ditNet_smul]
+      rfl) hi, ditNet_smul, scaleRows,
+    ditNet_congr _ k (x' := bitRevVec (rev k) x) (fun p hp => by
+      rw [revRows_apply k x hp, bitRevVec]) k le_rfl i hi,
+    ditNet_eq_dft ((hG k hk).inv) x hi, idft, dft]
+  congr 1
+  push_cast; ring
+
 end Plonky3Lean.Proofs.Dft
