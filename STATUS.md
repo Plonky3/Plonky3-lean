@@ -22,6 +22,7 @@ target `thumbv7em-none-eabi`
 | `field` | stub |  | 91 | 2 | 6 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
 | `koala-bear` | extracted | 3024 | 121 | 4 | 0 | 0 | 0 / 3 |  |
+| `matrix` | scoped | 1625 | 259 | 0 | 12 | 0 | 3 / 3 | pre `020`, pre `030`, post `020`, post `030` |
 | `mds` | scoped | 101 | 43 | 0 | 0 | 0 | 0 / 0 |  |
 | `mersenne-31` | scoped | 1444 | 259 | 0 | 12 | 30 | 1 / 1 | pre `010` |
 | `monty-31` | scoped | 1581 | 327 | 0 | 13 | 29 | 1 / 1 | pre `010` |
@@ -30,7 +31,7 @@ target `thumbv7em-none-eabi`
 | `security` | scoped | 1414 | 130 | 6 | 13 | 0 | 2 / 1 | pre `010`, pre `020` |
 | `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
 | `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
-| `util` | scoped | 182 | 56 | 0 | 1 | 0 | 0 / 0 |  |
+| `util` | scoped | 207 | 70 | 0 | 1 | 0 | 0 / 0 |  |
 
 Generated lines are `extraction/<Lib>/Extraction/{Types,Funs}.lean`. Hand-written
 lines are every other `.lean` file of the crate. *Dropped by the extractor* counts
@@ -255,6 +256,11 @@ charon errors: 0.
 charon errors: 0.
 Nothing translated is dropped.
 
+### `matrix`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ### `mds`
 
 charon errors: 0.
@@ -364,7 +370,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 769) whose dependencies include it; reaching one is not using it.
+(of 808) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -397,7 +403,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 769) whose dependencies include the declaration.
+counts the claims (of 808) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -429,6 +435,18 @@ counts the claims (of 769) whose dependencies include the declaration.
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_unchecked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked` | dropped | 2 |
+| `matrix` | `p3_matrix.interpolation.mirror.compute_adjusted_weights` | `p3_matrix::interpolation::compute_adjusted_weights` | not translated | 2 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_coset_with_precomputation` | `p3_matrix::interpolation::Interpolate::interpolate_coset_with_precomputation` | not translated | 3 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_coset` | `p3_matrix::interpolation::Interpolate::interpolate_coset` | not translated | 2 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_subgroup` | `p3_matrix::interpolation::Interpolate::interpolate_subgroup` | not translated | 0 |
+| `matrix` | `p3_matrix.interpolation.mirror.barycentric_weights` | `p3_matrix::interpolation::barycentric_weights` | not translated | 2 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_with_precomputation` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_with_precomputation` | not translated | 1 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_point` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_point` | not translated | 1 |
+| `matrix` | `p3_matrix.interpolation.mirror.recover_coefficients` | `p3_matrix::interpolation::InterpolateArbitrary::recover_coefficients` | not translated | 2 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_lagrange` | `p3_matrix::interpolation::interpolate_lagrange` | not translated | 1 |
+| `matrix` | `p3_matrix.util.mirror.reverse_matrix_index_bits` | `p3_matrix::util::reverse_matrix_index_bits` | not translated | 1 |
+| `matrix` | `p3_matrix.extension.mirror.flat_row_subseq` | `{impl p3_matrix::Matrix<F> for p3_matrix::extension::FlatMatrixView<F, EF, Inner>}::row_subseq_unchecked` | not translated | 1 |
+| `matrix` | `p3_matrix.extension.mirror.flat_iter_take` | `{impl core::iter::traits::iterator::Iterator for p3_matrix::extension::FlatIter<F, I>}::next` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.mersenne_31.Mersenne31.Insts.CoreIterTraitsAccumSumMersenne31.sum` | `{impl core::iter::traits::accum::Sum for p3_mersenne_31::mersenne_31::Mersenne31}::sum` | dropped | 2 |
 | `mersenne-31` | `p3_mersenne_31.mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.sum_array` | `{impl p3_field::field::PrimeCharacteristicRing for p3_mersenne_31::mersenne_31::Mersenne31}::sum_array` | dropped | 0 |
 | `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS` | `p3_mersenne_31::complex::{impl}::CIRCLE_TWO_ADIC_GENERATORS` | dropped | 2 |
@@ -494,6 +512,10 @@ counts the claims (of 769) whose dependencies include the declaration.
 | `blake2s/pre/010-reshape-hash-many` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the scalar `hash_many` calls the reshaped body, which a differential test equates with the original. |
 | `blake3/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds one free function, which calls `Blake3::hash_many`. No existing body changes. |
 | `blake3/pre/020-reshape-batch` | none in a normal build: the reshaped driver is compiled only under cfg(hax_backend_lean), as the crate's `batch` module, and under cfg(test), beside the shipped one. The extracted variant hashes on the one-lane backend, which is what the extraction target compiles. |
+| `matrix/pre/020-cfg-hide-row-iterators` | none in a normal build: every change is behind cfg(hax_lean_matrix), which only p3-matrix's extraction sets. In the extracted variant, the matrix trait keeps only the shape, element access and strided view. |
+| `matrix/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. |
+| `matrix/post/020-trait-default-for-impl-def` | none: the attribute only lets `impl_def` unfold the definition. |
+| `matrix/post/030-exposed-saturating-sub` | `core.num.Usize.saturating_sub_exposed` in HaxExt.lean, a model of `usize::saturating_sub`, trusted as the rest of HaxExt is. |
 | `mersenne-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of `Mersenne31`. No existing body changes. |
 | `monty-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method or constant of `MontyField31`. No existing body changes. |
 | `security/pre/010-budget-folding-round` | None in a normal build, where the new function is compiled but unused. In the extracted variant, the report computes its folding term with it. Its body is the original match, verbatim. |
@@ -509,6 +531,45 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 
 | Claim | Axioms |
 |---|---|
+| `Matrix.barycentric_weights.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.bitRevRows_bitRevRows` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.bitRev_bitRev` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.bit_reversed_zero_pad.identity` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.bitrev.get` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.bitrev.get.unsound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.bitrev.new_view` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.bitrev.new_view.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.dense.get` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.dense.get_unchecked` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.dense.get_unchecked.out_of_bounds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.dense.height` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.dense.new` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.flat.index` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.flat.row_subseq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.hpair.get` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.hpair.get.unsound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.hpair.new` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.interpolate_arbitrary_point.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.interpolate_coset.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.interpolate_coset.unique` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.interpolate_coset_with_precomputation.at_zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.interpolate_lagrange.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.log2_strict_usize` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.log2_strict_usize.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.recover_coefficients.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.reverse_bits_len` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.reverse_matrix_index_bits.disjoint` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.reverse_matrix_index_bits.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.strided.get` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.strided.get.unsound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.strided.new_view` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.strided.new_view.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.truncated.get` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.truncated.new_with_range` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.vpair.get` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.vpair.get.unsound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.vpair.height.overflow` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.vpair.new` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.QuotientMap.from_canonical_checked_i128` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.QuotientMap.from_canonical_checked_i32` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.QuotientMap.from_canonical_checked_i64` | `Classical.choice`, `Quot.sound`, `propext` |
