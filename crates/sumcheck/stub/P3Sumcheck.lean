@@ -12,5 +12,6 @@ public import P3Sumcheck.Lagrange
 public import P3Sumcheck.Data
 public import P3Sumcheck.GenericDegree
 public import P3Sumcheck.Strategy
+public import P3Sumcheck.Constraints
 
 @[expose] public section

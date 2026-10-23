@@ -125,6 +125,10 @@ name = "P3Stir"
 srcDir = "crates/stir/stub"
 
 [[lean_lib]]
+name = "P3Whir"
+srcDir = "crates/whir/stub"
+
+[[lean_lib]]
 name = "P3BinaryField"
 srcDir = "crates/binary-field/extraction"
 
