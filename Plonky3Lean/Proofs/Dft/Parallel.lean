@@ -497,4 +497,151 @@ theorem parallel_idft_batch (G : Gen K) (hG : GenValid G) {k : ℕ} (hk : k ≤ 
   congr 1
   push_cast; ring
 
+/-! ## The coset transform -/
+
+/-- The twiddles of the coset network of size 2^k: layer l, offset s uses (c omega^s)^(2^(k-1-l)). -/
+abbrev Tcoset (c ω : K) (k : ℕ) : ℕ → ℕ → K := fun l s => (c * ω ^ s) ^ 2 ^ (k - 1 - l)
+
+/-- The coset tables of size 2^k for the root omega and the shift c. -/
+abbrev cosetTbl (ω c : K) (k : ℕ) : List (List K) := (List.range k).map fun t =>
+  let tw := shiftedPowersList (ω ^ 2 ^ t) (c ^ 2 ^ t) (2 ^ k / 2 ^ (t + 1))
+  if (k + 1) / 2 ≤ k - 1 - t then revIndex (2 ^ k / 2 ^ (t + 1)) tw else tw
+
+theorem coset_tables (G : Gen K) {k : ℕ} (hk : k ≤ G.adicity) (c : K) :
+    get_or_compute_coset_twiddles G k c = some (cosetTbl (G.gen k) c k) := by
+  simp [get_or_compute_coset_twiddles, gen_get_of_le G hk]
+
+/-- The first-half reading of a coset table: layer l < mid reads entry i as (c omega^i)^(2^(k-1-l)). -/
+theorem coset_table_first (ω c : K) {k l i : ℕ} (hl : l < (k + 1) / 2) (hk : l < k) (hi : i < 2 ^ l) :
+    (((List.range k).map fun t =>
+      let tw := shiftedPowersList (ω ^ 2 ^ t) (c ^ 2 ^ t) (2 ^ k / 2 ^ (t + 1))
+      if (k + 1) / 2 ≤ k - 1 - t then revIndex (2 ^ k / 2 ^ (t + 1)) tw else tw).getD (k - 1 - l) []).getD i 0 =
+      Tcoset c ω k l i := by
+  have hlen : 2 ^ k / 2 ^ (k - 1 - l + 1) = 2 ^ l := by rw [pow_div_pow' (by omega)]; congr 1; omega
+  rw [List.getD_eq_getElem (d := ([] : List K)) _ (by simp; omega), List.getElem_map, List.getElem_range]
+  simp only [show ¬ ((k + 1) / 2 ≤ k - 1 - (k - 1 - l)) by omega, ↓reduceIte, hlen]
+  rw [getD_shiftedPowersList _ _ hi, Tcoset, mul_pow, ← pow_mul, ← pow_mul, mul_comm (2 ^ (k - 1 - l)) i]
+
+/-- The second-half reading of a coset table: layer l >= mid reads block b as (c omega^(rev_l(b)))^(2^(k-1-l)). -/
+theorem coset_table_second (ω c : K) {k l b : ℕ} (hl : (k + 1) / 2 ≤ l) (hk : l < k) (hb : b < 2 ^ l) :
+    (((List.range k).map fun t =>
+      let tw := shiftedPowersList (ω ^ 2 ^ t) (c ^ 2 ^ t) (2 ^ k / 2 ^ (t + 1))
+      if (k + 1) / 2 ≤ k - 1 - t then revIndex (2 ^ k / 2 ^ (t + 1)) tw else tw).getD (k - 1 - l) []).getD b 0 =
+      Tcoset c ω k l (rev l b) := by
+  have hlen : 2 ^ k / 2 ^ (k - 1 - l + 1) = 2 ^ l := by rw [pow_div_pow' (by omega)]; congr 1; omega
+  rw [List.getD_eq_getElem (d := ([] : List K)) _ (by simp; omega), List.getElem_map, List.getElem_range]
+  simp only [show (k + 1) / 2 ≤ k - 1 - (k - 1 - l) by omega, ↓reduceIte, hlen]
+  rw [getD_revIndex _ hb, getD_shiftedPowersList _ _ (Plonky3Lean.Proofs.Matrix.bitRev_lt l b), Tcoset,
+    mul_pow, ← pow_mul, ← pow_mul, mul_comm (2 ^ (k - 1 - l)) (rev l b)]
+
+theorem foldl_natL_coset (c ω : K) (k : ℕ) (x : ℕ → V) (n : ℕ) :
+    (List.range n).foldl (fun acc l => natL (Tcoset c ω k) k l acc) x = ditNetC c ω k n x := by
+  induction n with
+  | zero => rfl
+  | succ n ih => rw [List.range_succ, List.foldl_append, ih]; rfl
+
+theorem natL_localTo (T : ℕ → ℕ → K) {k mid l : ℕ} (hl : l < mid) (hmid : mid ≤ k) :
+    LocalTo (2 ^ mid) (2 ^ (k - mid)) (natL (V := V) T k l) := by
+  apply layer_localTo _ (by positivity)
+  · rw [show 2 * 2 ^ l = 2 ^ (l + 1) by ring]; exact Nat.pow_dvd_pow 2 (by omega)
+  · rw [← pow_succ', ← pow_add, ← pow_add]; congr 1; omega
+
+theorem first_half_general_step (ω c : K) {k mid t l : ℕ} (hmid : mid = (k + 1) / 2)
+    (ht : t < 2 ^ (k - mid)) (hl : l < mid) (bw : Bool) (acc : ℕ → V) :
+    dit_layer t (2 ^ mid) l (fun i => ((cosetTbl ω c k).getD (k - 1 - l) []).getD i 0) bw acc =
+      restrict (2 ^ mid) t (natL (Tcoset c ω k) k l) acc := by
+  have hdiv : 2 ^ mid / (2 * 2 ^ l) = 2 ^ (mid - 1 - l) := by
+    rw [show 2 * 2 ^ l = 2 ^ (l + 1) by ring, pow_div_pow' (by omega)]; congr 1; omega
+  have hnb : 2 ^ (mid - 1 - l) * (2 * 2 ^ l) = 2 ^ mid := by
+    rw [← pow_succ', ← pow_add]; congr 1; omega
+  have hcb : t * 2 ^ (mid - 1 - l) + 2 ^ (mid - 1 - l) ≤ 2 ^ (k - 1 - l) := by
+    have : (t + 1) * 2 ^ (mid - 1 - l) ≤ 2 ^ (k - mid) * 2 ^ (mid - 1 - l) :=
+      Nat.mul_le_mul_right _ ht
+    rw [← pow_add, show k - mid + (mid - 1 - l) = k - 1 - l by omega] at this
+    nlinarith
+  unfold dit_layer
+  dsimp only
+  rw [hdiv, pairLoop_chunkOrder _ _ _ (by positivity), layerOn_eq_restrict _ (by positivity)
+    (by positivity) hcb, hnb]
+  congr 1
+  funext z
+  exact layer_op_congr (fun b _ s hs => by
+    rw [ditButterfly_eq, coset_table_first ω c (by omega) (by omega) hs]) z
+
+theorem first_half_general_spec (ω c : K) (k : ℕ) (x : ℕ → V) :
+    ∃ y, first_half_general (2 ^ k) ((k + 1) / 2) (cosetTbl ω c k) x = some y ∧
+      ∀ i < 2 ^ k, y i = ditNetC c ω k ((k + 1) / 2) x i := by
+  have hmid : (k + 1) / 2 ≤ k := by omega
+  refine ⟨_, by simp only [first_half_general, log2Strict_pow, Option.bind_eq_bind,
+    Option.bind_some]; rfl, fun i hi => ?_⟩
+  rw [pow_div_pow' hmid]
+  rw [foldl_congr_mem _ (g := fun acc t =>
+      ((List.range ((k + 1) / 2)).map (natL (Tcoset c ω k) k)).foldl
+        (fun acc f => restrict (2 ^ ((k + 1) / 2)) t f acc) acc)
+    (fun t ht acc => by
+      rw [foldl_flag _ (fun l acc => restrict (2 ^ ((k + 1) / 2)) t (natL (Tcoset c ω k) k l) acc) _
+        (fun l hl bw => funext fun acc => first_half_general_step ω c rfl (List.mem_range.mp ht)
+          (List.mem_range.mp hl) bw acc), List.foldl_map])]
+  rw [chunked _ (fun f hf => by
+      obtain ⟨l, hl, rfl⟩ := List.mem_map.mp hf
+      exact natL_localTo _ (List.mem_range.mp hl) hmid) x
+    (by rw [← pow_add, show k - (k + 1) / 2 + (k + 1) / 2 = k by omega]; exact hi),
+    List.foldl_map, foldl_natL_coset]
+
+theorem second_half_general_spec (ω c : K) (k : ℕ) (z : ℕ → V) :
+    ∃ y, second_half_general (2 ^ k) ((k + 1) / 2) (cosetTbl ω c k) z = some y ∧
+      ∀ i < 2 ^ k, y i = (List.range (k - (k + 1) / 2)).foldl
+        (fun acc i => revL (Tcoset c ω k) k ((k + 1) / 2 + i) acc) z i := by
+  have hmid : (k + 1) / 2 ≤ k := by omega
+  refine ⟨_, by simp only [second_half_general, log2Strict_pow, Option.bind_eq_bind,
+    Option.bind_some]; rfl, fun i hi => ?_⟩
+  rw [show 2 ^ k / 2 ^ (k - (k + 1) / 2) = 2 ^ ((k + 1) / 2) by
+    rw [pow_div_pow' (by omega)]; congr 1; omega]
+  rw [foldl_congr_mem _ (g := fun acc t =>
+      ((List.range (k - (k + 1) / 2)).map (fun i => revL (Tcoset c ω k) k ((k + 1) / 2 + i))).foldl
+        (fun acc f => restrict (2 ^ (k - (k + 1) / 2)) t f acc) acc)
+    (fun t ht acc => by
+      rw [foldl_flag _ (fun i acc => restrict (2 ^ (k - (k + 1) / 2)) t
+          (revL (Tcoset c ω k) k ((k + 1) / 2 + i)) acc) _
+        (fun i hi bw => funext fun acc => by
+          have hi' := List.mem_range.mp hi
+          rw [second_half_step (by omega) (by omega) (List.mem_range.mp ht)]
+          congr 1
+          funext z
+          exact layer_op_congr (fun b hb _ _ => by
+            rw [ditButterfly_eq, coset_table_second ω c (by omega) (by omega) hb]) z),
+        List.foldl_map])]
+  rw [chunked _ (fun f hf => by
+      obtain ⟨l, hl, rfl⟩ := List.mem_map.mp hf
+      exact revL_localTo _ (by omega) (by have := List.mem_range.mp hl; omega)) z
+    (by rw [← pow_add, show (k + 1) / 2 + (k - (k + 1) / 2) = k by omega]; exact hi), List.foldl_map]
+
+/-- The in-place coset transform of the parallel backend, read bit-reversed, is the coset network. -/
+theorem coset_dft_spec (G : Gen K) {k : ℕ} (hk : k ≤ G.adicity) (c : K) (y : ℕ → V) :
+    ∃ z, coset_dft G (2 ^ k) c y = some z ∧
+      ∀ i < 2 ^ k, z (rev k i) = ditNetC c (G.gen k) k k y i := by
+  have hmid : (k + 1) / 2 ≤ k := by omega
+  obtain ⟨y1, hy1, hy1'⟩ := first_half_general_spec (G.gen k) c k y
+  obtain ⟨y2, hy2, hy2'⟩ := second_half_general_spec (G.gen k) c k (revRows k y1)
+  refine ⟨y2, by simp only [coset_dft, log2Strict_pow, coset_tables G hk, Option.bind_eq_bind,
+    Option.bind_some, hy1, hy2], fun i hi => ?_⟩
+  have hri := Plonky3Lean.Proofs.Matrix.bitRev_lt k i
+  rw [hy2' _ hri, revL_chain_congr _ hmid (z' := fun p => ditNetC c (G.gen k) k ((k + 1) / 2) y (rev k p))
+    (fun p hp => by rw [revRows_apply k _ hp, hy1' _ (Plonky3Lean.Proofs.Matrix.bitRev_lt k p)])
+    _ le_rfl _ hri, revL_chain _ hmid _ _ le_rfl _ hri, rev_involutive hi, natL_chain_ditNetC,
+    show (k + 1) / 2 + (k - (k + 1) / 2) = k by omega]
+
+/-- The parallel backend's coset transform, read through its bit-reversed view, is the coset transform. -/
+theorem parallel_coset_dft_batch (G : Gen K) (hG : GenValid G) {k : ℕ} (hk : k ≤ G.adicity) (c : K)
+    (x : ℕ → V) :
+    Computes (Radix2DitParallel.coset_dft_batch G (2 ^ k) c x) (2 ^ k)
+      (cosetDft c (G.gen k) (2 ^ k) x) := by
+  obtain ⟨z, hz, hz'⟩ := coset_dft_spec G hk c (revRows k x)
+  refine ⟨_, by simp only [Radix2DitParallel.coset_dft_batch, log2Strict_pow, Option.bind_eq_bind,
+    Option.bind_some, hz]; rfl, fun i hi => ?_⟩
+  simp only [bitRev_eq]
+  rw [hz' i hi, ditNetC_congr _ _ k (x' := bitRevVec (rev k) x) (fun p hp => by
+      rw [revRows_apply k x hp, bitRevVec]) k le_rfl i hi]
+  exact ditNetC_eq_cosetDft (hG k hk) x hi
+
 end Plonky3Lean.Proofs.Dft
