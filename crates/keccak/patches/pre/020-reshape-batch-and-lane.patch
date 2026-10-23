@@ -60,7 +60,7 @@
  impl CryptographicPermutation<[[u64; VECTOR_LEN]; 25]> for KeccakF {}
 --- /dev/null
 +++ b/keccak/src/hax_reshaped.rs
-@@ -0,0 +1,259 @@
+@@ -0,0 +1,265 @@
 +//! PATCHED: the batched hash and the one-lane permutation in a shape hax's Lean backend translates.
 +//!
 +//! The extractor has no model of a mutable slice iterator or of `transmute`.
@@ -207,8 +207,14 @@
 +    let final_block = len % RATE;
 +
 +    // Group `g` holds messages `g * VECTOR_LEN` onwards, one per lane.
++    // The group count rounds up without adding to `count`, which may be `usize::MAX`.
 +    let count = out.len();
-+    for group in 0..(count + VECTOR_LEN - 1) / VECTOR_LEN {
++    let groups = if count % VECTOR_LEN == 0 {
++        count / VECTOR_LEN
++    } else {
++        count / VECTOR_LEN + 1
++    };
++    for group in 0..groups {
 +        let first = group * VECTOR_LEN;
 +
 +        // A short last group repeats its first message in the spare lanes.

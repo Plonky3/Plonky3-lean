@@ -558,7 +558,7 @@ def hax_reshaped.hash_many_with_domain_loop0
     (iter, out)
 
 /-- [p3_keccak::hax_reshaped::hash_many_with_domain]: loop body 2:
-    Source: 'keccak/src/hax_reshaped.rs', lines 158:8-161:9 -/
+    Source: 'keccak/src/hax_reshaped.rs', lines 164:8-167:9 -/
 @[rust_loop_body]
 def hax_reshaped.hash_many_with_domain_loop1_loop0.body
   (len : Std.Usize) (first : Std.Usize) (present : Std.Usize)
@@ -581,7 +581,7 @@ def hax_reshaped.hash_many_with_domain_loop1_loop0.body
     ok (cont (iter1, a))
 
 /-- [p3_keccak::hax_reshaped::hash_many_with_domain]: loop 2:
-    Source: 'keccak/src/hax_reshaped.rs', lines 158:8-161:9 -/
+    Source: 'keccak/src/hax_reshaped.rs', lines 164:8-167:9 -/
 @[rust_loop]
 def hax_reshaped.hash_many_with_domain_loop1_loop0
   (iter : core.ops.range.Range Std.Usize) (len : Std.Usize) (first : Std.Usize)
@@ -595,7 +595,7 @@ def hax_reshaped.hash_many_with_domain_loop1_loop0
     (iter, starts)
 
 /-- [p3_keccak::hax_reshaped::hash_many_with_domain]: loop body 3:
-    Source: 'keccak/src/hax_reshaped.rs', lines 164:8-167:9 -/
+    Source: 'keccak/src/hax_reshaped.rs', lines 170:8-173:9 -/
 @[rust_loop_body]
 def hax_reshaped.hash_many_with_domain_loop1_loop1.body
   (i : Std.Usize) (input : Slice Std.U8) (starts : Array Std.Usize 1#usize)
@@ -619,7 +619,7 @@ def hax_reshaped.hash_many_with_domain_loop1_loop1.body
     ok (cont (iter1, state2))
 
 /-- [p3_keccak::hax_reshaped::hash_many_with_domain]: loop 3:
-    Source: 'keccak/src/hax_reshaped.rs', lines 164:8-167:9 -/
+    Source: 'keccak/src/hax_reshaped.rs', lines 170:8-173:9 -/
 @[rust_loop]
 def hax_reshaped.hash_many_with_domain_loop1_loop1
   (i : Std.Usize) (iter : core.ops.range.Range Std.Usize)
@@ -633,7 +633,7 @@ def hax_reshaped.hash_many_with_domain_loop1_loop1
     (iter, state)
 
 /-- [p3_keccak::hax_reshaped::hash_many_with_domain]: loop body 4:
-    Source: 'keccak/src/hax_reshaped.rs', lines 171:8-173:9 -/
+    Source: 'keccak/src/hax_reshaped.rs', lines 177:8-179:9 -/
 @[rust_loop_body]
 def hax_reshaped.hash_many_with_domain_loop1_loop2.body
   (first : Std.Usize) (state : Array (Array Std.U64 1#usize) 25#usize)
@@ -654,7 +654,7 @@ def hax_reshaped.hash_many_with_domain_loop1_loop2.body
     ok (cont (iter1, s))
 
 /-- [p3_keccak::hax_reshaped::hash_many_with_domain]: loop 4:
-    Source: 'keccak/src/hax_reshaped.rs', lines 171:8-173:9 -/
+    Source: 'keccak/src/hax_reshaped.rs', lines 177:8-179:9 -/
 @[rust_loop]
 def hax_reshaped.hash_many_with_domain_loop1_loop2
   (iter : core.ops.range.Range Std.Usize) (out : Slice (Array Std.U8 32#usize))
@@ -667,7 +667,7 @@ def hax_reshaped.hash_many_with_domain_loop1_loop2
     (iter, out)
 
 /-- [p3_keccak::hax_reshaped::hash_many_with_domain]: loop body 1:
-    Source: 'keccak/src/hax_reshaped.rs', lines 148:4-174:5 -/
+    Source: 'keccak/src/hax_reshaped.rs', lines 154:4-180:5 -/
 @[rust_loop_body]
 def hax_reshaped.hash_many_with_domain_loop1.body
   (DOMAIN : Std.U8) (i : Std.Usize) (input : Slice Std.U8) (len : Std.Usize)
@@ -715,7 +715,7 @@ def hax_reshaped.hash_many_with_domain_loop1.body
     ok (cont (iter1, out1))
 
 /-- [p3_keccak::hax_reshaped::hash_many_with_domain]: loop 1:
-    Source: 'keccak/src/hax_reshaped.rs', lines 148:4-174:5 -/
+    Source: 'keccak/src/hax_reshaped.rs', lines 154:4-180:5 -/
 @[rust_loop]
 def hax_reshaped.hash_many_with_domain_loop1
   (DOMAIN : Std.U8) (i : Std.Usize) (iter : core.ops.range.Range Std.Usize)
@@ -730,7 +730,7 @@ def hax_reshaped.hash_many_with_domain_loop1
     (iter, out)
 
 /-- [p3_keccak::hax_reshaped::hash_many_with_domain]:
-    Source: 'keccak/src/hax_reshaped.rs', lines 115:0-175:1 -/
+    Source: 'keccak/src/hax_reshaped.rs', lines 115:0-181:1 -/
 def hax_reshaped.hash_many_with_domain
   (DOMAIN : Std.U8) (input : Slice Std.U8)
   (out : Slice (Array Std.U8 32#usize)) :
@@ -766,11 +766,15 @@ def hax_reshaped.hash_many_with_domain
         let i2 ← RATE
         let full_blocks ← len / i2
         let final_block ← len % i2
-        let i3 ← i1 + fallback.VECTOR_LEN
-        let i4 ← i3 - 1#usize
-        let i5 ← i4 / fallback.VECTOR_LEN
+        let i3 ← i1 % fallback.VECTOR_LEN
+        let groups ←
+          if i3 = 0#usize
+          then i1 / fallback.VECTOR_LEN
+          else do
+               let i4 ← i1 / fallback.VECTOR_LEN
+               i4 + 1#usize
         hax_reshaped.hash_many_with_domain_loop1 DOMAIN i2
-          { start := 0#usize, «end» := i5 } input out len full_blocks
+          { start := 0#usize, «end» := groups } input out len full_blocks
           final_block i1
     else
       let a ←
