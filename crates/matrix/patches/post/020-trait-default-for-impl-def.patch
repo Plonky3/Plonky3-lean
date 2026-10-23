@@ -3,7 +3,7 @@
 # Target:       extraction/P3Matrix/Extraction/Funs.lean
 # Hunks:        3
 # Class:        reshape
-# Gap:          docs/extractor-issues.md 19 (`impl_def` unfolds only
+# Gap:          docs/extractor-issues.md 21 (`impl_def` unfolds only
 #               `@[trait_default]` functions, and a default reaches the
 #               instance through a closure's `FnOnce` instance or a function).
 # Cost:         none: the attribute only lets `impl_def` unfold the definition.

@@ -3,7 +3,7 @@
 # Target:       extraction/P3Matrix/Extraction/Funs.lean
 # Hunks:        1
 # Class:        reshape
-# Gap:          docs/extractor-issues.md 20 (Aeneas's `UScalar.saturating_sub`
+# Gap:          docs/extractor-issues.md 22 (Aeneas's `UScalar.saturating_sub`
 #               has no exposed body).
 # Cost:         `core.num.Usize.saturating_sub_exposed` in HaxExt.lean, a model
 #               of `usize::saturating_sub`, trusted as the rest of HaxExt is.
