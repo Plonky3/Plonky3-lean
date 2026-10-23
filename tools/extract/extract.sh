@@ -289,10 +289,19 @@ printf '%s\n' "$CRATES" | while IFS='|' read -r crate lib state; do
     # A dependency outside the workspace is extracted from a copy of the source
     # Cargo resolves it to, so that nothing is written into Cargo's registry.
     src="$("$CONFIG" source "$crate")"
+    feats="$("$CONFIG" features "$crate")"
     case "$src" in
-        "$RUST"/*) ;;
+        "$RUST"/*)
+           if [ -n "$feats" ]; then
+               echo "error: crates/$crate/crate.toml lists features; only a crate outside" >&2
+               echo "       the workspace can have them (docs/extractor-issues.md 90)." >&2
+               exit 1
+           fi ;;
         *) mkdir -p "$WORK/src"; rm -rf "${WORK:?}/src/$crate"
-           cp -R "$src" "$WORK/src/$crate"; src="$WORK/src/$crate" ;;
+           cp -R "$src" "$WORK/src/$crate"; src="$WORK/src/$crate"
+           # hax's lean backend does not pass cargo arguments on to charon, so the
+           # crate's features become the copy's default features.
+           [ -z "$feats" ] || "$HERE/default-features.py" "$src/Cargo.toml" "$feats" ;;
     esac
     # hax's output also goes to a per-crate log, which gap-report.py reads for
     # charon's diagnostics.

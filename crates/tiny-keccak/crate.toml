@@ -1,0 +1,25 @@
+# tiny-keccak: the Keccak-f[1600] permutation that p3-keccak wraps.
+#
+# Not a Plonky3 crate: `package` names the crates.io dependency, and the run
+# extracts the source Cargo resolves it to for the Plonky3 workspace.
+
+lean_lib = "TinyKeccak"
+
+package = "tiny-keccak"
+
+state = "scoped"
+
+# The permutation is compiled only when one of the hash features is on.
+features = ["keccak"]
+
+# Only the permutation's tables are extracted, and its body is transcribed.
+#
+# The rounds are written with crunchy's `unroll!`, which inlines every inner loop.
+# aeneas runs out of 12 GB of memory on the result, as on sha2's unrolled rounds
+# (docs/extractor-issues.md 15).
+#
+# The sponge buffer XORs bytes in through raw pointers into a transmuted state
+# (docs/extractor-issues.md 12 and 14), so the incremental hashers do not extract.
+start_from = ["tiny_keccak::RHO", "tiny_keccak::PI", "tiny_keccak::WORDS", "tiny_keccak::keccakf::ROUNDS", "tiny_keccak::keccakf::RC"]
+
+watch = ["Cargo.toml"]

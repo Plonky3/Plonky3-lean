@@ -125,6 +125,15 @@ srcDir = "crates/sha256/extraction"
 name = "Sha2"
 srcDir = "crates/sha2/extraction"
 
+# Not a Plonky3 crate: the dependency p3-keccak permutes with (crates/tiny-keccak/crate.toml).
+[[lean_lib]]
+name = "TinyKeccak"
+srcDir = "crates/tiny-keccak/extraction"
+
+[[lean_lib]]
+name = "P3Keccak"
+srcDir = "crates/keccak/extraction"
+
 [[lean_lib]]
 name = "P3Blake2s"
 srcDir = "crates/blake2s/extraction"
