@@ -34,6 +34,7 @@ target `thumbv7em-none-eabi`
 | `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
 | `symmetric` | scoped | 1008 | 38 | 0 | 0 | 5 | 4 / 2 | pre `010`, pre `020`, pre `030`, pre `040` |
 | `util` | scoped | 207 | 70 | 0 | 1 | 0 | 0 / 0 |  |
+| `zk-codes` | stub |  | 234 | 0 | 19 |  | 0 / 0 |  |
 
 Generated lines are `extraction/<Lib>/Extraction/{Types,Funs}.lean`. Hand-written
 lines are every other `.lean` file of the crate. *Dropped by the extractor* counts
@@ -385,7 +386,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 872) whose dependencies include it; reaching one is not using it.
+(of 902) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -418,25 +419,25 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 872) whose dependencies include the declaration.
+counts the claims (of 902) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
 | `blake3-crate` | `blake3.BLOCK_LEN` | `blake3::BLOCK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.CHUNK_LEN` | `blake3::CHUNK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.OUT_LEN` | `blake3::OUT_LEN` | stub | 0 |
-| `dft` | `p3_dft.butterflies.mirror.DitButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DitButterfly<F>}::apply` | stub | 15 |
+| `dft` | `p3_dft.butterflies.mirror.DitButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DitButterfly<F>}::apply` | stub | 17 |
 | `dft` | `p3_dft.butterflies.mirror.DifButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterfly<F>}::apply` | stub | 6 |
 | `dft` | `p3_dft.butterflies.mirror.DifButterflyZeros.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterflyZeros<F>}::apply` | stub | 0 |
-| `dft` | `p3_dft.butterflies.mirror.TwiddleFreeButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::TwiddleFreeButterfly}::apply` | stub | 17 |
+| `dft` | `p3_dft.butterflies.mirror.TwiddleFreeButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::TwiddleFreeButterfly}::apply` | stub | 19 |
 | `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.new` | `p3_dft::butterflies::ScaledDitButterfly::new` | stub | 5 |
 | `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::ScaledDitButterfly<F>}::apply` | stub | 4 |
 | `dft` | `p3_dft.butterflies.mirror.DitButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DitButterfly<F>}::apply_to_rows` | stub | 1 |
 | `dft` | `p3_dft.butterflies.mirror.DifButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterfly<F>}::apply_to_rows` | stub | 1 |
 | `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::ScaledDitButterfly<F>}::apply_to_rows` | stub | 1 |
 | `dft` | `p3_dft.butterflies.mirror.DifButterflyZeros.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterflyZeros<F>}::apply_to_rows` | stub | 0 |
-| `dft` | `p3_dft.mirror.bitRev` | `p3_util::reverse_bits_len` | stub | 21 |
-| `dft` | `p3_dft.mirror.revIndex` | `p3_util::reverse_slice_index_bits` | stub | 17 |
+| `dft` | `p3_dft.mirror.bitRev` | `p3_util::reverse_bits_len` | stub | 23 |
+| `dft` | `p3_dft.mirror.revIndex` | `p3_util::reverse_slice_index_bits` | stub | 18 |
 | `dft` | `p3_dft.util.mirror.divide_by_height` | `p3_dft::util::divide_by_height` | stub | 4 |
 | `dft` | `p3_dft.util.mirror.coset_shift_cols` | `p3_dft::util::coset_shift_cols` | stub | 5 |
 | `dft` | `p3_dft.naive.mirror.NaiveDft.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::naive::NaiveDft}::dft_batch` | stub | 3 |
@@ -445,9 +446,9 @@ counts the claims (of 872) whose dependencies include the declaration.
 | `dft` | `p3_dft.traits.mirror.coset_idft_batch` | `p3_dft::traits::TwoAdicSubgroupDft::coset_idft_batch` | stub | 3 |
 | `dft` | `p3_dft.traits.mirror.coset_lde_batch_with_transform` | `p3_dft::traits::TwoAdicSubgroupDft::coset_lde_batch_with_transform` | stub | 1 |
 | `dft` | `p3_dft.traits.mirror.via_base` | `p3_dft::traits::TwoAdicSubgroupDft::dft_algebra_batch` | stub | 1 |
-| `dft` | `p3_dft.radix_2_dit.mirror.Radix2Dit.get_or_compute_twiddles` | `p3_dft::radix_2_dit::Radix2Dit::get_or_compute_twiddles` | stub | 4 |
-| `dft` | `p3_dft.radix_2_dit.mirror.dit_layer` | `p3_dft::radix_2_dit::dit_layer` | stub | 4 |
-| `dft` | `p3_dft.radix_2_dit.mirror.Radix2Dit.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit::Radix2Dit<F>}::dft_batch` | stub | 4 |
+| `dft` | `p3_dft.radix_2_dit.mirror.Radix2Dit.get_or_compute_twiddles` | `p3_dft::radix_2_dit::Radix2Dit::get_or_compute_twiddles` | stub | 5 |
+| `dft` | `p3_dft.radix_2_dit.mirror.dit_layer` | `p3_dft::radix_2_dit::dit_layer` | stub | 5 |
+| `dft` | `p3_dft.radix_2_dit.mirror.Radix2Dit.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit::Radix2Dit<F>}::dft_batch` | stub | 5 |
 | `dft` | `p3_dft.radix_2_dit.mirror.Radix2Dit.coset_lde_batch_with_transform` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit::Radix2Dit<F>}::coset_lde_batch_with_transform` | stub | 1 |
 | `dft` | `p3_dft.radix_2_bowers.mirror.butterfly_layer` | `p3_dft::radix_2_bowers::butterfly_layer` | stub | 7 |
 | `dft` | `p3_dft.radix_2_bowers.mirror.bowers_g` | `p3_dft::radix_2_bowers::bowers_g` | stub | 5 |
@@ -477,20 +478,20 @@ counts the claims (of 872) whose dependencies include the declaration.
 | `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit_parallel::Radix2DitParallel<F>}::idft_batch` | stub | 2 |
 | `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.coset_idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit_parallel::Radix2DitParallel<F>}::coset_idft_batch` | stub | 1 |
 | `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.lde_with_consumer` | `p3_dft::radix_2_dit_parallel::Radix2DitParallel::lde_with_consumer` | stub | 1 |
-| `dft` | `p3_dft.radix_2_small_batch.mirror.roots_of_unity_table` | `p3_dft::radix_2_small_batch::Radix2DFTSmallBatch::roots_of_unity_table` | stub | 2 |
-| `dft` | `p3_dft.radix_2_small_batch.mirror.cache` | `p3_dft::radix_2_small_batch::Radix2DFTSmallBatch::update_twiddles` | stub | 2 |
-| `dft` | `p3_dft.radix_2_small_batch.mirror.estimate_num_rows_in_l1` | `p3_dft::radix_2_small_batch::estimate_num_rows_in_l1` | stub | 2 |
-| `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par` | `p3_dft::radix_2_small_batch::dft_layer_par` | stub | 2 |
-| `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par_double_dit` | `p3_dft::radix_2_small_batch::dft_layer_par_double` | stub | 1 |
-| `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par_triple_dit` | `p3_dft::radix_2_small_batch::dft_layer_par_triple` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.roots_of_unity_table` | `p3_dft::radix_2_small_batch::Radix2DFTSmallBatch::roots_of_unity_table` | stub | 3 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.cache` | `p3_dft::radix_2_small_batch::Radix2DFTSmallBatch::update_twiddles` | stub | 3 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.estimate_num_rows_in_l1` | `p3_dft::radix_2_small_batch::estimate_num_rows_in_l1` | stub | 3 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par` | `p3_dft::radix_2_small_batch::dft_layer_par` | stub | 3 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par_double_dit` | `p3_dft::radix_2_small_batch::dft_layer_par_double` | stub | 2 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par_triple_dit` | `p3_dft::radix_2_small_batch::dft_layer_par_triple` | stub | 2 |
 | `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par_double_dif` | `{impl p3_dft::radix_2_small_batch::MultiLayerButterfly<F, p3_dft::butterflies::DifButterfly<F>> for p3_dft::radix_2_small_batch::MultiLayerDifButterfly}::apply_2_layers` | stub | 1 |
 | `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par_triple_dif` | `{impl p3_dft::radix_2_small_batch::MultiLayerButterfly<F, p3_dft::butterflies::DifButterfly<F>> for p3_dft::radix_2_small_batch::MultiLayerDifButterfly}::apply_3_layers` | stub | 1 |
-| `dft` | `p3_dft.radix_2_small_batch.mirror.extra_layers_dit` | `p3_dft::radix_2_small_batch::dft_layer_par_extra_layers` | stub | 1 |
-| `dft` | `p3_dft.radix_2_small_batch.mirror.remaining_layers` | `p3_dft::radix_2_small_batch::remaining_layers` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.extra_layers_dit` | `p3_dft::radix_2_small_batch::dft_layer_par_extra_layers` | stub | 2 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.remaining_layers` | `p3_dft::radix_2_small_batch::remaining_layers` | stub | 2 |
 | `dft` | `p3_dft.radix_2_small_batch.mirror.initial_layers` | `p3_dft::radix_2_small_batch::initial_layers` | stub | 1 |
-| `dft` | `p3_dft.radix_2_small_batch.mirror.par_remaining_layers` | `p3_dft::radix_2_small_batch::par_remaining_layers` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.par_remaining_layers` | `p3_dft::radix_2_small_batch::par_remaining_layers` | stub | 2 |
 | `dft` | `p3_dft.radix_2_small_batch.mirror.par_initial_layers` | `p3_dft::radix_2_small_batch::par_initial_layers` | stub | 1 |
-| `dft` | `p3_dft.radix_2_small_batch.mirror.Radix2DFTSmallBatch.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_small_batch::Radix2DFTSmallBatch<F>}::dft_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.Radix2DFTSmallBatch.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_small_batch::Radix2DFTSmallBatch<F>}::dft_batch` | stub | 2 |
 | `dft` | `p3_dft.radix_2_small_batch.mirror.Radix2DFTSmallBatch.idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_small_batch::Radix2DFTSmallBatch<F>}::idft_batch` | stub | 1 |
 | `field` | `p3_field.dup.Dup` | `p3_field::dup::Dup` | stub | 0 |
 | `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 2 |
@@ -526,7 +527,7 @@ counts the claims (of 872) whose dependencies include the declaration.
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_point` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_point` | not translated | 1 |
 | `matrix` | `p3_matrix.interpolation.mirror.recover_coefficients` | `p3_matrix::interpolation::InterpolateArbitrary::recover_coefficients` | not translated | 2 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_lagrange` | `p3_matrix::interpolation::interpolate_lagrange` | not translated | 1 |
-| `matrix` | `p3_matrix.util.mirror.reverse_matrix_index_bits` | `p3_matrix::util::reverse_matrix_index_bits` | not translated | 14 |
+| `matrix` | `p3_matrix.util.mirror.reverse_matrix_index_bits` | `p3_matrix::util::reverse_matrix_index_bits` | not translated | 16 |
 | `matrix` | `p3_matrix.extension.mirror.flat_row_subseq` | `{impl p3_matrix::Matrix<F> for p3_matrix::extension::FlatMatrixView<F, EF, Inner>}::row_subseq_unchecked` | not translated | 1 |
 | `matrix` | `p3_matrix.extension.mirror.flat_iter_take` | `{impl core::iter::traits::iterator::Iterator for p3_matrix::extension::FlatIter<F, I>}::next` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.mersenne_31.Mersenne31.Insts.CoreIterTraitsAccumSumMersenne31.sum` | `{impl core::iter::traits::accum::Sum for p3_mersenne_31::mersenne_31::Mersenne31}::sum` | dropped | 2 |
@@ -576,6 +577,25 @@ counts the claims (of 872) whose dependencies include the declaration.
 | `security` | `Plonky3Lean.Proofs.Security.Real.upperX` | `p3_security::proximity::compute_upper_m` | not translated | 2 |
 | `security` | `Plonky3Lean.Proofs.Security.Real.sumBitsR` | `p3_security::error::ErrorBits::sum` | not translated | 1 |
 | `util` | `p3_util.branch_hint` | `p3_util::branch_hint` | not translated | 12 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.new` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::new` | stub | 3 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.evaluation_point` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::evaluation_point` | stub | 7 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.message_row_iter` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::message_row_iter` | stub | 2 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.randomness_row_iter` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::randomness_row_iter` | stub | 2 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.message_row` | `{impl p3_zk_codes::encoding::LinearZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::message_row` | stub | 2 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.randomness_row` | `{impl p3_zk_codes::encoding::LinearZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::randomness_row` | stub | 2 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.message_len` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::message_len` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.randomness_len` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::randomness_len` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.query_bound` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::query_bound` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.codeword_len` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::codeword_len` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.error` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::error` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.sample_message` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::sample_message` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.sample_randomness` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::sample_randomness` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.encode` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::encode` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.simulate` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::simulate` | stub | 4 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.encode_with_randomness` | `{impl p3_zk_codes::encoding::ZkEncodingWithRandomness<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::encode_with_randomness` | stub | 11 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.encode_batch_with_randomness` | `{impl p3_zk_codes::encoding::ZkEncodingWithRandomness<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::encode_batch_with_randomness` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.encoding.mirror.stack_codewords` | `p3_zk_codes::encoding::stack_codewords` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.encoding.mirror.encode_batch_with_randomness` | `p3_zk_codes::encoding::ZkEncodingWithRandomness::encode_batch_with_randomness` | stub | 1 |
 
 ## Patches with a cost
 
@@ -1489,6 +1509,36 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Util.gcd_inversion_prime_field_32.pos_inverse_small_prime` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.wrong_of_large_a` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.accessors` | `Quot.sound`, `propext` |
+| `ZkCodes.beyond_adicity` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.default_encode_batch_with_randomness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.encode_batch_with_randomness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.encode_linear` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.encode_rows` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.encode_with_randomness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.encode_with_randomness.panics_msg_len` | `Quot.sound`, `propext` |
+| `ZkCodes.encode_with_randomness.panics_rand_len` | `Quot.sound`, `propext` |
+| `ZkCodes.encode_with_randomness.radix2Dit` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.encode_with_randomness.smallBatch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.evaluation_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.evaluation_point.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.message_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.new` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.new.some_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.randomness_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.rs_generating` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.rs_isZk` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.rs_isZk_subgroup` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.rs_mem_code` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.rs_not_isZk_of_zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.rs_not_isZk_succ` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.rs_view_balanced` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.rs_view_bijective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.sampling` | `Quot.sound`, `propext` |
+| `ZkCodes.simulate` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.simulate.t_zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.simulate.wraps` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.simulate_matches_encode` | `Classical.choice`, `Quot.sound`, `propext` |
 
 ## Known warnings
 
