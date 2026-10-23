@@ -42,3 +42,14 @@ the extracted crates that depend on it reference.
 
 Extract from the bottom of the Cargo graph upwards where possible: each crate
 extracted retires a stub that every crate above it relied on.
+
+## A variant
+
+To extract a crate again for another target, add a `[[variant]]` table to its
+`crate.toml` ([`extracting.md`](extracting.md#variants)) and a `[[lean_lib]]`
+for it in `lakefile.toml`, rooted at `crates/<crate>/variants/<name>/extraction`
+and listed in `defaultTargets`. Then follow steps 2, 3 and 6 above, in
+`variants/<name>/`. Its `Assumptions/` bind the externals of the `opaque`
+modules to the crate's own library where they can, and give each `transmute`
+the generated code needs a `core.intrinsics.Transmute` instance whose docstring
+says, in a sentence starting "Assumed", which Rust layout it rests on.
