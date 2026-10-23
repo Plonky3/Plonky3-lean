@@ -37,6 +37,9 @@
 #     `mul_2exp_u64`. aeneas cannot build that dictionary (issue 9), so the
 #     three stay transcribed in Mirror.lean.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/monty-31/src/hax_roots.rs b/monty-31/src/hax_roots.rs
 new file mode 100644
 index 00000000..e1048c4a
