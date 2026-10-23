@@ -26,6 +26,36 @@ namespace p3_uni_stark.verifier.mirror
 open p3_air.builder.mirror p3_air.air.mirror p3_uni_stark.folder.mirror
 open p3_commit.domain.mirror p3_field.coset.mirror p3_dft.mirror
 
+/-- Why a proof's shape is rejected, without the counts Rust reports alongside. -/
+inductive InvalidProofShapeError where
+  | TraceNextMismatch
+  | UnexpectedTraceNext
+  | UnexpectedPreprocessedNext
+  | QuotientDomainsCountMismatch
+  | PreprocessedTraceWidthMismatch
+  | PreprocessedVerifierKeyInconsistency
+  | PreprocessedDegreeMismatch
+  | UnexpectedPreprocessedValues
+  | DegreeBitsTooSmall
+  | DegreeBitsTooLarge
+  | QuotientDomainTooLarge
+  | PublicValuesLengthMismatch
+  | OpenedValuesDimensionMismatch
+  | NonCanonicalOodPowWitness
+  deriving DecidableEq
+
+/-- Why a proof is rejected. -/
+inductive VerificationError where
+  | InvalidProofShape (e : InvalidProofShapeError)
+  | PeriodicColumn
+  | InvalidOpeningArgument
+  | OodEvaluationMismatch
+  | RandomizationError
+  | NextPointUnavailable
+  | OodPointInDomain
+  | InvalidOodPowWitness
+  deriving DecidableEq
+
 variable {F K : Type} [Field F] [DecidableEq F] [Field K] [DecidableEq K] [Algebra F K]
 
 /-- The element whose coordinates in the basis are the given values, absent unless there are exactly D of them. -/
@@ -54,5 +84,32 @@ noncomputable def recompose_quotient_from_chunks {D : ℕ} (B : Module.Basis (Fi
     let ch ← chunks[i]?
     let c ← from_ext_basis_coefficients B ch
     pure (acc + zp * c)) 0
+
+/-- The two preprocessed rows as a window, or a window of width zero unless both are present. -/
+def preprocessedWindow (preprocessed_local preprocessed_next : Option (List K)) : RowWindow K :=
+  match preprocessed_local, preprocessed_next with
+  | some l, some n => ⟨l, n⟩
+  | _, _ => ⟨[], []⟩
+
+/-- The constraint check at zeta: fold the AIR's constraints at the opened rows with the selectors at zeta, and compare the fold times 1 / Z(zeta) with the recombined quotient.
+
+An AIR with boundary cells panics, and so do the selectors when zeta lies on the trace domain. -/
+def verify_constraints (air : Air F) (trace_local trace_next : List K)
+    (preprocessed_local preprocessed_next : Option (List K)) (periodic_values : List K)
+    (public_values : List F) (trace_domain : Coset G) (zeta alpha quotient : K) :
+    Option (Except VerificationError Unit) := do
+  if air.public_boundary_io ≠ [] then none
+  let sels ← Coset.selectors_at_point G trace_domain zeta
+  let preprocessed_local_len := (preprocessed_local.map List.length).getD 0
+  let preprocessed_next_len := (preprocessed_next.map List.length).getD 0
+  if preprocessed_local_len ≠ preprocessed_next_len then
+    return .error (.InvalidProofShape .PreprocessedTraceWidthMismatch)
+  let folder := verifierFolder ⟨trace_local, trace_next⟩
+    (preprocessedWindow preprocessed_local preprocessed_next) public_values periodic_values
+    sels.is_first_row sels.is_last_row sels.is_transition alpha
+  let folded_constraints := air.eval folder 0
+  if folded_constraints * sels.inv_vanishing ≠ quotient then
+    return .error .OodEvaluationMismatch
+  pure (.ok ())
 
 end p3_uni_stark.verifier.mirror
