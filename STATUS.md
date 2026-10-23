@@ -20,8 +20,9 @@ target `thumbv7em-none-eabi`
 | `blake2s` | scoped | 148 | 51 | 1 | 0 | 0 | 1 / 0 | pre `010` |
 | `blake3` | scoped | 2609 | 40 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
 | `blake3-crate` | stub |  | 26 | 0 | 3 |  | 0 / 0 |  |
+| `commit` | stub |  | 762 | 0 | 59 |  | 0 / 0 |  |
 | `dft` | stub |  | 901 | 0 | 67 |  | 0 / 0 |  |
-| `field` | stub |  | 91 | 2 | 6 |  | 0 / 0 |  |
+| `field` | stub |  | 194 | 2 | 19 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
 | `koala-bear` | extracted | 3024 | 121 | 4 | 0 | 0 | 0 / 3 |  |
 | `matrix` | scoped | 1625 | 259 | 0 | 12 | 0 | 3 / 3 | pre `020`, pre `030`, post `020`, post `030` |
@@ -397,11 +398,11 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 972) whose dependencies include it; reaching one is not using it.
+(of 1031) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
-| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 67 |
+| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 69 |
 | `baby-bear` | `mds.MDSBabyBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon2.BabyBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
@@ -431,7 +432,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 972) whose dependencies include the declaration.
+counts the claims (of 1031) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -505,18 +506,77 @@ counts the claims (of 972) whose dependencies include the declaration.
 | `blake3-crate` | `blake3.BLOCK_LEN` | `blake3::BLOCK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.CHUNK_LEN` | `blake3::CHUNK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.OUT_LEN` | `blake3::OUT_LEN` | stub | 0 |
-| `dft` | `p3_dft.butterflies.mirror.DitButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DitButterfly<F>}::apply` | stub | 17 |
+| `commit` | `p3_commit.domain.mirror.LagrangeSelectors` | `p3_commit::domain::LagrangeSelectors` | stub | 7 |
+| `commit` | `p3_commit.domain.mirror.Coset.size` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::size` | stub | 18 |
+| `commit` | `p3_commit.domain.mirror.Coset.first_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::first_point` | stub | 4 |
+| `commit` | `p3_commit.domain.mirror.Coset.next_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::next_point` | stub | 4 |
+| `commit` | `p3_commit.domain.mirror.Coset.try_create_disjoint_domain` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::try_create_disjoint_domain` | stub | 6 |
+| `commit` | `p3_commit.domain.mirror.Coset.create_disjoint_domain` | `p3_commit::domain::PolynomialSpace::create_disjoint_domain` | stub | 1 |
+| `commit` | `p3_commit.domain.mirror.Coset.split_domains` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::split_domains` | stub | 3 |
+| `commit` | `p3_commit.domain.mirror.Coset.split_evals` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::split_evals` | stub | 3 |
+| `commit` | `p3_commit.domain.mirror.Coset.vanishing_poly_at_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::vanishing_poly_at_point` | stub | 2 |
+| `commit` | `p3_commit.domain.mirror.Coset.selectors_at_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::selectors_at_point` | stub | 3 |
+| `commit` | `p3_commit.domain.mirror.Coset.selectors_on_coset` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::selectors_on_coset` | stub | 5 |
+| `commit` | `p3_commit.domain.mirror.Coset.evaluate_polynomial_at` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::evaluate_polynomial_at` | stub | 9 |
+| `commit` | `p3_commit.domain.mirror.Coset.default_evaluate_periodic_column_at` | `p3_commit::domain::PolynomialSpace::evaluate_periodic_column_at` | stub | 1 |
+| `commit` | `p3_commit.domain.mirror.Coset.evaluate_periodic_column_at` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::evaluate_periodic_column_at` | stub | 7 |
+| `commit` | `p3_commit.domain.mirror.Coset.default_evaluate_periodic_columns_at` | `p3_commit::domain::PolynomialSpace::evaluate_periodic_columns_at` | stub | 1 |
+| `commit` | `p3_commit.domain.mirror.Coset.evaluate_periodic_columns_at` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::evaluate_periodic_columns_at` | stub | 1 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicColumnShapeError` | `p3_commit::periodic::PeriodicColumnShapeError` | stub | 5 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicColumns` | `p3_commit::periodic::PeriodicColumns` | stub | 5 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicColumns.new` | `p3_commit::periodic::PeriodicColumns::new` | stub | 5 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicColumns.max_period` | `p3_commit::periodic::PeriodicColumns::max_period` | stub | 3 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicLdeTable` | `p3_commit::periodic::PeriodicLdeTable` | stub | 7 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicLdeTable.new` | `p3_commit::periodic::PeriodicLdeTable::new` | stub | 3 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicLdeTable.empty` | `p3_commit::periodic::PeriodicLdeTable::empty` | stub | 4 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicLdeTable.is_empty` | `p3_commit::periodic::PeriodicLdeTable::is_empty` | stub | 1 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicLdeTable.packed_group_period` | `p3_commit::periodic::PeriodicLdeTable::packed_group_period` | stub | 1 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicLdeTable.get` | `p3_commit::periodic::PeriodicLdeTable::get` | stub | 2 |
+| `commit` | `p3_commit.periodic.mirror.unitEvalOnLde` | `{impl p3_commit::periodic::PeriodicEvaluator<F, D> for ()}::eval_on_lde` | stub | 1 |
+| `commit` | `p3_commit.periodic.mirror.unitEvalAtPoint` | `{impl p3_commit::periodic::PeriodicEvaluator<F, D> for ()}::eval_at_point` | stub | 1 |
+| `commit` | `p3_commit.periodic.mirror.build_periodic_lde_table` | `p3_commit::pcs::univariate::UnivariateStarkPcs::build_periodic_lde_table` | stub | 3 |
+| `commit` | `p3_commit.pcs.univariate.mirror.PointOpening` | `p3_commit::pcs::univariate::PointOpening` | stub | 3 |
+| `commit` | `p3_commit.pcs.univariate.mirror.MatrixOpening` | `p3_commit::pcs::univariate::MatrixOpening` | stub | 3 |
+| `commit` | `p3_commit.pcs.univariate.mirror.CommitmentOpening` | `p3_commit::pcs::univariate::CommitmentOpening` | stub | 3 |
+| `commit` | `p3_commit.pcs.univariate.mirror.commit_preprocessing` | `p3_commit::pcs::univariate::UnivariateStarkPcs::commit_preprocessing` | stub | 1 |
+| `commit` | `p3_commit.pcs.univariate.mirror.commit_quotient` | `p3_commit::pcs::univariate::UnivariateStarkPcs::commit_quotient` | stub | 1 |
+| `commit` | `p3_commit.pcs.univariate.mirror.get_evaluations_on_domain_no_random` | `p3_commit::pcs::univariate::UnivariateStarkPcs::get_evaluations_on_domain_no_random` | stub | 1 |
+| `commit` | `p3_commit.pcs.univariate.mirror.open_with_preprocessing` | `p3_commit::pcs::univariate::UnivariateStarkPcs::open_with_preprocessing` | stub | 1 |
+| `commit` | `p3_commit.pcs.univariate.mirror.verify_with_preprocessing` | `p3_commit::pcs::univariate::UnivariateStarkPcs::verify_with_preprocessing` | stub | 1 |
+| `commit` | `p3_commit.pcs.univariate.mirror.get_opt_randomization_poly_commitment` | `p3_commit::pcs::univariate::UnivariateStarkPcs::get_opt_randomization_poly_commitment` | stub | 1 |
+| `commit` | `p3_commit.testing.mirror.TrivialPcs` | `p3_commit::testing::TrivialPcs` | stub | 3 |
+| `commit` | `p3_commit.testing.mirror.eval_coeffs_at_pt` | `p3_commit::testing::eval_coeffs_at_pt` | stub | 2 |
+| `commit` | `p3_commit.testing.mirror.natural_domain_for_degree` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_commit::testing::TrivialPcs<Val, Dft>}::natural_domain_for_degree` | stub | 2 |
+| `commit` | `p3_commit.testing.mirror.TrivialPcs.commit` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_commit::testing::TrivialPcs<Val, Dft>}::commit` | stub | 2 |
+| `commit` | `p3_commit.testing.mirror.TrivialPcs.open` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_commit::testing::TrivialPcs<Val, Dft>}::open` | stub | 2 |
+| `commit` | `p3_commit.testing.mirror.TrivialPcs.verify` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_commit::testing::TrivialPcs<Val, Dft>}::verify` | stub | 2 |
+| `commit` | `p3_commit.testing.mirror.TrivialPcs.get_evaluations_on_domain` | `{impl p3_commit::pcs::univariate::UnivariateStarkPcs<Challenge, Challenger> for p3_commit::testing::TrivialPcs<Val, Dft>}::get_evaluations_on_domain` | stub | 1 |
+| `commit` | `p3_commit.mmcs.mirror.commit_matrix` | `p3_commit::mmcs::Mmcs::commit_matrix` | stub | 1 |
+| `commit` | `p3_commit.mmcs.mirror.commit_vec` | `p3_commit::mmcs::Mmcs::commit_vec` | stub | 1 |
+| `commit` | `p3_commit.mmcs.mirror.get_matrix_heights` | `p3_commit::mmcs::Mmcs::get_matrix_heights` | stub | 1 |
+| `commit` | `p3_commit.mmcs.mirror.get_max_height` | `p3_commit::mmcs::Mmcs::get_max_height` | stub | 1 |
+| `commit` | `p3_commit.adapters.extension_mmcs.mirror.commit` | `{impl p3_commit::mmcs::Mmcs<EF> for p3_commit::adapters::extension_mmcs::ExtensionMmcs<F, EF, InnerMmcs>}::commit` | stub | 1 |
+| `commit` | `p3_commit.adapters.extension_mmcs.mirror.open_batch` | `{impl p3_commit::mmcs::Mmcs<EF> for p3_commit::adapters::extension_mmcs::ExtensionMmcs<F, EF, InnerMmcs>}::open_batch` | stub | 1 |
+| `commit` | `p3_commit.adapters.extension_mmcs.mirror.get_matrices` | `{impl p3_commit::mmcs::Mmcs<EF> for p3_commit::adapters::extension_mmcs::ExtensionMmcs<F, EF, InnerMmcs>}::get_matrices` | stub | 1 |
+| `commit` | `p3_commit.adapters.extension_mmcs.mirror.verify_batch` | `{impl p3_commit::mmcs::Mmcs<EF> for p3_commit::adapters::extension_mmcs::ExtensionMmcs<F, EF, InnerMmcs>}::verify_batch` | stub | 1 |
+| `commit` | `p3_commit.adapters.extension_mmcs.mirror.flatten_to_base` | `p3_field::field::BasedVectorSpace::flatten_to_base` | stub | 1 |
+| `commit` | `p3_commit.adapters.extension_mmcs.mirror.reconstitute_from_base` | `p3_field::field::BasedVectorSpace::reconstitute_from_base` | stub | 1 |
+| `commit` | `p3_commit.encoder.mirror.zero_padded` | `p3_commit::encoder::zero_padded` | stub | 1 |
+| `commit` | `p3_commit.encoder.mirror.encode_batch` | `{impl p3_commit::encoder::Encoder<F> for D}::encode_batch` | stub | 3 |
+| `commit` | `p3_commit.encoder.mirror.encode_batch_padded` | `p3_commit::encoder::Encoder::encode_batch_padded` | stub | 1 |
+| `commit` | `p3_commit.encoder.mirror.encode_batch_borrowed` | `p3_commit::encoder::Encoder::encode_batch_borrowed` | stub | 1 |
+| `dft` | `p3_dft.butterflies.mirror.DitButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DitButterfly<F>}::apply` | stub | 18 |
 | `dft` | `p3_dft.butterflies.mirror.DifButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterfly<F>}::apply` | stub | 6 |
 | `dft` | `p3_dft.butterflies.mirror.DifButterflyZeros.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterflyZeros<F>}::apply` | stub | 0 |
-| `dft` | `p3_dft.butterflies.mirror.TwiddleFreeButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::TwiddleFreeButterfly}::apply` | stub | 19 |
-| `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.new` | `p3_dft::butterflies::ScaledDitButterfly::new` | stub | 5 |
-| `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::ScaledDitButterfly<F>}::apply` | stub | 4 |
+| `dft` | `p3_dft.butterflies.mirror.TwiddleFreeButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::TwiddleFreeButterfly}::apply` | stub | 20 |
+| `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.new` | `p3_dft::butterflies::ScaledDitButterfly::new` | stub | 6 |
+| `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::ScaledDitButterfly<F>}::apply` | stub | 5 |
 | `dft` | `p3_dft.butterflies.mirror.DitButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DitButterfly<F>}::apply_to_rows` | stub | 1 |
 | `dft` | `p3_dft.butterflies.mirror.DifButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterfly<F>}::apply_to_rows` | stub | 1 |
 | `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::ScaledDitButterfly<F>}::apply_to_rows` | stub | 1 |
 | `dft` | `p3_dft.butterflies.mirror.DifButterflyZeros.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterflyZeros<F>}::apply_to_rows` | stub | 0 |
-| `dft` | `p3_dft.mirror.bitRev` | `p3_util::reverse_bits_len` | stub | 23 |
-| `dft` | `p3_dft.mirror.revIndex` | `p3_util::reverse_slice_index_bits` | stub | 18 |
+| `dft` | `p3_dft.mirror.bitRev` | `p3_util::reverse_bits_len` | stub | 24 |
+| `dft` | `p3_dft.mirror.revIndex` | `p3_util::reverse_slice_index_bits` | stub | 19 |
 | `dft` | `p3_dft.util.mirror.divide_by_height` | `p3_dft::util::divide_by_height` | stub | 4 |
 | `dft` | `p3_dft.util.mirror.coset_shift_cols` | `p3_dft::util::coset_shift_cols` | stub | 5 |
 | `dft` | `p3_dft.naive.mirror.NaiveDft.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::naive::NaiveDft}::dft_batch` | stub | 3 |
@@ -539,14 +599,14 @@ counts the claims (of 972) whose dependencies include the declaration.
 | `dft` | `p3_dft.radix_2_bowers.mirror.Radix2Bowers.coset_lde_batch_with_transform` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_bowers::Radix2Bowers}::coset_lde_batch_with_transform` | stub | 1 |
 | `dft` | `p3_dft.radix_2_bowers.mirror.bit_reversed_zero_pad` | `p3_matrix::dense::DenseMatrix::bit_reversed_zero_pad` | stub | 3 |
 | `dft` | `p3_dft.radix_2_dit_parallel.mirror.get_or_compute_twiddles` | `p3_dft::radix_2_dit_parallel::Radix2DitParallel::get_or_compute_twiddles` | stub | 1 |
-| `dft` | `p3_dft.radix_2_dit_parallel.mirror.get_or_compute_inverse_twiddles` | `p3_dft::radix_2_dit_parallel::Radix2DitParallel::get_or_compute_inverse_twiddles` | stub | 3 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.get_or_compute_inverse_twiddles` | `p3_dft::radix_2_dit_parallel::Radix2DitParallel::get_or_compute_inverse_twiddles` | stub | 4 |
 | `dft` | `p3_dft.radix_2_dit_parallel.mirror.get_or_compute_coset_twiddles` | `p3_dft::radix_2_dit_parallel::Radix2DitParallel::get_or_compute_coset_twiddles` | stub | 2 |
-| `dft` | `p3_dft.radix_2_dit_parallel.mirror.dit_layer_twiddle_free` | `p3_dft::radix_2_dit_parallel::dit_layer_twiddle_free` | stub | 4 |
-| `dft` | `p3_dft.radix_2_dit_parallel.mirror.dit_layer_first_one` | `p3_dft::radix_2_dit_parallel::dit_layer_first_one` | stub | 4 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.dit_layer_twiddle_free` | `p3_dft::radix_2_dit_parallel::dit_layer_twiddle_free` | stub | 5 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.dit_layer_first_one` | `p3_dft::radix_2_dit_parallel::dit_layer_first_one` | stub | 5 |
 | `dft` | `p3_dft.radix_2_dit_parallel.mirror.dit_layer` | `p3_dft::radix_2_dit_parallel::dit_layer` | stub | 2 |
-| `dft` | `p3_dft.radix_2_dit_parallel.mirror.dit_layer_rev` | `p3_dft::radix_2_dit_parallel::dit_layer_rev` | stub | 5 |
-| `dft` | `p3_dft.radix_2_dit_parallel.mirror.first_half` | `p3_dft::radix_2_dit_parallel::first_half` | stub | 4 |
-| `dft` | `p3_dft.radix_2_dit_parallel.mirror.second_half` | `p3_dft::radix_2_dit_parallel::second_half` | stub | 4 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.dit_layer_rev` | `p3_dft::radix_2_dit_parallel::dit_layer_rev` | stub | 6 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.first_half` | `p3_dft::radix_2_dit_parallel::first_half` | stub | 5 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.second_half` | `p3_dft::radix_2_dit_parallel::second_half` | stub | 5 |
 | `dft` | `p3_dft.radix_2_dit_parallel.mirror.first_half_general` | `p3_dft::radix_2_dit_parallel::first_half_general` | stub | 2 |
 | `dft` | `p3_dft.radix_2_dit_parallel.mirror.second_half_general` | `p3_dft::radix_2_dit_parallel::second_half_general` | stub | 2 |
 | `dft` | `p3_dft.radix_2_dit_parallel.mirror.coset_dft` | `p3_dft::radix_2_dit_parallel::coset_dft` | stub | 2 |
@@ -554,7 +614,7 @@ counts the claims (of 972) whose dependencies include the declaration.
 | `dft` | `p3_dft.radix_2_dit_parallel.mirror.coset_dft_oop` | `p3_dft::radix_2_dit_parallel::coset_dft_oop` | stub | 1 |
 | `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit_parallel::Radix2DitParallel<F>}::dft_batch` | stub | 1 |
 | `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.coset_dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit_parallel::Radix2DitParallel<F>}::coset_dft_batch` | stub | 1 |
-| `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit_parallel::Radix2DitParallel<F>}::idft_batch` | stub | 2 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit_parallel::Radix2DitParallel<F>}::idft_batch` | stub | 3 |
 | `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.coset_idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit_parallel::Radix2DitParallel<F>}::coset_idft_batch` | stub | 1 |
 | `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.lde_with_consumer` | `p3_dft::radix_2_dit_parallel::Radix2DitParallel::lde_with_consumer` | stub | 1 |
 | `dft` | `p3_dft.radix_2_small_batch.mirror.roots_of_unity_table` | `p3_dft::radix_2_small_batch::Radix2DFTSmallBatch::roots_of_unity_table` | stub | 3 |
@@ -578,6 +638,19 @@ counts the claims (of 972) whose dependencies include the declaration.
 | `field` | `p3_field.field.PrimeField` | `p3_field::field::PrimeField` | stub | 0 |
 | `field` | `p3_field.field.UniformSamplingField` | `p3_field::field::UniformSamplingField` | stub | 0 |
 | `field` | `p3_field.helpers.halve_u32` | `p3_field::helpers::halve_u32` | stub | 1 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset` | `p3_field::coset::TwoAdicMultiplicativeCoset` | stub | 41 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.new` | `p3_field::coset::TwoAdicMultiplicativeCoset::new` | stub | 18 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.subgroup_generator` | `p3_field::coset::TwoAdicMultiplicativeCoset::subgroup_generator` | stub | 27 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.shift_inverse` | `p3_field::coset::TwoAdicMultiplicativeCoset::shift_inverse` | stub | 6 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.size` | `p3_field::coset::TwoAdicMultiplicativeCoset::size` | stub | 19 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.shrink_coset` | `p3_field::coset::TwoAdicMultiplicativeCoset::shrink_coset` | stub | 1 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.exp_power_of_2` | `p3_field::coset::TwoAdicMultiplicativeCoset::exp_power_of_2` | stub | 1 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.set_shift` | `p3_field::coset::TwoAdicMultiplicativeCoset::set_shift` | stub | 1 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.shift_by` | `p3_field::coset::TwoAdicMultiplicativeCoset::shift_by` | stub | 1 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.contains` | `p3_field::coset::TwoAdicMultiplicativeCoset::contains` | stub | 1 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.generator_exp` | `p3_field::coset::TwoAdicMultiplicativeCoset::generator_exp` | stub | 1 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.element` | `p3_field::coset::TwoAdicMultiplicativeCoset::element` | stub | 1 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.iter` | `p3_field::coset::TwoAdicMultiplicativeCoset::iter` | stub | 6 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreOpsArithSubGoldilocksGoldilocks.sub` | `{impl core::ops::arith::Sub for p3_goldilocks::goldilocks::Goldilocks}::sub` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreCmpPartialEqGoldilocks.eq` | `{impl core::cmp::PartialEq for p3_goldilocks::goldilocks::Goldilocks}::eq` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.halve` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::halve` | not translated | 2 |
@@ -597,16 +670,16 @@ counts the claims (of 972) whose dependencies include the declaration.
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_unchecked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked` | dropped | 2 |
-| `matrix` | `p3_matrix.interpolation.mirror.compute_adjusted_weights` | `p3_matrix::interpolation::compute_adjusted_weights` | not translated | 2 |
-| `matrix` | `p3_matrix.interpolation.mirror.interpolate_coset_with_precomputation` | `p3_matrix::interpolation::Interpolate::interpolate_coset_with_precomputation` | not translated | 3 |
-| `matrix` | `p3_matrix.interpolation.mirror.interpolate_coset` | `p3_matrix::interpolation::Interpolate::interpolate_coset` | not translated | 2 |
+| `matrix` | `p3_matrix.interpolation.mirror.compute_adjusted_weights` | `p3_matrix::interpolation::compute_adjusted_weights` | not translated | 11 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_coset_with_precomputation` | `p3_matrix::interpolation::Interpolate::interpolate_coset_with_precomputation` | not translated | 12 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_coset` | `p3_matrix::interpolation::Interpolate::interpolate_coset` | not translated | 11 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_subgroup` | `p3_matrix::interpolation::Interpolate::interpolate_subgroup` | not translated | 0 |
 | `matrix` | `p3_matrix.interpolation.mirror.barycentric_weights` | `p3_matrix::interpolation::barycentric_weights` | not translated | 2 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_with_precomputation` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_with_precomputation` | not translated | 1 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_point` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_point` | not translated | 1 |
 | `matrix` | `p3_matrix.interpolation.mirror.recover_coefficients` | `p3_matrix::interpolation::InterpolateArbitrary::recover_coefficients` | not translated | 2 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_lagrange` | `p3_matrix::interpolation::interpolate_lagrange` | not translated | 1 |
-| `matrix` | `p3_matrix.util.mirror.reverse_matrix_index_bits` | `p3_matrix::util::reverse_matrix_index_bits` | not translated | 16 |
+| `matrix` | `p3_matrix.util.mirror.reverse_matrix_index_bits` | `p3_matrix::util::reverse_matrix_index_bits` | not translated | 17 |
 | `matrix` | `p3_matrix.extension.mirror.flat_row_subseq` | `{impl p3_matrix::Matrix<F> for p3_matrix::extension::FlatMatrixView<F, EF, Inner>}::row_subseq_unchecked` | not translated | 1 |
 | `matrix` | `p3_matrix.extension.mirror.flat_iter_take` | `{impl core::iter::traits::iterator::Iterator for p3_matrix::extension::FlatIter<F, I>}::next` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.mersenne_31.Mersenne31.Insts.CoreIterTraitsAccumSumMersenne31.sum` | `{impl core::iter::traits::accum::Sum for p3_mersenne_31::mersenne_31::Mersenne31}::sum` | dropped | 2 |
@@ -774,6 +847,65 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Air.when_ne_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Air.when_transition_accepts` | `Quot.sound`, `propext` |
 | `Air.when_when_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.PeriodicColumns.new.error` | `Quot.sound`, `propext` |
+| `Commit.PeriodicColumns.new.ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.PeriodicLdeTable.get.packed` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.PeriodicLdeTable.is_empty` | `Quot.sound`, `propext` |
+| `Commit.PeriodicLdeTable.packed_group_period` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.babyBear.facts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.babyBear.selectors_on_disjoint_domain` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.build_periodic_lde_table` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.build_periodic_lde_table.nil` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.build_periodic_lde_table.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.commit_quotient` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.coset.contains` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.coset.element` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.coset.exp_power_of_2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.coset.iter` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.coset.set_shift` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.create_disjoint_domain` | `Quot.sound`, `propext` |
+| `Commit.create_disjoint_domain.disjoint` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.create_disjoint_domain.shape` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.create_disjoint_domain.some_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.default_evaluate_periodic_column_at` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.delegating_defaults` | `Quot.sound`, `propext` |
+| `Commit.encode_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.encode_batch.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.encode_batch_borrowed` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.evaluate_periodic_column_at` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.evaluate_periodic_column_at.panics_long` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.evaluate_periodic_column_at.panics_not_pow` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.evaluate_periodic_columns_at` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.evaluate_polynomial_at` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.mmcs.commit_matrix` | `propext` |
+| `Commit.mmcs.extension` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.mmcs.get_max_height` | `propext` |
+| `Commit.mmcs.reference` | `Quot.sound`, `propext` |
+| `Commit.natural_domain_for_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.natural_domain_for_degree.panics` | `Quot.sound`, `propext` |
+| `Commit.next_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.open_with_preprocessing` |  |
+| `Commit.paddedLen` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.pcs.binding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.selectors_at_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.selectors_at_point.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.selectors_on_coset` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.selectors_on_coset.at_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.selectors_on_coset.disjoint_domain` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.selectors_on_coset.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.split_domains` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.split_domains.partition` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.split_domains.points` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.split_domains.some_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.split_evals` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.split_evals.panics` | `Quot.sound`, `propext` |
+| `Commit.trivial.contract` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.trivial.contract.parallel` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.trivial.get_evaluations_on_domain.height` | `Quot.sound`, `propext` |
+| `Commit.unit_evaluator` | `Quot.sound`, `propext` |
+| `Commit.vanishing_poly_at_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.vanishing_poly_at_point.eq_zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.verify_with_preprocessing` |  |
 | `Dft.babyBear.generators` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Dft.bitrev_table` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Dft.bowers.coset_lde_batch` | `Classical.choice`, `Quot.sound`, `propext` |
