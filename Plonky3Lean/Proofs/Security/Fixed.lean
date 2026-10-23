@@ -281,6 +281,7 @@ theorem u64_saturating_sub_spec (x y : Std.U64) :
   exact Nat.mod_eq_of_lt (by simp at this ⊢; omega)
 
 /-- `bits_per_query` never panics, and computes `FixedLog.bpq`. -/
+@[step]
 theorem bits_per_query_spec (b : Std.U32) (f : Std.U64) :
     fixed.bits_per_query b f ⦃ y => y.val = bpq b.val f.val ⦄ := by
   unfold fixed.bits_per_query
