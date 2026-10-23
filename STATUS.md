@@ -41,6 +41,7 @@ target `thumbv7em-none-eabi`
 | `security` | scoped | 1414 | 130 | 6 | 13 | 0 | 2 / 1 | pre `010`, pre `020` |
 | `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
 | `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
+| `stir` | stub |  | 624 | 0 | 40 |  | 0 / 0 |  |
 | `sumcheck` | stub |  | 336 | 0 | 17 |  | 0 / 0 |  |
 | `symmetric` | scoped | 1078 | 58 | 1 | 0 | 4 | 4 / 2 | pre `010`, pre `020`, pre `030`, pre `040` |
 | `tiny-keccak` | scoped | 98 | 94 | 0 | 3 | 0 | 0 / 0 |  |
@@ -450,11 +451,11 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1322) whose dependencies include it; reaching one is not using it.
+(of 1363) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
-| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 71 |
+| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 72 |
 | `baby-bear` | `mds.MDSBabyBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon2.BabyBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
@@ -489,7 +490,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1322) whose dependencies include the declaration.
+counts the claims (of 1363) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -1067,6 +1068,46 @@ counts the claims (of 1322) whose dependencies include the declaration.
 | `security` | `Plonky3Lean.Proofs.Security.Real.foldingPowBitsR` | `p3_security::assumption::SecurityAssumption::folding_pow_bits` | not translated | 1 |
 | `security` | `Plonky3Lean.Proofs.Security.Real.upperX` | `p3_security::proximity::compute_upper_m` | not translated | 2 |
 | `security` | `Plonky3Lean.Proofs.Security.Real.sumBitsR` | `p3_security::error::ErrorBits::sum` | not translated | 1 |
+| `stir` | `p3_stir.utils.mirror.eval_poly` | `p3_stir::utils::eval_poly` | stub | 7 |
+| `stir` | `p3_stir.utils.mirror.eval_poly_parallel` | `p3_stir::utils::eval_poly_parallel` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.divide_by_linear` | `p3_stir::utils::divide_by_linear` | stub | 0 |
+| `stir` | `p3_stir.utils.mirror.add_polys` | `p3_stir::utils::add_polys` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.eval_degree_correction` | `p3_stir::utils::eval_degree_correction` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.combine_on_coset` | `p3_stir::utils::combine_on_coset` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.eval_poly_at_base` | `p3_stir::utils::eval_poly_at_base` | stub | 5 |
+| `stir` | `p3_stir.utils.mirror.reduce_mod_x_pow_minus_c` | `p3_stir::utils::reduce_mod_x_pow_minus_c` | stub | 6 |
+| `stir` | `p3_stir.utils.mirror.vanishing_poly_from_roots` | `p3_stir::utils::vanishing_poly_from_roots` | stub | 3 |
+| `stir` | `p3_stir.utils.mirror.next_domain_shift` | `p3_stir::utils::next_domain_shift` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.fold_domain_params` | `p3_stir::utils::fold_domain_params` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.OodFilter` | `p3_stir::utils::OodFilter` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.OodFilter.new` | `p3_stir::utils::OodFilter::new` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.OodFilter.accepts` | `p3_stir::utils::OodFilter::accepts` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.allDistinct` | `p3_stir::utils::interpolate_poly` | stub | 4 |
+| `stir` | `p3_stir.utils.mirror.interpolate_poly` | `p3_stir::utils::interpolate_poly` | stub | 4 |
+| `stir` | `p3_stir.utils.mirror.check_ans_interpolates` | `p3_stir::utils::check_ans_interpolates` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.fold_codeword` | `p3_stir::utils::fold_codeword` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.fold_pass` | `p3_stir::utils::fold_pass` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.fold_poly_coeffs` | `p3_stir::utils::fold_poly_coeffs` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.fold_fiber` | `p3_stir::utils::fold_fiber` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.lagrange_eval_at` | `p3_stir::utils::lagrange_eval_at` | stub | 0 |
+| `stir` | `p3_stir.utils.mirror.lagrange_interpolate_at` | `p3_stir::utils::lagrange_interpolate_at` | stub | 5 |
+| `stir` | `p3_stir.verifier.mirror.StirError` | `p3_stir::error::StirError` | stub | 7 |
+| `stir` | `p3_stir.verifier.mirror.VirtualRoundContext` | `p3_stir::verifier::VirtualRoundContext` | stub | 4 |
+| `stir` | `p3_stir.verifier.mirror.materialize_virtual_fiber` | `p3_stir::verifier::materialize_virtual_fiber` | stub | 4 |
+| `stir` | `p3_stir.verifier.mirror.query_fold_value` | `p3_stir::verifier::query_fold_value` | stub | 3 |
+| `stir` | `p3_stir.verifier.mirror.check_ans_length` | `p3_stir::verifier::check_ans_length` | stub | 3 |
+| `stir` | `p3_stir.verifier.mirror.resolve_ans_polynomial` | `p3_stir::verifier::resolve_ans_polynomial` | stub | 2 |
+| `stir` | `p3_stir.verifier.mirror.external_fibers_in_draw_order` | `p3_stir::verifier::external_fibers_in_draw_order` | stub | 1 |
+| `stir` | `p3_stir.verifier.mirror.fetch_committed_rows` | `p3_stir::verifier::fetch_round_rows` | stub | 0 |
+| `stir` | `p3_stir.verifier.mirror.QueryState` | `p3_stir::verifier::RoundVerifier` | stub | 1 |
+| `stir` | `p3_stir.verifier.mirror.fold_queries` | `p3_stir::verifier::RoundVerifier::fetch_and_fold` | stub | 1 |
+| `stir` | `p3_stir.verifier.mirror.all_points_and_values` | `p3_stir::verifier::RoundVerifier::all_points_and_values` | stub | 0 |
+| `stir` | `p3_stir.verifier.mirror.finish_ctx` | `p3_stir::verifier::RoundVerifier::finish` | stub | 2 |
+| `stir` | `p3_stir.verifier.mirror.round_geometry` | `p3_stir::verifier::RoundVerifier::new` | stub | 1 |
+| `stir` | `p3_stir.verifier.mirror.excluded_domains` | `p3_stir::verifier::RoundVerifier::excluded_domains` | stub | 0 |
+| `stir` | `p3_stir.verifier.mirror.set_gamma` | `p3_stir::verifier::RoundVerifier::set_gamma` | stub | 1 |
+| `stir` | `p3_stir.verifier.mirror.check_final_queries` | `p3_stir::verifier::FinalRoundVerifier::fetch_and_check` | stub | 0 |
+| `stir` | `p3_stir.pcs.plan.mirror.combine_coefficients` | `p3_stir::pcs::plan::combine_coefficients` | stub | 2 |
 | `sumcheck` | `p3_sumcheck.lagrange.mirror.lagrange_weights_01inf` | `p3_sumcheck::lagrange::lagrange_weights_01inf` | stub | 13 |
 | `sumcheck` | `p3_sumcheck.lagrange.mirror.lagrange_weights_01inf_multi` | `p3_sumcheck::lagrange::lagrange_weights_01inf_multi` | stub | 0 |
 | `sumcheck` | `p3_sumcheck.lagrange.mirror.extrapolate_01inf` | `p3_sumcheck::lagrange::extrapolate_01inf` | stub | 13 |
@@ -2403,6 +2444,47 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Symmetric.sponge.PaddingFreeSponge.hash_iter.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Symmetric.sponge.PaddingFreeSponge.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Symmetric.truncated.collision_of_inverse` | `Quot.sound`, `propext` |
+| `Stir.add_polys` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.babyBear.facts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.check_ans_interpolates` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.check_ans_length` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.combine_coefficients` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.combine_coefficients.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.combine_on_coset` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.coset_membership` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.degCor_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.eval_degree_correction` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.eval_poly` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.eval_poly_at_base` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.eval_poly_parallel` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.external_fibers_in_draw_order.no_panic` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.fold_codeword` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.fold_fiber` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.fold_of_polynomial` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.fold_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.fold_poly_coeffs` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.fold_queries` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.geometric_sum` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.interpolate_poly` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.interpolate_poly.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.lagrange_interpolate_at` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.materialize_virtual_fiber` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.next_domain_avoids_points` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.next_polynomial` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.ood_filter` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.polyFold_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.query_fold_value.initial` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.query_fold_value.virtual` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.reduce_mod_x_pow_minus_c` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.reduce_mod_x_pow_minus_c.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.resolve_ans_polynomial.compact` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.resolve_ans_polynomial.no_panic` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.round_completeness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.round_geometry` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.set_gamma` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.split_parts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.vanishing_poly_from_roots` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.virtual_oracle` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sumcheck.RoundPolyInterpolator.eval.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sumcheck.RoundPolyInterpolator.new.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sumcheck.extrapolate_01inf.spec` | `Classical.choice`, `Quot.sound`, `propext` |
