@@ -102,6 +102,7 @@ def outB (k x y z : ℕ) : Bool :=
 
 end row
 
+omit [DecidableEq F] in
 /-- Two limb folds agree when their bits do. -/
 theorem limbOf_congr {f g : ℕ → F} (limb : ℕ) (h : ∀ j < 16, f (limb * 16 + j) = g (limb * 16 + j)) :
     limbOf fieldOps f limb = limbOf fieldOps g limb := by
@@ -120,6 +121,7 @@ theorem limbOf_congr {f g : ℕ → F} (limb : ℕ) (h : ∀ j < 16, f (limb * 1
   obtain ⟨j, rfl⟩ : ∃ j, z = limb * 16 + j := ⟨z - limb * 16, by omega⟩
   exact h j (by omega)
 
+omit [DecidableEq F] in
 /-- A sum of one-hot values over a list without repeats is 1 exactly when the hot index is listed. -/
 theorem sum_onehot (l : List ℕ) (hl : l.Nodup) (k : ℕ) :
     (l.map fun r => if r = k then (1 : F) else 0).sum = if k ∈ l then 1 else 0 := by
