@@ -8,6 +8,7 @@ public import Plonky3Lean.Claims.Commit
 public import Plonky3Lean.Claims.Challenger
 public import Plonky3Lean.Claims.Dft
 public import Plonky3Lean.Claims.BinaryField
+public import Plonky3Lean.Claims.BinaryDft
 public import Plonky3Lean.Claims.Goldilocks
 public import Plonky3Lean.Claims.KoalaBear
 public import Plonky3Lean.Claims.Matrix
