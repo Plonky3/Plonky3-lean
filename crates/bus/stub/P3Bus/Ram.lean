@@ -282,7 +282,9 @@ def channel (nm : String) : Option String :=
   | .ok nm => some nm
   | .error _ => none
 
-/-- declare: pull each access; in a continuing proof, pull the opening value from the inherited image and push the closing value to the handed-on one. -/
+/-- declare: pull each access.
+
+A continuing proof also pulls each opening value from the inherited image, and pushes each closing value to the handed-on one. -/
 def RamAir.declare (air : RamAir) (B : BusBuilder F E S) (s : S) : Option S := do
   let row := (B.main s).current
   let L := air.layout

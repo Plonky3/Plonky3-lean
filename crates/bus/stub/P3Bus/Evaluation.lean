@@ -66,7 +66,7 @@ inductive BusEvaluationError where
   | FingerprintWidth (expected actual : ℕ)
   deriving DecidableEq
 
-/-- compile_leaf: a current-row access, a selector or a constant; another row is refused. -/
+/-- compile_leaf: a current-row access, a selector or a constant, and an error for another row. -/
 def compile_leaf : BaseLeaf F → Except BusEvaluationError (BusNode F)
   | .Variable v => match v.entry with
     | .Main 0 => .ok (.Main v.index)
@@ -138,7 +138,9 @@ def nodeValue (values : BusEvaluation F EF) (scratch : List EF) :
 
 /-- BusFactorPlan::evaluate: one forward pass, the payload inner product, the shift, then the activation's interpolation with the identity.
 
-An operand index is always earlier than its user, so reading it never panics; the transcription reads zero past the end. -/
+An operand index is always earlier than its user, so reading it never panics.
+
+The transcription reads zero past the end. -/
 def BusFactorPlan.evaluate (f : BusFactorPlan F EF) (values : BusEvaluation F EF) :
     Except BusEvaluationError EF := do
   let scratch ← f.nodes.foldlM (fun scratch node => do

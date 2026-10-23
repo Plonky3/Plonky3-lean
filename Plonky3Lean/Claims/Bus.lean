@@ -6,7 +6,7 @@ public import Plonky3Lean.Proofs.Bus.Evaluation
 public import Plonky3Lean.Proofs.Bus.Timestamped
 public import Plonky3Lean.Proofs.Bus.Security
 public import CompPoly.Fields.BabyBear.Ext4
-public import CompPoly.Fields.KoalaBear.Ext4
+public import CompPoly.Fields.KoalaBear.Basic
 
 @[expose] public section
 
@@ -104,7 +104,7 @@ theorem flattening_faithful (values : BusEvaluation F K) (e : SymbolicExpression
 
 /-! ## The product-tree reduction -/
 
-/-- **The schedule.** A height 2k contracts two levels per layer; a height 2k + 1 starts with one binary layer. -/
+/-- **The schedule.** A height 2k contracts two levels per layer, and a height 2k + 1 starts with one binary layer. -/
 theorem schedule (s : ProductGkrShape) :
     s.layers = if s.log_height % 2 = 0 then
         (List.range (s.log_height / 2)).map fun j => (4, 2 * j)

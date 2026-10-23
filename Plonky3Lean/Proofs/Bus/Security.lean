@@ -18,7 +18,11 @@ The bus charges four error events, each a numerator over the challenge-field ord
 
 The fingerprint numerator is the coefficient of the proven soundness count.
 
-The other three follow the schedule: for a height h = 2k, R = k(k - 1) and L = k; for h = 2k + 1, R = k^2 and L = k + 1.
+The other three follow the schedule.
+
+For a height h = 2k, R = k(k - 1) and L = k.
+
+For a height h = 2k + 1, R = k^2 and L = k + 1.
 -/
 
 namespace Plonky3Lean.Proofs.Bus

@@ -10,7 +10,7 @@ public import Plonky3Lean.Proofs.MultilinearUtil.Unique
 
 A tree of height h is reduced root first.
 
-An odd tree starts with one binary layer; every other layer contracts two levels:
+An odd tree starts with one binary layer, and every other layer contracts two levels:
 
 ```text
     h = 2k       (4, 0), (4, 2), ..., (4, 2k - 2)
@@ -47,7 +47,7 @@ theorem layersLoop_even (h : ℕ) : ∀ (k p : ℕ),
     simp [Function.comp_def]
     intro _ _; omega
 
-/-- **The schedule.** An even height contracts two levels per layer; an odd height starts with one binary layer. -/
+/-- **The schedule.** An even height contracts two levels per layer, and an odd height starts with one binary layer. -/
 theorem layers_eq (s : ProductGkrShape) :
     s.layers = if s.log_height % 2 = 0 then
         (List.range (s.log_height / 2)).map fun j => (4, 2 * j)
