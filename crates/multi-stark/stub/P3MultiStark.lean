@@ -14,5 +14,7 @@ public import P3MultiStark.Transcript
 public import P3MultiStark.Security
 public import P3MultiStark.FractionalGkr
 public import P3MultiStark.Lookup
+public import P3MultiStark.LogupStar
+public import P3MultiStark.Bus
 
 @[expose] public section

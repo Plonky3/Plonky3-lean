@@ -101,6 +101,50 @@ theorem link_claim (bs : List (FracBlock K)) (q : List K) (θ : K)
       rowExt_add, rowExt_const]; ring
   rw [hs]; ring
 
+theorem list_sum_map_sub {ι : Type _} (l : List ι) (f g : ι → K) :
+    (l.map fun i => f i - g i).sum = (l.map f).sum - (l.map g).sum := by
+  induction l with
+  | nil => simp
+  | cons i l ih => simp only [List.map_cons, List.sum_cons, ih]; ring
+
+/-- **The numerator opening.**
+
+The opening of the numerator table is the blocks' openings, each times its weight. -/
+theorem rowExt_numTable (bs : List (FracBlock K)) (q : List K)
+    (hb : ∀ b ∈ bs, b.n ≤ q.length ∧ b.c < 2 ^ (q.length - b.n)) :
+    rowExt (numTable bs) q =
+      (bs.map fun b => b.weight q * rowExt b.m (q.drop (q.length - b.n))).sum := by
+  have h := link_claim bs q 0 hb
+  simpa using h
+
+/-- **The denominator opening.**
+
+The opening of the denominator table is the blocks' openings, each times its weight.
+
+The padding adds one minus the sum of the weights. -/
+theorem rowExt_denTable (bs : List (FracBlock K)) (q : List K)
+    (hb : ∀ b ∈ bs, b.n ≤ q.length ∧ b.c < 2 ^ (q.length - b.n)) :
+    rowExt (denTable bs) q =
+      (bs.map fun b => b.weight q * rowExt b.d (q.drop (q.length - b.n))).sum +
+        (1 - (bs.map fun b => b.weight q).sum) := by
+  have h1 := link_claim bs q 1 hb
+  have h0 := link_claim bs q 0 hb
+  simp only [zero_mul, add_zero, one_mul] at h0 h1
+  rw [h0] at h1
+  have : rowExt (denTable bs) q - 1 = (bs.map fun b => b.weight q *
+      (rowExt b.d (q.drop (q.length - b.n)) - 1)).sum := by
+    have h2 : (bs.map fun b => b.weight q * (rowExt b.m (q.drop (q.length - b.n)) +
+        (rowExt b.d (q.drop (q.length - b.n)) - 1))).sum =
+        (bs.map fun b => b.weight q * rowExt b.m (q.drop (q.length - b.n))).sum +
+          (bs.map fun b => b.weight q * (rowExt b.d (q.drop (q.length - b.n)) - 1)).sum := by
+      rw [← List.sum_map_add]; congr 1; exact List.map_congr_left fun b _ => by ring
+    linear_combination h1 + h2
+  have h3 : (bs.map fun b => b.weight q * (rowExt b.d (q.drop (q.length - b.n)) - 1)).sum =
+      (bs.map fun b => b.weight q * rowExt b.d (q.drop (q.length - b.n))).sum -
+        (bs.map fun b => b.weight q).sum := by
+    rw [← list_sum_map_sub]; congr 1; exact List.map_congr_left fun b _ => by ring
+  linear_combination this + h3
+
 /-! ## The leaf sum -/
 
 /-- The leaves of the block of index c at height 2^n: c 2^n to c 2^n + 2^n - 1. -/
