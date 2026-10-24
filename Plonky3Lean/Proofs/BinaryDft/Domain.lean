@@ -8,8 +8,9 @@ public import Plonky3Lean.Proofs.BinaryDft.Network
 /-!
 # The domain transcriptions
 
-The domain point of an index is point(index) of the Cantor table, and it panics exactly when the
-index has a set bit at or past the bit width.
+The domain point of an index is point(index) of the Cantor table.
+
+It panics exactly when the index has a set bit at or past the bit width.
 
 The steps table holds the sums beta_1 + ... + beta_(r+1).
 
@@ -112,13 +113,17 @@ theorem domain_point_loop (L : Level F) (p : F) (rem r : ℕ) :
           rw [Nat.sub_eq_zero_of_le (by omega)]; omega
         simp [this]
 
-/-- The domain point of an index below 2^(2^b) is point(index) of the Cantor table, and any other index panics. -/
+/-- The domain point of an index below 2^(2^b) is point(index) of the Cantor table.
+
+Any other index panics. -/
 theorem domain_point_eq (L : Level F) (index : ℕ) :
     domain_point L index =
       if index < 2 ^ 2 ^ L.logBits then some (point L.cantor index) else none := by
   simp [domain_point, domain_point_loop]
 
-/-- Entry r of the steps table is beta_1 + ... + beta_(r+1); the table panics unless every entry is in the level. -/
+/-- Entry r of the steps table is beta_1 + ... + beta_(r+1).
+
+The table panics unless every entry is in the level. -/
 theorem domain_point_steps_eq (L : Level F) (count : ℕ) :
     domain_point_steps L count =
       if count < 2 ^ L.logBits then

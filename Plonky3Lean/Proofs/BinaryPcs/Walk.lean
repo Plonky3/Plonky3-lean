@@ -12,9 +12,13 @@ One round of the tower-basis fold splits its outputs into tasks of 2^10 symbols.
 
 Each task evaluates the domain point of its first output, then walks to the next by one addition.
 
-From output c - 1 to output c, point(2 c) adds beta_1 + ... + beta_(t+1), with t the trailing zeros of c.
+From output c - 1 to output c, point(2 c) adds beta_1 + ... + beta_(t+1).
 
-So the walk visits exactly the points the plain fold of each pair evaluates, and the round is that fold, pair by pair.
+Here t counts the trailing zeros of c.
+
+So the walk visits exactly the points the plain fold of each pair evaluates.
+
+The round is therefore that fold, pair by pair.
 -/
 
 namespace Plonky3Lean.Proofs.BinaryPcs
@@ -32,7 +36,7 @@ theorem trailingZeros_two_pow (k : ℕ) : trailingZeros (2 ^ k) = k := by
     simp only [h1, h2, ↓reduceIte, zero_ne_one]
     rw [show 2 ^ (k + 1) / 2 = 2 ^ k by rw [pow_succ]; simp, ih]
 
-/-- Tasks of G outputs, each a run of consecutive outputs, cover the first min N (T G) outputs in order. -/
+/-- Tasks of G consecutive outputs cover the first min N (T G) outputs in order. -/
 theorem flatten_tasks {α : Type _} (f : ℕ → α) (G N : ℕ) :
     ∀ T, ((List.range T).map fun t => (List.range (min G (N - t * G))).map fun o => f (t * G + o)).flatten =
       (List.range (min N (T * G))).map f := by
@@ -57,7 +61,11 @@ variable {F EF : Type _} [Field F] [CharP F 2] [Field EF] [Algebra F EF]
 def pairValue (beta : EF) (x lo hi : F) : EF :=
   beta * algebraMap F EF ((lo + x * (lo + hi)) + (lo + hi)) + algebraMap F EF (lo + x * (lo + hi))
 
-/-- The in-task walk: after the first o outputs, the point is that of the last output, and the outputs are the plain folds. -/
+/-- The in-task walk.
+
+After the first o outputs, the point is that of the last output.
+
+The outputs are the plain folds. -/
 theorem walk_loop (L : Level F) (codeword : List F) (beta : EF) (steps : List F) (start bound : ℕ)
     (f : F × List EF → ℕ → Option (F × List EF))
     (hf : ∀ (x : F) (out : List EF) (offset : ℕ), f (x, out) offset =
@@ -86,7 +94,7 @@ theorem walk_loop (L : Level F) (codeword : List F) (beta : EF) (steps : List F)
       List.map_append, List.map_cons, List.map_nil]
     simp [pure, List.range_succ]
 
-/-- One round of the tower-basis fold is the plain fold of every pair, at the pair's own domain point.
+/-- One round of the tower-basis fold is the plain fold of every pair, at its own domain point.
 
 It needs the codeword inside the alphabet's domain and inside a word. -/
 theorem fold_round_eq (L : Level F) (codeword : List F) (beta : EF) {m : ℕ}

@@ -8,9 +8,13 @@ public import CompPoly.Fields.Binary.AdditiveNTT.NovelPolynomialBasis
 /-!
 # The subspace polynomial of CompPoly
 
-CompPoly's additive NTT defines W_i as the product of X - u over the subspace U_i spanned by beta_0, ..., beta_(i-1).
+CompPoly's additive NTT defines W_i as the product of X - u over the subspace U_i.
 
-For a linearly independent basis over a field of two elements, the points 0, ..., 2^i - 1 run over U_i once each.
+That subspace is spanned by beta_0, ..., beta_(i-1).
+
+Take a linearly independent basis over a field of two elements.
+
+Then the points 0, ..., 2^i - 1 run over U_i once each.
 
 So CompPoly's W_i evaluates to the subspace polynomial of this specification.
 -/

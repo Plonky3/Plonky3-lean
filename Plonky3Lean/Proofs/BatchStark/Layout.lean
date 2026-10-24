@@ -12,13 +12,18 @@ One pair (alpha, beta) is drawn for the whole batch.
 
 Every lookup gets a bus id:
 
-* two global lookups share an id exactly when they name the same bus;
-* a local lookup gets an id no other lookup has;
-* every id is below the number of lookups.
+- two global lookups share an id exactly when they name the same bus
+- a local lookup gets an id no other lookup has
+- every id is below the number of lookups.
 
-Lookup j of instance i then reads the pair (alpha + (id + 1) beta^W, beta), with W the widest payload, at least 1.
+Lookup j of instance i then reads the pair (alpha + (id + 1) beta^W, beta).
 
-The layout panics exactly when a lookup's tuples differ in width, or when two global lookups on one bus differ in width.
+Here W is the widest payload, at least 1.
+
+The layout panics exactly when widths disagree in one of two places:
+
+- the tuples of one lookup
+- two global lookups on one bus.
 -/
 
 set_option linter.unusedSectionVars false
@@ -36,7 +41,7 @@ def width (l : Lookup F) : Option ℕ := assert_uniform_tuple_width l.elements
 def SameBus (P : List (Lookup F)) (a b : ℕ) : Prop :=
   a = b ∨ ∃ n, P[a]?.map (·.kind) = some (.Global n) ∧ P[b]?.map (·.kind) = some (.Global n)
 
-/-- The invariant of the layout over the lookups P processed so far, their ids, and the bookkeeping. -/
+/-- The layout's invariant over the lookups P processed so far, their ids, and the bookkeeping. -/
 structure Inv (P : List (Lookup F)) (ids : List ℕ) (st : LayoutState) : Prop where
   len : ids.length = P.length
   bound : st.next_bus ≤ P.length
@@ -85,7 +90,9 @@ theorem split_lt {P : List (Lookup F)} {c : Lookup F} {a : ℕ} (ha : a < (P ++ 
     a < P.length ∨ a = P.length := by
   simp at ha; omega
 
-/-- The id characterization extends to a new lookup whose id meets exactly the lookups it shares a bus with. -/
+/-- The id characterization extends to a new lookup.
+
+Its id must equal exactly the ids of the lookups it shares a bus with. -/
 theorem eq_iff_ext {P : List (Lookup F)} {ids : List ℕ} {c : Lookup F} {id : ℕ}
     (len : ids.length = P.length)
     (eq_iff : ∀ a < ids.length, ∀ b < ids.length, ids.getD a 0 = ids.getD b 0 ↔ SameBus P a b)
@@ -305,12 +312,16 @@ theorem outer_inv {all : List (List (Lookup F))} {acc : List (List ℕ)} {st : L
     obtain ⟨new, rfl, hl, hI'⟩ := ih hI1 h
     exact ⟨ids :: new, by simp, by simp [hl, hl1], by simpa using hI'⟩
 
-/-- **The bus ids.** When the layout's bookkeeping succeeds, it gives each instance one id per lookup, and over the flattened lookups:
+/-- **The bus ids.**
 
-* two ids agree exactly when the lookups are the same one, or global lookups naming the same bus;
-* every id is below the next free id, which is at most the number of lookups;
-* every lookup has a payload width, at most the widest payload W, and 1 <= W;
-* global lookups on one bus have one width. -/
+When the layout's bookkeeping succeeds, it gives each instance one id per lookup.
+
+Over the flattened lookups:
+
+- two ids agree exactly when the lookups are the same one, or global lookups on the same bus
+- every id is below the next free id, which is at most the number of lookups
+- every lookup has a payload width, at most the widest payload W, and 1 <= W
+- global lookups on one bus have one width. -/
 theorem busIds_spec {all : List (List (Lookup F))} {ids : List (List ℕ)} {st : LayoutState}
     (h : busIds all = some (ids, st)) :
     ids.map List.length = all.map List.length ∧ Inv all.flatten ids.flatten st := by
@@ -323,7 +334,12 @@ theorem lt_of_mem_flatten {P : List (Lookup F)} {ids : List ℕ} {st : LayoutSta
   have := hI.lt a ha
   rwa [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem ha, Option.getD_some] at this
 
-/-- **The layout.** With two challenges per lookup, lookup j of instance i reads its bus offset alpha + (id + 1) beta^W and then beta, with W the widest payload. -/
+/-- **The layout.**
+
+With two challenges per lookup, lookup j of instance i reads two values:
+
+- its bus offset alpha + (id + 1) beta^W, with W the widest payload
+- then beta. -/
 theorem lay_out_eq {K : Type} [Field K] {all : List (List (Lookup F))} {ids : List (List ℕ)}
     {st : LayoutState} (h : busIds all = some (ids, st)) (α β : K) :
     lay_out_lookup_challenges 2 all α β =
@@ -454,7 +470,12 @@ theorem outer_none_iff {all : List (List (Lookup F))} {acc : List (List ℕ)} {s
       simp only [Option.bind_some, Option.pure_def]
       rw [ih hI1]; simp
 
-/-- **When the layout panics.** With two challenges per lookup, the layout panics exactly when a lookup's tuples differ in width, or two global lookups naming one bus differ in width. -/
+/-- **When the layout panics.**
+
+With two challenges per lookup, the layout panics exactly when widths disagree in one of two places:
+
+- the tuples of one lookup
+- two global lookups on one bus. -/
 theorem lay_out_none_iff {K : Type} [Field K] (all : List (List (Lookup F))) (α β : K) :
     lay_out_lookup_challenges 2 all α β = none ↔ ¬ WidthsOk all.flatten := by
   rcases h : busIds all with _ | ⟨ids, st⟩

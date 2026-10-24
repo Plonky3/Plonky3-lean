@@ -13,7 +13,10 @@ public import Mathlib.Algebra.Field.Basic
 
 A key is a list of digits, least significant first, each 0 or 1 in a field.
 
-The comparison proves `right = left + delta` with a ripple adder whose final carry is zero, and a running or proving `delta` nonzero.
+The comparison proves right = left + delta with two gadgets:
+
+- a ripple adder whose final carry is zero
+- a running or proving delta nonzero.
 
 Over digits that are bits, the adder identities are the integer ones:
 
@@ -22,7 +25,9 @@ Over digits that are bits, the adder identities are the integer ones:
     majority(a, b, c) = (a + b + c) div 2
 ```
 
-So the accepted keys satisfy `value(right) = value(left) + value(delta) > value(left)` as natural numbers, and nothing wraps.
+So the accepted keys satisfy value(right) = value(left) + value(delta) > value(left).
+
+This holds as natural numbers, and nothing wraps.
 -/
 
 namespace Plonky3Lean.Proofs.Bus
@@ -70,7 +75,15 @@ theorem or_bits {a b : F} (ha : IsBit a) (hb : IsBit b) :
   rcases ha with rfl | rfl <;> rcases hb with rfl | rfl <;>
     norm_num [p3_bus.ram.mirror.or, fieldExprOps, IsBit, h01, h01.symm]
 
-/-- **The ripple adder.** With bit inputs, a zero carry in, and the sum and carry identities on the first k digits, the k-digit values satisfy right + 2^k carry_k = left + delta. -/
+/-- **The ripple adder.**
+
+Assume on the first k digits:
+
+- the inputs are bits
+- the carry in is zero
+- the sum and carry identities hold.
+
+Then the k-digit values satisfy right + 2^k carry_k = left + delta. -/
 theorem ripple {left right delta carry : List F} :
     ∀ k : ℕ, (∀ i < k, IsBit (left.getD i 0)) → (∀ i < k, IsBit (delta.getD i 0)) →
       carry.getD 0 0 = 0 →
@@ -89,7 +102,9 @@ theorem ripple {left right delta carry : List F} :
     rw [pv_succ, pv_succ, pv_succ, hr k (by omega), pow_succ]
     linear_combination (norm := ring_nf) ih + 2 ^ k * hsum
 
-/-- **The running or.** The flags of a running or over bits reach 1 exactly when some digit so far is 1. -/
+/-- **The running or.**
+
+The flags of a running or over bits reach 1 exactly when some digit so far is 1. -/
 theorem running_or {delta nonzero : List F} :
     ∀ k : ℕ, (∀ i ≤ k, IsBit (delta.getD i 0)) → nonzero.getD 0 0 = delta.getD 0 0 →
       (∀ i < k, nonzero.getD (i + 1) 0 = p3_bus.ram.mirror.or (fieldExprOps F) (nonzero.getD i 0) (delta.getD (i + 1) 0)) →

@@ -8,13 +8,17 @@ public import CompPoly.Fields.BabyBear.Ext4
 /-!
 # Extension expressions: meaning and degree
 
-An extension expression denotes a polynomial over the extension field, in the base variables and the extension variables.
+An extension expression denotes a polynomial over the extension field.
+
+Its variables are the base variables and the extension variables.
 
 A base subexpression denotes its base polynomial, with coefficients moved to the extension.
 
 An extension constant that lies in the base field folds as that base constant.
 
-The simplifying operators then denote the ring operations, and the degree walk bounds the degree.
+The simplifying operators then denote the ring operations.
+
+The degree walk bounds the degree.
 
 The quartic extension of BabyBear recognises its base field by its coordinates.
 -/
@@ -55,7 +59,11 @@ theorem leafDen_extLeafPoly (h : LawfulInBase F EF) :
   from_const c := by
     simp [SymLeaf.from_const, extLeafPoly, toPoly, denote, leafPoly, MvPolynomial.algebraMap_eq]
 
-/-- Degree bounds for an extension assignment: the base bounds, permutation columns of degree at most n - 1, and constant challenges and permutation values. -/
+/-- Degree bounds for an extension assignment:
+
+- the base variables meet the base bounds
+- permutation columns have degree at most n - 1
+- challenges and permutation values are constant. -/
 structure ExtDegreeBounds (σ : Var ⊕ SymbolicVariableExt → Polynomial EF) (n : ℕ) (periods : List ℕ) :
     Prop where
   base : DegreeBounds (σ ∘ Sum.inl) n periods

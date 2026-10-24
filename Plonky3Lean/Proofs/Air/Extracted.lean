@@ -10,7 +10,11 @@ public import Plonky3Lean.Lib
 /-!
 # The extracted integer helpers
 
-The extracted boundary row, degree conversion and variable degrees never panic outside the documented case.
+Three extracted helpers never panic outside the documented case:
+
+- the boundary row
+- the degree conversion
+- the variable degrees.
 
 Each agrees with its transcription, so the theorems about the transcriptions hold of the extracted code.
 -/
@@ -22,7 +26,7 @@ open p3_air
 
 /-! ## Boundary rows -/
 
-/-- On a trace with rows, the row of a boundary cell is 0 for the first end and height - 1 for the last. -/
+/-- On a nonempty trace, a boundary cell sits on row 0 for the first end and height - 1 for the last. -/
 theorem row_spec (cell : boundary.BoundaryPublic) (height : Std.Usize) (h : 0 < height.val) :
     boundary.BoundaryPublic.row cell height ⦃ r =>
       r.val = match cell.end with
@@ -146,7 +150,9 @@ def varExtOf {F EF : Type} (v : symbolic.variable.SymbolicVariableExt F EF) :
     | .Challenge => .Challenge
     | .PermutationValue => .PermutationValue, v.index.val⟩
 
-/-- The extracted degree multiple of an extension variable never panics and returns its transcription. -/
+/-- The extracted degree multiple of an extension variable never panics.
+
+It returns its transcription. -/
 theorem ext_degree_multiple_spec {F EF : Type} (v : symbolic.variable.SymbolicVariableExt F EF) :
     symbolic.variable.SymbolicVariableExt.degree_multiple v ⦃ d =>
       d.val = (varExtOf v).degree_multiple ⦄ := by
@@ -154,7 +160,9 @@ theorem ext_degree_multiple_spec {F EF : Type} (v : symbolic.variable.SymbolicVa
   rcases v with ⟨e, i, _⟩
   cases e <;> simp [varExtOf, p3_air.symbolic.mirror.SymbolicVariableExt.degree_multiple]
 
-/-- The extracted polynomial degree of an extension variable never panics and returns its transcription. -/
+/-- The extracted polynomial degree of an extension variable never panics.
+
+It returns its transcription. -/
 theorem ext_poly_degree_spec {F EF : Type} (v : symbolic.variable.SymbolicVariableExt F EF)
     (n : Std.Usize) :
     symbolic.variable.SymbolicVariableExt.poly_degree v n ⦃ d =>
@@ -184,7 +192,9 @@ theorem call_mut_spec (c : boundary.validate.closure) (a : boundary.BoundaryPubl
   unfold boundary.validate.closure.Insts.CoreOpsFunctionFnMutTupleShared1BoundaryPublicBool.call_mut
   by_cases h : a.column = c.column <;> simp [h, end_eq_spec, sameCell]
 
-/-- The duplicate scan of the extracted declaration check never panics, and reports whether some cell has the given column and end. -/
+/-- The duplicate scan of the extracted declaration check never panics.
+
+It reports whether some cell has the given column and end. -/
 theorem any_spec (c : boundary.validate.closure) (l : List boundary.BoundaryPublic) :
     ∀ s : CoreModels.core.slice.iter.Iter boundary.BoundaryPublic,
     (show Slice boundary.BoundaryPublic from s).val = l →

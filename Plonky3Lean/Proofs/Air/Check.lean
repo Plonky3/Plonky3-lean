@@ -13,7 +13,10 @@ So, on a parametric AIR, it asserts the values of the AIR's constraint polynomia
 
 It records a failure exactly for the nonzero ones.
 
-The checker therefore accepts a trace exactly when its shape checks pass and every constraint polynomial vanishes on every row.
+The checker therefore accepts a trace exactly when:
+
+- its shape checks pass
+- every constraint polynomial vanishes on every row.
 -/
 
 set_option linter.unusedSectionVars false
@@ -82,7 +85,12 @@ def instOf (air : Air F) (M : Mat F) (pv : List F) : Instance F where
   pub j := pv.getD j 0
   periodic j r := (air.periodic_values r).getD j 0
 
-/-- The widths the checker relies on: the trace width, the preprocessed width, the public values and the periodic columns match the AIR. -/
+/-- The widths the checker relies on all match the AIR:
+
+- the trace width
+- the preprocessed width
+- the public values
+- the periodic columns. -/
 structure Shapes (air : Air F) (M : Mat F) (pv : List F) : Prop where
   main_width : M.width = air.width
   prep_width : ∀ P, air.preprocessed_trace = some P → P.width = air.preprocessed_width
@@ -162,7 +170,7 @@ theorem eval_rowBuilder {air : Air F} {M : Mat F} {pv : List F} (hs : Shapes air
         ((constraints air).map (MvPolynomial.eval (rowEnv (instOf air M pv) i))) :=
   air.parametric _ _ _ _ (builderRel_poly_row hs hp hi) [] _ rfl
 
-/-- At row i, the debug builder records no failure exactly when every constraint polynomial vanishes on row i. -/
+/-- At row i, the debug builder records no failure exactly when every constraint vanishes there. -/
 theorem rowBuilder_ok_iff {air : Air F} {M : Mat F} {pv : List F} (hs : Shapes air M pv)
     (hp : PrepHeight air M) {i : ℕ} (hi : i < M.height) :
     (air.eval (rowBuilder air M pv i) (DebugState.new i)).failures = [] ↔
@@ -185,7 +193,12 @@ theorem assert_periodic_column_shapes_ok (air : Air F) (height : ℕ) :
   by_cases h1 : col.length ≠ 0 ∧ 2 ^ Nat.log 2 col.length = col.length <;>
     by_cases h2 : height % col.length = 0 <;> simp_all [bind, Except.bind, pure, Except.pure]
 
-/-- The checker accepts exactly when the preprocessed height matches, the periodic shapes are valid, every boundary cell holds its public value, and the trace satisfies the AIR's constraint polynomials. -/
+/-- The checker accepts exactly when:
+
+- the preprocessed height matches
+- the periodic shapes are valid
+- every boundary cell holds its public value
+- the trace satisfies the AIR's constraint polynomials. -/
 theorem check_constraints_ok_iff {air : Air F} {M : Mat F} {pv : List F} (hs : Shapes air M pv) :
     check_constraints air M pv = .ok () ↔
       PrepHeight air M ∧ PeriodicShapes air M.height ∧

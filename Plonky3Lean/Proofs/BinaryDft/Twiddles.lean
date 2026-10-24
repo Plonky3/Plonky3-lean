@@ -8,10 +8,13 @@ public import Mathlib.Tactic.LinearCombination
 /-!
 # The twiddle state
 
-For a Cantor basis, the twiddle of stage j and block b is W_j(shift) + point(2b) (Lin, Chung and Han,
-section III, with W_j(beta_i) = beta_(i-j)).
+For a Cantor basis, the twiddle of stage j and block b is W_j(shift) + point(2b).
 
-Going from block b to block b + 1 flips the bits 1 .. t + 1 of 2b, where t counts the trailing zeros of b + 1.
+This uses W_j(beta_i) = beta_(i-j), as in Lin, Chung and Han, section III.
+
+Going from block b to block b + 1 flips the bits 1 .. t + 1 of 2b.
+
+Here t counts the trailing zeros of b + 1.
 
 So the step is beta_1 + ... + beta_(t+1), entry t of the steps table.
 -/

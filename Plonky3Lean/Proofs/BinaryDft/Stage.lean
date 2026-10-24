@@ -8,10 +8,13 @@ public import Plonky3Lean.Proofs.Dft.Glue
 /-!
 # One stage of the transcribed transform
 
-A slice of whole blocks, its twiddle walked from block to block, runs the butterflies of the stage
-on those blocks.
+Take a slice of whole blocks, with its twiddle walked from block to block.
 
-A stage pass cuts the rows into such slices and writes each one back, so it is the stage.
+It runs the butterflies of the stage on those blocks.
+
+A stage pass cuts the rows into such slices and writes each one back.
+
+So a stage pass is the stage.
 -/
 
 namespace Plonky3Lean.Proofs.BinaryDft
@@ -99,7 +102,9 @@ theorem canonTw_step {j c : ℕ} (hj : j < l) (hc : 0 < c) (hcl : c < 2 ^ (l - j
   rw [twiddle_cantor hL shift (by omega) (blocks_lt hl hj hcl),
     twiddle_cantor hL shift (by omega) (blocks_lt hl hj (by omega)), point_step _ hc, add_assoc]
 
-/-- A slice of cnt whole blocks, its twiddle walked from block first, runs the stage's butterflies there. -/
+/-- A slice of cnt whole blocks runs the stage's butterflies on them.
+
+Its twiddle is walked from block first onwards. -/
 theorem walkBlocks_eq (inverse : Bool) {j first cnt : ℕ} (hj : j < l) (hcnt : 0 < cnt)
     (hfc : first + cnt ≤ 2 ^ (l - j - 1)) (y : ℕ → V) :
     walkBlocks L (canonTw L l shift) inverse j first (cnt * (2 * 2 ^ j)) (2 ^ j) y =
@@ -127,7 +132,7 @@ theorem walkBlocks_eq (inverse : Bool) {j first cnt : ℕ} (hj : j < l) (hcnt : 
       rw [(canonTw_step hL hl shift hj (by omega) (by omega)).1]
       simp only [Option.pure_def, Option.bind_some]
       rw [blockButterfly_full _ (by nlinarith)]; rfl)]
-  -- the walk carries the twiddle of the block it is on
+  -- The walk carries the twiddle of the block it is on.
   have walk : ∀ k, 1 ≤ k → k ≤ cnt →
       (List.range k).foldl g (y, τ 0) =
         ((List.range k).foldl (fun y i => blk (τ i) i y) y, τ (k - 1)) := by
@@ -188,7 +193,8 @@ theorem stage_pass_eq (inverse : Bool) {width j : ℕ} (hw : 0 < width) (hj : j 
     rw [hB, ← mul_assoc, mul_comm _ 2, ← pow_succ', ← pow_add]; congr 1; omega
   set T := P * B
   have hT0 : 0 < T := Nat.mul_pos hP1 hB0
-  -- task k covers blocks k P .. k P + cnt k - 1, rows k T .. k T + cnt k B - 1
+  -- Task k covers blocks k P .. k P + cnt k - 1.
+  -- It covers rows k T .. k T + cnt k B - 1.
   let cnt := fun k => min P (nb - k * P)
   have hlen : ∀ k, min T (2 ^ l - k * T) = cnt k * B := fun k => by
     simp only [cnt, T, hn, show k * (P * B) = k * P * B by ring, ← Nat.sub_mul,
@@ -205,13 +211,13 @@ theorem stage_pass_eq (inverse : Bool) {width j : ℕ} (hw : 0 < width) (hj : j 
     have h := (htasks k).mp hk
     rw [hn, show k * T = k * P * B by ring] at h
     exact Nat.lt_of_mul_lt_mul_right h
-  -- each step of the fold transforms one task's rows
+  -- Each step of the fold transforms one task's rows.
   rw [foldlM_some _ g _ (fun acc k hk => by
     have hk' := hk_lt k (List.mem_range.mp hk)
     rw [hlen k, walkBlocks_eq hL hl shift inverse hj (by simp [cnt]; omega) (by simp [cnt]; omega)]
     rfl)]
   congr 1
-  -- after k tasks, the rows below k T are those of the stage
+  -- After k tasks, the rows below k T are those of the stage.
   have inv : ∀ k ≤ ntasks, (List.range k).foldl g x =
       fun r => if r < k * T ∧ r < 2 ^ l then S r else x r := by
     intro k hk

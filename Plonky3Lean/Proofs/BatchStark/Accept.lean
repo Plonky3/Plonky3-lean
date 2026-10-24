@@ -8,9 +8,20 @@ public import Plonky3Lean.Proofs.Lookup.Api
 /-!
 # What the batch verifier guarantees
 
-* It never panics on a proof, once every AIR binds its public values by constraints and the keygen-cached lookups pass the layout's width checks.
-* Its permutation round lists exactly the instances with lookups, in order, which is the prover's commit order.
-* When it accepts: the shape checks and the height bound pass, the transcript is the pattern, every instance passes its check at the shared zeta with the shared alpha, the opening argument passes, and the terminals sum to zero.
+The verifier never panics on a proof, under two conditions:
+
+- every AIR binds its public values by constraints
+- the keygen-cached lookups pass the layout's width checks.
+
+Its permutation round lists exactly the instances with lookups, in the prover's commit order.
+
+When it accepts:
+
+- the shape checks and the height bound pass
+- the transcript is the pattern
+- every instance passes its check at the shared zeta with the shared alpha
+- the opening argument passes
+- the terminals sum to zero.
 -/
 
 set_option linter.unusedSectionVars false
@@ -61,7 +72,13 @@ theorem opening_reads_ne_none {cfg : Config} {airs : List AirInfo} {proof : Batc
     rw [hrs]; simp
   · simp
 
-/-- **The permutation round.** With an extension of degree at least 1, the instances with a nonempty permutation opening are exactly those with lookups, in order: the prover's commit order. -/
+/-- **The permutation round.**
+
+Take an extension of degree at least 1.
+
+The instances with a nonempty permutation opening are exactly those with lookups.
+
+They come in the prover's commit order. -/
 theorem permutation_round {cfg : Config} {airs : List AirInfo} {proof : BatchProof C F K}
     {pvs : List (List F)} {common : CommonData C F} {checked : Checked}
     (hS : Shaped cfg airs proof pvs common checked) (hD : 1 ≤ cfg.dimension) :
@@ -81,7 +98,13 @@ section Verify
 
 variable [Zero F] [DecidableEq F] [Field K] [DecidableEq K]
 
-/-- **The verifier never panics on a proof.** When every AIR binds its public values by constraints and the keygen-cached lookups pass the layout's width checks, verification returns an acceptance or an error on every proof. -/
+/-- **The verifier never panics on a proof.**
+
+Assume every AIR binds its public values by constraints.
+
+Assume the keygen-cached lookups pass the layout's width checks.
+
+Then verification returns an acceptance or an error on every proof. -/
 theorem verify_batch_ne_none (cfg : Config) (airs : List AirInfo) (proof : BatchProof C F K)
     (pvs : List (List F)) (common : CommonData C F) (H : List (Msg C F K) → K)
     (powOk : List (Msg C F K) → ℕ → F → Bool) (pcsOk : List (Msg C F K) → K → Bool)
@@ -102,11 +125,11 @@ theorem verify_batch_ne_none (cfg : Config) (airs : List AirInfo) (proof : Batch
 
 /-- **What acceptance means.** When verification accepts:
 
-* the shape checks accept, so the height bound passes and every guarantee of an accepted shape holds;
-* the replay accepts with the steps of the pattern, and yields the lookup challenges, alpha and zeta;
-* the opening argument accepts at zeta;
-* every instance passes its check at the shared zeta, with the shared alpha and its own challenges;
-* the present terminals sum to zero. -/
+- the shape checks accept, so the height bound and every guarantee of an accepted shape hold
+- the replay plays the pattern and yields the lookup challenges, alpha and zeta
+- the opening argument accepts at zeta
+- every instance passes its check at the shared zeta, the shared alpha and its own challenges
+- the present terminals sum to zero. -/
 theorem verify_batch_accepts {cfg : Config} {airs : List AirInfo} {proof : BatchProof C F K}
     {pvs : List (List F)} {common : CommonData C F} {H : List (Msg C F K) → K}
     {powOk : List (Msg C F K) → ℕ → F → Bool} {pcsOk : List (Msg C F K) → K → Bool}

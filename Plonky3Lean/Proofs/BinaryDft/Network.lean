@@ -10,9 +10,13 @@ public import Mathlib.Tactic.Module
 
 The forward network runs stage l - 1 first.
 
-That stage splits sum_k d_k X_k into P_0 + W^_(l-1) P_1, with P_0 and P_1 in the first 2^(l-1) basis polynomials.
+That stage splits sum_k d_k X_k into P_0 + W^_(l-1) P_1.
 
-On the lower half of the domain W^_(l-1) is the twiddle t, and on the upper half it is t + 1:
+Both P_0 and P_1 lie in the span of the first 2^(l-1) basis polynomials.
+
+On the lower half of the domain, W^_(l-1) is the twiddle t.
+
+On the upper half it is t + 1:
 
 ```text
     lower half:   P_0 + t P_1           coefficients  u_k = d_k + t d_(k + h)
@@ -290,8 +294,11 @@ theorem twiddle_upper (β : ℕ → F) (shift : F) {l j b : ℕ} (hj : j < l)
   rw [twiddle, twiddle, e, point_add_two_pow β hlt]
   congr 1; ring
 
-/-- Lin, Chung and Han, section III: the network of the twiddles W^_j at the block points
-evaluates sum_k d_k X_k on the coset shift + S_l, for an independent basis. -/
+/-- Lin, Chung and Han, section III.
+
+Take an independent basis and the twiddles W^_j at the block points.
+
+The network then evaluates sum_k d_k X_k on the coset shift + S_l. -/
 theorem network_ntt (β : ℕ → F) {n l : ℕ} (hβ : Independent β n) (hl : l ≤ n) (shift : F)
     (d : ℕ → V) {i : ℕ} (hi : i < 2 ^ l) :
     network (twiddle β shift) l d i = ntt β l shift d i := by

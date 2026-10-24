@@ -66,7 +66,9 @@ variable {F : Type _} [Field F] [DecidableEq F] [CharP F 2] {V : Type _} [AddCom
   [Module F V] {L : Level F} (hL : Cantor L)
 include hL
 
-/-- The extension of 2^l values by a dimensions: the input rows come back first, and the rest evaluate their interpolant. -/
+/-- The extension of 2^l values by a dimensions.
+
+The input rows come back first, and the rest evaluate their interpolant. -/
 theorem shifted_lde_eq {l a width : ℕ} (hla : l + a ≤ 2 ^ L.logBits) (ha : 0 < a) (hw : 0 < width)
     (har : a < 64) (hword : 2 ^ l * width * 2 ^ a < 2 ^ 64) (shift : F) (y : ℕ → V) :
     ∃ d : ℕ → V, (∀ i < 2 ^ l, ntt L.cantor l shift d i = y i) ∧

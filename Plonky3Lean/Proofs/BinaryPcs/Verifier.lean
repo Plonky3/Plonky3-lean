@@ -10,9 +10,13 @@ public import Plonky3Lean.Proofs.BinaryPcs.Fold
 
 On an accepted schedule, the query phase answers every proof with an acceptance or a typed rejection.
 
-The proof is arbitrary: its round count, row counts, row widths, final codeword and witness are all adversarial.
+The proof is arbitrary.
 
-The shape checks run before any index is read, and they bound every index the fold chain reads.
+Its round count, row counts, row widths, final codeword and witness are all adversarial.
+
+The shape checks run before any index is read.
+
+They bound every index the fold chain reads.
 -/
 
 namespace Plonky3Lean.Proofs.BinaryPcs
@@ -341,7 +345,11 @@ theorem check_round_and_final_lengths_eq {c : BinaryPcsConfig} (hc : Inv c)
   split_ifs <;> simp_all [pure]
 
 omit [Field F] [Field EF] [Algebra F EF] [DecidableEq F] [DecidableEq EF] in
-/-- The query indices: as many as the shape's pairs, each a pair index times 2^lff, below the domain. -/
+/-- The query indices:
+
+- there are as many as the shape's pairs
+- each is a pair index times 2^lff
+- each lies below the domain size. -/
 theorem indices_facts (S : PSponge F EF) {c : BinaryPcsConfig} (hc : Inv c) {s : BinaryPcsShape}
     (hs : BinaryPcsShape.new c = some s) (h : List (Step F EF)) :
     let indices := (query_pairs S s h).1.map (· <<< (c.log_folding_factor - 1))
@@ -368,7 +376,9 @@ theorem indices_facts (S : PSponge F EF) {c : BinaryPcsConfig} (hc : Inv c) {s :
 
 /-- On an accepted schedule, the query phase never panics on any proof.
 
-The alphabet's and the field's domains must hold the codeword, as the schedule checks for the alphabet. -/
+The alphabet's and the field's domains must hold the codeword.
+
+The schedule checks this for the alphabet. -/
 theorem verify_query_paths_ne_none {c : BinaryPcsConfig} (hc : Inv c)
     (hLF : c.committed_field_bits ≤ 2 ^ V.LF.logBits) (hLE : c.committed_field_bits ≤ 2 ^ V.LE.logBits)
     {s : BinaryPcsShape} (hs : BinaryPcsShape.new c = some s) (base_commitment : ComT) (betas : List EF)

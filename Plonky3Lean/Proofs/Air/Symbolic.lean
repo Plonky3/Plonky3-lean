@@ -46,7 +46,9 @@ theorem map_denote {S G : Type _} [CommRing S] [FunLike G R S] [RingHomClass G R
     (den : A → R) (e : SymbolicExpr A) : f (denote den e) = denote (fun a => f (den a)) e := by
   induction e <;> simp_all [denote]
 
-/-- A leaf valuation that sends a leaf holding a constant, and the leaf built from one, to that constant. -/
+/-- A leaf valuation that sends each constant leaf to its constant.
+
+This covers a leaf holding a constant and the leaf built from one. -/
 structure LeafDen (den : A → R) : Prop where
   as_const : ∀ a c, SymLeaf.as_const a = some c → den a = algebraMap F R c
   from_const : ∀ c, den (SymLeaf.from_const c) = algebraMap F R c
@@ -235,7 +237,9 @@ section bounds
 
 variable {K : Type _} [Field K] [Algebra F K] {σ : Var → Polynomial K} {n : ℕ} {periods : List ℕ}
 
-/-- A periodic column stays within the walk's degree: n - n / p, or n - 1 when the period is missing, at least n, or 0. -/
+/-- A periodic column stays within the walk's degree.
+
+That degree is n - n / p, or n - 1 when the period is missing, at least n, or 0. -/
 theorem natDegree_periodic_le (hσ : DegreeBounds σ n periods)
     (hp : ∀ j p : ℕ, periods[j]? = some p → 0 < p → p < n → p ∣ n) (j : ℕ) :
     (σ (.periodic j)).natDegree ≤ SymbolicVariable.poly_degree ⟨.Periodic, j⟩ n periods := by
@@ -270,7 +274,7 @@ theorem natDegree_varPoly_le (hσ : DegreeBounds σ n periods)
   | Public => simp [varPoly, SymbolicVariable.poly_degree, hσ.pub]
   | Periodic => simpa [varPoly] using natDegree_periodic_le hσ hp j
 
-/-- Every leaf's polynomial stays within its leaf degree, under the degree bounds of the variables. -/
+/-- Under the degree bounds of the variables, every leaf's polynomial stays within its leaf degree. -/
 theorem natDegree_leaf_le (hσ : DegreeBounds σ n periods)
     (hp : ∀ j p : ℕ, periods[j]? = some p → 0 < p → p < n → p ∣ n) (a : BaseLeaf F) :
     (MvPolynomial.aeval σ (leafPoly a)).natDegree ≤ SymLeaf.poly_degree a n periods := by

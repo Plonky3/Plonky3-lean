@@ -9,9 +9,18 @@ public import Plonky3Lean.Proofs.BatchStark.Layout
 /-!
 # The batch verifier's shape checks
 
-* One instance's checks accept exactly the documented shapes.
-* A count mismatch is rejected first, as such, and a randomization mismatch next.
-* An accepted shape fixes every count the transcript reads: one degree bit and one public-value list per instance, a terminal exactly for each instance with lookups, a permutation commitment exactly when some instance has lookups, and a randomization opening exactly when the scheme hides.
+One instance's checks accept exactly the documented shapes.
+
+A count mismatch is rejected first, with its own error.
+
+A randomization mismatch is rejected next.
+
+An accepted shape fixes every count the transcript reads:
+
+- one degree bit and one public-value list per instance
+- a terminal exactly for each instance with lookups
+- a permutation commitment exactly when some instance has lookups
+- a randomization opening exactly when the scheme hides.
 -/
 
 set_option linter.unusedSectionVars false
@@ -97,7 +106,9 @@ def CountsOk (airs : List AirInfo) (proof : BatchProof C F K) (pvs : List (List 
     proof.lookup_terminals.length = airs.length ∧ common.lookups.length = airs.length ∧
     ∀ g ∈ common.preprocessed, g.2.length = airs.length
 
-/-- **Wrong table count.** The verifier rejects with the count error exactly when a per-instance list has another length than the AIRs. -/
+/-- **Wrong table count.**
+
+The verifier rejects with the count error when a per-instance list and the AIRs differ in length. -/
 theorem check_shape_count (cfg : Config) (airs : List AirInfo) (proof : BatchProof C F K)
     (pvs : List (List F)) (common : CommonData C F) (h : ¬ CountsOk airs proof pvs common) :
     check_shape cfg airs proof pvs common = .error .InstanceCountMismatch := by
@@ -105,7 +116,11 @@ theorem check_shape_count (cfg : Config) (airs : List AirInfo) (proof : BatchPro
   simp only [check_shape, ensure, h, ↓reduceIte]
   rfl
 
-/-- **Randomization.** With the right counts, the verifier rejects with the randomization error exactly when a randomization opening or commitment disagrees with the hiding flag. -/
+/-- **Randomization.**
+
+With the right counts, the verifier rejects with the randomization error in one case.
+
+That case is a randomization opening or commitment that disagrees with the hiding flag. -/
 theorem check_shape_random (cfg : Config) (airs : List AirInfo) (proof : BatchProof C F K)
     (pvs : List (List F)) (common : CommonData C F) (hc : CountsOk airs proof pvs common)
     (h : ¬ ((∀ ov ∈ proof.opened, ov.random.isSome = cfg.zk) ∧ proof.random.isSome = cfg.zk)) :

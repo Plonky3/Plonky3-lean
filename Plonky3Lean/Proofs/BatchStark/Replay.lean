@@ -7,11 +7,13 @@ public import Plonky3Lean.Proofs.BatchStark.Verifier
 /-!
 # The batch verifier's transcript replay
 
-Once the shape checks accept, and the keygen-cached lookups pass the layout's width checks:
+Assume the shape checks accept and the keygen-cached lookups pass the layout's width checks.
 
-* the replay never panics;
-* it plays exactly the pattern when it accepts, and a prefix of it when a grind rejects;
-* the lookup pair, alpha and zeta are the oracle at explicit transcripts, in the order of the pattern.
+Then:
+
+- the replay never panics
+- it plays exactly the pattern when it accepts, and a prefix of it when a grind rejects
+- the lookup pair, alpha and zeta are the oracle at explicit transcripts, in pattern order.
 -/
 
 set_option linter.unusedSectionVars false
@@ -22,7 +24,13 @@ open p3_batch_stark.verifier.mirror p3_batch_stark.transcript.mirror p3_lookup.m
 
 variable {C F K : Type} [Zero F] [DecidableEq F] [Field K]
 
-/-- The messages before the lookup phase: the seed, every degree bit, the main commitment, every public value and the preprocessed commitment. -/
+/-- The messages before the lookup phase:
+
+- the seed
+- every degree bit
+- the main commitment
+- every public value
+- the preprocessed commitment. -/
 def preLookup (shape : BatchShape) (db : List ℕ) (main : C) (pvs : List (List F)) (prep : Option C) :
     List (Msg C F K) :=
   [.seed shape.domain_separator] ++ db.map (fun b => .ext (b : K)) ++ [.com main] ++
@@ -88,7 +96,9 @@ theorem filterMap_length {α : Type} (t : List (Option K)) (ls : List (List α))
       have := ih ls h.2
       rcases x with _ | x <;> cases l <;> simp_all
 
-/-- After the lookup phase, the replay plays the rest of the pattern, or a prefix of it when the grind rejects. -/
+/-- After the lookup phase, the replay plays the rest of the pattern.
+
+When the grind rejects, it plays a prefix of it. -/
 theorem tail_played (shape : BatchShape) (H : List (Msg C F K) → K)
     (powOk : List (Msg C F K) → ℕ → F → Bool) (st : St C F K) (perm : Option C) (terms : List K) (q : C)
     (rand : Option C) (w : F)
@@ -121,7 +131,7 @@ theorem tail_played (shape : BatchShape) (H : List (Msg C F K) → K)
     by_cases hl : shape.has_lookups
     · simp [hl]
     · simp [hl, hk hl]
-  -- The grind either rejects, a prefix, or accepts and the bracket follows.
+  -- The grind either rejects, leaving a prefix, or accepts and the bracket follows.
   set st2 := quotient_phase (permutation_phase H st perm terms).1 q rand
   constructor
   · intro z hz
@@ -156,7 +166,13 @@ theorem lookup_phase_isSome {shape : BatchShape} {H : List (Msg C F K) → K}
           simp [hc]
   · rcases w <;> simp [hl]
 
-/-- **The replay never panics.** Once the shape checks accept, and the keygen-cached lookups pass the layout's width checks, the replay returns, playing exactly the pattern when it accepts and a prefix of it when a grind rejects. -/
+/-- **The replay never panics.**
+
+Assume the shape checks accept and the keygen-cached lookups pass the layout's width checks.
+
+Then the replay returns.
+
+It plays exactly the pattern when it accepts, and a prefix of it when a grind rejects. -/
 theorem replay_played {cfg : Config} {airs : List AirInfo} {proof : BatchProof C F K}
     {pvs : List (List F)} {common : CommonData C F} {checked : Checked}
     (hS : Shaped cfg airs proof pvs common checked) (hW : WidthsOk common.lookups.flatten)
@@ -235,10 +251,11 @@ theorem msgs_before [Zero F] [DecidableEq F] (shape : BatchShape) (db : List ℕ
 
 /-- **The Fiat-Shamir order.** When the replay accepts:
 
-* with lookups, the pair is the oracle at the seed, every degree bit, the main commitment, every public value, the preprocessed commitment and the grind witness, then beta one draw later;
-* without lookups, no pair is drawn and every instance gets no challenge;
-* alpha is the oracle one step after the permutation commitment and every terminal;
-* zeta is the oracle after the quotient commitment, the randomization commitment and the second grind witness. -/
+- with lookups, the lookup alpha is the oracle at the messages before the lookup phase and the grind witness
+- with lookups, beta is drawn one step later
+- without lookups, no pair is drawn and every instance gets no challenge
+- alpha is the oracle one step after the permutation commitment and every terminal
+- zeta is the oracle after the quotient and randomization commitments and the second grind witness. -/
 theorem replay_ok {cfg : Config} {airs : List AirInfo} {proof : BatchProof C F K}
     {pvs : List (List F)} {common : CommonData C F} {checked : Checked}
     {H : List (Msg C F K) → K} {powOk : List (Msg C F K) → ℕ → F → Bool} {st : St C F K}

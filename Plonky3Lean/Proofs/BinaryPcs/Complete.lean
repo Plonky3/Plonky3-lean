@@ -9,11 +9,17 @@ public import Plonky3Lean.Proofs.BinaryPcs.Verifier
 
 The honest prover commits to the codeword of the message over S_(n+r).
 
-After the first s folds, the word is the codeword over S_(n+r-s) of the message with its s lowest variables bound.
+After the first s folds, the word is a codeword over S_(n+r-s).
 
-It opens, at every drawn index, the whole coset of every batch, and sends the last word in full.
+Its message is the original one with its s lowest variables bound.
 
-Every fold check then compares a folded coset with the same value of the next word, so the query phase accepts.
+At every drawn index, the prover opens the whole coset of every batch.
+
+It sends the last word in full.
+
+Every fold check then compares a folded coset with the same value of the next word.
+
+So the query phase accepts.
 -/
 
 namespace Plonky3Lean.Proofs.BinaryPcs
@@ -70,7 +76,11 @@ def honestWord (d : ℕ → F) (betas : List EF) (m s : ℕ) (i : ℕ) : EF :=
 omit [DecidableEq F] in
 /-- One fold check of an honest proof passes.
 
-The base word is the codeword of d over S_(n+r), every later word the honest word of its first variable, and the final word the honest word after every fold. -/
+The words of the proof are honest:
+
+- the base word is the codeword of d over S_(n+r)
+- every later word is the honest word of its first variable
+- the final word is the honest word after every fold. -/
 theorem foldCheck_honest {n r lff : ℕ} (hk : 0 < lff) (hLF : Cantor V.LF) (hLE : Cantor V.LE)
     (hpre : ∀ t < 2 ^ V.LF.logBits, V.LE.cantor t = algebraMap F EF (V.LF.cantor t))
     (hbF : n + r ≤ 2 ^ V.LF.logBits) (hbE : n + r ≤ 2 ^ V.LE.logBits) (hw : n + r ≤ 64)
@@ -180,7 +190,12 @@ theorem check_round_shape_of {A : Type _} (round : ℕ) (rows : List (List A)) (
 
 /-- On an accepted schedule, the query phase accepts an honest proof.
 
-The prover commits to the codeword of d, folds with the sumcheck challenges, sends the last word, and opens every coset of every batch at the drawn indices.
+The honest prover:
+
+- commits to the codeword of d
+- folds with the sumcheck challenges
+- sends the last word
+- opens every coset of every batch at the drawn indices.
 
 The two Merkle schemes accept honest openings, and the grinding witness passes. -/
 theorem verify_query_paths_complete {c : BinaryPcsConfig} (hc : Inv c) (hLF : Cantor V.LF)

@@ -10,15 +10,20 @@ public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
 /-!
 # The debug checker and the selectors in a lookup count
 
-* The checker panics on a preprocessed or permutation trace of another height.
-* Otherwise it passes exactly when every row's AIR and lookup constraints pass with the 0/1 selectors.
+The checker panics on a preprocessed or permutation trace of another height.
 
-The prover's permutation trace also reads the 0/1 selectors, while the STARK evaluates the Lagrange selectors.
+Otherwise it passes exactly when every row's AIR and lookup constraints pass with the 0/1 selectors.
 
-A lookup count that reads a selector therefore means two things:
+The prover's permutation trace also reads the 0/1 selectors.
 
-* the honest fraction m / d, with m the 0/1 value, satisfies the STARK's pin only on rows where both values agree;
-* on row 0, the transition selector is 1 - omega^(n-1) in the STARK and 1 in the checker, so the honest proof fails.
+The STARK evaluates the Lagrange selectors instead.
+
+A lookup count that reads a selector therefore has two consequences:
+
+- the honest fraction m / d, with m the 0/1 value, meets the STARK's pin only where both values agree
+- on row 0 the transition selector is 1 - omega^(n-1) in the STARK and 1 in the checker.
+
+So the honest proof fails on row 0.
 -/
 
 set_option linter.unusedSectionVars false
@@ -43,7 +48,13 @@ theorem forM_option_eq_some {α : Type} (l : List α) (f : α → Option Unit) :
     · simp [hfa]
     · simpa [hfa] using ih
 
-/-- **The checker.** With traces of one height, it passes exactly when every row's AIR and lookup constraints evaluate without panicking and without a failure; with another height it panics. -/
+/-- **The checker.**
+
+With traces of one height, it passes exactly when every row's AIR and lookup constraints evaluate cleanly.
+
+Cleanly means without panicking and without a failure.
+
+With traces of another height it panics. -/
 theorem check_constraints_eq_some (air : Air F) (main : Mat F) (prep : Option (Mat F)) (perm : Mat K)
     (ch vals : List K) (pv : List F) (lookups : List (Lookup F)) :
     p3_batch_stark.checker.mirror.check_constraints air main prep perm ch vals pv lookups = some () ↔
@@ -90,12 +101,20 @@ theorem pin_single_iff {d c m : K} (hd : d ≠ 0) : Pinned [(d, c)] (m / d) ↔ 
   · intro h; field_simp at h; exact h.symm
   · rintro rfl; rfl
 
-/-- **The honest fraction under the STARK's selectors.** For a count reading a selector v on row i, the prover's fraction m / d, with m the 0/1 value, satisfies the STARK's pin exactly when the two selector values agree. -/
+/-- **The honest fraction under the STARK's selectors.**
+
+Take a count reading a selector v on row i.
+
+The prover's fraction m / d, with m the 0/1 value, meets the STARK's pin exactly when the two values agree. -/
 theorem selector_count_pinned_iff (T : Instance K) (ω : K) (i : ℕ) (v : Var) {d : K} (hd : d ≠ 0) :
     Pinned [(d, starkRowEnv T ω i v)] (rowEnv T i v / d) ↔ starkRowEnv T ω i v = rowEnv T i v :=
   pin_single_iff hd
 
-/-- **The transition selector on row 0.** On a trace of n >= 2 rows, the STARK evaluates it to 1 - omega^(n-1), never 1, so a count reading it pins no honest fraction on row 0. -/
+/-- **The transition selector on row 0.**
+
+On a trace of n >= 2 rows, the STARK evaluates it to 1 - omega^(n-1), never 1.
+
+So a count reading it pins no honest fraction on row 0. -/
 theorem transition_row0_ne (T : Instance K) {ω : K} (hω : IsPrimitiveRoot ω T.height) (hn : 2 ≤ T.height)
     {d : K} (hd : d ≠ 0) :
     starkRowEnv T ω 0 .isTransition ≠ rowEnv T 0 .isTransition ∧

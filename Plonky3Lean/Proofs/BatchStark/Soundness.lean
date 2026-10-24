@@ -8,9 +8,13 @@ public import Plonky3Lean.Proofs.Lookup.RunningSum
 /-!
 # The cross-table bus sum
 
-* Lookup j of instance i reads the pair at positions 2j and 2j + 1, the bus offset and beta.
-* Its combiner alpha' - fingerprint(e) is then the domain-separated denominator of its bus id.
-* Messages keyed by the layout's bus ids meet the hypotheses of p3-lookup's soundness count, when there are fewer lookups than the characteristic.
+Lookup j of instance i reads the bus offset at position 2j and beta at position 2j + 1.
+
+Its combiner alpha' - fingerprint(e) is then the domain-separated denominator of its bus id.
+
+Take messages keyed by the layout's bus ids, with fewer lookups than the characteristic.
+
+They meet the hypotheses of the soundness count of p3-lookup.
 -/
 
 set_option linter.unusedSectionVars false
@@ -34,7 +38,12 @@ theorem flatMap_pair_get (f : ℕ → K) (β : K) (l : List ℕ) (j : ℕ) (hj :
       have := ih j (by simpa using hj)
       simpa [show 2 * (j + 1) = 2 * j + 2 by ring, show 2 * j + 2 + 1 = 2 * j + 1 + 2 by ring] using this
 
-/-- **The pair a lookup reads.** Lookup j of instance i reads alpha + (id + 1) beta^W at position 2j and beta at position 2j + 1. -/
+/-- **The pair a lookup reads.**
+
+Lookup j of instance i reads two values:
+
+- alpha + (id + 1) beta^W at position 2j
+- beta at position 2j + 1. -/
 theorem lay_out_pair {all : List (List (Lookup F))} {ids : List (List ℕ)} {st : LayoutState}
     (h : busIds all = some (ids, st)) (α β : K) {i j : ℕ} (hi : i < ids.length) (hj : j < ids[i].length) :
     ∃ ch, lay_out_lookup_challenges 2 all α β = some ch ∧
@@ -48,14 +57,22 @@ theorem lay_out_pair {all : List (List (Lookup F))} {ids : List (List ℕ)} {st 
 theorem combiner_eq_busDenom (α β : K) (W b : ℕ) (e : List K) :
     (α + ((b : K) + 1) * β ^ W) - fingerprint β e = busDenom α β W b e := rfl
 
-/-- Messages keyed by the layout: each carries the bus id of some lookup, and a payload of that lookup's width. -/
+/-- Messages keyed by the layout.
+
+Each carries the bus id of some lookup, and a payload of that lookup's width. -/
 def KeyedBy (P : List (Lookup F)) (ids : List ℕ) (msgs : List (Key K × K)) : Prop :=
   ∀ q ∈ msgs, ∃ a < P.length, q.1.1 = ids.getD a 0 ∧ (P[a]?.bind width) = some q.1.2.length
 
 variable [DecidableEq K]
 
 open Classical in
-/-- **The batch's bus soundness.** For messages keyed by the layout's bus ids, with fewer lookups than the characteristic p of K, an unbalanced bus passes on at most N (W + 1) |K| of the |K|^2 challenge pairs, whatever permutation columns the prover picks after the challenges. -/
+/-- **The batch's bus soundness.**
+
+Take messages keyed by the layout's bus ids, with fewer lookups than the characteristic p of K.
+
+An unbalanced bus passes on at most N (W + 1) |K| of the |K|^2 challenge pairs.
+
+This holds whatever permutation columns the prover picks after the challenges. -/
 theorem batch_soundness [Fintype K] {p : ℕ} [CharP K p] {all : List (List (Lookup F))}
     {ids : List (List ℕ)} {st : LayoutState} (h : busIds all = some (ids, st))
     (hp : all.flatten.length ≤ p) (airs : List (AirMessages K))

@@ -25,7 +25,9 @@ namespace Plonky3Lean.Proofs.BinaryPcs
 
 open p3_binary_pcs.params.mirror p3_binary_pcs.transcript.mirror
 
-/-- The model of a schedule: its challenge width, arity, rate, factor, queries and grinding. -/
+/-- The model of a schedule.
+
+It keeps the challenge width, arity, rate, factor, queries and grinding. -/
 def regimeOf (c : BinaryPcsConfig) : BinaryPcsRegime :=
   ⟨c.challenge_field_bits, c.num_variables, c.params.log_inv_rate, c.log_folding_factor,
     c.num_queries, c.params.pow_bits⟩
@@ -131,7 +133,9 @@ theorem try_new_with_folding_none (Q : ℕ → ℕ → ℕ → ℕ) (fBits efBit
 theorem Inv.security_regime {c : BinaryPcsConfig} (h : Inv c) : c.security_regime = some (regimeOf c) := by
   simp [BinaryPcsConfig.security_regime, h.try_security_regime]
 
-/-- Changing the folding factor of an accepted schedule never panics, and accepts exactly the factors that keep the invariants. -/
+/-- Changing the folding factor of an accepted schedule never panics.
+
+It accepts exactly the factors that keep the invariants. -/
 theorem Inv.try_with_folding {c : BinaryPcsConfig} (h : Inv c) (lff : ℕ) :
     (∃ r, c.try_with_folding lff = some r) ∧
       ∀ c', c.try_with_folding lff = some (.ok c') ↔
@@ -224,7 +228,9 @@ theorem range_filter_dvd {n k : ℕ} (hk : 0 < k) :
     rw [Nat.lt_iff_add_one_le, Nat.le_div_iff_mul_le hk, add_mul] at hb
     omega
 
-/-- The fold batches of an accepted schedule: batch b starts at b lff and folds at most lff variables. -/
+/-- The fold batches of an accepted schedule.
+
+Batch b starts at b lff and folds at most lff variables. -/
 theorem Inv.fold_batches {c : BinaryPcsConfig} (h : Inv c) :
     c.fold_batches = some ((List.range ((c.num_variables + c.log_folding_factor - 1) / c.log_folding_factor)).map
       fun b => (b * c.log_folding_factor, min c.log_folding_factor (c.num_variables - b * c.log_folding_factor))) := by

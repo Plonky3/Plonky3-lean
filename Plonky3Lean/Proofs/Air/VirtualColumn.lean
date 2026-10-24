@@ -9,7 +9,9 @@ public import Plonky3Lean.Proofs.Air.Symbolic
 
 A virtual column is a constant plus weighted columns of a preprocessed row and a main row.
 
-In a commutative ring it evaluates to that affine combination, when every column is in range, and panics otherwise.
+In a commutative ring it evaluates to that affine combination when every column is in range.
+
+Otherwise it panics.
 
 On the symbolic builder it denotes the same combination of the polynomial variables.
 -/
@@ -44,7 +46,7 @@ theorem foldlM_apply {R V : Type _} [CommRing R] [Algebra F R] (into : V → R)
     rw [show (pure _ : Option R) = some _ from rfl, Option.bind_some, ih']
     simp [ringOps, add_assoc]
 
-/-- A virtual column whose columns are all in range evaluates to its constant plus the weighted columns. -/
+/-- A virtual column with every column in range evaluates to its constant plus the weighted columns. -/
 theorem apply_eq {R V : Type _} [CommRing R] [Algebra F R] (into : V → R) (vc : VirtualPairCol F)
     (preprocessed main : List V) (val : PairCol → V)
     (h : ∀ cw ∈ vc.column_weights, cw.1.get preprocessed main = some (val cw.1)) :

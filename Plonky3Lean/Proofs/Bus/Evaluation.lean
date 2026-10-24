@@ -8,9 +8,13 @@ public import Plonky3Lean.Proofs.MultilinearUtil.Mle
 /-!
 # The leaf factor of a declaration
 
-A declaration is flattened into nodes, each operand before its user, and one forward pass evaluates them.
+A declaration is flattened into nodes, each operand before its user.
 
-Its factor is the offset minus the fingerprint of its padded tuple, interpolated with the identity by its activation:
+One forward pass evaluates them.
+
+Its factor is the offset minus the fingerprint of its padded tuple.
+
+Its activation interpolates that factor with the identity:
 
 ```text
     factor = 1 + ((gamma - fingerprint(tuple, r)) - 1) s      (s = 1 always active)
@@ -27,7 +31,9 @@ set_option linter.unusedSectionVars false
 
 variable {F EF : Type} [Field F] [Field EF] [Algebra F EF]
 
-/-- The value of a symbolic expression at a point, none for an access no opening answers. -/
+/-- The value of a symbolic expression at a point.
+
+It is none for an access no opening answers. -/
 def exprValue (values : BusEvaluation F EF) : SymbolicExpression F → Option EF
   | .Leaf (.Variable v) => match v.entry with
     | .Main 0 => values.main[v.index]?
@@ -117,7 +123,13 @@ theorem getD_append_left {l l' : List EF} {i : ℕ} (h : i < l.length) :
     (l ++ l').getD i 0 = l.getD i 0 := by
   simp [List.getD_eq_getElem?_getD, List.getElem?_append_left h]
 
-/-- **Flattening is faithful.** Compiling an expression after some evaluated nodes appends nodes whose pass extends the earlier values and puts the expression's value at the returned position. -/
+/-- **Flattening is faithful.**
+
+Compiling an expression after some evaluated nodes appends new nodes.
+
+Their pass extends the earlier values.
+
+It puts the expression's value at the returned position. -/
 theorem compile_eval (values : BusEvaluation F EF) : ∀ (e : SymbolicExpression F)
     (nodes nodes' : List (BusNode F)) (i : ℕ) (sc : List EF) (v : EF),
     compile_expression nodes e = .ok (nodes', i) → evalNodes values nodes = .ok sc →
@@ -199,7 +211,7 @@ theorem compile_eval (values : BusEvaluation F EF) : ∀ (e : SymbolicExpression
       p1.trans (List.prefix_append _ _), by simp [hlen],
       by simp [List.getD_eq_getElem?_getD, hlen]⟩
 
-/-- Compiling the fields in order: each field's value sits at its recorded position. -/
+/-- Compiling the fields in order puts each field's value at its recorded position. -/
 theorem compile_fields (values : BusEvaluation F EF) :
     ∀ (fields : List (SymbolicExpression F)) (acc : List (BusNode F) × List ℕ) (sc : List EF)
       (vals : List EF) (out : List (BusNode F) × List ℕ),
@@ -336,7 +348,11 @@ theorem payload_sum {ps : List ℕ} {ws sc vals : List EF} {w : ℕ} (hps : ps.l
     List.getD_eq_getElem ws 0 (by omega)]
   simp only [List.getElem_zip, List.getElem_take]
 
-/-- The activation's value: none for an always-active declaration, the boundary selector, or the caller's selector. -/
+/-- The activation's value:
+
+- none for an always-active declaration
+- the boundary selector for a boundary declaration
+- the caller's selector otherwise. -/
 def actValue (values : BusEvaluation F EF) : BusActivation (SymbolicExpression F) → Option (Option EF)
   | .Always => some none
   | .Boundary .First => some (some values.is_first_row)
@@ -360,7 +376,11 @@ theorem evaluate_eq (f : BusFactorPlan F EF) (values : BusEvaluation F EF) {sc :
   cases f.activation <;> rfl
 
 open Finset in
-/-- **The leaf factor.** On a valid plan, a compiled declaration evaluates to its activation applied to the offset minus the weighted sum of its padded tuple's slots. -/
+/-- **The leaf factor.**
+
+On a valid plan, a compiled declaration evaluates to its activation applied to one value.
+
+That value is the offset minus the weighted sum of its padded tuple's slots. -/
 theorem factor_eq {p : BusPlan} (hp : LayoutWF p) {b : ℕ} (hb : b < p.domains.length)
     {interaction : SymbolicBusInteraction F} (hw : interaction.fields.length = p.domains[b].payload_width)
     {weights : List EF} (hwl : weights.length = p.fingerprint_width) (offset : EF)
@@ -427,7 +447,13 @@ theorem factor_eq {p : BusPlan} (hp : LayoutWF p) {b : ℕ} (hb : b < p.domains.
     rw [hpay _ p2, hsplit, hdom]; ring_nf
 
 open Finset Plonky3Lean.Spec.MultilinearUtil in
-/-- **The factor is the specified leaf.** With the equality table of the fingerprint point as weights, a compiled declaration evaluates to its activation applied to gamma minus the multilinear extension of its padded tuple at the point. -/
+/-- **The factor is the specified leaf.**
+
+Take the equality table of the fingerprint point as weights.
+
+A compiled declaration then evaluates to its activation applied to one value.
+
+That value is gamma minus the multilinear extension of its padded tuple at the point. -/
 theorem factor_eq_leaf {p : BusPlan} (hp : LayoutWF p) {b : ℕ} (hb : b < p.domains.length)
     {interaction : SymbolicBusInteraction F} (hw : interaction.fields.length = p.domains[b].payload_width)
     {r : List EF} (hr : r.length = p.geometry.tuple_variables) (γ : EF)

@@ -7,8 +7,14 @@ public import P3BatchStark.Assumptions.Mirror.Transcript
 /-!
 # The batch transcript
 
-* Each verifier phase plays its steps and absorbs its messages in closed form.
-* The seed determines the instance count, every trace and preprocessed width, every public-value count, and every flag and difficulty the pattern holds.
+Each verifier phase plays its steps and absorbs its messages in closed form.
+
+The seed determines:
+
+- the instance count
+- every trace and preprocessed width
+- every public-value count
+- every flag and difficulty the pattern holds.
 -/
 
 set_option linter.unusedSectionVars false
@@ -83,7 +89,9 @@ theorem observe_pow_eq {powOk : List (Msg C F E) → ℕ → F → Bool} {st : S
       if bits = 0 ∨ powOk st.msgs bits w then some (st.step s (powMsgs bits w)) else none := by
   unfold observe_pow powMsgs; split_ifs <;> simp_all
 
-/-- When the out-of-domain phase accepts, zeta is the oracle at the input state extended by the witness when the difficulty is positive. -/
+/-- When the out-of-domain phase accepts, zeta is the oracle at the input state.
+
+At positive difficulty, that state is first extended by the witness. -/
 theorem ood_phase_ok {shape : BatchShape} {H : List (Msg C F E) → E}
     {powOk : List (Msg C F E) → ℕ → F → Bool} {st st' : St C F E} {w : F} {ζ : E}
     (h : ood_phase shape H powOk st w = (st', .ok ζ)) :
@@ -93,7 +101,10 @@ theorem ood_phase_ok {shape : BatchShape} {H : List (Msg C F E) → E}
   split_ifs at h with h1 h2 <;> simp only [St.draw, St.step, Prod.mk.injEq] at h <;>
     obtain ⟨rfl, h⟩ := h <;> simp_all
 
-/-- The out-of-domain phase rejects exactly a nonzero witness at zero difficulty, and a witness the grind check refuses. -/
+/-- The out-of-domain phase rejects exactly two witnesses:
+
+- a nonzero witness at zero difficulty
+- a witness the grind check refuses. -/
 theorem ood_phase_error {shape : BatchShape} {H : List (Msg C F E) → E}
     {powOk : List (Msg C F E) → ℕ → F → Bool} {st st' : St C F E} {w : F}
     {e : BatchTranscriptFailure} (h : ood_phase shape H powOk st w = (st', .error e)) :
@@ -104,7 +115,11 @@ theorem ood_phase_error {shape : BatchShape} {H : List (Msg C F E) → E}
   split_ifs at h with h1 h2 <;> simp only [St.draw, St.step, Prod.mk.injEq] at h <;>
     obtain ⟨rfl, h⟩ := h <;> simp_all
 
-/-- When the lookup phase accepts with lookups, the pair is the oracle at the input state extended by the witness, then by alpha's draw. -/
+/-- When the lookup phase accepts with lookups, the pair comes from the oracle.
+
+Alpha is the oracle at the input state extended by the witness.
+
+Beta is the oracle one draw later. -/
 theorem lookup_phase_ok [Field E] {shape : BatchShape} {H : List (Msg C F E) → E}
     {powOk : List (Msg C F E) → ℕ → F → Bool} {nc : ℕ} {st st' : St C F E}
     {ls : List (List (Lookup F))} {w : Option F} {ch : List (List E)}
@@ -139,7 +154,11 @@ theorem lookup_phase_no_lookups [Field E] {shape : BatchShape} {H : List (Msg C 
   unfold lookup_phase
   rcases w with _ | x <;> simp [hl]
 
-/-- With lookups, the lookup phase rejects exactly a missing witness, a nonzero witness at zero difficulty, and a witness the grind check refuses. -/
+/-- With lookups, the lookup phase rejects exactly:
+
+- a missing witness
+- a nonzero witness at zero difficulty
+- a witness the grind check refuses. -/
 theorem lookup_phase_error [Field E] {shape : BatchShape} {H : List (Msg C F E) → E}
     {powOk : List (Msg C F E) → ℕ → F → Bool} {nc : ℕ} {st st' : St C F E}
     {ls : List (List (Lookup F))} {w : Option F} {e : BatchTranscriptFailure}
@@ -203,7 +222,16 @@ theorem count_randomization_pattern (s : BatchShape) :
   simp only [BatchShape.pattern, BatchShape.lookupSteps]
   split_ifs <;> simp_all [List.count_replicate, List.count_eq_zero]
 
-/-- **The seed binds the shape.** Two shapes with one seed agree on the instance count, every trace and preprocessed width, every public-value count, the preprocessed, lookup-count and randomization flags, the out-of-domain difficulty, and the lookup difficulty when there are lookups. -/
+/-- **The seed binds the shape.**
+
+Two shapes with one seed agree on:
+
+- the instance count
+- every trace and preprocessed width
+- every public-value count
+- the preprocessed flag, the lookup count and the randomization flag
+- the out-of-domain difficulty
+- the lookup difficulty, when there are lookups. -/
 theorem domain_separator_injective {s s' : BatchShape} (h : s.domain_separator = s'.domain_separator) :
     s.trace_widths = s'.trace_widths ∧ s.preprocessed_widths = s'.preprocessed_widths ∧
       s.public_value_counts = s'.public_value_counts ∧

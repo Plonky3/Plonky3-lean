@@ -16,13 +16,17 @@ For a Cantor basis, the novel basis splits at its lowest bit:
     P(y) = P_even(y^2 + y) + y P_odd(y^2 + y)
 ```
 
-The fold reads P at y = point(2 j) and y + 1 = point(2 j + 1), both above point(j) = y^2 + y.
+The fold reads P at y = point(2 j) and y + 1 = point(2 j + 1).
+
+Both points lie above point(j) = y^2 + y.
 
 It recovers P_odd(point j) as their sum, and P_even(point j) from the first.
 
 The fold at beta returns (1 - beta) P_even + beta P_odd at point(j).
 
-That is the codeword over S_l of the coefficients (1 - beta) d_(2k) + beta d_(2k+1): the lowest variable bound to beta.
+That is the codeword over S_l of the coefficients (1 - beta) d_(2k) + beta d_(2k+1).
+
+In other words, the lowest variable is bound to beta.
 
 This is the folding lemma of FRI-Binius (Diamond and Posen, eprint 2024/504, section 4).
 -/
@@ -109,7 +113,9 @@ variable {F EF : Type _} [Field F] [CharP F 2] [Field EF] [Algebra F EF] {β : �
 
 /-- The fold of the pair above point(j) of the codeword of d over S_(l+1).
 
-It is the codeword over S_l, in the challenge field, of the coefficients with the lowest variable bound to beta. -/
+It is the codeword over S_l, in the challenge field, of the coefficients.
+
+The lowest variable of those coefficients is bound to beta. -/
 theorem fold_ntt (hβ : IsCantor β N) {l : ℕ} (hl : l + 1 ≤ N) (d : ℕ → F) {j : ℕ} (hj : j < 2 ^ l)
     (beta : EF) :
     let lo := ntt β (l + 1) 0 d (2 * j)
@@ -160,7 +166,7 @@ open p3_binary_dft.mirror p3_binary_pcs.fold.mirror
 variable {F EF : Type _} [Field F] [CharP F 2] [Field EF] [Algebra F EF]
 
 omit [CharP F 2] in
-/-- fold_pair panics exactly when the doubled index, wrapped at the word, leaves the alphabet's domain.
+/-- The pair fold panics exactly when the doubled index, wrapped at the word, leaves the alphabet's domain.
 
 Otherwise it is f_0 + beta (f_0 + f_1), with f_1 = lo + hi and f_0 = lo + point(2 index) f_1. -/
 theorem fold_pair_eq (L : Level F) (index : ℕ) (beta : EF) (lo hi : F) :
@@ -174,7 +180,9 @@ theorem fold_pair_eq (L : Level F) (index : ℕ) (beta : EF) (lo hi : F) :
   rw [domain_point_eq]
   split_ifs <;> rfl
 
-/-- The fold of the pair above point(j) of an honest codeword over S_(l+1) is the honest codeword over S_l of the bound coefficients. -/
+/-- Fold the pair above point(j) of an honest codeword over S_(l+1).
+
+The result is the honest codeword over S_l of the bound coefficients. -/
 theorem fold_pair_ntt {L : Level F} (hL : Cantor L) {l : ℕ} (hl : l + 1 ≤ 2 ^ L.logBits) (hw : l < 64)
     (d : ℕ → F) {j : ℕ} (hj : j < 2 ^ l) (beta : EF) :
     fold_pair L j beta (ntt L.cantor (l + 1) 0 d (2 * j)) (ntt L.cantor (l + 1) 0 d (2 * j + 1)) =
@@ -239,7 +247,9 @@ theorem coset_layer_ntt {L : Level EF} [CharP EF 2] (hL : Cantor L) {l : ℕ} (h
   simp [Algebra.algebraMap_self]
   rfl
 
-/-- The in-place layers of the coset fold, over honest values of level l + m, end at the honest value of level l. -/
+/-- Run the in-place layers of the coset fold over honest values of level l + m.
+
+They end at the honest value of level l. -/
 theorem coset_loop_ntt {L : Level EF} [CharP EF 2] (hL : Cantor L) {l : ℕ} (c : ℕ) (hc : c < 2 ^ l) :
     ∀ (rest : List EF) (e : ℕ → EF) (scratch : List EF),
       l + rest.length ≤ 2 ^ L.logBits → l + rest.length ≤ 64 → 2 ^ rest.length ≤ scratch.length →
@@ -282,9 +292,13 @@ theorem coset_loop_ntt {L : Level EF} [CharP EF 2] (hL : Cantor L) {l : ℕ} (c 
     simp only [List.length_cons, hm, hlay, Option.bind_eq_bind, Option.bind_some, pure]
     exact hout
 
-/-- The coset fold of an honest coset is the honest value, one level per challenge down, of the bound coefficients.
+/-- The coset fold of an honest coset is the honest value of the bound coefficients.
 
-The first fold reads the alphabet's codeword; the alphabet's Cantor basis is the leading part of the field's. -/
+Each challenge moves it one level down.
+
+The first fold reads the alphabet's codeword.
+
+The alphabet's Cantor basis is the leading part of the field's. -/
 theorem fold_coset_ntt {LF : Level F} {LE : Level EF} [CharP EF 2] (hF : Cantor LF) (hE : Cantor LE)
     (hpre : ∀ r < 2 ^ LF.logBits, LE.cantor r = algebraMap F EF (LF.cantor r)) {l a : ℕ} (ha : 0 < a)
     (hla : l + a ≤ 2 ^ LF.logBits) (hlaE : l + a ≤ 2 ^ LE.logBits) (hw : l + a ≤ 64) (d : ℕ → F)
@@ -340,7 +354,9 @@ section Final
 
 variable {EF : Type _} [Field EF]
 
-/-- The equality weight of hypercube point k at the challenges: bit i of k selects b_i, else 1 - b_i. -/
+/-- The equality weight of hypercube point k at the challenges.
+
+Bit i of k selects b_i when set, and 1 - b_i otherwise. -/
 def eqWeight : List EF → ℕ → EF
   | [], _ => 1
   | b :: bs, k => (if k % 2 = 1 then b else 1 - b) * eqWeight bs (k / 2)
@@ -368,7 +384,9 @@ theorem bindAll_support (bs : List EF) (e : ℕ → EF) (he : ∀ k, 2 ^ bs.leng
     simp only [List.length_cons, pow_succ] at he
     simp [bind1, he (2 * k) (by omega), he (2 * k + 1) (by omega)]
 
-/-- After every fold, the honest codeword over S_r is uniform: each symbol is the multilinear evaluation at the challenges. -/
+/-- After every fold, the honest codeword over S_r is uniform.
+
+Each symbol is the multilinear evaluation at the challenges. -/
 theorem ntt_bindAll {β : ℕ → EF} (r : ℕ) (bs : List EF) (e : ℕ → EF)
     (he : ∀ k, 2 ^ bs.length ≤ k → e k = 0) (i : ℕ) :
     ntt β r 0 (bindAll bs e) i = ∑ k ∈ range (2 ^ bs.length), eqWeight bs k * e k := by

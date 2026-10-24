@@ -44,7 +44,9 @@ theorem natDegree_le_poly_degree (hσ : DegreeBounds σ n periods)
   rw [constraintPoly_toPoly]
   exact natDegree_denote_le (natDegree_leaf_le hσ hp) e
 
-/-- A periodic column of period p dividing n is f(X^(n/p)) with deg f < p, of degree at most n - n/p. -/
+/-- A periodic column of period p dividing n is f(X^(n/p)) with deg f < p.
+
+Its degree is at most n - n/p. -/
 theorem natDegree_periodic_comp_le {K : Type _} [Field K] {f : Polynomial K} {n p : ℕ}
     (hp : p ∣ n) (hf : f.natDegree < p) :
     (f.comp (Polynomial.X ^ (n / p))).natDegree ≤ n - n / p := by
@@ -86,7 +88,7 @@ theorem leaf_poly_degree_le (a : BaseLeaf F) :
     have : 1 ≤ n / (q + 1) := Nat.div_pos (hq ▸ min_le_right _ _) (Nat.succ_pos q)
     omega
 
-/-- The cached degree multiple bounds the polynomial degree, plus one per transition selector along a product. -/
+/-- The cached degree multiple bounds the polynomial degree, plus one per transition selector. -/
 theorem poly_degree_le_degree_multiple {e : SymbolicExpression F} (he : WF e) :
     e.poly_degree n periods ≤ e.degree_multiple * (n - 1) + transitionCount e := by
   rw [he.degree_multiple_eq]
@@ -98,7 +100,7 @@ theorem constraint_degree_from_poly_degree_eq {pd n : ℕ} (hn : 2 ≤ n) (h0 : 
     constraint_degree_from_poly_degree pd n = (pd - 1 + (n - 1) - 1) / (n - 1) := by
   simp [constraint_degree_from_poly_degree, h0, show n > 1 by omega]
 
-/-- For n >= 2, the conversion gives a d with poly_degree <= d (n - 1) + 1. -/
+/-- For n >= 2, the conversion gives a d with polynomial degree at most d (n - 1) + 1. -/
 theorem le_constraint_degree_from_poly_degree (pd : ℕ) {n : ℕ} (hn : 2 ≤ n) :
     pd ≤ constraint_degree_from_poly_degree pd n * (n - 1) + 1 := by
   rcases Nat.eq_zero_or_pos pd with rfl | h0
@@ -128,7 +130,9 @@ theorem le_two_pow_log2_ceil (m : ℕ) : m ≤ 2 ^ log2_ceil_usize m := by
 theorem log2_ceil_le {m k : ℕ} (h : m ≤ 2 ^ k) : log2_ceil_usize m ≤ k :=
   Nat.size_le.mpr (by have := Nat.two_pow_pos k; omega)
 
-/-- The chunk count 2^(ceil(log_2(max(d + z, 2) - 1)) + z) is 2^z times the least power of two at least max(d + z, 2) - 1. -/
+/-- The chunk count 2^(ceil(log_2(max(d + z, 2) - 1)) + z) splits as a product.
+
+It is 2^z times the least power of two at least max(d + z, 2) - 1. -/
 theorem num_quotient_chunks_eq (d z : ℕ) :
     2 ^ (log2_ceil_usize (max (d + z) 2 - 1) + z) =
       2 ^ z * 2 ^ log2_ceil_usize (max (d + z) 2 - 1) ∧
@@ -136,7 +140,9 @@ theorem num_quotient_chunks_eq (d z : ℕ) :
     ∀ k, max (d + z) 2 - 1 ≤ 2 ^ k → log2_ceil_usize (max (d + z) 2 - 1) ≤ k :=
   ⟨by rw [pow_add, mul_comm], le_two_pow_log2_ceil _, fun _ => log2_ceil_le⟩
 
-/-- A polynomial of degree at most d (n - 1) + 1 fits c chunks of n coefficients when d <= D and c >= max(D, 2) - 1. -/
+/-- A polynomial of degree at most d (n - 1) + 1 fits c chunks of n coefficients.
+
+This needs d <= D and c >= max(D, 2) - 1. -/
 theorem fitsChunks_of_le {C : Polynomial F} {n d D c : ℕ} (hn : 1 ≤ n)
     (hC : C.natDegree ≤ d * (n - 1) + 1) (hd : d ≤ D) (hc : max D 2 - 1 ≤ c) :
     FitsChunks n c C := by
@@ -196,7 +202,9 @@ theorem quotient_fits_periodic {air : Air F} {L : ℕ} (hn : 2 ≤ n)
   exact (natDegree_le_poly_degree hσ hp e).trans
     (hmax.trans (le_constraint_degree_from_poly_degree _ hn))
 
-/-- Without periodic columns, every constraint polynomial with at most one transition selector along a product fits the quotient chunks. -/
+/-- Without periodic columns, every constraint polynomial fits the quotient chunks.
+
+This needs at most one transition selector along each product. -/
 theorem quotient_fits_fast {air : Air F} {L : ℕ} (hn : 1 ≤ n)
     (hper : (AirLayout.from_air air).num_periodic_columns = 0)
     (h : get_log_quotient_degree air (AirLayout.from_air air) n 0 = .ok L)
