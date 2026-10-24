@@ -40,6 +40,11 @@ public import Plonky3Lean.Proofs.Whir.Zk
 public import Plonky3Lean.Proofs.Hash.Blake2s
 public import Plonky3Lean.Proofs.Hash.Blake3.Spec
 public import Plonky3Lean.Proofs.Hash.Blake3.Vectors
+public import Plonky3Lean.Proofs.Blake3Air.Fields
+public import Plonky3Lean.Proofs.Blake3Air.Small
+public import Plonky3Lean.Proofs.Blake3Air.Complete
+public import Plonky3Lean.Proofs.Blake3Air.Extracted
+public import Plonky3Lean.Proofs.Blake3Air.Binary.Complete
 public import Plonky3Lean.Proofs.Hash.Sha256.Vectors
 public import Plonky3Lean.Proofs.Hash.Keccak.Vectors
 public import Plonky3Lean.Proofs.Hash.Keccak.Digest
