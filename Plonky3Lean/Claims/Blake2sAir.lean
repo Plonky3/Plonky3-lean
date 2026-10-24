@@ -3,6 +3,7 @@ module
 public import Plonky3Lean.Proofs.Blake2sAir.Trace
 public import Plonky3Lean.Proofs.Blake2sAir.Degree
 public import Plonky3Lean.Proofs.Blake2sAir.Extracted
+public import Plonky3Lean.Proofs.Blake2sAir.Packed
 public import Plonky3Lean.Proofs.Hash.Blake2s.Vectors
 
 @[expose] public section
@@ -141,6 +142,32 @@ theorem binary.generation.g_words.eq_rfc {st : ℕ → ℕ → BitVec 32} {v : L
       GS (g_words st slots X Y).2 (Plonky3Lean.Spec.Blake2s.G v (slots.getD 0 0) (4 + slots.getD 1 0)
         (8 + slots.getD 2 0) (12 + slots.getD 3 0) X Y) :=
   g_words_spec hs hsl X Y
+
+/-! ## The packed generator's helpers
+
+The packed generator holds a word of 64 trace rows as 32 planes of 64 bits.
+
+Bit `k` of plane `i` is bit `i` of the word of lane `k`. -/
+
+/-- The extracted adder on planes never panics.
+
+In every lane, it returns the sum of the two words modulo `2^32`.
+
+It also returns the ripple carries into bits 1 to 31, in place of the carry planes it is given. -/
+theorem binary.generation.add_planes.spec (x y : Std.Array Std.U64 32#usize) (c : Std.Array Std.U64 31#usize) :
+    ∃ sum c', p3_blake2s_air.binary.generation.add_planes x y c = .ok (sum, c') ∧
+      (∀ k, laneWord sum k = laneWord x k + laneWord y k) ∧
+      ∀ k, ∀ i < 31, (c'.val[i]!).bv.getLsbD k = BitVec.carry (i + 1) (laneWord x k) (laneWord y k) false :=
+  add_planes_spec x y c
+
+/-- The extracted rotation on planes never panics for an amount below 32.
+
+In every lane, it returns `(x ^ y) >>> amount`. -/
+theorem binary.generation.xor_rotate_right.spec (x y : Std.Array Std.U64 32#usize) (amount : Std.Usize)
+    (ha : amount.val < 32) :
+    ∃ out, p3_blake2s_air.binary.generation.xor_rotate_right x y amount = .ok out ∧
+      ∀ k, laneWord out k = (laneWord x k ^^^ laneWord y k).rotateRight amount.val :=
+  xor_rotate_right_spec x y amount ha
 
 /-! ## Soundness -/
 

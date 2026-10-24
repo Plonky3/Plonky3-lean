@@ -76,6 +76,7 @@ public import Plonky3Lean.Proofs.Sha256Air.Binary.Complete
 public import Plonky3Lean.Proofs.Blake2sAir.Trace
 public import Plonky3Lean.Proofs.Blake2sAir.Degree
 public import Plonky3Lean.Proofs.Blake2sAir.Extracted
+public import Plonky3Lean.Proofs.Blake2sAir.Packed
 public import Plonky3Lean.Proofs.Symmetric.Roots
 public import Plonky3Lean.Proofs.Field.BabyBear
 public import Plonky3Lean.Proofs.Field.BabyBear.Arith

@@ -273,6 +273,10 @@ name   = "Plonky3Lean.Claims.Blake2sAir.binary.G_SCHEDULE.eq_rfc"
 axioms = ["Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.Blake2sAir.binary.generation.add_planes.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.Blake2sAir.binary.generation.carries_word.eq"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -286,6 +290,10 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.Blake2sAir.binary.generation.g_words.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Blake2sAir.binary.generation.xor_rotate_right.spec"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
