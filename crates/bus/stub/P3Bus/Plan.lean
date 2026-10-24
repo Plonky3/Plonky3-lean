@@ -1,16 +1,21 @@
 /-
 Transcriptions of the bus plan: the named domains, the tuple layout, the block layout, and the planner.
 
-These do not extract: the planner is generic over the field traits, and the crate's dependencies do not compile in the extraction variant (docs/extractor-issues.md 180).
+These do not extract: the planner is generic over the field traits.
+
+The crate's dependencies also fail to compile in the extraction variant (docs/extractor-issues.md 180).
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts:
 
-* a `usize` is a natural number, and an addition, a shift or a power of two past 64 bits is the error Rust returns;
-* a sorted map keyed by name is a list sorted by name, and a symbolic expression is its tree;
-* the planner's pointer-keyed visited set is omitted: a tree has no shared node to revisit, and revisiting changes no answer;
-* a panic is none.
+- a machine word is a natural number
+- an addition, a shift or a power of two past 64 bits is the error Rust returns
+- a sorted map keyed by name is a list sorted by name
+- a symbolic expression is its tree
+- the planner's pointer-keyed visited set is omitted, since a tree has no shared node
+- revisiting a node would change no answer anyway
+- a panic is none.
 
 Loops, branches and the order of operations are kept.
 -/
@@ -27,14 +32,14 @@ open p3_bus.mirror p3_bus.product.mirror p3_air.symbolic.mirror
 
 /-! ## Machine-word helpers -/
 
-/-- `log2_ceil_usize`: 64 minus the leading zeros of n - 1, which is the bit length of n - 1. -/
+/-- ceil(log_2 n): the bit length of n - 1. -/
 def log2_ceil_usize (n : ℕ) : ℕ := (n - 1).size
 
-/-- `usize::checked_next_power_of_two`: the least power of two at or above n, none past 2^63. -/
+/-- The least power of two at or above n, none past 2^63. -/
 def checked_next_power_of_two (n : ℕ) : Option ℕ :=
   if n ≤ 2 ^ 63 then some (2 ^ Nat.clog 2 n) else none
 
-/-- `usize::checked_add`. -/
+/-- Addition of machine words, none at 2^64 or more. -/
 def checked_add (a b : ℕ) : Option ℕ := if a + b < 2 ^ 64 then some (a + b) else none
 
 /-! ## Domains and slots -/
@@ -46,7 +51,7 @@ structure BusDomain where
   identity : ℕ
   deriving DecidableEq
 
-/-- identity_bit: one little-endian bit of the identity, zero past 64. -/
+/-- One little-endian bit of the identity, zero past 64. -/
 def BusDomain.identity_bit (d : BusDomain) (bit : ℕ) : Bool :=
   bit < 64 && (d.identity >>> bit) % 2 == 1
 
@@ -82,7 +87,13 @@ structure BusSecurityGeometry where
   layer_count : ℕ
   deriving DecidableEq
 
-/-- A plan: the domains, the tuple dimensions, the blocks of each side, the geometry and the product shape. -/
+/-- A plan:
+
+- the domains
+- the tuple dimensions
+- the blocks of each side
+- the geometry
+- the product shape. -/
 structure BusPlan where
   domains : List BusDomain
   payload_slots : ℕ
@@ -94,7 +105,12 @@ structure BusPlan where
   geometry : BusSecurityGeometry
   product_shape : ProductGkrShape
 
-/-- tuple_slot: a payload position, then zero up to the widest payload, then the identity bits, then zero. -/
+/-- The meaning of a tuple slot, in slot order:
+
+- a payload position
+- zero up to the widest payload
+- the identity bits
+- zero. -/
 def BusPlan.tuple_slot (plan : BusPlan) (bus slot : ℕ) : Option BusTupleSlot := do
   let domain ← plan.domains[bus]?
   if slot ≥ plan.fingerprint_width then none
@@ -104,7 +120,7 @@ def BusPlan.tuple_slot (plan : BusPlan) (bus slot : ℕ) : Option BusTupleSlot :
     return .DomainBit (domain.identity_bit (slot - plan.payload_slots))
   return .Zero
 
-/-- blocks: the blocks of one side. -/
+/-- The blocks of one side. -/
 def BusPlan.blocks (plan : BusPlan) : BusDirection → List BusBlock
   | .Push => plan.pushes
   | .Pull => plan.pulls
@@ -157,7 +173,7 @@ def leafAccess {F : Type _} : BaseLeaf F → Option UnsupportedBusAccess
     | .Preprocessed offset => some (.PreprocessedOffset offset)
   | _ => none
 
-/-- The worklist walk of validate_expression: pop a node, report a rejected leaf, push the operands. -/
+/-- The worklist walk of expression validation: pop a node, report a rejected leaf, push the operands. -/
 def validateWalk {F : Type _} : List (SymbolicExpression F) → Option UnsupportedBusAccess
   | [] => none
   | .Leaf leaf :: pending => (leafAccess leaf).or (validateWalk pending)
@@ -167,14 +183,14 @@ def validateWalk {F : Type _} : List (SymbolicExpression F) → Option Unsupport
 termination_by pending => (pending.map sizeOf).sum
 decreasing_by all_goals (simp_wf; try omega)
 
-/-- validate_expression: the first rejected access in the walk. -/
+/-- The first rejected access in the walk. -/
 def validate_expression {F : Type _} (air declaration : ℕ) (location : BusExpressionLocation)
     (expression : SymbolicExpression F) : Except BusPlanError Unit :=
   match validateWalk [expression] with
   | some access => .error (.UnsupportedExpression air declaration location access)
   | none => .ok ()
 
-/-- validate_interaction: each field in order, then a caller selector. -/
+/-- Validate one declaration: each field in order, then a caller selector. -/
 def validate_interaction {F : Type _} (air declaration : ℕ) (interaction : SymbolicBusInteraction F) :
     Except BusPlanError Unit := do
   (interaction.fields.zipIdx).forM fun (expression, field) =>
@@ -198,7 +214,9 @@ def pendingLe (a b : PendingBlock) : Bool :=
     (ka.2.2.1 < kb.2.2.1 || (ka.2.2.1 = kb.2.2.1 && (ka.2.2.2.1 < kb.2.2.2.1 ||
       (ka.2.2.2.1 = kb.2.2.2.1 && ka.2.2.2.2 ≤ kb.2.2.2.2)))))))
 
-/-- The first loop of build: check each AIR's height and each declaration, and record each bus's width. -/
+/-- The planner's first loop.
+
+It checks each AIR's height and each declaration, and records each bus's width. -/
 def collectWidths {F : Type _} (inputs : List (BusPlanInput F)) :
     Except BusPlanError (List (String × ℕ)) :=
   (inputs.zipIdx).foldlM (fun widths (input, air) => do
@@ -232,7 +250,13 @@ def layoutBlocks (pending : List PendingBlock) :
     Except BusPlanError (List BusBlock × List BusBlock × ℕ × ℕ) :=
   pending.foldlM layoutStep ([], [], 0, 0)
 
-/-- BusPlan::build: the widths, the domains in name order, the tuple dimensions, the sorted blocks and their offsets, then the product shape. -/
+/-- Build the plan, in order:
+
+- the widths
+- the domains, in name order
+- the tuple dimensions
+- the sorted blocks and their offsets
+- the product shape. -/
 def BusPlan.build {F : Type _} (inputs : List (BusPlanInput F)) :
     Except BusPlanError (Option BusPlan) := do
   let some declaration_count := inputs.foldlM (fun count input =>

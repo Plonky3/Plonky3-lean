@@ -7,11 +7,12 @@ Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts:
 
-* a builder is a record of its trait items over its state, and a mutable borrow is a returned state;
-* the expression type is an arbitrary type with the ring operations and the embedding of constants, and no laws;
-* a variable, a public value and a periodic value are read as expressions, which is what every arithmetic operation on them does first;
-* a window is its current row and its next row;
-* a panic is none.
+- a builder is a record of its trait items over its state
+- a mutable borrow is a returned state
+- the expression type has the ring operations and the embedding of constants, and no laws
+- a variable, a public value and a periodic value are read as expressions, as every operation does first
+- a window is its current row and its next row
+- a panic is none.
 
 Loops, branches and the order of operations are kept.
 -/
@@ -124,7 +125,9 @@ def assert_eq_ext (s : S) (x y : EE) : S := B.assert_zero_ext s (B.ext_sub x y)
 /-- Assert x - 1 in the extension. -/
 def assert_one_ext (s : S) (x : EE) : S := B.assert_eq_ext s x B.ext_one
 
-/-- The filtered builder over an extension builder: an extension expression is multiplied by the condition on its right. -/
+/-- The filtered builder over an extension builder.
+
+An extension expression is multiplied by the condition on its right. -/
 def when (condition : E) : ExtensionBuilder F E EE S :=
   { B with
     toAirBuilder := B.toAirBuilder.when condition

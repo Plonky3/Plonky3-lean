@@ -3,11 +3,11 @@ Transcriptions of the matrix commitment scheme's default methods, and of the ext
 
 What a transcription abstracts:
 
-* a matrix is its height, width and entries;
-* a scheme's required methods are parameters;
-* an extension element is its D coordinates over the base field, through a basis and its inverse;
-* the flattened view keeps the original matrix, so the adapter's prover data keeps both;
-* a panic is none.
+- a matrix is its height, width and entries
+- a scheme's required methods are parameters
+- an extension element is its D coordinates over the base field, through a basis and its inverse
+- the flattened view keeps the original matrix, so the adapter's prover data keeps both
+- a panic is none.
 
 Loops, branches and the order of operations are kept.
 -/
@@ -48,7 +48,9 @@ namespace p3_commit.adapters.extension_mmcs.mirror
 
 open p3_commit.pcs.univariate.mirror
 
-/-- An extension field with a basis of D elements over the base field: coordinates and their inverse. -/
+/-- An extension field with a basis of D elements over the base field.
+
+It carries the coordinates and their inverse. -/
 structure Basis (F EF : Type _) where
   D : ℕ
   coords : EF → Fin D → F
@@ -60,7 +62,9 @@ variable {F EF : Type _} [Zero F] (B : Basis F EF)
 def flatten_to_base (row : List EF) : List F :=
   row.flatMap fun e => List.ofFn (B.coords e)
 
-/-- Rebuild extension elements from consecutive runs of D coordinates; the length must be a multiple of D. -/
+/-- Rebuild extension elements from consecutive runs of D coordinates.
+
+The length must be a multiple of D. -/
 def reconstitute_from_base (l : List F) : Option (List EF) :=
   if l.length % B.D ≠ 0 then none
   else some ((List.range (l.length / B.D)).map fun i => B.ofCoords fun j => l.getD (i * B.D + j.val) 0)

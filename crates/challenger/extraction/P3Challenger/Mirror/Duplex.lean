@@ -1,12 +1,15 @@
 /-
 Transcriptions of the duplex challenger's sampling methods.
 
-aeneas does not elaborate them: each builds its output with a closure over the challenger (docs/extractor-issues.md 60), and the uniform sampler picks a strategy with a `const` generic (item 61).
+aeneas does not elaborate them, for two reasons:
+
+- each builds its output with a closure over the challenger (docs/extractor-issues.md 60)
+- the uniform sampler picks a strategy with a const generic (item 61).
 
 What a transcription abstracts:
 
-* the sampled type is the base field, so the closure of `from_basis_coefficients_fn` runs once;
-* the strategy trait is unfolded into a flag that says whether to reject or to fail.
+- the sampled type is the base field, so the closure building it from basis coefficients runs once
+- the strategy trait is unfolded into a flag that says whether to reject or to fail.
 
 Loops, branches, assertions and the order of operations are kept.
 -/
@@ -24,7 +27,7 @@ namespace p3_challenger.duplex_challenger.mirror
 
 variable {F P : Type} {W R : Std.Usize}
 
-/-- `<DuplexChallenger as CanSample<F>>::sample` at the base field (`duplex_challenger.rs:253`).
+/-- Sample one base field element (duplex_challenger.rs:253).
 
 Duplex if inputs are pending or no output is left, then pop the last output. -/
 def sample (copyInst : core.marker.Copy F)
@@ -41,9 +44,11 @@ def sample (copyInst : core.marker.Copy F)
   let t ← core.option.Option.expect o (toStr "Output buffer should be non-empty")
   ok (t, { c1 with output_buffer := v })
 
-/-- `<DuplexChallenger as CanSampleBits<usize>>::sample_bits` (`duplex_challenger.rs:282`).
+/-- Sample b bits (duplex_challenger.rs:282).
 
-Assert `bits < usize::BITS` and `2^bits < p`, sample, and keep the low `bits` bits of the canonical value. -/
+Assert b < 64 and 2^b < p.
+
+Then sample, and keep the low b bits of the canonical value. -/
 def sample_bits (copyInst : core.marker.Copy F)
     (permInst : p3_symmetric.permutation.CryptographicPermutation P (Std.Array F W))
     (ringInst : p3_field.field.PrimeCharacteristicRing F)

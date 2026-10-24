@@ -1,16 +1,19 @@
 /-
 Transcriptions of the mutable read-write memory: its statement, its column layout, and its constraints.
 
-These do not extract: the constraints are generic over the builder, and the crate's dependencies do not compile in the extraction variant (docs/extractor-issues.md 180).
+These do not extract: the constraints are generic over the builder.
+
+The crate's dependencies also fail to compile in the extraction variant (docs/extractor-issues.md 180).
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts, beyond the declaring builder:
 
-* a `usize` is a natural number, and an addition that overflows 64 bits is the error Rust returns;
-* a slice of a row is its sublist, and a range past the row's end panics;
-* a debug assertion panics, as in a debug build;
-* a panic is none.
+- a machine word is a natural number
+- an addition that overflows 64 bits is the error Rust returns
+- a slice of a row is its sublist, and a range past the row's end panics
+- a debug assertion panics, as in a debug build
+- a panic is none.
 
 Loops, branches and the order of operations are kept.
 -/
@@ -74,7 +77,7 @@ def RamStatement.access_payload_width (st : RamStatement) : ℕ :=
 /-- Cell digits, then value. -/
 def RamStatement.image_payload_width (st : RamStatement) : ℕ := st.address_bits + st.value_width
 
-/-- RamStatement::validate: the dimensions in order, then each channel name and its uniqueness. -/
+/-- Validate a statement: the dimensions in order, then each channel name and its uniqueness. -/
 def RamStatement.validate (st : RamStatement) : Except RamError Unit := do
   if st.access_count < MIN_RAM_ACCESS_COUNT then
     throw (.TooFewAccesses st.access_count MIN_RAM_ACCESS_COUNT)
@@ -95,7 +98,11 @@ def RamStatement.validate (st : RamStatement) : Except RamError Unit := do
     | .ok _ => pure ()
     if (names.take position).contains nm then throw (.DuplicateBus nm)
 
-/-- Leaves added on the push and pull sides: one pull per access, and an image entry each way per row of a continuing proof. -/
+/-- Leaves added on the push and pull sides.
+
+There is one pull per access.
+
+A continuing proof adds an image entry each way per row. -/
 def RamStatement.leaf_contribution (st : RamStatement) : ℕ × ℕ :=
   let images := if st.boundary.is_segment then st.access_count else 0
   (images, st.access_count + images)
@@ -120,7 +127,7 @@ structure RamLayout where
   width : ℕ
   deriving DecidableEq
 
-/-- `usize::checked_add`. -/
+/-- Addition of machine words, none at 2^64 or more. -/
 def checked_add (a b : ℕ) : Option ℕ := if a + b < 2 ^ 64 then some (a + b) else none
 
 /-- One step of the offset allocator: the current offset, and the next one. -/
@@ -129,7 +136,7 @@ def take (next count : ℕ) : Except RamError (ℕ × ℕ) :=
   | some n => .ok (next, n)
   | none => .error .LayoutOverflow
 
-/-- RamLayout::new: validate, then allocate the columns in order. -/
+/-- The layout: validate, then allocate the columns in order. -/
 def RamLayout.new (st : RamStatement) : Except RamError RamLayout := do
   st.validate
   let compare_bits := max st.address_bits st.timestamp_bits
@@ -157,16 +164,16 @@ def RamLayout.image_columns (L : RamLayout) : List ℕ :=
 
 /-! ## The constraints -/
 
-/-- RamAir: the statement and its layout. -/
+/-- The memory AIR: the statement and its layout. -/
 structure RamAir where
   statement : RamStatement
   layout : RamLayout
 
-/-- RamAir::new: the layout, which validates. -/
+/-- Build the AIR from its layout, which validates. -/
 def RamAir.new (st : RamStatement) : Except RamError RamAir := do
   pure ⟨st, ← RamLayout.new st⟩
 
-/-- `&row[a..a + n]`, which panics past the row's end. -/
+/-- The n entries of a row from position a, which panics past the row's end. -/
 def slice {E : Type _} (row : List E) (a n : ℕ) : Option (List E) :=
   if a + n ≤ row.length then some ((row.drop a).take n) else none
 
@@ -186,7 +193,9 @@ def majority (B : ExprOps F E) (a b c : E) : E :=
 /-- Inclusive or of two bit-valued expressions: l + r - l r. -/
 def or (B : ExprOps F E) (l r : E) : E := B.sub (B.add l r) (B.mul l r)
 
-/-- assert_strict_increase: the later key is the earlier one plus a nonzero gap, by a ripple adder that refuses a final carry. -/
+/-- The later key is the earlier one plus a nonzero gap.
+
+A ripple adder checks the sum, and refuses a final carry. -/
 def assert_strict_increase (B : AirBuilder F E S) (s : S) (enabled : E)
     (left right delta carry nonzero : List E) : Option S := do
   let bits := left.length
@@ -208,7 +217,7 @@ def assert_strict_increase (B : AirBuilder F E S) (s : S) (enabled : E)
   if bits = 0 then none
   pure (B.assert_zero s (B.mul enabled (B.sub (B.const 1) (← nonzero[bits - 1]?))))
 
-/-- eval_booleanity: every cell digit, clock digit and gap digit is a bit. -/
+/-- Every cell digit, clock digit and gap digit is a bit. -/
 def RamAir.eval_booleanity (air : RamAir) (B : AirBuilder F E S) (s : S) : Option S := do
   let row := (B.main s).current
   let L := air.layout
@@ -219,7 +228,7 @@ def RamAir.eval_booleanity (air : RamAir) (B : AirBuilder F E S) (s : S) : Optio
   (List.range L.compare_bits).foldlM
     (fun s bit => do pure (B.assert_bool s (← row[L.compare_delta + bit]?))) s
 
-/-- eval_run_start: an opening read returns zero, or a continuing proof's opening access is a read. -/
+/-- An opening read returns zero, or a continuing proof's opening access is a read. -/
 def RamAir.eval_run_start (air : RamAir) (B : AirBuilder F E S) (s : S) (row : List E) :
     Option S := do
   let L := air.layout
@@ -230,7 +239,16 @@ def RamAir.eval_run_start (air : RamAir) (B : AirBuilder F E S) (s : S) (row : L
       (fun s component => do pure (B.assert_zero s (B.mul read (← row[L.value + component]?)))) s
   | .Segment .. => pure (B.assert_zero s (← row[L.operation]?))
 
-/-- eval_order: the opening rule on row zero, then on each transition the cell equality, the two strict comparisons, read continuity, and a continuing proof's opening rule. -/
+/-- The order constraints.
+
+Row zero gets the opening rule.
+
+Each transition gets:
+
+- the cell equality
+- the two strict comparisons
+- read continuity
+- a continuing proof's opening rule. -/
 def RamAir.eval_order (air : RamAir) (B : AirBuilder F E S) (s : S) : Option S := do
   let row := (B.main s).current
   let next_row := (B.main s).next
@@ -266,7 +284,9 @@ def RamAir.eval_order (air : RamAir) (B : AirBuilder F E S) (s : S) : Option S :
     air.eval_run_start (transition.when_ne same (B.const 1)) s next_row
   else pure s
 
-/-- eval_run_marker: in a continuing proof, a row closes its run exactly when the next row opens one, and the last row closes. -/
+/-- The run marker of a continuing proof.
+
+A row closes its run exactly when the next row opens one, and the last row closes. -/
 def RamAir.eval_run_marker (air : RamAir) (B : AirBuilder F E S) (s : S) : Option S := do
   if !air.statement.boundary.is_segment then return s
   let row := (B.main s).current
@@ -276,15 +296,17 @@ def RamAir.eval_run_marker (air : RamAir) (B : AirBuilder F E S) (s : S) : Optio
     (B.sub (B.const 1) (← next_row[L.same_address]?))
   pure ((B.when_last_row s).assert_one s (← row[L.group_end]?))
 
-/-- `channel`: a validated name, read back. -/
+/-- A validated channel name, read back. -/
 def channel (nm : String) : Option String :=
   match BusName.try_new nm with
   | .ok nm => some nm
   | .error _ => none
 
-/-- declare: pull each access.
+/-- Declare the bus interactions: pull each access.
 
-A continuing proof also pulls each opening value from the inherited image, and pushes each closing value to the handed-on one. -/
+A continuing proof also pulls each opening value from the inherited image.
+
+It pushes each closing value to the handed-on image. -/
 def RamAir.declare (air : RamAir) (B : BusBuilder F E S) (s : S) : Option S := do
   let row := (B.main s).current
   let L := air.layout
@@ -299,7 +321,7 @@ def RamAir.declare (air : RamAir) (B : BusBuilder F E S) (s : S) : Option S := d
     let closing ← row[L.group_end]?
     pure (B.push_bus_interaction s (← channel outgoing) .Push image (.Boolean closing))
 
-/-- Air::eval: the bits, the order, the run marker, then the declarations. -/
+/-- The AIR's evaluation: the bits, the order, the run marker, then the declarations. -/
 def RamAir.eval (air : RamAir) (B : BusBuilder F E S) (s : S) : Option S := do
   let s ← air.eval_booleanity B.toAirBuilder s
   let s ← air.eval_order B.toAirBuilder s

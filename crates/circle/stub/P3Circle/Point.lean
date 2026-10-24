@@ -3,16 +3,18 @@ Transcriptions of the points of the circle x^2 + y^2 = 1 and their maps.
 
 What a transcription abstracts:
 
-* the base field and its extension are one mathlib field K, base values read through their embedding;
-* the field's circle generators are a table G of coordinate pairs, and asking past its adicity panics;
-* square(x) is x x, double(x) is x + x, and mul_2exp_u64(x, k) is x 2^k;
-* an inverse of zero panics, and so does a batch inversion with a zero entry;
-* a debug assertion is checked, as in a debug build, except the circle check of the point constructor;
-* a panic is none.
+- the base field and its extension are one mathlib field K, base values read through their embedding
+- the field's circle generators are a table G of coordinate pairs, and asking past its adicity panics
+- squaring x is x x, doubling x is x + x, and multiplying x by 2^k is x 2^k
+- an inverse of zero panics, and so does a batch inversion with a zero entry
+- a debug assertion is checked, as in a debug build, except the circle check of the point constructor
+- a panic is none.
 
 The point constructor debug-asserts x^2 + y^2 = 1.
 
-That assertion is not modelled: every point the crate builds lies on the circle, which the proofs show for each map.
+That assertion is not modelled.
+
+Every point the crate builds lies on the circle, and the proofs show it for each map.
 
 Loops and the order of operations are kept.
 -/
@@ -43,13 +45,17 @@ def tryInverse (a : K) : Option K := if a = 0 then none else some a⁻¹
 
 namespace Point
 
-/-- The constructor; its debug assertion of x^2 + y^2 = 1 is not modelled. -/
+/-- The constructor.
+
+Its debug assertion of x^2 + y^2 = 1 is not modelled. -/
 def new (x y : K) : Point K := ⟨x, y⟩
 
 /-- The neutral element (1, 0). -/
 def ZERO : Point K := ⟨1, 0⟩
 
-/-- The inverse stereographic projection t -> ((1 - t^2) / (1 + t^2), 2 t / (1 + t^2)), which panics at t^2 = -1. -/
+/-- The inverse stereographic projection t -> ((1 - t^2) / (1 + t^2), 2 t / (1 + t^2)).
+
+It panics at t^2 = -1. -/
 def from_projective_line (t : K) : Option (Point K) := do
   let t2 := t * t
   let inv_denom ← inv (1 + t2)
@@ -71,7 +77,9 @@ def repeated_double (p : Point K) : ℕ → Point K
 /-- The x-coordinate step of the squaring map. -/
 def vnStep (x : K) : K := x * x + x * x - 1
 
-/-- The vanishing polynomial of the standard coset of size 2^log_n: the x-coordinate after log_n - 1 squarings.
+/-- The vanishing polynomial of the standard coset of size 2^log_n.
+
+It is the x-coordinate after log_n - 1 squarings.
 
 It debug-asserts log_n >= 1. -/
 def v_n (p : Point K) (log_n : ℕ) : Option K :=
@@ -97,22 +105,30 @@ def add (p q : Point K) : Point K :=
 def sub (p q : Point K) : Point K :=
   new (p.x * q.x + p.y * q.y) (p.y * q.x - p.x * q.y)
 
-/-- The selector that vanishes at self: the projection of at - self, which panics at its pole. -/
+/-- The selector that vanishes at self: the projection of at - self.
+
+It panics at its pole. -/
 def v_tilde_p (self at_ : Point K) : Option K :=
   to_projective_line (sub at_ self)
 
-/-- The numerator and the denominator of the reciprocal of v_tilde_p: (at - self).x + 1 and (at - self).y. -/
+/-- The numerator and the denominator of the reciprocal of v_tilde_p.
+
+They are (at - self).x + 1 and (at - self).y. -/
 def recip_v_tilde_p_num_den (self at_ : Point K) : K × K :=
   let diff := sub at_ self
   (diff.x + 1, diff.y)
 
-/-- The value of the selector v_n / v_tilde_p at p itself: -2^(2 log_n - 1) v_n_prod(p) p.y.
+/-- The value of the selector v_n / v_tilde_p at p itself.
+
+It is -2^(2 log_n - 1) P(p) p.y, for P(p) the product of v_1, ..., v_(log_n - 1) at p.
 
 It debug-asserts log_n >= 1. -/
 def s_p_at_p (self : Point K) (log_n : ℕ) : Option K :=
   if log_n ≥ 1 then some (-(v_n_prod self log_n * 2 ^ (2 * log_n - 1)) * self.y) else none
 
-/-- The single-point vanishing function at at, as a + b i: (1 - d.x, -d.y) for d = self - at. -/
+/-- The single-point vanishing function at a point, as a + b i.
+
+It is (1 - d.x, -d.y) for d = self - at. -/
 def v_p (self at_ : Point K) : K × K :=
   let diff := add (neg at_) self
   (1 - diff.x, -diff.y)

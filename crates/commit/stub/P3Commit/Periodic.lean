@@ -1,13 +1,16 @@
 /-
-Transcriptions of the periodic-column support, and of the trait default that tabulates periodic columns on the quotient domain.
+Transcriptions of the periodic-column support.
+
+They include the trait default that tabulates periodic columns on the quotient domain.
 
 What a transcription abstracts, beyond the model of the coset's polynomial space:
 
-* a machine word is a natural number below 2^64, and an operation that leaves the word panics;
-* the trailing-zero count of zero is 64, the word size;
-* a row-major matrix is its flat list of values and its width;
-* the error values are kept, with the offending index;
-* a debug assertion is checked, as in a debug build.
+- a machine word is a natural number below 2^64
+- an operation that leaves the word panics
+- the trailing-zero count of zero is 64, the word size
+- a row-major matrix is its flat list of values and its width
+- the error values are kept, with the offending index
+- a debug assertion is checked, as in a debug build.
 
 Loops, branches, early returns and the order of checks are kept.
 -/
@@ -69,7 +72,11 @@ structure PeriodicLdeTable (K : Type _) where
   width : ℕ
   height : ℕ
 
-/-- The constructor: the height is the length over the width, zero for width zero, and must be zero or a power of two. -/
+/-- The constructor.
+
+The height is the length over the width, zero for width zero.
+
+It must be zero or a power of two. -/
 def PeriodicLdeTable.new (values : List K) (width : ℕ) : Option (PeriodicLdeTable K) :=
   let height := if width = 0 then 0 else values.length / width
   if height = 0 ∨ isPowerOfTwo height then some ⟨values, width, height⟩ else none
@@ -79,7 +86,9 @@ def PeriodicLdeTable.empty : PeriodicLdeTable K := ⟨[], 0, 0⟩
 
 def PeriodicLdeTable.is_empty (t : PeriodicLdeTable K) : Bool := t.values.isEmpty
 
-/-- The period of the packed row groups: the height shifted right by the smaller trailing-zero count.
+/-- The period of the packed row groups.
+
+It is the height shifted right by the smaller trailing-zero count.
 
 A zero pack width fails the debug check, and a shift by 64 or more panics. -/
 def PeriodicLdeTable.packed_group_period (t : PeriodicLdeTable K) (pack_width : ℕ) : Option ℕ :=
@@ -88,7 +97,9 @@ def PeriodicLdeTable.packed_group_period (t : PeriodicLdeTable K) (pack_width : 
     let log_gcd := min (trailingZeros t.height) (trailingZeros pack_width)
     if log_gcd < 64 then some (t.height / 2 ^ log_gcd) else none
 
-/-- The value of a column at an LDE index: the row is the index masked by height - 1.
+/-- The value of a column at an LDE index.
+
+The row is the index masked by height - 1.
 
 An empty table fails the debug check, and an index past the values panics. -/
 def PeriodicLdeTable.get (t : PeriodicLdeTable K) (lde_idx col_idx : ℕ) : Option K :=
@@ -106,7 +117,9 @@ def unitEvalAtPoint (periodic_table : List (List K)) : Option (List K) :=
 
 variable [Field K] [DecidableEq K] (G : Gen K)
 
-/-- The quotient-domain points the table is built on: the first point, then next_point applied repeatedly. -/
+/-- The quotient-domain points the table is built on.
+
+They are the first point, then the next point taken repeatedly. -/
 def quotientPoints (quotient : Coset G) : ℕ → K → Option (List K)
   | 0, _ => some []
   | n + 1, pt => do
@@ -114,7 +127,11 @@ def quotientPoints (quotient : Coset G) : ℕ → K → Option (List K)
     let rest ← quotientPoints quotient n next
     pure (pt :: rest)
 
-/-- The trait default: tabulate every periodic column, padded to the longest period, on the first max_period * blowup quotient points. -/
+/-- The trait default.
+
+It tabulates every periodic column, padded to the longest period.
+
+The table covers the first p b quotient points, for p the longest period and b the blowup. -/
 def build_periodic_lde_table (cols : List (List K)) (trace quotient : Coset G) :
     Option (PeriodicLdeTable K) :=
   let trace_size := Coset.size G trace

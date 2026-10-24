@@ -3,13 +3,15 @@ Transcriptions of the DEEP quotient on the circle and of the lambda extraction.
 
 What a transcription abstracts, beyond the models of the points, the domains, the order and the circle FFT:
 
-* the base field and its extension are one mathlib field K, base values read through their embedding;
-* a matrix is its list of rows;
-* dot_product zips its two iterators, so it stops at the shorter one, as zip does;
-* a parallel loop whose items write disjoint outputs runs its items in order;
-* try_inverse returns none at zero, and an inverse of zero or a batch inversion with a zero entry panics;
-* exp_u64(x, k) is x^k;
-* a panic is none, and a returned option that may also panic is an option inside an option.
+- the base field and its extension are one mathlib field K, base values read through their embedding
+- a matrix is its list of rows
+- a dot product zips its two iterators, so it stops at the shorter one
+- a parallel loop whose items write disjoint outputs runs its items in order
+- the fallible inverse returns none at zero
+- the plain inverse of zero panics, and so does a batch inversion with a zero entry
+- raising x to a machine-word power k is x^k
+- a panic is none
+- a returned option that may also panic is an option inside an option.
 
 Loops and the order of operations are kept.
 -/
@@ -30,12 +32,16 @@ variable {K : Type _} [Field K] [DecidableEq K]
 /-- The sum of the products of two lists, as far as the shorter one goes. -/
 def dot_product (l r : List K) : K := ((l.zip r).map fun p => p.1 * p.2).sum
 
-/-- The numerator re - alpha^W im and the denominator 2 re of the vanishing part, for v_p(zeta) = re + i im. -/
+/-- The numerator and the denominator of the vanishing part.
+
+For v_p(zeta) = re + i im, they are re - alpha^W im and 2 re. -/
 def deep_quotient_vanishing_part (x zeta : Point K) (alpha_pow_width : K) : K × K :=
   let (re_v_zeta, im_v_zeta) := Point.v_p x zeta
   (re_v_zeta - alpha_pow_width * im_v_zeta, re_v_zeta + re_v_zeta)
 
-/-- The DEEP quotient of one row: the vanishing part times sum_j alpha^j (p_j(x) - p_j(zeta)), or none when the denominator vanishes. -/
+/-- The DEEP quotient of one row: the vanishing part times sum_j alpha^j (p_j(x) - p_j(zeta)).
+
+It is none when the denominator vanishes. -/
 def deep_quotient_reduce_row (alpha_pow_width : K) (alpha_powers : List K) (x zeta : Point K)
     (ps_at_x ps_at_zeta : List K) : Option K := do
   let (vp_num, vp_denom) := deep_quotient_vanishing_part x zeta alpha_pow_width
@@ -50,9 +56,11 @@ def compute_vanishing_parts (points : List (Point K)) (zeta : Point K) : Option 
   let denom_inv ← batchInv denoms
   some ((reim.zip denom_inv).map fun p => p.1.2 * p.2)
 
-/-- Add one matrix and point's DEEP quotient to the running reduced openings:
+/-- Add the DEEP quotient of one matrix and point to the running reduced openings:
 
-ro_i += (offset / 2 - offset alpha^W im_i / (2 re_i)) (r_i - c). -/
+```text
+ro_i += (offset / 2 - offset alpha^W im_i / (2 re_i)) (r_i - c)
+``` -/
 def accumulate_deep_quotient (ro : List K) (alpha_offset alpha_pow_width : K) (reduced_rows vp : List K)
     (reduced_ps_at_zeta : K) : List K :=
   let alpha_offset_over_two := alpha_offset / 2
@@ -68,7 +76,9 @@ variable (G : Gen (K × K))
 
 /-- Remove from an LDE in circle FFT order its component along the vanishing polynomial of the pre-blowup domain.
 
-lambda = <lde, v_d> / 2^(log_lde - 1), with v_d read through the circle FFT order and the zigzag of the 2 2^log_blowup cosets.
+It uses lambda = <lde, v_d> / 2^(log_lde - 1).
+
+Here v_d is read through the circle FFT order and the zigzag of the 2 2^log_blowup cosets.
 
 The subtractions log_lde - log_blowup and log_lde - 1 panic below zero. -/
 def extract_lambda (lde : List K) (log_blowup : ℕ) : Option (K × List K) := do

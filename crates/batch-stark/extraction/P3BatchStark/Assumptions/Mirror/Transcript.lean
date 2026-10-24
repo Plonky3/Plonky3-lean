@@ -7,14 +7,14 @@ Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts:
 
-* the sponge state is the list of messages absorbed so far, starting from the seed;
-* a challenge is an arbitrary function of that list, as a random oracle;
-* the grind check is an arbitrary predicate of that list, the bit count and the witness;
-* the pattern player is the list of steps played, checked against the pattern by the caller;
-* the seed is the protocol identity, the pattern, and the instance label as a list of numbers;
-* a commitment absorbs as one message, and a field element as one message;
-* a hash map is a list of keys with their values, in first-insertion order;
-* a panic is none.
+- the sponge state is the list of messages absorbed so far, starting from the seed
+- a challenge is an arbitrary function of that list, as a random oracle
+- the grind check is an arbitrary predicate of that list, the bit count and the witness
+- the pattern player is the list of steps played, checked against the pattern by the caller
+- the seed is the protocol identity, the pattern, and the instance label as a list of numbers
+- a commitment absorbs as one message, and so does a field element
+- a hash map is a list of keys with their values, in first-insertion order
+- a panic is none.
 
 The order of absorptions, samples and checks is kept.
 -/
@@ -28,7 +28,9 @@ namespace p3_batch_stark.transcript.mirror
 
 open p3_lookup.mirror
 
-/-- The numbers the transcript is described by, taken from the AIRs, the common data and the configuration, never from a proof. -/
+/-- The numbers that describe the transcript.
+
+They come from the AIRs, the common data and the configuration, never from a proof. -/
 structure BatchShape where
   trace_widths : List ℕ
   public_value_counts : List ℕ
@@ -66,7 +68,12 @@ inductive Step where
   | end_opening_argument
   deriving DecidableEq
 
-/-- The steps of the lookup phase: the grind, the pair, the permutation commitment and one terminal per instance with a lookup. -/
+/-- The steps of the lookup phase:
+
+- the grind
+- the pair
+- the permutation commitment
+- one terminal per instance with a lookup. -/
 def BatchShape.lookupSteps (s : BatchShape) : List Step :=
   [.lookup_pow s.lookup_pow_bits, .lookup_alpha, .lookup_beta, .permutation_commitment] ++
     List.replicate s.num_lookup_instances .lookup_terminal
@@ -93,7 +100,9 @@ structure DomainSeparator where
 def BatchShape.domain_separator (s : BatchShape) : DomainSeparator :=
   ⟨1, "p3-batch-stark", s.pattern, s.num_instances :: (s.trace_widths ++ s.preprocessed_widths)⟩
 
-/-- A message the sponge absorbs: the seed, a commitment, a base element, an extension element, or the marker of a challenge drawn. -/
+/-- A message the sponge absorbs.
+
+It is the seed, a commitment, a base element, an extension element, or the marker of a draw. -/
 inductive Msg (C F E : Type) where
   | seed (d : DomainSeparator)
   | com (c : C)
@@ -148,7 +157,9 @@ def preprocessed_phase (st : St C F E) (commitment : Option C) : St C F E :=
   | some c => st.step .preprocessed_commitment [.com c]
   | none => st
 
-/-- Replay a grind: a step of that difficulty, then the witness absorbed and checked only when the difficulty is positive. -/
+/-- Replay a grind: a step of that difficulty, then the witness.
+
+The witness is absorbed and checked only when the difficulty is positive. -/
 def observe_pow (powOk : List (Msg C F E) → ℕ → F → Bool) (st : St C F E) (s : Step) (bits : ℕ)
     (w : F) : Option (St C F E) :=
   if bits = 0 then some (st.step s [])
@@ -158,7 +169,11 @@ end Phases
 
 /-! ## The lookup challenges -/
 
-/-- The bookkeeping of the challenge layout: global bus ids and widths by name, the next bus id, and the widest payload. -/
+/-- The bookkeeping of the challenge layout:
+
+- the global bus ids and widths, by name
+- the next bus id
+- the widest payload. -/
 structure LayoutState where
   global_index : List (String × ℕ)
   global_width : List (String × ℕ)
@@ -168,7 +183,9 @@ structure LayoutState where
 /-- The value of a key in a list map. -/
 def lookupKey {β : Type} (m : List (String × β)) (k : String) : Option β := (m.find? (·.1 = k)).map (·.2)
 
-/-- The `entry(k).or_insert(v)` of a list map: the stored value, or the inserted one. -/
+/-- Look up a key in a list map, inserting a default when absent.
+
+It returns the stored value, or the inserted one. -/
 def orInsert {β : Type} (m : List (String × β)) (k : String) (v : β) : β × List (String × β) :=
   match lookupKey m k with
   | some x => (x, m)
@@ -176,7 +193,9 @@ def orInsert {β : Type} (m : List (String × β)) (k : String) (v : β) : β ×
 
 /-- The bus id of one lookup: a global bus shares the id of its name, a local bus takes a fresh id.
 
-A lookup whose tuples differ in width panics, and so does a global bus whose width differs from its name's first width. -/
+A lookup whose tuples differ in width panics.
+
+So does a global bus whose width differs from the first width under its name. -/
 def busId (st : LayoutState) (ctx : Lookup F) : Option (ℕ × LayoutState) := do
   let ctx_width ← assert_uniform_tuple_width ctx.elements
   let max_message_width := max st.max_message_width ctx_width

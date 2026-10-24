@@ -1,17 +1,20 @@
 /-
 Transcriptions of the evaluation of planned declarations: the leaf factor of one declaration at one point.
 
-These do not extract: they are generic over the field traits, and the crate's dependencies do not compile in the extraction variant (docs/extractor-issues.md 180).
+These do not extract: they are generic over the field traits.
+
+The crate's dependencies also fail to compile in the extraction variant (docs/extractor-issues.md 180).
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts:
 
-* the evaluation point and the challenges share one extension field EF, into which base values embed;
-* the flattening of a declaration is a post-order walk of its tree;
-  the Rust worklist records each distinct node once and in another order, and evaluation depends only on every operand preceding its user;
-* the fingerprint weights are the equality table p3-multilinear-util computes, at its packing width and task split;
-* a panic is none.
+- the evaluation point and the challenges share one extension field EF, into which base values embed
+- the flattening of a declaration is a post-order walk of its tree
+- the Rust worklist records each distinct node once, in another order
+- evaluation only needs every operand to precede its user, so the order does not matter
+- the fingerprint weights are the equality table of p3-multilinear-util, at its packing width and task split
+- a panic is none.
 
 Loops, branches and the order of operations are kept.
 -/
@@ -66,7 +69,9 @@ inductive BusEvaluationError where
   | FingerprintWidth (expected actual : ℕ)
   deriving DecidableEq
 
-/-- compile_leaf: a current-row access, a selector or a constant, and an error for another row. -/
+/-- Compile a leaf: a current-row access, a selector or a constant.
+
+Any other row is an error. -/
 def compile_leaf : BaseLeaf F → Except BusEvaluationError (BusNode F)
   | .Variable v => match v.entry with
     | .Main 0 => .ok (.Main v.index)
@@ -80,7 +85,7 @@ def compile_leaf : BaseLeaf F → Except BusEvaluationError (BusNode F)
   | .IsTransition => .ok .IsTransition
   | .Constant c => .ok (.Constant c)
 
-/-- compile_expression: append the expression's nodes, operands first, and return its position. -/
+/-- Append the expression's nodes, operands first, and return its position. -/
 def compile_expression : List (BusNode F) → SymbolicExpression F →
     Except BusEvaluationError (List (BusNode F) × ℕ)
   | nodes, .Leaf leaf => do pure (nodes ++ [← compile_leaf leaf], nodes.length)
@@ -100,7 +105,7 @@ def compile_expression : List (BusNode F) → SymbolicExpression F →
     let (nodes, ix) ← compile_expression nodes x
     pure (nodes ++ [.Neg ix], nodes.length)
 
-/-- fingerprint_weights: the equality table of the fingerprint point, coordinate 0 on the top bit. -/
+/-- The equality table of the fingerprint point, with coordinate 0 on the top bit. -/
 def fingerprint_weights (W task_len : ℕ) (fingerprint : List EF) : Option (List EF) :=
   Point.equality_weights_msb W task_len fingerprint
 
@@ -136,7 +141,12 @@ def nodeValue (values : BusEvaluation F EF) (scratch : List EF) :
   | .Neg x => .ok (-scratch.getD x 0)
   | .Mul x y => .ok (scratch.getD x 0 * scratch.getD y 0)
 
-/-- BusFactorPlan::evaluate: one forward pass, the payload inner product, the shift, then the activation's interpolation with the identity.
+/-- Evaluate one declaration's factor, in order:
+
+- one forward pass over the nodes
+- the payload inner product
+- the shift
+- the activation's interpolation with the identity.
 
 An operand index is always earlier than its user, so reading it never panics.
 
@@ -152,7 +162,11 @@ def BusFactorPlan.evaluate (f : BusFactorPlan F EF) (values : BusEvaluation F EF
     | none => factor
     | some node => 1 + (factor - 1) * scratch.getD node 0)
 
-/-- BusPlan::compile_factor: the bus, the payload width and the weight count are checked, the identity bits are folded into the shift, and the declaration is flattened. -/
+/-- Compile one declaration's factor:
+
+- check the bus, the payload width and the weight count
+- fold the identity bits into the shift
+- flatten the declaration. -/
 def BusPlan.compile_factor (plan : BusPlan) (bus : ℕ) (interaction : SymbolicBusInteraction F)
     (weights : List EF) (offset : EF) : Except BusEvaluationError (BusFactorPlan F EF) := do
   let some domain := plan.domains[bus]?

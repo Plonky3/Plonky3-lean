@@ -3,14 +3,17 @@ Transcriptions of the twin-coset domains of the circle and their polynomial spac
 
 What a transcription abstracts, beyond the model of the points:
 
-* an iterator is the list it yields, and itertools' interleave alternates two lists, then appends what is left;
-* a matrix is its list of rows;
-* the thread count of the parallel point chain is a parameter, at least one;
-* a parallel loop whose items write disjoint outputs runs its items in order;
-* the circle two-adicity is the adicity of the generator table;
-* an inverse of zero panics, and so does a batch inversion with a zero entry;
-* an assertion panics, and a debug assertion and a subtraction below zero are checked, as in a debug build;
-* a panic is none, and a returned option that may also panic is an option inside an option.
+- an iterator is the list it yields
+- itertools' interleave alternates two lists, then appends what is left
+- a matrix is its list of rows
+- the thread count of the parallel point chain is a parameter, at least one
+- a parallel loop whose items write disjoint outputs runs its items in order
+- the circle two-adicity is the adicity of the generator table
+- an inverse of zero panics, and so does a batch inversion with a zero entry
+- an assertion panics
+- a debug assertion and a subtraction below zero are checked, as in a debug build
+- a panic is none
+- a returned option that may also panic is an option inside an option.
 
 Loops and the order of operations are kept.
 -/
@@ -24,7 +27,9 @@ namespace p3_circle.domain.mirror
 
 open p3_dft.mirror p3_circle.point.mirror p3_commit.domain.mirror
 
-/-- A twin coset of size 2^log_n: the points shift + i g and -shift + (i + 1) g, interleaved, for g of order 2^(log_n - 1). -/
+/-- A twin coset of size 2^log_n.
+
+Its points are shift + i g and -shift + (i + 1) g, interleaved, for g of order 2^(log_n - 1). -/
 structure CircleDomain (K : Type _) where
   log_n : ℕ
   shift : Point K
@@ -42,7 +47,11 @@ def interleave {α : Type _} : List α → List α → List α
 def chain (seed g : Point K) (len : ℕ) : List (Point K) :=
   (List.range len).map fun i => (fun p => Point.add p g)^[i] seed
 
-/-- The chunked point chain: below the threshold the plain chain, else chunks reseeded by a scalar multiplication. -/
+/-- The chunked point chain.
+
+Below the threshold it is the plain chain.
+
+Above it, each chunk is reseeded by a scalar multiplication. -/
 def parallel_point_chain (threads : ℕ) (seed g : Point K) (len : ℕ) : List (Point K) :=
   if len < 2 ^ 10 then chain seed g len
   else
@@ -65,7 +74,9 @@ namespace CircleDomain
 /-- The constructor. -/
 def new (log_n : ℕ) (shift : Point K) : CircleDomain K := ⟨log_n, shift⟩
 
-/-- The standard position coset of size 2^log_n: the shift is the generator of order 2^(log_n + 1). -/
+/-- The standard position coset of size 2^log_n.
+
+Its shift is the generator of order 2^(log_n + 1). -/
 def standard (log_n : ℕ) : Option (CircleDomain K) :=
   (Point.generator G (log_n + 1)).map fun shift => ⟨log_n, shift⟩
 
@@ -73,7 +84,9 @@ def standard (log_n : ℕ) : Option (CircleDomain K) :=
 def is_standard (d : CircleDomain K) : Option Bool :=
   (Point.generator G (d.log_n + 1)).map fun g => decide (d.shift = g)
 
-/-- The generator of order 2^(log_n - 1); log_n = 0 underflows. -/
+/-- The generator of order 2^(log_n - 1).
+
+log_n = 0 underflows. -/
 def subgroup_generator (d : CircleDomain K) : Option (Point K) :=
   if d.log_n = 0 then none else Point.generator G (d.log_n - 1)
 
@@ -101,7 +114,7 @@ def points_vec (threads : ℕ) (d : CircleDomain K) : Option (List (Point K)) :=
   let c1 := parallel_point_chain threads (Point.sub g d.shift) g half
   some (interleave c0 c1)
 
-/-- Point idx: shift + (idx / 2) g at an even index, -shift + (idx / 2 + 1) g at an odd one. -/
+/-- Point idx: shift + (idx / 2) g at an even index, and -shift + (idx / 2 + 1) g at an odd one. -/
 def nth_point (d : CircleDomain K) (idx : ℕ) : Option (Point K) := do
   let (idx, lsb) := (idx / 2, idx % 2)
   let g ← subgroup_generator G d
@@ -117,11 +130,15 @@ def vanishing_poly (d : CircleDomain K) (at_ : Point K) : Option K := do
 /-- The number of points. -/
 def size (d : CircleDomain K) : ℕ := 2 ^ d.log_n
 
-/-- The first point, on the projective line; it panics when the shift is (-1, 0). -/
+/-- The first point, on the projective line.
+
+It panics when the shift is (-1, 0). -/
 def first_point (d : CircleDomain K) : Option K :=
   Point.to_projective_line d.shift
 
-/-- The next point after x, on the projective line, for a standard domain; none otherwise. -/
+/-- The next point after x, on the projective line, for a standard domain.
+
+It is none otherwise. -/
 def next_point (d : CircleDomain K) (x : K) : Option (Option K) := do
   let std ← is_standard G d
   if std then do
@@ -173,7 +190,14 @@ def vanishing_poly_at_point (d : CircleDomain K) (point : K) : Option K := do
 
 /-- The selectors at the point of the projective line x, with one shared batch inversion.
 
-With z the vanishing polynomial and k = s_p_at_p(-shift), they are z / v_tilde(shift), z / v_tilde(-shift), 1 - z / (k v_tilde(-shift)) and 1 / z. -/
+Let z be the vanishing polynomial, and k the value of v_n / v_tilde_p at p = -shift.
+
+The selectors are:
+
+- z / v_tilde(shift)
+- z / v_tilde(-shift)
+- 1 - z / (k v_tilde(-shift))
+- 1 / z. -/
 def selectors_at_point (d : CircleDomain K) (point : K) : Option (LagrangeSelectors K) := do
   let point ← Point.from_projective_line point
   let neg_shift := Point.neg d.shift

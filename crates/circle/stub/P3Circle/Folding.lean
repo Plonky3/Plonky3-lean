@@ -3,13 +3,15 @@ Transcriptions of the circle FRI folds: the first-layer y-fold, the x-folds, and
 
 What a transcription abstracts, beyond the models of the points, the domains and the circle FFT:
 
-* a matrix of width 2 is its list of rows, each a pair;
-* halve(x) is x / 2;
-* reverse_bits_len(x, k) is the k-bit reversal of x, which it is for k > 0 or x = 0, and the folds call it on x < 2^k only;
-* a parallel loop whose items write disjoint outputs runs its items in order;
-* an inverse of zero panics, and so does a batch inversion with a zero entry;
-* an assertion panics, and a debug assertion and a subtraction below zero are checked, as in a debug build;
-* a panic is none.
+- a matrix of width 2 is its list of rows, each a pair
+- halving x is x / 2
+- the bit reversal of x on k bits is the k-bit reversal of x
+- that holds for k > 0 or x = 0, and the folds call it on x < 2^k only
+- a parallel loop whose items write disjoint outputs runs its items in order
+- an inverse of zero panics, and so does a batch inversion with a zero entry
+- an assertion panics
+- a debug assertion and a subtraction below zero are checked, as in a debug build
+- a panic is none.
 
 Loops and the order of operations are kept.
 -/
@@ -55,13 +57,17 @@ def fold_x (beta : K) (log_arity : ℕ) (rows : List (K × K)) : Option (List K)
     let invs ← batchInv xs
     fold rows beta invs
 
-/-- Fold two values with an inverted twiddle; it asserts exactly two values. -/
+/-- Fold two values with an inverted twiddle.
+
+It asserts exactly two values. -/
 def fold_row_with_inv_twiddle (inv_twiddle beta : K) (evals : List K) : Option K :=
   match evals with
   | [e0, e1] => some ((e0 + e1 + beta * ((e0 - e1) * inv_twiddle)) / 2)
   | _ => none
 
-/-- One query's x-fold of a row, with the twiddle of index rev(index) of the standard domain of size 2^(h + 2).
+/-- One query's x-fold of a row.
+
+It uses the twiddle of index rev(index) of the standard domain of size 2^(h + 2).
 
 It asserts arity 2 and two values. -/
 def fold_x_row (index log_folded_height log_arity : ℕ) (beta : K) (evals : List K) : Option K := do
@@ -75,7 +81,9 @@ def fold_x_row (index log_folded_height log_arity : ℕ) (beta : K) (evals : Lis
     let e1 := evals.getD 1 0
     some ((e0 + e1 + beta * ((e0 - e1) * t)) / 2)
 
-/-- The loop of the per-query chain: square the x-coordinate, and negate it when the next index bit is set. -/
+/-- The loop of the per-query chain.
+
+It squares the x-coordinate, and negates it when the next index bit is set. -/
 def twiddleChainLoop (top_level_index : ℕ) (acc : List K × K) (r : ℕ) : List K × K :=
   let x := Point.vnStep acc.2
   let x := if (top_level_index / 2 ^ (r + 1)) % 2 = 1 then -x else x

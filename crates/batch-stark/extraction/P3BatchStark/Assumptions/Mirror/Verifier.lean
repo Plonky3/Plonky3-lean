@@ -7,11 +7,15 @@ Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts, beyond the transcript transcriptions:
 
-* an AIR is the numbers and flags the verifier reads from it, and its quotient sizing as a function of the base degree bits;
-* the configuration is the hiding flag, the extension degree, the trace-height bounds, the word size, the characteristic and the two difficulties;
-* the opening argument is a predicate on the commitments, the points and the claimed values;
-* each instance's constraint check at zeta is a function of the instance's openings, its challenges, alpha and zeta;
-* a hash map is a list, an error carries the instance index where Rust reports one, and a panic is none.
+- an AIR is the numbers and flags the verifier reads from it
+- its quotient sizing is a function of the base degree bits
+- the configuration is the hiding flag, the extension degree and the trace-height bounds
+- it also holds the word size, the characteristic and the two difficulties
+- the opening argument is a predicate on the commitments, the points and the claimed values
+- each instance's check at zeta is a function of its openings, its challenges, alpha and zeta
+- a hash map is a list
+- an error carries the instance index where Rust reports one
+- a panic is none.
 
 Loops, branches and the order of checks are kept.
 -/
@@ -50,7 +54,10 @@ structure Config where
 /-- The hiding flag as the number 0 or 1. -/
 def Config.is_zk (c : Config) : ℕ := c.zk.toNat
 
-/-- The keygen-cached data: the preprocessed width and degree bits of each instance under the global preprocessed commitment, and each instance's lookups. -/
+/-- The keygen-cached data:
+
+- the preprocessed width and degree bits of each instance under the global preprocessed commitment
+- each instance's lookups. -/
 structure CommonData (C F : Type) where
   preprocessed : Option (C × List (Option (ℕ × ℕ)))
   lookups : List (List (Lookup F))
@@ -105,7 +112,9 @@ inductive BatchError where
   | TerminalSum
   deriving DecidableEq
 
-/-- `validate_degree_bits`: the bits within the bounds and below the word size, as the base bits and the extended size. -/
+/-- Check the degree bits are within the bounds and below the word size.
+
+It returns the base bits and the extended size. -/
 def validate_degree_bits (cfg : Config) (air db : ℕ) : Except BatchError (ℕ × ℕ) :=
   if db < cfg.is_zk + cfg.log_min_trace_height then .error (.DegreeBitsTooSmall air)
   else if cfg.log_max_trace_height < db then .error (.DegreeBitsTooLarge air)
@@ -116,7 +125,12 @@ def validate_degree_bits (cfg : Config) (air db : ℕ) : Except BatchError (ℕ 
 def preprocessedWidth {C F : Type} (common : CommonData C F) (i : ℕ) : ℕ :=
   ((common.preprocessed.bind fun g => g.2[i]?.join).map (·.1)).getD 0
 
-/-- What the shape checks hand on: the base degree bits, the committed chunk counts, the preprocessed widths and the number of instances with lookups. -/
+/-- What the shape checks hand on:
+
+- the base degree bits
+- the committed chunk counts
+- the preprocessed widths
+- the number of instances with lookups. -/
 structure Checked where
   base_degree_bits : List ℕ
   log_num_quotient_chunks : List ℕ
@@ -161,7 +175,14 @@ def check_instance (cfg : Config) (common : CommonData C F) (air : AirInfo) (i :
     (.PermutationWidthMismatch i)
   ensure (terminal.isSome = !lookups.isEmpty) (.TerminalPresenceMismatch i)
 
-/-- The shape checks of `verify_batch`, before any transcript work: counts, randomization, degree bits and chunk counts, the height bound, each instance's openings, and the permutation commitment. -/
+/-- The verifier's shape checks, before any transcript work:
+
+- the counts
+- the randomization
+- the degree bits and chunk counts
+- the height bound
+- each instance's openings
+- the permutation commitment. -/
 def check_shape (cfg : Config) (airs : List AirInfo) (proof : BatchProof C F K)
     (public_values : List (List F)) (common : CommonData C F) : Except BatchError Checked := do
   let n := airs.length
@@ -192,7 +213,11 @@ def shapeOf (cfg : Config) (airs : List AirInfo) (common : CommonData C F) (chec
   ⟨airs.map (·.width), airs.map (·.num_public_values), checked.preprocessed_widths,
     common.preprocessed.isSome, checked.num_lookup_instances, cfg.lookup_pow_bits, cfg.zk, cfg.ood_pow_bits⟩
 
-/-- The transcript replay of `verify_batch`: none on a panic of the layout, then the state reached and the challenges or the rejection.
+/-- The verifier's transcript replay.
+
+It is none on a panic of the layout.
+
+Otherwise it returns the state reached, and the challenges or the rejection.
 
 The two grind rejections stop the replay. -/
 def replay [Zero F] [DecidableEq F] [Field K] (cfg : Config) (airs : List AirInfo)
@@ -215,7 +240,10 @@ def replay [Zero F] [DecidableEq F] [Field K] (cfg : Config) (airs : List AirInf
     | .error e => pure (st, .error (.Transcript e))
     | .ok zeta => pure (delegate st, .ok (challenges, alpha, zeta))
 
-/-- The reads of the opening argument that Rust unwraps: each instance's next row when its AIR reads it, and its randomization opening under a randomization commitment.
+/-- The reads of the opening argument that Rust unwraps:
+
+- each instance's next row, when its AIR reads it
+- its randomization opening, under a randomization commitment.
 
 The permutation round lists the instances with a nonempty permutation opening, in order. -/
 def opening_reads (airs : List AirInfo) (proof : BatchProof C F K) :
@@ -231,7 +259,14 @@ def opening_reads (airs : List AirInfo) (proof : BatchProof C F K) :
     !(proof.opened.getD i default).permutation_local.isEmpty
   pure (nexts, randoms, perm)
 
-/-- `verify_batch`: the boundary assertion, the shape checks, the replay, the opening argument, each instance's check at zeta with the shared alpha, and the cross-table terminal sum.
+/-- The batch verifier, in order:
+
+- the boundary assertion
+- the shape checks
+- the replay
+- the opening argument
+- each instance's check at zeta, with the shared alpha
+- the cross-table terminal sum.
 
 A panic is none. -/
 def verify_batch [Zero F] [DecidableEq F] [Field K] [DecidableEq K] (cfg : Config) (airs : List AirInfo)

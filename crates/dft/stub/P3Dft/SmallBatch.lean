@@ -3,10 +3,13 @@ Transcriptions of the small-batch radix-2 backend.
 
 What a transcription abstracts, beyond those of the other transforms:
 
-* a layer splits each half block into equally sized sub-chunks and pairs them in order, which pairs every element with the element at the same offset, so the transcription applies the butterfly to whole halves;
-* the matrix is exactly h rows of w values, without values past the last row;
-* the shared twiddle cache holds the tables for the largest size requested so far, 2^L >= h;
-* the rows per parallel chunk, min(next_pow2(c / w), h), take the element count c of the L1 estimate as a parameter.
+- a layer splits each half block into equal sub-chunks and pairs them in order
+- that pairs every element with the element at the same offset
+- so the transcription applies the butterfly to whole halves
+- the matrix is exactly h rows of w values, without values past the last row
+- the shared twiddle cache holds the tables for the largest size requested so far, 2^L >= h
+- the rows per parallel chunk are min(2^(ceil(log_2(c / w))), h)
+- the element count c of the L1 estimate is a parameter.
 -/
 module
 
@@ -20,11 +23,13 @@ open p3_dft.mirror p3_dft.butterflies.mirror
 
 variable {K : Type _} [Field K] [DecidableEq K] {V : Type _} [AddCommGroup V] [Module K V]
 
-/-- Every s-th entry of a list, from the first: the step_by iterator. -/
+/-- Every s-th entry of a list, from the first, as a stepping iterator yields them. -/
 def stepBy {α : Type _} (l : List α) (s : ℕ) : List α :=
   ((List.range ((l.length + s - 1) / s)).filterMap fun j => l[j * s]?)
 
-/-- The tables for an fft of length n = 2^lg_n: table i holds every 2^i-th of the first n/2 powers. -/
+/-- The tables for an FFT of length n = 2^k.
+
+Table i holds every 2^i-th of the first n/2 powers. -/
 def roots_of_unity_table (G : Gen K) (n : ℕ) : Option (List (List K)) := do
   let lg_n ← log2Strict n
   if lg_n = 0 then none
@@ -34,7 +39,9 @@ def roots_of_unity_table (G : Gen K) (n : ℕ) : Option (List (List K)) := do
     let nth_roots := powersList generator half_n
     pure ((List.range lg_n).map fun i => stepBy nth_roots (2 ^ i))
 
-/-- The cache of the largest size 2^L requested so far: the tables bit-reversed, and the inverse tables.
+/-- The cache of the largest size 2^L requested so far.
+
+It holds the tables bit-reversed, and the inverse tables.
 
 An inverse table keeps the one in front and lists the rest reversed and negated. -/
 def cache (G : Gen K) (L : ℕ) : Option (List (List K) × List (List K)) :=
@@ -45,11 +52,13 @@ def cache (G : Gen K) (L : ℕ) : Option (List (List K) × List (List K)) :=
         let inv := 1 :: (ts.tail.reverse.map fun f => -f)
         revIndex inv.length inv)
 
-/-- The rows per parallel chunk: min(next_pow2(workload / w), h). -/
+/-- The rows per parallel chunk: min(2^(ceil(log_2(c / w))), h), for c the workload. -/
 def estimate_num_rows_in_l1 (workload w h : ℕ) : ℕ :=
   min (2 ^ Nat.clog 2 (workload / w)) h
 
-/-- One parallel layer: blocks of h / n rows, n the table length; block ind uses twiddle ind.
+/-- One parallel layer: blocks of h / n rows, for n the table length.
+
+Block ind uses twiddle ind.
 
 Block 0 uses the butterfly without a twiddle. -/
 def dft_layer_par (h : ℕ) (twiddles : List K) (fly : K → V → V → V × V) (x : ℕ → V) : ℕ → V :=
@@ -109,7 +118,7 @@ def tuples3 {α : Type _} : List α → List (α × α × α)
   | a :: b :: c :: rest => (a, b, c) :: tuples3 rest
   | _ => []
 
-/-- One chunk of npr rows at chunk index idx: decimation-in-time layers, smallest table last.
+/-- One chunk of rows at chunk index idx: decimation-in-time layers, smallest table last.
 
 Layer l of the chunk reads 2^l consecutive twiddles, from twiddle idx 2^l. -/
 def remaining_layers (npr idx : ℕ) (root_table : List (List K)) (x : ℕ → V) : ℕ → V :=
@@ -120,7 +129,7 @@ def remaining_layers (npr idx : ℕ) (root_table : List (List K)) (x : ℕ → V
     pairLoop ((List.range n).flatMap fun b => (List.range half).map fun s => (idx * n + b, s)) half
       (fun b _ => DitButterfly.apply (twiddles.getD b 0)) acc) x
 
-/-- One chunk of npr rows at chunk index idx: decimation-in-frequency layers, largest table first.
+/-- One chunk of rows at chunk index idx: decimation-in-frequency layers, largest table first.
 
 Layer l of the chunk reads 2^(r - l - 1) consecutive twiddles, for r tables. -/
 def initial_layers (npr idx : ℕ) (root_table : List (List K)) (x : ℕ → V) : ℕ → V :=
@@ -137,7 +146,9 @@ def par_remaining_layers (h npr : ℕ) (root_table : List (List K)) (x : ℕ →
   (List.range (h / npr)).foldl (fun acc idx =>
     fun i => if i / npr = idx then remaining_layers npr idx root_table acc i else acc i) x
 
-/-- The initial layers, chunk by chunk, each chunk first divided by the height 2^log_height. -/
+/-- The initial layers, chunk by chunk.
+
+Each chunk is first divided by the height 2^log_height. -/
 def par_initial_layers (h npr : ℕ) (root_table : List (List K)) (log_height : ℕ) (x : ℕ → V) :
     ℕ → V :=
   let inv_height := ((2 : K) ^ log_height)⁻¹
@@ -162,7 +173,12 @@ def extra_layers_dif (h : ℕ) (tables : List (List K)) (x : ℕ → V) : Option
 
 /-- The forward transform with a cache of size 2^L and the L1 element estimate c.
 
-Triples of layers from the one-block layer down, the extra layers, the chunked layers, then a bit reversal. -/
+It runs, in order:
+
+- triples of layers, from the one-block layer down
+- the extra layers
+- the chunked layers
+- a bit reversal. -/
 def Radix2DFTSmallBatch.dft_batch (G : Gen K) (L c w h : ℕ) (x : ℕ → V) : Option (ℕ → V) := do
   let log_h ← log2Strict h
   let (g, _) ← cache G L
@@ -176,8 +192,14 @@ def Radix2DFTSmallBatch.dft_batch (G : Gen K) (L c w h : ℕ) (x : ℕ → V) : 
   let x := par_remaining_layers h num_par_rows (root_table.take log_num_par_rows) x
   pure (revRows log_h x)
 
-/-- The inverse with a cache of size 2^L: a bit reversal, the chunked layers with the division by
-the height, the extra layers, then triples of layers up to the one-block layer. -/
+/-- The inverse with a cache of size 2^L.
+
+It runs, in order:
+
+- a bit reversal
+- the chunked layers, with the division by the height
+- the extra layers
+- triples of layers, up to the one-block layer. -/
 def Radix2DFTSmallBatch.idft_batch (G : Gen K) (L c w h : ℕ) (x : ℕ → V) : Option (ℕ → V) := do
   let log_h ← log2Strict h
   let (_, g) ← cache G L

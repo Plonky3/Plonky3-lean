@@ -3,9 +3,9 @@ Transcriptions of the univariate scheme trait's default methods.
 
 What a transcription abstracts, beyond the model of the coset's polynomial space:
 
-* a scheme's required methods are parameters;
-* a matrix is its height, width and entries;
-* a panic is none.
+- a scheme's required methods are parameters
+- a matrix is its height, width and entries
+- a panic is none.
 
 The order of operations is kept.
 -/
@@ -27,7 +27,9 @@ def commit_preprocessing {α : Type _} (commit : List (Coset G × Mat K) → α)
     (evaluations : List (Coset G × Mat K)) : α :=
   commit evaluations
 
-/-- The default quotient commit: split the evaluations and the domain into chunks, extend each chunk, and commit the extensions. -/
+/-- The default quotient commit.
+
+Split the evaluations and the domain into chunks, extend each chunk, and commit the extensions. -/
 def commit_quotient {α : Type _}
     (get_quotient_ldes : List (Coset G × Mat K) → ℕ → Option (List (Mat K)))
     (commit_ldes : List (Mat K) → Option α) (quotient_domain : Coset G) (evals : Mat K)
@@ -45,7 +47,9 @@ def get_evaluations_on_domain_no_random {PD α : Type _}
     (domain : Coset G) : α :=
   get_evaluations_on_domain prover_data idx domain
 
-/-- The default opening with preprocessing: it asserts the scheme is not hiding, then opens as usual. -/
+/-- The default opening with preprocessing.
+
+It asserts the scheme is not hiding, then opens as usual. -/
 def open_with_preprocessing {R C α : Type _} (zk : Bool) (open_ : R → C → α) (requests : R)
     (challenger : C) (_preprocessed : Option ℕ) : Option α :=
   if zk then none else some (open_ requests challenger)

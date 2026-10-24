@@ -3,8 +3,8 @@ Transcriptions of the butterflies of p3-dft.
 
 What a transcription abstracts:
 
-* a packed value is a row, a vector in V, and its arithmetic is elementwise;
-* multiplying a row by a field element is the scalar action.
+- a packed value is a row, a vector in V, and its arithmetic is elementwise
+- multiplying a row by a field element is the scalar action.
 -/
 module
 
@@ -20,12 +20,16 @@ def TwiddleFreeButterfly.apply {V : Type _} [AddCommGroup V] (x_1 x_2 : V) : V �
 
 variable {K : Type _} [Field K] {V : Type _} [AddCommGroup V] [Module K V]
 
-/-- The decimation-in-time butterfly: it multiplies the second input by the twiddle, then adds and subtracts. -/
+/-- The decimation-in-time butterfly.
+
+It multiplies the second input by the twiddle, then adds and subtracts. -/
 def DitButterfly.apply (t : K) (x_1 x_2 : V) : V × V :=
   let x_2_twiddle := t • x_2
   (x_1 + x_2_twiddle, x_1 - x_2_twiddle)
 
-/-- The decimation-in-frequency butterfly: it adds and subtracts, then multiplies the difference by the twiddle. -/
+/-- The decimation-in-frequency butterfly.
+
+It adds and subtracts, then multiplies the difference by the twiddle. -/
 def DifButterfly.apply (t : K) (x_1 x_2 : V) : V × V :=
   (x_1 + x_2, t • (x_1 - x_2))
 
@@ -43,7 +47,9 @@ structure ScaledDitButterfly (K : Type _) where
 def ScaledDitButterfly.new (twiddle scale : K) : ScaledDitButterfly K :=
   { twiddle, scale, twiddle_times_scale := twiddle * scale }
 
-/-- The scaled butterfly: it scales the first input, multiplies the second by the precomputed product, then adds and subtracts. -/
+/-- The scaled butterfly.
+
+It scales the first input, multiplies the second by the precomputed product, then adds and subtracts. -/
 def ScaledDitButterfly.apply (b : ScaledDitButterfly K) (x_1 x_2 : V) : V × V :=
   let x_1_scale := b.scale • x_1
   let x_2_twiddle_scale := b.twiddle_times_scale • x_2
@@ -103,7 +109,9 @@ def ScaledDitButterfly.apply_to_rows (b : ScaledDitButterfly F) : List F → Lis
     ((r1.zip r2).map fun p => p.1 * b.scale + p.2 * b.twiddle_times_scale,
       (r1.zip r2).map fun p => p.1 * b.scale - p.2 * b.twiddle_times_scale)
 
-/-- The row form of the butterfly for a zero second row: the second row becomes the first times the twiddle. -/
+/-- The row form of the butterfly for a zero second row.
+
+The second row becomes the first times the twiddle. -/
 def DifButterflyZeros.apply_to_rows (t : F) (r1 r2 : List F) : List F × List F :=
   (r1, (r1.zip r2).map fun p => p.1 * t)
 

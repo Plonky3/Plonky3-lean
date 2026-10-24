@@ -3,11 +3,15 @@ Transcriptions of the Lin-Chung-Han transform of p3-binary-dft.
 
 A slice of a matrix is its own matrix, its rows renumbered from zero, as the Rust chunks are.
 
-The thread pool is serial, as maybe-rayon without its parallel feature is: it has one worker.
+The thread pool is serial, as maybe-rayon without its parallel feature is.
 
-With one worker no stage is staged, and a staged group is never reached; its branch is a panic here.
+It has one worker, so no stage is staged and a staged group is never reached.
 
-The staged coset pass of a message larger than one tile is not transcribed; its branch is a panic here.
+That branch is a panic here.
+
+The staged coset pass of a message larger than one tile is not transcribed.
+
+Its branch is a panic here too.
 -/
 module
 
@@ -62,7 +66,9 @@ def BUTTERFLY_GRAIN : ℕ := 1024
 /-- Bytes of one contiguous row tile. -/
 def DEEP_TILE_BYTES : ℕ := 128 * 1024
 
-/-- The butterfly of the level on block i of a slice: the block is split at its half, and the two runs are asserted equal. -/
+/-- The butterfly of the level on block i of a slice.
+
+The block is split at its half, and the two runs are asserted equal. -/
 def blockButterfly (inverse : Bool) (len half i : ℕ) (t : F) (y : ℕ → V) : Option (ℕ → V) :=
   let start := i * (2 * half)
   let blockLen := min (2 * half) (len - start)
@@ -98,9 +104,9 @@ def stage_pass (L : Level F) (tw : Twiddles F) (inverse : Bool) (width n j : ℕ
 
 /-! ## Tiles and the schedule -/
 
-/-- Run the log_rows stages of a tile of 2^log_rows rows: global stages stage_base and up.
+/-- Run the k stages of a tile of 2^k rows, which are the global stages from a base stage up.
 
-At its stage jj, the tile's blocks continue the global block numbering from index << (log_rows - 1 - jj). -/
+At its stage j, the tile's blocks continue the global numbering from index * 2^(k - 1 - j). -/
 def tile_stages (L : Level F) (tw : Twiddles F) (inverse : Bool) (len log_rows stage_base index : ℕ)
     (y : ℕ → V) : Option (ℕ → V) :=
   (List.range log_rows).foldlM (fun y step =>
@@ -108,7 +114,7 @@ def tile_stages (L : Level F) (tw : Twiddles F) (inverse : Bool) (len log_rows s
       walkBlocks L tw inverse (stage_base + jj) (index * 2 ^ (log_rows - 1 - jj)) len
         (2 ^ jj) y) y
 
-/-- Run the bottom log_rows stages inside each contiguous tile of 2^log_rows rows. -/
+/-- Run the bottom k stages inside each contiguous tile of 2^k rows. -/
 def deep_tiles (L : Level F) (tw : Twiddles F) (inverse : Bool) (n log_rows : ℕ) (x : ℕ → V) :
     Option (ℕ → V) :=
   (List.range ((n + 2 ^ log_rows - 1) / 2 ^ log_rows)).foldlM (fun x index => do
@@ -161,7 +167,9 @@ def Cut.bounds (c : Cut) (g : ℕ) : ℕ × ℕ :=
   let low := c.tile + g * c.group
   (low, min (low + c.group) c.log_n)
 
-/-- Run the stages low .. high as one pass: a single stage is a plain pass, and a staged group panics here. -/
+/-- Run the stages low .. high as one pass.
+
+A single stage is a plain pass, and a staged group panics here. -/
 def group_pass (L : Level F) (tw : Twiddles F) (inverse : Bool) (width n : ℕ) (b : ℕ × ℕ)
     (x : ℕ → V) : Option (ℕ → V) :=
   if b.2 - b.1 = 1 then stage_pass L tw inverse width n b.1 x else none
@@ -196,9 +204,11 @@ def transform (L : Level F) (inverse : Bool) (width n : ℕ) (shift : F) (x : �
       stage_pass L tw inverse width n (if inverse then step else log_n - 1 - step) x) x
   else run L tw inverse width log_n (Schedule.new L.bytes width log_n) x
 
-/-- Transform a matrix whose leading 2^log_message rows hold the message and the rest zeros.
+/-- Transform a matrix whose leading 2^m rows hold the message and the rest zeros.
 
-Each further coset starts as a copy of the message, transformed over its own shift; the message last. -/
+Each further coset starts as a copy of the message, transformed over its own shift.
+
+The message itself is transformed last. -/
 def transform_cosets (L : Level F) (width n log_message : ℕ) (x : ℕ → V) : Option (ℕ → V) := do
   let m := 2 ^ log_message
   if L.bytes * (width * m) ≤ DEEP_TILE_BYTES then
@@ -218,7 +228,9 @@ def LchNtt.shifted_ntt_batch (L : Level F) (width n : ℕ) (x : ℕ → V) (shif
 def LchNtt.shifted_intt_batch (L : Level F) (width n : ℕ) (x : ℕ → V) (shift : F) :
     Option (ℕ → V) := transform L true width n shift x
 
-/-- The padded transform: the height must be a power of two, at least the padding, and within the level. -/
+/-- The padded transform.
+
+The height must be a power of two, at least the padding, and within the level. -/
 def LchNtt.ntt_batch_padded (L : Level F) (width n : ℕ) (x : ℕ → V) (log_inv_rate : ℕ) :
     Option (ℕ → V) := do
   let log_n ← log2Strict n

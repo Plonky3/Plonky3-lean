@@ -14,14 +14,14 @@ namespace p3_binary_pcs.transcript.mirror
 
 open p3_sumcheck.mirror p3_binary_pcs.mirror p3_binary_pcs.params.mirror
 
-/-- num_distinct_queries: one test per fold pair, so at most half the domain. -/
+/-- The number of distinct queries: one test per fold pair, so at most half the domain. -/
 def num_distinct_queries (domain_size num_queries : ℕ) : ℕ := min num_queries (domain_size / 2)
 
-/-- log2_strict_usize: the exponent of a power of two, which panics on anything else. -/
+/-- The exponent of a power of two, which panics on anything else. -/
 def log2_strict_usize (n : ℕ) : Option ℕ :=
   if n ≠ 0 ∧ 2 ^ Nat.log2 n = n then some (Nat.log2 n) else none
 
-/-- BinaryPcsShape. -/
+/-- The shape of one run: the numbers the transcript pattern is built from. -/
 structure BinaryPcsShape where
   num_variables : ℕ
   log_folding_factor : ℕ
@@ -32,9 +32,13 @@ structure BinaryPcsShape where
   num_pairs : ℕ
   deriving DecidableEq
 
-/-- BinaryPcsShape::new.
+/-- The shape of a run under a schedule.
 
-The subtractions panic below zero, the shifts at a word or more, and the logarithm off a power of two. -/
+It panics when:
+
+- a subtraction goes below zero
+- a shift is a word or more
+- the logarithm is taken off a power of two. -/
 def BinaryPcsShape.new (c : BinaryPcsConfig) : Option BinaryPcsShape := do
   if c.log_folding_factor = 0 then none
   let shift := c.log_folding_factor - 1
@@ -47,13 +51,15 @@ def BinaryPcsShape.new (c : BinaryPcsConfig) : Option BinaryPcsShape := do
   pure ⟨c.num_variables, c.log_folding_factor, batches - 1, 2 ^ c.log_final_len,
     c.params.pow_bits, pair_bits, num_distinct_queries pair_domain c.num_queries⟩
 
-/-- The numbers the seed binds: the step counts and widths of the pattern, then the arity and the folding factor. -/
+/-- The numbers the seed binds.
+
+They are the step counts and widths of the pattern, then the arity and the folding factor. -/
 def BinaryPcsShape.seed {F EF : Type _} (s : BinaryPcsShape) : Step F EF :=
   .seed "p3-binary-pcs"
     [s.num_oracles, s.final_codeword_len, s.pow_bits, s.pair_bits, s.num_pairs,
       s.num_variables, s.log_folding_factor]
 
-/-- sorted_pairs: the drawn pairs in ascending order, each lifted to its low position. -/
+/-- The drawn pairs in ascending order, each lifted to its low position. -/
 def sorted_pairs (kept : List ℕ) : List ℕ := (kept.mergeSort (· ≤ ·)).map (· <<< 1)
 
 /-- The errors of the transcript steps. -/
@@ -66,21 +72,25 @@ section Verifier
 
 variable {F EF : Type _} [Field F] [DecidableEq F] (S : PSponge F EF) (s : BinaryPcsShape)
 
-/-- BinaryPcsVerifierTranscript::final_codeword: the length is checked, then every symbol absorbed. -/
+/-- Read the final codeword: the length is checked, then every symbol absorbed. -/
 def final_codeword (codeword : List EF) (h : List (Step F EF)) :
     Except (TranscriptFailure F) (List (Step F EF)) :=
   if codeword.length ≠ s.final_codeword_len then
     .error (.FinalCodewordLength s.final_codeword_len codeword.length)
   else .ok (h ++ [.message codeword])
 
-/-- BinaryPcsVerifierTranscript::query_pow: zero is the only witness at zero difficulty; else the grind is checked and absorbed. -/
+/-- Read the query grind.
+
+At zero difficulty, zero is the only witness.
+
+Otherwise the grind is checked and absorbed. -/
 def query_pow (witness : F) (h : List (Step F EF)) : Except (TranscriptFailure F) (List (Step F EF)) :=
   if s.pow_bits = 0 then
     if witness ≠ 0 then .error (.NonCanonicalPowWitness witness) else .ok h
   else if S.grind h s.pow_bits witness then .ok (h ++ [.pow s.pow_bits witness])
   else .error (.PowWitness s.pow_bits)
 
-/-- BinaryPcsVerifierTranscript::query_pairs: the distinct pairs, sorted and lifted to their low positions. -/
+/-- Draw the distinct query pairs, sorted and lifted to their low positions. -/
 def query_pairs (h : List (Step F EF)) : List ℕ × List (Step F EF) :=
   (sorted_pairs (List.ofFn fun i => (S.pairs h s.pair_bits s.num_pairs i : ℕ)), h ++ [.challenge])
 

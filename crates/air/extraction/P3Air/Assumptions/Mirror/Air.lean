@@ -7,12 +7,12 @@ Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts, beyond the builder transcriptions:
 
-* an AIR's evaluation is a function generic in the builder's expression and state types;
-* Rust makes such a function parametric, so it relates related builders; here that is a field the AIR proves;
-* a row-major matrix is its width and its values, and its height is the number of whole rows;
-* a symbolic window of width 0 is read as two empty rows, where the pinned Rust panics (upstream #2490 removed the panic);
-* a constraint label is dropped, since the plain assertion passes an empty name;
-* a panic is an error message.
+- an AIR's evaluation is a function generic in the builder's expression and state types
+- Rust makes it parametric for free, so here the AIR proves it relates related builders
+- a row-major matrix is its width and its values, and its height is the number of whole rows
+- a symbolic window of width 0 is two empty rows, where the pinned Rust panics (upstream #2490)
+- a constraint label is dropped, since the plain assertion passes an empty name
+- a panic is an error message.
 
 Loops, branches and the order of checks are kept.
 -/
@@ -80,7 +80,11 @@ inductive BoundaryIoError where
   | DuplicateCell (column : ℕ) (e : BoundaryEnd)
   deriving DecidableEq
 
-/-- Check each cell in order: column in range, public value in range, and no earlier cell on the same column and end. -/
+/-- Check each cell in order:
+
+- the column is in range
+- the public value is in range
+- no earlier cell sits on the same column and end. -/
 def validate (cells : List BoundaryPublic) (width num_public_values : ℕ) :
     Except BoundaryIoError Unit :=
   cells.zipIdx.forM fun (cell, index) => do
@@ -209,7 +213,9 @@ def AirLayout.validate_against_air (layout : AirLayout) (air : Air F) : Except S
 def windowRow (entry : ℕ → BaseEntry) (offset width : ℕ) : List (SymbolicExpression F) :=
   (List.range width).map fun index => .Leaf (.Variable ⟨entry offset, index⟩)
 
-/-- The symbolic builder: variables for every cell of the window, and a state that records each asserted expression. -/
+/-- The symbolic builder.
+
+It has a variable for every cell of the window, and a state that records each asserted expression. -/
 def symbolicBuilder (layout : AirLayout) :
     AirBuilder F (SymbolicExpression F) (List (SymbolicExpression F)) where
   add := SymbolicExpr.sym_add
@@ -234,7 +240,9 @@ def get_symbolic_constraints (air : Air F) (layout : AirLayout) :
   layout.validate_against_air air
   pure (air.eval (symbolicBuilder layout) [])
 
-/-- The least d with poly_degree <= d (n - 1) + 1, dividing by 1 for n <= 1. -/
+/-- The least d with p <= d (n - 1) + 1, for p the polynomial degree.
+
+It divides by 1 for n <= 1. -/
 def constraint_degree_from_poly_degree (poly_degree trace_len : ℕ) : ℕ :=
   if poly_degree = 0 then 0
   else
@@ -260,7 +268,9 @@ def get_max_constraint_degree (air : Air F) (layout : AirLayout) (trace_len : �
 /-- ceil(log_2 n): the bit length of n - 1, which is 64 minus its leading zeros. -/
 def log2_ceil_usize (n : ℕ) : ℕ := Nat.size (n - 1)
 
-/-- log_2 of the quotient chunk count: the degree plus the ZK flag, padded to 2, minus 1, rounded up to a power of two.
+/-- log_2 of the quotient chunk count.
+
+The count is the degree plus the ZK flag, padded to 2, minus 1, rounded up to a power of two.
 
 The flag must be 0 or 1. -/
 def get_log_quotient_degree (air : Air F) (layout : AirLayout) (trace_len is_zk : ℕ) :
@@ -366,7 +376,12 @@ def rowBuilder [Inhabited F] (air : Air F) (main : Mat F) (public_values : List 
     (if row_index = 0 then 1 else 0) (if row_index = height - 1 then 1 else 0)
     (if row_index ≠ height - 1 then 1 else 0) (air.periodic_values row_index)
 
-/-- The debug check: the preprocessed height must match, the periodic shapes must be valid, every boundary cell must hold its public value, and every row must assert only zeros.
+/-- The debug check:
+
+- the preprocessed height must match
+- the periodic shapes must be valid
+- every boundary cell must hold its public value
+- every row must assert only zeros.
 
 Each violation panics. -/
 def check_constraints [Inhabited F] (air : Air F) (main : Mat F) (public_values : List F) :

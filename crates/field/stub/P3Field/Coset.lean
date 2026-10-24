@@ -3,12 +3,12 @@ Transcriptions of the two-adic multiplicative coset.
 
 What a transcription abstracts:
 
-* the field is a mathlib field K;
-* the field's two-adic generators are a table gen, defined up to the index adicity;
-* the private fields carry the invariant the constructor establishes, a nonzero shift and a size the table covers;
-* the cached inverse of the shift is its inverse in K;
-* an iterator is the list it yields;
-* a panic is none.
+- the field is a mathlib field K
+- the field's two-adic generators are a table gen, defined up to the index adicity
+- the private fields carry the constructor's invariant: a nonzero shift and a size the table covers
+- the cached inverse of the shift is its inverse in K
+- an iterator is the list it yields
+- a panic is none.
 
 Loops, branches and early returns are kept.
 -/
@@ -45,30 +45,40 @@ def shift_inverse (c : TwoAdicMultiplicativeCoset K adicity gen) : K := c.shift�
 /-- The number of elements, 2^log_size. -/
 def size (c : TwoAdicMultiplicativeCoset K adicity gen) : ℕ := 2 ^ c.log_size
 
-/-- The same shift over a subgroup 2^log_scale_factor times smaller, or nothing if that underflows. -/
+/-- The same shift over a subgroup 2^k times smaller, for k the log scale factor.
+
+It is nothing if that underflows. -/
 def shrink_coset (c : TwoAdicMultiplicativeCoset K adicity gen) (log_scale_factor : ℕ) :
     Option (TwoAdicMultiplicativeCoset K adicity gen) :=
   if h : log_scale_factor ≤ c.log_size then
     some ⟨c.shift, c.log_size - log_scale_factor, c.shift_ne_zero, by have := c.log_size_le; omega⟩
   else none
 
-/-- The image of the coset under x |-> x^(2^log_scale_factor): the shrunk coset, with the shift raised. -/
+/-- The image of the coset under x |-> x^(2^k), for k the log scale factor.
+
+It is the shrunk coset, with the shift raised. -/
 def exp_power_of_2 (c : TwoAdicMultiplicativeCoset K adicity gen) (log_scale_factor : ℕ) :
     Option (TwoAdicMultiplicativeCoset K adicity gen) :=
   (c.shrink_coset log_scale_factor).map fun d =>
     ⟨c.shift ^ 2 ^ log_scale_factor, d.log_size, pow_ne_zero _ c.shift_ne_zero, d.log_size_le⟩
 
-/-- Replace the shift; inverting a zero shift panics. -/
+/-- Replace the shift.
+
+Inverting a zero shift panics. -/
 def set_shift (c : TwoAdicMultiplicativeCoset K adicity gen) (shift : K) :
     Option (TwoAdicMultiplicativeCoset K adicity gen) :=
   if h : shift ≠ 0 then some ⟨shift, c.log_size, h, c.log_size_le⟩ else none
 
-/-- Multiply the shift by scale; inverting a zero product panics. -/
+/-- Multiply the shift by a scale.
+
+Inverting a zero product panics. -/
 def shift_by (c : TwoAdicMultiplicativeCoset K adicity gen) (scale : K) :
     Option (TwoAdicMultiplicativeCoset K adicity gen) :=
   c.set_shift (c.shift * scale)
 
-/-- One iteration of the membership loop: return on a match, otherwise square both sides. -/
+/-- One iteration of the membership loop.
+
+Return on a match, otherwise square both sides. -/
 def containsStep : (K × K) ⊕ Bool → Unit → (K × K) ⊕ Bool
   | .inr b, _ => .inr b
   | .inl (s, e), _ => if e = s then .inr true else .inl (s ^ 2, e ^ 2)
@@ -79,7 +89,9 @@ def contains (c : TwoAdicMultiplicativeCoset K adicity gen) (element : K) : Bool
   | .inr b => b
   | .inl (s, e) => decide (e = s)
 
-/-- The bit loop of the generator power: bit j of the exponent multiplies by gen (log_size - j). -/
+/-- The bit loop of the generator power.
+
+Bit j of the exponent multiplies by gen (log_size - j). -/
 def generator_exp_loop : ℕ → ℕ → K → ℕ → K
   | 0, _, acc, _ => acc
   | fuel + 1, exp, acc, i =>

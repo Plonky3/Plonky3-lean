@@ -3,7 +3,11 @@ Transcriptions of the verifier: verifier.rs, the opening verifier of pcs.rs, and
 
 The layout that batches the opening claims is abstract.
 
-It records each claim against the transcript, absorbs its seed before the batching challenge, and turns that challenge into the claimed sum and the weight polynomial.
+It does three things:
+
+- record each claim against the transcript
+- absorb its seed before the batching challenge
+- turn that challenge into the claimed sum and the weight polynomial.
 
 The opening protocol is its claim capacity check, its table counts and its batch shapes.
 -/
@@ -19,7 +23,7 @@ namespace p3_binary_pcs.verifier.mirror
 open p3_sumcheck.mirror p3_binary_dft.mirror p3_binary_pcs.mirror p3_binary_pcs.params.mirror
 open p3_binary_pcs.transcript.mirror p3_binary_pcs.fold.mirror
 
-/-- BinaryPcsError. -/
+/-- Why the verifier rejects a proof. -/
 inductive BinaryPcsError (F E : Type _) where
   | RoundCountMismatch (expected actual : ℕ)
   | OpeningCountMismatch (round expected actual : ℕ)
@@ -40,19 +44,21 @@ inductive BinaryPcsError (F E : Type _) where
   | NonEmptyPowWitnesses (actual : ℕ)
   | NonCanonicalPowWitness (actual : F)
 
-/-- From TranscriptFailure. -/
+/-- The rejection a failed transcript step maps to. -/
 def BinaryPcsError.ofTranscript {F E : Type _} : TranscriptFailure F → BinaryPcsError F E
   | .FinalCodewordLength expected got => .FinalCodewordLengthMismatch expected got
   | .PowWitness _ => .InvalidPowWitness
   | .NonCanonicalPowWitness actual => .NonCanonicalPowWitness actual
 
-/-- RoundProof. -/
+/-- The proof of one round: its commitment, its opened rows and its Merkle multi-proof. -/
 structure RoundProof (EF ComX MPX : Type _) where
   commitment : ComX
   opened_values : List (List EF)
   multi_proof : MPX
 
-/-- BinaryPcsProof; each opening batch is its current and successor evaluations. -/
+/-- A binary PCS proof.
+
+Each opening batch is its current and successor evaluations. -/
 structure BinaryPcsProof (F EF ComX MPT MPX : Type _) where
   polynomial_evaluations : List (EF × EF)
   pow_witnesses : List F
@@ -65,14 +71,14 @@ structure BinaryPcsProof (F EF ComX MPT MPX : Type _) where
 
 /-- What the opening verifier reads of an opening protocol. -/
 structure OpeningProtocol where
-  /-- checked_num_cells: the stacked cell count, none on overflow. -/
+  /-- The stacked cell count, none on overflow. -/
   cells : Option ℕ
-  /-- checked_num_claims: the scalar claim count, none on overflow. -/
+  /-- The scalar claim count, none on overflow. -/
   claims : Option ℕ
   /-- Each opening batch: its table, and its current and successor column counts. -/
   openings : List (ℕ × ℕ × ℕ)
 
-/-- log2_ceil_usize: the bit length of n - 1. -/
+/-- ceil(log_2 n): the bit length of n - 1. -/
 def log2_ceil_usize (n : ℕ) : ℕ := if n ≤ 1 then 0 else Nat.log2 (n - 1) + 1
 
 /-- What a verifier run is given besides the proof. -/
@@ -84,9 +90,9 @@ structure Env (F EF ComT ComX MPT MPX E : Type _) [Field F] [Field EF] where
   /-- The alphabet's level and the challenge field's. -/
   LF : Level F
   LE : Level EF
-  /-- max_opening_claims: the claim capacity the security model leaves. -/
+  /-- The claim capacity the security model leaves. -/
   max_claims : ℕ
-  /-- Layout::add_claim for each batch, in order, against the history. -/
+  /-- Record one batch's claim in the layout, against the history. -/
   addClaim : List (Step F EF) → ℕ → Except SumcheckError (List (Step F EF))
   /-- The step the layout absorbs before its batching challenge. -/
   layoutSeed : Step F EF
@@ -100,13 +106,15 @@ section Verifier
 variable {F EF ComT ComX MPT MPX E : Type} [Field F] [Field EF] [Algebra F EF] [DecidableEq F]
   [DecidableEq EF] (V : Env F EF ComT ComX MPT MPX E)
 
-/-- flat_coset_indices: every symbol of each queried coset, in query order and ascending within a coset. -/
+/-- Every symbol of each queried coset.
+
+They come in query order, and in ascending order within a coset. -/
 def flat_coset_indices (indices : List ℕ) (start arity : ℕ) : List ℕ :=
   indices.flatMap fun index =>
     let first := (index >>> start) >>> arity <<< arity
     List.range' first (2 ^ arity)
 
-/-- check_round_shape: the row count, then each row's width of one. -/
+/-- Check a round's shape: the row count, then a width of one for each row. -/
 def check_round_shape {A : Type _} (round : ℕ) (opened_values : List (List A)) (expected_opens : ℕ) :
     Except (BinaryPcsError F E) Unit :=
   if opened_values.length ≠ expected_opens then
@@ -116,7 +124,7 @@ def check_round_shape {A : Type _} (round : ℕ) (opened_values : List (List A))
     | some q => .error (.RowWidthMismatch round q 1 (opened_values.getD q []).length)
     | none => .ok ()
 
-/-- check_round_and_final_lengths: the round count, then the final codeword's length. -/
+/-- Check the round count, then the final codeword's length. -/
 def check_round_and_final_lengths (c : BinaryPcsConfig) (proof : BinaryPcsProof F EF ComX MPT MPX) :
     Option (Except (BinaryPcsError F E) Unit) := do
   let batches ← c.num_fold_batches
@@ -128,13 +136,15 @@ def check_round_and_final_lengths (c : BinaryPcsConfig) (proof : BinaryPcsProof 
     return .error (.FinalCodewordLengthMismatch (2 ^ c.log_final_len) proof.final_codeword.length)
   pure (.ok ())
 
-/-- check_canonical_pow_witness: at zero difficulty, the witness must be zero. -/
+/-- At zero difficulty, the grinding witness must be zero. -/
 def check_canonical_pow_witness (c : BinaryPcsConfig) (proof : BinaryPcsProof F EF ComX MPT MPX) :
     Except (BinaryPcsError F E) Unit :=
   if c.params.pow_bits = 0 ∧ proof.pow_witness ≠ 0 then .error (.NonCanonicalPowWitness proof.pow_witness)
   else .ok ()
 
-/-- fold_query_coset: a single challenge folds one pair, more fold the gathered coset. -/
+/-- Fold a queried coset.
+
+A single challenge folds one pair, and more challenges fold the gathered coset. -/
 def fold_query_coset {A : Type _} [Field A] [Algebra A EF] (L : Level A) (rows : List (List A))
     (query next_position : ℕ) (betas : List EF) : Option EF := do
   match betas with
@@ -169,13 +179,22 @@ def foldCheck (betas : List EF) (proof : BinaryPcsProof F EF ComX MPT MPX)
     | none => proof.final_codeword[next_position]?
   pure (if folded ≠ expected then .error (.FoldMismatch (batch + 1) q) else .ok ())
 
-/-- Run checks in order, keeping the first rejection; a panic is none. -/
+/-- Run checks in order, keeping the first rejection.
+
+A panic is none. -/
 def firstError {α ε : Type _} (xs : List α) (f : α → Option (Except ε Unit)) : Option (Except ε Unit) :=
   xs.foldlM (fun acc x => match acc with
     | .error e => pure (.error e)
     | .ok () => f x) (.ok ())
 
-/-- verify_query_paths: the shape checks, the final codeword, the grind, the draw, the Merkle openings and the fold chain.
+/-- Verify the query paths, in order:
+
+- the shape checks
+- the final codeword
+- the grind
+- the draw
+- the Merkle openings
+- the fold chain.
 
 It asserts one fold challenge per round. -/
 def verify_query_paths (c : BinaryPcsConfig) (base_commitment : ComT) (betas : List EF)
@@ -230,7 +249,11 @@ def verify_query_paths (c : BinaryPcsConfig) (base_commitment : ComT) (betas : L
   | .error e => return .error e
   | .ok () => pure (.ok h)
 
-/-- validate_opening_protocol: a nonzero cell count whose ceiling logarithm is the arity, then the claim budget. -/
+/-- Validate the opening protocol.
+
+The cell count must be nonzero, with ceiling logarithm equal to the arity.
+
+Then the claims must fit the budget. -/
 def validate_opening_protocol (c : BinaryPcsConfig) (protocol : OpeningProtocol) :
     Except (BinaryPcsError F E) Unit :=
   match protocol.cells with
@@ -245,7 +268,7 @@ def validate_opening_protocol (c : BinaryPcsConfig) (protocol : OpeningProtocol)
     else .error .InvalidOpeningProtocol
   | none => .error .InvalidOpeningProtocol
 
-/-- The claim loop of verify_opening: each batch's shape, then its claim recorded. -/
+/-- The claim loop of the opening verifier: each batch's shape, then its claim recorded. -/
 def addClaims (protocol : OpeningProtocol) (proof : BinaryPcsProof F EF ComX MPT MPX)
     (h : List (Step F EF)) : Option (Except (BinaryPcsError F E) (List (Step F EF))) :=
   (List.range protocol.openings.length).foldlM (fun acc i => match acc with
@@ -262,7 +285,9 @@ def addClaims (protocol : OpeningProtocol) (proof : BinaryPcsProof F EF ComX MPT
 /-- The state of the fold loop: the challenges so far, the running claim and the history. -/
 abbrev FoldState (F EF : Type _) := List EF × EF × List (Step F EF)
 
-/-- One fold round of verify_opening: its single sumcheck round at zero difficulty in the evaluation basis. -/
+/-- One fold round of the opening verifier.
+
+It is a single sumcheck round, at zero difficulty, in the evaluation basis. -/
 def foldRound (proof : BinaryPcsProof F EF ComX MPT MPX) (acc : Except (BinaryPcsError F E) (FoldState F EF))
     (r : ℕ) : Option (Except (BinaryPcsError F E) (FoldState F EF)) :=
   match acc with
@@ -273,7 +298,9 @@ def foldRound (proof : BinaryPcsProof F EF ComX MPT MPX) (acc : Except (BinaryPc
       | .error e => .error (.Sumcheck e)
       | .ok (point, claimed, h) => .ok (betas ++ [point.headD 0], claimed, h))
 
-/-- One fold batch of verify_opening: its rounds, then the root of its word unless it is the last. -/
+/-- One fold batch of the opening verifier.
+
+It runs its rounds, then absorbs the root of its word unless it is the last. -/
 def foldBatch (proof : BinaryPcsProof F EF ComX MPT MPX) (num_batches : ℕ)
     (acc : Except (BinaryPcsError F E) (FoldState F EF)) (b : ℕ × ℕ × ℕ) :
     Option (Except (BinaryPcsError F E) (FoldState F EF)) := do
@@ -286,7 +313,14 @@ def foldBatch (proof : BinaryPcsProof F EF ComX MPT MPX) (num_batches : ℕ)
       pure (.ok (betas, claimed, h ++ [.message (V.enc r.commitment)]))
     else pure (.ok (betas, claimed, h))
 
-/-- verify_opening: the protocol and shape checks, the claims, the batching challenge, the fold rounds, the final check and the query paths.
+/-- The opening verifier, in order:
+
+- the protocol and shape checks
+- the claims
+- the batching challenge
+- the fold rounds
+- the final check
+- the query paths.
 
 It returns the claimed evaluations and the history the caller continues from. -/
 def verify_opening (c : BinaryPcsConfig) (commitment : ComT) (proof : BinaryPcsProof F EF ComX MPT MPX)

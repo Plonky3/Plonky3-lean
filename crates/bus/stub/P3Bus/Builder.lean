@@ -1,5 +1,7 @@
 /-
-Transcriptions of the declaration surface: the direction, the channel name, the boundary, the activation, and the declaring builder.
+Transcriptions of the declaration surface.
+
+It covers the direction, the channel name, the boundary, the activation, and the declaring builder.
 
 These do not extract: the builder trait carries associated types bounded by the field traits, which aeneas rejects.
 
@@ -7,9 +9,9 @@ Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts:
 
-* a builder is the p3-air builder record, extended by the recorder's one method;
-* a channel name is a string, and its bytes are its UTF-8 bytes;
-* a panic is none.
+- a builder is the p3-air builder record, extended by the recorder's one method
+- a channel name is a string, and its bytes are its UTF-8 bytes
+- a panic is none.
 
 Loops, branches and the order of operations are kept.
 -/
@@ -52,7 +54,9 @@ def isAsciiAlphabetic (b : UInt8) : Bool := (65 ≤ b && b ≤ 90) || (97 ≤ b 
 
 def isAsciiAlphanumeric (b : UInt8) : Bool := isAsciiAlphabetic b || (48 ≤ b && b ≤ 57)
 
-/-- BusName::try_new: one to 64 bytes, an ASCII letter, then letters, digits, `_`, `.` or `-`.
+/-- A valid channel name has one to 64 bytes.
+
+It starts with an ASCII letter, followed by letters, digits, `_`, `.` or `-`.
 
 The index loop returns at the first byte outside the alphabet. -/
 def BusName.try_new (nm : String) : Except BusNameError String :=
@@ -75,7 +79,7 @@ inductive BusBoundary where
   | Last
   deriving DecidableEq, Repr
 
-/-- BusBoundary::contains_row: row zero, or the last row of a table of this height. -/
+/-- Whether a boundary holds a row: row zero, or the last row of a table of this height. -/
 def BusBoundary.contains_row : BusBoundary → ℕ → ℕ → Bool
   | .First, row, _ => row == 0
   | .Last, row, height => row + 1 == height
@@ -90,7 +94,9 @@ inductive BusActivation (E : Type _) where
 structure BusBuilder (F E S : Type _) extends AirBuilder F E S where
   record : S → String → BusDirection → List E → BusActivation E → S
 
-/-- push_bus_interaction: a Boolean activation is asserted Boolean, then the declaration is recorded. -/
+/-- Declare one bus interaction.
+
+A Boolean activation is asserted Boolean, then the declaration is recorded. -/
 def BusBuilder.push_bus_interaction {F E S : Type _} [Zero F] [One F] (B : BusBuilder F E S)
     (s : S) (bus : String) (direction : BusDirection) (fields : List E)
     (activation : BusActivation E) : S :=

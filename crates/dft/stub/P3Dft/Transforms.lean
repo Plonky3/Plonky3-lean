@@ -3,13 +3,14 @@ Transcriptions of the naive transform, the trait's default methods, the radix-2 
 
 What a transcription abstracts, beyond the model of a matrix as its rows:
 
-* the field is a mathlib field K, and a matrix of width w has rows in V = K^w;
-* the powers and shifted-powers iterators yield g^i and s g^i;
-* dividing one by 2^e in the prime subfield, then embedding it, is (2^e)^(-1);
-* inverting zero panics;
-* a memoized twiddle table is the table its computation returns, since one key always gets the same computation;
-* the parallel iterators of maybe-rayon run serially, in order, as they do without the parallel feature;
-* the width w appears only where the Rust's own arithmetic uses it.
+- the field is a mathlib field K, and a matrix of width w has rows in V = K^w
+- the powers and shifted-powers iterators yield g^i and s g^i
+- dividing one by 2^e in the prime subfield, then embedding it, is (2^e)^(-1)
+- inverting zero panics
+- a memoized twiddle table is the table its computation returns
+- that is sound since one key always gets the same computation
+- the parallel iterators of maybe-rayon run serially, in order, as without the parallel feature
+- the width w appears only where the Rust's own arithmetic uses it.
 
 Loops, branches and the order of operations are kept.
 -/
@@ -98,7 +99,9 @@ def coset_dft_batch (dft_batch : ℕ → (ℕ → V) → Option (ℕ → V)) (w 
     (shift : K) : Option (ℕ → V) :=
   (coset_shift_cols w h x shift).bind (dft_batch h)
 
-/-- The default inverse: transform, divide by the height, then swap row r with row h - r for 0 < r < h / 2. -/
+/-- The default inverse: transform, then divide by the height.
+
+Then swap row r with row h - r, for 0 < r < h / 2. -/
 def idft_batch (dft_batch : ℕ → (ℕ → V) → Option (ℕ → V)) (h : ℕ) (x : ℕ → V) :
     Option (ℕ → V) := do
   let d ← dft_batch h x
@@ -126,8 +129,9 @@ def coset_lde_batch_with_transform (idft_batch : ℕ → (ℕ → V) → Option 
     coset_dft_batch (h * 2 ^ a) (fun i => if i < h then coeffs i else 0) shift
   else none
 
-/-- A method on an algebra over the field: flatten each element to its coordinates, run the
-base-field method, and rebuild the elements. -/
+/-- A method on an algebra over the field.
+
+Flatten each element to its coordinates, run the base-field method, and rebuild the elements. -/
 def via_base {W U : Type _} (flatten : W → U) (reconstitute : U → W)
     (base : (ℕ → U) → Option (ℕ → U)) (x : ℕ → W) : Option (ℕ → W) :=
   (base (flatten ∘ x)).map (reconstitute ∘ ·)
@@ -144,7 +148,9 @@ variable {K : Type _} [Field K] [DecidableEq K] {V : Type _} [AddCommGroup V] [M
 def Radix2Dit.get_or_compute_twiddles (G : Gen K) (log_h : ℕ) : Option (List K) :=
   (G.get log_h).map fun root => powersList root (2 ^ log_h / 2)
 
-/-- One layer: blocks of 2^(layer+1) rows, and pair ind of each block uses twiddle ind 2^(log_h - 1 - layer).
+/-- One layer: blocks of 2^(layer+1) rows.
+
+Pair ind of each block uses twiddle ind 2^(log_h - 1 - layer).
 
 Pair 0 uses the butterfly without a twiddle. -/
 def dit_layer (h layer : ℕ) (twiddles : List K) (x : ℕ → V) : Option (ℕ → V) := do
@@ -157,13 +163,17 @@ def dit_layer (h layer : ℕ) (twiddles : List K) (x : ℕ → V) : Option (ℕ 
         else DitButterfly.apply (twiddles.getD (ind * 2 ^ layer_rev) 0)) x)
   else none
 
-/-- The radix-2 decimation-in-time transform: bit-reverse the rows, then run layers 0 to log_h - 1. -/
+/-- The radix-2 decimation-in-time transform.
+
+Bit-reverse the rows, then run layers 0 to log_h - 1. -/
 def Radix2Dit.dft_batch (G : Gen K) (h : ℕ) (x : ℕ → V) : Option (ℕ → V) := do
   let log_h ← log2Strict h
   let twiddles ← Radix2Dit.get_or_compute_twiddles G log_h
   (List.range log_h).foldlM (fun acc layer => dit_layer h layer twiddles acc) (revRows log_h x)
 
-/-- The low-degree extension: invert, transform the coefficients, shift them, pad with zeros and transform. -/
+/-- The low-degree extension.
+
+Invert, transform the coefficients, shift them, pad with zeros and transform. -/
 def Radix2Dit.coset_lde_batch_with_transform (G : Gen K) (w h a : ℕ) (shift : K)
     (transform : (ℕ → V) → ℕ → V) (x : ℕ → V) : Option (ℕ → V) := do
   let coeffs ← p3_dft.traits.mirror.idft_batch (K := K) (Radix2Dit.dft_batch G) h x
@@ -181,7 +191,9 @@ open p3_dft.mirror p3_dft.butterflies.mirror
 
 variable {K : Type _} [Field K] [DecidableEq K] {V : Type _} [AddCommGroup V] [Module K V]
 
-/-- One layer of the Bowers networks: blocks of 2 half rows, and block b uses the butterfly of entry b.
+/-- One layer of the Bowers networks: blocks of 2 half rows.
+
+Block b uses the butterfly of entry b.
 
 Block 0 uses the butterfly without a twiddle. -/
 def butterfly_layer (h half_block_size : ℕ) (fly : ℕ → V → V → V × V) (x : ℕ → V) : ℕ → V :=
@@ -231,7 +243,12 @@ def Radix2Bowers.lde_batch (G : Gen K) (h a : ℕ) (x : ℕ → V) : Option (ℕ
   let y ← p3_dft.util.mirror.divide_by_height (K := K) h y
   bowers_g G (h * 2 ^ a) (bit_reversed_zero_pad h a y)
 
-/-- The coset extension: G^T, then row i times the bit-reversed weight 2^(-log_h) shift^i, padding, then G. -/
+/-- The coset extension, in order:
+
+- G^T
+- row i times the bit-reversed weight 2^(-log_h) shift^i
+- the padding
+- G. -/
 def Radix2Bowers.coset_lde_batch (G : Gen K) (h a : ℕ) (shift : K) (x : ℕ → V) :
     Option (ℕ → V) := do
   let log_h ← log2Strict h
@@ -241,8 +258,13 @@ def Radix2Bowers.coset_lde_batch (G : Gen K) (h a : ℕ) (shift : K) (x : ℕ �
   let y := fun i => weights.getD i 0 • y i
   bowers_g G (h * 2 ^ a) (bit_reversed_zero_pad h a y)
 
-/-- The coset extension with a transform: the scaling by 2^(-log_h) happens before the transform,
-which sees the coefficients in bit-reversed order, and the shift powers after it. -/
+/-- The coset extension with a transform.
+
+The scaling by 2^(-log_h) happens before the transform.
+
+The transform sees the coefficients in bit-reversed order.
+
+The shift powers are applied after it. -/
 def Radix2Bowers.coset_lde_batch_with_transform (G : Gen K) (h a : ℕ) (shift : K)
     (transform : (ℕ → V) → ℕ → V) (x : ℕ → V) : Option (ℕ → V) := do
   let log_h ← log2Strict h

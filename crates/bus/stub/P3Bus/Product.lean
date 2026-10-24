@@ -1,16 +1,20 @@
 /-
 Transcriptions of the batched product-tree reduction: its arithmetic, its shape, and its verifier.
 
-These do not extract: they are generic over the field traits, and the crate's dependencies do not compile in the extraction variant (docs/extractor-issues.md 180).
+These do not extract: they are generic over the field traits.
+
+The crate's dependencies also fail to compile in the extraction variant (docs/extractor-issues.md 180).
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts:
 
-* a field is a mathlib field, and a `usize` is a natural number with its 64-bit bound kept where Rust checks it;
-* the field's bit count and its interpolation nodes are parameters, read through the field trait;
-* the Fiat-Shamir transcript is a record of its four challenge steps over an abstract state, each binding the messages it is given;
-* a panic is none.
+- a field is a mathlib field
+- a machine word is a natural number, with its 64-bit bound kept where Rust checks it
+- the field's bit count and its interpolation nodes are parameters, read through the field trait
+- the Fiat-Shamir transcript is a record of its four challenge steps over an abstract state
+- each step binds the messages it is given
+- a panic is none.
 
 Loops, branches and the order of operations are kept.
 -/
@@ -32,20 +36,20 @@ section Math
 
 variable {F : Type _} [Field F]
 
-/-- combine: one claim per tree, weighted by consecutive powers of the challenge. -/
+/-- Combine one claim per tree, weighted by consecutive powers of the challenge. -/
 def combine (values : List F) (challenge : F) : F :=
   ((values.zip ((List.range values.length).map (challenge ^ ·))).map fun p => p.1 * p.2).sum
 
-/-- interpolate_pair: the line through two values at a point. -/
+/-- The line through two values, at a point. -/
 def interpolate_pair (values : F × F) (point : F) : F := values.1 + point * (values.2 - values.1)
 
-/-- interpolate_quad: a four-entry table at two low-order coordinates. -/
+/-- A four-entry table, interpolated at two low-order coordinates. -/
 def interpolate_quad (values : F × F × F × F) (point : F × F) : F :=
   let low_zero := interpolate_pair (values.1, values.2.1) point.1
   let low_one := interpolate_pair (values.2.2.1, values.2.2.2) point.1
   interpolate_pair (low_zero, low_one) point.2
 
-/-- has_distinct_round_nodes: a field of at least three bits whose nodes 0 to 5 are pairwise distinct. -/
+/-- The field has at least three bits, and its nodes 0 to 5 are pairwise distinct. -/
 def has_distinct_round_nodes [DecidableEq F] (bits : ℕ) (node : ℕ → F) : Bool :=
   if bits < 3 then false
   else (List.range 6).all fun i => (List.range 6).all fun j => j ≤ i || node i != node j
@@ -80,7 +84,7 @@ inductive ProductGkrError where
   | LayerConsistency (layer : ℕ)
   deriving DecidableEq, Repr
 
-/-- `usize::MAX`. -/
+/-- The largest machine word, 2^64 - 1. -/
 def USIZE_MAX : ℕ := 2 ^ 64 - 1
 
 /-- The dimensions of one batched reduction. -/
@@ -90,7 +94,11 @@ structure ProductGkrShape where
   root_shape : ProductGkrRootShape
   deriving DecidableEq, Repr
 
-/-- ProductGkrShape::new: the height must fit a word, the batch must be nonempty and fit, and a shared root needs two trees. -/
+/-- The shape constructor:
+
+- the height must fit a word
+- the batch must be nonempty and fit
+- a shared root needs two trees. -/
 def ProductGkrShape.new (log_height num_trees : ℕ) (root_shape : ProductGkrRootShape) :
     Except ProductGkrShapeError ProductGkrShape :=
   if log_height ≥ 64 then .error (.HeightOverflow log_height 63)
@@ -100,7 +108,7 @@ def ProductGkrShape.new (log_height num_trees : ℕ) (root_shape : ProductGkrRoo
     .error (.SharedRootNeedsTwoTrees num_trees 2)
   else .ok ⟨log_height, num_trees, root_shape⟩
 
-/-- root_message_len: one root per tree, less one when the first two share. -/
+/-- The root message length: one root per tree, less one when the first two share. -/
 def ProductGkrShape.root_message_len (s : ProductGkrShape) : ℕ :=
   match s.root_shape with
   | .Distinct => s.num_trees
@@ -117,10 +125,12 @@ def layersLoop (log_height : ℕ) : (point_len remaining : ℕ) → List (ℕ ×
 termination_by _ r => r
 decreasing_by exact Nat.sub_lt (Nat.succ_pos _) (by split <;> decide)
 
-/-- layers: the arity and round count of each layer, root first. -/
+/-- The arity and round count of each layer, root first. -/
 def ProductGkrShape.layers (s : ProductGkrShape) : List (ℕ × ℕ) := layersLoop s.log_height 0 s.log_height
 
-/-- identity_padding_evaluation: the sum of eq(point, i) over the addresses at or above the prefix, by the binary threshold.
+/-- The sum of eq(point, i) over the addresses i at or above the prefix.
+
+It is computed by the binary threshold.
 
 A point of the wrong dimension, or a prefix longer than the table, panics. -/
 def ProductGkrShape.identity_padding_evaluation {F : Type _} [Field F] (s : ProductGkrShape)
@@ -139,7 +149,7 @@ def ProductGkrShape.identity_padding_evaluation {F : Type _} [Field F] (s : Prod
         else (acc.1, acc.2 * (1 - coordinate))) (0, 1)
       some (1 - below)
 
-/-- encode: the roots as carried, refusing unequal shared roots. -/
+/-- Encode the roots as carried, refusing unequal shared roots. -/
 def ProductGkrRootShape.encode {F : Type _} [DecidableEq F] (shape : ProductGkrRootShape)
     (roots : List F) : Option (Except ProductGkrError (List F)) :=
   match shape with
@@ -150,7 +160,7 @@ def ProductGkrRootShape.encode {F : Type _} [DecidableEq F] (shape : ProductGkrR
     if r0 ≠ r1 then return .error .SharedRootMismatch
     pure (.ok (r0 :: roots.drop 2))
 
-/-- decode: the roots as expanded, the first message standing for the first two roots. -/
+/-- Decode the roots as expanded, the first message standing for the first two roots. -/
 def ProductGkrRootShape.decode {F : Type _} (shape : ProductGkrRootShape) (encoded : List F) :
     Option (List F) :=
   match shape with
@@ -166,7 +176,7 @@ inductive ProductGkrLayerProof (F : Type _) where
   | Binary (children : List (F × F))
   | RadixFour (round_polys : List (Fin 5 → F)) (children : List (F × F × F × F))
 
-/-- `ROUND_POLY_LEN`: the evaluations a degree-five round polynomial carries. -/
+/-- The evaluations a degree-five round polynomial carries. -/
 def ROUND_POLY_LEN : ℕ := 5
 
 /-- The roots and the layers, root first. -/
@@ -180,7 +190,7 @@ structure ProductGkrOutput (F : Type _) where
   point : List F
   values : List F
 
-/-- validate_shape: the root count, the layer count, and each layer's kind and lengths. -/
+/-- Check the proof's shape: the root count, the layer count, and each layer's kind and lengths. -/
 def ProductGkrProof.validate_shape {F : Type _} (p : ProductGkrProof F) (shape : ProductGkrShape) :
     Except ProductGkrError Unit := do
   if p.roots.length ≠ shape.root_message_len then
@@ -196,7 +206,9 @@ def ProductGkrProof.validate_shape {F : Type _} (p : ProductGkrProof F) (shape :
       | _, _ => false
     if !valid then throw (.MalformedLayer layer_index)
 
-/-- The verifier's transcript: its state after the roots, and its four challenge steps, each binding its messages. -/
+/-- The verifier's transcript: its state after the roots, and its four challenge steps.
+
+Each step binds its messages. -/
 structure VerifierTranscript (F S : Type _) where
   init : List F → S
   begin_layer : S → F × S
@@ -204,7 +216,12 @@ structure VerifierTranscript (F S : Type _) where
   end_binary_layer : S → List (F × F) → F × S
   end_radix_four_layer : S → List (F × F × F × F) → (F × F) × S
 
-/-- The verifier's loop state: the claims, the point, the first inconsistent layer, and the transcript. -/
+/-- The verifier's loop state:
+
+- the claims
+- the point
+- the first inconsistent layer
+- the transcript. -/
 structure VerifyState (F S : Type _) where
   values : List F
   point : List F
@@ -241,7 +258,12 @@ def verify_layer (weights : Fin 6 → F) (st : VerifyState F S) (layer_index : �
     pure ⟨children.map (interpolate_quad · branches), [branches.1, branches.2] ++ round_point,
       inconsistent, t⟩
 
-/-- ProductGkrProof::verify: the field check, the shape check, the layers, then the first inconsistent layer, if any.
+/-- The verifier, in order:
+
+- the field check
+- the shape check
+- the layers
+- the first inconsistent layer, if any.
 
 The point is reversed to the most-significant-first convention. -/
 def ProductGkrProof.verify (bits : ℕ) (p : ProductGkrProof F) (shape : ProductGkrShape) :

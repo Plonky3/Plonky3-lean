@@ -3,12 +3,13 @@ Transcriptions of the polynomial space of a two-adic multiplicative coset.
 
 What a transcription abstracts, beyond the models of p3-field's coset, p3-dft and p3-matrix:
 
-* the base field and its extension are one mathlib field K, base values read through their embedding;
-* the field's generator is a parameter g;
-* a matrix of height h is its rows, a function from row indices, as in p3-dft's model;
-* an inverse or a division by zero panics, and so does a batch inversion with a zero entry;
-* an iterator is the list it yields, and an ordered map is a list sorted by key;
-* a debug assertion is checked, and a subtraction that leaves the word panics, as in a debug build.
+- the base field and its extension are one mathlib field K, base values read through their embedding
+- the field's generator is a parameter g
+- a matrix of height h is its rows, a function from row indices, as in p3-dft's model
+- an inverse or a division by zero panics, and so does a batch inversion with a zero entry
+- an iterator is the list it yields
+- an ordered map is a list sorted by key
+- a debug assertion is checked, and a subtraction that leaves the word panics, as in a debug build.
 
 Loops, branches and the order of operations are kept.
 -/
@@ -30,7 +31,12 @@ variable {K : Type _} [Field K] [DecidableEq K]
 /-- The coset type over the generator table G. -/
 abbrev Coset (G : Gen K) := TwoAdicMultiplicativeCoset K G.adicity G.gen
 
-/-- The four selectors: first row, last row, all but the last row, and the inverse vanishing polynomial. -/
+/-- The four selectors:
+
+- the first row
+- the last row
+- all but the last row
+- the inverse vanishing polynomial. -/
 structure LagrangeSelectors (T : Type _) where
   is_first_row : T
   is_last_row : T
@@ -47,11 +53,15 @@ def div (a b : K) : Option K := if b = 0 then none else some (a / b)
 def batchInv (l : List K) : Option (List K) :=
   if ∀ x ∈ l, x ≠ 0 then some (l.map (·⁻¹)) else none
 
-/-- Zip a list with the endless repetition of another: entry m is a_(m mod |a|) * b_m. -/
+/-- Zip a list with the endless repetition of another.
+
+Entry m is a_(m mod |a|) * b_m. -/
 def zipCycle (a b : List K) : List K :=
   b.zipIdx.map fun p => a.getD (p.2 % a.length) 0 * p.1
 
-/-- The ceiling base-2 logarithm, as the bit length of n - 1; zero for n = 0 and n = 1. -/
+/-- The ceiling base-2 logarithm, as the bit length of n - 1.
+
+It is zero for n = 0 and n = 1. -/
 def log2Ceil (n : ℕ) : ℕ := Nat.size (n - 1)
 
 variable (G : Gen K)
@@ -67,7 +77,11 @@ def first_point (c : Coset G) : K := c.shift
 /-- The next point: multiplication by the subgroup generator, always defined. -/
 def next_point (c : Coset G) (x : K) : Option K := some (x * c.subgroup_generator)
 
-/-- A coset disjoint from this one: shift times the field generator, over the smallest subgroup of size at least min_size. -/
+/-- A coset disjoint from this one.
+
+Its shift is this shift times the field generator.
+
+Its subgroup is the smallest one of size at least min_size. -/
 def try_create_disjoint_domain (c : Coset G) (g : K) (min_size : ℕ) : Option (Coset G) :=
   TwoAdicMultiplicativeCoset.new (c.shift * g) (log2Ceil min_size)
 
@@ -86,7 +100,9 @@ def split_domains (c : Coset G) (num_chunks : ℕ) : Option (List (Coset G)) := 
         (c.log_size - log_chunks)
   else none
 
-/-- Distribute the rows over num_chunks matrices: row r goes to chunk r mod num_chunks, at row r / num_chunks.
+/-- Distribute the rows over num_chunks matrices.
+
+Row r goes to chunk r mod num_chunks, at row r / num_chunks.
 
 The two debug assertions are checked, and the copy is the row-by-row loop. -/
 def split_evals {V : Type _} [Zero V] (c : Coset G) (num_chunks height : ℕ) (rows : ℕ → V) :
@@ -123,7 +139,11 @@ def selectors_at_point (c : Coset G) (point : K) : Option (LagrangeSelectors K) 
 
 /-- The selectors of a subgroup at every point of a coset at least as large.
 
-The subgroup's shift must be one, the coset's shift must not be one, and the coset must be at least as large. -/
+It requires:
+
+- the subgroup's shift is one
+- the coset's shift is not one
+- the coset is at least as large. -/
 def selectors_on_coset (c coset : Coset G) : Option (LagrangeSelectors (List K)) :=
   if c.shift ≠ 1 then none
   else if coset.shift = 1 then none
@@ -160,7 +180,9 @@ def default_evaluate_periodic_column_at (c : Coset G) (col : List K) (point : K)
   else Coset.evaluate_polynomial_at G c
     ((List.range (Coset.size G c)).map fun i => col.getD (i % col.length) 0) point
 
-/-- One periodic column of length p: interpolate over the coset of order p with the shift raised to n / p, at x^(n / p). -/
+/-- One periodic column of length p.
+
+Interpolate over the coset of order p with the shift raised to n / p, at x^(n / p). -/
 def evaluate_periodic_column_at (c : Coset G) (col : List K) (point : K) : Option K := do
   let log_period ← log2Strict col.length
   if log_period ≤ c.log_size then

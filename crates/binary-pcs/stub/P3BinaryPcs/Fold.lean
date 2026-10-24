@@ -19,19 +19,25 @@ open p3_binary_dft.mirror p3_binary_dft.domain.mirror
 
 variable {F EF : Type _} [Field F] [Field EF] [Algebra F EF]
 
-/-- fold_pair: the novel-basis halves f_1 = lo + hi and f_0 = lo + x f_1 at x the point of 2 index, combined as f_0 + beta (f_0 + f_1).
+/-- Fold one pair (lo, hi) at the challenge beta.
 
-The doubled index wraps at the word. -/
+Let x be the domain point of 2 index, where the doubled index wraps at the word.
+
+The novel-basis halves are f_1 = lo + hi and f_0 = lo + x f_1.
+
+The result is f_0 + beta (f_0 + f_1). -/
 def fold_pair (L : Level F) (index : ℕ) (beta : EF) (lo hi : F) : Option EF := do
   let x ← domain_point L (2 * index % 2 ^ 64)
   let f1 := lo + hi
   let f0 := lo + x * f1
   pure (beta * algebraMap F EF (f0 + f1) + algebraMap F EF f0)
 
-/-- FOLD_GRAIN: the output symbols one task owns. -/
+/-- The output symbols one task owns. -/
 def FOLD_GRAIN : ℕ := 2 ^ 10
 
-/-- fold_round: each task of FOLD_GRAIN outputs evaluates its first point, then walks the domain by the steps table.
+/-- One round of the tower-basis fold.
+
+Each task evaluates its first point, then walks the domain by the steps table.
 
 A trailing unpaired symbol is dropped. -/
 def fold_round (L : Level F) (codeword : List F) (beta : EF) : Option (List EF) := do
@@ -53,17 +59,23 @@ def fold_round (L : Level F) (codeword : List F) (beta : EF) : Option (List EF) 
     pure out.2
   pure chunks.flatten
 
-/-- One in-place layer of fold_coset: the live prefix of `len` symbols, folded at the offset of the coset. -/
+/-- One in-place layer of the coset fold.
+
+It folds the live prefix of len symbols at the offset of the coset. -/
 def coset_layer (L : Level EF) (coset_index len : ℕ) (beta : EF) (scratch : List EF) :
     Option (List EF) :=
   (List.range len).mapM fun i =>
     fold_pair L (coset_index * len + i) beta (scratch.getD (2 * i) 0) (scratch.getD (2 * i + 1) 0)
 
-/-- fold_coset: the first round reads the alphabet, every later one folds the live prefix in place.
+/-- Fold one coset.
+
+The first round reads the alphabet, and every later one folds the live prefix in place.
 
 It asserts one symbol per leaf of the challenge tree, and panics without a challenge.
 
-Writing slot i reads slots 2 i and 2 i + 1, which no earlier write of the layer touched, so the layer is a map of the prefix. -/
+Writing slot i reads slots 2 i and 2 i + 1, which no earlier write of the layer touched.
+
+So the layer is a map of the prefix. -/
 def fold_coset (LF : Level F) (LE : Level EF) (coset_index : ℕ) (values : List F)
     (challenges : List EF) : Option EF := do
   if values.length ≠ 2 ^ challenges.length then none
