@@ -15,22 +15,22 @@ target `thumbv7em-none-eabi`
 | Crate | State | Generated lines | Hand-written lines | `opaque` | Mirrored | Dropped by the extractor | Patches (pre / post) | Patches with a cost |
 |---|---|---:|---:|---:|---:|---:|---|---|
 | `air` | scoped | 364 | 931 | 0 | 67 | 0 | 0 / 1 | post `010` |
-| `baby-bear` | extracted | 2953 | 121 | 4 | 0 | 0 | 4 / 3 | pre `020`, pre `030`, pre `040` |
+| `baby-bear` | extracted | 2953 | 121 | 4 | 0 | 0 | 5 / 3 | pre `020`, pre `030`, pre `040`, pre `050` |
 | `batch-stark` | scoped | 116 | 788 | 0 | 54 | 0 | 0 / 0 |  |
 | `binary-dft` | stub |  | 552 | 0 | 50 |  | 0 / 0 |  |
-| `binary-field` | scoped | 21777 | 66 | 0 | 0 | 139 | 7 / 2 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050`, pre `060`, pre `070` |
-| `binary-pcs` | stub |  | 828 | 0 | 10 |  | 0 / 0 |  |
+| `binary-field` | scoped | 21777 | 66 | 0 | 0 | 137 | 7 / 2 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050`, pre `060`, pre `070` |
+| `binary-pcs` | stub |  | 828 | 0 | 10 |  | 1 / 0 | pre `010` |
 | `blake2s` | scoped | 148 | 51 | 1 | 0 | 0 | 1 / 0 | pre `010` |
 | `blake2s-air` | scoped | 499 | 515 | 0 | 37 | 0 | 0 / 0 |  |
 | `blake3` | scoped | 2609 | 40 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
 | `blake3-air` | scoped | 240 | 953 | 0 | 117 | 0 | 0 / 0 |  |
 | `blake3-crate` | stub |  | 26 | 0 | 3 |  | 0 / 0 |  |
-| `bus` | stub |  | 1395 | 0 | 122 |  | 0 / 0 |  |
+| `bus` | scoped | 163 | 1431 | 0 | 122 | 0 | 1 / 0 | pre `010` |
 | `challenger` | scoped | 1552 | 223 | 0 | 12 | 6 | 1 / 1 | pre `010` |
 | `circle` | stub |  | 1283 | 0 | 80 |  | 0 / 0 |  |
 | `commit` | stub |  | 836 | 0 | 59 |  | 0 / 0 |  |
 | `dft` | stub |  | 992 | 0 | 67 |  | 0 / 0 |  |
-| `field` | stub |  | 346 | 7 | 25 |  | 0 / 0 |  |
+| `field` | stub |  | 375 | 7 | 25 |  | 0 / 0 |  |
 | `fri` | stub |  | 1598 | 0 | 114 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
 | `keccak` | scoped | 1109 | 39 | 0 | 0 | 6 | 2 / 2 | pre `010`, pre `020` |
@@ -42,8 +42,8 @@ target `thumbv7em-none-eabi`
 | `merkle-tree` | scoped | 1306 | 43 | 0 | 0 | 0 | 2 / 0 | pre `010`, pre `020` |
 | `mersenne-31` | scoped | 1444 | 259 | 0 | 12 | 30 | 1 / 1 | pre `010` |
 | `monty-31` | scoped | 1581 | 327 | 0 | 13 | 29 | 1 / 1 | pre `010` |
-| `multi-stark` | stub |  | 1004 | 0 | 77 |  | 0 / 0 |  |
-| `multilinear-util` | stub |  | 1077 | 0 | 75 |  | 1 / 0 | pre `010` |
+| `multi-stark` | scoped | 338 | 1046 | 0 | 77 | 0 | 3 / 1 | pre `010`, pre `020`, pre `030`, post `010` |
+| `multilinear-util` | scoped | 222 | 1113 | 0 | 75 | 0 | 2 / 0 | pre `010`, pre `020` |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 68 | 2 | 4 |  | 0 / 0 |  |
 | `security` | scoped | 1414 | 130 | 6 | 13 | 0 | 2 / 1 | pre `010`, pre `020` |
@@ -91,7 +91,7 @@ Nothing translated is dropped.
 ### `binary-field`
 
 charon errors: 0.
-139 item(s) dropped, 0 of them mirrored.
+137 item(s) dropped, 0 of them mirrored.
 
 | Item | Source | Mirrored |
 |---|---|---|
@@ -111,7 +111,6 @@ charon errors: 0.
 | `p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::add_assign_lane` | `` |  |
 | `p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::extract` | `` |  |
 | `p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::from_ext_slice` | `` |  |
-| `p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::packed_ext_powers` | `` |  |
 | `p3_binary_field::gf2::{impl core::clone::Clone}::clone` | `` |  |
 | `p3_binary_field::gf2::{impl core::cmp::Ord}::cmp` | `` |  |
 | `p3_binary_field::gf2::{impl core::cmp::PartialOrd}::partial_cmp` | `` |  |
@@ -186,7 +185,6 @@ charon errors: 0.
 | `p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::add_assign_lane` | `` |  |
 | `p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::extract` | `` |  |
 | `p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::from_ext_slice` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::packed_ext_powers` | `` |  |
 | `p3_binary_field::poly192::{impl}::limbs` | `` |  |
 | `p3_binary_field::poly64::ALPHA` | `` |  |
 | `p3_binary_field::poly64::TOWER_GENERATOR` | `` |  |
@@ -260,6 +258,11 @@ charon errors: 0.
 | `p3_blake3::{impl p3_symmetric::hasher::CryptographicHasher}::hash_iter::BUFLEN` | `` |  |
 
 ### `blake3-air`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `bus`
 
 charon errors: 0.
 Nothing translated is dropped.
@@ -432,6 +435,16 @@ charon errors: 0.
 | `p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_int` | `` |  |
 | `p3_monty_31::monty_31::{impl}::HALF` | `` |  |
 
+### `multi-stark`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `multilinear-util`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ### `security`
 
 charon errors: 0.
@@ -498,7 +511,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1780) whose dependencies include it; reaching one is not using it.
+(of 1797) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -540,7 +553,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1780) whose dependencies include the declaration.
+counts the claims (of 1797) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -882,128 +895,128 @@ counts the claims (of 1780) whose dependencies include the declaration.
 | `blake3-crate` | `blake3.BLOCK_LEN` | `blake3::BLOCK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.CHUNK_LEN` | `blake3::CHUNK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.OUT_LEN` | `blake3::OUT_LEN` | stub | 0 |
-| `bus` | `p3_bus.mirror.BusDirection` | `p3_bus::direction::BusDirection` | stub | 4 |
-| `bus` | `p3_bus.mirror.BusDirection.index` | `p3_bus::direction::BusDirection::index` | stub | 2 |
-| `bus` | `p3_bus.mirror.BusDirection.ALL` | `p3_bus::direction::BusDirection::ALL` | stub | 0 |
-| `bus` | `p3_bus.mirror.BusNameError` | `p3_bus::name::BusNameError` | stub | 3 |
-| `bus` | `p3_bus.mirror.BusName.MAX_LEN` | `p3_bus::name::BusName::MAX_LEN` | stub | 3 |
-| `bus` | `p3_bus.mirror.isAsciiAlphabetic` | `core::num::u8::is_ascii_alphabetic` | stub | 3 |
-| `bus` | `p3_bus.mirror.isAsciiAlphanumeric` | `core::num::u8::is_ascii_alphanumeric` | stub | 3 |
-| `bus` | `p3_bus.mirror.BusName.try_new` | `p3_bus::name::BusName::try_new` | stub | 3 |
-| `bus` | `p3_bus.mirror.BusBoundary` | `p3_bus::builder::BusBoundary` | stub | 4 |
-| `bus` | `p3_bus.mirror.BusBoundary.contains_row` | `p3_bus::builder::BusBoundary::contains_row` | stub | 0 |
-| `bus` | `p3_bus.mirror.BusActivation` | `p3_bus::builder::BusActivation` | stub | 4 |
-| `bus` | `p3_bus.mirror.BusBuilder` | `p3_bus::builder::BusInteractionRecorder` | stub | 2 |
-| `bus` | `p3_bus.mirror.BusBuilder.push_bus_interaction` | `p3_bus::builder::BusInteractionBuilder::push_bus_interaction` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.MAX_RAM_BIT_WIDTH` | `p3_bus::ram::statement::MAX_RAM_BIT_WIDTH` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.MIN_RAM_ACCESS_COUNT` | `p3_bus::ram::statement::MIN_RAM_ACCESS_COUNT` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamBoundary` | `p3_bus::ram::statement::RamBoundary` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamBoundary.is_segment` | `p3_bus::ram::statement::RamBoundary::is_segment` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamBoundary.image_buses` | `p3_bus::ram::statement::RamBoundary::image_buses` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamStatement` | `p3_bus::ram::statement::RamStatement` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamError` | `p3_bus::ram::error::RamError` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamStatement.access_payload_width` | `p3_bus::ram::statement::RamStatement::access_payload_width` | stub | 0 |
-| `bus` | `p3_bus.ram.mirror.RamStatement.image_payload_width` | `p3_bus::ram::statement::RamStatement::image_payload_width` | stub | 0 |
-| `bus` | `p3_bus.ram.mirror.RamStatement.validate` | `p3_bus::ram::statement::RamStatement::validate` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamStatement.leaf_contribution` | `p3_bus::ram::statement::RamStatement::leaf_contribution` | stub | 0 |
-| `bus` | `p3_bus.ram.mirror.RamLayout` | `p3_bus::ram::statement::RamLayout` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.checked_add` | `core::num::usize::checked_add` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.take` | `p3_bus::ram::statement::RamLayout::new` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamLayout.new` | `p3_bus::ram::statement::RamLayout::new` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamLayout.access_columns` | `p3_bus::ram::statement::RamLayout::access_columns` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamLayout.image_columns` | `p3_bus::ram::statement::RamLayout::image_columns` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamAir` | `p3_bus::ram::air::RamAir` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamAir.new` | `p3_bus::ram::air::RamAir::new` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.slice` | `core::slice::index::Index::index` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.xor` | `p3_bus::ram::air::xor` | stub | 3 |
-| `bus` | `p3_bus.ram.mirror.xor3` | `p3_bus::ram::air::xor3` | stub | 3 |
-| `bus` | `p3_bus.ram.mirror.majority` | `p3_bus::ram::air::majority` | stub | 3 |
-| `bus` | `p3_bus.ram.mirror.or` | `p3_bus::ram::air::or` | stub | 3 |
-| `bus` | `p3_bus.ram.mirror.assert_strict_increase` | `p3_bus::ram::air::assert_strict_increase` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamAir.eval_booleanity` | `p3_bus::ram::air::RamAir::eval_booleanity` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamAir.eval_run_start` | `p3_bus::ram::air::RamAir::eval_run_start` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamAir.eval_order` | `p3_bus::ram::air::RamAir::eval_order` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamAir.eval_run_marker` | `p3_bus::ram::air::RamAir::eval_run_marker` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.channel` | `p3_bus::ram::statement::channel` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamAir.declare` | `p3_bus::ram::air::RamAir::declare` | stub | 2 |
-| `bus` | `p3_bus.ram.mirror.RamAir.eval` | `p3_bus::ram::air::RamAir::eval` | stub | 2 |
-| `bus` | `p3_bus.product.mirror.combine` | `p3_bus::product::math::combine` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.interpolate_pair` | `p3_bus::product::math::interpolate_pair` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.interpolate_quad` | `p3_bus::product::math::interpolate_quad` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.has_distinct_round_nodes` | `p3_bus::product::math::has_distinct_round_nodes` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.ProductGkrRootShape` | `p3_bus::product::shape::ProductGkrRootShape` | stub | 2 |
-| `bus` | `p3_bus.product.mirror.ProductGkrShapeError` | `p3_bus::product::error::ProductGkrShapeError` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.ProductGkrError` | `p3_bus::product::error::ProductGkrError` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.USIZE_MAX` | `core::num::usize::MAX` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.ProductGkrShape` | `p3_bus::product::shape::ProductGkrShape` | stub | 8 |
-| `bus` | `p3_bus.product.mirror.ProductGkrShape.new` | `p3_bus::product::shape::ProductGkrShape::new` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.ProductGkrShape.root_message_len` | `p3_bus::product::shape::ProductGkrShape::root_message_len` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.layersLoop` | `p3_bus::product::shape::ProductGkrShape::layers` | stub | 6 |
-| `bus` | `p3_bus.product.mirror.ProductGkrShape.layers` | `p3_bus::product::shape::ProductGkrShape::layers` | stub | 6 |
-| `bus` | `p3_bus.product.mirror.ProductGkrShape.identity_padding_evaluation` | `p3_bus::product::shape::ProductGkrShape::identity_padding_evaluation` | stub | 2 |
-| `bus` | `p3_bus.product.mirror.ProductGkrRootShape.encode` | `p3_bus::product::shape::ProductGkrRootShape::encode` | stub | 0 |
-| `bus` | `p3_bus.product.mirror.ProductGkrRootShape.decode` | `p3_bus::product::shape::ProductGkrRootShape::decode` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.ProductGkrLayerProof` | `p3_bus::product::proof::ProductGkrLayerProof` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.ROUND_POLY_LEN` | `p3_bus::product::proof::ROUND_POLY_LEN` | stub | 0 |
-| `bus` | `p3_bus.product.mirror.ProductGkrProof` | `p3_bus::product::proof::ProductGkrProof` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.ProductGkrOutput` | `p3_bus::product::proof::ProductGkrOutput` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.ProductGkrProof.validate_shape` | `p3_bus::product::proof::ProductGkrProof::validate_shape` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.VerifierTranscript` | `p3_bus::product::transcript::ProductGkrVerifierTranscript` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.VerifyState` | `p3_bus::product::proof::ProductGkrProof::verify` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.verify_layer` | `p3_bus::product::proof::ProductGkrProof::verify` | stub | 1 |
-| `bus` | `p3_bus.product.mirror.ProductGkrProof.verify` | `p3_bus::product::proof::ProductGkrProof::verify` | stub | 1 |
-| `bus` | `p3_bus.plan.mirror.log2_ceil_usize` | `p3_util::log2_ceil_usize` | stub | 1 |
-| `bus` | `p3_bus.plan.mirror.checked_next_power_of_two` | `core::num::usize::checked_next_power_of_two` | stub | 1 |
-| `bus` | `p3_bus.plan.mirror.checked_add` | `core::num::usize::checked_add` | stub | 2 |
-| `bus` | `p3_bus.plan.mirror.BusDomain` | `p3_bus::plan::BusDomain` | stub | 4 |
-| `bus` | `p3_bus.plan.mirror.BusDomain.identity_bit` | `p3_bus::plan::BusDomain::identity_bit` | stub | 3 |
-| `bus` | `p3_bus.plan.mirror.BusTupleSlot` | `p3_bus::plan::BusTupleSlot` | stub | 3 |
-| `bus` | `p3_bus.plan.mirror.BusBlockOwner` | `p3_bus::plan::BusBlockOwner` | stub | 2 |
-| `bus` | `p3_bus.plan.mirror.BusBlock` | `p3_bus::plan::BusBlock` | stub | 2 |
-| `bus` | `p3_bus.plan.mirror.BusSecurityGeometry` | `p3_bus::plan::BusSecurityGeometry` | stub | 4 |
-| `bus` | `p3_bus.plan.mirror.BusPlan` | `p3_bus::plan::BusPlan` | stub | 5 |
-| `bus` | `p3_bus.plan.mirror.BusPlan.tuple_slot` | `p3_bus::plan::BusPlan::tuple_slot` | stub | 3 |
-| `bus` | `p3_bus.plan.mirror.BusPlan.blocks` | `p3_bus::plan::BusPlan::blocks` | stub | 0 |
-| `bus` | `p3_bus.plan.mirror.UnsupportedBusAccess` | `p3_bus::plan::UnsupportedBusAccess` | stub | 1 |
-| `bus` | `p3_bus.plan.mirror.BusExpressionLocation` | `p3_bus::plan::BusExpressionLocation` | stub | 1 |
-| `bus` | `p3_bus.plan.mirror.BusPlanError` | `p3_bus::plan::error::BusPlanError` | stub | 2 |
-| `bus` | `p3_bus.plan.mirror.SymbolicBusInteraction` | `p3_bus::builder::SymbolicBusInteraction` | stub | 2 |
-| `bus` | `p3_bus.plan.mirror.BusPlanInput` | `p3_bus::plan::BusPlanInput` | stub | 1 |
-| `bus` | `p3_bus.plan.mirror.leafAccess` | `p3_bus::plan::validate_expression` | stub | 1 |
-| `bus` | `p3_bus.plan.mirror.validateWalk` | `p3_bus::plan::validate_expression` | stub | 1 |
-| `bus` | `p3_bus.plan.mirror.validate_expression` | `p3_bus::plan::validate_expression` | stub | 1 |
-| `bus` | `p3_bus.plan.mirror.validate_interaction` | `p3_bus::plan::validate_interaction` | stub | 1 |
-| `bus` | `p3_bus.plan.mirror.PendingBlock` | `p3_bus::plan::PendingBlock` | stub | 2 |
-| `bus` | `p3_bus.plan.mirror.pendingLe` | `p3_bus::plan::BusPlan::build` | stub | 2 |
-| `bus` | `p3_bus.plan.mirror.collectWidths` | `p3_bus::plan::BusPlan::build` | stub | 1 |
-| `bus` | `p3_bus.plan.mirror.layoutBlocks` | `p3_bus::plan::BusPlan::build` | stub | 2 |
-| `bus` | `p3_bus.plan.mirror.BusPlan.build` | `p3_bus::plan::BusPlan::build` | stub | 1 |
-| `bus` | `p3_bus.evaluation.mirror.BusEvaluation` | `p3_bus::evaluation::BusEvaluation` | stub | 2 |
-| `bus` | `p3_bus.evaluation.mirror.BusNode` | `p3_bus::evaluation::BusNode` | stub | 2 |
-| `bus` | `p3_bus.evaluation.mirror.BusEvaluationError` | `p3_bus::evaluation::error::BusEvaluationError` | stub | 2 |
-| `bus` | `p3_bus.evaluation.mirror.compile_leaf` | `p3_bus::evaluation::compile_leaf` | stub | 2 |
-| `bus` | `p3_bus.evaluation.mirror.compile_expression` | `p3_bus::evaluation::compile_expression` | stub | 2 |
-| `bus` | `p3_bus.evaluation.mirror.fingerprint_weights` | `p3_bus::argument::BusChallenges::fingerprint_weights` | stub | 0 |
-| `bus` | `p3_bus.evaluation.mirror.BusFactorPlan` | `p3_bus::evaluation::BusFactorPlan` | stub | 1 |
-| `bus` | `p3_bus.evaluation.mirror.nodeValue` | `p3_bus::evaluation::BusFactorPlan::evaluate` | stub | 2 |
-| `bus` | `p3_bus.evaluation.mirror.BusFactorPlan.evaluate` | `p3_bus::evaluation::BusFactorPlan::evaluate` | stub | 1 |
-| `bus` | `p3_bus.evaluation.mirror.BusPlan.compile_factor` | `p3_bus::evaluation::BusPlan::compile_factor` | stub | 1 |
-| `bus` | `p3_bus.timestamped.mirror.CLOCK_RANGE_BITS` | `p3_bus::timestamped::CLOCK_RANGE_BITS` | stub | 3 |
-| `bus` | `p3_bus.timestamped.mirror.CLOCK_GAP_BITS` | `p3_bus::timestamped::CLOCK_GAP_BITS` | stub | 2 |
-| `bus` | `p3_bus.timestamped.mirror.TimestampedMemoryError` | `p3_bus::timestamped::error::TimestampedMemoryError` | stub | 1 |
-| `bus` | `p3_bus.timestamped.mirror.clock_orbit` | `p3_bus::timestamped::clock_orbit` | stub | 1 |
-| `bus` | `p3_bus.timestamped.mirror.check_orbit` | `p3_bus::timestamped::TimestampedMemory::new` | stub | 1 |
-| `bus` | `p3_bus.timestamped.mirror.check_accesses` | `p3_bus::timestamped::TimestampedMemory::check_against` | stub | 0 |
-| `bus` | `p3_bus.timestamped.mirror.high_step` | `p3_bus::timestamped::high_step` | stub | 2 |
-| `bus` | `p3_bus.timestamped.mirror.gap_factors` | `p3_bus::timestamped::TimestampedMemory::gap_factors` | stub | 1 |
-| `bus` | `p3_bus.timestamped.mirror.slot_offset` | `p3_bus::timestamped::TimestampedMemory::slot_offset` | stub | 0 |
-| `bus` | `p3_bus.timestamped.mirror.ClockRangeAir.low` | `p3_bus::timestamped::air::ClockRangeAir::low` | stub | 2 |
-| `bus` | `p3_bus.timestamped.mirror.ClockRangeAir.high` | `p3_bus::timestamped::air::ClockRangeAir::high` | stub | 2 |
-| `bus` | `p3_bus.timestamped.mirror.gap_constraint` | `p3_bus::timestamped::TimestampedMemoryInteractionBuilder::timestamped_access` | stub | 0 |
-| `bus` | `p3_bus.security.mirror.BusSecurityDims` | `p3_security::bus::ProductGkrSecurityProfile` | stub | 1 |
-| `bus` | `p3_bus.security.mirror.BusPlan.security_dims` | `p3_bus::security::BusPlan::security_model` | stub | 1 |
-| `bus` | `p3_bus.security.mirror.components` | `p3_security::bus::BusSecurityModel::components` | stub | 1 |
-| `bus` | `p3_bus.plan.mirror.layoutStep` | `p3_bus::plan::BusPlan::build` | stub | 2 |
+| `bus` | `p3_bus.mirror.BusDirection` | `p3_bus::direction::BusDirection` | not translated | 5 |
+| `bus` | `p3_bus.mirror.BusDirection.index` | `p3_bus::direction::BusDirection::index` | not translated | 3 |
+| `bus` | `p3_bus.mirror.BusDirection.ALL` | `p3_bus::direction::BusDirection::ALL` | not translated | 0 |
+| `bus` | `p3_bus.mirror.BusNameError` | `p3_bus::name::BusNameError` | not translated | 3 |
+| `bus` | `p3_bus.mirror.BusName.MAX_LEN` | `p3_bus::name::BusName::MAX_LEN` | not translated | 3 |
+| `bus` | `p3_bus.mirror.isAsciiAlphabetic` | `core::num::u8::is_ascii_alphabetic` | not translated | 3 |
+| `bus` | `p3_bus.mirror.isAsciiAlphanumeric` | `core::num::u8::is_ascii_alphanumeric` | not translated | 3 |
+| `bus` | `p3_bus.mirror.BusName.try_new` | `p3_bus::name::BusName::try_new` | not translated | 3 |
+| `bus` | `p3_bus.mirror.BusBoundary` | `p3_bus::builder::BusBoundary` | not translated | 5 |
+| `bus` | `p3_bus.mirror.BusBoundary.contains_row` | `p3_bus::builder::BusBoundary::contains_row` | not translated | 1 |
+| `bus` | `p3_bus.mirror.BusActivation` | `p3_bus::builder::BusActivation` | not translated | 4 |
+| `bus` | `p3_bus.mirror.BusBuilder` | `p3_bus::builder::BusInteractionRecorder` | not translated | 2 |
+| `bus` | `p3_bus.mirror.BusBuilder.push_bus_interaction` | `p3_bus::builder::BusInteractionBuilder::push_bus_interaction` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.MAX_RAM_BIT_WIDTH` | `p3_bus::ram::statement::MAX_RAM_BIT_WIDTH` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.MIN_RAM_ACCESS_COUNT` | `p3_bus::ram::statement::MIN_RAM_ACCESS_COUNT` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamBoundary` | `p3_bus::ram::statement::RamBoundary` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamBoundary.is_segment` | `p3_bus::ram::statement::RamBoundary::is_segment` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamBoundary.image_buses` | `p3_bus::ram::statement::RamBoundary::image_buses` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamStatement` | `p3_bus::ram::statement::RamStatement` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamError` | `p3_bus::ram::error::RamError` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamStatement.access_payload_width` | `p3_bus::ram::statement::RamStatement::access_payload_width` | not translated | 0 |
+| `bus` | `p3_bus.ram.mirror.RamStatement.image_payload_width` | `p3_bus::ram::statement::RamStatement::image_payload_width` | not translated | 0 |
+| `bus` | `p3_bus.ram.mirror.RamStatement.validate` | `p3_bus::ram::statement::RamStatement::validate` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamStatement.leaf_contribution` | `p3_bus::ram::statement::RamStatement::leaf_contribution` | not translated | 0 |
+| `bus` | `p3_bus.ram.mirror.RamLayout` | `p3_bus::ram::statement::RamLayout` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.checked_add` | `core::num::usize::checked_add` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.take` | `p3_bus::ram::statement::RamLayout::new` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamLayout.new` | `p3_bus::ram::statement::RamLayout::new` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamLayout.access_columns` | `p3_bus::ram::statement::RamLayout::access_columns` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamLayout.image_columns` | `p3_bus::ram::statement::RamLayout::image_columns` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir` | `p3_bus::ram::air::RamAir` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.new` | `p3_bus::ram::air::RamAir::new` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.slice` | `core::slice::index::Index::index` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.xor` | `p3_bus::ram::air::xor` | not translated | 3 |
+| `bus` | `p3_bus.ram.mirror.xor3` | `p3_bus::ram::air::xor3` | not translated | 3 |
+| `bus` | `p3_bus.ram.mirror.majority` | `p3_bus::ram::air::majority` | not translated | 3 |
+| `bus` | `p3_bus.ram.mirror.or` | `p3_bus::ram::air::or` | not translated | 3 |
+| `bus` | `p3_bus.ram.mirror.assert_strict_increase` | `p3_bus::ram::air::assert_strict_increase` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.eval_booleanity` | `p3_bus::ram::air::RamAir::eval_booleanity` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.eval_run_start` | `p3_bus::ram::air::RamAir::eval_run_start` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.eval_order` | `p3_bus::ram::air::RamAir::eval_order` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.eval_run_marker` | `p3_bus::ram::air::RamAir::eval_run_marker` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.channel` | `p3_bus::ram::statement::channel` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.declare` | `p3_bus::ram::air::RamAir::declare` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.eval` | `p3_bus::ram::air::RamAir::eval` | not translated | 2 |
+| `bus` | `p3_bus.product.mirror.combine` | `p3_bus::product::math::combine` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.interpolate_pair` | `p3_bus::product::math::interpolate_pair` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.interpolate_quad` | `p3_bus::product::math::interpolate_quad` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.has_distinct_round_nodes` | `p3_bus::product::math::has_distinct_round_nodes` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrRootShape` | `p3_bus::product::shape::ProductGkrRootShape` | not translated | 2 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShapeError` | `p3_bus::product::error::ProductGkrShapeError` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrError` | `p3_bus::product::error::ProductGkrError` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.USIZE_MAX` | `core::num::usize::MAX` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape` | `p3_bus::product::shape::ProductGkrShape` | not translated | 8 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape.new` | `p3_bus::product::shape::ProductGkrShape::new` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape.root_message_len` | `p3_bus::product::shape::ProductGkrShape::root_message_len` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.layersLoop` | `p3_bus::product::shape::ProductGkrShape::layers` | not translated | 6 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape.layers` | `p3_bus::product::shape::ProductGkrShape::layers` | not translated | 6 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape.identity_padding_evaluation` | `p3_bus::product::shape::ProductGkrShape::identity_padding_evaluation` | not translated | 2 |
+| `bus` | `p3_bus.product.mirror.ProductGkrRootShape.encode` | `p3_bus::product::shape::ProductGkrRootShape::encode` | not translated | 0 |
+| `bus` | `p3_bus.product.mirror.ProductGkrRootShape.decode` | `p3_bus::product::shape::ProductGkrRootShape::decode` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrLayerProof` | `p3_bus::product::proof::ProductGkrLayerProof` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.ROUND_POLY_LEN` | `p3_bus::product::proof::ROUND_POLY_LEN` | not translated | 0 |
+| `bus` | `p3_bus.product.mirror.ProductGkrProof` | `p3_bus::product::proof::ProductGkrProof` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrOutput` | `p3_bus::product::proof::ProductGkrOutput` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrProof.validate_shape` | `p3_bus::product::proof::ProductGkrProof::validate_shape` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.VerifierTranscript` | `p3_bus::product::transcript::ProductGkrVerifierTranscript` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.VerifyState` | `p3_bus::product::proof::ProductGkrProof::verify` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.verify_layer` | `p3_bus::product::proof::ProductGkrProof::verify` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrProof.verify` | `p3_bus::product::proof::ProductGkrProof::verify` | not translated | 1 |
+| `bus` | `p3_bus.plan.mirror.log2_ceil_usize` | `p3_util::log2_ceil_usize` | not translated | 1 |
+| `bus` | `p3_bus.plan.mirror.checked_next_power_of_two` | `core::num::usize::checked_next_power_of_two` | not translated | 1 |
+| `bus` | `p3_bus.plan.mirror.checked_add` | `core::num::usize::checked_add` | not translated | 2 |
+| `bus` | `p3_bus.plan.mirror.BusDomain` | `p3_bus::plan::BusDomain` | not translated | 4 |
+| `bus` | `p3_bus.plan.mirror.BusDomain.identity_bit` | `p3_bus::plan::BusDomain::identity_bit` | not translated | 3 |
+| `bus` | `p3_bus.plan.mirror.BusTupleSlot` | `p3_bus::plan::BusTupleSlot` | not translated | 3 |
+| `bus` | `p3_bus.plan.mirror.BusBlockOwner` | `p3_bus::plan::BusBlockOwner` | not translated | 2 |
+| `bus` | `p3_bus.plan.mirror.BusBlock` | `p3_bus::plan::BusBlock` | not translated | 2 |
+| `bus` | `p3_bus.plan.mirror.BusSecurityGeometry` | `p3_bus::plan::BusSecurityGeometry` | not translated | 4 |
+| `bus` | `p3_bus.plan.mirror.BusPlan` | `p3_bus::plan::BusPlan` | not translated | 5 |
+| `bus` | `p3_bus.plan.mirror.BusPlan.tuple_slot` | `p3_bus::plan::BusPlan::tuple_slot` | not translated | 3 |
+| `bus` | `p3_bus.plan.mirror.BusPlan.blocks` | `p3_bus::plan::BusPlan::blocks` | not translated | 0 |
+| `bus` | `p3_bus.plan.mirror.UnsupportedBusAccess` | `p3_bus::plan::UnsupportedBusAccess` | not translated | 1 |
+| `bus` | `p3_bus.plan.mirror.BusExpressionLocation` | `p3_bus::plan::BusExpressionLocation` | not translated | 1 |
+| `bus` | `p3_bus.plan.mirror.BusPlanError` | `p3_bus::plan::error::BusPlanError` | not translated | 2 |
+| `bus` | `p3_bus.plan.mirror.SymbolicBusInteraction` | `p3_bus::builder::SymbolicBusInteraction` | not translated | 2 |
+| `bus` | `p3_bus.plan.mirror.BusPlanInput` | `p3_bus::plan::BusPlanInput` | not translated | 1 |
+| `bus` | `p3_bus.plan.mirror.leafAccess` | `p3_bus::plan::validate_expression` | not translated | 1 |
+| `bus` | `p3_bus.plan.mirror.validateWalk` | `p3_bus::plan::validate_expression` | not translated | 1 |
+| `bus` | `p3_bus.plan.mirror.validate_expression` | `p3_bus::plan::validate_expression` | not translated | 1 |
+| `bus` | `p3_bus.plan.mirror.validate_interaction` | `p3_bus::plan::validate_interaction` | not translated | 1 |
+| `bus` | `p3_bus.plan.mirror.PendingBlock` | `p3_bus::plan::PendingBlock` | not translated | 2 |
+| `bus` | `p3_bus.plan.mirror.pendingLe` | `p3_bus::plan::BusPlan::build` | not translated | 2 |
+| `bus` | `p3_bus.plan.mirror.collectWidths` | `p3_bus::plan::BusPlan::build` | not translated | 1 |
+| `bus` | `p3_bus.plan.mirror.layoutBlocks` | `p3_bus::plan::BusPlan::build` | not translated | 2 |
+| `bus` | `p3_bus.plan.mirror.BusPlan.build` | `p3_bus::plan::BusPlan::build` | not translated | 1 |
+| `bus` | `p3_bus.evaluation.mirror.BusEvaluation` | `p3_bus::evaluation::BusEvaluation` | not translated | 2 |
+| `bus` | `p3_bus.evaluation.mirror.BusNode` | `p3_bus::evaluation::BusNode` | not translated | 2 |
+| `bus` | `p3_bus.evaluation.mirror.BusEvaluationError` | `p3_bus::evaluation::error::BusEvaluationError` | not translated | 2 |
+| `bus` | `p3_bus.evaluation.mirror.compile_leaf` | `p3_bus::evaluation::compile_leaf` | not translated | 2 |
+| `bus` | `p3_bus.evaluation.mirror.compile_expression` | `p3_bus::evaluation::compile_expression` | not translated | 2 |
+| `bus` | `p3_bus.evaluation.mirror.fingerprint_weights` | `p3_bus::argument::BusChallenges::fingerprint_weights` | not translated | 0 |
+| `bus` | `p3_bus.evaluation.mirror.BusFactorPlan` | `p3_bus::evaluation::BusFactorPlan` | not translated | 1 |
+| `bus` | `p3_bus.evaluation.mirror.nodeValue` | `p3_bus::evaluation::BusFactorPlan::evaluate` | not translated | 2 |
+| `bus` | `p3_bus.evaluation.mirror.BusFactorPlan.evaluate` | `p3_bus::evaluation::BusFactorPlan::evaluate` | not translated | 1 |
+| `bus` | `p3_bus.evaluation.mirror.BusPlan.compile_factor` | `p3_bus::evaluation::BusPlan::compile_factor` | not translated | 1 |
+| `bus` | `p3_bus.timestamped.mirror.CLOCK_RANGE_BITS` | `p3_bus::timestamped::CLOCK_RANGE_BITS` | not translated | 3 |
+| `bus` | `p3_bus.timestamped.mirror.CLOCK_GAP_BITS` | `p3_bus::timestamped::CLOCK_GAP_BITS` | not translated | 2 |
+| `bus` | `p3_bus.timestamped.mirror.TimestampedMemoryError` | `p3_bus::timestamped::error::TimestampedMemoryError` | not translated | 1 |
+| `bus` | `p3_bus.timestamped.mirror.clock_orbit` | `p3_bus::timestamped::clock_orbit` | not translated | 1 |
+| `bus` | `p3_bus.timestamped.mirror.check_orbit` | `p3_bus::timestamped::TimestampedMemory::new` | not translated | 1 |
+| `bus` | `p3_bus.timestamped.mirror.check_accesses` | `p3_bus::timestamped::TimestampedMemory::check_against` | not translated | 0 |
+| `bus` | `p3_bus.timestamped.mirror.high_step` | `p3_bus::timestamped::high_step` | not translated | 2 |
+| `bus` | `p3_bus.timestamped.mirror.gap_factors` | `p3_bus::timestamped::TimestampedMemory::gap_factors` | not translated | 1 |
+| `bus` | `p3_bus.timestamped.mirror.slot_offset` | `p3_bus::timestamped::TimestampedMemory::slot_offset` | not translated | 0 |
+| `bus` | `p3_bus.timestamped.mirror.ClockRangeAir.low` | `p3_bus::timestamped::air::ClockRangeAir::low` | not translated | 2 |
+| `bus` | `p3_bus.timestamped.mirror.ClockRangeAir.high` | `p3_bus::timestamped::air::ClockRangeAir::high` | not translated | 2 |
+| `bus` | `p3_bus.timestamped.mirror.gap_constraint` | `p3_bus::timestamped::TimestampedMemoryInteractionBuilder::timestamped_access` | not translated | 0 |
+| `bus` | `p3_bus.security.mirror.BusSecurityDims` | `p3_security::bus::ProductGkrSecurityProfile` | not translated | 1 |
+| `bus` | `p3_bus.security.mirror.BusPlan.security_dims` | `p3_bus::security::BusPlan::security_model` | not translated | 1 |
+| `bus` | `p3_bus.security.mirror.components` | `p3_security::bus::BusSecurityModel::components` | not translated | 1 |
+| `bus` | `p3_bus.plan.mirror.layoutStep` | `p3_bus::plan::BusPlan::build` | not translated | 2 |
 | `challenger` | `p3_challenger.duplex_challenger.mirror.sample` | `{impl p3_challenger::CanSample<EF> for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::sample` | not translated | 1 |
 | `challenger` | `p3_challenger.duplex_challenger.mirror.sample_bits` | `{impl p3_challenger::CanSampleBits<usize> for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::sample_bits` | not translated | 0 |
 | `challenger` | `p3_challenger.mirror.squeezeLoop` | `p3_field::helpers::squeeze_field_order_num_limbs` | not translated | 2 |
@@ -1223,10 +1236,10 @@ counts the claims (of 1780) whose dependencies include the declaration.
 | `dft` | `p3_dft.radix_2_small_batch.mirror.Radix2DFTSmallBatch.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_small_batch::Radix2DFTSmallBatch<F>}::dft_batch` | stub | 2 |
 | `dft` | `p3_dft.radix_2_small_batch.mirror.Radix2DFTSmallBatch.idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_small_batch::Radix2DFTSmallBatch<F>}::idft_batch` | stub | 1 |
 | `field` | `p3_field.dup.Dup` | `p3_field::dup::Dup` | stub | 0 |
-| `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 14 |
-| `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 8 |
+| `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 23 |
+| `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 17 |
 | `field` | `p3_field.field.PrimeField` | `p3_field::field::PrimeField` | stub | 0 |
-| `field` | `p3_field.field.Algebra` | `p3_field::field::Algebra` | stub | 8 |
+| `field` | `p3_field.field.Algebra` | `p3_field::field::Algebra` | stub | 17 |
 | `field` | `p3_field.integers.QuotientMap` | `p3_field::integers::QuotientMap` | stub | 0 |
 | `field` | `p3_field.field.PrimeField64` | `p3_field::field::PrimeField64` | stub | 0 |
 | `field` | `p3_field.field.PrimeField32` | `p3_field::field::PrimeField32` | stub | 0 |
@@ -1514,158 +1527,158 @@ counts the claims (of 1780) whose dependencies include the declaration.
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.exp_u64.step` | `p3_field::field::PrimeCharacteristicRing::exp_u64` | not translated | 4 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.mul_2exp_u64` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::mul_2exp_u64` | dropped | 4 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.try_inverse` | `{impl p3_field::field::Field for p3_monty_31::monty_31::MontyField31<_>}::try_inverse` | dropped | 3 |
-| `multi-stark` | `p3_multi_stark.selectors.mirror.BoundaryEvals` | `p3_multi_stark::selectors::BoundaryEvals` | stub | 10 |
-| `multi-stark` | `p3_multi_stark.selectors.mirror.atStep` | `p3_multi_stark::selectors::BoundaryEvals::at` | stub | 10 |
-| `multi-stark` | `p3_multi_stark.selectors.mirror.BoundaryEvals.at` | `p3_multi_stark::selectors::BoundaryEvals::at` | stub | 10 |
-| `multi-stark` | `p3_multi_stark.selectors.mirror.BoundaryEvals.apply` | `p3_multi_stark::selectors::BoundaryEvals::apply` | stub | 0 |
-| `multi-stark` | `p3_multi_stark.selectors.mirror.BoundaryEvals.from_row` | `p3_multi_stark::selectors::BoundaryEvals::from_row` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.selectors.mirror.BoundaryEvals.from_row_with_prefix` | `p3_multi_stark::selectors::BoundaryEvals::from_row_with_prefix` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.opening.mirror.TableOpening` | `p3_multi_stark::opening::TableOpening` | stub | 7 |
-| `multi-stark` | `p3_multi_stark.opening.mirror.TableOpening.empty` | `p3_multi_stark::opening::TableOpening::empty` | stub | 0 |
-| `multi-stark` | `p3_multi_stark.opening.mirror.scatterStep` | `p3_multi_stark::opening::OpeningClaims::next_row` | stub | 7 |
-| `multi-stark` | `p3_multi_stark.opening.mirror.next_row` | `p3_multi_stark::opening::OpeningClaims::next_row` | stub | 7 |
-| `multi-stark` | `p3_multi_stark.zerocheck.mirror.ZerocheckError` | `p3_multi_stark::zerocheck::ZerocheckError` | stub | 8 |
-| `multi-stark` | `p3_multi_stark.zerocheck.mirror.ZerocheckReduction` | `p3_multi_stark::zerocheck::ZerocheckReduction` | stub | 7 |
-| `multi-stark` | `p3_multi_stark.zerocheck.mirror.checkAir` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | stub | 7 |
-| `multi-stark` | `p3_multi_stark.zerocheck.mirror.accumulate` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | stub | 5 |
-| `multi-stark` | `p3_multi_stark.zerocheck.mirror.entries` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | stub | 4 |
-| `multi-stark` | `p3_multi_stark.zerocheck.mirror.closing` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | stub | 4 |
-| `multi-stark` | `p3_multi_stark.zerocheck.mirror.check_constraint` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | stub | 4 |
-| `multi-stark` | `p3_multi_stark.zerocheck.mirror.round_degree` | `p3_multi_stark::zerocheck::AirZerocheck::verify_reduction_with_lookup_and_bus` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.zerocheck.mirror.check_claimed_sum` | `p3_multi_stark::zerocheck::AirZerocheck::verify_reduction_with_lookup_and_bus` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.transcript.mirror.MultiStarkInstanceShape` | `p3_multi_stark::transcript::MultiStarkInstanceShape` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.transcript.mirror.MultiStarkShape` | `p3_multi_stark::transcript::MultiStarkShape` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.transcript.mirror.MultiStarkShape.has_preprocessed` | `p3_multi_stark::transcript::MultiStarkShape::has_preprocessed` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.transcript.mirror.Step` | `p3_multi_stark::transcript::MultiStarkShape::pattern` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.transcript.mirror.Delegation` | `p3_multi_stark::transcript::MultiStarkShape::pattern` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.transcript.mirror.delegation` | `p3_multi_stark::transcript::delegation` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.transcript.mirror.MultiStarkShape.pattern` | `p3_multi_stark::transcript::MultiStarkShape::pattern` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.transcript.mirror.columnWords` | `p3_multi_stark::transcript::MultiStarkShape::domain_separator` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.transcript.mirror.instanceWords` | `p3_multi_stark::transcript::MultiStarkShape::domain_separator` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.transcript.mirror.MultiStarkShape.label` | `p3_multi_stark::transcript::MultiStarkShape::domain_separator` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.transcript.mirror.AirDegrees` | `p3_multi_stark::rounds::AirDegrees` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.transcript.mirror.ZerocheckStep` | `p3_multi_stark::zerocheck::transcript::ZerocheckShape::pattern` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.transcript.mirror.ZerocheckShape` | `p3_multi_stark::zerocheck::transcript::ZerocheckShape` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.transcript.mirror.ZerocheckShape.free_coordinates` | `p3_multi_stark::zerocheck::transcript::ZerocheckShape::free_coordinates` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.transcript.mirror.ZerocheckShape.pattern` | `p3_multi_stark::zerocheck::transcript::ZerocheckShape::pattern` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.transcript.mirror.ZerocheckShape.label` | `p3_multi_stark::zerocheck::transcript::ZerocheckShape::domain_separator` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.security.mirror.AirParams` | `p3_security::multilinear::MultilinearAirParams` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.security.mirror.air_terms` | `p3_security::multilinear::reduction_terms` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.security.mirror.num_variables` | `p3_multi_stark::security::assess_statement` | stub | 0 |
-| `multi-stark` | `p3_multi_stark.security.mirror.charged_degree` | `p3_multi_stark::security::assess_statement` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.zerocheck.mirror.M` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | stub | 7 |
-| `multi-stark` | `p3_multi_stark.zerocheck.mirror.AirView` | `p3_multi_stark::folder::VerifierAir` | stub | 7 |
-| `multi-stark` | `p3_multi_stark.zerocheck.mirror.BusTerm` | `p3_multi_stark::bus::BusContext::terminal_composition` | stub | 4 |
-| `multi-stark` | `p3_multi_stark.zerocheck.mirror.Entry` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | stub | 7 |
-| `multi-stark` | `p3_multi_stark.security.mirror.Term` | `p3_security::SecurityTerm` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.security.mirror.Denominator` | `p3_security::multilinear::reduction_terms` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.SplitFraction` | `p3_multi_stark::fractional_gkr::SplitFraction` | stub | 7 |
-| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.SplitFraction.gate` | `p3_multi_stark::fractional_gkr::SplitFraction::gate` | stub | 6 |
-| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.FractionGkrError` | `p3_multi_stark::fractional_gkr::FractionGkrError` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.ROUND_POLY_LEN` | `p3_multi_stark::fractional_gkr::transcript::ROUND_POLY_LEN` | stub | 0 |
-| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.FractionGkrLayerProof` | `p3_multi_stark::fractional_gkr::FractionGkrLayerProof` | stub | 4 |
-| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.FractionGkrProof` | `p3_multi_stark::fractional_gkr::FractionGkrProof` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.FractionGkrOutput` | `p3_multi_stark::fractional_gkr::FractionGkrOutput` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.VerifierTranscript` | `p3_multi_stark::fractional_gkr::transcript::FractionGkrVerifierTranscript` | stub | 3 |
-| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.VerifyState` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | stub | 3 |
-| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.firstBadRound` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | stub | 3 |
-| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.roundStep` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | stub | 3 |
-| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.verify_layer` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | stub | 3 |
-| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.verify_fractional_gkr` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.lookup.mirror.LookupInstancePlan` | `p3_multi_stark::lookup::LookupInstancePlan` | stub | 3 |
-| `multi-stark` | `p3_multi_stark.lookup.mirror.log2_ceil_usize` | `p3_util::log2_ceil_usize` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.lookup.mirror.place` | `p3_multi_stark::lookup::LookupPlan::build` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.lookup.mirror.bus_capacity_ok` | `p3_multi_stark::lookup::LookupPlan::build` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.lookup.mirror.tupleWeights` | `p3_multi_stark::lookup::AirLinkClaim::new` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.lookup.mirror.blockWeights` | `p3_multi_stark::lookup::AirLinkClaim::new` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.lookup.mirror.claimed_sum` | `p3_multi_stark::lookup::AirLinkClaim::new` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.lookup.mirror.theta_bus_offset` | `p3_multi_stark::lookup::AirLinkClaim::new` | stub | 0 |
-| `multi-stark` | `p3_multi_stark.lookup.mirror.bus_prefixes` | `p3_lookup::Challenges::new` | stub | 0 |
-| `multi-stark` | `p3_multi_stark.logup_star.mirror.embed` | `p3_multi_stark::logup_star::position::embed` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.logup_star.mirror.fits` | `p3_multi_stark::logup_star::position::fits` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.logup_star.mirror.eval` | `p3_multi_stark::logup_star::position::eval` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.logup_star.mirror.claimed_sum` | `p3_multi_stark::logup_star::product::claimed_sum` | stub | 0 |
-| `multi-stark` | `p3_multi_stark.bus.mirror.TerminalShare` | `p3_bus::BusTerminalShare` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.bus.mirror.BusBindingError` | `p3_multi_stark::bus::BusBindingError` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.bus.mirror.shareTerm` | `p3_multi_stark::bus::BusContext::terminal_composition` | stub | 2 |
-| `multi-stark` | `p3_multi_stark.bus.mirror.terminal_composition` | `p3_multi_stark::bus::BusContext::terminal_composition` | stub | 1 |
-| `multi-stark` | `p3_multi_stark.security.mirror.LookupParams` | `p3_security::multilinear::MultilinearLookupParams` | stub | 0 |
-| `multi-stark` | `p3_multi_stark.security.mirror.lookup_terms` | `p3_security::multilinear::reduction_terms` | stub | 0 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.split_at` | `p3_multilinear_util::point::Point::split_at` | stub | 0 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.reversed` | `p3_multilinear_util::point::Point::reversed` | stub | 0 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.split_by_coordinate` | `p3_multilinear_util::point::split_by_coordinate` | stub | 3 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.fill_equality_table_serial` | `p3_multilinear_util::point::Point::fill_equality_table_serial` | stub | 3 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.fill_equality_table_in_chunks` | `p3_multilinear_util::point::Point::fill_equality_table_in_chunks` | stub | 3 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.fill_equality_table` | `p3_multilinear_util::point::Point::fill_equality_table` | stub | 3 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_table` | `p3_multilinear_util::point::Point::equality_table` | stub | 3 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_weights_msb` | `p3_multilinear_util::point::Point::equality_weights_msb` | stub | 2 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_weights_lsb` | `p3_multilinear_util::point::Point::equality_weights_lsb` | stub | 2 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_at_vertex` | `p3_multilinear_util::point::Point::equality_at_vertex` | stub | 3 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.hypercube` | `p3_multilinear_util::point::Point::hypercube` | stub | 3 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.expand_from_univariate` | `p3_multilinear_util::point::Point::expand_from_univariate` | stub | 9 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_eq` | `p3_multilinear_util::point::Point::eval_eq` | stub | 19 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_select` | `p3_multilinear_util::point::Point::eval_select` | stub | 7 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_next` | `p3_multilinear_util::point::Point::eval_next` | stub | 3 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.transpose` | `p3_multilinear_util::point::Point::transpose` | stub | 0 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.fill_buffer_batch` | `p3_multilinear_util::eq_batch::fill_buffer_batch` | stub | 20 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_1_batch` | `p3_multilinear_util::eq_batch::eval_eq_1_batch` | stub | 20 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_2_batch` | `p3_multilinear_util::eq_batch::eval_eq_2_batch` | stub | 20 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_3_batch` | `p3_multilinear_util::eq_batch::eval_eq_3_batch` | stub | 20 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.add_or_set` | `p3_multilinear_util::eq_batch::add_or_set` | stub | 20 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch_basic` | `p3_multilinear_util::eq_batch::eval_eq_batch_basic` | stub | 20 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.packed_eq_poly_batch` | `p3_multilinear_util::eq_batch::packed_eq_poly_batch` | stub | 20 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.extEvaluator` | `{impl p3_multilinear_util::eq_batch::EqualityEvaluator for p3_multilinear_util::eq_batch::ExtFieldEvaluator<F, EF>}` | stub | 19 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.baseEvaluator` | `{impl p3_multilinear_util::eq_batch::EqualityEvaluator for p3_multilinear_util::eq_batch::BaseFieldEvaluator<F, EF>}` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_packed_batch` | `p3_multilinear_util::eq_batch::eval_eq_packed_batch` | stub | 20 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch_common` | `p3_multilinear_util::eq_batch::eval_eq_batch_common` | stub | 20 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch` | `p3_multilinear_util::eq_batch::eval_eq_batch` | stub | 19 |
-| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_base_batch` | `p3_multilinear_util::eq_batch::eval_eq_base_batch` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new` | `p3_multilinear_util::poly::Poly::new` | stub | 9 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.as_constant` | `p3_multilinear_util::poly::Poly::as_constant` | stub | 0 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.zero` | `p3_multilinear_util::poly::Poly::zero` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.truncate_to_half` | `p3_multilinear_util::poly::Poly::truncate_to_half` | stub | 0 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.pad_zeros` | `p3_multilinear_util::poly::Poly::pad_zeros` | stub | 0 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_from_point` | `p3_multilinear_util::poly::Poly::new_from_point` | stub | 17 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_next_from_point` | `p3_multilinear_util::poly::Poly::new_next_from_point` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_mut` | `p3_multilinear_util::poly::Poly::fix_prefix_var_mut` | stub | 6 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.sum_prefix_var_mut` | `p3_multilinear_util::poly::Poly::sum_prefix_var_mut` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_mut_monomial` | `p3_multilinear_util::poly::Poly::fix_prefix_var_mut_monomial` | stub | 0 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut_whole` | `p3_multilinear_util::poly::Poly::fix_suffix_var_mut_whole` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut_split` | `p3_multilinear_util::poly::Poly::fix_suffix_var_mut_split` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut` | `p3_multilinear_util::poly::Poly::fix_suffix_var_mut` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var` | `p3_multilinear_util::poly::Poly::fix_prefix_var` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_at` | `p3_multilinear_util::poly::Poly::fix_prefix_var_at` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var` | `p3_multilinear_util::poly::Poly::fix_suffix_var` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_to_packed` | `p3_multilinear_util::poly::Poly::fix_prefix_var_to_packed` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.pack` | `p3_multilinear_util::poly::Poly::pack` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.unpack` | `p3_multilinear_util::poly::Poly::unpack` | stub | 2 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.eval_multilinear_recursive` | `p3_multilinear_util::poly::eval_multilinear_recursive` | stub | 12 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.eq_serial` | `p3_multilinear_util::poly::Poly::new_packed_from_point::eq_serial` | stub | 16 |
-| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_packed_from_point` | `p3_multilinear_util::poly::Poly::new_packed_from_point` | stub | 16 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.new_unpacked` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::new_unpacked` | stub | 14 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.new_packed` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::new_packed` | stub | 14 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.num_scalar_evals` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::num_scalar_evals` | stub | 14 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.num_variables` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::num_variables` | stub | 14 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_base` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_base` | stub | 5 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_ext` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_ext` | stub | 6 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_ext_packed` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_ext_packed` | stub | 0 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.accumulate_scalar_into` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::accumulate_scalar_into` | stub | 2 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.compress_prefix_into` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::compress_prefix_into` | stub | 0 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.packed_basis_dot` | `p3_multilinear_util::split_eq::packed_kernel::packed_basis_dot` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.compress_hi_dot_packed` | `p3_multilinear_util::split_eq::packed_kernel::compress_hi_dot_packed` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.compress_suffix_dot` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::compress_suffix_dot` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_base_shifted` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_base_shifted` | stub | 0 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.last_scalar` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::last_scalar` | stub | 0 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.new_unpacked` | `p3_multilinear_util::split_eq::SplitEq::new_unpacked` | stub | 0 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.new_packed` | `p3_multilinear_util::split_eq::SplitEq::new_packed` | stub | 14 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.num_variables` | `p3_multilinear_util::split_eq::SplitEq::num_variables` | stub | 14 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.eval_base` | `p3_multilinear_util::split_eq::SplitEq::eval_base` | stub | 5 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.eval_ext` | `p3_multilinear_util::split_eq::SplitEq::eval_ext` | stub | 6 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.accumulate_into` | `p3_multilinear_util::split_eq::SplitEq::accumulate_into` | stub | 2 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.materialize` | `p3_multilinear_util::split_eq::SplitEq::materialize` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.compress_suffix_into` | `p3_multilinear_util::split_eq::SplitEq::compress_suffix_into` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.Poly.eval_base` | `p3_multilinear_util::poly::Poly::eval_base` | stub | 3 |
-| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.Poly.eval_ext` | `p3_multilinear_util::poly::Poly::eval_ext` | stub | 6 |
+| `multi-stark` | `p3_multi_stark.selectors.mirror.BoundaryEvals` | `p3_multi_stark::selectors::BoundaryEvals` | not translated | 14 |
+| `multi-stark` | `p3_multi_stark.selectors.mirror.atStep` | `p3_multi_stark::selectors::BoundaryEvals::at` | not translated | 13 |
+| `multi-stark` | `p3_multi_stark.selectors.mirror.BoundaryEvals.at` | `p3_multi_stark::selectors::BoundaryEvals::at` | not translated | 13 |
+| `multi-stark` | `p3_multi_stark.selectors.mirror.BoundaryEvals.apply` | `p3_multi_stark::selectors::BoundaryEvals::apply` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.selectors.mirror.BoundaryEvals.from_row` | `p3_multi_stark::selectors::BoundaryEvals::from_row` | not translated | 4 |
+| `multi-stark` | `p3_multi_stark.selectors.mirror.BoundaryEvals.from_row_with_prefix` | `p3_multi_stark::selectors::BoundaryEvals::from_row_with_prefix` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.opening.mirror.TableOpening` | `p3_multi_stark::opening::TableOpening` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.opening.mirror.TableOpening.empty` | `p3_multi_stark::opening::TableOpening::empty` | not translated | 0 |
+| `multi-stark` | `p3_multi_stark.opening.mirror.scatterStep` | `p3_multi_stark::opening::OpeningClaims::next_row` | not translated | 8 |
+| `multi-stark` | `p3_multi_stark.opening.mirror.next_row` | `p3_multi_stark::opening::OpeningClaims::next_row` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.ZerocheckError` | `p3_multi_stark::zerocheck::ZerocheckError` | not translated | 8 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.ZerocheckReduction` | `p3_multi_stark::zerocheck::ZerocheckReduction` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.checkAir` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.accumulate` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | not translated | 5 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.entries` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | not translated | 4 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.closing` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | not translated | 4 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.check_constraint` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | not translated | 4 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.round_degree` | `p3_multi_stark::zerocheck::AirZerocheck::verify_reduction_with_lookup_and_bus` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.check_claimed_sum` | `p3_multi_stark::zerocheck::AirZerocheck::verify_reduction_with_lookup_and_bus` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.MultiStarkInstanceShape` | `p3_multi_stark::transcript::MultiStarkInstanceShape` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.MultiStarkShape` | `p3_multi_stark::transcript::MultiStarkShape` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.MultiStarkShape.has_preprocessed` | `p3_multi_stark::transcript::MultiStarkShape::has_preprocessed` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.Step` | `p3_multi_stark::transcript::MultiStarkShape::pattern` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.Delegation` | `p3_multi_stark::transcript::MultiStarkShape::pattern` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.delegation` | `p3_multi_stark::transcript::delegation` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.MultiStarkShape.pattern` | `p3_multi_stark::transcript::MultiStarkShape::pattern` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.columnWords` | `p3_multi_stark::transcript::MultiStarkShape::domain_separator` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.instanceWords` | `p3_multi_stark::transcript::MultiStarkShape::domain_separator` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.MultiStarkShape.label` | `p3_multi_stark::transcript::MultiStarkShape::domain_separator` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.AirDegrees` | `p3_multi_stark::rounds::AirDegrees` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.ZerocheckStep` | `p3_multi_stark::zerocheck::transcript::ZerocheckShape::pattern` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.ZerocheckShape` | `p3_multi_stark::zerocheck::transcript::ZerocheckShape` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.ZerocheckShape.free_coordinates` | `p3_multi_stark::zerocheck::transcript::ZerocheckShape::free_coordinates` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.ZerocheckShape.pattern` | `p3_multi_stark::zerocheck::transcript::ZerocheckShape::pattern` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.ZerocheckShape.label` | `p3_multi_stark::zerocheck::transcript::ZerocheckShape::domain_separator` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.security.mirror.AirParams` | `p3_security::multilinear::MultilinearAirParams` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.security.mirror.air_terms` | `p3_security::multilinear::reduction_terms` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.security.mirror.num_variables` | `p3_multi_stark::security::assess_statement` | not translated | 0 |
+| `multi-stark` | `p3_multi_stark.security.mirror.charged_degree` | `p3_multi_stark::security::assess_statement` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.M` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.AirView` | `p3_multi_stark::folder::VerifierAir` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.BusTerm` | `p3_multi_stark::bus::BusContext::terminal_composition` | not translated | 4 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.Entry` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.security.mirror.Term` | `p3_security::SecurityTerm` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.security.mirror.Denominator` | `p3_security::multilinear::reduction_terms` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.SplitFraction` | `p3_multi_stark::fractional_gkr::SplitFraction` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.SplitFraction.gate` | `p3_multi_stark::fractional_gkr::SplitFraction::gate` | not translated | 6 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.FractionGkrError` | `p3_multi_stark::fractional_gkr::FractionGkrError` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.ROUND_POLY_LEN` | `p3_multi_stark::fractional_gkr::transcript::ROUND_POLY_LEN` | not translated | 0 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.FractionGkrLayerProof` | `p3_multi_stark::fractional_gkr::FractionGkrLayerProof` | not translated | 4 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.FractionGkrProof` | `p3_multi_stark::fractional_gkr::FractionGkrProof` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.FractionGkrOutput` | `p3_multi_stark::fractional_gkr::FractionGkrOutput` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.VerifierTranscript` | `p3_multi_stark::fractional_gkr::transcript::FractionGkrVerifierTranscript` | not translated | 3 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.VerifyState` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | not translated | 3 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.firstBadRound` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | not translated | 3 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.roundStep` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | not translated | 3 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.verify_layer` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | not translated | 3 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.verify_fractional_gkr` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.LookupInstancePlan` | `p3_multi_stark::lookup::LookupInstancePlan` | not translated | 3 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.log2_ceil_usize` | `p3_util::log2_ceil_usize` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.place` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.bus_capacity_ok` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.tupleWeights` | `p3_multi_stark::lookup::AirLinkClaim::new` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.blockWeights` | `p3_multi_stark::lookup::AirLinkClaim::new` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.claimed_sum` | `p3_multi_stark::lookup::AirLinkClaim::new` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.theta_bus_offset` | `p3_multi_stark::lookup::AirLinkClaim::new` | not translated | 0 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.bus_prefixes` | `p3_lookup::Challenges::new` | not translated | 0 |
+| `multi-stark` | `p3_multi_stark.logup_star.mirror.embed` | `p3_multi_stark::logup_star::position::embed` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.logup_star.mirror.fits` | `p3_multi_stark::logup_star::position::fits` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.logup_star.mirror.eval` | `p3_multi_stark::logup_star::position::eval` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.logup_star.mirror.claimed_sum` | `p3_multi_stark::logup_star::product::claimed_sum` | not translated | 0 |
+| `multi-stark` | `p3_multi_stark.bus.mirror.TerminalShare` | `p3_bus::BusTerminalShare` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.bus.mirror.BusBindingError` | `p3_multi_stark::bus::BusBindingError` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.bus.mirror.shareTerm` | `p3_multi_stark::bus::BusContext::terminal_composition` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.bus.mirror.terminal_composition` | `p3_multi_stark::bus::BusContext::terminal_composition` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.security.mirror.LookupParams` | `p3_security::multilinear::MultilinearLookupParams` | not translated | 0 |
+| `multi-stark` | `p3_multi_stark.security.mirror.lookup_terms` | `p3_security::multilinear::reduction_terms` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.split_at` | `p3_multilinear_util::point::Point::split_at` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.reversed` | `p3_multilinear_util::point::Point::reversed` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.split_by_coordinate` | `p3_multilinear_util::point::split_by_coordinate` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.fill_equality_table_serial` | `p3_multilinear_util::point::Point::fill_equality_table_serial` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.fill_equality_table_in_chunks` | `p3_multilinear_util::point::Point::fill_equality_table_in_chunks` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.fill_equality_table` | `p3_multilinear_util::point::Point::fill_equality_table` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_table` | `p3_multilinear_util::point::Point::equality_table` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_weights_msb` | `p3_multilinear_util::point::Point::equality_weights_msb` | not translated | 2 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_weights_lsb` | `p3_multilinear_util::point::Point::equality_weights_lsb` | not translated | 2 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_at_vertex` | `p3_multilinear_util::point::Point::equality_at_vertex` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.hypercube` | `p3_multilinear_util::point::Point::hypercube` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.expand_from_univariate` | `p3_multilinear_util::point::Point::expand_from_univariate` | not translated | 9 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_eq` | `p3_multilinear_util::point::Point::eval_eq` | not translated | 22 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_select` | `p3_multilinear_util::point::Point::eval_select` | not translated | 7 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_next` | `p3_multilinear_util::point::Point::eval_next` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.transpose` | `p3_multilinear_util::point::Point::transpose` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.fill_buffer_batch` | `p3_multilinear_util::eq_batch::fill_buffer_batch` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_1_batch` | `p3_multilinear_util::eq_batch::eval_eq_1_batch` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_2_batch` | `p3_multilinear_util::eq_batch::eval_eq_2_batch` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_3_batch` | `p3_multilinear_util::eq_batch::eval_eq_3_batch` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.add_or_set` | `p3_multilinear_util::eq_batch::add_or_set` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch_basic` | `p3_multilinear_util::eq_batch::eval_eq_batch_basic` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.packed_eq_poly_batch` | `p3_multilinear_util::eq_batch::packed_eq_poly_batch` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.extEvaluator` | `{impl p3_multilinear_util::eq_batch::EqualityEvaluator for p3_multilinear_util::eq_batch::ExtFieldEvaluator<F, EF>}` | not translated | 19 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.baseEvaluator` | `{impl p3_multilinear_util::eq_batch::EqualityEvaluator for p3_multilinear_util::eq_batch::BaseFieldEvaluator<F, EF>}` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_packed_batch` | `p3_multilinear_util::eq_batch::eval_eq_packed_batch` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch_common` | `p3_multilinear_util::eq_batch::eval_eq_batch_common` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch` | `p3_multilinear_util::eq_batch::eval_eq_batch` | not translated | 19 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_base_batch` | `p3_multilinear_util::eq_batch::eval_eq_base_batch` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new` | `p3_multilinear_util::poly::Poly::new` | not translated | 9 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.as_constant` | `p3_multilinear_util::poly::Poly::as_constant` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.zero` | `p3_multilinear_util::poly::Poly::zero` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.truncate_to_half` | `p3_multilinear_util::poly::Poly::truncate_to_half` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.pad_zeros` | `p3_multilinear_util::poly::Poly::pad_zeros` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_from_point` | `p3_multilinear_util::poly::Poly::new_from_point` | not translated | 17 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_next_from_point` | `p3_multilinear_util::poly::Poly::new_next_from_point` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_mut` | `p3_multilinear_util::poly::Poly::fix_prefix_var_mut` | not translated | 6 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.sum_prefix_var_mut` | `p3_multilinear_util::poly::Poly::sum_prefix_var_mut` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_mut_monomial` | `p3_multilinear_util::poly::Poly::fix_prefix_var_mut_monomial` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut_whole` | `p3_multilinear_util::poly::Poly::fix_suffix_var_mut_whole` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut_split` | `p3_multilinear_util::poly::Poly::fix_suffix_var_mut_split` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut` | `p3_multilinear_util::poly::Poly::fix_suffix_var_mut` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var` | `p3_multilinear_util::poly::Poly::fix_prefix_var` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_at` | `p3_multilinear_util::poly::Poly::fix_prefix_var_at` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var` | `p3_multilinear_util::poly::Poly::fix_suffix_var` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_to_packed` | `p3_multilinear_util::poly::Poly::fix_prefix_var_to_packed` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.pack` | `p3_multilinear_util::poly::Poly::pack` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.unpack` | `p3_multilinear_util::poly::Poly::unpack` | not translated | 2 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.eval_multilinear_recursive` | `p3_multilinear_util::poly::eval_multilinear_recursive` | not translated | 12 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.eq_serial` | `p3_multilinear_util::poly::Poly::new_packed_from_point::eq_serial` | not translated | 16 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_packed_from_point` | `p3_multilinear_util::poly::Poly::new_packed_from_point` | not translated | 16 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.new_unpacked` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::new_unpacked` | not translated | 14 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.new_packed` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::new_packed` | not translated | 14 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.num_scalar_evals` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::num_scalar_evals` | not translated | 14 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.num_variables` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::num_variables` | not translated | 14 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_base` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_base` | not translated | 5 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_ext` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_ext` | not translated | 6 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_ext_packed` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_ext_packed` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.accumulate_scalar_into` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::accumulate_scalar_into` | not translated | 2 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.compress_prefix_into` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::compress_prefix_into` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.packed_basis_dot` | `p3_multilinear_util::split_eq::packed_kernel::packed_basis_dot` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.compress_hi_dot_packed` | `p3_multilinear_util::split_eq::packed_kernel::compress_hi_dot_packed` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.compress_suffix_dot` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::compress_suffix_dot` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_base_shifted` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_base_shifted` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.last_scalar` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::last_scalar` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.new_unpacked` | `p3_multilinear_util::split_eq::SplitEq::new_unpacked` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.new_packed` | `p3_multilinear_util::split_eq::SplitEq::new_packed` | not translated | 14 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.num_variables` | `p3_multilinear_util::split_eq::SplitEq::num_variables` | not translated | 14 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.eval_base` | `p3_multilinear_util::split_eq::SplitEq::eval_base` | not translated | 5 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.eval_ext` | `p3_multilinear_util::split_eq::SplitEq::eval_ext` | not translated | 6 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.accumulate_into` | `p3_multilinear_util::split_eq::SplitEq::accumulate_into` | not translated | 2 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.materialize` | `p3_multilinear_util::split_eq::SplitEq::materialize` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.compress_suffix_into` | `p3_multilinear_util::split_eq::SplitEq::compress_suffix_into` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.Poly.eval_base` | `p3_multilinear_util::poly::Poly::eval_base` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.Poly.eval_ext` | `p3_multilinear_util::poly::Poly::eval_ext` | not translated | 6 |
 | `poseidon1` | `p3_poseidon1.external.FullRoundLayerConstructor` | `p3_poseidon1::external::FullRoundLayerConstructor` | stub | 0 |
 | `poseidon1` | `p3_poseidon1.internal.PartialRoundLayerConstructor` | `p3_poseidon1::internal::PartialRoundLayerConstructor` | stub | 0 |
 | `poseidon1` | `p3_poseidon1.Poseidon1Constants` | `p3_poseidon1::Poseidon1Constants` | stub | 0 |
@@ -1940,6 +1953,7 @@ counts the claims (of 1780) whose dependencies include the declaration.
 | `baby-bear/pre/020-field-cfg-raw-data-serializable-supertrait` | none in a normal build (see below). In the extracted variant, `Field` no longer implies `RawDataSerializable`. |
 | `baby-bear/pre/030-field-cfg-rpitit-packed-methods` | none in a normal build: every change is behind cfg(hax_backend_lean). In the extracted variant, four default methods are absent and `to_ext_iter` sits on an extension trait. |
 | `baby-bear/pre/040-field-cfg-rpitit-bit-plane-expansion` | none in a normal build: the change is behind cfg(hax_backend_lean). In the extracted variant, `Field::prepare_bit_plane_expansion` is absent. |
+| `baby-bear/pre/050-field-cfg-packed-ext-powers` | none in a normal build: every change is behind cfg(hax_backend_lean). In the extracted variant, `PackedFieldExtension::packed_ext_powers` and its 8 impls are absent. |
 | `binary-field/pre/010-cfg-raw-data-serializable-bounds` | none: each added bound is implied by `TowerLevel: Field` in a normal build. |
 | `binary-field/pre/020-cfg-hide-ghash-bit-plane-expansion` | none in a normal build: the change is behind cfg(hax_backend_lean). In the extracted variant, `Ghash128::prepare_bit_plane_expansion` is absent. |
 | `binary-field/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of a field type. No existing body changes. |
@@ -1947,9 +1961,11 @@ counts the claims (of 1780) whose dependencies include the declaration.
 | `binary-field/pre/050-poly192-copied-limbs` | none in a normal build: the copy is compiled but unused there. In the extracted variant, `Mul`, `Mul<Poly64>` and `square` read the coordinates through `limbs_owned`, which copies each coordinate's bits, instead of borrowing them in place. |
 | `binary-field/pre/060-field-default-shims` | none in a normal build: the copies are compiled but unused there. In the extracted variant, inherent `inverse`, `is_zero` and `is_one` shadow the `Field` defaults at every call site on a concrete field type of this crate, and call copies of the default bodies. |
 | `binary-field/pre/070-field-api-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of a field type. No existing body changes. |
+| `binary-pcs/pre/010-raw-data-bounds` | none: each added bound is implied by `TowerLevel: Field` in a normal build. |
 | `blake2s/pre/010-reshape-hash-many` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the scalar `hash_many` calls the reshaped body, which a differential test equates with the original. |
 | `blake3/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds one free function, which calls `Blake3::hash_many`. No existing body changes. |
 | `blake3/pre/020-reshape-batch` | none in a normal build: the reshaped driver is compiled only under cfg(hax_backend_lean), as the crate's `batch` module, and under cfg(test), beside the shipped one. The extracted variant hashes on the one-lane backend, which is what the extraction target compiles. |
+| `bus/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. No existing body changes. |
 | `challenger/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of the crate. No existing body changes. |
 | `keccak/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of the crate. No existing body changes. |
 | `keccak/pre/020-reshape-batch-and-lane` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the batched hash and the one-lane permutation call the reshaped bodies, which a differential test equates with the originals. |
@@ -1961,7 +1977,12 @@ counts the claims (of 1780) whose dependencies include the declaration.
 | `merkle-tree/pre/020-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one reshaped body. No existing body changes. |
 | `mersenne-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of `Mersenne31`. No existing body changes. |
 | `monty-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method or constant of `MontyField31`. No existing body changes. |
+| `multi-stark/pre/010-import-packed-extension-iter` | none: the added items are behind cfg(hax_backend_lean), so a normal build is token for token as shipped. |
+| `multi-stark/pre/020-raw-data-bounds` | none: each added bound is implied by `Field` in a normal build. |
+| `multi-stark/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. No existing body changes. |
+| `multi-stark/post/010-exposed-saturating-sub` | `core.num.Usize.saturating_sub_exposed` in HaxExt.lean, a model of `usize::saturating_sub`, trusted as the rest of HaxExt is. |
 | `multilinear-util/pre/010-import-packed-extension-iter` | none: every added line is behind cfg(hax_backend_lean), so a normal build is token for token as shipped. |
+| `multilinear-util/pre/020-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. No existing body changes. |
 | `security/pre/010-budget-folding-round` | None in a normal build, where the new function is compiled but unused. In the extracted variant, the report computes its folding term with it. Its body is the original match, verbatim. |
 | `security/pre/020-budget-binding-index` | None in a normal build, where the two new functions are compiled but unused. In the extracted variant, the binding term is read at the first minimum. That minimum is taken over the seven bit counts. |
 | `sha256/pre/010-reshape-compress` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `Sha256Compress::compress` calls the reshaped body, which a differential test equates with the original. |
@@ -2177,8 +2198,11 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Blake3Air.ringChar_fields` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake3Air.sound` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.blocks_aligned` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.builder.BusBoundary.contains_row.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.builder.BusBoundary.contains_row.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.bus_soundness` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.clock_orbit_fields` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.direction.BusDirection.index.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.factor_is_leaf` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.flattening_faithful` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.forged_cycle` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -2190,6 +2214,10 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Bus.layout_injective` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.multiset_identity` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.planner_layout` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.ram.statement.RamStatement.access_payload_width.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.ram.statement.RamStatement.access_payload_width.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.ram.statement.RamStatement.image_payload_width.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.ram.statement.RamStatement.image_payload_width.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.ram_consistent` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.ram_consistent_machine` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.schedule` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -2627,12 +2655,18 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `MultiStark.lookup_placed` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.lookup_weights` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.next_row_opening` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.opening.OpeningClaims.next_row.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.padded_denominator` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.position_closed_form` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.position_fits` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.prover_selectors` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.pushforward_identity` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.round_degree_charged` | `Quot.sound`, `propext` |
+| `MultiStark.selectors.BoundaryEvals.apply.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.selectors.BoundaryEvals.at.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.selectors.BoundaryEvals.from_row.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.selectors.BoundaryEvals.from_row.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.selectors.BoundaryEvals.from_row_with_prefix.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.selectors_are_extensions` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.selectors_on_rows` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.statement_before_challenges` | `Quot.sound`, `propext` |
@@ -2640,6 +2674,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `MultiStark.suffix_point` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.transition_gated` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.ungated_next_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.zerocheck.transcript.ZerocheckShape.free_coordinates.eq_spec` | `Quot.sound`, `propext` |
 | `MultiStark.zerocheck_by_instance` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.zerocheck_complete` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.zerocheck_priced` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -2692,6 +2727,9 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `MultilinearUtil.new_packed_from_point.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultilinearUtil.nextTable_eval_next` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultilinearUtil.pack_unpack` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.point.eval_eq.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.point.eval_eq.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.point.eval_eq.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultilinearUtil.split_eval_base` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultilinearUtil.split_eval_base.constant` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultilinearUtil.sum_prefix_var_mut` | `Classical.choice`, `Quot.sound`, `propext` |
