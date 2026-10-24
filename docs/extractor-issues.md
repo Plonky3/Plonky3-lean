@@ -327,10 +327,18 @@ keeps its number and says so.
 
     A pre-patch would have to rewrite the transcript, so the loop stays transcribed.
 
-    Two dependents still fail in that variant:
+    Two dependents failed in that variant, and now compile:
 
-    - rustc panics on p3-binary-pcs, in a serde derive over the bit ring switch's claims proof ("escaping bound vars");
-    - p3-multi-stark needs the same import and bound as p3-sumcheck, at 11 sites.
+    - p3-multi-stark needed the same import as p3-sumcheck, and the same bound at 15 sites (pre-patches `multi-stark/010` and `020`);
+    - rustc panicked on p3-binary-pcs ("escaping bound vars") while reporting the same unmet bound on a serde derive, at 13 sites (pre-patch `binary-pcs/010`).
+
+    p3-binary-pcs still extracts nothing that can be proved:
+
+    - its configuration constructor reads the query count, which p3-security computes in floating point (19);
+    - the fold of a pair calls p3-binary-dft's domain, which is a stub;
+    - the change of folding factor extracts, but p3-security's security ceiling uses saturating operations without an exposed body (22).
+
+    p3-bus's name check, RAM validation and RAM layout do not extract either; pre-patch `bus/010` says why for each.
 
 240. **aeneas has no function types.**
 
