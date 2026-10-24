@@ -149,8 +149,10 @@ partial def claimClosure (env : Environment) (start : Name) : NameSet := Id.run 
 #eval show CommandElabM Unit from do
   let env ← getEnv
   let libs : List String := LIBS
-  let claims : List Name := CLAIMS
-  let mirrors : List Name := MIRRORS
+  -- Names travel as one string, since a list literal of every claim overflows the code generator.
+  let names (s : String) : List Name := (s.splitOn " ").filter (· ≠ "") |>.map String.toName
+  let claims : List Name := names CLAIMS
+  let mirrors : List Name := names MIRRORS
   let inLib (n : Name) : Bool := match env.getModuleIdxFor? n with
     | some i => libs.any fun l => (env.header.moduleNames[i.toNat]!).toString.startsWith l
     | none => false
@@ -172,7 +174,7 @@ partial def claimClosure (env : Environment) (start : Name) : NameSet := Id.run 
 
 
 def lean_facts(libs, claims, mirrors):
-    q = lambda xs: "[" + ", ".join(f"`{x}" for x in xs) + "]"
+    q = lambda xs: json.dumps(" ".join(str(x) for x in xs))
     src = (LEAN_QUERY.replace("LIBS", "[" + ", ".join(json.dumps(x) for x in libs) + "]")
            .replace("CLAIMS", q(claims)).replace("MIRRORS", q(mirrors)))
     with tempfile.NamedTemporaryFile("w", suffix=".lean", delete=False) as f:
