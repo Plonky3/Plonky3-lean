@@ -220,7 +220,7 @@ apply_set() {
         grep '^+++ ' "$pf" | sed 's/^+++ b\///; s/^+++ //; s/\t.*$//'
     done < "$list" | sort -u | while read -r f; do
         mkdir -p "$scratch/$(dirname "$f")"
-        [ -f "$root/$f" ] && cp "$root/$f" "$scratch/$f"
+        if [ -f "$root/$f" ]; then cp "$root/$f" "$scratch/$f"; fi
     done
     while read -r pf; do
         if ! patch $PATCH_FLAGS -d "$scratch" < "$pf" >/dev/null 2>&1; then
