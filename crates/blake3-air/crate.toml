@@ -1,0 +1,497 @@
+# p3-blake3-air: the BLAKE3 compression function as an AIR, over a prime field of characteristic above 3 * 2^16 and over a field of characteristic 2.
+
+lean_lib = "P3Blake3Air"
+
+# The integer code is extracted: the constants, the message permutation, the half quarter-round of the generator, and the characteristic-2 G step on words.
+#
+# The AIR evaluations and the trace generators are generic over the builder and the field traits, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# They are transcribed in extraction/P3Blake3Air/Assumptions/Mirror/.
+state = "scoped"
+
+features = []
+
+start_from = [
+  "p3_blake3_air::constants::IV",
+  "p3_blake3_air::constants::MSG_PERMUTATION",
+  "p3_blake3_air::generation::verifiable_half_round",
+  "p3_blake3_air::binary::G_SCHEDULE",
+  "p3_blake3_air::binary::iv_word",
+  "p3_blake3_air::binary::generation::g_words",
+  "p3_blake3_air::binary::generation::input_words",
+]
+
+watch = ["blake3-air/src", "blake3-air/Cargo.toml"]
+
+# The transcriptions in extraction/P3Blake3Air/Assumptions/Mirror/.
+# Hashes are pending tools/mirror.
+#
+# Plonky3Lean/Proofs/Blake3Air/Extracted.lean proves the transcribed constants, half quarter round and carry word equal to the extracted ones.
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.BITS_PER_LIMB"
+rust = "p3_blake3_air::constants::BITS_PER_LIMB"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.U32_LIMBS"
+rust = "p3_blake3_air::constants::U32_LIMBS"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.IV"
+rust = "p3_blake3_air::constants::IV"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.ivHalf"
+rust = "p3_blake3_air::constants::IV"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.MSG_PERMUTATION"
+rust = "p3_blake3_air::constants::MSG_PERMUTATION"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.permute"
+rust = "p3_blake3_air::constants::permute"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.col.inputs"
+rust = "p3_blake3_air::columns::Blake3Cols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.col.chaining_values"
+rust = "p3_blake3_air::columns::Blake3Cols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.col.counter_low"
+rust = "p3_blake3_air::columns::Blake3Cols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.col.counter_hi"
+rust = "p3_blake3_air::columns::Blake3Cols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.col.block_len"
+rust = "p3_blake3_air::columns::Blake3Cols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.col.flags"
+rust = "p3_blake3_air::columns::Blake3Cols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.col.initial_row0"
+rust = "p3_blake3_air::columns::Blake3Cols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.col.initial_row2"
+rust = "p3_blake3_air::columns::Blake3Cols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.col.state"
+rust = "p3_blake3_air::columns::Blake3Cols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.col.final_round_helpers"
+rust = "p3_blake3_air::columns::Blake3Cols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.col.outputs"
+rust = "p3_blake3_air::columns::Blake3Cols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.NUM_BLAKE3_COLS"
+rust = "p3_blake3_air::columns::NUM_BLAKE3_COLS"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.Blake3State"
+rust = "p3_blake3_air::columns::Blake3State"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.stateAt"
+rust = "p3_blake3_air::columns::Blake3State"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.FullRound"
+rust = "p3_blake3_air::columns::FullRound"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.fullRoundAt"
+rust = "p3_blake3_air::columns::FullRound"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.QuarterRound"
+rust = "p3_blake3_air::columns::QuarterRound"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.pack_bits_le"
+rust = "p3_air::utils::pack_bits_le"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.low16"
+rust = "p3_air::utils::pack_bits_le"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.high16"
+rust = "p3_air::utils::pack_bits_le"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.mul_2exp"
+rust = "p3_field::PrimeCharacteristicRing::mul_2exp_u64"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.add3"
+rust = "p3_air::utils::add3"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.add2"
+rust = "p3_air::utils::add2"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.xor_32_shift"
+rust = "p3_air::utils::xor_32_shift"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.quarter_round_function"
+rust = "p3_blake3_air::air::Blake3Air::quarter_round_function"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.full_round_to_column_quarter_round"
+rust = "p3_blake3_air::air::Blake3Air::full_round_to_column_quarter_round"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.full_round_to_diagonal_quarter_round"
+rust = "p3_blake3_air::air::Blake3Air::full_round_to_diagonal_quarter_round"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.verify_round"
+rust = "p3_blake3_air::air::Blake3Air::verify_round"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.initial_row_3"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.assert_inputs"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.assert_initial_row0"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.assert_initial_row2"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.m_values"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.initial_state"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.round_input"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.verify_rounds"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.final"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.assert_helpers"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.assert_outputs_bool"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.assert_output_row0"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.assert_output_xor"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.eval"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.Blake3Cols"
+rust = "p3_blake3_air::columns::Blake3Cols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.Blake3Cols.zeroState"
+rust = "p3_blake3_air::columns::Blake3Cols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.Blake3Cols.zero"
+rust = "p3_blake3_air::columns::Blake3Cols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.Blake3Cols.words"
+rust = "p3_blake3_air::columns::Blake3Cols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.Blake3Cols.stateCells"
+rust = "p3_blake3_air::columns::Blake3State"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.Blake3Cols.roundCells"
+rust = "p3_blake3_air::columns::FullRound"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.Blake3Cols.cells"
+rust = "p3_blake3_air::columns::Blake3Cols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.u32_to_bits_le"
+rust = "p3_air::utils::u32_to_bits_le"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.lowLimb"
+rust = "p3_blake3_air::generation::save_state_to_trace"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.highLimb"
+rust = "p3_blake3_air::generation::save_state_to_trace"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.ivWord"
+rust = "p3_blake3_air::generation::generate_trace_rows_for_perm"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.verifiable_half_round"
+rust = "p3_blake3_air::generation::verifiable_half_round"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.save_state_to_trace"
+rust = "p3_blake3_air::generation::save_state_to_trace"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.setWords"
+rust = "p3_blake3_air::generation::generate_trace_row_for_round"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.halfRounds"
+rust = "p3_blake3_air::generation::generate_trace_row_for_round"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.generate_trace_row_for_round"
+rust = "p3_blake3_air::generation::generate_trace_row_for_round"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.generate_trace_rows_for_perm"
+rust = "p3_blake3_air::generation::generate_trace_rows_for_perm"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.generate_trace_rows"
+rust = "p3_blake3_air::generation::generate_trace_rows"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.NUM_ROUNDS"
+rust = "p3_blake3_air::binary::NUM_ROUNDS"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.G_PER_ROUND"
+rust = "p3_blake3_air::binary::G_PER_ROUND"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.G_SCHEDULE"
+rust = "p3_blake3_air::binary::G_SCHEDULE"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.slot"
+rust = "p3_blake3_air::binary::G_SCHEDULE"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.col.chaining_value"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.col.block"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.col.counter_low"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.col.counter_high"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.col.block_len"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.col.flags"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.col.g"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.col.add1_carries"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.col.d1"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.col.b1"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.col.add2_carries"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.col.d2"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.col.b2"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.NUM_BLAKE3_BINARY_COLS"
+rust = "p3_blake3_air::binary::columns::NUM_BLAKE3_BINARY_COLS"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.NUM_INPUT_WORDS"
+rust = "p3_blake3_air::binary::generation::NUM_INPUT_WORDS"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.NUM_INPUT_BITS"
+rust = "p3_blake3_air::binary::air::NUM_INPUT_BITS"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.CONSTRAINTS_PER_G"
+rust = "p3_blake3_air::binary::air::CONSTRAINTS_PER_G"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.NUM_G_CONSTRAINTS"
+rust = "p3_blake3_air::binary::air::NUM_G_CONSTRAINTS"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.num_constraints"
+rust = "{impl p3_air::air::BaseAir<F> for p3_blake3_air::binary::air::Blake3BinaryAir}::num_constraints"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.iv_word"
+rust = "p3_blake3_air::binary::iv_word"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.xor_rotl"
+rust = "p3_blake3_air::binary::air::xor_rotl"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.maj"
+rust = "p3_blake3_air::binary::air::maj"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.add2"
+rust = "p3_blake3_air::binary::air::add2"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.add3"
+rust = "p3_blake3_air::binary::air::add3"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.State"
+rust = "p3_blake3_air::binary::air::State"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.eval_g"
+rust = "p3_blake3_air::binary::air::eval_g"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.initial_d"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::binary::air::Blake3BinaryAir}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.assert_inputs"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::binary::air::Blake3BinaryAir}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.initial_state"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::binary::air::Blake3BinaryAir}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.g_step"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::binary::air::Blake3BinaryAir}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.rounds"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::binary::air::Blake3BinaryAir}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.eval"
+rust = "{impl p3_air::air::Air<AB> for p3_blake3_air::binary::air::Blake3BinaryAir}::eval"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.WState"
+rust = "p3_blake3_air::binary::generation::g_words"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.GWords"
+rust = "p3_blake3_air::binary::generation::GWords"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.carries_word"
+rust = "p3_blake3_air::binary::generation::carries_word"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.g_words"
+rust = "p3_blake3_air::binary::generation::g_words"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.Blake3CompressionInput"
+rust = "p3_blake3_air::binary::generation::Blake3CompressionInput"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.Blake3BinaryGCols"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryGCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.Blake3BinaryCols"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.Blake3BinaryGCols.cells"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryGCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.Blake3BinaryCols.cells"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryCols"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.word_to_bits_le"
+rust = "p3_blake3_air::binary::generation::word_to_bits_le"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.generate_g"
+rust = "p3_blake3_air::binary::generation::generate_g"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.generate_trace_row"
+rust = "p3_blake3_air::binary::generation::generate_trace_row"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.generate_binary_trace_rows"
+rust = "p3_blake3_air::binary::generation::generate_binary_trace_rows"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.read_word"
+rust = "p3_blake3_air::binary::generation::read_word"
+
+[[mirror]]
+lean = "p3_blake3_air.mirror.binary.compression_output"
+rust = "p3_blake3_air::binary::columns::Blake3BinaryCols::compression_output"

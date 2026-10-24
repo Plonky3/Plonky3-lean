@@ -208,6 +208,10 @@ name = "P3Sha256Air"
 srcDir = "crates/sha256-air/extraction"
 
 [[lean_lib]]
+name = "P3Blake3Air"
+srcDir = "crates/blake3-air/extraction"
+
+[[lean_lib]]
 name = "P3BatchStark"
 srcDir = "crates/batch-stark/extraction"
 
