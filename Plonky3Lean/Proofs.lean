@@ -45,6 +45,13 @@ public import Plonky3Lean.Proofs.Word.Relations
 public import Plonky3Lean.Proofs.Word.System
 public import Plonky3Lean.Proofs.Word.Models
 public import Plonky3Lean.Proofs.Word.Index
+public import Plonky3Lean.Proofs.WordBackend.Lift
+public import Plonky3Lean.Proofs.WordBackend.LiftSound
+public import Plonky3Lean.Proofs.WordBackend.ShiftLinear
+public import Plonky3Lean.Proofs.WordBackend.Transpose
+public import Plonky3Lean.Proofs.WordBackend.Columns
+public import Plonky3Lean.Proofs.WordBackend.Accept
+public import Plonky3Lean.Proofs.WordBackend.Code
 public import Plonky3Lean.Proofs.Word.Layout
 public import Plonky3Lean.Proofs.Word.Composition
 public import Plonky3Lean.Proofs.Word.Layout2

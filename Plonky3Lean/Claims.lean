@@ -27,6 +27,7 @@ public import Plonky3Lean.Claims.Sha256
 public import Plonky3Lean.Claims.Symmetric
 public import Plonky3Lean.Claims.Util
 public import Plonky3Lean.Claims.Word
+public import Plonky3Lean.Claims.WordBackend
 public import Plonky3Lean.Claims.ZkCodes
 public import Plonky3Lean.Proofs
 public import Plonky3Lean.Claims.MerkleTree
