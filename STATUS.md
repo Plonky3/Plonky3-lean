@@ -30,7 +30,7 @@ target `thumbv7em-none-eabi`
 | `circle` | stub |  | 1283 | 0 | 80 |  | 0 / 0 |  |
 | `commit` | stub |  | 836 | 0 | 59 |  | 0 / 0 |  |
 | `dft` | stub |  | 992 | 0 | 67 |  | 0 / 0 |  |
-| `field` | stub |  | 342 | 7 | 25 |  | 0 / 0 |  |
+| `field` | stub |  | 346 | 7 | 25 |  | 0 / 0 |  |
 | `fri` | stub |  | 1425 | 0 | 94 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
 | `keccak` | scoped | 1109 | 39 | 0 | 0 | 6 | 2 / 2 | pre `010`, pre `020` |
@@ -43,7 +43,7 @@ target `thumbv7em-none-eabi`
 | `mersenne-31` | scoped | 1444 | 259 | 0 | 12 | 30 | 1 / 1 | pre `010` |
 | `monty-31` | scoped | 1581 | 327 | 0 | 13 | 29 | 1 / 1 | pre `010` |
 | `multi-stark` | stub |  | 581 | 0 | 45 |  | 0 / 0 |  |
-| `multilinear-util` | stub |  | 1077 | 0 | 75 |  | 0 / 0 |  |
+| `multilinear-util` | stub |  | 1077 | 0 | 75 |  | 1 / 0 | pre `010` |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 68 | 2 | 4 |  | 0 / 0 |  |
 | `security` | scoped | 1414 | 130 | 6 | 13 | 0 | 2 / 1 | pre `010`, pre `020` |
@@ -51,7 +51,7 @@ target `thumbv7em-none-eabi`
 | `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
 | `sha256-air` | scoped | 150 | 925 | 0 | 76 | 0 | 0 / 0 |  |
 | `stir` | stub |  | 695 | 0 | 40 |  | 0 / 0 |  |
-| `sumcheck` | stub |  | 522 | 0 | 29 |  | 0 / 0 |  |
+| `sumcheck` | scoped | 299 | 558 | 0 | 29 | 0 | 3 / 0 | pre `010`, pre `020`, pre `030` |
 | `symmetric` | scoped | 1078 | 62 | 1 | 0 | 4 | 4 / 2 | pre `010`, pre `020`, pre `030`, pre `040` |
 | `tiny-keccak` | scoped | 98 | 101 | 0 | 3 | 0 | 0 / 0 |  |
 | `uni-stark` | scoped | 252 | 558 | 0 | 30 | 0 | 0 / 0 |  |
@@ -456,6 +456,11 @@ charon errors: 0.
 charon errors: 0.
 Nothing translated is dropped.
 
+### `sumcheck`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ### `symmetric`
 
 charon errors: 0.
@@ -493,7 +498,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1703) whose dependencies include it; reaching one is not using it.
+(of 1711) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -535,7 +540,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1703) whose dependencies include the declaration.
+counts the claims (of 1711) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -1218,10 +1223,10 @@ counts the claims (of 1703) whose dependencies include the declaration.
 | `dft` | `p3_dft.radix_2_small_batch.mirror.Radix2DFTSmallBatch.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_small_batch::Radix2DFTSmallBatch<F>}::dft_batch` | stub | 2 |
 | `dft` | `p3_dft.radix_2_small_batch.mirror.Radix2DFTSmallBatch.idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_small_batch::Radix2DFTSmallBatch<F>}::idft_batch` | stub | 1 |
 | `field` | `p3_field.dup.Dup` | `p3_field::dup::Dup` | stub | 0 |
-| `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 6 |
-| `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 0 |
+| `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 14 |
+| `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 8 |
 | `field` | `p3_field.field.PrimeField` | `p3_field::field::PrimeField` | stub | 0 |
-| `field` | `p3_field.field.Algebra` | `p3_field::field::Algebra` | stub | 0 |
+| `field` | `p3_field.field.Algebra` | `p3_field::field::Algebra` | stub | 8 |
 | `field` | `p3_field.integers.QuotientMap` | `p3_field::integers::QuotientMap` | stub | 0 |
 | `field` | `p3_field.field.PrimeField64` | `p3_field::field::PrimeField64` | stub | 0 |
 | `field` | `p3_field.field.PrimeField32` | `p3_field::field::PrimeField32` | stub | 0 |
@@ -1746,35 +1751,35 @@ counts the claims (of 1703) whose dependencies include the declaration.
 | `stir` | `p3_stir.verifier.mirror.set_gamma` | `p3_stir::verifier::RoundVerifier::set_gamma` | stub | 1 |
 | `stir` | `p3_stir.verifier.mirror.check_final_queries` | `p3_stir::verifier::FinalRoundVerifier::fetch_and_check` | stub | 0 |
 | `stir` | `p3_stir.pcs.plan.mirror.combine_coefficients` | `p3_stir::pcs::plan::combine_coefficients` | stub | 2 |
-| `sumcheck` | `p3_sumcheck.lagrange.mirror.lagrange_weights_01inf` | `p3_sumcheck::lagrange::lagrange_weights_01inf` | stub | 19 |
-| `sumcheck` | `p3_sumcheck.lagrange.mirror.lagrange_weights_01inf_multi` | `p3_sumcheck::lagrange::lagrange_weights_01inf_multi` | stub | 0 |
-| `sumcheck` | `p3_sumcheck.lagrange.mirror.extrapolate_01inf` | `p3_sumcheck::lagrange::extrapolate_01inf` | stub | 19 |
-| `sumcheck` | `p3_sumcheck.mirror.Basis.reduce_claim` | `p3_sumcheck::strategy::Basis::reduce_claim` | stub | 18 |
-| `sumcheck` | `p3_sumcheck.mirror.SumcheckShape.seed` | `p3_sumcheck::transcript::SumcheckShape::domain_separator` | stub | 12 |
-| `sumcheck` | `p3_sumcheck.mirror.VerifierTranscript.round` | `p3_sumcheck::transcript::VerifierTranscript::round` | stub | 12 |
-| `sumcheck` | `p3_sumcheck.mirror.verify_rounds` | `p3_sumcheck::data::SumcheckData::verify_rounds` | stub | 12 |
-| `sumcheck` | `p3_sumcheck.mirror.verify_final_sumcheck_rounds` | `p3_sumcheck::data::verify_final_sumcheck_rounds` | stub | 7 |
-| `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.new` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::new` | stub | 4 |
-| `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.eval` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::eval` | stub | 3 |
-| `sumcheck` | `p3_sumcheck.generic_degree.mirror.GenericDegreeShape.seed` | `p3_sumcheck::generic_degree::transcript::GenericDegreeShape::domain_separator` | stub | 1 |
-| `sumcheck` | `p3_sumcheck.generic_degree.mirror.VerifierTranscript.round` | `p3_sumcheck::generic_degree::transcript::VerifierTranscript::round` | stub | 1 |
-| `sumcheck` | `p3_sumcheck.generic_degree.mirror.verify` | `p3_sumcheck::generic_degree::proof::GenericDegreeProof::verify` | stub | 1 |
-| `sumcheck` | `p3_sumcheck.strategy.mirror.round_reduce` | `p3_sumcheck::strategy::round_reduce` | stub | 4 |
-| `sumcheck` | `p3_sumcheck.strategy.mirror.round_step` | `p3_sumcheck::strategy::round_step` | stub | 4 |
-| `sumcheck` | `p3_sumcheck.strategy.mirror.chunk_round_step` | `p3_sumcheck::strategy::chunk_round_step` | stub | 4 |
-| `sumcheck` | `p3_sumcheck.strategy.mirror.sumcheck_coefficients_prefix` | `p3_sumcheck::strategy::sumcheck_coefficients_prefix` | stub | 4 |
-| `sumcheck` | `p3_sumcheck.constraints.mirror.dot` | `p3_field::dot_product` | stub | 9 |
-| `sumcheck` | `p3_sumcheck.constraints.mirror.horner` | `p3_field::HornerIter::horner` | stub | 5 |
-| `sumcheck` | `p3_sumcheck.constraints.mirror.EqStatement.combine_evals` | `p3_sumcheck::constraints::statement::eq::EqStatement::combine_evals` | stub | 7 |
-| `sumcheck` | `p3_sumcheck.constraints.mirror.EqStatement.weights_at` | `p3_sumcheck::constraints::statement::eq::EqStatement::weights_at` | stub | 6 |
-| `sumcheck` | `p3_sumcheck.constraints.mirror.SelectStatement.combine_evals` | `p3_sumcheck::constraints::statement::select::SelectStatement::combine_evals` | stub | 7 |
-| `sumcheck` | `p3_sumcheck.constraints.mirror.SelectStatement.weights_at` | `p3_sumcheck::constraints::statement::select::SelectStatement::weights_at` | stub | 6 |
-| `sumcheck` | `p3_sumcheck.constraints.mirror.SelectStatement.verify` | `p3_sumcheck::constraints::statement::select::SelectStatement::verify` | stub | 5 |
-| `sumcheck` | `p3_sumcheck.constraints.mirror.Constraint.new` | `p3_sumcheck::constraints::Constraint::new` | stub | 5 |
-| `sumcheck` | `p3_sumcheck.constraints.mirror.Constraint.new_with_existing_claim` | `p3_sumcheck::constraints::Constraint::new_with_existing_claim` | stub | 5 |
-| `sumcheck` | `p3_sumcheck.constraints.mirror.Constraint.combine_evals` | `p3_sumcheck::constraints::Constraint::combine_evals` | stub | 7 |
-| `sumcheck` | `p3_sumcheck.constraints.mirror.subpoint` | `p3_multilinear_util::point::Point::get_subpoint_over_range` | stub | 6 |
-| `sumcheck` | `p3_sumcheck.constraints.mirror.VariableOrder.eval_constraints_poly` | `p3_sumcheck::strategy::VariableOrder::eval_constraints_poly` | stub | 6 |
+| `sumcheck` | `p3_sumcheck.lagrange.mirror.lagrange_weights_01inf` | `p3_sumcheck::lagrange::lagrange_weights_01inf` | not translated | 26 |
+| `sumcheck` | `p3_sumcheck.lagrange.mirror.lagrange_weights_01inf_multi` | `p3_sumcheck::lagrange::lagrange_weights_01inf_multi` | not translated | 2 |
+| `sumcheck` | `p3_sumcheck.lagrange.mirror.extrapolate_01inf` | `p3_sumcheck::lagrange::extrapolate_01inf` | not translated | 24 |
+| `sumcheck` | `p3_sumcheck.mirror.Basis.reduce_claim` | `p3_sumcheck::strategy::Basis::reduce_claim` | not translated | 22 |
+| `sumcheck` | `p3_sumcheck.mirror.SumcheckShape.seed` | `p3_sumcheck::transcript::SumcheckShape::domain_separator` | not translated | 12 |
+| `sumcheck` | `p3_sumcheck.mirror.VerifierTranscript.round` | `p3_sumcheck::transcript::VerifierTranscript::round` | not translated | 12 |
+| `sumcheck` | `p3_sumcheck.mirror.verify_rounds` | `p3_sumcheck::data::SumcheckData::verify_rounds` | not translated | 12 |
+| `sumcheck` | `p3_sumcheck.mirror.verify_final_sumcheck_rounds` | `p3_sumcheck::data::verify_final_sumcheck_rounds` | not translated | 7 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.new` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::new` | not translated | 4 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.eval` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::eval` | not translated | 3 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.GenericDegreeShape.seed` | `p3_sumcheck::generic_degree::transcript::GenericDegreeShape::domain_separator` | not translated | 1 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.VerifierTranscript.round` | `p3_sumcheck::generic_degree::transcript::VerifierTranscript::round` | not translated | 1 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.verify` | `p3_sumcheck::generic_degree::proof::GenericDegreeProof::verify` | not translated | 1 |
+| `sumcheck` | `p3_sumcheck.strategy.mirror.round_reduce` | `p3_sumcheck::strategy::round_reduce` | not translated | 4 |
+| `sumcheck` | `p3_sumcheck.strategy.mirror.round_step` | `p3_sumcheck::strategy::round_step` | not translated | 4 |
+| `sumcheck` | `p3_sumcheck.strategy.mirror.chunk_round_step` | `p3_sumcheck::strategy::chunk_round_step` | not translated | 4 |
+| `sumcheck` | `p3_sumcheck.strategy.mirror.sumcheck_coefficients_prefix` | `p3_sumcheck::strategy::sumcheck_coefficients_prefix` | not translated | 4 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.dot` | `p3_field::dot_product` | not translated | 9 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.horner` | `p3_field::HornerIter::horner` | not translated | 5 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.EqStatement.combine_evals` | `p3_sumcheck::constraints::statement::eq::EqStatement::combine_evals` | not translated | 7 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.EqStatement.weights_at` | `p3_sumcheck::constraints::statement::eq::EqStatement::weights_at` | not translated | 6 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.SelectStatement.combine_evals` | `p3_sumcheck::constraints::statement::select::SelectStatement::combine_evals` | not translated | 7 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.SelectStatement.weights_at` | `p3_sumcheck::constraints::statement::select::SelectStatement::weights_at` | not translated | 6 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.SelectStatement.verify` | `p3_sumcheck::constraints::statement::select::SelectStatement::verify` | not translated | 5 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.Constraint.new` | `p3_sumcheck::constraints::Constraint::new` | not translated | 5 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.Constraint.new_with_existing_claim` | `p3_sumcheck::constraints::Constraint::new_with_existing_claim` | not translated | 5 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.Constraint.combine_evals` | `p3_sumcheck::constraints::Constraint::combine_evals` | not translated | 7 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.subpoint` | `p3_multilinear_util::point::Point::get_subpoint_over_range` | not translated | 6 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.VariableOrder.eval_constraints_poly` | `p3_sumcheck::strategy::VariableOrder::eval_constraints_poly` | not translated | 6 |
 | `tiny-keccak` | `tiny_keccak.keccakf.keccakf` | `tiny_keccak::keccakf::keccakf` | not translated | 14 |
 | `tiny-keccak` | `tiny_keccak.keccakf.rounds` | `tiny_keccak::keccakf::keccakf` | not translated | 14 |
 | `tiny-keccak` | `tiny_keccak.keccakf.round` | `tiny_keccak::keccakf::keccakf` | not translated | 14 |
@@ -1904,9 +1909,13 @@ counts the claims (of 1703) whose dependencies include the declaration.
 | `merkle-tree/pre/020-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one reshaped body. No existing body changes. |
 | `mersenne-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of `Mersenne31`. No existing body changes. |
 | `monty-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method or constant of `MontyField31`. No existing body changes. |
+| `multilinear-util/pre/010-import-packed-extension-iter` | none: every added line is behind cfg(hax_backend_lean), so a normal build is token for token as shipped. |
 | `security/pre/010-budget-folding-round` | None in a normal build, where the new function is compiled but unused. In the extracted variant, the report computes its folding term with it. Its body is the original match, verbatim. |
 | `security/pre/020-budget-binding-index` | None in a normal build, where the two new functions are compiled but unused. In the extracted variant, the binding term is read at the first minimum. That minimum is taken over the seven bit counts. |
 | `sha256/pre/010-reshape-compress` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `Sha256Compress::compress` calls the reshaped body, which a differential test equates with the original. |
+| `sumcheck/pre/010-import-packed-extension-iter` | none: the added lines are behind cfg(hax_backend_lean), so a normal build is token for token as shipped. |
+| `sumcheck/pre/020-ring-switch-raw-data-bounds` | none: each added bound is implied by `TowerLevel: Field` in a normal build. |
+| `sumcheck/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. No existing body changes. |
 | `symmetric/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of the crate. No existing body changes. |
 | `symmetric/pre/020-reshape-padding-free-sponge` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `PaddingFreeSponge::hash_iter` calls the reshaped body, which a differential test equates with the original. |
 | `symmetric/pre/030-reshape-pad10-sponge` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `Pad10Sponge::hash_iter` calls the reshaped body, which a differential test equates with the original. |
@@ -3498,11 +3507,19 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Sumcheck.RoundPolyInterpolator.eval.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sumcheck.RoundPolyInterpolator.new.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sumcheck.extrapolate_01inf.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.lagrange.extrapolate_01inf.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.lagrange.lagrange_weights_01inf.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.lagrange.lagrange_weights_01inf_multi.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.lagrange.lagrange_weights_01inf_multi.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sumcheck.protocol.completeness` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sumcheck.protocol.soundness` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sumcheck.reduce_claim.evaluation` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sumcheck.reduce_claim.projective` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sumcheck.reduce_claim.sum_check` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.strategy.Basis.reduce_claim.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.strategy.Basis.reduce_claim.evaluation` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.strategy.Basis.reduce_claim.projective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.strategy.Basis.reduce_claim.sum_check` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sumcheck.sumcheck_coefficients_prefix.honest` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sumcheck.sumcheck_coefficients_prefix.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sumcheck.verify.completeness` | `Classical.choice`, `Quot.sound`, `propext` |
