@@ -39,8 +39,8 @@ def rowBuilder (air : Air F) (main : Mat F) (preprocessed : Option (Mat F)) (per
     permutation_values := fun _ => values }
 
 /-- `eval_air_and_lookups` on one row: the AIR's constraints, then the lookups' constraints. -/
-def eval_air_and_lookups (air : Air F) (B : PermBuilder F F K DebugState) (s : DebugState)
-    (lookups : List (Lookup F)) : Option DebugState :=
+def eval_air_and_lookups {E EE S : Type} (air : Air F) (B : PermBuilder F E EE S) (s : S)
+    (lookups : List (Lookup F)) : Option S :=
   let s := air.eval B.toAirBuilder s
   if lookups.isEmpty then
     if (B.permutation_values s).length ≠ 0 then none else some s

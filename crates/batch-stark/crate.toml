@@ -219,6 +219,14 @@ lean = "p3_batch_stark.verifier.mirror.verify_batch"
 rust = "p3_batch_stark::verifier::verify_batch"
 
 [[mirror]]
+lean = "p3_batch_stark.constraints.mirror.verifierPermFolder"
+rust = "p3_batch_stark::folder::VerifierConstraintFolderWithLookups"
+
+[[mirror]]
+lean = "p3_batch_stark.constraints.mirror.verify_constraints_with_lookups"
+rust = "p3_batch_stark::verifier::VerifierData::verify_constraints_with_lookups"
+
+[[mirror]]
 lean = "p3_batch_stark.checker.mirror.rowBuilder"
 rust = "p3_air::DebugConstraintBuilder::new_with_permutation"
 
