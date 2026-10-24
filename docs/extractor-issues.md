@@ -345,6 +345,16 @@ keeps its number and says so.
 
     Post-patch `word/020` binds the result directly.
 
+243. **aeneas leaves the state of a closure with several captures semireducible.**
+
+    A closure that captures one value gets a reducible state type.
+
+    A closure that captures two gets a pair, defined without the attribute.
+
+    Its call site passes a pair literal, so the term is not type-correct at reducible transparency, and `simp` rejects every goal that contains it.
+
+    Post-patch `word/030` marks the three such states of p3-word reducible.
+
 200. **charon's `--start-from` does not accept trait generics.** A pattern such
     as `{impl p3_field::integers::QuotientMap<u32> for …}::from_int` fails with
     "`--start-from` does not support trait generics", and charon exits 101.

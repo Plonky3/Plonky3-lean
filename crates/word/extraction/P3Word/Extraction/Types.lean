@@ -90,6 +90,8 @@ def component.CompositionError.extend_family.closure := Std.Usize
 
 /-- [p3_word::component::{p3_word::component::CompositionError}::bound_segment::{closure}]
     Source: 'word/src/component.rs', lines 200:35-200:76 -/
+-- PATCHED: reducible, as aeneas marks every other closure state.
+@[reducible]
 def component.CompositionError.bound_segment.closure :=
   index.Segment × Std.Usize
 
@@ -233,6 +235,8 @@ structure component.Composition (W : Type _) where
 
 /-- [p3_word::component::reshaped::{p3_word::component::Composition<W>[TraitClause0]}::bound_family::{closure}]
     Source: 'word/src/component_reshaped.rs', lines 102:35-102:89 -/
+-- PATCHED: reducible, as aeneas marks every other closure state.
+@[reducible]
 def component.reshaped.Composition.bound_family.closure (W : Type _) :=
   system.ConstraintKind × Std.Usize
 
@@ -307,6 +311,8 @@ structure constraint.EvaluationError where
 
 /-- [p3_word::constraint::{p3_word::constraint::Operand<W>[TraitClause0]}::evaluate::{closure}]
     Source: 'word/src/constraint.rs', lines 66:28-70:17 -/
+-- PATCHED: reducible, as aeneas marks every other closure state.
+@[reducible]
 def constraint.Operand.evaluate.closure (W : Type _) :=
   index.ValueIndex × Slice W
 
