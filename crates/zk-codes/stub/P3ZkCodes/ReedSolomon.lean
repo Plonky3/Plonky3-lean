@@ -3,11 +3,13 @@ Transcriptions of the Reed-Solomon zero-knowledge encoding.
 
 What a transcription abstracts, beyond the model of p3-dft:
 
-* the field is a mathlib field K, and exp_u64 and the powers iterator yield powers of their base;
-* the backend's forward transform is a parameter, of the shape p3-dft's transcriptions have;
-* a codeword is the rows of the transform's output, a single column for one message;
-* a random generator is the stream of its draws: the k-th call to random returns draw k;
-* the configured lengths are words, and an addition that leaves the word panics, as in a debug build.
+* the field is a mathlib field K
+* exponentiation and the powers iterator yield powers of their base
+* the backend's forward transform is a parameter, shaped like p3-dft's transcriptions
+* a codeword is the rows of the transform's output, a single column for one message
+* a random generator is the stream of its draws, the k-th call returning draw k
+* the configured lengths are words
+* an addition that leaves the word panics, as in a debug build.
 
 Loops, branches and the order of operations are kept.
 -/
@@ -21,7 +23,11 @@ namespace p3_zk_codes.reed_solomon.mirror
 
 open p3_dft.mirror
 
-/-- The configuration: t masks, a message of msg_len coefficients, a codeword of m positions. -/
+/-- The configuration:
+
+- t masks
+- a message of msg_len coefficients
+- a codeword of m positions. -/
 structure ReedSolomonZkEncoding where
   t : ℕ
   msg_len : ℕ
@@ -50,7 +56,9 @@ def ReedSolomonZkEncoding.message_row_iter (G : Gen K) (rs : ReedSolomonZkEncodi
   let x ← rs.evaluation_point G position
   pure (powersList x rs.msg_len)
 
-/-- The first n values of the successors iterator: the seed, if any, then next applied repeatedly. -/
+/-- The first n values of the successors iterator.
+
+They are the seed, if any, then the step function applied repeatedly. -/
 def successorsTake (next : K → K) : Option K → ℕ → List K
   | _, 0 => []
   | none, _ + 1 => []
@@ -104,7 +112,8 @@ def resize (l : List K) (n : ℕ) : List K := l.take n ++ List.replicate (n - l.
 
 The lengths are asserted.
 
-The coefficients are the message, then the randomness, then zeros up to m; the codeword is their transform. -/
+The coefficients are the message, then the randomness, then zeros up to m.
+The codeword is their transform. -/
 def ReedSolomonZkEncoding.encode_with_randomness (dft_batch : ℕ → (ℕ → K) → Option (ℕ → K))
     (rs : ReedSolomonZkEncoding) (msg randomness : List K) : Option (ℕ → K) :=
   if msg.length ≠ rs.msg_len then none
@@ -113,13 +122,17 @@ def ReedSolomonZkEncoding.encode_with_randomness (dft_batch : ℕ → (ℕ → K
     let coeffs := resize (msg ++ randomness) rs.m
     dft_batch rs.m (fun i => coeffs.getD i 0)
 
-/-- Encode with randomness drawn from the generator: t draws, then the explicit-randomness encoding. -/
+/-- Encode with randomness drawn from the generator.
+
+It takes t draws, then runs the explicit-randomness encoding. -/
 def ReedSolomonZkEncoding.encode (dft_batch : ℕ → (ℕ → K) → Option (ℕ → K))
     (rs : ReedSolomonZkEncoding) (msg : List K) (draw : ℕ → K) : Option (ℕ → K) :=
   let randomness := (List.range rs.t).map draw
   rs.encode_with_randomness dft_batch msg randomness
 
-/-- One step of the simulator: a cached position reuses its value, a new one takes the next draw. -/
+/-- One step of the simulator.
+
+A cached position reuses its value, and a new one takes the next draw. -/
 def simStep (draw : ℕ → K) (st : List (ℕ × K) × List K) (p : ℕ) : List (ℕ × K) × List K :=
   match st.1.find? (fun q => q.1 == p) with
   | some (_, v) => (st.1, st.2 ++ [v])
@@ -139,7 +152,8 @@ def ReedSolomonZkEncoding.simulate (rs : ReedSolomonZkEncoding) (query_set : Lis
 
 /-- The batch encoding: w columns, packed into one matrix of m rows and transformed once.
 
-The batch must be nonempty, its two counts must agree, and every member's lengths are asserted.
+The batch must be nonempty, and its two counts must agree.
+Every member's lengths are asserted.
 
 Row r of column c is entry r w + c of the flat buffer. -/
 def ReedSolomonZkEncoding.encode_batch_with_randomness {w : ℕ}

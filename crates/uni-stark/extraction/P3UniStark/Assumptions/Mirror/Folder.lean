@@ -1,17 +1,19 @@
 /-
 Transcriptions of the constraint folders and of the alpha-power layout they share.
 
-These do not extract: they are generic over the configuration and the field traits, which aeneas rejects.
+These do not extract.
+They are generic over the configuration and the field traits, which aeneas rejects.
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts, beyond the builder transcriptions of p3-air:
 
-* the base field F and the challenge field K are mathlib fields, with K an F-algebra;
-* the basis of K over F that Rust fixes is a parameter;
-* a packed value is one lane: every lane runs the same operations on its own row;
-* the AIR emits base constraints only, as p3-air's transcribed AIR does, so the extension streams are empty;
-* the debug-only constraint counter is dropped;
+* the base field F and the challenge field K are mathlib fields, with K an F-algebra
+* the basis of K over F that Rust fixes is a parameter
+* a packed value is one lane, since every lane runs the same operations on its own row
+* the AIR emits base constraints only, as p3-air's transcribed AIR does
+* so the extension streams are empty
+* the debug-only constraint counter is dropped
 * a panic is none.
 
 The order of operations is kept.
@@ -55,13 +57,17 @@ def get_constraint_layout (air : Air F) (layout : AirLayout) : Except String Con
   let cs := air.eval (symbolicBuilder layout) []
   pure ⟨List.range cs.length, []⟩
 
-/-- The linear combination sum_i c_i v_i, which asserts that both lists have one length. -/
+/-- The linear combination sum_i c_i v_i.
+
+It asserts that both lists have the same length. -/
 def batched_linear_combination {R A : Type} [CommRing R] [AddCommMonoid A] [Module R A]
     (values : List A) (coeffs : List R) : Option A :=
   if values.length = coeffs.length then some ((values.zip coeffs).map fun p => p.2 • p.1).sum
   else none
 
-/-- The prover's folder on one row: the row's values, and a state that collects each asserted base constraint. -/
+/-- The prover's folder on one row.
+
+It holds the row's values, and a state that collects each asserted base constraint. -/
 def proverFolder (main preprocessed : RowWindow F) (public_values periodic_values : List F)
     (is_first_row is_last_row is_transition : F) : AirBuilder F F (List F) where
   add := (· + ·)
@@ -78,7 +84,10 @@ def proverFolder (main preprocessed : RowWindow F) (public_values periodic_value
   public_values _ := public_values
   periodic_values _ := periodic_values
 
-/-- The prover's combination: one base dot product per basis coordinate, assembled in the basis, plus the extension dot product. -/
+/-- The prover's combination of the constraints.
+
+It takes one base dot product per basis coordinate, assembled in the basis.
+It adds the extension dot product. -/
 noncomputable def finalize_constraints {D : ℕ} (B : Module.Basis (Fin D) F K)
     (base_alpha_powers : List (List F)) (ext_alpha_powers : List K)
     (base_constraints : List F) (ext_constraints : List K) : Option K := do
@@ -88,7 +97,10 @@ noncomputable def finalize_constraints {D : ℕ} (B : Module.Basis (Fin D) F K)
   let ext ← batched_linear_combination ext_constraints ext_alpha_powers
   pure (acc + ext)
 
-/-- The verifier's folder at the out-of-domain point: the opened values, and an accumulator that folds acc alpha + x for each assertion. -/
+/-- The verifier's folder at the out-of-domain point.
+
+It holds the opened values, and an accumulator.
+Each assertion x updates the accumulator to acc alpha + x. -/
 def verifierFolder (main preprocessed : RowWindow K) (public_values : List F)
     (periodic_values : List K) (is_first_row is_last_row is_transition alpha : K) :
     AirBuilder F K K where

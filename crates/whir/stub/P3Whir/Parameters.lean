@@ -3,7 +3,9 @@ Transcription of the integer schedule of WhirConfig::new_with_max_domain_log, pa
 
 The folding schedule is the derived one, an input.
 
-The query, out-of-domain and grinding counts come from p3-security's floating-point bounds; they are inputs, as functions of the round and the rates.
+The query, out-of-domain and grinding counts come from p3-security's floating-point bounds.
+
+They are inputs, as functions of the round and the rates.
 -/
 module
 
@@ -25,7 +27,9 @@ inductive WhirConfigError where
   | RateGrowsDomain (round : ℕ)
   deriving DecidableEq
 
-/-- The counts the floating-point bounds give: per round, from the rates and the variable count. -/
+/-- The counts the floating-point bounds give.
+
+They are per round, from the rates and the variable count. -/
 structure Counts where
   queries : ℕ → ℕ
   ood : ℕ → ℕ → ℕ
@@ -35,7 +39,12 @@ structure Counts where
   final_pow : ℕ
   final_folding_pow : ℕ
 
-/-- The state of the round loop: the rounds so far, the variables left, the rate and the domain size. -/
+/-- The state of the round loop:
+
+- the rounds so far
+- the variables left
+- the rate
+- the domain size. -/
 structure LoopState where
   rounds : List RoundConfig
   num_variables : ℕ
@@ -56,7 +65,9 @@ def roundStep (cs : Counts) (folding : List ℕ) (st : LoopState) (e : ℕ × �
     pure ⟨st.rounds ++ [params], st.num_variables - folding.getD (round + 1) 0, next_rate,
       st.domain_size >>> rs_reduction_factor⟩
 
-/-- WhirConfig::final_round_config: the codeword the final queries open, after the last round's domain reduction. -/
+/-- WhirConfig::final_round_config: the codeword the final queries open.
+
+It comes after the last round's domain reduction. -/
 def finalRoundConfig (cs : Counts) (n rate0 : ℕ) (folding : List ℕ) (rounds : List RoundConfig)
     (rates : List ℕ) : RoundConfig :=
   match rounds.getLast? with
@@ -72,7 +83,11 @@ def finalRoundConfig (cs : Counts) (n rate0 : ℕ) (folding : List ℕ) (rounds 
     ⟨cs.final_pow, cs.final_folding_pow, cs.queries (rates.getD r 0), 0, last.num_variables - k, k,
       domain_size, Nat.log 2 domain_size - k⟩
 
-/-- new_with_max_domain_log, its integer part: the rate and domain checks, the first-fold capacity check, and the rounds. -/
+/-- new_with_max_domain_log, its integer part, in order:
+
+- the rate and domain checks
+- the first-fold capacity check
+- the rounds. -/
 def schedule (cs : Counts) (n rate0 : ℕ) (folding rates : List ℕ) (max_log : ℕ) :
     Except WhirConfigError WhirConfig := do
   if rate0 = 0 then throw .NonRedundantStartingRate

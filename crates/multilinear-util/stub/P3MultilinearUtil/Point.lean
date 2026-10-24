@@ -3,7 +3,9 @@ Transcriptions of the point methods of p3-multilinear-util.
 
 A point is the list of its coordinates.
 
-The objects are those of the model; the thread split of the equality table is the parameter task_len.
+The objects are those of the model.
+
+The thread split of the equality table is a task-length parameter.
 -/
 module
 
@@ -33,7 +35,7 @@ def Point.reversed (p : List F) : List F := p.reverse
 
 /-- Split each weight of low into its bit-0 share, kept in low, and its bit-1 share, written to high.
 
-high is only written, and has the length of low.
+The high part is only written, and has the length of the low part.
 
 Whole lanes are processed packed, and the tail one entry at a time. -/
 def split_by_coordinate (W : ℕ) (low : List F) (coordinate : F) : List F × List F :=
@@ -50,9 +52,11 @@ def entering (p : List F) (order : BitOrder) (k : ℕ) : F :=
   | .Msb => p.getD (p.length - 1 - k) 0
   | .Lsb => p.getD k 0
 
-/-- The single-threaded table: out[0] = scale, then each coordinate doubles the filled prefix.
+/-- The single-threaded table.
 
-It debug-asserts that out has 2^n entries. -/
+Entry 0 is the scale, then each coordinate doubles the filled prefix.
+
+It debug-asserts that the output has 2^n entries. -/
 def Point.fill_equality_table_serial (W : ℕ) (p : List F) (out : List F) (order : BitOrder)
     (scale : F) : Option (List F) :=
   if out.length ≠ 2 ^ p.length then none
@@ -61,13 +65,17 @@ def Point.fill_equality_table_serial (W : ℕ) (p : List F) (out : List F) (orde
       let (low, high) := split_by_coordinate W (out.take (2 ^ k)) (entering p order k)
       low ++ high ++ out.drop (2 ^ (k + 1))) (out.set 0 scale))
 
-/-- The coordinates binding the high and the low index bits: the high bits are bound at the high-bit end of the point. -/
+/-- The coordinates binding the high and the low index bits.
+
+The high bits are bound at the high-bit end of the point. -/
 def high_low (p : List F) (order : BitOrder) (low_variables : ℕ) : List F × List F :=
   match order with
   | .Msb => (p.take (p.length - low_variables), p.drop (p.length - low_variables))
   | .Lsb => (p.drop low_variables, p.take low_variables)
 
-/-- The table as chunks of 2^low_variables entries: serial seeds over the high variables, then one task per chunk. -/
+/-- The table as chunks of 2^low_variables entries.
+
+Serial seeds cover the high variables, then one task fills each chunk. -/
 def Point.fill_equality_table_in_chunks (W : ℕ) (p : List F) (out : List F) (order : BitOrder)
     (scale : F) (low_variables : ℕ) : Option (List F) := do
   if p.length < low_variables then none
@@ -81,7 +89,9 @@ def Point.fill_equality_table_in_chunks (W : ℕ) (p : List F) (out : List F) (o
       Point.fill_equality_table_serial W low cs.1 order cs.2
     pure (parts.flatten ++ out.drop (seeds.length * 2 ^ low_variables))
 
-/-- The split chosen by the cost model: one task when W > 1, and log_2 of the task length otherwise. -/
+/-- The split chosen by the cost model.
+
+It is one task when W > 1, and log_2 of the task length otherwise. -/
 def Point.fill_equality_table (W task_len : ℕ) (p : List F) (out : List F) (order : BitOrder)
     (scale : F) : Option (List F) :=
   let task_len := if W > 1 then out.length else task_len
@@ -107,12 +117,16 @@ def vertexStep (acc : List F × ℕ) (coordinate : F) : List F × ℕ :=
   let bit := acc.2 % 2
   (acc.1 ++ [if bit = 0 then 1 - coordinate else coordinate], acc.2 / 2)
 
-/-- equality_at_vertex: none when the vertex has a bit at or above n, else the product from the last coordinate. -/
+/-- equality_at_vertex: none when the vertex has a bit at or above n.
+
+Otherwise it is the product of the factors, from the last coordinate. -/
 def Point.equality_at_vertex (p : List F) (vertex : ℕ) : Option F :=
   if p.length < 64 ∧ vertex >>> p.length ≠ 0 then none
   else some ((p.reverse.foldl vertexStep ([], vertex)).1.foldl (· * ·) 1)
 
-/-- hypercube: value in big-endian, coordinate i is bit n - 1 - i; it asserts value < 2^n. -/
+/-- hypercube: the value in big-endian, coordinate i being bit n - 1 - i.
+
+It asserts value < 2^n. -/
 def Point.hypercube (value num_variables : ℕ) : Option (List F) :=
   if 64 ≤ num_variables then none
   else if value < 2 ^ num_variables then
@@ -125,7 +139,9 @@ def Point.expand_from_univariate (point : F) (num_variables : ℕ) : List F :=
   ((List.range num_variables).reverse.foldl (fun (acc : List F × F) i =>
     (acc.1.set i acc.2, acc.2 * acc.2)) (List.replicate num_variables 0, point)).1
 
-/-- eval_eq: the product of 2 l r - l - r + 1, which asserts the points have the same length. -/
+/-- eval_eq: the product of 2 l r - l - r + 1.
+
+It asserts the points have the same length. -/
 def Point.eval_eq (p : List F) (q : List EF) : Option EF :=
   if p.length ≠ q.length then none
   else some ((List.zipWith (fun l r => (r + r) * algebraMap F EF l - algebraMap F EF l - r + 1)
@@ -150,7 +166,9 @@ def evalNextStep (acc : F × F × F) (bits : F × F) : F × F × F :=
   let omega := omega * (point_bit * row_bit)
   (carry, done, omega)
 
-/-- eval_next: the carry, completed and boundary weights, folded from the last coordinate; it asserts equal lengths. -/
+/-- eval_next: the carry, completed and boundary weights, folded from the last coordinate.
+
+It asserts equal lengths. -/
 def Point.eval_next (point row : List F) : Option (F × F × F) :=
   if point.length ≠ row.length then none
   else some ((point.zip row).reverse.foldl evalNextStep (1, 0, 1))

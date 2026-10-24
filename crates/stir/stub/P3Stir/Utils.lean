@@ -3,7 +3,9 @@ Transcriptions of p3-stir's polynomial utilities (stir/src/utils.rs).
 
 A polynomial is its coefficient list, constant term first.
 
-Domain points, shifts and twiddles live in the base field F, and values and challenges in the extension EF.
+Domain points, shifts and twiddles live in the base field F.
+
+Values and challenges live in the extension EF.
 -/
 module
 
@@ -23,9 +25,12 @@ variable {K : Type _} [Field K] [DecidableEq K]
 def eval_poly (poly : List K) (point : K) : K :=
   poly.reverse.foldl (fun acc coeff => acc * point + coeff) 0
 
-/-- eval_poly_parallel: Horner on each chunk of the given size, then Horner over the chunk values with ratio point^chunk_size.
+/-- eval_poly_parallel: Horner on each chunk of the given size.
 
-The cost model picks the chunk size; a chunk spanning the whole polynomial falls back to eval_poly. -/
+It then runs Horner over the chunk values, with ratio point^chunk_size.
+
+The cost model picks the chunk size.
+A chunk spanning the whole polynomial falls back to plain Horner. -/
 def eval_poly_parallel (chunk_size : ℕ) (poly : List K) (point : K) : Option K :=
   if chunk_size ≥ poly.length then some (eval_poly poly point)
   else do
@@ -34,7 +39,9 @@ def eval_poly_parallel (chunk_size : ℕ) (poly : List K) (point : K) : Option K
     some ((cs.map fun chunk => eval_poly chunk point).reverse.foldl
       (fun acc chunk_val => acc * point_pow_chunk + chunk_val) 0)
 
-/-- divide_by_linear: synthetic division by X - point, which asserts the polynomial is not empty. -/
+/-- divide_by_linear: synthetic division by X - point.
+
+It asserts the polynomial is not empty. -/
 def divide_by_linear (poly : List K) (point : K) : Option (List K × K) :=
   if poly = [] then none
   else
@@ -51,7 +58,9 @@ def add_polys (a b : List K) : List K :=
   (List.range (max a.length b.length)).map fun i =>
     (if i < a.length then a.getD i 0 else 0) + (if i < b.length then b.getD i 0 else 0)
 
-/-- eval_degree_correction: value times 1 + step + ... + step^gap, step = point r_comb, in closed form. -/
+/-- eval_degree_correction: value times 1 + step + ... + step^gap, in closed form.
+
+Here step = point r_comb. -/
 def eval_degree_correction (value point r_comb : K) (gap : ℕ) : Option K :=
   let step := point * r_comb
   if step = 1 then some (value * ((gap + 1 : ℕ) : K))
@@ -72,7 +81,9 @@ def allDistinct (points : List K) : Bool :=
   (List.range points.length).all fun i => (List.range i).all fun j =>
     points.getD i 0 != points.getD j 0
 
-/-- interpolate_poly: Newton's divided differences, expanded into coefficients, trailing zeros removed down to one.
+/-- interpolate_poly: Newton's divided differences, expanded into coefficients.
+
+Trailing zeros are removed, down to one coefficient.
 
 It asserts equal lengths and distinct points. -/
 def interpolate_poly (points values : List K) : Option (List K) :=
@@ -113,7 +124,9 @@ where
     (List.range l.length).foldl (fun cs _ =>
       if cs.getLast? = some 0 ∧ cs.length > 1 then cs.dropLast else cs) l
 
-/-- check_ans_interpolates: compare ans(rho) with the barycentric interpolant at rho, cross-multiplied. -/
+/-- check_ans_interpolates: compare ans(rho) with the barycentric interpolant at rho.
+
+The comparison is cross-multiplied. -/
 def check_ans_interpolates (ans points values : List K) (rho : K) : Option Bool :=
   if points.length ≠ values.length then some false
   else if points = [] then some (ans.all fun c => c = 0)
@@ -142,9 +155,13 @@ variable {F EF : Type _} [Field F] [Field EF] [Algebra F EF] [DecidableEq F] [De
 /-- An extension element times a base element. -/
 local infixl:70 " ⋆ " => fun (a : EF) (b : F) => a * algebraMap F EF b
 
-/-- combine_on_coset: sum_i r_i f_i(x) (1 + s + ... + s^gap_i), s = r_comb x, at every point x of shift <g>.
+/-- combine_on_coset: sum_i r_i f_i(x) (1 + s + ... + s^gap_i), at every point x of shift <g>.
 
-The geometric sums are swept in chunks of c and divided by 1 - s in one batch inversion; the one lane where s = 1, if any, is given its closed form gap_i + 1 afterwards. -/
+Here s = r_comb x.
+
+The geometric sums are swept in chunks of c.
+They are divided by 1 - s in one batch inversion.
+The one lane where s = 1, if any, then gets its closed form gap_i + 1. -/
 def combine_on_coset (c : ℕ) (G : Gen F) (groups : List (EF × ℕ × List EF)) (r_comb : EF)
     (shift : F) (log_domain : ℕ) : Option (List EF) := do
   let n := 2 ^ log_domain
@@ -176,7 +193,9 @@ def combine_on_coset (c : ℕ) (G : Gen F) (groups : List (EF × ℕ × List EF)
 def eval_poly_at_base (poly : List EF) (point : F) : EF :=
   poly.reverse.foldl (fun acc coeff => acc ⋆ point + coeff) 0
 
-/-- reduce_mod_x_pow_minus_c: block q of n coefficients is scaled by c^q and added onto the n slots. -/
+/-- reduce_mod_x_pow_minus_c: the remainder modulo X^n - c.
+
+Block q of n coefficients is scaled by c^q and added onto the n slots. -/
 def reduce_mod_x_pow_minus_c (poly : List EF) (n : ℕ) (c : F) : Option (List EF) := do
   let blocks ← chunks n poly
   let (remainder, _) := blocks.foldl (fun (st : List EF × F) block =>
@@ -194,7 +213,10 @@ def fold_domain_params (current_shift : F) (current_log_domain log_arity : ℕ) 
   let log_size ← subChecked current_log_domain log_arity
   some (log_size, current_shift ^ 2 ^ log_arity)
 
-/-- OodFilter: shift^(-2^log_size) and log_size of each excluded domain, and the largest log_size. -/
+/-- OodFilter, the out-of-domain filter:
+
+- shift^(-2^log_size) and log_size of each excluded domain
+- the largest log_size. -/
 structure OodFilter (F : Type _) where
   shift_inv_pows : List F
   log_sizes : List ℕ
@@ -208,7 +230,10 @@ def OodFilter.new (excluded_domains : List (F × ℕ)) : Option (OodFilter F) :=
 
 /-- OodFilter::accepts: one squaring chain records z^(2^log_size) for each domain.
 
-z is kept when it lies outside every domain of positive log_size and differs from every kept point. -/
+The point z is kept when two conditions hold:
+
+- it lies outside every domain of positive log_size
+- it differs from every kept point. -/
 def OodFilter.accepts (filter : OodFilter F) (candidate : EF) (kept : List EF) : Bool :=
   let z := candidate
   let (z_pows, _) := (List.range (filter.max_log_size + 1)).foldl (fun (st : List EF × EF) l =>
@@ -220,7 +245,9 @@ def OodFilter.accepts (filter : OodFilter F) (candidate : EF) (kept : List EF) :
     filter.log_sizes.getD s 0 = 0 || z_pows.getD s 0 ⋆ filter.shift_inv_pows.getD s 0 != 1
   outside_all_domains && kept.all fun existing => existing != z
 
-/-- fold_pass: one arity-2 pass, (lo + hi)/2 + (lo - hi) (g^(-j)/2) beta with lo, hi entries j and j + height. -/
+/-- fold_pass: one arity-2 pass, (lo + hi)/2 + (lo - hi) (g^(-j)/2) beta.
+
+Here lo and hi are entries j and j + height. -/
 def fold_pass (G : Gen F) (src : List EF) (beta : EF) (log_domain_size : ℕ) : Option (List EF) := do
   let height := src.length / 2
   let g ← G.get log_domain_size
@@ -231,7 +258,9 @@ def fold_pass (G : Gen F) (src : List EF) (beta : EF) (log_domain_size : ℕ) : 
     let hi := src.getD (j + height) 0
     (lo + hi) / 2 + (lo - hi) ⋆ halve_inv_powers.getD j 0 * beta)
 
-/-- fold_codeword: log_arity arity-2 passes at beta, beta^2, beta^4, ..., which asserts at least one point is left. -/
+/-- fold_codeword: log_arity arity-2 passes at beta, beta^2, beta^4, and so on.
+
+It asserts at least one point is left. -/
 def fold_codeword (G : Gen F) (codeword : List EF) (beta : EF) (log_arity log_domain_size : ℕ) :
     Option (List EF) := do
   let arity := 2 ^ log_arity
@@ -252,7 +281,9 @@ def fold_poly_coeffs (coeffs : List EF) (gamma : EF) (log_arity : ℕ) : Option 
   let blocks ← chunks (2 ^ log_arity) coeffs
   some (blocks.map fun block => eval_poly block gamma)
 
-/-- lagrange_eval_at: the barycentric interpolant through (xs_i, ys_i) at point, a node answered directly. -/
+/-- lagrange_eval_at: the barycentric interpolant through (xs_i, ys_i) at a point.
+
+A node is answered directly. -/
 def lagrange_eval_at (xs : List F) (ys : List EF) (point : EF) : Option EF :=
   let n := xs.length
   if ys.length ≠ n then none
@@ -270,9 +301,12 @@ def lagrange_eval_at (xs : List F) (ys : List EF) (point : EF) : Option EF :=
     let den_inv ← inverse den
     some (num * den_inv)
 
-/-- lagrange_interpolate_at: the interpolant at point through a coset of the n-th roots of unity, n = 2^k, with weights x_i / (n x_0^n).
+/-- lagrange_interpolate_at: the interpolant through a coset of the n-th roots of unity, n = 2^k.
 
-It asserts equal lengths and a power-of-two length; a node is answered directly. -/
+The weights are x_i / (n x_0^n).
+
+It asserts equal lengths and a power-of-two length.
+A node is answered directly. -/
 def lagrange_interpolate_at (xs : List F) (ys : List EF) (point : EF) : Option EF :=
   let n := xs.length
   if ys.length ≠ n then none
@@ -290,7 +324,9 @@ def lagrange_interpolate_at (xs : List F) (ys : List EF) (point : EF) : Option E
       acc + ys.getD i 0 ⋆ (xs.getD i 0 * weight_scale) * diff_invs.getD i 0) 0
     some (result * l_point)
 
-/-- fold_fiber: interpolate the fiber at the nodes g^j zeta^l, zeta = g^(new height), and evaluate at beta. -/
+/-- fold_fiber: interpolate the fiber at the nodes g^j zeta^l, and evaluate at beta.
+
+Here zeta = g^(new height). -/
 def fold_fiber (G : Gen F) (fiber : List EF) (j log_new_height log_arity : ℕ) (beta : EF) :
     Option EF := do
   let arity := 2 ^ log_arity

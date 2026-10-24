@@ -1,14 +1,17 @@
 /-
-Transcriptions of the FRI verifier: the fold chain of one query, the input openings and their reduction, and verify_fri.
+Transcriptions of the FRI verifier.
+
+They cover the fold chain of one query, the input openings and their reduction, and the full verifier.
 
 What a transcription abstracts, beyond Fold.lean and Types.lean:
 
-* the folding strategy is the two-adic one, which samples no extra index bits;
-* the field's generator is a parameter g, and a claimed domain is a coset over the generator table G;
-* an ordered map keyed by height is a function of the height, read at the keys present, tallest first;
-* the denominators are inverted one at a time, in the order the batch inversion consumes them;
-* a usize is a natural number, and a shift by at least 64 bits fails;
-* an assertion panics, and a debug assertion is checked, as in a debug build;
+* the folding strategy is the two-adic one, which samples no extra index bits
+* the field's generator is a parameter g
+* a claimed domain is a coset over the generator table G
+* an ordered map keyed by height is a function of the height, read at its keys, tallest first
+* the denominators are inverted one at a time, in the order the batch inversion consumes them
+* a usize is a natural number, and a shift by at least 64 bits fails
+* an assertion panics, and a debug assertion is checked, as in a debug build
 * a panic is none, and a returned error is an error.
 
 Loops, branches and early returns are kept.
@@ -85,16 +88,27 @@ def check_canonical_pow_witnesses {C MP IMP : Type} (params : FriParameters) (pr
   !(params.commit_proof_of_work_bits = 0 && proof.commit_pow_witnesses.any (· ≠ 0)) &&
   !(params.query_proof_of_work_bits = 0 && proof.query_pow_witness ≠ 0)
 
-/-- Rebuild a row of 2^log_arity values: the folded value at index_in_group, the siblings elsewhere in order. -/
+/-- Rebuild a row of 2^log_arity values.
+
+The folded value sits at the index in the group, and the siblings fill the rest in order. -/
 def rebuildRow (arity index_in_group : ℕ) (folded : K) (siblings : List K) : List K :=
   (List.range arity).map fun j =>
     if j = index_in_group then folded
     else siblings.getD (if j < index_in_group then j else j - 1) 0
 
-/-- The state of the fold chain: the index, the folded value, the height, the openings left, and each round's group index and row. -/
+/-- The state of the fold chain:
+
+- the index
+- the folded value
+- the height
+- the openings left
+- each round's group index and row. -/
 abbrev ChainState (K : Type) := ℕ × K × ℕ × List (ℕ × K) × List (ℕ × List K)
 
-/-- One round of the fold chain: rebuild the row, shift the index, fold, record the group and row, and roll in an opening at the folded height. -/
+/-- One round of the fold chain.
+
+It rebuilds the row, shifts the index, folds, and records the group and row.
+It then rolls in an opening at the folded height. -/
 def foldStep (G : Gen K) (query : ℕ) (st : ChainState K) (round : K × ℕ × List (List K)) :
     Option (ChainState K) := do
   let (index, folded_eval, log_current_height, ro, recorded) := st
@@ -119,7 +133,11 @@ def badRound (query : ℕ) (e : List (List K) × ℕ) : Bool :=
   | none => true
   | some s => s.length ≠ 2 ^ e.2 - 1
 
-/-- Check the schedule and the opened shapes, start from the opening at the tallest height, fold every round, and check the final height and that every opening was rolled in.
+/-- The fold chain of one query.
+
+It checks the schedule and the opened shapes, and starts from the opening at the tallest height.
+It folds every round.
+It then checks the final height, and that every opening was rolled in.
 
 It returns the folded value, the final index, and each round's group index and rebuilt row. -/
 def fold_query {ME IE : Type} (G : Gen K) (query start_index : ℕ) (betas : List K) (log_arities : List ℕ)
@@ -143,28 +161,40 @@ def fold_query {ME IE : Type} (G : Gen K) (query start_index : ℕ) (betas : Lis
   if ro' ≠ [] then throw .UnconsumedReducedOpenings
   pure (folded, index, recorded)
 
-/-- The points of the claims, flattened in batch, matrix, point order, each with its matrix's log height. -/
+/-- The points of the claims, flattened in batch, matrix, point order.
+
+Each comes with its matrix's log height. -/
 def openingPoints {G : Gen K} {C : Type} (log_blowup : ℕ) (claims : List (Claim G C)) :
     List (ℕ × PointOpening K) :=
   claims.flatMap fun c => c.matrices.flatMap fun m =>
     m.points.map fun p => (m.domain.log_size + log_blowup, p)
 
-/-- The ladder start of each opening point: the number of claimed values at its height before it. -/
+/-- The ladder start of each opening point.
+
+It is the number of claimed values at its height before it. -/
 def ladderOffsets (pts : List (ℕ × PointOpening K)) : List ℕ :=
   (pts.foldl (fun (st : (ℕ → ℕ) × List ℕ) e =>
     (Function.update st.1 e.1 (st.1 e.1 + e.2.values.length), st.2 ++ [st.1 e.1])) (fun _ => 0, [])).2
 
-/-- The query point of a matrix of log height h at a global index: g G_h^rev_h(index >> (H - h)). -/
+/-- The query point of a matrix of log height h at a global index.
+
+It is g G_h^rev_h(index >> (H - h)). -/
 def queryPoint (G : Gen K) (g : K) (log_global_max_height log_height index : ℕ) : Option K := do
   let w ← G.get log_height
   some (g * w ^ bitRev log_height (index / 2 ^ (log_global_max_height - log_height)))
 
-/-- The contribution of one point: the sum over the columns of alpha^(off + i) (y_i - p_i(x)), over z - x. -/
+/-- The contribution of one point.
+
+It is the sum over the columns of alpha^(off + i) (y_i - p_i(x)), divided by z - x. -/
 def pointTerm (alpha x : K) (off : ℕ) (p : PointOpening K) (row : List K) : K :=
   (((List.range p.values.length).map fun i => alpha ^ (off + i) * p.values.getD i 0).sum -
     ((List.range row.length).map fun i => alpha ^ (off + i) * row.getD i 0).sum) * (p.point - x)⁻¹
 
-/-- The running state of one query's reduction: the value at each height, the heights seen in order, and the ladder starts left. -/
+/-- The running state of one query's reduction:
+
+- the value at each height
+- the heights seen, in order
+- the ladder starts left. -/
 abbrev RedState (K : Type) := (ℕ → K) × List ℕ × List ℕ
 
 /-- One matrix of one query: every point of the matrix adds its term at the matrix's height. -/
@@ -215,7 +245,9 @@ def checkBatch {ME : Type} (G : Gen K) {C : Type} (mmcs : MmcsOps K) (log_blowup
   | .error e => throw (.InputError e)
   | .ok () => pure ()
 
-/-- The denominators of every query, batch, matrix and point, before any is inverted: a zero rejects. -/
+/-- The denominators of every query, batch, matrix and point, checked before any is inverted.
+
+A zero rejects. -/
 def checkDenominators {ME IE : Type} (G : Gen K) (g : K) {C : Type} (log_blowup log_global_max_height : ℕ)
     (indices : List ℕ) (claims : List (Claim G C)) : Res ME IE Unit :=
   indices.forM fun index => claims.forM fun c => c.matrices.forM fun m => do

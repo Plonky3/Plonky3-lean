@@ -1,14 +1,18 @@
 /-
-Transcriptions of the LogUp gadget: the tuple combiners, the rational folds, the constraints, the degree, and the terminal check.
+Transcriptions of the LogUp gadget.
 
-These do not extract: they are generic over the field traits and over the builder, which aeneas rejects.
+They cover the tuple combiners, the rational folds, the constraints, the degree, and the terminal check.
+
+These do not extract.
+They are generic over the field traits and over the builder, which aeneas rejects.
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts, beyond the p3-air builder transcriptions:
 
-* a permutation builder is an extension builder with the extension ring operations, the embedding of base expressions, and the permutation window, challenges and values;
-* `zip_eq` on unequal lengths, an index out of range, and a failed `assert!` are a panic, which is none.
+* a permutation builder is an extension builder with the extension ring and the base embedding
+* it also holds the permutation window, challenges and values
+* a strict zip on unequal lengths, an index out of range, and a failed assertion are a panic, which is none.
 
 Loops, branches and the order of operations are kept.
 -/
@@ -30,7 +34,13 @@ structure RingOps (E : Type) where
   zero : E
   one : E
 
-/-- The permutation builder trait: an extension builder with the extension ring, the embedding of base expressions, and the permutation window, challenges and values. -/
+/-- The permutation builder trait.
+
+It extends an extension builder with:
+
+- the extension ring
+- the embedding of base expressions
+- the permutation window, challenges and values. -/
 structure PermBuilder (F E EE S : Type) extends ExtensionBuilder F E EE S where
   ext : RingOps EE
   ext_of : E → EE
@@ -38,11 +48,11 @@ structure PermBuilder (F E EE S : Type) extends ExtensionBuilder F E EE S where
   permutation_randomness : S → List EE
   permutation_values : S → List EE
 
-/-- `zip_eq`: the pairs, and a panic on unequal lengths. -/
+/-- The strict zip: the pairs, and a panic on unequal lengths. -/
 def zip_eq {α β : Type _} (l : List α) (l' : List β) : Option (List (α × β)) :=
   if l.length = l'.length then some (l.zip l') else none
 
-/-- Each tuple folded by Horner's rule, `elt + acc * beta`, then subtracted from alpha. -/
+/-- Each tuple folded by Horner's rule, elt + acc * beta, then subtracted from alpha. -/
 def combine_elements {E : Type} (R : RingOps E) (elements : List (List E)) (alpha beta : E) :
     List E :=
   elements.map fun elts =>
@@ -71,7 +81,10 @@ def compute_combined_sum_terms {E : Type} (R : RingOps E) (elements : List (List
       pure (R.add acc (R.mul (R.mul m p) s))) R.zero
     numerator.map (·, common_denominator)
 
-/-- The numerator and denominator of an exclusive column: N = sum_k f_k m_k and D = sum_k f_k t_k + 1 - sum_k f_k.
+/-- The numerator and denominator of an exclusive column:
+
+- N = sum_k f_k m_k
+- D = sum_k f_k t_k + 1 - sum_k f_k.
 
 Unequal lengths panic. -/
 def compute_exclusive_terms {E : Type} (R : RingOps E) (flags : List E) (elements : List (List E))
@@ -108,7 +121,11 @@ def eval_fraction {E EE S : Type} (B : PermBuilder F E EE S) (s : S) (lookup : L
     else compute_exclusive_terms B.ext flags elements multiplicities alpha beta
   pure (B.assert_zero_ext s (B.ext.sub (B.ext.mul common_denominator frac_local) numerator))
 
-/-- The accumulator constraints on the current row: acc = 0 on the first row, acc' = acc + row sum on transitions, and terminal = acc + row sum on the last row.
+/-- The accumulator constraints on the current row:
+
+- acc = 0 on the first row
+- acc' = acc + row sum on transitions
+- terminal = acc + row sum on the last row.
 
 The permutation window must hold the accumulator and every fraction column. -/
 def eval_accumulator {E EE S : Type} (B : PermBuilder F E EE S) (s : S) (lookups : List (Lookup F))
@@ -126,7 +143,11 @@ def eval_accumulator {E EE S : Type} (B : PermBuilder F E EE S) (s : S) (lookups
   pure ((B.when (B.is_last_row s)).assert_zero_ext s
     (B.ext.sub (B.ext.sub terminal acc_local) row_sum))
 
-/-- Every lookup constraint of one AIR: no lookup needs no permutation value; otherwise one terminal, each fraction pinned, then the accumulator. -/
+/-- Every lookup constraint of one AIR.
+
+With no lookup, there must be no permutation value.
+
+Otherwise there is one terminal, each fraction is pinned, then the accumulator is constrained. -/
 def eval_all {E EE S : Type} (B : PermBuilder F E EE S) (s : S) (lookups : List (Lookup F)) :
     Option S := do
   if lookups.isEmpty then
@@ -145,7 +166,9 @@ def verify_terminal_sum {EF : Type} [Field EF] [DecidableEq EF] (terminals : Lis
 
 /-- The degree of the fraction pin, with the transition selector at the given degree.
 
-Additive: max(1 + sum_i deg_i, max_i (deg m_i + sum_(j != i) deg_j)), deg_i the largest degree in tuple i.
+Additive: max(1 + sum_i deg_i, max_i (deg m_i + sum_(j != i) deg_j)).
+
+Here deg_i is the largest degree in tuple i.
 
 Exclusive: max(1 + max_k max(deg f_k + deg_k, deg f_k), max_k (deg f_k + deg m_k)).
 

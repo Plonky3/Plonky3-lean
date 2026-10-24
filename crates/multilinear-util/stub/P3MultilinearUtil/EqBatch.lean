@@ -1,17 +1,15 @@
 /-
 Transcriptions of the batched equality tables of p3-multilinear-util.
 
-A dense matrix view is the list of its rows; column i of the points matrix is point i.
+What a transcription abstracts:
 
-The input field IF is the field of the coordinates, and EF the field of the weights and of the output.
-
-A product of a value by a coordinate maps the coordinate into the value's algebra first.
-
-Every index the loops read or write is in range at every call site, so out-of-range accesses are not modelled.
-
-The flag INITIALIZED adds to the output when true and overwrites it when false.
-
-The workspaces are modelled by their lengths: a split past the end panics, and the values left in them are never read.
+* a dense matrix view is the list of its rows
+* column i of the points matrix is point i
+* the input field IF holds the coordinates, and EF the weights and the output
+* a product of a value by a coordinate maps the coordinate into the value's algebra first
+* out-of-range accesses are not modelled: every index the loops touch is in range at every call site
+* the flag INITIALIZED adds to the output when true, and overwrites it when false
+* a workspace is its length: a split past the end panics, and the values left in it are never read.
 -/
 module
 
@@ -28,7 +26,9 @@ open p3_multilinear_util.mirror
 
 variable {IF EF : Type _} [Field IF] [Field EF] [Algebra IF EF]
 
-/-- One doubling of the buffer for every point: row idx keeps v - v z, row idx + stride gets v z. -/
+/-- One doubling of the buffer for every point.
+
+Row idx keeps v - v z, and row idx + stride gets v z. -/
 def fillStep {A : Type _} [CommRing A] [Algebra IF A] (m : ℕ) (row : List IF) (stride : ℕ)
     (buf : List (List A)) (idx : ℕ) : List (List A) :=
   let vals := (buf.getD idx []).zip (row.take m)
@@ -45,7 +45,9 @@ def fill_buffer_batch {A : Type _} [CommRing A] [Algebra IF A] (m_evals m : ℕ)
   else some (evals.reverse.zipIdx.foldl (fun buf ri =>
     (List.range (2 ^ ri.2)).foldl (fillStep m ri.1 (2 ^ ri.2)) buf) buffer)
 
-/-- eval_eq_1_batch: the two weighted sums over one variable, eq(1, z) = z and eq(0, z) = 1 - z. -/
+/-- eval_eq_1_batch: the two weighted sums over one variable.
+
+They use eq(1, z) = z and eq(0, z) = 1 - z. -/
 def eval_eq_1_batch (row : List IF) (scalars : List EF) : EF × EF :=
   let sum := scalars.sum
   let eq_1_sum := (List.zipWith (fun s z => s * algebraMap IF EF z) scalars row).sum
@@ -56,7 +58,9 @@ def splitScalars (row : List IF) (scalars : List EF) : List EF × List EF :=
   let s1 := List.zipWith (fun s z => s * algebraMap IF EF z) scalars row
   (List.zipWith (· - ·) scalars s1, s1)
 
-/-- eval_eq_2_batch: the four sums over two variables, in big-endian order; the workspace holds 2 m. -/
+/-- eval_eq_2_batch: the four sums over two variables, in big-endian order.
+
+The workspace holds 2 m. -/
 def eval_eq_2_batch (rows : List (List IF)) (scalars : List EF) (m ws : ℕ) : Option (List EF) :=
   if ws < 2 * m then none
   else
@@ -65,7 +69,9 @@ def eval_eq_2_batch (rows : List (List IF)) (scalars : List EF) (m ws : ℕ) : O
     let (e10, e11) := eval_eq_1_batch (rows.getD 1 []) eq_1s
     some [e00, e01, e10, e11]
 
-/-- eval_eq_3_batch: the eight sums over three variables; the workspace holds 6 m. -/
+/-- eval_eq_3_batch: the eight sums over three variables.
+
+The workspace holds 6 m. -/
 def eval_eq_3_batch (rows : List (List IF)) (scalars : List EF) (m ws : ℕ) : Option (List EF) := do
   if ws < 2 * m then none
   let next := ws - 2 * m
@@ -108,7 +114,8 @@ def eval_eq_batch_basic (initialized : Bool) (m : ℕ) :
 
 /-- packed_eq_poly_batch: the tables of the last log_2 W variables, one packed value per point.
 
-The buffer starts with the weights in row 0; column i is then packed, and from_ext_slice asserts it has W entries. -/
+The buffer starts with the weights in row 0.
+Each column is then packed, and the packing asserts it has W entries. -/
 def packed_eq_poly_batch {K : Type _} [Field K] (W m : ℕ) (rows : List (List K))
     (scalars : List K) : Option (List (Fin W → K)) := do
   if W ≠ 2 ^ rows.length then none
@@ -135,7 +142,9 @@ def extEvaluator (W m : ℕ) : Evaluator EF EF (Fin W → EF) where
       some (if initialized then List.zipWith (· + ·) out unpacked ++ out.drop unpacked.length
         else unpacked.take out.length ++ out.drop unpacked.length)
 
-/-- The base evaluator: the seeds have unit weights, and lane k accumulates sum_i scalars_i table_i[k]. -/
+/-- The base evaluator.
+
+The seeds have unit weights, and lane k accumulates sum_i scalars_i table_i[k]. -/
 def baseEvaluator {F : Type _} [Field F] [Algebra F EF] (W m : ℕ) : Evaluator F EF (Fin W → F) where
   init_packed_batch rows _ := packed_eq_poly_batch W m rows (List.replicate m 1)
   accumulate_packed_batch initialized out final scalars :=
@@ -205,7 +214,8 @@ def eval_eq_packed_batch {P : Type _} [CommRing P] [Algebra IF P] (E : Evaluator
 
 /-- eval_eq_batch_common, for W = 2^w lanes and T threads.
 
-Small tables take the recursive path; large ones split the variables into thread, middle and lane variables. -/
+Small tables take the recursive path.
+Large ones split the variables into thread, middle and lane variables. -/
 def eval_eq_batch_common {P : Type _} [CommRing P] [Algebra IF P] (E : Evaluator IF EF P)
     (w T : ℕ) (initialized : Bool) (m : ℕ) (rows : List (List IF)) (out scalars : List EF) :
     Option (List EF) := do

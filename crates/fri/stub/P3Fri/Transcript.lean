@@ -3,9 +3,9 @@ Transcriptions of the described transcripts of FRI and of the PCS around it.
 
 What a transcription abstracts:
 
-* a transcript step is its kind, its label and its length, as the interaction pattern lists them;
-* the domain separator's encoding of the steps and instance values is left out;
-* a usize is a natural number;
+* a transcript step is its kind, its label and its length, as the interaction pattern lists them
+* the domain separator's encoding of the steps and instance values is left out
+* a usize is a natural number
 * a panic is none.
 
 Loops and branches are kept.
@@ -20,7 +20,9 @@ namespace p3_fri.transcript.mirror
 
 open p3_fri.config.mirror
 
-/-- One described step: a commitment, a grinding step of some bits, a challenge, a message of some length, or the bracket of a sub-protocol. -/
+/-- One described step.
+
+It is a commitment, a grinding step, a challenge, a message, or the bracket of a sub-protocol. -/
 inductive Step where
   | commitment
   | commitPow (bits : ℕ)
@@ -61,8 +63,9 @@ def new (params : FriParameters) (input_log_heights : List ℕ) (index_bits : �
 
 /-- The steps in order.
 
-Each round: a commitment, a grinding step if its difficulty is positive, and a challenge.
-Then: the final polynomial, the query grinding step if positive, and the indices. -/
+Each round has a commitment, a grinding step if its difficulty is positive, and a challenge.
+
+Then come the final polynomial, the query grinding step if positive, and the indices. -/
 def pattern (s : FriShape) : List Step :=
   (s.log_arities.flatMap fun _ =>
     [Step.commitment] ++ (if 0 < s.commit_pow_bits then [Step.commitPow s.commit_pow_bits] else []) ++
@@ -73,12 +76,19 @@ def pattern (s : FriShape) : List Step :=
 
 end FriShape
 
-/-- The shape of one PCS opening: the claimed evaluation count of every point, and the batching difficulty. -/
+/-- The shape of one PCS opening.
+
+It holds the claimed evaluation count of every point, and the batching difficulty. -/
 structure PcsShape where
   claimed_evaluation_counts : List (List (List ℕ))
   batch_pow_bits : ℕ
 
-/-- One message per opening point, the batching grinding step if positive, the challenge, and the bracket of the low-degree test. -/
+/-- The steps of one PCS opening, in order:
+
+- one message per opening point
+- the batching grinding step, if positive
+- the challenge
+- the bracket of the low-degree test. -/
 def PcsShape.pattern (s : PcsShape) : List Step :=
   (s.claimed_evaluation_counts.flatten.flatten.map Step.claimedEvaluations) ++
   (if 0 < s.batch_pow_bits then [Step.batchPow s.batch_pow_bits] else []) ++

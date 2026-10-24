@@ -29,7 +29,9 @@ structure EqStatement (EF : Type _) where
   points : List (List EF)
   evaluations : List EF
 
-/-- SelectStatement: claims sum_b p(b) z_i^b = s_i, for scalar points z_i of the base field. -/
+/-- SelectStatement: claims sum_b p(b) z_i^b = s_i.
+
+The points z_i are scalars of the base field. -/
 structure SelectStatement (F EF : Type _) where
   num_variables : ℕ
   vars : List F
@@ -45,11 +47,15 @@ def SelectStatement.len (s : SelectStatement F EF) : ℕ := s.evaluations.length
 def EqStatement.combine_evals (s : EqStatement EF) (claimed gamma : EF) (shift : ℕ) : EF :=
   claimed + dot s.evaluations (powers gamma shift s.evaluations.length)
 
-/-- SelectStatement::combine_evals: add sum_i gamma^(shift + i) s_i, over the first len powers. -/
+/-- SelectStatement::combine_evals: add sum_i gamma^(shift + i) s_i.
+
+It uses one power per claimed evaluation. -/
 def SelectStatement.combine_evals (s : SelectStatement F EF) (claimed gamma : EF) (shift : ℕ) : EF :=
   claimed + dot s.evaluations (powers gamma shift s.len)
 
-/-- EqStatement::weights_at: eq(z_i, x) for each point, which asserts equal lengths. -/
+/-- EqStatement::weights_at: eq(z_i, x) for each point.
+
+It asserts equal lengths. -/
 def EqStatement.weights_at (s : EqStatement EF) (row : List EF) : Option (List EF) :=
   s.points.mapM fun p => Point.eval_eq p row
 
@@ -57,10 +63,14 @@ def EqStatement.weights_at (s : EqStatement EF) (row : List EF) : Option (List E
 def SelectStatement.weights_at (s : SelectStatement F EF) (row : List EF) : List EF :=
   s.vars.map fun v => Point.eval_select v row
 
-/-- Horner's rule: c_0 + x (c_1 + x (c_2 + ...)), the univariate polynomial with coefficients c at x. -/
+/-- Horner's rule: c_0 + x (c_1 + x (c_2 + ...)).
+
+It evaluates the univariate polynomial with coefficients c at x. -/
 def horner (c : List EF) (x : EF) : EF := c.foldr (fun a acc => a + x * acc) 0
 
-/-- SelectStatement::verify: every claimed value is the coefficient table's polynomial at its point. -/
+/-- SelectStatement::verify: each claimed value matches the polynomial at its point.
+
+The polynomial is given by its coefficient table. -/
 def SelectStatement.verify [DecidableEq EF] (s : SelectStatement F EF) (poly : List EF) : Bool :=
   (s.vars.zip s.evaluations).all fun ve => horner poly (algebraMap F EF ve.1) == ve.2
 
@@ -89,14 +99,16 @@ def Statements.weights_at : Statements F EF → List EF → Option (List EF)
   | .Eq s, row => s.weights_at row
   | .Select s, row => some (s.weights_at row)
 
-/-- Constraint: statement groups batched by the powers of one challenge, from initial_power on. -/
+/-- Constraint: statement groups batched by the powers of one challenge.
+
+The powers start at an initial exponent. -/
 structure Constraint (F EF : Type _) where
   num_variables : ℕ
   statements : List (Statements F EF)
   challenge : EF
   initial_power : ℕ
 
-/-- Constraint::new, which asserts every group has num_variables variables. -/
+/-- Constraint::new, which asserts every group has the constraint's variable count. -/
 def Constraint.new (challenge : EF) (num_variables : ℕ) (statements : List (Statements F EF)) :
     Option (Constraint F EF) :=
   if statements.all (·.num_variables == num_variables) then some ⟨num_variables, statements, challenge, 0⟩
@@ -107,7 +119,9 @@ def Constraint.new_with_existing_claim (challenge : EF) (num_variables : ℕ)
     (statements : List (Statements F EF)) : Option (Constraint F EF) :=
   (Constraint.new challenge num_variables statements).map fun c => { c with initial_power := 1 }
 
-/-- Constraint::combine_evals: each group adds its claims, its powers following the previous group's. -/
+/-- Constraint::combine_evals: each group adds its claims.
+
+Its powers continue from the previous group's. -/
 def Constraint.combine_evals (c : Constraint F EF) (claimed : EF) : EF :=
   (c.statements.foldl (fun (acc : EF × ℕ) s =>
     (s.combine_evals acc.1 c.challenge acc.2, acc.2 + s.len)) (claimed, c.initial_power)).1
@@ -120,14 +134,18 @@ inductive VariableOrder where
 /-- Point::get_subpoint_over_range(..n), which panics past the end. -/
 def subpoint (p : List EF) (n : ℕ) : Option (List EF) := if n ≤ p.length then some (p.take n) else none
 
-/-- One constraint's term of eval_constraints_poly: each group's weights against the powers after the previous groups. -/
+/-- One constraint's term of eval_constraints_poly.
+
+Each group's weights are dotted against the powers after the previous groups. -/
 def constraintValue (c : Constraint F EF) (local_challenge : List EF) : Option EF :=
   (c.statements.foldlM (fun (acc : EF × ℕ) (s : Statements F EF) => do
     let w ← s.weights_at local_challenge
     pure (acc.1 + dot w (powers c.challenge (c.initial_power + acc.2) w.length), acc.2 + s.len))
     (0, 0)).map Prod.fst
 
-/-- VariableOrder::eval_constraints_poly: the batched weight of every constraint at the end of the point it was formed before. -/
+/-- VariableOrder::eval_constraints_poly: the batched weight of every constraint.
+
+Each is read at the end of the point it was formed before. -/
 def VariableOrder.eval_constraints_poly (order : VariableOrder) (constraints : List (Constraint F EF))
     (challenge : List EF) : Option EF := do
   let reversed := challenge.reverse

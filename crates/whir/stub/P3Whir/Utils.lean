@@ -17,14 +17,18 @@ variable {F EF : Type _} [Field F] [Field EF] [Algebra F EF]
 def eval_ze_star_n (point : F) (coeffs : List EF) : EF :=
   coeffs.foldr (fun c acc => acc * algebraMap F EF point + c) 0
 
-/-- par_eval_ze_star_n: each run of chunk_len coefficients by Horner, shifted by point^(c chunk_len), which asserts chunk_len is positive. -/
+/-- par_eval_ze_star_n: each run of chunk_len coefficients by Horner, shifted by point^(c chunk_len).
+
+It asserts the chunk length is positive. -/
 def par_eval_ze_star_n (point : F) (coeffs : List EF) (chunk_len : ℕ) : Option EF :=
   if chunk_len = 0 then none
   else some ((List.range ((coeffs.length + chunk_len - 1) / chunk_len)).map fun c =>
     eval_ze_star_n point ((coeffs.drop (c * chunk_len)).take chunk_len) *
       algebraMap F EF (point ^ (c * chunk_len))).sum
 
-/-- par_add_scaled_powers: add coeff point^b into slot b, each run restarting its power, which asserts chunk_len is positive. -/
+/-- par_add_scaled_powers: add coeff point^b into slot b, each run restarting its power.
+
+It asserts the chunk length is positive. -/
 def par_add_scaled_powers (out : List EF) (point coeff : EF) (chunk_len : ℕ) : Option (List EF) :=
   if chunk_len = 0 then none
   else some ((List.range ((out.length + chunk_len - 1) / chunk_len)).flatMap fun c =>

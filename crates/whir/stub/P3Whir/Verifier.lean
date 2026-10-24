@@ -1,5 +1,7 @@
 /-
-Transcriptions of the WHIR verifier: pcs/verifier/mod.rs, committer/reader.rs and the verifier transcript of transcript/mod.rs.
+Transcriptions of the WHIR verifier.
+
+They cover pcs/verifier/mod.rs, committer/reader.rs, and the verifier transcript of transcript/mod.rs.
 
 The domain is the two-adic one, whose query points are powers of the generator.
 -/
@@ -45,7 +47,9 @@ def WhirConfig.n_rounds (c : WhirConfig) : ℕ := c.round_parameters.length
 /-- WhirConfig::round_folding_factor, which panics past the schedule. -/
 def WhirConfig.round_folding_factor (c : WhirConfig) (round : ℕ) : Option ℕ := c.folding_schedule[round]?
 
-/-- The numbers of one query site of the shape: index width, draw count and summand depths. -/
+/-- The numbers of one query site of the shape.
+
+They are the index width, the draw count and the summand depths. -/
 structure QuerySite where
   pow_bits : ℕ
   index_bits : ℕ
@@ -53,7 +57,9 @@ structure QuerySite where
   depths : List ℕ
   deriving Inhabited
 
-/-- The query site of a round: the folded domain, its draws and their width, which asserts the folded size is a power of two. -/
+/-- The query site of a round: the folded domain, its draws and their width.
+
+It asserts the folded size is a power of two. -/
 def querySite (domain_size folding num_queries pow_bits : ℕ) : Option QuerySite :=
   let folded := domain_size >>> folding
   if folded ≠ 0 ∧ 2 ^ Nat.log 2 folded = folded then
@@ -61,7 +67,7 @@ def querySite (domain_size folding num_queries pow_bits : ℕ) : Option QuerySit
     some ⟨pow_bits, Nat.log 2 folded, draws, query_summand_depths draws⟩
   else none
 
-/-- The query site of round, or of the final phase for round = n_rounds. -/
+/-- The query site of a round, or of the final phase one past the last round. -/
 def WhirConfig.site (c : WhirConfig) (round : ℕ) : Option QuerySite :=
   if round < c.n_rounds then do
     let p ← c.round_parameters[round]?
@@ -88,7 +94,9 @@ inductive VerifierError where
   | FinalPolyLengthMismatch (expected actual : ℕ)
   deriving DecidableEq
 
-/-- QueryOpenings: the opened rows of one round, base field at round 0, extension after. -/
+/-- QueryOpenings: the opened rows of one round.
+
+They are in the base field at round 0, and in the extension after. -/
 inductive QueryOpenings (F EF MP : Type _) where
   | Base (rows : List (List F)) (proof : MP)
   | Extension (rows : List (List EF)) (proof : MP)
@@ -117,7 +125,14 @@ section Verifier
 
 variable {F EF Com MP : Type _} [Field F] [Field EF] [Algebra F EF] [DecidableEq F] [DecidableEq EF]
 
-/-- What a verifier run is given besides the proof: the sponge, the Merkle scheme, the commitment encoding, the generator, the evaluation thresholds and the layout. -/
+/-- What a verifier run is given besides the proof:
+
+- the sponge
+- the Merkle scheme
+- the commitment encoding
+- the generator
+- the evaluation thresholds
+- the layout. -/
 structure Env (F EF Com MP : Type _) [Field EF] where
   S : WSponge F EF
   mmcs : Mmcs F EF Com MP
@@ -134,7 +149,9 @@ structure Env (F EF Com MP : Type _) [Field EF] where
 
 variable (E : Env F EF Com MP)
 
-/-- WhirVerifierTranscript::query_pow: nothing at zero difficulty, else the grinding check and the witness absorbed. -/
+/-- WhirVerifierTranscript::query_pow: nothing at zero difficulty.
+
+Otherwise it checks the grinding and absorbs the witness. -/
 def query_pow (round bits : ℕ) (witness : F) (h : List (Step F EF)) :
     Except VerifierError (List (Step F EF)) :=
   if bits = 0 then pure h
@@ -146,7 +163,9 @@ def sumcheck (data : SumcheckData F EF) (h : List (Step F EF)) (claimed : EF) (r
     Except VerifierError (List EF × EF × List (Step F EF)) :=
   (verify_rounds E.S.toSponge data.1 data.2 h claimed rounds pow_bits .Evaluation).mapError .Sumcheck
 
-/-- verify_merkle_proof: the round's rows, lifted to the extension, after the variant, count and Merkle checks. -/
+/-- verify_merkle_proof: the round's rows, lifted to the extension.
+
+It first checks the variant, the count and the Merkle proof. -/
 def verify_merkle_proof (openings : QueryOpenings F EF MP) (root : Com) (indices : List ℕ) (dims : ℕ × ℕ)
     (round_index : ℕ) : Except VerifierError (List (List EF)) :=
   match openings, round_index == 0 with
@@ -163,9 +182,11 @@ def verify_merkle_proof (openings : QueryOpenings F EF MP) (root : Com) (indices
     else throw (.MerkleProofInvalid round_index)
   | _, _ => throw (.MerkleProofInvalid round_index)
 
-/-- verify_stir_challenges: grind, draw the indices, open and fold each row, and pair each fold with its domain point.
+/-- verify_stir_challenges: grind, draw the indices, and open and fold each row.
 
-A panic is none, as in the prover's two_adic_generator, Poly::new and eval_ext. -/
+Each fold is paired with its domain point.
+
+A panic is none, as in the generator lookup, the polynomial constructor and the evaluation. -/
 def verify_stir_challenges (c : WhirConfig) (openings : QueryOpenings F EF MP) (pow_witness : F)
     (params : RoundConfig) (root : Com) (folding_randomness : List EF) (round_index : ℕ)
     (h : List (Step F EF)) : Option (Except VerifierError (SelectStatement F EF × List (Step F EF))) := do
@@ -184,7 +205,9 @@ def verify_stir_challenges (c : WhirConfig) (openings : QueryOpenings F EF MP) (
       let g ← two_adic_generator E.adicity E.gen params.log_folded_domain_size
       pure (.ok (⟨params.num_variables, indices.map (g ^ ·), folds⟩, h))
 
-/-- ParsedCommitment::parse_with_round: the root, then each OOD point drawn and its answer absorbed. -/
+/-- ParsedCommitment::parse_with_round: the root is absorbed first.
+
+Then each OOD point is drawn and its answer absorbed. -/
 def parse_with_round (rp : WhirRoundProof F EF Com MP) (num_variables ood_samples round_index : ℕ)
     (h : List (Step F EF)) : Except VerifierError (Com × EqStatement EF × List (Step F EF)) :=
   match rp.commitment with
@@ -200,7 +223,12 @@ def parse_with_round (rp : WhirRoundProof F EF Com MP) (num_variables ood_sample
         (acc.1 ++ [point], acc.2 ++ [.challenge, .message [rp.ood_answers.getD i 0]])) ([], h)
       pure (root, ⟨num_variables, pts, rp.ood_answers⟩, h)
 
-/-- The state the round loop carries: constraints, folding randomness per phase, previous root, claim and history. -/
+/-- The state the round loop carries:
+
+- the constraints
+- the folding randomness per phase
+- the previous root
+- the claim and the history. -/
 structure LoopState (F EF Com : Type _) where
   constraints : List (Constraint F EF)
   randomness : List (List EF)
@@ -230,14 +258,22 @@ def roundStep (c : WhirConfig) (proof : WhirProof F EF Com MP) (st : LoopState F
       | .ok (rs, claimed, h) =>
         pure (.ok ⟨st.constraints ++ [constraint], st.randomness ++ [rs], root, claimed, h⟩)
 
-/-- One step of the round loop of replay: an earlier rejection is kept, else the round runs. -/
+/-- One step of the round loop of replay.
+
+An earlier rejection is kept, otherwise the round runs. -/
 def loopStep (c : WhirConfig) (proof : WhirProof F EF Com MP) (acc : Except VerifierError (LoopState F EF Com))
     (round_index : ℕ) : Option (Except VerifierError (LoopState F EF Com)) :=
   match acc with
   | .error e => pure (.error e)
   | .ok st => roundStep E c proof st round_index
 
-/-- replay: the initial fold, every round, the final polynomial and its queries, the closing fold, and the final identity. -/
+/-- replay, in order:
+
+- the initial fold
+- every round
+- the final polynomial and its queries
+- the closing fold
+- the final identity. -/
 def replay (c : WhirConfig) (proof : WhirProof F EF Com MP) (commitment : Com) (h : List (Step F EF)) :
     Option (Except VerifierError (List EF × List (Step F EF))) := do
   -- The layout's batching seed and challenge, then the initial sumcheck.

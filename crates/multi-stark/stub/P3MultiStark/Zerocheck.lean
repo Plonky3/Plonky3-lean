@@ -1,17 +1,21 @@
 /-
-Transcriptions of the zerocheck verifier of p3-multi-stark: the claim its sumcheck starts from, the round degree, and the closing check.
+Transcriptions of the zerocheck verifier of p3-multi-stark.
 
-These do not extract: they are generic over the field traits and the AIR, which aeneas rejects.
+They cover the claim its sumcheck starts from, the round degree, and the closing check.
+
+These do not extract.
+They are generic over the field traits and the AIR, which aeneas rejects.
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts:
 
-* an AIR is the numbers the verifier reads from it, its periodic columns at a point, and its folder evaluation;
-* the folder evaluation takes the selectors, the opened rows and the periodic values, and returns the alpha-batched constraints and the lookup link, with alpha and the public values fixed;
-* whether an AIR is linked to the lookup reduction is a flag on the AIR;
-* the bus family is a function of the opened current rows and the periodic values, whose error is one value;
-* a periodic declaration that does not fit is one error;
+* an AIR is the numbers the verifier reads from it, its periodic columns at a point, and its folder evaluation
+* the folder evaluation reads the selectors, the opened rows and the periodic values
+* it returns the alpha-batched constraints and the lookup link, with alpha and the public values fixed
+* whether an AIR is linked to the lookup reduction is a flag on the AIR
+* the bus family is a function of the opened current rows and the periodic values, with a single error value
+* a periodic declaration that does not fit is one error
 * a vector is a list, and a panic is none.
 
 Loops, branches and the order of checks are kept.
@@ -54,7 +58,9 @@ structure AirView (K : Type _) where
   main_width : ℕ
   preprocessed_width : ℕ
   num_public_values : ℕ
-  /-- air_periodic_evals_at: the periodic columns at a point, or none when the declaration does not fit. -/
+  /-- air_periodic_evals_at: the periodic columns at a point.
+
+  It is none when the declaration does not fit. -/
   periodic : List K → Option (List K)
   /-- The folder run over the AIR: alpha-batched constraints, then the lookup link. -/
   eval : BoundaryEvals K → List K → List K → List K → List K → List K → K × K
@@ -74,9 +80,16 @@ structure ZerocheckReduction (K : Type _) where
 /-- The bus family at the bound point: a function of the opened current rows and the periodic values. -/
 abbrev BusTerm (K : Type _) := List (List K) → List (List K) → List (List K) → Except Unit K
 
-/-- The body of the per-AIR loop of check_constraint_with_lookup_and_bus: the width checks, the suffix of the point, the next rows, the periodic values, and the AIR's term weighted by its power of beta.
+/-- The body of the per-AIR loop of check_constraint_with_lookup_and_bus, in order:
 
-The subtraction max_log_height - log_height panics below zero, and the slice panics past the end. -/
+- the width checks
+- the suffix of the point
+- the next rows
+- the periodic values
+- the AIR's term, weighted by its power of beta.
+
+The subtraction of the AIR's log height from the largest panics below zero.
+The slice panics past the end. -/
 def checkAir (red : ZerocheckReduction K) (air : AirView K) (pv log_height : ℕ)
     (main prep : TableOpening K) (beta_pow : K) : M (K × List K) :=
   if air.main_width = 0 then none
@@ -106,10 +119,19 @@ def checkAir (red : ZerocheckReduction K) (air : AirView K) (pv log_height : ℕ
         else some (.ok (beta_pow * ci.1, periodic))
     | _, _ => none
 
-/-- One AIR per entry: the AIR, its public-value count, its trace arity, its main and its preprocessed opening. -/
+/-- One entry per AIR:
+
+- the AIR
+- its public-value count
+- its trace arity
+- its main opening
+- its preprocessed opening. -/
 abbrev Entry (K : Type _) := AirView K × ℕ × ℕ × TableOpening K × TableOpening K
 
-/-- The per-AIR loop: accumulate g in AIR order, the i-th AIR weighted by beta^i, and collect the periodic values. -/
+/-- The per-AIR loop.
+
+It accumulates g in AIR order, the i-th AIR weighted by beta^i.
+It also collects the periodic values. -/
 def accumulate (red : ZerocheckReduction K) : List (Entry K) → K → K → M (K × List (List K))
   | [], g, _ => some (.ok (g, []))
   | (air, pv, h, main, prep) :: rest, g, beta_pow =>
@@ -122,7 +144,9 @@ def accumulate (red : ZerocheckReduction K) : List (Entry K) → K → K → M (
       | some (.error e) => some (.error e)
       | some (.ok (g', periodics)) => some (.ok (g', periodic :: periodics))
 
-/-- The entries of the loop: the AIRs zipped with their public-value counts, arities and openings. -/
+/-- The entries of the loop.
+
+Each AIR is zipped with its public-value count, arity and openings. -/
 def entries (airs : List (AirView K)) (pvs log_heights : List ℕ) (main prep : List (TableOpening K)) :
     List (Entry K) :=
   (airs.zip (pvs.zip (log_heights.zip (main.zip prep)))).map
@@ -146,7 +170,12 @@ def closing (red : ZerocheckReduction K) (main prep : List (TableOpening K))
       if red.final_sum ≠ eq_at_point * g + red.lambda * bus_term then some (.error .FinalSumMismatch)
       else some (.ok ())
 
-/-- AirZerocheck::check_constraint_with_lookup_and_bus: the caller's assertions, the opening counts, the per-AIR loop, then the closing comparison. -/
+/-- AirZerocheck::check_constraint_with_lookup_and_bus, in order:
+
+- the caller's assertions
+- the opening counts
+- the per-AIR loop
+- the closing comparison. -/
 def check_constraint (airs : List (AirView K)) (pvs log_heights : List ℕ)
     (main prep : List (TableOpening K)) (red : ZerocheckReduction K)
     (bus : Option (BusTerm K)) : M Unit :=
@@ -164,7 +193,10 @@ def check_constraint (airs : List (AirView K)) (pvs log_heights : List ℕ)
     | some (.error e) => some (.error e)
     | some (.ok (g, periodics)) => closing red main prep bus g periodics
 
-/-- The round degree of verify_reduction_with_lookup_and_bus: one more than the largest AIR degree for the eq weight, widened to the bus composition degree. -/
+/-- The round degree of verify_reduction_with_lookup_and_bus.
+
+It is one more than the largest AIR degree, for the eq weight.
+It is widened to the bus composition degree. -/
 def round_degree (air_degrees : List ℕ) (bus_degree : Option ℕ) : ℕ :=
   let air := air_degrees.foldl max 0 + 1
   match bus_degree with

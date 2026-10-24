@@ -1,13 +1,15 @@
 /-
 Transcriptions of the boundary selectors of p3-multi-stark.
 
-These do not extract: they are generic over the field traits, which aeneas rejects.
+These do not extract.
+They are generic over the field traits, which aeneas rejects.
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 A point is the list of its coordinates, and a field element is an element of a field K.
 
-The packed forms are left out: they compute the same values one lane at a time.
+The packed forms are left out.
+They compute the same values one lane at a time.
 -/
 module
 
@@ -28,7 +30,9 @@ structure BoundaryEvals (K : Type _) where
 /-- One step of BoundaryEvals::at: multiply the running products by 1 - r and by r. -/
 def atStep (acc : K × K) (r : K) : K × K := (acc.1 * (1 - r), acc.2 * r)
 
-/-- BoundaryEvals::at: the two running products over the coordinates, and the transition as one minus the last. -/
+/-- BoundaryEvals::at: the two running products over the coordinates.
+
+The transition is one minus the last-row product. -/
 def BoundaryEvals.at (rs : List K) : BoundaryEvals K :=
   let acc := rs.foldl atStep (1, 1)
   ⟨acc.1, acc.2, 1 - acc.2⟩

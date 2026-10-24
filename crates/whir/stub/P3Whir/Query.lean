@@ -24,14 +24,20 @@ def query_summand_depths (remaining : ℕ) : List ℕ :=
 termination_by remaining
 decreasing_by exact Nat.sub_lt (Nat.pos_of_ne_zero h) (Nat.two_pow_pos _)
 
-/-- stratified_index: the draw low inside stratum number stratum of depth depth. -/
+/-- stratified_index: a low draw placed inside a stratum of the given number and depth. -/
 def stratified_index (width depth stratum low : ℕ) : ℕ := (stratum <<< (width - depth)) ||| low
 
-/-- One draw of count indices of the given width: the indices, and the history after the draw. -/
+/-- One draw of a count of indices of the given width.
+
+It returns the indices, and the history after the draw. -/
 def draw (S : WSponge F EF) (h : List (Step F EF)) (bits count : ℕ) : List ℕ × List (Step F EF) :=
   (S.indices h bits count, h ++ [.challenge])
 
-/-- assemble_query_indices played through the sponge: every position when nothing is drawn, one draw unstratified, else one draw per summand. -/
+/-- assemble_query_indices played through the sponge:
+
+- every position, when nothing is drawn
+- one draw, when unstratified
+- otherwise one draw per summand. -/
 def play_query_indices (S : WSponge F EF) (h : List (Step F EF)) (width draws : ℕ) (stratified : Bool)
     (depths : List ℕ) : List ℕ × List (Step F EF) :=
   if draws = 0 then (List.range (2 ^ width), h)

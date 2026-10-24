@@ -1,18 +1,26 @@
 /-
-Transcriptions of the prover side: the row context, the power-table tuple combiner, and the permutation-trace generator.
+Transcriptions of the prover side of the lookups.
 
-These do not extract: they are generic over the field traits, which aeneas rejects.
+They cover the row context, the power-table tuple combiner, and the permutation-trace generator.
+
+These do not extract.
+They are generic over the field traits, which aeneas rejects.
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts, beyond the gadget transcriptions:
 
-* the extension field is a field K with an algebra map from F;
-* p3-field's batch inversion is the entrywise inverse, and a zero entry panics, as the inverse of a zero product does;
-* p3-maybe-rayon's thread count and task floor are parameters, and a parallel loop over chunks is the sequential loop;
-* a chunk's flat denominator and multiplicity buffers are kept as nested lists in the same order, row, then lookup, then tuple.
+* the extension field is a field K with an algebra map from F
+* p3-field's batch inversion is the entrywise inverse, and a zero entry panics
+* p3-maybe-rayon's thread count and task floor are parameters
+* a parallel loop over chunks is the sequential loop
+* a chunk's flat buffers are nested lists in the same order: row, then lookup, then tuple.
 
-Loops over rows and chunks, the zero-multiplicity skip, the exclusive checks and the three-phase prefix sum are kept.
+These are kept:
+
+* the loops over rows and chunks
+* the zero-multiplicity skip and the exclusive checks
+* the three-phase prefix sum.
 -/
 module
 
@@ -27,7 +35,11 @@ open p3_air.symbolic.mirror p3_air.builder.mirror p3_air.air.mirror
 
 variable {F : Type} [Field F] [DecidableEq F]
 
-/-- The row context of the prover: two-row windows of the main and preprocessed traces, the public values, and the selectors of row `row` of `height`.
+/-- The row context of the prover at one row of a trace:
+
+- two-row windows of the main and preprocessed traces
+- the public values
+- the selectors of that row.
 
 It keeps the trait's default periodic values, which are empty.
 
@@ -50,10 +62,13 @@ def LookupTraceBuilder (main preprocessed : RowWindow F) (public_values : List F
 
 variable {K : Type} [Field K] [Algebra F K] [DecidableEq K]
 
-/-- `dot_product`: the sum of products over the zipped lists. -/
+/-- The dot product: the sum of products over the zipped lists. -/
 def dot_product (l : List K) (r : List F) : K := ((l.zip r).map fun (a, b) => a * algebraMap F K b).sum
 
-/-- The prover's tuple combiner: the last entry at beta^0, and each leading entry e_i times the precomputed beta^(k-1-i).
+/-- The prover's tuple combiner.
+
+The last entry sits at beta^0.
+Each leading entry e_i is multiplied by the precomputed beta^(k-1-i).
 
 A tuple wider than the power table panics. -/
 def combine_tuple (elts : List (SymbolicExpression F)) (beta_powers : List K)
@@ -68,7 +83,9 @@ def combine_tuple (elts : List (SymbolicExpression F)) (beta_powers : List K)
     let lifted_last ← (resolve row_ctx () last).map (algebraMap F K)
     pure (lifted_last + dot_product high_powers leading_resolved)
 
-/-- `chunks`: consecutive pieces of n entries, the last one shorter; a chunk size of 0 panics. -/
+/-- Consecutive pieces of n entries, the last one shorter.
+
+A chunk size of 0 panics. -/
 def chunks {α : Type _} (n : ℕ) (l : List α) : Option (List (List α)) :=
   if n = 0 then none else some (go n l.length l)
 where
@@ -86,7 +103,8 @@ def batch_multiplicative_inverse (x : List K) : Option (List K) :=
 
 An additive lookup gives one pair per tuple, with denominator 1 for a zero multiplicity.
 
-An exclusive lookup gives one pair, after checking that each flag is 0 or 1 and that they sum to 0 or 1. -/
+An exclusive lookup gives one pair.
+It first checks that each flag is 0 or 1, and that the flags sum to 0 or 1. -/
 def lookup_row_terms (row_ctx : AirBuilder F F Unit) (lookup : Lookup F) (alpha : K)
     (powers : List K) : Option (List (K × F)) :=
   match lookup.flags with
@@ -119,7 +137,10 @@ def rowContext (main : Mat F) (preprocessed : Option (Mat F)) (public_values : L
      | none => ⟨[], []⟩)
     public_values height i
 
-/-- One chunk of rows: fill each row's pairs, invert the chunk's denominators at once, and emit each row's fractions and their total. -/
+/-- One chunk of rows.
+
+It fills each row's pairs and inverts the chunk's denominators at once.
+It then emits each row's fractions and their total. -/
 def process_chunk (rows : List ℕ) (main : Mat F) (preprocessed : Option (Mat F))
     (public_values : List F) (lookups : List (Lookup F)) (lookup_challenges : List (K × K))
     (beta_powers : List (List K)) : Option (List (List K × K)) := do
@@ -155,7 +176,8 @@ def prefix_sum (row_totals : List K) (chunk_size : ℕ) : Option (List K) := do
 
 No lookup gives an empty trace and no terminal.
 
-Otherwise the accumulator is column 0 and lookup i's fraction column i + 1, and the terminal is the sum over the trace.
+Otherwise the accumulator is column 0, and lookup i's fraction is column i + 1.
+The terminal is the sum over the trace.
 
 A lookup whose slot is not its position panics, and so does an empty trace. -/
 def generate_permutation (main : Mat F) (preprocessed : Option (Mat F)) (public_values : List F)

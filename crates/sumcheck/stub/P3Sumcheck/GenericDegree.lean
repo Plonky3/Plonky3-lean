@@ -1,7 +1,9 @@
 /-
-Transcriptions of the generic-degree sumcheck verifier: generic_degree/util.rs, transcript.rs and proof.rs.
+Transcriptions of the generic-degree sumcheck verifier.
 
-The interpolation node i is a parameter, the field's interpolation_node(i).
+They cover generic_degree/util.rs, transcript.rs and proof.rs.
+
+The interpolation node i is a parameter, the field's i-th interpolation node.
 -/
 module
 
@@ -17,11 +19,15 @@ open p3_sumcheck.mirror p3_matrix.interpolation.mirror
 
 variable {F EF : Type _} [Field EF] [DecidableEq EF]
 
-/-- RoundPolyInterpolator::new: the barycentric weights of the nodes 0, ..., d, which panics on equal nodes. -/
+/-- RoundPolyInterpolator::new: the barycentric weights of the nodes 0, ..., d.
+
+Equal nodes panic. -/
 def RoundPolyInterpolator.new (node : ℕ → EF) (degree : ℕ) : Option (Fin (degree + 1) → EF) :=
   barycentric_weights fun i : Fin (degree + 1) => node i
 
-/-- RoundPolyInterpolator::eval: h(r) from h(0), h(2), ..., h(d) and the sum h(0) + h(1).
+/-- RoundPolyInterpolator::eval: h(r).
+
+It reads h(0), h(2), ..., h(d) and the sum h(0) + h(1).
 
 The width is a debug assertion, and an empty slice panics on its first entry.
 
@@ -53,7 +59,10 @@ inductive GenericDegreeError where
 def GenericDegreeShape.seed (num_rounds degree pow_bits : ℕ) : Step F EF :=
   .seed "p3-sumcheck-generic-degree" [num_rounds, degree, pow_bits]
 
-/-- VerifierTranscript::round: absorb the d values, whose count the step fixes, check the witness, draw the challenge. -/
+/-- VerifierTranscript::round.
+
+It absorbs the d values, whose count the step fixes.
+It then checks the witness and draws the challenge. -/
 def VerifierTranscript.round (S : Sponge F EF) (degree pow_bits round : ℕ) (h : List (Step F EF))
     (evals : List EF) (witness : Option F) : Except GenericDegreeError (EF × List (Step F EF)) := do
   if evals.length ≠ degree then throw (.PolyEvalCountMismatch round degree evals.length)
@@ -66,7 +75,9 @@ def VerifierTranscript.round (S : Sponge F EF) (degree pow_bits round : ℕ) (h 
     else pure h
   pure (S.sample h, h ++ [.challenge])
 
-/-- One iteration of the round loop of verify; none is a panic of the interpolator. -/
+/-- One iteration of the round loop of verify.
+
+None is a panic of the interpolator. -/
 def verifyRound (S : Sponge F EF) (node : ℕ → EF) (degree pow_bits : ℕ)
     (weights : Fin (degree + 1) → EF) (polys : List (List EF)) (wits : List F)
     (acc : Except GenericDegreeError (List EF × EF × List (Step F EF))) (round : ℕ) :
@@ -82,7 +93,9 @@ def verifyRound (S : Sponge F EF) (node : ℕ → EF) (degree pow_bits : ℕ)
       (RoundPolyInterpolator.eval node degree weights evals running_sum r).map fun s =>
         .ok (rs ++ [r], s, h)
 
-/-- GenericDegreeProof::verify: the challenges, the reduced claim, and the sponge history.
+/-- GenericDegreeProof::verify.
+
+It returns the challenges, the reduced claim, and the sponge history.
 
 The claimed sum is absorbed after the seed, before any round. -/
 def verify (S : Sponge F EF) (node : ℕ → EF) (claimed_sum : EF) (polys : List (List EF))

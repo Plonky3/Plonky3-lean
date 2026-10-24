@@ -1,13 +1,15 @@
 /-
-Transcriptions of the FRI prover: the commit phase, the query answers, the input openings, and prove_fri.
+Transcriptions of the FRI prover.
+
+They cover the commit phase, the query answers, the input openings, and the full prover.
 
 What a transcription abstracts, beyond Fold.lean and Types.lean:
 
-* the folding strategy is the two-adic one, which samples no extra index bits;
-* the inverse DFT of the final polynomial is a parameter, which p3-dft's model proves is the inverse transform;
-* the committed matrix of a round is the flat folded vector read with width 2^log_arity;
-* a parallel loop whose items write disjoint outputs runs its items in order;
-* an assertion panics, and a debug assertion is checked, as in a debug build;
+* the folding strategy is the two-adic one, which samples no extra index bits
+* the inverse DFT of the final polynomial is a parameter, proved to be the inverse transform in p3-dft
+* the committed matrix of a round is the flat folded vector read with width 2^log_arity
+* a parallel loop whose items write disjoint outputs runs its items in order
+* an assertion panics, and a debug assertion is checked, as in a debug build
 * a panic is none, and a returned error is an error.
 
 Loops, branches and early returns are kept.
@@ -34,7 +36,9 @@ def matOfFlat (v : List K) (w : ℕ) : Mat K := ⟨v.length / w, w, fun r c => v
 def flatOfMat (m : Mat K) : List K :=
   (List.range m.height).flatMap fun r => (List.finRange m.width).map (m.entry r)
 
-/-- What the commit phase returns: the commitments, prover data, arities, witnesses and final polynomial. -/
+/-- What the commit phase returns.
+
+It holds the commitments, prover data, arities, witnesses and final polynomial. -/
 structure CommitPhaseResult (K C PD : Type _) where
   commits : List C
   data : List PD
@@ -42,11 +46,16 @@ structure CommitPhaseResult (K C PD : Type _) where
   pow_witnesses : List K
   final_poly : List K
 
-/-- The fold that a round applies: fold_matrix at the packing width W and field width, with any scratch buffer. -/
+/-- The fold that a round applies.
+
+It is the matrix fold at the packing width W and field width, with any scratch buffer. -/
 structure Folder (K : Type _) where
   fold : K → ℕ → List K → Option (List K)
 
-/-- One commit round: commit the vector at width 2^log_arity, draw beta, fold, and roll in the next input of the folded length scaled by beta^(2^log_arity). -/
+/-- One commit round.
+
+It commits the vector at width 2^log_arity, draws beta, and folds.
+It then adds the next input of the folded length, scaled by beta^(2^log_arity). -/
 def commitRound (mmcs : MmcsOps K) {S : Type _} (tx : ProverTx K mmcs.Commitment S) (folder : Folder K)
     (log_arity : ℕ)
     (st : List K × List (List K) × List mmcs.Commitment × List mmcs.ProverData × List K × S) :
@@ -83,7 +92,11 @@ def commit_phase (mmcs : MmcsOps K) {S : Type _} (tx : ProverTx K mmcs.Commitmen
       let truncated := folded.take params.final_poly_len
       some (⟨commits, data, log_arities, ws, idft (revIndex truncated.length truncated)⟩, s')
 
-/-- Per round: each query's group, one shared opening of those groups, and each group without the queried value. -/
+/-- The query answers, per round:
+
+- each query's group
+- one shared opening of those groups
+- each group without the queried value. -/
 def answer_queries (mmcs : MmcsOps K) (log_arities : List ℕ) (data : List mmcs.ProverData)
     (start_indices : List ℕ) : Option (List (CommitPhaseMultiStep K mmcs.MultiProof)) := do
   let (_, out) ← (data.zipIdx).foldlM (fun (st : List ℕ × List (CommitPhaseMultiStep K mmcs.MultiProof)) e => do
@@ -102,7 +115,9 @@ def answer_queries (mmcs : MmcsOps K) (log_arities : List ℕ) (data : List mmcs
     (start_indices, [])
   some out
 
-/-- Per input batch: the indices shifted down to the batch's tallest height, and one shared opening. -/
+/-- The input openings, per batch.
+
+The indices are shifted down to the batch's tallest height and share one opening. -/
 def open_inputs (mmcs : MmcsOps K) (log_global_max_height : ℕ) (indices : List ℕ)
     (data : List mmcs.ProverData) : Option (List (BatchMultiOpening K mmcs.MultiProof)) :=
   data.mapM fun pd => do
@@ -115,7 +130,9 @@ def open_inputs (mmcs : MmcsOps K) (log_global_max_height : ℕ) (indices : List
         mmcs.open_multi_batch (indices.map (· / 2 ^ bits_reduced)) pd
       some ⟨opened_values, opening_proof⟩
 
-/-- The prover at the derived schedule: the assertions, the height preflight, the commit phase, the query phase, and the openings. -/
+/-- The prover at the derived schedule.
+
+It runs the assertions, the height preflight, the commit phase, the query phase, and the openings. -/
 def prove_fri (fmmcs : MmcsOps K) (immcs : MmcsOps K) {S : Type _} (tx : ProverTx K fmmcs.Commitment S)
     (folder : Folder K) (idft : List K → List K) (params : FriParameters) (inputs : List (List K))
     (log_global_max_height : ℕ) (input_data : List immcs.ProverData) (batch_pow_witness : K) (s : S) :

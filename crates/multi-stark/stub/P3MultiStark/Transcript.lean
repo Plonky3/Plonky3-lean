@@ -1,14 +1,17 @@
 /-
-Transcriptions of the statement transcript of p3-multi-stark and of its zerocheck transcript: the step sequences they describe and the numbers their instance labels bind.
+Transcriptions of the statement transcript of p3-multi-stark and of its zerocheck transcript.
 
-These do not extract: they are generic over the AIR and the transcript field, which aeneas rejects.
+They cover the step sequences the transcripts describe, and the numbers their instance labels bind.
+
+These do not extract.
+They are generic over the AIR and the transcript field, which aeneas rejects.
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts:
 
-* a step is its role and its length, without the type names the markers record as diagnostics;
-* an instance label is the list of the 64-bit words absorbed, each as a natural number;
+* a step is its role and its length, without the type names the markers record as diagnostics
+* an instance label is the list of the 64-bit words absorbed, each as a natural number
 * an AIR is the numbers the shape reads from it.
 
 Loops, branches and the order of steps are kept.
@@ -69,7 +72,12 @@ def MultiStarkShape.has_preprocessed (s : MultiStarkShape) : Bool :=
 /-- delegation: the matched marker pair of one delegation. -/
 def delegation (d : Delegation) : List Step := [.Begin d, .End d]
 
-/-- MultiStarkShape::pattern: the preprocessed commitment, the main commitment's bracket, one public-value step per instance, then the delegations in the order the run performs them. -/
+/-- MultiStarkShape::pattern, in order:
+
+- the preprocessed commitment
+- the main commitment's bracket
+- one public-value step per instance
+- the delegations, in the order the run performs them. -/
 def MultiStarkShape.pattern (s : MultiStarkShape) : List Step :=
   (if s.has_preprocessed then [.PreprocessedCommitment] else []) ++
   delegation .MainCommitment ++
@@ -119,10 +127,18 @@ structure ZerocheckShape where
   bus_degree : Option ℕ
   deriving DecidableEq
 
-/-- ZerocheckShape::free_coordinates: the coordinates of the zerocheck point drawn here, ahead of the lookup tail. -/
+/-- ZerocheckShape::free_coordinates: the coordinates of the zerocheck point drawn here.
+
+They come ahead of the lookup tail. -/
 def ZerocheckShape.free_coordinates (s : ZerocheckShape) : ℕ := s.log_height - s.lookup_point_len
 
-/-- ZerocheckShape::pattern: alpha, beta, eta with a lookup, lambda with a bus, the free coordinates, then the sumcheck's bracket. -/
+/-- ZerocheckShape::pattern, in order:
+
+- alpha and beta
+- eta, with a lookup
+- lambda, with a bus
+- the free coordinates
+- the sumcheck's bracket. -/
 def ZerocheckShape.pattern (s : ZerocheckShape) : List ZerocheckStep :=
   [.Alpha, .Beta] ++
   (if s.lookup_point_len > 0 then [.Eta] else []) ++

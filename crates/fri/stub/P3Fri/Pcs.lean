@@ -1,14 +1,16 @@
 /-
-Transcriptions of the two-adic FRI PCS's opening reduction: the inverse denominators and the reduced openings the prover folds.
+Transcriptions of the two-adic FRI PCS's opening reduction.
+
+They cover the inverse denominators and the reduced openings the prover folds.
 
 What a transcription abstracts, beyond Fold.lean:
 
-* the field's generator is a parameter g;
-* the opened values are inputs, computed by p3-matrix's coset interpolation;
-* the packed row dot product with the offset powers of alpha is the dot product with those powers;
-* the per-height arrays have 33 slots, and a height past 32 panics, as the array index does;
-* a map keyed by point is a function of the point;
-* a parallel loop whose items write disjoint outputs runs its items in order;
+* the field's generator is a parameter g
+* the opened values are inputs, computed by p3-matrix's coset interpolation
+* the packed row dot product with the offset powers of alpha is the plain dot product
+* the per-height arrays have 33 slots, and a height past 32 panics, as the array index does
+* a map keyed by point is a function of the point
+* a parallel loop whose items write disjoint outputs runs its items in order
 * a panic is none.
 
 Loops, branches and the order of operations are kept.
@@ -45,10 +47,16 @@ def compute_inverse_denominators (mats : List (MatToOpen K)) (coset : List K) (z
   let hs := (mats.filter fun m => z ∈ m.points).map fun m => Nat.log 2 m.mat.height
   batchInv ((coset.take (2 ^ hs.foldl max 0)).map (z - ·))
 
-/-- The state of the reduction: per log height, the count of reduced columns, and the reduced vector if a matrix of that height was seen. -/
+/-- The state of the reduction, per log height:
+
+- the count of reduced columns
+- the reduced vector, if a matrix of that height was seen. -/
 abbrev PcsRedState (K : Type) := (ℕ → ℕ) × (ℕ → Option (List K))
 
-/-- One point of a matrix of log height lh and width w: add (alpha^num y - alpha^(k w) compressed) / (z - x) to every row, and advance the ladder by w. -/
+/-- One point of a matrix of log height lh and width w.
+
+It adds (alpha^num y - alpha^(k w) compressed) / (z - x) to every row.
+It then advances the ladder by w. -/
 def reducePoint (alpha : K) (inv_denoms : K → Option (List K)) (lh w : ℕ) (compressed : List K)
     (st2 : (ℕ → ℕ) × List K) (e : (K × List K) × ℕ) : Option ((ℕ → ℕ) × List K) := do
   let (num2, ro) := st2
@@ -61,7 +69,10 @@ def reducePoint (alpha : K) (inv_denoms : K → Option (List K)) (lh w : ℕ) (c
     ro.getD r 0 + (weighted - rescale * compressed.getD r 0) * inv.getD r 0
   some (Function.update num2 lh (num2 lh + w), ro')
 
-/-- One matrix: compress its rows with the offset powers of alpha, then add each point's quotient at its height. -/
+/-- One matrix of the reduction.
+
+It compresses the rows with the offset powers of alpha.
+It then adds each point's quotient at its height. -/
 def reduceMat (alpha : K) (inv_denoms : K → Option (List K)) (st : PcsRedState K) (m : MatToOpen K) :
     Option (PcsRedState K) := do
   let (num, red) := st

@@ -3,9 +3,9 @@ Transcriptions of the FRI parameters, the per-round arity and the folding schedu
 
 What a transcription abstracts:
 
-* a usize is a natural number, and a checked addition fails when the sum reaches 2^64;
-* the testing and benchmark constructors, the security mirror and the MMCS field are left out;
-* an assertion panics, and a debug assertion is checked, as in a debug build;
+* a usize is a natural number, and a checked addition fails when the sum reaches 2^64
+* the testing and benchmark constructors, the security mirror and the MMCS field are left out
+* an assertion panics, and a debug assertion is checked, as in a debug build
 * a panic is none.
 
 Loops, branches and early returns are kept.
@@ -62,7 +62,9 @@ end FriParameters
 
 /-- The smallest of the distance to the final height, the distance to the next input, and the cap.
 
-It asserts a positive cap, and debug-asserts that the current height lies above the final height and the next input. -/
+It asserts a positive cap.
+
+It debug-asserts that the current height lies above the final height and the next input. -/
 def compute_log_arity_for_round (log_current_height : ℕ) (next_input_log_height : Option ℕ)
     (log_final_height max_log_arity : ℕ) : Option ℕ :=
   if max_log_arity = 0 then none
@@ -75,7 +77,9 @@ def compute_log_arity_for_round (log_current_height : ℕ) (next_input_log_heigh
       if log_current_height ≤ next then none
       else some (min (min (log_current_height - next) max_fold_to_target) max_log_arity)
 
-/-- One round of the schedule loop, with fuel: push the round's arity, descend, and roll in an input the descent reached. -/
+/-- One round of the schedule loop, with fuel.
+
+It pushes the round's arity, descends, and rolls in an input the descent reached. -/
 def fold_schedule_loop (heights : List ℕ) (log_final_height max_log_arity : ℕ) :
     ℕ → ℕ → ℕ → List ℕ → Option (List ℕ)
   | 0, _, _, acc => some acc
@@ -92,7 +96,9 @@ def fold_schedule_loop (heights : List ℕ) (log_final_height max_log_arity : �
 /-- The log-arities of every round, from the tallest input down to the final height.
 
 It asserts strictly decreasing heights.
-The loop runs while the height lies above the final height; the fuel, the tallest height, is never the bound that stops it. -/
+
+The loop runs while the height lies above the final height.
+The fuel, the tallest height, is never the bound that stops it. -/
 def fold_schedule (heights : List ℕ) (log_final_height max_log_arity : ℕ) : Option (List ℕ) :=
   if ¬ heights.IsChain (· > ·) then none
   else match heights with

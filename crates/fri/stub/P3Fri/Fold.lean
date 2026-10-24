@@ -1,18 +1,20 @@
 /-
-Transcriptions of the two-adic folding: the row fold, the matrix fold on its three paths, and Lagrange interpolation.
+Transcriptions of the two-adic folding.
+
+They cover the row fold, the matrix fold on its three paths, and Lagrange interpolation.
 
 What a transcription abstracts, beyond the models of p3-dft and p3-commit:
 
-* the base field and its extension are one mathlib field K, base values read through their embedding;
-* the field's two-adic generators are a table G, and asking past its adicity panics;
-* reverse_bits_len(x, k) is the k-bit reversal of x, which it is for k > 0 or x = 0, and the folds call it on x < 2^k only;
-* halve(x) is x / 2;
-* a matrix of width w is its row-major entries;
-* a packed value has W lanes, a function on Fin W, and packed arithmetic acts lane by lane;
-* a parallel loop whose items write disjoint outputs runs its items in order;
-* the scratch buffer a worker thread reuses across packed blocks is an arbitrary list of the right length;
-* an inverse of zero panics, and so does a batch inversion with a zero entry;
-* an assertion panics, and a debug assertion is checked, as in a debug build;
+* the base field and its extension are one mathlib field K, base values read through their embedding
+* the field's two-adic generators are a table G, and asking past its adicity panics
+* reverse_bits_len(x, k) is the k-bit reversal of x, exact for k > 0 or x = 0, and only called on x < 2^k
+* halve(x) is x / 2
+* a matrix of width w is its row-major entries
+* a packed value has W lanes, a function on Fin W, and packed arithmetic acts lane by lane
+* a parallel loop whose items write disjoint outputs runs its items in order
+* the scratch buffer a worker thread reuses across packed blocks is an arbitrary list of the right length
+* an inverse of zero panics, and so does a batch inversion with a zero entry
+* an assertion panics, and a debug assertion is checked, as in a debug build
 * a panic is none.
 
 Loops, branches and early returns are kept.
@@ -36,7 +38,7 @@ abbrev inv (a : K) : Option K := p3_commit.domain.mirror.inv a
 /-- Batch inversion, which panics on a zero entry. -/
 abbrev batchInv (l : List K) : Option (List K) := p3_commit.domain.mirror.batchInv l
 
-/-- The barycentric formula over points xs, which the caller places on a coset of 2^log_n roots of unity.
+/-- The barycentric formula over points xs, on a coset of 2^log_n roots of unity.
 
 A point equal to z returns its value.
 The weight of x_i is x_i / (n x_0^n). -/
@@ -63,8 +65,12 @@ def foldPair (lo hi beta c : K) : K := (lo + hi) / 2 + (lo - hi) * beta * c
 
 /-- The fold of one opened row at the challenge beta.
 
-The row holds the values at s w^rev(j), for s = g^rev(index), g of order 2^(log_height + log_arity) and w of order 2^log_arity.
-Arity 2 uses the closed form; other arities interpolate. -/
+The row holds the values at s w^rev(j), with s = g^rev(index).
+
+Here g has order 2^(log_height + log_arity) and w has order 2^log_arity.
+
+Arity 2 uses the closed form.
+Other arities interpolate. -/
 def fold_row (G : Gen K) (index log_height log_arity : ℕ) (beta : K) (evals : List K) : Option K := do
   let arity := 2 ^ log_arity
   let g ← G.get (log_height + log_arity)
@@ -93,7 +99,8 @@ def foldRounds (tbl : List K) : ℕ → K → List K → List K
 /-- The scalar paths of fold_matrix, on a matrix of width 2^log_arity given by its entries v.
 
 Arity 2 folds each row with the bit-reversed table of g^(-i) / 2.
-Arity 2^k folds the pairs of every row, then folds the result k - 1 more times with beta^2, beta^4, and so on. -/
+Arity 2^k folds the pairs of every row.
+It then folds the result k - 1 more times, with beta^2, beta^4, and so on. -/
 def fold_matrix_scalar (G : Gen K) (beta : K) (log_arity : ℕ) (v : List K) : Option (List K) := do
   let width := 2 ^ log_arity
   let height := v.length / width
@@ -117,7 +124,11 @@ def fold_matrix_scalar (G : Gen K) (beta : K) (log_arity : ℕ) (v : List K) : O
 /-- Whether n is a power of two, which zero is not. -/
 def isPow2 (n : ℕ) : Bool := decide (2 ^ Nat.log 2 n = n)
 
-/-- The packed kernel runs for a power-of-two packing width W > 1, no taller than the matrix, over a field of at most 32 bits. -/
+/-- The packed kernel runs under three conditions:
+
+- the packing width W is a power of two above 1
+- W is no taller than the matrix
+- the field has at most 32 bits. -/
 def use_packed_fold (packing_width height field_bits : ℕ) : Bool :=
   decide (1 < packing_width) && isPow2 packing_width && decide (packing_width ≤ height) &&
     decide (field_bits ≤ 32)
@@ -140,7 +151,11 @@ def packedRounds {W : ℕ} : List (List K) → (Fin W → K) → List (Fin W →
 
 /-- fold_matrix_packed, on a matrix of width 2^log_arity given by its entries v, W rows at a time.
 
-Round s halves pair k of row t by g^(-2^s rev(t)) w^(-2^s rev(k)) / 2, with the row part packed and the pair part merged with beta^(2^s).
+Round s halves pair k of row t by g^(-2^s rev(t)) w^(-2^s rev(k)) / 2.
+
+The row part is packed.
+The pair part is merged with beta^(2^s).
+
 Each block starts from the buffer init, which its first round overwrites. -/
 def fold_matrix_packed (G : Gen K) (W : ℕ) (init : List (Fin W → K)) (beta : K) (log_arity : ℕ)
     (v : List K) : Option (List K) := do

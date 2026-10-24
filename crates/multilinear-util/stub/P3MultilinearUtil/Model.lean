@@ -57,7 +57,9 @@ def mulBase {F EF : Type _} [CommSemiring F] [Semiring EF] [Algebra F EF] {W : �
 /-- The sum of the lanes of a packed value. -/
 def laneSum {W : ℕ} [AddCommMonoid K] (x : Fin W → K) : K := (List.ofFn x).sum
 
-/-- chunks(c): consecutive pieces of c entries, the last one possibly shorter; c is positive. -/
+/-- chunks(c): consecutive pieces of c entries, the last one possibly shorter.
+
+The size c is positive. -/
 def chunks (c : ℕ) (l : List K) : List (List K) :=
   (List.range ((l.length + c - 1) / c)).map fun j => (l.drop (j * c)).take c
 

@@ -1,15 +1,19 @@
 /-
-Transcriptions of the verifier's checks: the chunk recombination, the constraint check at the out-of-domain point, and the shape checks.
+Transcriptions of the verifier's checks.
 
-These do not extract: they are generic over the configuration, the field traits and the AIR, which aeneas rejects.
+They cover the chunk recombination, the constraint check at the out-of-domain point, and the shape checks.
+
+These do not extract.
+They are generic over the configuration, the field traits and the AIR, which aeneas rejects.
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts, beyond the folder transcriptions:
 
-* the domains are two-adic cosets over the challenge field K, as p3-commit's transcriptions model them, with base values read through their embedding;
-* the basis of K over the base field F that Rust fixes is a parameter;
-* an inverse of zero panics, as Rust's checked inverse does;
+* the domains are two-adic cosets over the challenge field K, as in p3-commit's transcriptions
+* base values are read through their embedding
+* the basis of K over the base field F that Rust fixes is a parameter
+* an inverse of zero panics, as Rust's checked inverse does
 * a panic is none, and a rejection is an error value.
 
 Loops, branches and the order of checks are kept.
@@ -58,14 +62,18 @@ inductive VerificationError where
 
 variable {F K : Type} [Field F] [DecidableEq F] [Field K] [DecidableEq K] [Algebra F K]
 
-/-- The element whose coordinates in the basis are the given values, absent unless there are exactly D of them. -/
+/-- The element whose coordinates in the basis are the given values.
+
+It is absent unless there are exactly D of them. -/
 noncomputable def from_ext_basis_coefficients {D : ℕ} (B : Module.Basis (Fin D) F K) (ch : List K) :
     Option K :=
   if ch.length = D then some (∑ d : Fin D, ch.getD d 0 * B d) else none
 
 variable (G : Gen K)
 
-/-- The Lagrange factor of chunk i at zeta: the product over the other chunks j of Z_j(zeta) / Z_j(first point of chunk i). -/
+/-- The Lagrange factor of chunk i at zeta.
+
+It is the product over the other chunks j of Z_j(zeta) / Z_j(first point of chunk i). -/
 def chunkFactor (domains : List (Coset G)) (zeta : K) (i : ℕ) : Option K := do
   let domain ← domains[i]?
   ((List.range domains.length).filter (· ≠ i)).foldlM (fun acc j => do
@@ -73,7 +81,9 @@ def chunkFactor (domains : List (Coset G)) (zeta : K) (i : ℕ) : Option K := do
     let w ← inv (Coset.vanishing_poly_at_point G other (Coset.first_point G domain))
     pure (acc * (Coset.vanishing_poly_at_point G other zeta * w))) 1
 
-/-- The quotient at zeta from its chunks' openings: each chunk's value, rebuilt from its coordinates, times its Lagrange factor.
+/-- The quotient at zeta, from its chunks' openings.
+
+It sums each chunk's value, rebuilt from its coordinates, times its Lagrange factor.
 
 A chunk without exactly D coordinates panics. -/
 noncomputable def recompose_quotient_from_chunks {D : ℕ} (B : Module.Basis (Fin D) F K)
@@ -85,15 +95,21 @@ noncomputable def recompose_quotient_from_chunks {D : ℕ} (B : Module.Basis (Fi
     let c ← from_ext_basis_coefficients B ch
     pure (acc + zp * c)) 0
 
-/-- The two preprocessed rows as a window, or a window of width zero unless both are present. -/
+/-- The two preprocessed rows as a window.
+
+The window has width zero unless both rows are present. -/
 def preprocessedWindow (preprocessed_local preprocessed_next : Option (List K)) : RowWindow K :=
   match preprocessed_local, preprocessed_next with
   | some l, some n => ⟨l, n⟩
   | _, _ => ⟨[], []⟩
 
-/-- The constraint check at zeta: fold the AIR's constraints at the opened rows with the selectors at zeta, and compare the fold times 1 / Z(zeta) with the recombined quotient.
+/-- The constraint check at zeta.
 
-An AIR with boundary cells panics, and so do the selectors when zeta lies on the trace domain. -/
+It folds the AIR's constraints at the opened rows, with the selectors at zeta.
+It compares the fold times 1 / Z(zeta) with the recombined quotient.
+
+An AIR with boundary cells panics.
+So do the selectors when zeta lies on the trace domain. -/
 def verify_constraints (air : Air F) (trace_local trace_next : List K)
     (preprocessed_local preprocessed_next : Option (List K)) (periodic_values : List K)
     (public_values : List F) (trace_domain : Coset G) (zeta alpha quotient : K) :
@@ -117,7 +133,9 @@ def verify_constraints (air : Air F) (trace_local trace_next : List K)
 * A randomization opening and commitment are present exactly when the scheme is hiding.
 * There is one public value per declared public value.
 * The next row is present, as wide as the trace, exactly when the AIR reads it.
-* The current row is as wide as the trace, there is one opening per quotient chunk, and each chunk and the randomization opening hold D values.
+* The current row is as wide as the trace.
+* There is one opening per quotient chunk.
+* Each chunk and the randomization opening hold D values.
 * At zero grinding difficulty the grind witness is zero. -/
 def check_shape (air : Air F) (opens_main_next zk : Bool) (D num_quotient_chunks ood_pow_bits : ℕ)
     (public_values : List F) (trace_local : List K) (trace_next : Option (List K))
@@ -137,7 +155,9 @@ def check_shape (air : Air F) (opens_main_next zk : Bool) (D num_quotient_chunks
   if ood_pow_bits = 0 ∧ ood_pow_witness ≠ 0 then
     throw (.InvalidProofShape .NonCanonicalOodPowWitness)
 
-/-- The rejection of a point on the trace domain, before anything divides by its vanishing polynomial. -/
+/-- The rejection of a point on the trace domain.
+
+It runs before anything divides by the domain's vanishing polynomial. -/
 def check_ood_point (init_trace_domain : Coset G) (zeta : K) : Except VerificationError Unit :=
   if Coset.vanishing_poly_at_point G init_trace_domain zeta = 0 then throw .OodPointInDomain
   else pure ()

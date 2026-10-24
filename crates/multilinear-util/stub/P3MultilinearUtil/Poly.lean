@@ -3,7 +3,9 @@ Transcriptions of the multilinear polynomial methods of p3-multilinear-util.
 
 A polynomial is its table of evaluations over the cube, a list of 2^n entries.
 
-The table entries live in A, the challenges in K, and A is a K-algebra, or the reverse, as each method's bounds say.
+The table entries live in A and the challenges in K.
+
+Each method's bounds say whether A is a K-algebra or the reverse.
 
 The evaluation dispatch and the in-place folds take the cost model's choice as a parameter.
 -/
@@ -25,7 +27,9 @@ def Poly.new {A : Type _} (evals : List A) : Option (List A) :=
 def Poly.as_constant {A : Type _} (evals : List A) : Option A :=
   if evals.length = 1 then evals.head? else none
 
-/-- zero: 2^n zeros; the shift panics when n >= 64. -/
+/-- zero: 2^n zeros.
+
+The shift panics when n >= 64. -/
 def Poly.zero {A : Type _} [Zero A] (num_variables : ℕ) : Option (List A) :=
   if num_variables < 64 then some (List.replicate (2 ^ num_variables) 0) else none
 
@@ -33,7 +37,9 @@ def Poly.zero {A : Type _} [Zero A] (num_variables : ℕ) : Option (List A) :=
 def Poly.truncate_to_half {A : Type _} (evals : List A) : Option (List A) :=
   if evals.length ≤ 1 then none else some (evals.take (evals.length / 2))
 
-/-- pad_zeros: zeros up to 2^n entries, which asserts n is at least the current variable count. -/
+/-- pad_zeros: zeros up to 2^n entries.
+
+It asserts n is at least the current variable count. -/
 def Poly.pad_zeros {A : Type _} [Zero A] (evals : List A) (num_variables : ℕ) : Option (List A) :=
   if Nat.log 2 evals.length ≤ num_variables ∧ num_variables < 64 then
     some (evals.take (2 ^ num_variables) ++
@@ -46,14 +52,17 @@ variable {F : Type _} [Field F]
 
 /-- new_from_point: scale eq(point, x) for every x, through the batched table of one point.
 
-The constant case is the scale; 2^n must fit a usize. -/
+The constant case is the scale.
+The size 2^n must fit a usize. -/
 def Poly.new_from_point (w T : ℕ) (point : List F) (scale : F) : Option (List F) :=
   if point.length = 0 then some [scale]
   else if point.length < 64 then
     eval_eq_batch w T false 1 (point.map fun z => [z]) (List.replicate (2 ^ point.length) 0) [scale]
   else none
 
-/-- new_next_from_point: the equality table shifted up one row, with the last weight kept on the last row. -/
+/-- new_next_from_point: the equality table shifted up one row.
+
+The last weight is kept on the last row. -/
 def Poly.new_next_from_point (w T : ℕ) (point : List F) : Option (List F) := do
   let res ← Poly.new_from_point w T point 1
   let n := res.length
@@ -77,7 +86,9 @@ def Poly.fix_prefix_var_mut (evals : List A) (r : K) : Option (List A) :=
     some (List.zipWith (fun a0 a1 => a0 + (a1 - a0) * algebraMap K A r) (evals.take mid)
       (evals.drop mid))
 
-/-- sum_prefix_var_mut: p[i] += p[i + mid], then keep the lower half; a constant is left alone. -/
+/-- sum_prefix_var_mut: p[i] += p[i + mid], then keep the lower half.
+
+A constant is left alone. -/
 def Poly.sum_prefix_var_mut (evals : List A) : List A :=
   if evals.length = 1 then evals
   else
@@ -116,7 +127,9 @@ section Extension
 
 variable {A B : Type _} [Field A] [Field B] [Algebra A B]
 
-/-- fix_prefix_var: (1 - r) p(0, x) + r p(1, x), into the larger field; it asserts the table is not constant. -/
+/-- fix_prefix_var: (1 - r) p(0, x) + r p(1, x), into the larger field.
+
+It asserts the table is not constant. -/
 def Poly.fix_prefix_var (evals : List A) (r : B) : Option (List B) :=
   if evals.length ≤ 1 then none
   else
@@ -124,20 +137,26 @@ def Poly.fix_prefix_var (evals : List A) (r : B) : Option (List B) :=
     Poly.new (List.zipWith (fun a0 a1 => r * algebraMap A B (a1 - a0) + algebraMap A B a0)
       (evals.take half) (evals.drop half))
 
-/-- fix_prefix_var_at: one entry of the prefix fold; the reads panic past the end. -/
+/-- fix_prefix_var_at: one entry of the prefix fold.
+
+The reads panic past the end. -/
 def Poly.fix_prefix_var_at (evals : List A) (r : B) (index : ℕ) : Option B := do
   let half := evals.length / 2
   let lo ← evals[index]?
   let hi ← evals[index + half]?
   pure (r * algebraMap A B (hi - lo) + algebraMap A B lo)
 
-/-- fix_suffix_var: the adjacent pairs folded at r; it asserts the table is not constant. -/
+/-- fix_suffix_var: the adjacent pairs folded at r.
+
+It asserts the table is not constant. -/
 def Poly.fix_suffix_var (evals : List A) (r : B) : Option (List B) :=
   if evals.length = 1 then none
   else Poly.new ((chunks 2 evals).map fun a =>
     r * algebraMap A B (a.getD 1 0 - a.getD 0 0) + algebraMap A B (a.getD 0 0))
 
-/-- fix_prefix_var_to_packed: the prefix fold on packed lanes; it asserts n > log_2 W. -/
+/-- fix_prefix_var_to_packed: the prefix fold on packed lanes.
+
+It asserts n > log_2 W. -/
 def Poly.fix_prefix_var_to_packed (w : ℕ) (evals : List A) (r : B) :
     Option (List (Fin (2 ^ w) → B)) := do
   if Nat.log 2 evals.length ≤ w then none
@@ -146,7 +165,9 @@ def Poly.fix_prefix_var_to_packed (w : ℕ) (evals : List A) (r : B) :
   Poly.new (List.zipWith (fun a0 a1 => (fun _ => r) * mulBase (fun _ => 1) (a1 - a0) +
     mulBase (fun _ => 1) a0) (poly.take half) (poly.drop half))
 
-/-- pack: W consecutive extension values per packed value; it asserts n >= log_2 W. -/
+/-- pack: W consecutive extension values per packed value.
+
+It asserts n >= log_2 W. -/
 def Poly.pack (w : ℕ) (evals : List B) : Option (List (Fin (2 ^ w) → B)) :=
   if Nat.log 2 evals.length < w then none
   else (chunks (2 ^ w) evals).mapM (from_ext_slice (2 ^ w))
@@ -154,7 +175,9 @@ def Poly.pack (w : ℕ) (evals : List B) : Option (List (Fin (2 ^ w) → B)) :=
 /-- unpack: the lanes of every packed value, in order. -/
 def Poly.unpack {W : ℕ} (packed : List (Fin W → B)) : List B := to_ext_iter packed
 
-/-- eval_multilinear_recursive in a release build: unrolled up to four variables, then a split on the first.
+/-- eval_multilinear_recursive in a release build.
+
+It unrolls up to four variables, then splits on the first.
 
 The reads panic past the end of the table. -/
 def eval_multilinear_recursive : List A → List B → Option B
@@ -203,9 +226,9 @@ end Extension
 
 section Packed
 
-/-- eq_serial: out[0] = scale, then each coordinate from the last doubles the filled prefix.
+/-- eq_serial: entry 0 is the scale, then each coordinate from the last doubles the filled prefix.
 
-It asserts out has 2^n entries, and it writes every one of them. -/
+It asserts the output has 2^n entries, and it writes every one of them. -/
 def eq_serial {K A : Type _} [Field K] [CommRing A] [Algebra K A] (out : List A) (point : List K)
     (scale : A) : Option (List A) :=
   if out.length ≠ 2 ^ point.length then none

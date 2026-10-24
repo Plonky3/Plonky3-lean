@@ -1,5 +1,7 @@
 /-
-Transcriptions of the quadratic sumcheck verifier: strategy.rs (the round identity), transcript.rs and data.rs.
+Transcriptions of the quadratic sumcheck verifier.
+
+They cover strategy.rs (the round identity), transcript.rs and data.rs.
 -/
 module
 
@@ -20,7 +22,9 @@ inductive Basis where
   /-- The pair is s(1) and s(inf), and s(0) comes from the claim. -/
   | Projective
 
-/-- Basis::reduce_claim: the round polynomial at r, rebuilt from the pair and the running claim. -/
+/-- Basis::reduce_claim: the round polynomial at r.
+
+It is rebuilt from the pair and the running claim. -/
 def Basis.reduce_claim : Basis → EF → EF → EF → EF → EF
   | .Evaluation, c_a, c_inf, r, claimed_sum => extrapolate_01inf c_a (claimed_sum - c_a) c_inf r
   | .Projective, c_a, c_inf, r, claimed_sum => extrapolate_01inf (claimed_sum - c_inf) c_a c_inf r
@@ -39,11 +43,15 @@ inductive SumcheckError where
   | PowWitnessCountMismatch (expected actual : ℕ)
   deriving DecidableEq
 
-/-- SumcheckShape::domain_separator: the protocol name, the round count, the difficulty and the basis label. -/
+/-- SumcheckShape::domain_separator.
+
+It binds the protocol name, the round count, the difficulty and the basis label. -/
 def SumcheckShape.seed (num_rounds pow_bits : ℕ) (basis : Basis) : Step F EF :=
   .seed "p3-sumcheck-quadratic" [num_rounds, pow_bits, basis.label]
 
-/-- VerifierTranscript::round: absorb the pair, check the witness, and draw the challenge. -/
+/-- VerifierTranscript::round.
+
+It absorbs the pair, checks the witness, and draws the challenge. -/
 def VerifierTranscript.round (S : Sponge F EF) (pow_bits round : ℕ) (h : List (Step F EF))
     (c_a c_inf : EF) (witness : Option F) : Except SumcheckError (EF × List (Step F EF)) := do
   let h := h ++ [.message [c_a, c_inf]]
@@ -66,7 +74,9 @@ def verifyRound (S : Sponge F EF) (evals : List (EF × EF)) (wits : List F) (pow
   let (r, h) ← VerifierTranscript.round S pow_bits round h c_a c_inf witness
   pure (rs ++ [r], basis.reduce_claim c_a c_inf r claimed_sum, h)
 
-/-- SumcheckData::verify_rounds: the challenges, the reduced claim, and the sponge history.
+/-- SumcheckData::verify_rounds.
+
+It returns the challenges, the reduced claim, and the sponge history.
 
 Both counts are checked against the configuration first.
 
@@ -83,7 +93,9 @@ def verify_rounds (S : Sponge F EF) (evals : List (EF × EF)) (wits : List F) (h
       let h := if 0 < expected_rounds then h ++ [SumcheckShape.seed expected_rounds pow_bits basis] else h
       (List.range expected_rounds).foldlM (verifyRound S evals wits pow_bits basis) ([], claimed_sum, h)
 
-/-- verify_final_sumcheck_rounds: no rounds return the empty point, and missing data with rounds is an error. -/
+/-- verify_final_sumcheck_rounds: no rounds return the empty point.
+
+Missing data with rounds is an error. -/
 def verify_final_sumcheck_rounds (S : Sponge F EF) (data : Option (List (EF × EF) × List F))
     (h : List (Step F EF)) (claimed_sum : EF) (rounds pow_bits : ℕ) (basis : Basis) :
     Except SumcheckError (List EF × EF × List (Step F EF)) :=

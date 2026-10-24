@@ -1,16 +1,20 @@
 /-
-Transcriptions of the lookup records, the per-AIR lookup list, its packing, and the checks run over every AIR.
+Transcriptions of the lookup records.
 
-These do not extract: they are generic over the field traits, which aeneas rejects.
+They cover the per-AIR lookup list, its packing, and the checks run over every AIR.
+
+These do not extract.
+They are generic over the field traits, which aeneas rejects.
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts:
 
-* a field is a mathlib field F, and a `u32` weight is a natural number with its bound kept where Rust checks it;
-* a bus name is a string;
-* a panic is none;
-* `BigUint` arithmetic is natural-number arithmetic, and the characteristic is a parameter.
+* a field is a mathlib field F
+* a u32 weight is a natural number, with its bound kept where Rust checks it
+* a bus name is a string
+* a panic is none
+* big-integer arithmetic is natural-number arithmetic, and the characteristic is a parameter.
 
 Loops, branches and the order of checks are kept.
 -/
@@ -30,7 +34,13 @@ inductive Kind where
   | Global (bus : String)
   deriving DecidableEq
 
-/-- One lookup: tuples, a signed multiplicity per tuple, a per-row weight bound, its slot, and optional exclusive flags. -/
+/-- One lookup:
+
+- its tuples
+- a signed multiplicity per tuple
+- a per-row weight bound
+- its slot
+- optional exclusive flags. -/
 structure Lookup (F : Type) where
   kind : Kind
   elements : List (List (SymbolicExpression F))
@@ -43,10 +53,10 @@ structure Lookup (F : Type) where
 def Lookup.num_denoms {F : Type} (l : Lookup F) : ℕ :=
   if l.flags.isSome then 1 else l.elements.length
 
-/-- The largest value of a `u32`. -/
+/-- The largest value of a u32. -/
 def U32_MAX : ℕ := 2 ^ 32 - 1
 
-/-- `u32::checked_add`: none on overflow. -/
+/-- Checked u32 addition: none on overflow. -/
 def checked_add_u32 (a b : ℕ) : Option ℕ := if a + b ≤ U32_MAX then some (a + b) else none
 
 /-- One message on a named bus: payload, signed count and its weight. -/
@@ -72,7 +82,9 @@ structure SymbolicExclusiveInteraction (F : Type) where
   bus_name : String
   branches : List (SymbolicExclusiveBranch F)
 
-/-- The width check: none unless every width equals the first; the first width, or 0 for none. -/
+/-- The width check: none unless every width equals the first.
+
+It returns the first width, or 0 for an empty list. -/
 def assert_uniform_widths (widths : List ℕ) : Option ℕ :=
   match widths with
   | [] => some 0
@@ -83,7 +95,9 @@ def assert_uniform_tuple_width {F : Type} (elements : List (List (SymbolicExpres
     Option ℕ :=
   assert_uniform_widths (elements.map List.length)
 
-/-- The lookups of an AIR, locals first, then globals, then exclusive groups, with contiguous slots.
+/-- The lookups of an AIR, with contiguous slots.
+
+Locals come first, then globals, then exclusive groups.
 
 A local lookup's weight is the sum of its tuples' weights, and an overflow panics.
 
@@ -126,7 +140,9 @@ def assert_bus_widths {F : Type} (lookups : List (Lookup F)) : Option Unit :=
 
 /-- Greedy packing of one bus's lookups into columns within a degree budget.
 
-A lone lookup always opens a column, and the weights of merged lookups add, with an overflow panicking. -/
+A lone lookup always opens a column.
+
+The weights of merged lookups add, and an overflow panics. -/
 def pack_bus {F : Type} (max_degree : ℕ) (constraint_degree : Lookup F → ℕ) :
     List (Lookup F) → Option (List (Lookup F)) → Option (List (Lookup F))
   | members, acc => do
@@ -145,7 +161,12 @@ def pack_bus {F : Type} (max_degree : ℕ) (constraint_degree : Lookup F → ℕ
 
 /-- Fold same-bus global lookups into shared columns.
 
-The width check runs first; exclusive and local lookups pass through in order; then each bus, in first-appearance order, is packed greedily; slots are renumbered. -/
+The steps are:
+
+- the width check runs first
+- exclusive and local lookups pass through in order
+- each bus, in first-appearance order, is packed greedily
+- the slots are renumbered. -/
 def pack_same_bus_with_degree {F : Type} (lookups : List (Lookup F)) (max_degree : ℕ)
     (constraint_degree : Lookup F → ℕ) : Option (List (Lookup F)) := do
   assert_bus_widths lookups
@@ -164,7 +185,9 @@ def pack_same_bus_with_degree {F : Type} (lookups : List (Lookup F)) (max_degree
 def total_count_weight {F : Type} (lookups : List (Lookup F)) : ℕ :=
   (lookups.map (·.count_weight)).sum
 
-/-- One width per bus across every AIR: the widest global payload, or the first mismatch as (bus, expected, actual). -/
+/-- One width per bus across every AIR.
+
+It returns the widest global payload, or the first mismatch as (bus, expected, actual). -/
 def check_bus_widths {F : Type} (lookups : List (List (Lookup F))) :
     Except (String × ℕ × ℕ) ℕ := do
   let (_, widest) ← lookups.foldlM (fun (st : List (String × ℕ) × ℕ) air =>

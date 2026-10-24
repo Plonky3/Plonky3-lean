@@ -1,15 +1,25 @@
 /-
-Transcriptions of the challenge table, the signed counts, the typed buses, the debug balance check and the indexed declarations.
+Transcriptions of the lookup API around the gadgets.
 
-These do not extract: they are generic over the field traits or over the builder, which aeneas rejects, or they return early from inside a loop (docs/extractor-issues.md 23).
+They cover:
+
+* the challenge table and the signed counts
+* the typed buses
+* the debug balance check
+* the indexed declarations.
+
+These do not extract, for one of two reasons:
+
+* they are generic over the field traits or over the builder, which aeneas rejects
+* they return early from inside a loop (docs/extractor-issues.md 23).
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts, beyond the gadget transcriptions:
 
-* an `i32` is an integer in its range, and a `u32` a natural number;
-* an interaction builder is the list of interactions it recorded, as the symbolic builder keeps them;
-* the debug check's hash map is a list of keys with their net multiplicities, in first-insertion order;
+* an i32 is an integer in its range, and a u32 a natural number
+* an interaction builder is the list of interactions it recorded, as the symbolic builder keeps them
+* the debug check's hash map is a list of keys with their net multiplicities, in first-insertion order
 * a panic is none, or false for a check that panics on failure.
 
 Loops, branches and the order of checks are kept.
@@ -26,7 +36,9 @@ open p3_air.symbolic.mirror p3_air.builder.mirror p3_air.air.mirror
 
 /-! ## Challenges -/
 
-/-- The challenge table: alpha, beta, and the bus offsets alpha + (i + 1) beta^W, accumulated one gamma at a time.
+/-- The challenge table: alpha, beta, and the bus offsets alpha + (i + 1) beta^W.
+
+The offsets accumulate one gamma at a time.
 
 A width of 0 panics. -/
 def Challenges.new {K : Type _} [Field K] (alpha beta : K) (max_message_width num_bus_ids : ℕ) :
@@ -47,7 +59,9 @@ def Count.neg {E : Type _} (neg : E → E) (c : E × ℕ) : E × ℕ := (neg c.1
 
 /-! ## Buses -/
 
-/-- What an interaction builder records: global messages, local lookups and exclusive groups, in order. -/
+/-- What an interaction builder records, in order.
+
+It holds global messages, local lookups and exclusive groups. -/
 structure Recorded (E : Type _) where
   global : List (String × List E × (E × ℕ)) := []
   local' : List (List (List E × (E × ℕ))) := []
@@ -73,7 +87,9 @@ def LookupBus.table_entry {E : Type _} (neg : E → E) (bus : String) (r : Recor
     (key : List E) (num_lookups : E) : Recorded E :=
   r.push_interaction bus key (neg num_lookups, 0)
 
-/-- Query a table with one of several exclusive keys: each branch is a unit query gated by its flag. -/
+/-- Query a table with one of several exclusive keys.
+
+Each branch is a unit query gated by its flag. -/
 def LookupBus.lookup_key_exclusive {E : Type _} (one : E) (bus : String) (r : Recorded E)
     (branches : List (E × List E)) : Recorded E :=
   r.push_exclusive_interaction bus (branches.map fun (flag, key) => (flag, (one, 1), key))
@@ -90,14 +106,18 @@ def PermutationCheckBus.receive {E : Type _} (neg : E → E) (bus : String) (r :
 
 /-! ## The debug balance check -/
 
-/-- Add a key's multiplicity to a multiset: a zero multiplicity is skipped, and a known key adds up. -/
+/-- Add a key's multiplicity to a multiset.
+
+A zero multiplicity is skipped, and a known key adds up. -/
 def MultiSet.add {κ F : Type _} [DecidableEq κ] [Field F] [DecidableEq F] (m : List (κ × F))
     (key : κ) (multiplicity : F) : List (κ × F) :=
   if multiplicity = 0 then m
   else if m.any (·.1 = key) then m.map fun e => if e.1 = key then (e.1, e.2 + multiplicity) else e
   else m ++ [(key, multiplicity)]
 
-/-- The multiset is empty when every net multiplicity is zero; otherwise the check panics. -/
+/-- The multiset is empty when every net multiplicity is zero.
+
+Otherwise the check panics. -/
 def MultiSet.assert_empty {κ F : Type _} [Field F] [DecidableEq F] (m : List (κ × F)) : Bool :=
   m.all (·.2 = 0)
 
@@ -126,7 +146,10 @@ def accumulate_lookup (inst : LookupDebugInstance F) (lookup : Lookup F) (m : Li
         | none => pure count
       pure (MultiSet.add m key multiplicity)) m) m
 
-/-- The debug check: each local lookup balances on its own, and each global bus balances across every instance. -/
+/-- The debug balance check.
+
+Each local lookup balances on its own.
+Each global bus balances across every instance. -/
 def check_lookups (instances : List (LookupDebugInstance F)) : Option Bool := do
   let locals_ok ← instances.allM fun inst =>
     inst.lookups.allM fun lookup =>
@@ -170,7 +193,9 @@ def check_columns (columns : List ℕ) (width : ℕ) (table : String) :
 
 /-- Check every read, then every table, against the AIR's widths.
 
-A read's position must be a main column, its payload nonempty and valid; a table's columns nonempty and valid in its window. -/
+A read's position must be a main column, and its payload nonempty and valid.
+
+A table's columns must be nonempty and valid in its window. -/
 def IndexedLookups.new (reads : List (String × ℕ × List ℕ))
     (tables : List (String × TraceWindow × List ℕ)) (main_width preprocessed_width : ℕ) :
     Except IndexedLookupError Unit := do

@@ -1,16 +1,18 @@
 /-
 Transcriptions of the security accounting p3-multi-stark charges for its own AIR reduction.
 
-These do not extract: the statement is read off generic AIRs, and the error bits are floating-point numbers.
+These do not extract.
+The statement is read off generic AIRs, and the error bits are floating-point numbers.
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts:
 
-* an error term is its numerator over a field order, before p3-security takes logarithms in floating point;
-* the denominator is the challenge field's order, or one less for a draw rejecting zero;
-* a term with a zero numerator is omitted, as p3-security omits it;
-* only the four AIR terms are kept, for a statement with no skip round: the lookup terms have their own transcriptions.
+* an error term is its numerator over a field order, before p3-security takes logarithms in floating point
+* the denominator is the challenge field's order, or one less for a draw rejecting zero
+* a term with a zero numerator is omitted, as p3-security omits it
+* only the four AIR terms are kept, for a statement with no skip round
+* the lookup terms have their own transcriptions.
 
 Loops, branches and the order of terms are kept.
 -/
@@ -44,7 +46,12 @@ structure AirParams where
   num_variables : ℕ
   constraint_degree : ℕ
 
-/-- p3_security::multilinear::reduction_terms, its AIR terms with no skip round: alpha over the constraints, beta over the instances, the zerocheck point over the variables, and the sumcheck rounds at one degree above the constraints. -/
+/-- p3_security::multilinear::reduction_terms, its AIR terms with no skip round:
+
+- alpha over the constraints
+- beta over the instances
+- the zerocheck point over the variables
+- the sumcheck rounds, at one degree above the constraints. -/
 def air_terms (p : AirParams) : List Term :=
   [⟨"constraint-batching", p.max_num_constraints - 1, .Field⟩,
    ⟨"air-batching", p.num_instances - 1, .Field⟩,
@@ -56,7 +63,9 @@ def air_terms (p : AirParams) : List Term :=
 def num_variables (heights : List ℕ) (lookup_variables : Option ℕ) : ℕ :=
   max (heights.foldl max 0) (lookup_variables.getD 0)
 
-/-- assess_statement: the degree charged, the largest AIR degree, raised to one below the bus composition degree. -/
+/-- assess_statement: the degree charged.
+
+It is the largest AIR degree, raised to one below the bus composition degree. -/
 def charged_degree (air_degrees : List ℕ) (bus_degree : Option ℕ) : ℕ :=
   let d := air_degrees.foldl max 0
   match bus_degree with

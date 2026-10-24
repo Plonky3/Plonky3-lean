@@ -1,16 +1,17 @@
 /-
 Transcriptions of the STARK's transcript: its pattern, and the verifier's two phases.
 
-These do not extract: they are generic over the challenger, the commitment and the field traits, which aeneas rejects.
+These do not extract.
+They are generic over the challenger, the commitment and the field traits, which aeneas rejects.
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 
 What a transcription abstracts:
 
-* the sponge state is the list of messages absorbed so far, starting from the domain separator;
-* a challenge is an arbitrary function of that list, as a random oracle;
-* the grind check is an arbitrary predicate of that list, the bit count and the witness;
-* the pattern player's bookkeeping is the pattern itself;
+* the sponge state is the list of messages absorbed so far, starting from the domain separator
+* a challenge is an arbitrary function of that list, as a random oracle
+* the grind check is an arbitrary predicate of that list, the bit count and the witness
+* the pattern player's bookkeeping is the pattern itself
 * a commitment absorbs as one message, and a field element as one message.
 
 The order of absorptions, samples and checks is kept.
@@ -23,7 +24,9 @@ public import Mathlib.Data.List.Basic
 
 namespace p3_uni_stark.transcript.mirror
 
-/-- The numbers the transcript is described by, taken from the configuration and the AIR, never from a proof. -/
+/-- The numbers the transcript is described by.
+
+They come from the configuration and the AIR, never from a proof. -/
 structure StarkShape where
   log_ext_degree : ℕ
   log_degree : ℕ
@@ -51,7 +54,11 @@ inductive Step where
   | end_opening_argument
   deriving DecidableEq
 
-/-- The pattern: the commitments and public values before alpha, the quotient, randomization and grind before zeta, then the opening argument. -/
+/-- The pattern, in order:
+
+- the commitments and public values, then alpha
+- the quotient, randomization and grind, then zeta
+- the opening argument. -/
 def StarkShape.pattern (s : StarkShape) : List Step :=
   [.trace_commitment] ++
   (if s.preprocessed_width > 0 then [.preprocessed_commitment] else []) ++
@@ -60,7 +67,9 @@ def StarkShape.pattern (s : StarkShape) : List Step :=
   (if s.ood_pow_bits > 0 then [.ood_pow s.ood_pow_bits] else []) ++
   [.zeta, .begin_opening_argument, .end_opening_argument]
 
-/-- A message the sponge absorbs: a commitment, a field element, or the marker of a challenge drawn. -/
+/-- A message the sponge absorbs.
+
+It is a commitment, a field element, or the marker of a challenge drawn. -/
 inductive Msg (C F : Type) where
   | com (c : C)
   | scalar (x : F)
@@ -77,7 +86,9 @@ inductive StarkTranscriptFailure where
 
 variable {C F E : Type}
 
-/-- An optional commitment: absorbed when described and present, an error when only one of the two holds. -/
+/-- An optional commitment.
+
+It is absorbed when described and present, and an error when only one of the two holds. -/
 def optional_commitment (described : Bool) (commitment : Option C) (missing unexpected : StarkTranscriptFailure)
     (st : List (Msg C F)) : Except StarkTranscriptFailure (List (Msg C F)) :=
   match described, commitment with
@@ -86,7 +97,10 @@ def optional_commitment (described : Bool) (commitment : Option C) (missing unex
   | true, none => .error missing
   | false, some _ => .error unexpected
 
-/-- The verifier's first phase: absorb the trace commitment, the preprocessed commitment when described, and the public values, then draw alpha. -/
+/-- The verifier's first phase.
+
+It absorbs the trace commitment, the preprocessed commitment when described, and the public values.
+It then draws alpha. -/
 def constraint_phase (shape : StarkShape) (H : List (Msg C F) → E) (st : List (Msg C F))
     (trace : C) (preprocessed : Option C) (public_values : List F) :
     Except StarkTranscriptFailure (List (Msg C F) × E) := do
@@ -95,7 +109,10 @@ def constraint_phase (shape : StarkShape) (H : List (Msg C F) → E) (st : List 
   let st := st ++ public_values.map .scalar
   pure (st ++ [.challenge .alpha], H st)
 
-/-- The verifier's second phase: absorb the quotient commitment and the randomization commitment when described, check the grind when it has bits, then draw zeta. -/
+/-- The verifier's second phase.
+
+It absorbs the quotient commitment, and the randomization commitment when described.
+It checks the grind when it has bits, then draws zeta. -/
 def ood_phase (shape : StarkShape) (H : List (Msg C F) → E)
     (powOk : List (Msg C F) → ℕ → F → Bool) (st : List (Msg C F)) (quotient : C)
     (random : Option C) (witness : F) : Except StarkTranscriptFailure (List (Msg C F) × E) := do

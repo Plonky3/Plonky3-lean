@@ -1,11 +1,14 @@
 /-
-Transcriptions of p3-stir's verifier (stir/src/verifier.rs): the virtual oracle, the query folds, the answer-polynomial checks and the final check.
+Transcriptions of p3-stir's verifier (stir/src/verifier.rs).
 
-A verifier step returns in ExceptT StirError Option: none is a panic, an error is a rejection.
+They cover the virtual oracle, the query folds, the answer-polynomial checks and the final check.
 
-The MMCS check of the opened rows is the predicate mmcs_ok, which the merkle-tree crate's claims are about.
+A verifier step returns none on a panic, and an error on a rejection.
 
-The transcript is not modelled here: its challenges are inputs.
+The MMCS check of the opened rows is a boolean input, which the merkle-tree crate's claims are about.
+
+The transcript is not modelled here.
+Its challenges are inputs.
 -/
 module
 
@@ -51,7 +54,9 @@ variable {F EF : Type _} [Field F] [Field EF] [Algebra F EF] [DecidableEq F] [De
 /-- An extension element times a base element. -/
 local infixl:70 " ⋆ " => fun (a : EF) (b : F) => a * algebraMap F EF b
 
-/-- VirtualRoundContext: what the next round needs to read the virtual oracle DegCor((g - Ans) / Z). -/
+/-- VirtualRoundContext: what the next round needs to read the virtual oracle.
+
+That oracle is DegCor((g - Ans) / Z). -/
 structure VirtualRoundContext (EF : Type _) where
   ans_poly : List EF
   vanishing_coeffs : List EF
@@ -59,7 +64,9 @@ structure VirtualRoundContext (EF : Type _) where
   gap : ℕ
   r_comb_pow_gap1 : EF
 
-/-- materialize_virtual_fiber: the opened row read through DegCor((g - Ans) / Z) at the fiber points shift u_l.
+/-- materialize_virtual_fiber: the opened row read through DegCor((g - Ans) / Z).
+
+It is read at the fiber points shift u_l.
 
 The inner none is a fiber that meets the round's interpolation nodes. -/
 def materialize_virtual_fiber (row_evals : List EF) (subgroup_points : List F) (shift : F)
@@ -90,7 +97,9 @@ def materialize_virtual_fiber (row_evals : List EF) (subgroup_points : List F) (
         if step = 1 then quotient * ((gap + 1 : ℕ) : EF)
         else quotient * (1 - ctx.r_comb_pow_gap1 ⋆ x ^ (gap + 1))))
 
-/-- query_fold_value: the fiber of index j at g^j zeta^l, read through the virtual oracle and folded at the challenge. -/
+/-- query_fold_value: the fiber of index j at g^j zeta^l.
+
+It is read through the virtual oracle and folded at the challenge. -/
 def query_fold_value (row_evals : List EF) (j : ℕ) (domain_gen fiber_step : F) (arity : ℕ)
     (current_shift : F) (fold_beta : EF) (prev_ctx : Option (VirtualRoundContext EF))
     (round : Option ℕ) (query : ℕ) : VM EF := do
@@ -100,7 +109,9 @@ def query_fold_value (row_evals : List EF) (j : ℕ) (domain_gen fiber_step : F)
   | none => throw (StirError.InvalidRoundConsistency round query)
   | some fiber => liftO (lagrange_interpolate_at subgroup_points fiber fold_beta)
 
-/-- check_ans_length: at most max_ans_len coefficients, and not none while a node remains. -/
+/-- check_ans_length: at most the maximum number of coefficients.
+
+The polynomial must not be empty while a node remains. -/
 def check_ans_length (round : ℕ) (ans_polynomial : List EF) (max_ans_len : ℕ) : VM Unit :=
   if ans_polynomial.length > max_ans_len then
     throw (StirError.AnsPolynomialTooLong round max_ans_len ans_polynomial.length)
@@ -108,7 +119,9 @@ def check_ans_length (round : ℕ) (ans_polynomial : List EF) (max_ans_len : ℕ
     throw (StirError.MissingAnsPolynomial round max_ans_len)
   else pure ()
 
-/-- resolve_ans_polynomial: the sent coefficients, or in compact mode the verifier's own interpolant. -/
+/-- resolve_ans_polynomial: the sent coefficients.
+
+In compact mode it is the verifier's own interpolant. -/
 def resolve_ans_polynomial (round : ℕ) (compact : Bool) (transmitted points values : List EF) :
     VM (List EF) :=
   if !compact then do
@@ -120,7 +133,9 @@ def resolve_ans_polynomial (round : ℕ) (compact : Bool) (transmitted points va
     throw (StirError.InvalidAnsConsistency round)
   else liftO (interpolate_poly points values)
 
-/-- external_fibers_in_draw_order: ask the source once for the sorted unique indices, then lay its fibers out in draw order. -/
+/-- external_fibers_in_draw_order: ask the source once for the sorted unique indices.
+
+Its fibers are then laid out in draw order. -/
 def external_fibers_in_draw_order (indices : List ℕ) (arity : ℕ) (round : Option ℕ)
     (source : List ℕ → VM (List (List EF))) : VM (List (List EF)) := do
   let unique := (indices.mergeSort (· ≤ ·)).dedup
@@ -133,7 +148,12 @@ def external_fibers_in_draw_order (indices : List ℕ) (arity : ℕ) (round : Op
       | some pos => pure (fibers.getD pos [])
       | none => panic
 
-/-- fetch_round_rows, for a committed oracle: the opening count, every row's arity, the commitment, then the MMCS check. -/
+/-- fetch_round_rows, for a committed oracle, checks in order:
+
+- the opening count
+- every row's arity
+- the commitment
+- the MMCS proof. -/
 def fetch_committed_rows (mmcs_ok : Bool) (row_evals : Option (List (List EF)))
     (has_commitment : Bool) (expected_num_queries arity : ℕ) (round : Option ℕ) :
     VM (List (List EF)) :=
@@ -149,7 +169,11 @@ def fetch_committed_rows (mmcs_ok : Bool) (row_evals : Option (List (List EF)))
         else if !mmcs_ok then throw (StirError.InvalidMmcsProof round)
         else pure rows
 
-/-- The state RoundVerifier carries through its query loop: points, answers, seen indices, and round 0's pairs and draws. -/
+/-- The state RoundVerifier carries through its query loop:
+
+- the seen indices
+- the query points and answers
+- round 0's pairs and draws. -/
 structure QueryState (F EF : Type _) where
   seen : List ℕ
   query_points : List EF
@@ -157,7 +181,10 @@ structure QueryState (F EF : Type _) where
   first_round_pairs : List (ℕ × List EF)
   first_round_draws : List ℕ
 
-/-- The query loop of RoundVerifier::fetch_and_fold: fold every opened row, record round 0's draws, and keep each index's first point and answer. -/
+/-- The query loop of RoundVerifier::fetch_and_fold.
+
+It folds every opened row and records round 0's draws.
+It keeps each index's first point and answer. -/
 def fold_queries (G : Gen F) (round : ℕ) (fold_shift : F) (fold_log_domain current_log_domain : ℕ)
     (arity : ℕ) (current_shift : F) (fold_beta : EF) (prev_ctx : Option (VirtualRoundContext EF))
     (query_indices : List ℕ) (round_rows : List (List EF)) : VM (QueryState F EF) := do
@@ -177,7 +204,9 @@ def fold_queries (G : Gen F) (round : ℕ) (fold_shift : F) (fold_log_domain cur
     else pure { st with first_round_draws := draws })
     ⟨[], [], [], [], []⟩
 
-/-- all_points_and_values: the OOD points then the distinct query points, with their claimed values. -/
+/-- all_points_and_values: the OOD points, then the distinct query points.
+
+Each comes with its claimed value. -/
 def all_points_and_values (ood_points query_points ood_answers query_answers : List EF) :
     List EF × List EF :=
   (ood_points ++ query_points, ood_answers ++ query_answers)
@@ -187,7 +216,9 @@ def finish_ctx (r_comb : EF) (ans_polynomial all_points : List EF) : VirtualRoun
   let gap := all_points.length
   ⟨ans_polynomial, vanishing_poly_from_roots all_points, r_comb, gap, r_comb ^ (gap + 1)⟩
 
-/-- RoundVerifier::new: the fold's domain, the arity, and the next domain, halved and shifted by the generator. -/
+/-- RoundVerifier::new: the fold's domain, the arity, and the next domain.
+
+The next domain is halved and shifted by the generator. -/
 def round_geometry (generator current_shift : F) (current_log_domain log_arity : ℕ) :
     Option (ℕ × F × ℕ × ℕ × F) := do
   let (fold_log_domain, fold_shift) ← fold_domain_params current_shift current_log_domain log_arity
@@ -200,11 +231,15 @@ def excluded_domains (current_shift : F) (current_log_domain : ℕ) (next_shift 
     (next_log_domain : ℕ) (fold_shift : F) (fold_log_domain : ℕ) : List (F × ℕ) :=
   [(current_shift, current_log_domain), (next_shift, next_log_domain), (fold_shift, fold_log_domain)]
 
-/-- set_gamma: the coset fold point gamma / shift, which panics on a zero shift. -/
+/-- set_gamma: the coset fold point gamma / shift.
+
+A zero shift panics. -/
 def set_gamma (gamma : EF) (current_shift : F) : Option EF :=
   (inverse current_shift).map fun s => gamma ⋆ s
 
-/-- The final round's query loop: fold each row and compare it with the final polynomial at the queried point. -/
+/-- The final round's query loop.
+
+It folds each row and compares it with the final polynomial at the queried point. -/
 def check_final_queries (G : Gen F) (final_new_log_domain current_log_domain final_arity : ℕ)
     (final_new_shift current_shift : F) (fold_beta : EF) (prev_ctx : Option (VirtualRoundContext EF))
     (final_polynomial : List EF) (final_indices : List ℕ) (final_rows : List (List EF)) :
