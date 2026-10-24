@@ -1,6 +1,7 @@
 module
 
 public import Plonky3Lean.Proofs.Circle.Pcs
+public import Plonky3Lean.Proofs.Circle.Deep
 
 @[expose] public section
 
@@ -484,5 +485,174 @@ theorem firstLayer_fold (h2 : (2 : K) ≠ 0) {P : C K} (hy : P.y ≠ 0) (b : ℕ
     have := foldPair_fftEval h2 hy' m c β
     rw [neg_neg, C.neg_x, C.neg_y] at this
     rw [fold_formula, this]; rfl
+
+/-! ## The DEEP quotients of one query -/
+
+open p3_circle.deep_quotient.mirror in
+theorem dot_product_range_prefix (f : ℕ → K) {M : ℕ} (r : List K) (h : r.length ≤ M) :
+    dot_product ((List.range M).map f) r = dot_product ((List.range r.length).map f) r := by
+  unfold dot_product
+  rw [List.zip_eq_zip_take_min, List.zip_eq_zip_take_min (l₁ := (List.range r.length).map f)]
+  simp [← List.map_take, List.take_range, min_eq_right h, Nat.min_eq_left h]
+
+open p3_circle.deep_quotient.mirror in
+/-- The verifier's powers of alpha run to the widest claim; the row reduction reads only as many as the row has. -/
+theorem reduce_row_prefix (αW α : K) {M : ℕ} (x z : Point K) (ps qs : List K) (hpq : ps.length = qs.length)
+    (hM : ps.length ≤ M) :
+    deep_quotient_reduce_row αW ((List.range M).map (α ^ ·)) x z ps qs =
+      deep_quotient_reduce_row αW ((List.range ps.length).map (α ^ ·)) x z ps qs := by
+  unfold deep_quotient_reduce_row
+  have hl : ((ps.zip qs).map fun p => -p.2 + p.1).length = ps.length := by simp [hpq]
+  rw [dot_product_range_prefix _ _ (by rw [hl]; exact hM), hl]
+
+/-- The DEEP term of one opening point at a query, Proposition 4:
+
+```text
+    sum_j alpha^j Re(q_j) + alpha^(W + j) Im(q_j),     q_j = (p_j(x) - p_j(zeta)) / v_zeta(x)
+``` -/
+noncomputable def deepTerm (α : K) (P Q : C K) (ps qs : List K) : K :=
+  ∑ j ∈ range ps.length, (α ^ j * (cquot (ps.getD j 0 - qs.getD j 0) (Point.v_p (ofC P) (ofC Q))).1 +
+    α ^ (ps.length + j) * (cquot (ps.getD j 0 - qs.getD j 0) (Point.v_p (ofC P) (ofC Q))).2)
+
+theorem foldlM_eq_pure_foldl {ε α β : Type _} {f : β → α → ExceptT ε Option β} {g : β → α → β} :
+    ∀ (l : List α) (e : β), (∀ e, ∀ p ∈ l, f e p = pure (g e p)) → l.foldlM f e = pure (l.foldl g e)
+  | [], _, _ => rfl
+  | p :: l, e, h => by
+    rw [List.foldlM_cons, h e p List.mem_cons_self, pure_bind,
+      foldlM_eq_pure_foldl l _ fun e q hq => h e q (List.mem_cons_of_mem _ hq)]
+    rfl
+
+/-- The point of the circle an opening point t names, and the neutral element at t^2 = -1. -/
+noncomputable def ptOf (t : K) : C K := if h : 1 + t * t = 0 then 0 else stereo t h
+
+open p3_circle.pcs.mirror p3_commit.pcs.univariate.mirror p3_circle.domain.mirror
+  p3_circle.deep_quotient.mirror in
+/-- One matrix of a query adds, at its height, every point's DEEP term times the running power of alpha.
+
+That power is alpha^(2 W) for each point before it, W the matrix's width. -/
+theorem reduceMatrix_eq {IME FME : Type} (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {lb H : ℕ} (α : K) {M : ℕ}
+    (index : ℕ) (acc : ℕ → K × K) (keys : List ℕ) (mat : MatrixOpening K (CircleDomain K)) (row : List K)
+    (hn : 1 ≤ mat.domain.log_n) (hh : mat.domain.log_n + lb ≤ H) (hG : H + 1 ≤ G.adicity) (hM : row.length ≤ M)
+    (hlen : ∀ p ∈ mat.points, p.values.length = row.length)
+    (hpts : ∀ p ∈ mat.points, 1 + p.point * p.point ≠ 0 ∧ ptOf p.point ≠
+      twinPoint (genPt G (mat.domain.log_n + lb + 1)) (genPt G (mat.domain.log_n + lb - 1))
+        (cfft_permute_index (index / 2 ^ (H - (mat.domain.log_n + lb))) (mat.domain.log_n + lb))) :
+    reduceMatrix (IME := IME) (FME := FME) G lb H ((List.range M).map (α ^ ·)) index (acc, keys)
+        (mat, row, α ^ row.length, (α ^ row.length) ^ 2) =
+      pure (Function.update acc (mat.domain.log_n + lb)
+        (mat.points.foldl (fun e p => (e.1 * (α ^ row.length) ^ 2, e.2 + e.1 *
+          deepTerm α (twinPoint (genPt G (mat.domain.log_n + lb + 1)) (genPt G (mat.domain.log_n + lb - 1))
+            (cfft_permute_index (index / 2 ^ (H - (mat.domain.log_n + lb))) (mat.domain.log_n + lb)))
+            (ptOf p.point) row p.values))
+          (acc (mat.domain.log_n + lb))),
+        if mat.domain.log_n + lb ∈ keys then keys else keys ++ [mat.domain.log_n + lb]) := by
+  set h := mat.domain.log_n + lb
+  set T := twinPoint (genPt G (h + 1)) (genPt G (h - 1)) (cfft_permute_index (index / 2 ^ (H - h)) h)
+  have hpt := standard_nth_point hV (h := h) (by omega) (by omega) (cfft_permute_index (index / 2 ^ (H - h)) h)
+  rw [standard_eq hV _ (by omega), Option.bind_some] at hpt
+  unfold reduceMatrix
+  dsimp only
+  rw [ite_eq_right (by omega), standard_eq hV _ (by omega), lift_some_bind']
+  erw [hpt, lift_some_bind']
+  rw [foldlM_eq_pure_foldl _ _ fun e p hp => ?_, pure_bind]
+  obtain ⟨hp1, hp2⟩ := hpts p hp
+  have hz : Point.from_projective_line p.point = some (ofC (ptOf p.point)) := by
+    rw [from_projective_line_eq, dite_eq_right hp1, ptOf, dite_eq_right hp1]
+  rw [ite_eq_right (by rw [hlen p hp]; simp), hz, lift_some_bind',
+    reduce_row_prefix _ α _ _ row p.values (hlen p hp).symm hM,
+    reduce_row_eq_re_im h2 α T (ptOf p.point) (Ne.symm hp2) row p.values (hlen p hp).symm]
+  rfl
+
+open p3_circle.pcs.mirror in
+/-- The first layer of one height at one query, on honest values, is the input circle FRI rolls in at round H - h.
+
+Take the lambda-corrected DEEP function at height h to be a polynomial of 2^(h - lb) coefficients c in the FFT basis.
+
+Take the sibling to be its value at the conjugate point.
+
+Then the leaf folds to g_0 + beta g_1 at the point round H - h reads, sigma_r x_r. -/
+theorem firstLayer_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {lb H h : ℕ} {i : ℕ} (hi : i < 2 ^ H)
+    (hlb : lb + 2 ≤ h) (hhH : h ≤ H) (hG : H + 1 ≤ G.adicity) (c : ℕ → K) (β ro lam sib : K)
+    (hro : ro - lam * vn (h - lb)
+      (twinPoint (genPt G (h + 1)) (genPt G (h - 1)) (cfft_permute_index (i / 2 ^ (H - h)) h)) =
+      fftEval (h - lb) c
+        (twinPoint (genPt G (h + 1)) (genPt G (h - 1)) (cfft_permute_index (i / 2 ^ (H - h)) h)))
+    (hsib : sib = fftEval (h - lb) c
+      (-twinPoint (genPt G (h + 1)) (genPt G (h - 1)) (cfft_permute_index (i / 2 ^ (H - h)) h))) :
+    ∃ y vals, firstLayerLeaf G lb H i (((h, ro), sib), lam) = some (h, y, vals, (2, 2 ^ (h - 1))) ∧
+      fold_row_with_inv_twiddle y⁻¹ β vals =
+        some (xEval (h - lb - 1) (foldCoeffs c β) (sgn (i / 2) (H - h) * Xq G (H - 1) (i / 2) (H - h))) := by
+  set p := twinPoint (genPt G (h + 1)) (genPt G (h - 1)) (cfft_permute_index (i / 2 ^ (H - h)) h)
+  have hpt := standard_nth_point hV (h := h) (by omega) (by omega) (cfft_permute_index (i / 2 ^ (H - h)) h)
+  rw [standard_eq hV _ (by omega), Option.bind_some] at hpt
+  have hy : p.y ≠ 0 := twinPoint_standard_y_ne_zero hV h2 (by omega) (by omega) _
+  obtain ⟨m, hm⟩ : ∃ m, h - lb = m + 1 := ⟨h - lb - 1, by omega⟩
+  unfold firstLayerLeaf
+  simp only [show h ≠ 0 by omega, show ¬ h < lb by omega, show ¬ H < h by omega, ↓reduceIte,
+    standard_eq hV _ (by omega : h + 1 ≤ G.adicity), Option.bind_eq_bind, Option.bind_some]
+  erw [hpt]
+  simp only [Option.bind_some, v_n_ofC, show 1 ≤ h - lb by omega, ↓reduceIte]
+  refine ⟨_, _, rfl, ?_⟩
+  have hfold := firstLayer_fold h2 hy ((i / 2 ^ (H - h)) % 2) m c β
+  rw [← firstLayer_point_x hV (by omega) hhH hG hi, show h - lb - 1 = m by omega]
+  rw [hm] at hro hsib
+  convert hfold using 3 <;> (try split_ifs) <;> simp [ofC, hm, hro, hsib, p]
+
+/-! ## Completeness of the verifier -/
+
+open p3_circle.pcs.mirror p3_commit.pcs.univariate.mirror p3_circle.domain.mirror in
+/-- Completeness of the PCS verifier, from honest inputs to circle FRI.
+
+Take claims whose checks before the transcript pass, and a transcript that accepts the proof's witnesses.
+
+Take input checks that return, for every query, the honest inputs at the points the query reads.
+
+Take honest commit-phase siblings, the folded constant as the final value, and a commit-phase scheme that accepts the honest codewords.
+
+Then the verifier accepts. -/
+theorem verify_complete (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {S : Type} (immcs fmmcs : MmcsOps K)
+    (tx : CircleVerifierTx K fmmcs.Commitment S) (params : FriParameters)
+    (rounds : List (Claim K immcs.Commitment))
+    (proof : CirclePcsProof K fmmcs.Commitment immcs.MultiProof fmmcs.MultiProof) (s : S) {H : ℕ}
+    (hmax : (claimHeights params.log_blowup rounds).max? = some H) (hlb : params.log_blowup + 1 ≤ H)
+    (had : H < G.adicity) {la : List ℕ}
+    (hshape : validate_proof_shape (ME := fmmcs.Error) (IE := InputError immcs.Error fmmcs.Error) params
+      proof.fri_proof (H - (params.log_blowup + 1)) = pure la)
+    (hbp : ¬ (params.batch_proof_of_work_bits = 0 ∧ proof.batch_pow_witness ≠ 0))
+    {r : Replayed K} (hreplay : replay_transcript (ME := fmmcs.Error) (IE := InputError immcs.Error fmmcs.Error)
+      tx rounds proof s = pure r)
+    (E : ℕ → ℕ → K) (P : ℕ → Prop) [DecidablePred P] (hE : ∀ r, ¬ P r → E r = fun _ => 0)
+    (hβ : r.betas.length = H - (params.log_blowup + 1))
+    (hopen : open_inputs G immcs fmmcs params.log_blowup H rounds proof.first_layer_commitment proof.lambdas
+      r.bivariate_beta ((List.range (((rounds.flatMap fun c => c.matrices.flatMap fun m =>
+        m.points.map (·.values.length)).max?).getD 0)).map (r.alpha ^ ·))
+      (rounds.map fun c => c.matrices.map fun m => (r.alpha ^ claimedWidth m, (r.alpha ^ claimedWidth m) ^ 2))
+      r.indices proof.fri_proof.input_openings =
+        pure (r.indices.map fun i => rollsFrom G E P (H - 1) (H - (params.log_blowup + 1)) (i / 2) 0))
+    (hsv : ∀ k < H - (params.log_blowup + 1), ∀ (q i : ℕ), r.indices[q]? = some i →
+      ((proof.fri_proof.commit_phase_openings.map (·.sibling_values)).getD k [])[q]? =
+        some [xEval (H - (params.log_blowup + 1) - k) (layer E (r.betas.getD · 0) k)
+          (-(sgn (i / 2) k * Xq G (H - 1) (i / 2) k))])
+    (hfinal : proof.fri_proof.final_poly = preLayer E (r.betas.getD · 0) (H - (params.log_blowup + 1)) 0)
+    (hmmcs : ∀ k < H - (params.log_blowup + 1), ∀ (c : fmmcs.Commitment)
+      (o : CommitPhaseMultiStep K fmmcs.MultiProof),
+      proof.fri_proof.commit_phase_commits[k]? = some c → proof.fri_proof.commit_phase_openings[k]? = some o →
+      ∀ groups : List ℕ, fmmcs.verify_multi_batch c [(2, 2 ^ (H - 1 - (k + 1)))] groups
+        (groups.map fun j => [honestWord G (H - 1) (H - (params.log_blowup + 1)) E (r.betas.getD · 0) k j])
+          o.opening_proof = .ok ()) :
+    verify G immcs fmmcs tx params rounds proof s = pure () := by
+  obtain ⟨rfl, hsh⟩ := validate_proof_shape_spec hshape
+  have hL : H - (params.log_blowup + 1) + params.log_blowup = H - 1 := by omega
+  unfold verify
+  rw [show (rounds.flatMap fun c => c.matrices.map fun m => m.domain.log_n + params.log_blowup) =
+    claimHeights params.log_blowup rounds from rfl]
+  dsimp only
+  rw [hmax]
+  simp only [pure_bind, show ¬ H < params.log_blowup + 1 by omega, show ¬ G.adicity ≤ H - 1 + 1 by omega,
+    ↓reduceIte, hshape, hbp, hreplay]
+  have := verify_queries_complete hV h2 fmmcs params proof.fri_proof r.betas r.indices
+    (R := H - (params.log_blowup + 1)) _ E P hE hsh.blowup (by omega) hβ hsh.openings
+    (by rw [hL]; exact hopen) (by rw [hL]; exact hsv) hfinal (by rw [hL]; exact hmmcs)
+  exact this
 
 end Plonky3Lean.Proofs.Circle
