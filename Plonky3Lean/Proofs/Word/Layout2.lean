@@ -362,4 +362,72 @@ theorem component_new_slots {inst : word.Word W} {body : system.ConstraintSystem
   rw [cast_u32_val _ (by omega), cast_u32_val _ (by omega)]
   omega
 
+/-- Slicing past the end of a slice panics. -/
+theorem slice_range_panic {T : Type} (sl : Slice T) (st en : Std.Usize) (h : sl.val.length < en.val) :
+    CoreModels.core.Slice.Insts.CoreOpsIndexIndex.index
+      (CoreModels.core.ops.range.RangeUsize.Insts.CoreSliceIndexSliceIndexSliceSlice T) sl
+      { start := st, «end» := en } = .fail .panic := by
+  simp only [CoreModels.core.Slice.Insts.CoreOpsIndexIndex.index,
+    CoreModels.core.ops.range.RangeUsize.Insts.CoreSliceIndexSliceIndexSliceSlice.get,
+    CoreModels.rust_primitives.slice.slice_length, bind_ok]
+  have h2 : ¬ (en ≤ Slice.len sl) := by rw [UScalar.le_equiv]; simp; omega
+  simp only [h2, ite_false, ite_self, bind_ok]
+  rfl
+
+/-- A lookup of an instance's interface panics when the caller's segment ends before the instance's block. -/
+theorem interface_panics (inst : word.Word W) (comp : component.Composition W) (pub : Slice W)
+    (k i st en : Std.Usize)
+    (hr : component.Composition.interface_range inst comp k i = .ok (.Ok (st, en)))
+    (hlen : pub.val.length < en.val) :
+    component.Composition.interface inst comp pub k i = .fail .panic := by
+  simp only [component.Composition.interface, hr, bind_ok,
+    CoreModels.core.result.Result.Insts.CoreOpsTry_traitTryTResultInfallibleE.branch,
+    Aeneas.Std.uncurry_apply_pair, slice_range_panic pub st en hlen, bind_fail]
+
+/-- In a laid-out composition, an instance's interface is its slice of the public block. -/
+theorem interface_range_eq (inst : word.Word W) (comp : component.Composition W) (hl : LaidOut comp)
+    (k i : Std.Usize) (hk : k.val < (callsOf comp).length)
+    (hi : i.val < ((callsOf comp)[k.val]).instances.val) :
+    component.Composition.interface_range inst comp k i = .ok (.Ok
+      (uOf (packed (counts comp) (widths comp .Public) k.val i.val 0),
+       uOf (packed (counts comp) (widths comp .Public) k.val i.val 0 +
+         slotsP (callsOf comp)[k.val]))) := by
+  have h32 := two_pow_32_le
+  have hkb : k.val < (basesOf comp).length := hl.len ▸ hk
+  set c := (callsOf comp)[k.val] with hc
+  have hblock := block_le comp hl hk .Public
+  rw [← hc] at hblock
+  have hw : slotsP c < 2 ^ 32 := by
+    have : slotsP c ≤ c.instances.val * slotsP c := Nat.le_mul_of_pos_left _ (by omega)
+    simp only [slotsOf] at hblock; omega
+  have hmk : k.val < (counts comp).length := by simp [counts, hk]
+  have hgw : (widths comp .Public).getD k.val 0 = slotsP c := by
+    simp [widths, hk, hc, List.getD_eq_getElem?_getD, slotsOf]
+  have hgm : (counts comp).getD k.val 0 = c.instances.val := by
+    simp [counts, hk, hc, List.getD_eq_getElem?_getD]
+  have htot := pref_le_sum (List.zipWith (· * ·) (counts comp) (widths comp .Public)) (k.val + 1)
+  rw [hl.total] at htot
+  have hlen : lenOf comp .Public < 2 ^ 32 := comp.public_len.hBounds
+  have hp : packed (counts comp) (widths comp .Public) k.val i.val 0 =
+      (baseOf (basesOf comp)[k.val] .Public).val + i.val * slotsP c := by
+    rw [hl.base k.val hkb, packed, hgw]; rfl
+  have hiw : (packed (counts comp) (widths comp .Public) k.val i.val 0) + slotsP c ≤
+      pref (List.zipWith (· * ·) (counts comp) (widths comp .Public)) (k.val + 1) := by
+    have hzl : k.val < (List.zipWith (· * ·) (counts comp) (widths comp .Public)).length := by
+      simp [counts, widths, hk]
+    have hzk : (List.zipWith (· * ·) (counts comp) (widths comp .Public))[k.val] =
+        c.instances.val * slotsP c := by simp [counts, widths, hc, slotsOf]
+    rw [pref_succ _ _ hzl, hzk, packed, hgw]
+    have := Nat.mul_le_mul_right (slotsP c) (Nat.succ_le_of_lt hi)
+    rw [Nat.succ_mul] at this; omega
+  simp only [component.Composition.interface_range, base_eq, List.getElem?_eq_getElem hkb, bind_ok,
+    CoreModels.core.result.Result.Insts.CoreOpsTry_traitTryTResultInfallibleE.branch,
+    check_instance_eq, List.getElem?_eq_getElem hk, ← hc, show ¬ c.instances.val ≤ i.val by omega,
+    ite_false, interface_slots_eq inst c hw]
+  have hu : (uOf (slotsP c)).val = slotsP c := uOf_val (by omega)
+  rw [usize_mul_eq _ _ (by rw [hu]; omega), bind_ok, hu]
+  simp only [baseOf] at hp
+  rw [usize_add_eq _ _ (by rw [uOf_val (by omega)]; omega), bind_ok, uOf_val (by omega),
+    usize_add_eq _ _ (by rw [uOf_val (by omega), hu]; omega), uOf_val (by omega), hu, ← hp, bind_ok]
+
 end Plonky3Lean.Proofs.Word
