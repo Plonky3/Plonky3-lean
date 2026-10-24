@@ -128,7 +128,8 @@ def foldStep (query : ℕ) (x_twiddle_inv : List K) (st : ChainState K)
 
 /-- The fold chain of one query.
 
-It folds every round from the tallest height, then checks the final height and that every opening was rolled in.
+It folds every round from the tallest height.
+It then checks the final height, and that every opening was rolled in.
 
 It returns the folded value, and each round's group index and rebuilt row. -/
 def fold_query {ME IE : Type} (log_blowup query index : ℕ) (betas : List K) (log_arities : List ℕ)

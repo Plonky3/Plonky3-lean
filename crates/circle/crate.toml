@@ -8,12 +8,12 @@ lean_lib = "P3Circle"
 #
 # A wrapper at Mersenne31 does not help: the generic impl it calls still needs the trait dictionary.
 #
-# The points, the domains, the order, the circle FFT, the folding and the DEEP quotient are transcribed over a field in stub/P3Circle/, with the abstractions each file lists.
+# The points, the domains, the order, the circle FFT, the folding, the DEEP quotient and the PCS verifier are transcribed over a field in stub/P3Circle/, with the abstractions each file lists.
 state = "stub"
 
 features = []
 
-watch = ["circle/src", "circle/Cargo.toml", "util/src/lib.rs", "field/src/batch_inverse.rs",
+watch = ["circle/src", "circle/Cargo.toml", "util/src/lib.rs", "field/src/batch_inverse.rs", "fri/src/verifier.rs",
   "mersenne-31/src/complex.rs"]
 
 # The transcriptions. Hashes are pending tools/mirror.
@@ -213,3 +213,127 @@ rust = "p3_circle::ordering::cfft_permute_slice"
 [[mirror]]
 lean = "p3_circle.ordering.mirror.cfft_permute_slice_chunked_in_place"
 rust = "p3_circle::ordering::cfft_permute_slice_chunked_in_place"
+
+[[mirror]]
+lean = "p3_circle.verifier.mirror.FriError"
+rust = "p3_fri::verifier::FriError"
+
+[[mirror]]
+lean = "p3_circle.verifier.mirror.Res"
+rust = "p3_circle::verifier::verify_queries"
+
+[[mirror]]
+lean = "p3_circle.verifier.mirror.crash"
+rust = "p3_circle::verifier::verify_queries"
+
+[[mirror]]
+lean = "p3_circle.verifier.mirror.lift"
+rust = "p3_circle::verifier::verify_queries"
+
+[[mirror]]
+lean = "p3_circle.verifier.mirror.CircleFriProof"
+rust = "p3_circle::proof::CircleFriProof"
+
+[[mirror]]
+lean = "p3_circle.verifier.mirror.validate_proof_shape"
+rust = "p3_circle::verifier::validate_proof_shape"
+
+[[mirror]]
+lean = "p3_circle.verifier.mirror.rebuildRow"
+rust = "p3_circle::verifier::fold_query"
+
+[[mirror]]
+lean = "p3_circle.verifier.mirror.ChainState"
+rust = "p3_circle::verifier::fold_query"
+
+[[mirror]]
+lean = "p3_circle.verifier.mirror.foldStep"
+rust = "p3_circle::verifier::fold_query"
+
+[[mirror]]
+lean = "p3_circle.verifier.mirror.fold_query"
+rust = "p3_circle::verifier::fold_query"
+
+[[mirror]]
+lean = "p3_circle.verifier.mirror.mapInputError"
+rust = "p3_circle::verifier::verify_queries"
+
+[[mirror]]
+lean = "p3_circle.verifier.mirror.checkRound"
+rust = "p3_circle::verifier::verify_queries"
+
+[[mirror]]
+lean = "p3_circle.verifier.mirror.checkQuery"
+rust = "p3_circle::verifier::verify_queries"
+
+[[mirror]]
+lean = "p3_circle.verifier.mirror.verify_queries"
+rust = "p3_circle::verifier::verify_queries"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.InputError"
+rust = "p3_circle::pcs::InputError"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.CircleInputProof"
+rust = "p3_circle::pcs::CircleInputProof"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.CirclePcsProof"
+rust = "p3_circle::pcs::CirclePcsProof"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.CircleVerifierTx"
+rust = "p3_circle::transcript::CircleVerifierTranscript"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.Claim"
+rust = "p3_circle::pcs::CommitmentWithClaims"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.IRes"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.Replayed"
+rust = "p3_circle::pcs::ReplayedChallenges"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.txResult"
+rust = "p3_circle::pcs::replay_transcript"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.replay_transcript"
+rust = "p3_circle::pcs::replay_transcript"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.checkBatch"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.reduceMatrix"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.firstLayerLeaf"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.reduceBatch"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.reduceQuery"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.open_inputs"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.claimedWidth"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify"
+
+[[mirror]]
+lean = "p3_circle.pcs.mirror.verify"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify"

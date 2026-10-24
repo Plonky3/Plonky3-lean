@@ -762,7 +762,10 @@ def TxQueries {Com S : Type} (tx : CircleVerifierTx K Com S) (params : FriParame
 def claimHeights {Com : Type} (lb : ℕ) (rounds : List (Claim K Com)) : List ℕ :=
   rounds.flatMap fun c => c.matrices.map fun m => m.domain.log_n + lb
 
-/-- The verifier never panics when every claimed domain has at least 2 rows and every opening point has 1 + t^2 nonzero. -/
+/-- The verifier never panics when:
+
+- every claimed domain has at least 2 rows
+- every opening point t has 1 + t^2 nonzero. -/
 theorem verify_total (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {S : Type} (immcs fmmcs : MmcsOps K)
     (tx : CircleVerifierTx K fmmcs.Commitment S) (params : FriParameters)
     (rounds : List (Claim K immcs.Commitment))
@@ -809,7 +812,10 @@ def PreChecks (G : Gen (K × K)) (immcs fmmcs : MmcsOps K) (params : FriParamete
       proof.fri_proof (H - (params.log_blowup + 1)) = pure la) ∧
     ¬ (params.batch_proof_of_work_bits = 0 ∧ proof.batch_pow_witness ≠ 0)
 
-/-- On claimed domains of at least 2 rows, the verifier panics exactly when the checks before the transcript pass and some opening point t has t^2 = -1. -/
+/-- On claimed domains of at least 2 rows, the verifier panics exactly when:
+
+- the checks before the transcript pass
+- some opening point t has t^2 = -1. -/
 theorem verify_panics_iff (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {S : Type} (immcs fmmcs : MmcsOps K)
     (tx : CircleVerifierTx K fmmcs.Commitment S) (params : FriParameters)
     (rounds : List (Claim K immcs.Commitment))

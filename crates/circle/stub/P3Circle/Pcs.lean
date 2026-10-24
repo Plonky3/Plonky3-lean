@@ -152,7 +152,9 @@ def reduceMatrix {IME FME : Type} (G : Gen (K × K)) (log_blowup log_global_max_
 
 /-- The first-layer leaf of one height at one query.
 
-It corrects the reduced value by lambda v_n, places it beside the sibling, and returns the y-twiddle and the leaf's shape. -/
+It corrects the reduced value by lambda v_n and places it beside the sibling.
+
+It also returns the y-twiddle and the leaf's shape. -/
 def firstLayerLeaf (G : Gen (K × K)) (log_blowup log_global_max_height index : ℕ)
     (e : ((ℕ × K) × K) × K) : Option (ℕ × K × List K × (ℕ × ℕ)) := do
   let (((log_height, ro), fl_sib), lambda) := e

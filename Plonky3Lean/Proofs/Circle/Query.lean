@@ -236,7 +236,9 @@ theorem foldlM_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {L R : ℕ} (
 
 /-- One query's fold chain on honest data returns the folded constant.
 
-The inputs are rolled in at their heights, every round folds the honest layer, and the chain ends at the final height. -/
+The inputs are rolled in at their heights, and every round folds the honest layer.
+
+The chain ends at the final height. -/
 theorem fold_query_honest {ME IE : Type} (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {lb R : ℕ} (hlb : 1 ≤ lb)
     (hG : R + lb + 2 ≤ G.adicity) (q t : ℕ) (E : ℕ → ℕ → K) (betas : List K) (hβ : betas.length = R)
     (P : ℕ → Prop) [DecidablePred P] (hE : ∀ r, ¬ P r → E r = fun _ => 0)
@@ -330,7 +332,9 @@ theorem query_twiddles_eq (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) (t : ℕ)
 
 Take inputs and commit-phase siblings that hold the honest layers at the points each query reads.
 
-Take a final constant equal to the folded coefficients, and a commit-phase scheme that accepts the honest codewords.
+Take a final constant equal to the folded coefficients.
+
+Take a commit-phase scheme that accepts the honest codewords.
 
 Then the query checks accept. -/
 theorem verify_queries_complete (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {IE IP : Type} (fmmcs : MmcsOps K)
@@ -451,7 +455,7 @@ theorem twinPoint_cfft_x (hV : CircleGenValid G) {n : ℕ} (hn : 1 ≤ n) (hG : 
       by ring, add_nsmul, hone, add_comm, add_genPt_one_x hV (by omega)]
     simp
 
-/-- The first-layer point of a query at height h, read in circle FFT order, sits at the circle FRI point of round H - h.
+/-- The first-layer point of a query at height h sits at the circle FRI point of round H - h.
 
 Its x-coordinate is sigma_r x_r, for r = H - h. -/
 theorem firstLayer_point_x (hV : CircleGenValid G) {H h : ℕ} (hh : 2 ≤ h) (hhH : h ≤ H) (hG : H + 1 ≤ G.adicity)
@@ -496,7 +500,9 @@ theorem dot_product_range_prefix (f : ℕ → K) {M : ℕ} (r : List K) (h : r.l
   simp [← List.map_take, List.take_range, min_eq_right h, Nat.min_eq_left h]
 
 open p3_circle.deep_quotient.mirror in
-/-- The verifier's powers of alpha run to the widest claim; the row reduction reads only as many as the row has. -/
+/-- The row reduction reads only as many powers of alpha as the row has.
+
+The verifier's list runs to the widest claim. -/
 theorem reduce_row_prefix (αW α : K) {M : ℕ} (x z : Point K) (ps qs : List K) (hpq : ps.length = qs.length)
     (hM : ps.length ≤ M) :
     deep_quotient_reduce_row αW ((List.range M).map (α ^ ·)) x z ps qs =
@@ -566,7 +572,9 @@ theorem reduceMatrix_eq {IME FME : Type} (hV : CircleGenValid G) (h2 : (2 : K) �
 open p3_circle.pcs.mirror in
 /-- The first layer of one height at one query, on honest values, is the input circle FRI rolls in at round H - h.
 
-Take the lambda-corrected DEEP function at height h to be a polynomial of 2^(h - lb) coefficients c in the FFT basis.
+Take the lambda-corrected DEEP function at height h to be a polynomial in the FFT basis.
+
+It has 2^(h - lb) coefficients c.
 
 Take the sibling to be its value at the conjugate point.
 
@@ -607,7 +615,9 @@ Take claims whose checks before the transcript pass, and a transcript that accep
 
 Take input checks that return, for every query, the honest inputs at the points the query reads.
 
-Take honest commit-phase siblings, the folded constant as the final value, and a commit-phase scheme that accepts the honest codewords.
+Take honest commit-phase siblings, and the folded constant as the final value.
+
+Take a commit-phase scheme that accepts the honest codewords.
 
 Then the verifier accepts. -/
 theorem verify_complete (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {S : Type} (immcs fmmcs : MmcsOps K)

@@ -2,6 +2,7 @@ module
 
 public import Plonky3Lean.Proofs.Circle.Deep
 public import Plonky3Lean.Proofs.Circle.Selectors
+public import Plonky3Lean.Proofs.Circle.Query
 
 @[expose] public section
 
@@ -126,5 +127,64 @@ theorem deep.extract_lambda : type_of% @Plonky3Lean.Proofs.Circle.extract_lambda
 
 /-- After the extraction the LDE is orthogonal to v_n on the LDE domain. -/
 theorem deep.extract_lambda_orthogonal : type_of% @Plonky3Lean.Proofs.Circle.extract_lambda_orthogonal := @Plonky3Lean.Proofs.Circle.extract_lambda_orthogonal
+
+/-! ## The PCS verifier -/
+
+/-- The verifier never panics when:
+
+- every claimed domain has at least 2 rows
+- no opening point t has t^2 = -1. -/
+theorem pcs.never_panics : type_of% @Plonky3Lean.Proofs.Circle.verify_total := @Plonky3Lean.Proofs.Circle.verify_total
+
+/-- On claimed domains of at least 2 rows, the verifier panics exactly when:
+
+- the checks before the transcript pass
+- some opening point t has t^2 = -1. -/
+theorem pcs.panics_iff : type_of% @Plonky3Lean.Proofs.Circle.verify_panics_iff :=
+  @Plonky3Lean.Proofs.Circle.verify_panics_iff
+
+/-- The lambda correction of a one-row claimed domain panics, since it reads v_0. -/
+theorem pcs.one_row_panics : type_of% @Plonky3Lean.Proofs.Circle.firstLayerLeaf_one_row :=
+  @Plonky3Lean.Proofs.Circle.firstLayerLeaf_one_row
+
+/-- The verifier accepts when:
+
+- the claims pass the checks before the transcript, and the transcript accepts
+- the input checks return the honest inputs at the points each query reads
+- the commit-phase siblings hold the honest layers, and the final value is the folded constant
+- the commit-phase scheme accepts the honest codewords. -/
+theorem pcs.complete : type_of% @Plonky3Lean.Proofs.Circle.verify_complete :=
+  @Plonky3Lean.Proofs.Circle.verify_complete
+
+/-! ## One query, against Sections 3 and 4 -/
+
+/-- One matrix adds, at its height, each point's DEEP term of Proposition 4 times the running power of alpha. -/
+theorem query.deep : type_of% @Plonky3Lean.Proofs.Circle.reduceMatrix_eq := @Plonky3Lean.Proofs.Circle.reduceMatrix_eq
+
+/-- The query point at height h has x-coordinate sigma_r x_r, the point circle FRI reads at round H - h. -/
+theorem query.first_layer_point : type_of% @Plonky3Lean.Proofs.Circle.firstLayer_point_x :=
+  @Plonky3Lean.Proofs.Circle.firstLayer_point_x
+
+/-- The first-layer fold of an honest pair is f_0 + beta f_1 at P.x, equations (14) to (16). -/
+theorem query.first_layer_fold : type_of% @Plonky3Lean.Proofs.Circle.firstLayer_fold :=
+  @Plonky3Lean.Proofs.Circle.firstLayer_fold
+
+/-- An honest first-layer leaf folds to the input circle FRI rolls in at round H - h. -/
+theorem query.first_layer : type_of% @Plonky3Lean.Proofs.Circle.firstLayer_honest :=
+  @Plonky3Lean.Proofs.Circle.firstLayer_honest
+
+/-- One round folds the honest row to g_0 + beta g_1 at pi(x_r), equations (17) to (19). -/
+theorem query.fold_step : type_of% @Plonky3Lean.Proofs.Circle.foldStep_honest := @Plonky3Lean.Proofs.Circle.foldStep_honest
+
+/-- Squaring round r's twiddle gives the point round r + 1 reads: pi(x_r) = sigma_(r+1) x_(r+1). -/
+theorem query.next_point : type_of% @Plonky3Lean.Proofs.Circle.piX_Xq := @Plonky3Lean.Proofs.Circle.piX_Xq
+
+/-- On honest data, a query's fold chain returns the folded constant and records every round's honest row. -/
+theorem query.fold_chain : type_of% @Plonky3Lean.Proofs.Circle.fold_query_honest :=
+  @Plonky3Lean.Proofs.Circle.fold_query_honest
+
+/-- The query checks accept honest inputs, honest siblings, the folded constant and accepted codewords. -/
+theorem query.complete : type_of% @Plonky3Lean.Proofs.Circle.verify_queries_complete :=
+  @Plonky3Lean.Proofs.Circle.verify_queries_complete
 
 end Plonky3Lean.Claims.Circle

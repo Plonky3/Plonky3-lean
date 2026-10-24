@@ -196,6 +196,9 @@ public import Plonky3Lean.Proofs.Circle.Ordering
 public import Plonky3Lean.Proofs.Circle.CfftStd
 public import Plonky3Lean.Proofs.Circle.Folding
 public import Plonky3Lean.Proofs.Circle.Deep
+public import Plonky3Lean.Proofs.Circle.Res
+public import Plonky3Lean.Proofs.Circle.Pcs
+public import Plonky3Lean.Proofs.Circle.Query
 public import Plonky3Lean.Proofs.Fri.Transcript
 public import Plonky3Lean.Proofs.Fri.Hiding
 public import Plonky3Lean.Proofs.Fri.Packed
