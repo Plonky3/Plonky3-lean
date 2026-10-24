@@ -68,6 +68,7 @@ A crate extracted again for another target (`[[variant]]` in its `crate.toml`), 
 
 | Variant | Target | Library | Namespace | Generated lines | Hand-written lines | `opaque` | Dropped by the extractor | Patches (post) |
 |---|---|---|---|---:|---:|---:|---:|---:|
+| `baby-bear@x86_64-avx2` | `x86_64-unknown-linux-gnu +avx2` | `P3BabyBearAvx2` | `p3_baby_bear_avx2` | 198 | 125 | 0 | 0 | 1 |
 | `field@x86_64-avx2` | `x86_64-unknown-linux-gnu +avx2` | `P3FieldAvx2` | `p3_field` | 85 | 32 | 0 | 0 | 0 |
 | `monty-31@x86_64-avx2` | `x86_64-unknown-linux-gnu +avx2` | `P3Monty31Avx2` | `p3_monty_31_avx2` | 426 | 116 | 0 | 0 | 1 |
 
@@ -477,6 +478,11 @@ Nothing translated is dropped.
 charon errors: 0.
 Nothing translated is dropped.
 
+### `baby-bear@x86_64-avx2`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ### `field@x86_64-avx2`
 
 charon errors: 0.
@@ -492,14 +498,14 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1498) whose dependencies include it; reaching one is not using it.
+(of 1514) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
 | `arch-shims` | `x86_64.types.M128i.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `arch-shims` | `x86_64.types.M256.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `arch-shims` | `x86_64.types.M256i.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
-| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 72 |
+| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 88 |
 | `baby-bear` | `mds.MDSBabyBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon2.BabyBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
@@ -545,7 +551,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1498) whose dependencies include the declaration.
+counts the claims (of 1514) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -2153,6 +2159,22 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3BabyBear.poseidon2.const_check_6.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.BabyBearParameters.MontyParameters.toPortable` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.BabyBearParameters.valid` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.PackedBabyBearAVX2.add.from_vector_arg` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.PackedBabyBearAVX2.add.lanewise` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.PackedBabyBearAVX2.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.PackedBabyBearAVX2.mul.from_vector_arg` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.PackedBabyBearAVX2.mul.lanewise` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.PackedBabyBearAVX2.mul.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.PackedBabyBearAVX2.neg.from_vector_arg` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.PackedBabyBearAVX2.neg.lanewise` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.PackedBabyBearAVX2.neg.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.PackedBabyBearAVX2.sub.from_vector_arg` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.PackedBabyBearAVX2.sub.lanewise` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.PackedBabyBearAVX2.sub.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.halve_avx2.lanewise` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.halve_avx2.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.Proofs.Binary.N128.injective'` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.Proofs.Binary.cantorTower.indep'` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.Proofs.Binary.cantorTower.span'` | `Classical.choice`, `Quot.sound`, `propext` |
