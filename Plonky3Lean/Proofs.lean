@@ -106,6 +106,7 @@ public import Plonky3Lean.Proofs.Field.BabyBear.Constants
 public import Plonky3Lean.Proofs.Field.BabyBear.Element
 public import Plonky3Lean.Proofs.Field.BabyBear.Extension
 public import Plonky3Lean.Proofs.Field.BabyBear.Generic
+public import Plonky3Lean.Proofs.Field.BabyBear.Neon
 public import Plonky3Lean.Proofs.Field.Binary.Aes
 public import Plonky3Lean.Proofs.Field.Binary.Clmul
 public import Plonky3Lean.Proofs.Field.Binary.Compact
@@ -178,6 +179,9 @@ public import Plonky3Lean.Proofs.Field.Mersenne31.Sum
 public import Plonky3Lean.Proofs.Field.Avx2.Shims
 public import Plonky3Lean.Proofs.Field.Avx2.Kernels
 public import Plonky3Lean.Proofs.Field.Avx2.Packing
+public import Plonky3Lean.Proofs.Field.Neon.Shims
+public import Plonky3Lean.Proofs.Field.Neon.Kernels
+public import Plonky3Lean.Proofs.Field.Neon.Packing
 public import Plonky3Lean.Proofs.Field.Monty31.Arith
 public import Plonky3Lean.Proofs.Field.Monty31.Convert
 public import Plonky3Lean.Proofs.Field.Monty31.Element

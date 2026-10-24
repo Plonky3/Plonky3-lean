@@ -39,13 +39,21 @@ The charon flags in `toolchain.toml`'s `charon_args` restrict what is extracted
 for every crate: `Debug` bodies become `opaque`, and serde is excluded.
 
 Extraction is target-scoped to `thumbv7em-none-eabi`. That target has no SIMD,
-so the models are of the portable scalar paths. The exception is AVX2: the
-`x86_64-avx2` variants of p3-field, p3-monty-31 and p3-baby-bear are extracted
-for x86_64 against models of the `core::arch` intrinsics (`arch/`), which are
-trusted, and checked against the hardware by `arch/tests/`. Of that code, only
-BabyBear's packed `Add`, `Sub`, `Mul`, `Neg` and `halve_avx2` are claimed
-(`Plonky3Lean/Claims/BabyBear/Avx2.lean`). **Nothing here describes the AVX-512
-or NEON code paths**, or the rest of the AVX2 one.
+so the models are of the portable scalar paths. The exceptions are AVX2 and
+NEON: the `x86_64-avx2` and `aarch64-neon` variants of p3-field, p3-monty-31 and
+p3-baby-bear are extracted for x86_64 and AArch64 against models of the
+`core::arch` intrinsics (`arch/`), which are trusted, and checked against the
+hardware by `arch/tests/`. Of that code, only BabyBear's packed `Add`, `Sub`,
+`Mul`, `Neg` and `halve_avx2` / `halve_neon` are claimed
+(`Plonky3Lean/Claims/BabyBear/Avx2.lean` and `Neon.lean`). **Nothing here
+describes the AVX-512 code path**, or the rest of the AVX2 and NEON ones.
+
+The NEON variants also rest on one stand-in. monty-31's `confuse_compiler` is an
+optimisation barrier written as an empty `asm!` block, which the extractor
+rejects; under the extraction cfg it is the identity (pre-patch
+`monty-31/030`). That is its value, since the block's template is a comment and
+the code after it tells the compiler `y == x`, but the stand-in is trusted: the
+models say nothing about the code generation the barrier is there to affect.
 
 ## 4. Specification libraries
 
