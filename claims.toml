@@ -6589,6 +6589,10 @@ name   = "Plonky3Lean.Claims.MultiStark.gkr_verifier"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.MultiStark.instCharPExt4FieldSize_plonky3Lean"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.MultiStark.instance_term"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
