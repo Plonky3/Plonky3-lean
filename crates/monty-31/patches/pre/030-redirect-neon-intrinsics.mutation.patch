@@ -1,0 +1,16 @@
+# Mutation of: 030-redirect-neon-intrinsics
+# Breaks:      a normal build imports the models, which it does not depend on.
+#
+--- a/monty-31/src/aarch64_neon/packing.rs
++++ b/monty-31/src/aarch64_neon/packing.rs
+@@ -1,8 +1,8 @@
+ use alloc::vec::Vec;
+ // PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
+-#[cfg(not(hax_backend_lean))]
+-use core::arch::aarch64::{self, int32x4_t, uint32x4_t};
+ #[cfg(hax_backend_lean)]
++use core::arch::aarch64::{self, int32x4_t, uint32x4_t};
++#[cfg(not(hax_backend_lean))]
+ use p3_arch_shims::aarch64::{self, int32x4_t, uint32x4_t};
+ // PATCHED: only the `asm!` barrier uses it, which the cfg replaces.
+ #[cfg(not(hax_backend_lean))]
