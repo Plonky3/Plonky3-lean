@@ -20,3 +20,23 @@ watch = [
   "Cargo.toml",
   "Cargo.lock",
 ]
+
+# BabyBear's AVX2 parameters, `PACKED_P` and `PACKED_MU`: the
+# `MontyParametersAVX2` impl, and the `PackedMontyParameters` impl that on
+# x86_64 with AVX2 has it as a supertrait. The traits are the monty-31
+# variant's, so `renames` points the generated code's `p3_monty_31.` references
+# there (`p3_monty_31_avx2.`). `baby_bear` is opaque: `BabyBearParameters`, its
+# derived impls and its `MontyParameters` constants are P3BabyBear's, by the
+# bindings in variants/x86_64-avx2/extraction/P3BabyBearAvx2/Assumptions/.
+[[variant]]
+name = "x86_64-avx2"
+target = "x86_64-unknown-linux-gnu"
+target_features = ["avx2"]
+lean_lib = "P3BabyBearAvx2"
+namespace = "p3_baby_bear_avx2"
+start_from = [
+  "{impl p3_monty_31::x86_64_avx2::packing::MontyParametersAVX2 for p3_baby_bear::baby_bear::BabyBearParameters}",
+  "{impl p3_monty_31::data_traits::PackedMontyParameters for p3_baby_bear::baby_bear::BabyBearParameters}",
+]
+opaque = ["p3_baby_bear::baby_bear"]
+renames = { p3_monty_31 = "p3_monty_31_avx2" }

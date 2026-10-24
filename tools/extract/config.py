@@ -13,7 +13,8 @@
   config.py package <unit>      the Cargo package one unit models
   config.py source <unit>       that package's source directory
   config.py rename <unit>       for a variant, `<lib> <namespace> <new lib>
-                                <new namespace>`: hax's names and the variant's
+                                <new namespace> [<ns>=<new ns> ...]`: hax's names
+                                and the variant's, then its `renames`
   config.py checks              the `cargo check`s of the pre-patched tree, one
                                 line per target: <target>|<rustflags>|<-p args>
   config.py pre-patches         every crates/*/patches/pre/*.patch, in apply order
@@ -152,7 +153,8 @@ def main(argv):
         name, c, v = unit(argv[1])
         if v is None:
             sys.exit(f"error: {argv[1]} is a crate, not a variant")
-        print(c["lean_lib"], namespace(name, c), v["lean_lib"], v["namespace"])
+        renames = [f"{k}={n}" for k, n in sorted(v.get("renames", {}).items())]
+        print(c["lean_lib"], namespace(name, c), v["lean_lib"], v["namespace"], *renames)
     elif argv == ["checks"]:
         # The crates in plonky3/'s dependency graph, as charon sees them: the
         # crates for the extraction target, and each variant for its own. A
