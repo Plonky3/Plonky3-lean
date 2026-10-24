@@ -5,7 +5,9 @@
 # Class:        cfg-hide
 # Gap:          docs/extractor-issues.md 10: charon#1266 (an `-> impl Trait`
 #               method is a hidden GAT, which `--lift-associated-types` cannot
-#               lift); aeneas has no GAT model.
+#               lift); aeneas has no GAT model. Without this patch aeneas stops
+#               on p3-baby-bear: "Can not extract trait associated types with
+#               parameters", and mixed recursion groups through `Field`.
 # Cost:         none in a normal build (see below). In the extracted variant,
 #               `Field` no longer implies `RawDataSerializable`.
 # Upstreamable: yes: inert in a normal build, so Plonky3 could carry the
@@ -20,9 +22,13 @@
 # Every method of `RawDataSerializable` except `NUM_BYTES` returns
 # `impl IntoIterator`. rustc desugars each one into a hidden generic
 # associated type on the trait, and `--preset=aeneas` cannot lift GATs.
-# Charon writes type errors into the LLBC, and aeneas then fails on every
-# item that mentions `Field`, which is nearly all of p3-baby-bear (803
-# errors). The trait is only reached through `Field`'s supertrait list.
+# aeneas then rejects `Field` and the trait group around it, which nearly all
+# of p3-baby-bear mentions. The trait is only reached through `Field`'s
+# supertrait list.
+#
+# Every hunk is needed: without the explicit bounds below, the cfg variant of
+# p3-field (extension impls) or p3-symmetric (`SerializingHasher`) does not
+# compile (E0599, `RawDataSerializable` methods not found).
 #
 # The edge now goes through `FieldRawData`:
 #   normal build:          trait FieldRawData: RawDataSerializable {}   + blanket impl

@@ -5,6 +5,8 @@
 # Class:        bound
 # Gap:          docs/extractor-issues.md 1 (hax passes no target selection to
 #               charon, so its cargo build also compiles the binaries).
+#               Without this patch the cargo check of the extracted variant
+#               fails on the binaries: "can't find crate for `std`" (E0463).
 # Cost:         none. The library is untouched; the two demo binaries are not built.
 # Upstreamable: no: the binaries are wanted upstream. A hax option forwarding
 #               `--lib` to charon would make the patch unnecessary.

@@ -4,7 +4,13 @@
 # Hunks:        6
 # Class:        cfg-hide
 # Gap:          docs/extractor-issues.md 10 (charon#1266, as for 020), and 9 for
-#               `unpack_iter`'s mixed type/function recursion group.
+#               `unpack_iter`'s mixed type/function recursion group. Without
+#               the `unpack_iter` hunk aeneas stops on p3-baby-bear ("Mixed-
+#               recursive declaration groups are not supported", "Can not
+#               extract trait associated types with parameters"). Without the
+#               three `PackedFieldExtension` hunks the generated Lean is the
+#               same, but charon prints 12 "GATs cannot work with
+#               `--lift-associated-types`" warnings.
 # Cost:         none in a normal build: every change is behind
 #               cfg(hax_backend_lean). In the extracted variant, four default
 #               methods are absent and `to_ext_iter` sits on an extension trait.

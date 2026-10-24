@@ -4,7 +4,9 @@
 # Hunks:        1
 # Class:        bound
 # Gap:          none of its own: it declares the cfg that 020, 030 and 040 gate
-#               on (docs/extractor-issues.md 10).
+#               on (docs/extractor-issues.md 10). Without it, extract.sh's
+#               cargo check fails: the patched tree adds `unexpected cfg
+#               condition name: hax_backend_lean` warnings.
 # Cost:         none. Declares a cfg name to rustc's check-cfg; no code changes.
 # Upstreamable: yes: together with 020-040, one inert line in the workspace lint
 #               table, worth carrying only if they are carried.

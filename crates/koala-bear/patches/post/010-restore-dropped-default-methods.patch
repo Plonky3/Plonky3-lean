@@ -8,6 +8,8 @@
 #               unused methods after the merge, which drops the default-method
 #               roots hax adds (`--start-from core::clone::Clone::clone_from`,
 #               `core::cmp::PartialEq::ne`). `--targets` is needed because of 1.
+#               Without this patch `lake build` fails: "Fields missing:
+#               `clone_from`" and "`ne`".
 # Cost:         none. Each added field is the body of the CoreModels default
 #               method it stands for (`clone.Clone.clone_from.default`,
 #               `cmp.PartialEq.ne.default`), inlined.
@@ -22,14 +24,14 @@
 # `core.cmp.PartialEq` has `ne`. A derived `Clone`/`PartialEq` never defines
 # them, so aeneas fills them with the trait's default method, but only if charon
 # translated it. hax adds the default methods as charon roots for exactly this
-# purpose. We extract with `--targets thumbv7em-none-eabi` (the only way to reach
-# charon's cargo with a target through hax 0.4.1 or 0.4.2), and in that mode charon
-# drops them again (measured: 11 `clone_from` in the LLBC without `--targets`,
-# 2 with it). So every derived impl comes out missing the field, and Lean
-# rejects the structure literal.
+# purpose. We extract with `--targets thumbv7em-none-eabi`, the only way to
+# reach charon's cargo with a target through hax (issue 1), and in that mode
+# charon drops those roots again. So every derived impl comes out missing the
+# field, and Lean rejects the structure literal.
 #
-# The alternative, `--translate-all-methods`, grows the extraction until it
-# fails with 276 errors. Adding the field by hand is the narrow fix:
+# The alternative, `--translate-all-methods`, translates every method of every
+# impl charon enters, which pulls in p3-field's trait hierarchy (issue 9).
+# Adding the field by hand is the narrow fix:
 #   clone_from := fun _ source => <clone> source        (= clone_from.default)
 #   ne := fun self other => do let b ← <eq> self other; ok (b = false)
 #                                                       (= ne.default)

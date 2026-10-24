@@ -4,7 +4,9 @@
 # Hunks:        4
 # Class:        equiv-rewrite
 # Gap:          docs/extractor-issues.md 14 (no model of a mutable slice
-#               iterator, here `iter_mut().enumerate()`).
+#               iterator, here `iter_mut().enumerate()`). Without this patch
+#               `lake build` fails on the generated `hash_many`: "Unknown
+#               constant `CoreModels.core.slice.iter.IterMut...`".
 # Cost:         none in a normal build: only the selection is behind
 #               cfg(hax_backend_lean). In the extracted variant, the scalar
 #               `hash_many` calls the reshaped body, which a differential test
@@ -19,6 +21,9 @@
 # The original body writes each digest through `iter_mut().enumerate()`.
 # The reshaped body writes digest `i` by index, with the same assertion and the same message slice.
 # The scalar file is compiled only for targets without a vector backend, so the test includes it a second time, under `cfg(test)`, to run the shipped body beside the reshaped one on any host.
+#
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
 #
 diff --git a/blake2s/src/hax_reshaped.rs b/blake2s/src/hax_reshaped.rs
 new file mode 100644

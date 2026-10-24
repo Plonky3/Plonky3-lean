@@ -3,11 +3,12 @@
 # Target:       monty-31/src/hax_roots.rs, monty-31/src/lib.rs
 # Hunks:        2
 # Class:        bound
-# Gap:          docs/extractor-issues.md 4: charon cannot root the
-#               `QuotientMap<uN>` impls (a `--start-from` pattern cannot name
-#               a trait's generic argument), and skips a provided-method
-#               override that nothing calls even when it is a root, so aeneas
-#               never emits them.
+# Gap:          docs/extractor-issues.md 200 and 4: charon's `--start-from`
+#               rejects the methods of the `QuotientMap<uN>` impls, and does
+#               not emit the overrides `halve` (and the other provided-method
+#               overrides wrapped here) even when they are roots, so aeneas
+#               never emits them. Without this patch the roots name a module
+#               that does not exist and charon exits 101.
 # Cost:         none in a normal build: the module exists only under
 #               cfg(hax_backend_lean). In the extracted variant it adds free
 #               functions, each of which calls one method or constant of

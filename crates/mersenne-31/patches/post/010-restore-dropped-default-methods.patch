@@ -7,7 +7,8 @@
 #               (`--targets`) forces `--translate-all-methods`, then filters
 #               unused methods after the merge, which drops the default-method
 #               roots hax adds (`--start-from core::clone::Clone::clone_from`).
-#               `--targets` is needed because of 1.
+#               `--targets` is needed because of 1. Without this patch `lake
+#               build` fails: "Fields missing: `clone_from`".
 # Cost:         none. The added field is the body of the CoreModels default
 #               method it stands for (`clone.Clone.clone_from.default`),
 #               inlined.

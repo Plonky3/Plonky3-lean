@@ -9,9 +9,10 @@ state = "scoped"
 features = []
 
 # One root: the `hax_roots` module that pre-patch 010 adds under
-# cfg(hax_backend_lean). Rooted at the methods themselves, aeneas drops every
-# method that no free function calls (docs/extractor-issues.md, 4); each
-# function of that module calls one method, so its body is extracted.
+# cfg(hax_backend_lean). The methods themselves cannot all be roots: charon's
+# `--start-from` rejects methods of generic trait impls, and does not emit some
+# rooted overrides (docs/extractor-issues.md, 200 and 4). Each function of that
+# module calls one method, so its body is extracted.
 start_from = ["p3_mersenne_31::hax_roots"]
 
 watch = ["mersenne-31/src", "mersenne-31/Cargo.toml", "field/src/integers.rs", "field/src/helpers.rs"]

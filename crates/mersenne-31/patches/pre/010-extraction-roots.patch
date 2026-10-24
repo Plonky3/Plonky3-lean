@@ -3,25 +3,31 @@
 # Target:       mersenne-31/src/lib.rs, mersenne-31/src/hax_roots.rs
 # Hunks:        2
 # Class:        bound
-# Gap:          docs/extractor-issues.md 4 (charon leaves methods that no free
-#               function calls out of `ordered_decls`, and aeneas drops them).
+# Gap:          docs/extractor-issues.md 200 and 4: charon's `--start-from`
+#               rejects the methods of generic trait impls (`QuotientMap<w>`,
+#               `HasTwoAdicBinomialExtension<2>`, `BinomiallyExtendable<3>`),
+#               and does not emit the overrides `from_bool`, `halve`,
+#               `mul_2exp_u64` and `dot_product` even when they are roots.
+#               Without this patch the roots name a module that does not exist
+#               and charon exits 101.
 # Cost:         none in a normal build: the module exists only under
 #               cfg(hax_backend_lean). In the extracted variant it adds free
 #               functions, each of which calls one method of `Mersenne31`.
 #               No existing body changes.
-# Upstreamable: no: the module exists only for the extractor. Charon ordering
-#               `--start-from` methods would make it unnecessary.
-# Drop when:    charon orders `--start-from` methods, so that the methods
-#               themselves can be roots.
+# Upstreamable: no: the module exists only for the extractor. Charon accepting
+#               trait generics in `--start-from`, and emitting rooted
+#               overrides, would make it unnecessary.
+# Drop when:    charon accepts trait generics in `--start-from` and emits
+#               rooted overrides, so that the methods themselves can be roots.
 # Test:         lint p3-mersenne-31 unexpected_cfgs
 # Mutation:     the module is gated on a misspelled cfg, so a normal
 #               `cargo check` reports `unexpected_cfgs`.
 #
-# Charon translates every method of `Mersenne31` with its body.
-# aeneas emits only the ones a free function reaches.
-# Rooted at the methods themselves, `Sub`, `Mul`, `Neg`, `new`, `from_int` and the rest are silently dropped.
-# `Add` survives only because `from_u62` calls it.
-# Rooted at a module of one-line wrappers, every wrapped method is reachable, so its own body is extracted instead of transcribed.
+# Rooted at the methods themselves, the 24 methods of generic trait impls cannot
+# be named at all, and four overrides of p3-field's provided methods are not
+# emitted. The other 19 would extract.
+# Rooted at a module of one-line wrappers, every wrapped method is reached from
+# a free function, so its own body is extracted instead of transcribed.
 #
 # Methods that need a whole trait-impl dictionary (`to_unique_u32`, anything on `Complex<Mersenne31>`) are not wrapped.
 # Nor are those that reach `core::iter` (`sum_array`, `Sum`).
