@@ -1,0 +1,14 @@
+# Mutation of: vtrn1q_u32
+# Breaks:      it zips (ZIP1) instead of transposing.
+#
+--- a/src/aarch64/neon.rs
++++ b/src/aarch64/neon.rs
+@@ -499,7 +499,7 @@
+ /// Elem[result, 2*p+1, esize] = Elem[operand2, 2*p+part, esize];`, with `part = 0`.
+ #[inline]
+ pub unsafe fn vtrn1q_u32(a: uint32x4_t, b: uint32x4_t) -> uint32x4_t {
+-    uint32x4_t([a.0[0], b.0[0], a.0[2], b.0[2]])
++    uint32x4_t([a.0[0], b.0[0], a.0[1], b.0[1]])
+ }
+ 
+ /// `vtrn2q_u32` (`TRN2`): `TRN1`'s loop with `part = 1`.

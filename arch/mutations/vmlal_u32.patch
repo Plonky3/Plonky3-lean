@@ -1,0 +1,14 @@
+# Mutation of: vmlal_u32
+# Breaks:      it sign-extends `b`.
+#
+--- a/src/aarch64/neon.rs
++++ b/src/aarch64/neon.rs
+@@ -436,7 +436,7 @@
+     let mut dst = [0u64; 2];
+     let mut e = 0;
+     while e < 2 {
+-        dst[e] = a.0[e].wrapping_add((b.0[e] as u64) * (c.0[e] as u64));
++        dst[e] = a.0[e].wrapping_add((b.0[e] as i32 as u64).wrapping_mul(c.0[e] as u64));
+         e += 1;
+     }
+     uint64x2_t(dst)

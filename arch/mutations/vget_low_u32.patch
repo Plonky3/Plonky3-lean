@@ -1,0 +1,14 @@
+# Mutation of: vget_low_u32
+# Breaks:      it returns the high half.
+#
+--- a/src/aarch64/neon.rs
++++ b/src/aarch64/neon.rs
+@@ -394,7 +394,7 @@
+ /// `Vpart[n, 0]`: lanes 0 and 1.
+ #[inline]
+ pub unsafe fn vget_low_u32(a: uint32x4_t) -> uint32x2_t {
+-    uint32x2_t([a.0[0], a.0[1]])
++    uint32x2_t([a.0[2], a.0[3]])
+ }
+ 
+ /// `vmull_u32` (`UMULL`).
