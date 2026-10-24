@@ -31,7 +31,7 @@ target `thumbv7em-none-eabi`
 | `commit` | stub |  | 836 | 0 | 59 |  | 0 / 0 |  |
 | `dft` | stub |  | 992 | 0 | 67 |  | 0 / 0 |  |
 | `field` | stub |  | 346 | 7 | 25 |  | 0 / 0 |  |
-| `fri` | stub |  | 1425 | 0 | 94 |  | 0 / 0 |  |
+| `fri` | stub |  | 1580 | 0 | 112 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
 | `keccak` | scoped | 1109 | 39 | 0 | 0 | 6 | 2 / 2 | pre `010`, pre `020` |
 | `keccak-air` | scoped | 624 | 676 | 0 | 39 | 0 | 0 / 0 |  |
@@ -498,7 +498,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1738) whose dependencies include it; reaching one is not using it.
+(of 1765) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -540,7 +540,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1738) whose dependencies include the declaration.
+counts the claims (of 1765) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -1125,9 +1125,9 @@ counts the claims (of 1738) whose dependencies include the declaration.
 | `commit` | `p3_commit.periodic.mirror.unitEvalOnLde` | `{impl p3_commit::periodic::PeriodicEvaluator<F, D> for ()}::eval_on_lde` | stub | 1 |
 | `commit` | `p3_commit.periodic.mirror.unitEvalAtPoint` | `{impl p3_commit::periodic::PeriodicEvaluator<F, D> for ()}::eval_at_point` | stub | 1 |
 | `commit` | `p3_commit.periodic.mirror.build_periodic_lde_table` | `p3_commit::pcs::univariate::UnivariateStarkPcs::build_periodic_lde_table` | stub | 4 |
-| `commit` | `p3_commit.pcs.univariate.mirror.PointOpening` | `p3_commit::pcs::univariate::PointOpening` | stub | 25 |
-| `commit` | `p3_commit.pcs.univariate.mirror.MatrixOpening` | `p3_commit::pcs::univariate::MatrixOpening` | stub | 23 |
-| `commit` | `p3_commit.pcs.univariate.mirror.CommitmentOpening` | `p3_commit::pcs::univariate::CommitmentOpening` | stub | 22 |
+| `commit` | `p3_commit.pcs.univariate.mirror.PointOpening` | `p3_commit::pcs::univariate::PointOpening` | stub | 38 |
+| `commit` | `p3_commit.pcs.univariate.mirror.MatrixOpening` | `p3_commit::pcs::univariate::MatrixOpening` | stub | 36 |
+| `commit` | `p3_commit.pcs.univariate.mirror.CommitmentOpening` | `p3_commit::pcs::univariate::CommitmentOpening` | stub | 34 |
 | `commit` | `p3_commit.pcs.univariate.mirror.commit_preprocessing` | `p3_commit::pcs::univariate::UnivariateStarkPcs::commit_preprocessing` | stub | 1 |
 | `commit` | `p3_commit.pcs.univariate.mirror.commit_quotient` | `p3_commit::pcs::univariate::UnivariateStarkPcs::commit_quotient` | stub | 1 |
 | `commit` | `p3_commit.pcs.univariate.mirror.get_evaluations_on_domain_no_random` | `p3_commit::pcs::univariate::UnivariateStarkPcs::get_evaluations_on_domain_no_random` | stub | 1 |
@@ -1165,8 +1165,8 @@ counts the claims (of 1738) whose dependencies include the declaration.
 | `dft` | `p3_dft.butterflies.mirror.DifButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterfly<F>}::apply_to_rows` | stub | 1 |
 | `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::ScaledDitButterfly<F>}::apply_to_rows` | stub | 1 |
 | `dft` | `p3_dft.butterflies.mirror.DifButterflyZeros.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterflyZeros<F>}::apply_to_rows` | stub | 0 |
-| `dft` | `p3_dft.mirror.bitRev` | `p3_util::reverse_bits_len` | stub | 73 |
-| `dft` | `p3_dft.mirror.revIndex` | `p3_util::reverse_slice_index_bits` | stub | 42 |
+| `dft` | `p3_dft.mirror.bitRev` | `p3_util::reverse_bits_len` | stub | 84 |
+| `dft` | `p3_dft.mirror.revIndex` | `p3_util::reverse_slice_index_bits` | stub | 48 |
 | `dft` | `p3_dft.util.mirror.divide_by_height` | `p3_dft::util::divide_by_height` | stub | 4 |
 | `dft` | `p3_dft.util.mirror.coset_shift_cols` | `p3_dft::util::coset_shift_cols` | stub | 5 |
 | `dft` | `p3_dft.naive.mirror.NaiveDft.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::naive::NaiveDft}::dft_batch` | stub | 3 |
@@ -1234,11 +1234,11 @@ counts the claims (of 1738) whose dependencies include the declaration.
 | `field` | `p3_field.field.BasedVectorSpace.Blanket` | `{impl p3_field::field::BasedVectorSpace<F> for F}` | stub | 0 |
 | `field` | `p3_field.field.UniformSamplingField` | `p3_field::field::UniformSamplingField` | stub | 0 |
 | `field` | `p3_field.helpers.halve_u32` | `p3_field::helpers::halve_u32` | stub | 1 |
-| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset` | `p3_field::coset::TwoAdicMultiplicativeCoset` | stub | 73 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset` | `p3_field::coset::TwoAdicMultiplicativeCoset` | stub | 86 |
 | `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.new` | `p3_field::coset::TwoAdicMultiplicativeCoset::new` | stub | 19 |
 | `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.subgroup_generator` | `p3_field::coset::TwoAdicMultiplicativeCoset::subgroup_generator` | stub | 44 |
 | `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.shift_inverse` | `p3_field::coset::TwoAdicMultiplicativeCoset::shift_inverse` | stub | 22 |
-| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.size` | `p3_field::coset::TwoAdicMultiplicativeCoset::size` | stub | 21 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.size` | `p3_field::coset::TwoAdicMultiplicativeCoset::size` | stub | 29 |
 | `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.shrink_coset` | `p3_field::coset::TwoAdicMultiplicativeCoset::shrink_coset` | stub | 1 |
 | `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.exp_power_of_2` | `p3_field::coset::TwoAdicMultiplicativeCoset::exp_power_of_2` | stub | 1 |
 | `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.set_shift` | `p3_field::coset::TwoAdicMultiplicativeCoset::set_shift` | stub | 1 |
@@ -1247,20 +1247,20 @@ counts the claims (of 1738) whose dependencies include the declaration.
 | `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.generator_exp` | `p3_field::coset::TwoAdicMultiplicativeCoset::generator_exp` | stub | 1 |
 | `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.element` | `p3_field::coset::TwoAdicMultiplicativeCoset::element` | stub | 1 |
 | `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.iter` | `p3_field::coset::TwoAdicMultiplicativeCoset::iter` | stub | 8 |
-| `fri` | `p3_fri.config.mirror.FriParameters` | `p3_fri::config::FriParameters` | stub | 14 |
-| `fri` | `p3_fri.config.mirror.FriProverError` | `p3_fri::config::FriProverError` | stub | 0 |
-| `fri` | `p3_fri.config.mirror.FriParameters.final_poly_len` | `p3_fri::config::FriParameters::final_poly_len` | stub | 9 |
+| `fri` | `p3_fri.config.mirror.FriParameters` | `p3_fri::config::FriParameters` | stub | 23 |
+| `fri` | `p3_fri.config.mirror.FriProverError` | `p3_fri::config::FriProverError` | stub | 3 |
+| `fri` | `p3_fri.config.mirror.FriParameters.final_poly_len` | `p3_fri::config::FriParameters::final_poly_len` | stub | 15 |
 | `fri` | `p3_fri.config.mirror.FriParameters.blowup` | `p3_fri::config::FriParameters::blowup` | stub | 0 |
 | `fri` | `p3_fri.config.mirror.FriParameters.conjectured_soundness_bits` | `p3_fri::config::FriParameters::conjectured_soundness_bits` | stub | 0 |
-| `fri` | `p3_fri.config.mirror.FriParameters.validate_input_height` | `p3_fri::config::FriParameters::validate_input_height` | stub | 0 |
-| `fri` | `p3_fri.config.mirror.compute_log_arity_for_round` | `p3_fri::config::compute_log_arity_for_round` | stub | 13 |
-| `fri` | `p3_fri.config.mirror.fold_schedule_loop` | `p3_fri::config::fold_schedule` | stub | 13 |
-| `fri` | `p3_fri.config.mirror.fold_schedule` | `p3_fri::config::fold_schedule` | stub | 13 |
-| `fri` | `p3_fri.two_adic_pcs.mirror.inv` | `p3_field::Field::inverse` | stub | 23 |
-| `fri` | `p3_fri.two_adic_pcs.mirror.batchInv` | `p3_field::batch_multiplicative_inverse` | stub | 22 |
-| `fri` | `p3_fri.two_adic_pcs.mirror.lagrange_interpolate_at` | `p3_fri::two_adic_pcs::lagrange_interpolate_at` | stub | 19 |
+| `fri` | `p3_fri.config.mirror.FriParameters.validate_input_height` | `p3_fri::config::FriParameters::validate_input_height` | stub | 3 |
+| `fri` | `p3_fri.config.mirror.compute_log_arity_for_round` | `p3_fri::config::compute_log_arity_for_round` | stub | 20 |
+| `fri` | `p3_fri.config.mirror.fold_schedule_loop` | `p3_fri::config::fold_schedule` | stub | 20 |
+| `fri` | `p3_fri.config.mirror.fold_schedule` | `p3_fri::config::fold_schedule` | stub | 20 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.inv` | `p3_field::Field::inverse` | stub | 29 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.batchInv` | `p3_field::batch_multiplicative_inverse` | stub | 29 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.lagrange_interpolate_at` | `p3_fri::two_adic_pcs::lagrange_interpolate_at` | stub | 25 |
 | `fri` | `p3_fri.two_adic_pcs.mirror.foldPair` | `{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_matrix` | stub | 5 |
-| `fri` | `p3_fri.two_adic_pcs.mirror.fold_row` | `{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_row` | stub | 18 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.fold_row` | `{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_row` | stub | 24 |
 | `fri` | `p3_fri.two_adic_pcs.mirror.foldPairs` | `{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_matrix` | stub | 5 |
 | `fri` | `p3_fri.two_adic_pcs.mirror.foldRounds` | `{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_matrix` | stub | 5 |
 | `fri` | `p3_fri.two_adic_pcs.mirror.fold_matrix_scalar` | `{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_matrix` | stub | 5 |
@@ -1271,19 +1271,19 @@ counts the claims (of 1738) whose dependencies include the declaration.
 | `fri` | `p3_fri.two_adic_pcs.mirror.packedRounds` | `p3_fri::two_adic_pcs::fold_matrix_packed` | stub | 1 |
 | `fri` | `p3_fri.two_adic_pcs.mirror.fold_matrix_packed` | `p3_fri::two_adic_pcs::fold_matrix_packed` | stub | 1 |
 | `fri` | `p3_fri.two_adic_pcs.mirror.fold_matrix` | `{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_matrix` | stub | 1 |
-| `fri` | `p3_fri.two_adic_pcs.mirror.bitrevCoset` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 2 |
-| `fri` | `p3_fri.two_adic_pcs.mirror.MatToOpen` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 3 |
-| `fri` | `p3_fri.two_adic_pcs.mirror.compute_inverse_denominators` | `p3_fri::two_adic_pcs::compute_inverse_denominators` | stub | 3 |
-| `fri` | `p3_fri.two_adic_pcs.mirror.reducePoint` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 2 |
-| `fri` | `p3_fri.two_adic_pcs.mirror.reduceMat` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 2 |
-| `fri` | `p3_fri.two_adic_pcs.mirror.reduced_openings` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 2 |
-| `fri` | `p3_fri.mirror.MmcsOps` | `p3_commit::Mmcs` | stub | 15 |
-| `fri` | `p3_fri.mirror.CommitPhaseMultiStep` | `p3_fri::proof::CommitPhaseMultiStep` | stub | 13 |
-| `fri` | `p3_fri.mirror.BatchMultiOpening` | `p3_fri::proof::BatchMultiOpening` | stub | 14 |
-| `fri` | `p3_fri.mirror.FriProof` | `p3_fri::proof::FriProof` | stub | 9 |
-| `fri` | `p3_fri.mirror.TranscriptFailure` | `p3_fri::transcript::TranscriptFailure` | stub | 11 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.bitrevCoset` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 6 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.MatToOpen` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 4 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.compute_inverse_denominators` | `p3_fri::two_adic_pcs::compute_inverse_denominators` | stub | 4 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.reducePoint` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 3 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.reduceMat` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 3 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.reduced_openings` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 3 |
+| `fri` | `p3_fri.mirror.MmcsOps` | `p3_commit::Mmcs` | stub | 22 |
+| `fri` | `p3_fri.mirror.CommitPhaseMultiStep` | `p3_fri::proof::CommitPhaseMultiStep` | stub | 19 |
+| `fri` | `p3_fri.mirror.BatchMultiOpening` | `p3_fri::proof::BatchMultiOpening` | stub | 21 |
+| `fri` | `p3_fri.mirror.FriProof` | `p3_fri::proof::FriProof` | stub | 15 |
+| `fri` | `p3_fri.mirror.TranscriptFailure` | `p3_fri::transcript::TranscriptFailure` | stub | 19 |
 | `fri` | `p3_fri.mirror.ProverTx` | `p3_fri::transcript::ProverTranscript` | stub | 0 |
-| `fri` | `p3_fri.mirror.VerifierTx` | `p3_fri::transcript::VerifierTranscript` | stub | 9 |
+| `fri` | `p3_fri.mirror.VerifierTx` | `p3_fri::transcript::VerifierTranscript` | stub | 15 |
 | `fri` | `p3_fri.prover.mirror.matOfFlat` | `p3_matrix::dense::DenseMatrix::new` | stub | 0 |
 | `fri` | `p3_fri.prover.mirror.flatOfMat` | `p3_matrix::Matrix::to_row_major_matrix` | stub | 0 |
 | `fri` | `p3_fri.prover.mirror.CommitPhaseResult` | `p3_fri::prover::CommitPhaseResult` | stub | 0 |
@@ -1293,54 +1293,72 @@ counts the claims (of 1738) whose dependencies include the declaration.
 | `fri` | `p3_fri.prover.mirror.answer_queries` | `p3_fri::prover::answer_queries` | stub | 0 |
 | `fri` | `p3_fri.prover.mirror.open_inputs` | `p3_fri::prover::open_inputs` | stub | 0 |
 | `fri` | `p3_fri.prover.mirror.prove_fri` | `p3_fri::prover::prove_fri_with_schedule` | stub | 0 |
-| `fri` | `p3_fri.verifier.mirror.FriError` | `p3_fri::verifier::FriError` | stub | 18 |
-| `fri` | `p3_fri.verifier.mirror.FriError.ofTranscript` | `{impl core::convert::From<p3_fri::transcript::TranscriptFailure> for p3_fri::verifier::FriError<CommitMmcsErr, InputError>}::from` | stub | 9 |
-| `fri` | `p3_fri.verifier.mirror.Res` | `p3_fri::verifier::verify_fri` | stub | 18 |
+| `fri` | `p3_fri.verifier.mirror.FriError` | `p3_fri::verifier::FriError` | stub | 32 |
+| `fri` | `p3_fri.verifier.mirror.FriError.ofTranscript` | `{impl core::convert::From<p3_fri::transcript::TranscriptFailure> for p3_fri::verifier::FriError<CommitMmcsErr, InputError>}::from` | stub | 15 |
+| `fri` | `p3_fri.verifier.mirror.Res` | `p3_fri::verifier::verify_fri` | stub | 32 |
 | `fri` | `p3_fri.verifier.mirror.crash` | `p3_fri::verifier::verify_fri` | stub | 0 |
-| `fri` | `p3_fri.verifier.mirror.lift` | `p3_fri::verifier::verify_fri` | stub | 17 |
-| `fri` | `p3_fri.verifier.mirror.Claim` | `p3_commit::CommitmentWithOpeningPoints` | stub | 15 |
-| `fri` | `p3_fri.verifier.mirror.check_canonical_pow_witnesses` | `p3_fri::verifier::check_canonical_pow_witnesses` | stub | 9 |
-| `fri` | `p3_fri.verifier.mirror.rebuildRow` | `p3_fri::verifier::fold_query` | stub | 14 |
-| `fri` | `p3_fri.verifier.mirror.ChainState` | `p3_fri::verifier::fold_query` | stub | 13 |
-| `fri` | `p3_fri.verifier.mirror.foldStep` | `p3_fri::verifier::fold_query` | stub | 13 |
-| `fri` | `p3_fri.verifier.mirror.badRound` | `p3_fri::verifier::fold_query` | stub | 12 |
-| `fri` | `p3_fri.verifier.mirror.fold_query` | `p3_fri::verifier::fold_query` | stub | 12 |
-| `fri` | `p3_fri.verifier.mirror.openingPoints` | `p3_fri::verifier::open_inputs` | stub | 13 |
-| `fri` | `p3_fri.verifier.mirror.ladderOffsets` | `p3_fri::verifier::open_inputs` | stub | 13 |
-| `fri` | `p3_fri.verifier.mirror.queryPoint` | `p3_fri::verifier::open_inputs` | stub | 15 |
-| `fri` | `p3_fri.verifier.mirror.pointTerm` | `p3_fri::verifier::open_inputs` | stub | 13 |
-| `fri` | `p3_fri.verifier.mirror.RedState` | `p3_fri::verifier::open_inputs` | stub | 13 |
-| `fri` | `p3_fri.verifier.mirror.reduceMatrix` | `p3_fri::verifier::open_inputs` | stub | 13 |
-| `fri` | `p3_fri.verifier.mirror.reduceQuery` | `p3_fri::verifier::open_inputs` | stub | 13 |
-| `fri` | `p3_fri.verifier.mirror.checkBatch` | `p3_fri::verifier::open_inputs` | stub | 11 |
-| `fri` | `p3_fri.verifier.mirror.checkDenominators` | `p3_fri::verifier::open_inputs` | stub | 11 |
-| `fri` | `p3_fri.verifier.mirror.open_inputs` | `p3_fri::verifier::open_inputs` | stub | 10 |
-| `fri` | `p3_fri.verifier.mirror.inputLogHeights` | `p3_fri::verifier::verify_fri` | stub | 9 |
-| `fri` | `p3_fri.verifier.mirror.horner` | `p3_field::HornerIter::horner` | stub | 10 |
-| `fri` | `p3_fri.verifier.mirror.checkQuery` | `p3_fri::verifier::verify_fri` | stub | 9 |
-| `fri` | `p3_fri.verifier.mirror.checkRound` | `p3_fri::verifier::verify_fri` | stub | 9 |
-| `fri` | `p3_fri.verifier.mirror.open_inputs'` | `p3_fri::verifier::verify_fri` | stub | 9 |
-| `fri` | `p3_fri.verifier.mirror.verify_fri` | `p3_fri::verifier::verify_fri` | stub | 9 |
+| `fri` | `p3_fri.verifier.mirror.lift` | `p3_fri::verifier::verify_fri` | stub | 25 |
+| `fri` | `p3_fri.verifier.mirror.Claim` | `p3_commit::CommitmentWithOpeningPoints` | stub | 27 |
+| `fri` | `p3_fri.verifier.mirror.check_canonical_pow_witnesses` | `p3_fri::verifier::check_canonical_pow_witnesses` | stub | 15 |
+| `fri` | `p3_fri.verifier.mirror.rebuildRow` | `p3_fri::verifier::fold_query` | stub | 20 |
+| `fri` | `p3_fri.verifier.mirror.ChainState` | `p3_fri::verifier::fold_query` | stub | 19 |
+| `fri` | `p3_fri.verifier.mirror.foldStep` | `p3_fri::verifier::fold_query` | stub | 19 |
+| `fri` | `p3_fri.verifier.mirror.badRound` | `p3_fri::verifier::fold_query` | stub | 18 |
+| `fri` | `p3_fri.verifier.mirror.fold_query` | `p3_fri::verifier::fold_query` | stub | 18 |
+| `fri` | `p3_fri.verifier.mirror.openingPoints` | `p3_fri::verifier::open_inputs` | stub | 21 |
+| `fri` | `p3_fri.verifier.mirror.ladderOffsets` | `p3_fri::verifier::open_inputs` | stub | 21 |
+| `fri` | `p3_fri.verifier.mirror.queryPoint` | `p3_fri::verifier::open_inputs` | stub | 24 |
+| `fri` | `p3_fri.verifier.mirror.pointTerm` | `p3_fri::verifier::open_inputs` | stub | 21 |
+| `fri` | `p3_fri.verifier.mirror.RedState` | `p3_fri::verifier::open_inputs` | stub | 21 |
+| `fri` | `p3_fri.verifier.mirror.reduceMatrix` | `p3_fri::verifier::open_inputs` | stub | 21 |
+| `fri` | `p3_fri.verifier.mirror.reduceQuery` | `p3_fri::verifier::open_inputs` | stub | 21 |
+| `fri` | `p3_fri.verifier.mirror.checkBatch` | `p3_fri::verifier::open_inputs` | stub | 18 |
+| `fri` | `p3_fri.verifier.mirror.checkDenominators` | `p3_fri::verifier::open_inputs` | stub | 18 |
+| `fri` | `p3_fri.verifier.mirror.open_inputs` | `p3_fri::verifier::open_inputs` | stub | 17 |
+| `fri` | `p3_fri.verifier.mirror.inputLogHeights` | `p3_fri::verifier::verify_fri` | stub | 18 |
+| `fri` | `p3_fri.verifier.mirror.horner` | `p3_field::HornerIter::horner` | stub | 16 |
+| `fri` | `p3_fri.verifier.mirror.checkQuery` | `p3_fri::verifier::verify_fri` | stub | 15 |
+| `fri` | `p3_fri.verifier.mirror.checkRound` | `p3_fri::verifier::verify_fri` | stub | 15 |
+| `fri` | `p3_fri.verifier.mirror.open_inputs'` | `p3_fri::verifier::verify_fri` | stub | 15 |
+| `fri` | `p3_fri.verifier.mirror.verify_fri` | `p3_fri::verifier::verify_fri` | stub | 15 |
 | `fri` | `p3_fri.transcript.mirror.Step` | `p3_challenger::fs::Interaction` | stub | 4 |
-| `fri` | `p3_fri.transcript.mirror.FriShape` | `p3_fri::transcript::FriShape` | stub | 14 |
-| `fri` | `p3_fri.transcript.mirror.FriShape.with_schedule` | `p3_fri::transcript::FriShape::with_schedule` | stub | 9 |
+| `fri` | `p3_fri.transcript.mirror.FriShape` | `p3_fri::transcript::FriShape` | stub | 22 |
+| `fri` | `p3_fri.transcript.mirror.FriShape.with_schedule` | `p3_fri::transcript::FriShape::with_schedule` | stub | 15 |
 | `fri` | `p3_fri.transcript.mirror.FriShape.new` | `p3_fri::transcript::FriShape::new` | stub | 0 |
 | `fri` | `p3_fri.transcript.mirror.FriShape.pattern` | `p3_fri::transcript::FriShape::pattern` | stub | 3 |
-| `fri` | `p3_fri.transcript.mirror.PcsShape` | `p3_fri::pcs_transcript::PcsShape` | stub | 6 |
+| `fri` | `p3_fri.transcript.mirror.PcsShape` | `p3_fri::pcs_transcript::PcsShape` | stub | 11 |
 | `fri` | `p3_fri.transcript.mirror.PcsShape.pattern` | `p3_fri::pcs_transcript::PcsShape::pattern` | stub | 1 |
-| `fri` | `p3_fri.mirror.PcsTranscriptFailure` | `p3_fri::pcs_transcript::PcsTranscriptFailure` | stub | 5 |
-| `fri` | `p3_fri.verifier.mirror.FriError.ofPcsTranscript` | `{impl core::convert::From<p3_fri::pcs_transcript::PcsTranscriptFailure> for p3_fri::verifier::FriError<CommitMmcsErr, InputError>}::from` | stub | 3 |
-| `fri` | `p3_fri.transcript.mirror.Sponge` | `p3_challenger::DuplexChallenger` | stub | 8 |
-| `fri` | `p3_fri.transcript.mirror.sample_bits` | `{impl p3_challenger::CanSampleBits<usize> for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::sample_bits` | stub | 7 |
-| `fri` | `p3_fri.transcript.mirror.check_witness` | `p3_challenger::grinding_challenger::GrindingChallenger::check_witness` | stub | 7 |
-| `fri` | `p3_fri.transcript.mirror.commit_round` | `p3_fri::transcript::VerifierTranscript::commit_round` | stub | 4 |
-| `fri` | `p3_fri.transcript.mirror.commit_rounds` | `p3_fri::transcript::VerifierTranscript::commit_rounds` | stub | 4 |
-| `fri` | `p3_fri.transcript.mirror.query_phase` | `p3_fri::transcript::VerifierTranscript::query_phase` | stub | 4 |
-| `fri` | `p3_fri.transcript.mirror.verifierTx` | `p3_fri::transcript::VerifierTranscript` | stub | 3 |
-| `fri` | `p3_fri.transcript.mirror.PcsShape.from_claims` | `p3_fri::pcs_transcript::PcsShape::from_claims` | stub | 4 |
-| `fri` | `p3_fri.transcript.mirror.claimed_openings` | `p3_fri::pcs_transcript::PcsVerifierTranscript::claimed_openings` | stub | 4 |
-| `fri` | `p3_fri.transcript.mirror.batch_phase` | `p3_fri::pcs_transcript::PcsVerifierTranscript::batch_phase` | stub | 4 |
-| `fri` | `p3_fri.two_adic_pcs.mirror.verify` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::verify` | stub | 3 |
+| `fri` | `p3_fri.mirror.PcsTranscriptFailure` | `p3_fri::pcs_transcript::PcsTranscriptFailure` | stub | 10 |
+| `fri` | `p3_fri.verifier.mirror.FriError.ofPcsTranscript` | `{impl core::convert::From<p3_fri::pcs_transcript::PcsTranscriptFailure> for p3_fri::verifier::FriError<CommitMmcsErr, InputError>}::from` | stub | 8 |
+| `fri` | `p3_fri.transcript.mirror.Sponge` | `p3_challenger::DuplexChallenger` | stub | 15 |
+| `fri` | `p3_fri.transcript.mirror.sample_bits` | `{impl p3_challenger::CanSampleBits<usize> for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::sample_bits` | stub | 14 |
+| `fri` | `p3_fri.transcript.mirror.check_witness` | `p3_challenger::grinding_challenger::GrindingChallenger::check_witness` | stub | 14 |
+| `fri` | `p3_fri.transcript.mirror.commit_round` | `p3_fri::transcript::VerifierTranscript::commit_round` | stub | 10 |
+| `fri` | `p3_fri.transcript.mirror.commit_rounds` | `p3_fri::transcript::VerifierTranscript::commit_rounds` | stub | 10 |
+| `fri` | `p3_fri.transcript.mirror.query_phase` | `p3_fri::transcript::VerifierTranscript::query_phase` | stub | 10 |
+| `fri` | `p3_fri.transcript.mirror.verifierTx` | `p3_fri::transcript::VerifierTranscript` | stub | 8 |
+| `fri` | `p3_fri.transcript.mirror.PcsShape.from_claims` | `p3_fri::pcs_transcript::PcsShape::from_claims` | stub | 9 |
+| `fri` | `p3_fri.transcript.mirror.claimed_openings` | `p3_fri::pcs_transcript::PcsVerifierTranscript::claimed_openings` | stub | 9 |
+| `fri` | `p3_fri.transcript.mirror.batch_phase` | `p3_fri::pcs_transcript::PcsVerifierTranscript::batch_phase` | stub | 9 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.verify` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::verify` | stub | 8 |
+| `fri` | `p3_fri.hiding_pcs.mirror.withRandomCols` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::commit` | stub | 1 |
+| `fri` | `p3_fri.hiding_pcs.mirror.randomize` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::commit` | stub | 1 |
+| `fri` | `p3_fri.hiding_pcs.mirror.hiding_budget` | `p3_fri::hiding_pcs::HidingFriPcs::hiding_budget` | stub | 14 |
+| `fri` | `p3_fri.hiding_pcs.mirror.HidingFriProverError` | `p3_fri::hiding_pcs::HidingFriProverError` | stub | 5 |
+| `fri` | `p3_fri.hiding_pcs.mirror.check_hiding_budget` | `p3_fri::hiding_pcs::HidingFriPcs::check_hiding_budget` | stub | 5 |
+| `fri` | `p3_fri.hiding_pcs.mirror.lde_mask_height` | `p3_fri::hiding_pcs::HidingFriPcs::lde_mask_height` | stub | 4 |
+| `fri` | `p3_fri.hiding_pcs.mirror.maskCoeffs` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::get_quotient_ldes` | stub | 1 |
+| `fri` | `p3_fri.hiding_pcs.mirror.lastMask` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::get_quotient_ldes` | stub | 0 |
+| `fri` | `p3_fri.hiding_pcs.mirror.mergeHiddenPoint` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::verify_with_preprocessing` | stub | 10 |
+| `fri` | `p3_fri.hiding_pcs.mirror.mergeHiddenMatrix` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::verify_with_preprocessing` | stub | 8 |
+| `fri` | `p3_fri.hiding_pcs.mirror.mergeHiddenRound` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::verify_with_preprocessing` | stub | 7 |
+| `fri` | `p3_fri.hiding_pcs.mirror.mergeHidden` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::verify_with_preprocessing` | stub | 7 |
+| `fri` | `p3_fri.hiding_pcs.mirror.verify_hiding` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::verify_with_preprocessing` | stub | 4 |
+| `fri` | `p3_fri.hiding_pcs.mirror.splitHidden` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::open_with_preprocessing` | stub | 4 |
+| `fri` | `p3_fri.hiding_pcs.mirror.HidingRound` | `p3_fri::hiding_pcs::HidingFriPcsProverData` | stub | 3 |
+| `fri` | `p3_fri.hiding_pcs.mirror.checkHidingRound` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::open_with_preprocessing` | stub | 3 |
+| `fri` | `p3_fri.hiding_pcs.mirror.checkHidingRounds` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::open_with_preprocessing` | stub | 3 |
+| `fri` | `p3_fri.hiding_pcs.mirror.open_hiding` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::open_with_preprocessing` | stub | 3 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreOpsArithSubGoldilocksGoldilocks.sub` | `{impl core::ops::arith::Sub for p3_goldilocks::goldilocks::Goldilocks}::sub` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreCmpPartialEqGoldilocks.eq` | `{impl core::cmp::PartialEq for p3_goldilocks::goldilocks::Goldilocks}::eq` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.halve` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::halve` | not translated | 2 |
@@ -2348,6 +2366,12 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Fri.edge.zero_blowup` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.edge.zero_queries` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.final_poly` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.first_word.chain` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.first_word.degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.first_word.inputs` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.first_word.prover` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.first_word.rolls` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.first_word.verifier` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.fold.coset_word` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.fold.degree` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.fold.of_degree_lt` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -2368,12 +2392,27 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Fri.fold_schedule.nil` | `Quot.sound`, `propext` |
 | `Fri.fold_schedule.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.fold_schedule.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.budget_min` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.complete` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.hiding_pcs.even_rows` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.exact` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.hiding_pcs.mask_column` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.hiding_pcs.mask_heights` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.hiding_pcs.masks_cancel` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.merge_honest` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.hiding_pcs.merge_rejects` | `Quot.sound`, `propext` |
 | `Fri.hiding_pcs.merge_split` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.merge_total` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.of_merge` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.one_row` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.open_ok` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.open_reopened` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.open_short` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.small_domain` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.split_panics` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.zero_codewords` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.zero_codewords_prover` | `propext` |
 | `Fri.honest_round` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.honest_round.degree` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.lagrange_interpolate_at` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -2383,14 +2422,20 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Fri.pcs.check_witness.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.pcs.claims_replay` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.pcs.commit_rounds.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.commit_rounds_length` | `Quot.sound`, `propext` |
 | `Fri.pcs.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.complete_of_fri` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.pcs.denominators_honest` | `Quot.sound`, `propext` |
 | `Fri.pcs.fri_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.fri_complete_of_chain` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.pcs.fri_panics_iff` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.pcs.inputs_honest` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.pcs.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.pcs.panics_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.query_indices_lt` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.pcs.query_phase.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pow.accepting_card` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pow.babyBear_count` | `propext` |
 | `Fri.reduceQuery.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.reduced_openings.agree` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.reduced_openings.spec` | `Classical.choice`, `Quot.sound`, `propext` |
