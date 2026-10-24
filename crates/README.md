@@ -28,7 +28,8 @@ it. Two crates that depend on `field` share `crates/field/stub/`.
 
 A crate may also have **variants**: the same package extracted again for another
 target, such as a SIMD backend, each in `variants/<name>/` with its own library
-and namespace (`P3Monty31Avx2`, `p3_monty_31_avx2`), declared by a `[[variant]]`
+and namespace (`P3Monty31Avx2`, `p3_monty_31_avx2`; `P3BabyBearAvx2`,
+`p3_baby_bear_avx2`), declared by a `[[variant]]`
 table in `crate.toml` ([`docs/extracting.md`](../docs/extracting.md#variants)).
 A variant's library sits beside the crate's and imports it: the portable types
 and functions it reuses are bound, not copied.

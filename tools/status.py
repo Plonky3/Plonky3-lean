@@ -159,13 +159,23 @@ partial def claimClosure (env : Environment) (start : Name) : NameSet := Id.run 
         for c in v.getUsedConstants do todo := todo.push c
   return seen
 
+/-- The names in a file, one per line, as `#print` writes them. A list literal of
+them would be one deep term, which the code generator cannot compile once there
+are a few thousand. -/
+def readNames (path : System.FilePath) : IO (List Name) := do
+  let lines ← IO.FS.lines path
+  return lines.toList.filter (· ≠ "") |>.map fun s =>
+    (Syntax.decodeNameLit ("`" ++ s)).getD .anonymous
+
 #eval show CommandElabM Unit from do
   let env ← getEnv
+  -- `moduleNames` builds the array on each call; build it once.
+  let modNames := env.header.moduleNames
   let libs : List String := LIBS
-  let claims : List Name := CLAIMS
-  let mirrors : List Name := MIRRORS
+  let claims : List Name ← readNames CLAIMS
+  let mirrors : List Name ← readNames MIRRORS
   let inLib (n : Name) : Bool := match env.getModuleIdxFor? n with
-    | some i => libs.any fun l => (env.header.moduleNames[i.toNat]!).toString.startsWith l
+    | some i => libs.any fun l => (modNames[i.toNat]!).toString.startsWith l
     | none => false
   let opaques := env.constants.toList.filterMap fun (n, ci) =>
     if ci matches .opaqueInfo _ && inLib n && !n.isInternal then some n else none
@@ -174,7 +184,7 @@ partial def claimClosure (env : Environment) (start : Name) : NameSet := Id.run 
   for n in opaques do
     let doc := (← findDocString? env n).getD ""
     let m := match env.getModuleIdxFor? n with
-      | some i => (env.header.moduleNames[i.toNat]!).toString
+      | some i => (modNames[i.toNat]!).toString
       | none => ""
     IO.println (Json.compress (Json.mkObj [("kind", "opaque"), ("name", toString n),
       ("module", m), ("doc", doc), ("reach", count n)]))
@@ -187,7 +197,7 @@ partial def claimClosure (env : Environment) (start : Name) : NameSet := Id.run 
       if ci.type.getForallBody.getAppFn.constName? == some `CoreModels.core.intrinsics.Transmute then
         let doc := (← findDocString? env n).getD ""
         let m := match env.getModuleIdxFor? n with
-          | some i => (env.header.moduleNames[i.toNat]!).toString
+          | some i => (modNames[i.toNat]!).toString
           | none => ""
         IO.println (Json.compress (Json.mkObj [("kind", "layout"), ("name", toString n),
           ("module", m), ("doc", doc)]))
@@ -195,17 +205,23 @@ partial def claimClosure (env : Environment) (start : Name) : NameSet := Id.run 
 
 
 def lean_facts(libs, imports, claims, mirrors):
-    q = lambda xs: "[" + ", ".join(f"`{x}" for x in xs) + "]"
+    def names_file(xs):
+        with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as f:
+            f.write("".join(f"{x}\n" for x in xs))
+        return f.name
+    claims_file, mirrors_file = names_file(claims), names_file(mirrors)
     src = (LEAN_QUERY.replace("IMPORTS", "\n".join(f"import {m}" for m in imports))
            .replace("LIBS", "[" + ", ".join(json.dumps(x) for x in libs) + "]")
-           .replace("CLAIMS", q(claims)).replace("MIRRORS", q(mirrors)))
+           .replace("CLAIMS", json.dumps(claims_file))
+           .replace("MIRRORS", json.dumps(mirrors_file)))
     with tempfile.NamedTemporaryFile("w", suffix=".lean", delete=False) as f:
         f.write(src)
     try:
         r = subprocess.run(["lake", "env", "lean", f.name], cwd=ROOT, text=True,
                            capture_output=True)
     finally:
-        Path(f.name).unlink()
+        for p in (f.name, claims_file, mirrors_file):
+            Path(p).unlink()
     if r.returncode != 0:
         sys.exit(f"error: the Lean pass failed (run `lake build` first?):\n{r.stdout}{r.stderr}")
     return [json.loads(line) for line in r.stdout.splitlines() if line.startswith("{")]
