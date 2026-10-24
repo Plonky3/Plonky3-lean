@@ -57,6 +57,7 @@ public import Plonky3Lean.Proofs.Blake3Air.Small
 public import Plonky3Lean.Proofs.Blake3Air.Complete
 public import Plonky3Lean.Proofs.Blake3Air.Extracted
 public import Plonky3Lean.Proofs.Blake3Air.Binary.Complete
+public import Plonky3Lean.Proofs.Hash.Blake2s.Vectors
 public import Plonky3Lean.Proofs.Hash.Sha256.Vectors
 public import Plonky3Lean.Proofs.Hash.Keccak.Vectors
 public import Plonky3Lean.Proofs.Hash.Keccak.Digest
@@ -72,6 +73,9 @@ public import Plonky3Lean.Proofs.Sha256Air.Degree
 public import Plonky3Lean.Proofs.Sha256Air.Extracted
 public import Plonky3Lean.Proofs.Sha256Air.Binary.Sound
 public import Plonky3Lean.Proofs.Sha256Air.Binary.Complete
+public import Plonky3Lean.Proofs.Blake2sAir.Trace
+public import Plonky3Lean.Proofs.Blake2sAir.Degree
+public import Plonky3Lean.Proofs.Blake2sAir.Extracted
 public import Plonky3Lean.Proofs.Symmetric.Roots
 public import Plonky3Lean.Proofs.Field.BabyBear
 public import Plonky3Lean.Proofs.Field.BabyBear.Arith
