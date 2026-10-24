@@ -4,7 +4,7 @@ lean_lib = "P3WordBackend"
 
 # Nothing is extracted.
 #
-# The crate's dependencies (sumcheck, binary-pcs, multilinear-util) do not compile in the variant charon reads.
+# The crate's dependency p3-binary-pcs does not compile in the variant charon reads (docs/extractor-issues.md 180).
 #
 # Its reductions are generic over the field and challenger traits, which aeneas rejects (docs/extractor-issues.md 9).
 #

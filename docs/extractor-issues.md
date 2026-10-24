@@ -316,6 +316,11 @@ keeps its number and says so.
 
     So p3-sumcheck extracts its round arithmetic only, which is generic over `Field` alone.
 
+    Two dependents still fail in that variant:
+
+    - rustc panics on p3-binary-pcs, in a serde derive over the bit ring switch's claims proof ("escaping bound vars");
+    - p3-multi-stark needs the same import and bound as p3-sumcheck, at 11 sites.
+
 240. **aeneas has no function types.**
 
     p3-word marks a shift's word width with `PhantomData<fn() -> W>`.
