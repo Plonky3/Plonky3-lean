@@ -1117,6 +1117,10 @@ name   = "Plonky3Lean.Claims.UniStark.honest_ood_check"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.UniStark.honest_ood_check_masked"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.UniStark.natDegree_masked_lt"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -1158,6 +1162,10 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.UniStark.recompose_quotient"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.UniStark.recompose_quotient_masked"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -4217,6 +4225,14 @@ name   = "Plonky3Lean.Claims.P3MerkleTree.salt_hits_le"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3MerkleTree.walk.binary_binding"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3MerkleTree.walk.binary_honest"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3MerkleTree.walk.binding"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -4643,6 +4659,10 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 [[claim]]
 name   = "Plonky3Lean.Claims.Commit.commit_quotient"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Commit.commit_quotient.counts"
+axioms = ["Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.Commit.coset.contains"
@@ -5645,6 +5665,26 @@ name   = "Plonky3Lean.Claims.Fri.hiding_pcs.exact"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.mask_residual"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.masks"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.masks_cancel_of_counts"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.masks_panic"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.masks_survive_of_counts"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.Fri.hiding_pcs.merge_honest"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -5693,8 +5733,28 @@ name   = "Plonky3Lean.Claims.Fri.hiding_pcs.zero_codewords_prover"
 axioms = ["propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.Fri.merkle.binding"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.merkle.complete"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.pcs.batch_dims_honest"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.pcs.batch_indices_honest"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.Fri.pcs.commit_rounds_length"
 axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.pcs.complete_merkle"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.Fri.pcs.complete_of_fri"
