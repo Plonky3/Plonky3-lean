@@ -1,0 +1,179 @@
+# p3-blake2s-air: the BLAKE2s compression function as an AIR over a field of characteristic 2.
+
+lean_lib = "P3Blake2sAir"
+
+# The integer code is extracted: the constants, the G step on words, and the bit-sliced helpers of the packed generator.
+#
+# The AIR evaluation and the trace generator are generic over the builder and the field traits, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# They are transcribed in extraction/P3Blake2sAir/Assumptions/Mirror/.
+state = "scoped"
+
+features = []
+
+start_from = [
+  "p3_blake2s_air::constants::IV",
+  "p3_blake2s_air::constants::SIGMA",
+  "p3_blake2s_air::binary::G_SCHEDULE",
+  "p3_blake2s_air::binary::generation::g_words",
+  "p3_blake2s_air::binary::generation::carries_word",
+  "p3_blake2s_air::binary::generation::input_words",
+  "p3_blake2s_air::binary::generation::transpose_bits",
+  "p3_blake2s_air::binary::generation::add_planes",
+  "p3_blake2s_air::binary::generation::xor_rotate_right",
+]
+
+watch = ["blake2s-air/src", "blake2s-air/Cargo.toml"]
+
+# The transcriptions in extraction/P3Blake2sAir/Assumptions/Mirror/.
+# Hashes are pending tools/mirror.
+#
+# Plonky3Lean/Proofs/Blake2sAir/Extracted.lean proves the transcribed constants and G step on words equal to the extracted ones.
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.IV"
+rust = "p3_blake2s_air::constants::IV"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.SIGMA"
+rust = "p3_blake2s_air::constants::SIGMA"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.NUM_ROUNDS"
+rust = "p3_blake2s_air::binary::NUM_ROUNDS"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.G_PER_ROUND"
+rust = "p3_blake2s_air::binary::G_PER_ROUND"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.G_SCHEDULE"
+rust = "p3_blake2s_air::binary::G_SCHEDULE"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.NUM_INPUT_WORDS"
+rust = "p3_blake2s_air::binary::generation::NUM_INPUT_WORDS"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.NUM_INPUT_BITS"
+rust = "p3_blake2s_air::binary::air::NUM_INPUT_BITS"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.CONSTRAINTS_PER_G"
+rust = "p3_blake2s_air::binary::air::CONSTRAINTS_PER_G"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.NUM_G_CONSTRAINTS"
+rust = "p3_blake2s_air::binary::air::NUM_G_CONSTRAINTS"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.num_constraints"
+rust = "{impl p3_air::air::BaseAir<F> for p3_blake2s_air::binary::air::Blake2sBinaryAir}::num_constraints"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.col.chaining_value"
+rust = "p3_blake2s_air::binary::columns::Blake2sBinaryCols"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.NUM_BLAKE2S_BINARY_COLS"
+rust = "p3_blake2s_air::binary::columns::NUM_BLAKE2S_BINARY_COLS"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.u32_to_bits_le"
+rust = "p3_air::utils::u32_to_bits_le"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.Blake2sBinaryGCols"
+rust = "p3_blake2s_air::binary::columns::Blake2sBinaryGCols"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.State"
+rust = "p3_blake2s_air::binary::air::State"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.xor_rotl"
+rust = "p3_blake2s_air::binary::air::xor_rotl"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.xor_rotl_var"
+rust = "p3_blake2s_air::binary::air::xor_rotl_var"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.maj"
+rust = "p3_blake2s_air::binary::air::maj"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.add2"
+rust = "p3_blake2s_air::binary::air::add2"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.add3"
+rust = "p3_blake2s_air::binary::air::add3"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.eval_g"
+rust = "p3_blake2s_air::binary::air::eval_g"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.eval"
+rust = "{impl p3_air::air::Air<AB> for p3_blake2s_air::binary::air::Blake2sBinaryAir}::eval"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.Blake2sCompressionInput"
+rust = "p3_blake2s_air::binary::generation::Blake2sCompressionInput"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.Blake2sCompressionInput.flag_word"
+rust = "p3_blake2s_air::binary::generation::Blake2sCompressionInput::flag_word"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.GWords"
+rust = "p3_blake2s_air::binary::generation::GWords"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.carries_word"
+rust = "p3_blake2s_air::binary::generation::carries_word"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.g_words"
+rust = "p3_blake2s_air::binary::generation::g_words"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.Blake2sBinaryCols"
+rust = "p3_blake2s_air::binary::columns::Blake2sBinaryCols"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.Blake2sBinaryCols.cells"
+rust = "p3_blake2s_air::binary::columns::Blake2sBinaryCols"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.Blake2sBinaryCols.ofCells"
+rust = "{impl core::borrow::Borrow<p3_blake2s_air::binary::columns::Blake2sBinaryCols<T>> for [T]}::borrow"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.word_to_bits_le"
+rust = "p3_blake2s_air::binary::generation::word_to_bits_le"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.generate_g"
+rust = "p3_blake2s_air::binary::generation::generate_g"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.generate_trace_row"
+rust = "p3_blake2s_air::binary::generation::generate_trace_row"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.generate_binary_trace_rows"
+rust = "p3_blake2s_air::binary::generation::generate_binary_trace_rows"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.read_word"
+rust = "p3_blake2s_air::binary::generation::read_word"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.state_after_round"
+rust = "p3_blake2s_air::binary::generation::Blake2sBinaryCols::state_after_round"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.compression_output"
+rust = "p3_blake2s_air::binary::generation::Blake2sBinaryCols::compression_output"
