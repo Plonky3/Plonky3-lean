@@ -34,6 +34,7 @@ public import Plonky3Lean.Claims.Fri
 public import Plonky3Lean.Claims.Stir
 public import Plonky3Lean.Claims.Circle
 public import Plonky3Lean.Claims.KeccakAir
+public import Plonky3Lean.Claims.MultiStark
 
 @[expose] public section
 

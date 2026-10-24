@@ -27,6 +27,7 @@ public import Plonky3Lean.Spec.Keccak
 public import Plonky3Lean.Spec.Fri
 public import Plonky3Lean.Spec.Stir
 public import Plonky3Lean.Spec.Circle
+public import Plonky3Lean.Spec.MultiStark
 
 @[expose] public section
 
