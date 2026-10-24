@@ -25,10 +25,9 @@
 #
 # The field stays generic, so the Lean model quantifies over every implementation.
 #
-# The round loop itself is not rooted, for two reasons.
+# The round loop itself is not rooted.
 #
-# - Its bound `EF: ExtensionField<F>` reaches `PackedFieldExtension::packed_ext_powers`, whose signature aeneas rejects.
-# - Its transcript holds a mutable borrow of the challenger, and aeneas finds no fixed point for the loop.
+# Its transcript holds a mutable borrow of the challenger, and aeneas stops on it in five places (docs/extractor-issues.md 180).
 #
 diff --git a/sumcheck/src/hax_roots.rs b/sumcheck/src/hax_roots.rs
 new file mode 100644

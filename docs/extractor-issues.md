@@ -309,12 +309,23 @@ keeps its number and says so.
 
     Pre-patches `multilinear-util/010`, `sumcheck/010` and `sumcheck/020` import the trait and state the bound, so both crates now compile there.
 
-    Code that names `ExtensionField` still does not extract, for two reasons:
+    aeneas rejected the signature of `PackedFieldExtension::packed_ext_powers` ("Internal error" in `translate_fun_sigs`), a required method that the packing bound of `ExtensionField` reaches.
 
-    - aeneas rejects the signature of `PackedFieldExtension::packed_ext_powers`, a required method that the packing bound of `ExtensionField` reaches ("Internal error" in `translate_fun_sigs`);
-    - the quadratic verifier's round loop keeps a transcript that holds a mutable borrow of the challenger, and aeneas finds no fixed point for the loop.
+    Pre-patch `baby-bear/050` hides it and its 8 impls under the cfg, so code generic over `ExtensionField` now extracts.
 
-    So p3-sumcheck extracts its round arithmetic only, which is generic over `Field` alone.
+    p3-multilinear-util's equality polynomial is the first such item.
+
+    The quadratic verifier's round loop still does not extract.
+
+    Rooted, it stops aeneas on five errors, all from the transcript that holds a mutable borrow of the challenger:
+
+    - the transcript's constructor builds its state in a closure over that borrow ("Can't end abstraction ... non-endable");
+    - a round reads the state through `Option::expect` on the borrowed option (an internal error in core's option.rs, line 968);
+    - closing the transcript consumes the state ("Unimplemented");
+    - the shape's pattern builds nested borrows ("Nested borrows are not supported yet");
+    - the loop that carries the transcript has no fixed point ("Could not compute a loop fixed point in 2 iterations").
+
+    A pre-patch would have to rewrite the transcript, so the loop stays transcribed.
 
     Two dependents still fail in that variant:
 
