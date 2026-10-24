@@ -1,0 +1,122 @@
+# p3-word-backend: the proving backend for word-level constraint systems.
+
+lean_lib = "P3WordBackend"
+
+# Nothing is extracted.
+#
+# The crate's dependencies (sumcheck, binary-pcs, multilinear-util) do not compile in the variant charon reads.
+#
+# Its reductions are generic over the field and challenger traits, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# The key codes, the relation columns, the shift transpose and the exponent lift are transcribed in stub/P3WordBackend/.
+state = "stub"
+
+features = []
+
+watch = ["word-backend/src", "word-backend/Cargo.toml"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_word_backend.keys.code.mirror.ShiftCode.new"
+rust = "p3_word_backend::keys::code::ShiftCode::new"
+
+[[mirror]]
+lean = "p3_word_backend.keys.code.mirror.ShiftCode.shift"
+rust = "p3_word_backend::keys::code::ShiftCode::shift"
+
+[[mirror]]
+lean = "p3_word_backend.keys.code.mirror.KeyCode.new"
+rust = "p3_word_backend::keys::code::KeyCode::new"
+
+[[mirror]]
+lean = "p3_word_backend.keys.code.mirror.KeyCode.operation"
+rust = "p3_word_backend::keys::code::KeyCode::operation"
+
+[[mirror]]
+lean = "p3_word_backend.keys.code.mirror.KeyCode.sequence"
+rust = "p3_word_backend::keys::code::KeyCode::sequence"
+
+[[mirror]]
+lean = "p3_word_backend.keys.code.mirror.ShiftSequenceCode.new"
+rust = "p3_word_backend::keys::code::ShiftSequenceCode::new"
+
+[[mirror]]
+lean = "p3_word_backend.keys.code.mirror.ShiftSequenceCode.shifts"
+rust = "p3_word_backend::keys::code::ShiftSequenceCode::shifts"
+
+[[mirror]]
+lean = "p3_word_backend.columns.mirror.check_shape"
+rust = "p3_word_backend::statement::StatementShape::check_shape"
+
+[[mirror]]
+lean = "p3_word_backend.columns.mirror.packedAdd32"
+rust = "{impl core::ops::arith::Add for p3_binary_field::bitslice::packing::PackedGf2<U>}::add"
+
+[[mirror]]
+lean = "p3_word_backend.columns.mirror.packedAdd64"
+rust = "{impl core::ops::arith::Add for p3_binary_field::bitslice::packing::PackedGf2<U>}::add"
+
+[[mirror]]
+lean = "p3_word_backend.columns.mirror.readTerm"
+rust = "p3_word_backend::columns::OperationColumns::extend"
+
+[[mirror]]
+lean = "p3_word_backend.columns.mirror.evaluate"
+rust = "p3_word_backend::columns::OperationColumns::extend"
+
+[[mirror]]
+lean = "p3_word_backend.columns.mirror.OperationColumns.extend"
+rust = "p3_word_backend::columns::OperationColumns::extend"
+
+[[mirror]]
+lean = "p3_word_backend.columns.mirror.OperationColumns.new"
+rust = "p3_word_backend::columns::OperationColumns::new"
+
+[[mirror]]
+lean = "p3_word_backend.shift.wiring.mirror.evaluate_word"
+rust = "p3_word_backend::shift::wiring::evaluate_word"
+
+[[mirror]]
+lean = "p3_word_backend.shift.wiring.mirror.shift_transpose"
+rust = "p3_word_backend::shift::wiring::shift_transpose"
+
+[[mirror]]
+lean = "p3_word_backend.shift.wiring.mirror.shift_weights"
+rust = "p3_word_backend::shift::wiring::shift_weights"
+
+[[mirror]]
+lean = "p3_word_backend.integer_mul.mirror.Tree.depth"
+rust = "p3_word_backend::integer_mul::Tree::depth"
+
+[[mirror]]
+lean = "p3_word_backend.integer_mul.mirror.IntegerMulReduction.new"
+rust = "p3_word_backend::integer_mul::IntegerMulReduction::new"
+
+[[mirror]]
+lean = "p3_word_backend.integer_mul.mirror.check_field"
+rust = "p3_word_backend::integer_mul::IntegerMulReduction::check_field"
+
+[[mirror]]
+lean = "p3_word_backend.integer_mul.mirror.generator_squarings"
+rust = "p3_word_backend::integer_mul::exponent::generator_squarings"
+
+[[mirror]]
+lean = "p3_word_backend.integer_mul.mirror.factor_weights"
+rust = "p3_word_backend::integer_mul::exponent::factor_weights"
+
+[[mirror]]
+lean = "p3_word_backend.integer_mul.mirror.result_weights"
+rust = "p3_word_backend::integer_mul::exponent::result_weights"
+
+[[mirror]]
+lean = "p3_word_backend.integer_mul.mirror.factor_leaves"
+rust = "p3_word_backend::integer_mul::factor_leaves"
+
+[[mirror]]
+lean = "p3_word_backend.integer_mul.mirror.result_leaves"
+rust = "p3_word_backend::integer_mul::result_leaves"
+
+[[mirror]]
+lean = "p3_word_backend.integer_mul.mirror.product_layers"
+rust = "p3_word_backend::integer_mul::product_layers"
