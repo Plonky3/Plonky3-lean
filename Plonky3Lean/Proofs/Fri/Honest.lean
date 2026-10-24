@@ -757,8 +757,8 @@ theorem open_inputs_deep {ME : Type} (G : Gen K) (hN : GenNested G) (g : K) {C :
     (hHa : (inputLogHeights b claims).headD 0 ≤ G.adicity)
     (hidx : ∀ i ∈ indices, i < 2 ^ (inputLogHeights b claims).headD 0)
     (hon : HonestOpenings G g b ((inputLogHeights b claims).headD 0) cols claims indices openings)
-    (hmmcs : ∀ bc ∈ openings.zip claims, ∀ dims reduced,
-      mmcs.verify_multi_batch (commit_of bc.2.commitment) dims reduced bc.1.opened_values bc.1.opening_proof = .ok ())
+    (hmmcs : ∀ bc ∈ openings.zip claims, mmcs.verify_multi_batch (commit_of bc.2.commitment) (batchDims b bc.2)
+      (batchReduced b ((inputLogHeights b claims).headD 0) indices bc.2) bc.1.opened_values bc.1.opening_proof = .ok ())
     (hpts : ∀ c ∈ claims, ∀ m ∈ c.matrices, m.points ≠ [])
     (hval : ∀ c ∈ claims, ∀ m ∈ c.matrices, ∀ p ∈ m.points, p.values = (cols m).map (·.eval p.point))
     (hout : ∀ c ∈ claims, ∀ m ∈ c.matrices, ∀ p ∈ m.points, ∀ r < 2 ^ (inputLogHeights b claims).headD 0,
@@ -897,9 +897,10 @@ theorem verify_fri_complete_honest (G : Gen K) (hV : GenValid G) (hN : GenNested
     (hidx : ∀ i ∈ indices, i < 2 ^ (inputLogHeights params.log_blowup claims).headD 0)
     (hon : HonestOpenings G g params.log_blowup ((inputLogHeights params.log_blowup claims).headD 0) cols claims
       indices proof.input_openings)
-    (hin : ∀ bc ∈ proof.input_openings.zip claims, ∀ dims reduced,
-      immcs.verify_multi_batch (commit_of bc.2.commitment) dims reduced bc.1.opened_values bc.1.opening_proof =
-        .ok ())
+    (hin : ∀ bc ∈ proof.input_openings.zip claims,
+      immcs.verify_multi_batch (commit_of bc.2.commitment) (batchDims params.log_blowup bc.2)
+        (batchReduced params.log_blowup ((inputLogHeights params.log_blowup claims).headD 0) indices bc.2)
+        bc.1.opened_values bc.1.opening_proof = .ok ())
     (hsib : ∀ q i, indices[q]? = some i →
       HonestSiblings G (deepInput g α params.log_blowup cols claims) q
         ((inputLogHeights params.log_blowup claims).headD 0) i
@@ -913,11 +914,12 @@ theorem verify_fri_complete_honest (G : Gen K) (hV : GenValid G) (hN : GenNested
     (hmmcs : ∀ k (hk : k < (proofRds G g α params cols claims proof betas L).length) (c : fmmcs.Commitment)
       (o : CommitPhaseMultiStep K fmmcs.MultiProof),
       proof.commit_phase_commits[k]? = some c → proof.commit_phase_openings[k]? = some o →
-      ∀ groups : List ℕ, fmmcs.verify_multi_batch c
+      fmmcs.verify_multi_batch c
         [(2 ^ (proofRds G g α params cols claims proof betas L)[k].a,
           2 ^ ((inputLogHeights params.log_blowup claims).headD 0 -
             (((proofRds G g α params cols claims proof betas L).take (k + 1)).map Rd.a).sum))]
-        groups (groups.map fun t =>
+        (roundGroups (proofRds G g α params cols claims proof betas L) indices k)
+        ((roundGroups (proofRds G g α params cols claims proof betas L) indices k).map fun t =>
           [rowList (proofRds G g α params cols claims proof betas L)[k].w
             (proofRds G g α params cols claims proof betas L)[k].a t]) o.opening_proof = .ok ()) :
     verify_fri G g fmmcs immcs mkTx params proof s claims commit_of α = pure () := by
@@ -1159,9 +1161,10 @@ theorem pcs_verify_complete_honest (G : Gen K) (hV : GenValid G) (hN : GenNested
       s3 proof.final_poly (some proof.query_pow_witness) = pure (indices, s4))
     (hon : HonestOpenings G g params.log_blowup ((inputLogHeights params.log_blowup claims).headD 0) cols claims
       indices proof.input_openings)
-    (hin : ∀ bc ∈ proof.input_openings.zip claims, ∀ dims reduced,
-      immcs.verify_multi_batch (commit_of bc.2.commitment) dims reduced bc.1.opened_values bc.1.opening_proof =
-        .ok ())
+    (hin : ∀ bc ∈ proof.input_openings.zip claims,
+      immcs.verify_multi_batch (commit_of bc.2.commitment) (batchDims params.log_blowup bc.2)
+        (batchReduced params.log_blowup ((inputLogHeights params.log_blowup claims).headD 0) indices bc.2)
+        bc.1.opened_values bc.1.opening_proof = .ok ())
     (hsib : ∀ q i, indices[q]? = some i →
       HonestSiblings G (deepInput g α params.log_blowup cols claims) q
         ((inputLogHeights params.log_blowup claims).headD 0) i
@@ -1175,11 +1178,12 @@ theorem pcs_verify_complete_honest (G : Gen K) (hV : GenValid G) (hN : GenNested
     (hmmcs : ∀ k (hk : k < (proofRds G g α params cols claims proof betas L).length) (c : fmmcs.Commitment)
       (o : CommitPhaseMultiStep K fmmcs.MultiProof),
       proof.commit_phase_commits[k]? = some c → proof.commit_phase_openings[k]? = some o →
-      ∀ groups : List ℕ, fmmcs.verify_multi_batch c
+      fmmcs.verify_multi_batch c
         [(2 ^ (proofRds G g α params cols claims proof betas L)[k].a,
           2 ^ ((inputLogHeights params.log_blowup claims).headD 0 -
             (((proofRds G g α params cols claims proof betas L).take (k + 1)).map Rd.a).sum))]
-        groups (groups.map fun t =>
+        (roundGroups (proofRds G g α params cols claims proof betas L) indices k)
+        ((roundGroups (proofRds G g α params cols claims proof betas L) indices k).map fun t =>
           [rowList (proofRds G g α params cols claims proof betas L)[k].w
             (proofRds G g α params cols claims proof betas L)[k].a t]) o.opening_proof = .ok ()) :
     verify G g fmmcs immcs sp params claims proof s commit_of = pure () :=

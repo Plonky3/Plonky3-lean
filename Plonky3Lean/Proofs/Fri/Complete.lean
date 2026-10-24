@@ -64,6 +64,10 @@ theorem recordedOf_getD : ∀ (rs : List (Rd K)) (idx k : ℕ) (hk : k < rs.leng
       List.getElem_cons_succ]
     rw [recordedOf_getD rs _ k (by simpa using hk), Nat.div_div_eq_div_mul, ← pow_add]
 
+/-- The group indices of round k: every query index shifted down by the arities through round k. -/
+def roundGroups (rs : List (Rd K)) (indices : List ℕ) (k : ℕ) : List ℕ :=
+  indices.map (· / 2 ^ ((rs.take (k + 1)).map Rd.a).sum)
+
 /-- Completeness of the FRI verifier.
 
 Take a proof whose checks before the transcript pass with schedule L, and a transcript that accepts it.
@@ -99,8 +103,9 @@ theorem verify_fri_complete (G : Gen K) (hV : GenValid G) (hN : GenNested G) (h2
     (hfinal : ∀ j < 2 ^ (H - totalA rs), horner proof.final_poly (G.gen H ^ bitRev H j) = wF.getD j 0)
     (hmmcs : ∀ k (hk : k < rs.length) (c : fmmcs.Commitment) (o : CommitPhaseMultiStep K fmmcs.MultiProof),
       proof.commit_phase_commits[k]? = some c → proof.commit_phase_openings[k]? = some o →
-      ∀ groups : List ℕ, fmmcs.verify_multi_batch c [(2 ^ rs[k].a, 2 ^ (H - ((rs.take (k + 1)).map Rd.a).sum))]
-        groups (groups.map fun t => [rowList rs[k].w rs[k].a t]) o.opening_proof = .ok ()) :
+      fmmcs.verify_multi_batch c [(2 ^ rs[k].a, 2 ^ (H - ((rs.take (k + 1)).map Rd.a).sum))]
+        (roundGroups rs indices k) ((roundGroups rs indices k).map fun t => [rowList rs[k].w rs[k].a t])
+        o.opening_proof = .ok ()) :
     verify_fri G g fmmcs immcs mkTx params proof s claims commit_of alpha = pure () := by
   subst hH hL
   have hc' : ((txAt G mkTx params claims (rs.map Rd.a)).commit_rounds s proof.commit_phase_commits
@@ -172,8 +177,14 @@ theorem verify_fri_complete (G : Gen K) (hV : GenValid G) (hN : GenNested G) (h2
     refine List.map_congr_left fun e _ => ?_
     simp only [Function.comp]
     rw [recordedOf_getD rs _ i hil]
+  have hgroups : recorded.map (fun r => (r.getD i (0, [])).1) = roundGroups rs indices i := by
+    simp only [recorded, List.map_map, roundGroups]
+    rw [show ((fun r => (r.getD i (0, [])).1) ∘ fun e : (ℕ × List (ℕ × K)) × ℕ => recordedOf rs e.1.1) =
+        (· / 2 ^ ((rs.take (i + 1)).map Rd.a).sum) ∘ (Prod.fst ∘ Prod.fst) by
+      funext e; simp only [Function.comp_apply]; rw [recordedOf_getD rs _ i hil], ← List.map_map, ← List.map_map, List.zipIdx_map_fst,
+      List.map_fst_zip (by simp)]
   dsimp only
-  rw [hrows, show H - ((rs.take i).map Rd.a).sum - rs[i].a = H - ((rs.take (i + 1)).map Rd.a).sum by
+  rw [hrows, hgroups, show H - ((rs.take i).map Rd.a).sum - rs[i].a = H - ((rs.take (i + 1)).map Rd.a).sum by
     rw [hS, Nat.sub_sub], hmmcs i hil c o
       (by rw [List.getElem?_eq_getElem (by simp [hl] at hi; omega)]; exact congrArg some hc.symm)
       (by rw [List.getElem?_eq_getElem (by simp [hl] at hi; omega)]; exact congrArg some ho.symm)]
@@ -210,18 +221,32 @@ theorem forM_eq_pure {ε α : Type _} {f : α → ExceptT ε Option PUnit} :
     show f x >>= (fun _ => l.forM f) = pure ()
     rw [h x List.mem_cons_self, pure_bind, forM_eq_pure l fun y hy => h y (List.mem_cons_of_mem _ hy)]
 
+/-- The dimensions one batch check passes to the scheme.
+
+Each matrix gets its claimed width and its height with the blowup. -/
+def batchDims {G : Gen K} {C : Type} (b : ℕ) (c : Claim G C) : List (ℕ × ℕ) :=
+  c.matrices.map fun m => ((m.points.headD ⟨0, []⟩).values.length, 2 ^ m.domain.log_size * 2 ^ b)
+
+/-- The indices one batch check passes to the scheme.
+
+Each query index is shifted down to the batch's tallest height. -/
+def batchReduced {G : Gen K} {C : Type} (b H : ℕ) (indices : List ℕ) (c : Claim G C) : List ℕ :=
+  match (c.matrices.map fun m => 2 ^ m.domain.log_size * 2 ^ b).max? with
+  | some h => indices.map (· / 2 ^ (H - Nat.log 2 h))
+  | none => indices.map fun _ => 0
+
 /-- One batch's checks pass on an honest opening:
 
 - one opened row set per query, each with one row per matrix
 - every matrix opened at some point
-- a scheme that accepts the rows at the claimed dimensions. -/
+- a scheme that accepts the rows at the dimensions and indices the check computes. -/
 theorem checkBatch_honest {ME : Type} (G : Gen K) {C : Type} (mmcs : MmcsOps K) (b H : ℕ) (indices : List ℕ)
     (commit_of : C → mmcs.Commitment) (bo : BatchMultiOpening K mmcs.MultiProof) (c : Claim G C)
     (hq : bo.opened_values.length = indices.length)
     (hm : ∀ r ∈ bo.opened_values, r.length = c.matrices.length)
     (hp : ∀ m ∈ c.matrices, m.points ≠ [])
-    (hmmcs : ∀ dims reduced, mmcs.verify_multi_batch (commit_of c.commitment) dims reduced bo.opened_values
-      bo.opening_proof = .ok ()) :
+    (hmmcs : mmcs.verify_multi_batch (commit_of c.commitment) (batchDims b c) (batchReduced b H indices c)
+      bo.opened_values bo.opening_proof = .ok ()) :
     checkBatch (ME := ME) G mmcs b H indices commit_of (bo, c) = pure () := by
   unfold checkBatch
   have h1 : (bo.opened_values.any fun x => decide (x.length ≠ c.matrices.length)) = false := by
@@ -229,7 +254,11 @@ theorem checkBatch_honest {ME : Type} (G : Gen K) {C : Type} (mmcs : MmcsOps K) 
     exact hm
   have h2' : (c.matrices.any fun x => decide (x.points = [])) = false := by
     simpa using hp
-  simp only [hq, ne_eq, not_true_eq_false, ↓reduceIte, h1, h2', Bool.false_eq_true, hmmcs]
+  simp only [hq, ne_eq, not_true_eq_false, ↓reduceIte, h1, h2', Bool.false_eq_true]
+  split
+  · rename_i e he
+    exact absurd (he.symm.trans hmmcs) (by simp)
+  · rfl
 
 /-- The denominator checks pass when no opening point is a query point. -/
 theorem checkDenominators_honest {ME IE : Type} (G : Gen K) (g : K) {C : Type} (b H : ℕ) (indices : List ℕ)
