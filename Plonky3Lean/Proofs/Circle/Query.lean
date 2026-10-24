@@ -353,9 +353,10 @@ theorem verify_queries_complete (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {IE
     (hfinal : proof.final_poly = preLayer E (betas.getD · 0) R 0)
     (hmmcs : ∀ r < R, ∀ (c : fmmcs.Commitment) (o : CommitPhaseMultiStep K fmmcs.MultiProof),
       proof.commit_phase_commits[r]? = some c → proof.commit_phase_openings[r]? = some o →
-      ∀ groups : List ℕ, fmmcs.verify_multi_batch c [(2, 2 ^ (R + params.log_blowup - (r + 1)))] groups
-        (groups.map fun j => [honestWord G (R + params.log_blowup) R E (betas.getD · 0) r j]) o.opening_proof =
-          .ok ()) :
+      fmmcs.verify_multi_batch c [(2, 2 ^ (R + params.log_blowup - (r + 1)))]
+        (indices.map fun i => i / 2 / 2 ^ (r + 1))
+        ((indices.map fun i => i / 2 / 2 ^ (r + 1)).map fun j =>
+          [honestWord G (R + params.log_blowup) R E (betas.getD · 0) r j]) o.opening_proof = .ok ()) :
     verify_queries G fmmcs params proof betas indices (List.replicate R 1) open_inputs = pure () := by
   set L := R + params.log_blowup
   set β : ℕ → K := (betas.getD · 0)
@@ -399,8 +400,15 @@ theorem verify_queries_complete (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {IE
     simp only [recorded, List.map_map]
     refine List.map_congr_left fun e _ => ?_
     simp [List.getD_eq_getElem?_getD, hiR, honestRow_eq]
+  have hgroups : recorded.map (fun rs => (rs.getD i (0, [])).1) = indices.map fun t => t / 2 / 2 ^ (i + 1) := by
+    simp only [recorded, List.map_map]
+    rw [show ((fun rs : List (ℕ × List K) => (rs.getD i (0, [])).1) ∘ fun e : (ℕ × List (ℕ × K)) × ℕ =>
+        (List.range R).map fun r => honestRow G L R E β (e.1.1 / 2) r) =
+        (fun t => t / 2 / 2 ^ (i + 1)) ∘ (Prod.fst ∘ Prod.fst) by
+      funext e; simp [List.getD_eq_getElem?_getD, hiR, honestRow_eq], ← List.map_map, ← List.map_map,
+      List.zipIdx_map_fst, List.map_fst_zip (by simp)]
   dsimp only
-  rw [hrows, pow_one, show L - i - 1 = L - (i + 1) by omega,
+  rw [hrows, hgroups, pow_one, show L - i - 1 = L - (i + 1) by omega,
     hmmcs i hiR c o (by rw [hc]; simp) (by rw [ho]; simp)]
 
 /-! ## The first layer -/
@@ -647,8 +655,9 @@ theorem verify_complete (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {S : Type} 
     (hmmcs : ∀ k < H - (params.log_blowup + 1), ∀ (c : fmmcs.Commitment)
       (o : CommitPhaseMultiStep K fmmcs.MultiProof),
       proof.fri_proof.commit_phase_commits[k]? = some c → proof.fri_proof.commit_phase_openings[k]? = some o →
-      ∀ groups : List ℕ, fmmcs.verify_multi_batch c [(2, 2 ^ (H - 1 - (k + 1)))] groups
-        (groups.map fun j => [honestWord G (H - 1) (H - (params.log_blowup + 1)) E (r.betas.getD · 0) k j])
+      fmmcs.verify_multi_batch c [(2, 2 ^ (H - 1 - (k + 1)))] (r.indices.map fun i => i / 2 / 2 ^ (k + 1))
+        ((r.indices.map fun i => i / 2 / 2 ^ (k + 1)).map fun j =>
+          [honestWord G (H - 1) (H - (params.log_blowup + 1)) E (r.betas.getD · 0) k j])
           o.opening_proof = .ok ()) :
     verify G immcs fmmcs tx params rounds proof s = pure () := by
   obtain ⟨rfl, hsh⟩ := validate_proof_shape_spec hshape

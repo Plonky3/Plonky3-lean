@@ -196,9 +196,13 @@ theorem merkle_verify_honest (mats : List (Mat K)) (dims : List (ℕ × ℕ)) (i
       rw [Nat.div_lt_iff_lt_mul (by positivity), ← pow_add, show capH + (n - capH) = n by omega]; exact hI
     simp [merkleCap, merkleLeaf, merkleSpecs, hlt, n]
 
-/-- Two multi-openings of one commitment at the same indices that both verify.
+/-- Take two multi-openings of one commitment, at the same indices, that both verify.
 
-Either the hasher or the compression collides, or the two agree on the row of every matrix at least as tall as the cap. -/
+Then one of these holds:
+
+- the compression collides
+- the hasher collides
+- the two agree on the row of every matrix at least as tall as the cap. -/
 theorem merkle_verify_binding (cap : List D) (dims : List (ℕ × ℕ)) (idxs : List ℕ)
     (v1 v2 : List (List (List K))) (p1 p2 : List (List D))
     (h1 : (merkleOps h c z capH).verify_multi_batch cap dims idxs v1 p1 = .ok ())

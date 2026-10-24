@@ -13,6 +13,8 @@ public import Plonky3Lean.Proofs.Fri.Edge
 public import Plonky3Lean.Proofs.Fri.Honest
 public import Plonky3Lean.Proofs.Fri.HidingPcs
 public import Plonky3Lean.Proofs.Fri.Pow
+public import Plonky3Lean.Proofs.Fri.MerklePcs
+public import Plonky3Lean.Proofs.Fri.HidingMasks
 
 @[expose] public section
 
@@ -41,6 +43,10 @@ The field facts are hypotheses:
 - 2 is invertible
 
 BabyBear and every extension of it satisfy them, the quartic one included.
+
+The completeness theorems assume the schemes accept only at the dimensions and indices the verifier computes.
+
+Over the Merkle tree scheme even that is proven, so no scheme hypothesis remains.
 -/
 
 open Polynomial Finset
@@ -673,6 +679,78 @@ theorem hiding_pcs.one_row (r q D : ℕ) (hD : 0 < D) (hr : D ≤ r) {req : ℕ}
   check_hiding_budget_one_row r q D hD hr hb
 
 end hidingOpen
+
+/-! ## The Merkle tree scheme -/
+
+section merkle
+
+variable {K D : Type}
+
+/-- The Merkle tree scheme accepts an honest multi-opening of a committed batch.
+
+The batch is not empty, every height is a power of two, and the cap lies at or below the root.
+
+The dimensions are the matrices' widths and heights, and every index is below the tallest height. -/
+theorem merkle.complete : type_of% @merkle_verify_honest := @merkle_verify_honest
+
+/-- Take two multi-openings of one commitment, at the same indices, that both verify.
+
+Then one of these holds:
+
+- the compression collides
+- the hasher collides
+- the two agree on the row of every matrix at least as tall as the cap. -/
+theorem merkle.binding : type_of% @merkle_verify_binding := @merkle_verify_binding
+
+end merkle
+
+/-- The PCS verifier accepts an honest proof over Merkle commitments.
+
+Both schemes are Merkle trees, with any hashers, compressions and padding digests.
+
+The prover commits the low-degree extensions of the columns and every round's codeword.
+
+It opens both at the indices the verifier derives.
+
+The caps lie at or below the shortest committed codewords that need them.
+
+No hypothesis says that a scheme accepts. -/
+theorem pcs.complete_merkle : type_of% @pcs_verify_complete_merkle := @pcs_verify_complete_merkle
+
+/-- On honest claims, a batch check passes the committed matrices' widths and heights to the input scheme. -/
+theorem pcs.batch_dims_honest : type_of% @batchDims_eq := @batchDims_eq
+
+/-- On a batch with a matrix, a batch check passes the query indices shifted to the batch's tallest height. -/
+theorem pcs.batch_indices_honest : type_of% @batchReduced_eq := @batchReduced_eq
+
+/-! ## The quotient masks and the chunk count -/
+
+section masks
+
+variable {K : Type} [Field K] [DecidableEq K]
+
+/-- With a chunk count n between 2 and the evaluation count d, the masks are:
+
+```text
+    t_i     = r_i                                        i != n - 1
+    t_(n-1) = r_(n-1) - sum_(j < n-1) (c_j / c_(n-1)) r_j
+    r_(d-1) = 0
+``` -/
+theorem hiding_pcs.masks : type_of% @quotientMaskValues_getD := @quotientMaskValues_getD
+
+/-- A chunk count of at most 1, or past the evaluation count, panics. -/
+theorem hiding_pcs.masks_panic : type_of% @quotientMaskValues_eq_none := @quotientMaskValues_eq_none
+
+/-- The weighted mask sum sum_i c_i t_i equals sum_(n-1 <= i < d) c_i r_i. -/
+theorem hiding_pcs.mask_residual : type_of% @maskResidual_eq := @maskResidual_eq
+
+/-- When the chunk count equals the evaluation count, the masks cancel for every draw. -/
+theorem hiding_pcs.masks_cancel_of_counts : type_of% @maskResidual_eq_zero := @maskResidual_eq_zero
+
+/-- When the chunk count falls short of the evaluation count, some draw leaves the masks uncancelled. -/
+theorem hiding_pcs.masks_survive_of_counts : type_of% @maskResidual_ne_zero := @maskResidual_ne_zero
+
+end masks
 
 /-! ## The grinding difficulty -/
 

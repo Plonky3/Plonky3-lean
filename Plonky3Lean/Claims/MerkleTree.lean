@@ -5,6 +5,7 @@ public import Plonky3Lean.Proofs.MerkleTree.Accept
 public import Plonky3Lean.Proofs.MerkleTree.Edge
 public import Plonky3Lean.Proofs.MerkleTree.Hiding
 public import Plonky3Lean.Proofs.MerkleTree.Bugs
+public import Plonky3Lean.Proofs.MerkleTree.Batch
 
 @[expose] public section
 
@@ -35,6 +36,9 @@ The extracted model checks arithmetic, as a debug build does, so an overflow pan
 
 - Two accepting openings at one index agree on every row read, or the hasher or the compression collides.
 - An honest opening of the tree verifies.
+- On the binary tree over power-of-two heights, the walk is complete and binding.
+
+  That is the layout the FRI PCS commits.
 - Once the dimensions pass the verifier's own checks, no index, rows, siblings or cap make it panic.
 - With arity 8, heights 4 and 2 make the pinned schedule loop forever.
 - With arity 2 and a cap two layers down, a height-1 matrix next to a height-8 one is never read.
@@ -440,5 +444,19 @@ theorem walk.binding (h : List (List F) → D) (c : List D → D) (pad : List D)
       CCollision c ∨ HCollision h ∨
         (d = d' ∧ ∀ g ∈ injected pl, group order o1 g.1 g.2 = group order o2 g.1 g.2) :=
   Plonky3Lean.Proofs.MerkleTree.walk_binding h c pad z order o1 o2 p1 p2 hlen hpad
+
+/-- The binary walk over power-of-two heights reaches cap entry I / 2^L from an honest opening of leaf I.
+
+The opening holds, for each matrix of height 2^e, its row I / 2^(n - e), and the siblings of the path. -/
+theorem walk.binary_honest : type_of% @bwalk_honest := @bwalk_honest
+
+/-- Take two binary walks over power-of-two heights that reach one digest from one leaf index.
+
+Then one of these holds:
+
+- the compression collides
+- the hasher collides
+- the two openings agree on every matrix of height at least 2^(n - L). -/
+theorem walk.binary_binding : type_of% @bwalk_binding := @bwalk_binding
 
 end Plonky3Lean.Claims.P3MerkleTree

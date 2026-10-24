@@ -121,6 +121,11 @@ theorem split_domains.some_iff (hV : GenValid G) (c : Coset G) (nc : ℕ) :
     (Coset.split_domains G c nc).isSome ↔ ∃ l, nc = 2 ^ l ∧ l ≤ c.log_size :=
   split_domains_isSome G hV c nc
 
+/-- The quotient commit hands the masking step exactly as many evaluations as its chunk count.
+
+Guarding that step with a count check changes nothing. -/
+theorem commit_quotient.counts : type_of% @commit_quotient_counts := @commit_quotient_counts
+
 /-- Point j of chunk i is point i + 2^l j of the coset. -/
 theorem split_domains.points (hV : GenValid G) (hN : GenNested G) (c : Coset G) {l : ℕ}
     (hl : l ≤ c.log_size) (i j : ℕ) :

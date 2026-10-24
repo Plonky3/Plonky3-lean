@@ -4,6 +4,7 @@ public import Plonky3Lean.Proofs.UniStark.Completeness
 public import Plonky3Lean.Proofs.UniStark.Transcript
 public import Plonky3Lean.Proofs.UniStark.Extracted
 public import Plonky3Lean.Proofs.UniStark.Zk
+public import Plonky3Lean.Proofs.UniStark.ZkCompleteness
 public import Plonky3Lean.Proofs.Commit.BabyBear
 public import CompPoly.Fields.BabyBear.Ext4
 
@@ -597,6 +598,18 @@ theorem natDegree_masked_lt {m : ℕ} (hm : m = 2 ^ (qd.log_size - l)) {q t : K[
     (hq : q.natDegree < m) (ht : t.natDegree < m) :
     (q + chunkZ hV qd l i * t).natDegree < 2 * m :=
   Plonky3Lean.Proofs.UniStark.natDegree_masked_lt hV qd l hm hq ht
+
+/-- Openings of the masked chunks recompose to the quotient at zeta, as the unmasked openings do. -/
+theorem recompose_quotient_masked : type_of% @Plonky3Lean.Proofs.UniStark.recompose_quotient_masked :=
+  @Plonky3Lean.Proofs.UniStark.recompose_quotient_masked
+
+/-- Completeness of the identity at zeta on masked quotient chunks.
+
+Each chunk opens to its interpolant plus Z_i times its mask, the last mask balancing the others.
+
+Then the recombined quotient is Q(zeta), and the check at zeta accepts it. -/
+theorem honest_ood_check_masked : type_of% @Plonky3Lean.Proofs.UniStark.honest_ood_check_masked :=
+  @Plonky3Lean.Proofs.UniStark.honest_ood_check_masked
 
 end zk
 
