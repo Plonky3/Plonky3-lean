@@ -21,6 +21,7 @@ target `thumbv7em-none-eabi`
 | `binary-field` | scoped | 21777 | 66 | 0 | 0 | 139 | 7 / 2 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050`, pre `060`, pre `070` |
 | `binary-pcs` | stub |  | 828 | 0 | 10 |  | 0 / 0 |  |
 | `blake2s` | scoped | 148 | 51 | 1 | 0 | 0 | 1 / 0 | pre `010` |
+| `blake2s-air` | scoped | 499 | 515 | 0 | 37 | 0 | 0 / 0 |  |
 | `blake3` | scoped | 2609 | 40 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
 | `blake3-air` | scoped | 240 | 953 | 0 | 117 | 0 | 0 / 0 |  |
 | `blake3-crate` | stub |  | 26 | 0 | 3 |  | 0 / 0 |  |
@@ -234,6 +235,11 @@ charon errors: 0.
 | `p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::xor` | `` |  |
 
 ### `blake2s`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `blake2s-air`
 
 charon errors: 0.
 Nothing translated is dropped.
@@ -486,7 +492,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1615) whose dependencies include it; reaching one is not using it.
+(of 1639) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -528,25 +534,25 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1615) whose dependencies include the declaration.
+counts the claims (of 1639) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
-| `air` | `p3_air.symbolic.mirror.SymbolicVariable.degree_multiple` | `p3_air::symbolic::variable::SymbolicVariable::degree_multiple` | not translated | 45 |
-| `air` | `p3_air.symbolic.mirror.SymbolicVariable.poly_degree` | `p3_air::symbolic::variable::SymbolicVariable::poly_degree` | not translated | 45 |
+| `air` | `p3_air.symbolic.mirror.SymbolicVariable.degree_multiple` | `p3_air::symbolic::variable::SymbolicVariable::degree_multiple` | not translated | 47 |
+| `air` | `p3_air.symbolic.mirror.SymbolicVariable.poly_degree` | `p3_air::symbolic::variable::SymbolicVariable::poly_degree` | not translated | 47 |
 | `air` | `p3_air.symbolic.mirror.SymbolicVariableExt.degree_multiple` | `p3_air::symbolic::variable::SymbolicVariableExt::degree_multiple` | not translated | 5 |
 | `air` | `p3_air.symbolic.mirror.SymbolicVariableExt.poly_degree` | `p3_air::symbolic::variable::SymbolicVariableExt::poly_degree` | not translated | 5 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_multiple` | `p3_air::symbolic::SymbolicExpr::degree_multiple` | not translated | 43 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_with` | `p3_air::symbolic::SymbolicExpr::degree_memo` | not translated | 31 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_multiple` | `p3_air::symbolic::SymbolicExpr::degree_multiple` | not translated | 45 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_with` | `p3_air::symbolic::SymbolicExpr::degree_memo` | not translated | 32 |
 | `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_multiple_with_transition` | `p3_air::symbolic::SymbolicExpr::degree_multiple_with_transition` | not translated | 5 |
 | `air` | `p3_air.symbolic.mirror.SymbolicExpr.poly_degree` | `p3_air::symbolic::SymbolicExpr::poly_degree` | not translated | 14 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.as_const` | `p3_air::symbolic::SymbolicExpr::as_const` | not translated | 40 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_add` | `p3_air::symbolic::SymbolicExpr::sym_add` | not translated | 35 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_neg` | `p3_air::symbolic::SymbolicExpr::sym_neg` | not translated | 36 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_sub` | `p3_air::symbolic::SymbolicExpr::sym_sub` | not translated | 35 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_mul` | `p3_air::symbolic::SymbolicExpr::sym_mul` | not translated | 35 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.const` | `{impl p3_field::PrimeCharacteristicRing for p3_air::symbolic::SymbolicExpr<A>}::from_prime_subfield` | not translated | 33 |
-| `air` | `p3_air.symbolic.mirror.instSymLeafBaseLeaf` | `{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression::BaseLeaf<F>}::degree_multiple` | not translated | 44 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.as_const` | `p3_air::symbolic::SymbolicExpr::as_const` | not translated | 42 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_add` | `p3_air::symbolic::SymbolicExpr::sym_add` | not translated | 37 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_neg` | `p3_air::symbolic::SymbolicExpr::sym_neg` | not translated | 38 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_sub` | `p3_air::symbolic::SymbolicExpr::sym_sub` | not translated | 37 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_mul` | `p3_air::symbolic::SymbolicExpr::sym_mul` | not translated | 37 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.const` | `{impl p3_field::PrimeCharacteristicRing for p3_air::symbolic::SymbolicExpr<A>}::from_prime_subfield` | not translated | 35 |
+| `air` | `p3_air.symbolic.mirror.instSymLeafBaseLeaf` | `{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression::BaseLeaf<F>}::degree_multiple` | not translated | 46 |
 | `air` | `p3_air.symbolic.mirror.instSymLeafExtLeaf` | `{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression_ext::ExtLeaf<F, EF>}::degree_multiple` | not translated | 4 |
 | `air` | `p3_air.symbolic.mirror.SymbolicExpressionExt.to_base` | `p3_air::symbolic::expression_ext::SymbolicExpressionExt::to_base` | not translated | 1 |
 | `air` | `p3_air.builder.mirror.AirBuilder.is_transition_window` | `p3_air::builder::AirBuilder::is_transition_window` | not translated | 7 |
@@ -556,13 +562,13 @@ counts the claims (of 1615) whose dependencies include the declaration.
 | `air` | `p3_air.builder.mirror.AirBuilder.when_last_row` | `p3_air::builder::AirBuilder::when_last_row` | not translated | 3 |
 | `air` | `p3_air.builder.mirror.AirBuilder.when_transition` | `p3_air::builder::AirBuilder::when_transition` | not translated | 13 |
 | `air` | `p3_air.builder.mirror.AirBuilder.when_transition_window` | `p3_air::builder::AirBuilder::when_transition_window` | not translated | 0 |
-| `air` | `p3_air.builder.mirror.AirBuilder.assert_zeros` | `p3_air::builder::AirBuilder::assert_zeros` | not translated | 43 |
-| `air` | `p3_air.builder.mirror.AirBuilder.bool_check` | `p3_field::PrimeCharacteristicRing::bool_check` | not translated | 45 |
-| `air` | `p3_air.builder.mirror.AirBuilder.assert_bools` | `p3_air::builder::AirBuilder::assert_bools` | not translated | 42 |
+| `air` | `p3_air.builder.mirror.AirBuilder.assert_zeros` | `p3_air::builder::AirBuilder::assert_zeros` | not translated | 50 |
+| `air` | `p3_air.builder.mirror.AirBuilder.bool_check` | `p3_field::PrimeCharacteristicRing::bool_check` | not translated | 52 |
+| `air` | `p3_air.builder.mirror.AirBuilder.assert_bools` | `p3_air::builder::AirBuilder::assert_bools` | not translated | 49 |
 | `air` | `p3_air.builder.mirror.AirBuilder.assert_one` | `p3_air::builder::AirBuilder::assert_one` | not translated | 18 |
 | `air` | `p3_air.builder.mirror.AirBuilder.assert_eq` | `p3_air::builder::AirBuilder::assert_eq` | not translated | 13 |
 | `air` | `p3_air.builder.mirror.AirBuilder.assert_eq_arrays` | `p3_air::builder::AirBuilder::assert_eq_arrays` | not translated | 0 |
-| `air` | `p3_air.builder.mirror.AirBuilder.assert_bool` | `p3_air::builder::AirBuilder::assert_bool` | not translated | 21 |
+| `air` | `p3_air.builder.mirror.AirBuilder.assert_bool` | `p3_air::builder::AirBuilder::assert_bool` | not translated | 28 |
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_zeros_ext` | `p3_air::builder::ExtensionBuilder::assert_zeros_ext` | not translated | 0 |
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_eq_ext` | `p3_air::builder::ExtensionBuilder::assert_eq_ext` | not translated | 2 |
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_one_ext` | `p3_air::builder::ExtensionBuilder::assert_one_ext` | not translated | 1 |
@@ -580,25 +586,25 @@ counts the claims (of 1615) whose dependencies include the declaration.
 | `air` | `p3_air.builder.mirror.VirtualPairCol.diff_preprocessed` | `p3_air::virtual_column::VirtualPairCol::diff_preprocessed` | not translated | 0 |
 | `air` | `p3_air.builder.mirror.VirtualPairCol.diff_main` | `p3_air::virtual_column::VirtualPairCol::diff_main` | not translated | 0 |
 | `air` | `p3_air.builder.mirror.VirtualPairCol.apply` | `p3_air::virtual_column::VirtualPairCol::apply` | not translated | 2 |
-| `air` | `p3_air.air.mirror.BoundaryPublic.row` | `p3_air::boundary::BoundaryPublic::row` | not translated | 5 |
-| `air` | `p3_air.air.mirror.validate` | `p3_air::boundary::validate` | not translated | 5 |
-| `air` | `p3_air.air.mirror.Air.periodic_values` | `p3_air::air::BaseAir::periodic_values` | not translated | 17 |
+| `air` | `p3_air.air.mirror.BoundaryPublic.row` | `p3_air::boundary::BoundaryPublic::row` | not translated | 6 |
+| `air` | `p3_air.air.mirror.validate` | `p3_air::boundary::validate` | not translated | 6 |
+| `air` | `p3_air.air.mirror.Air.periodic_values` | `p3_air::air::BaseAir::periodic_values` | not translated | 19 |
 | `air` | `p3_air.air.mirror.resolve` | `p3_air::symbolic::expression::SymbolicExpression::resolve` | not translated | 6 |
-| `air` | `p3_air.air.mirror.AirLayout.from_air` | `p3_air::symbolic::builder::AirLayout::from_air` | not translated | 56 |
+| `air` | `p3_air.air.mirror.AirLayout.from_air` | `p3_air::symbolic::builder::AirLayout::from_air` | not translated | 62 |
 | `air` | `p3_air.air.mirror.AirLayout.validate_against_air` | `p3_air::symbolic::builder::AirLayout::validate_against_air` | not translated | 13 |
-| `air` | `p3_air.air.mirror.symbolicBuilder` | `p3_air::symbolic::builder::SymbolicAirBuilder::new` | not translated | 33 |
+| `air` | `p3_air.air.mirror.symbolicBuilder` | `p3_air::symbolic::builder::SymbolicAirBuilder::new` | not translated | 35 |
 | `air` | `p3_air.air.mirror.get_symbolic_constraints` | `p3_air::symbolic::builder::get_symbolic_constraints` | not translated | 9 |
 | `air` | `p3_air.air.mirror.constraint_degree_from_poly_degree` | `p3_air::symbolic::builder::constraint_degree_from_poly_degree` | not translated | 10 |
 | `air` | `p3_air.air.mirror.get_max_constraint_degree` | `p3_air::symbolic::builder::get_max_constraint_degree_extension` | not translated | 8 |
 | `air` | `p3_air.air.mirror.log2_ceil_usize` | `p3_util::log2_ceil_usize` | not translated | 10 |
 | `air` | `p3_air.air.mirror.get_log_quotient_degree` | `p3_uni_stark::symbolic::get_log_quotient_degree_extension` | not translated | 8 |
-| `air` | `p3_air.air.mirror.DebugState.assert_zero` | `{impl p3_air::named::NamedAirBuilder for p3_air::check_constraints::DebugConstraintBuilder<'_, F, EF>}::assert_zero_named` | not translated | 25 |
-| `air` | `p3_air.air.mirror.debugBuilder` | `p3_air::check_constraints::DebugConstraintBuilder::new` | not translated | 25 |
+| `air` | `p3_air.air.mirror.DebugState.assert_zero` | `{impl p3_air::named::NamedAirBuilder for p3_air::check_constraints::DebugConstraintBuilder<'_, F, EF>}::assert_zero_named` | not translated | 26 |
+| `air` | `p3_air.air.mirror.debugBuilder` | `p3_air::check_constraints::DebugConstraintBuilder::new` | not translated | 26 |
 | `air` | `p3_air.air.mirror.debugExtBuilder` | `{impl p3_air::named::NamedExtensionBuilder for p3_air::check_constraints::DebugConstraintBuilder<'_, F, EF>}::assert_zero_ext_named` | not translated | 7 |
-| `air` | `p3_air.air.mirror.assert_periodic_column_shapes` | `p3_air::check_constraints::assert_periodic_column_shapes` | not translated | 4 |
-| `air` | `p3_air.air.mirror.boundary_io_mismatches` | `p3_air::check_constraints::boundary_io_mismatches` | not translated | 4 |
-| `air` | `p3_air.air.mirror.rowBuilder` | `p3_air::check_constraints::check_constraints` | not translated | 9 |
-| `air` | `p3_air.air.mirror.check_constraints` | `p3_air::check_constraints::check_constraints` | not translated | 4 |
+| `air` | `p3_air.air.mirror.assert_periodic_column_shapes` | `p3_air::check_constraints::assert_periodic_column_shapes` | not translated | 5 |
+| `air` | `p3_air.air.mirror.boundary_io_mismatches` | `p3_air::check_constraints::boundary_io_mismatches` | not translated | 5 |
+| `air` | `p3_air.air.mirror.rowBuilder` | `p3_air::check_constraints::check_constraints` | not translated | 10 |
+| `air` | `p3_air.air.mirror.check_constraints` | `p3_air::check_constraints::check_constraints` | not translated | 5 |
 | `batch-stark` | `p3_batch_stark.transcript.mirror.BatchShape` | `p3_batch_stark::transcript::BatchShape` | not translated | 5 |
 | `batch-stark` | `p3_batch_stark.transcript.mirror.BatchShape.num_instances` | `p3_batch_stark::transcript::BatchShape::num_instances` | not translated | 5 |
 | `batch-stark` | `p3_batch_stark.transcript.mirror.BatchShape.has_lookups` | `p3_batch_stark::transcript::BatchShape::has_lookups` | not translated | 5 |
@@ -711,6 +717,43 @@ counts the claims (of 1615) whose dependencies include the declaration.
 | `binary-pcs` | `p3_binary_pcs.fold.mirror.fold_coset` | `p3_binary_pcs::fold::fold_coset` | stub | 3 |
 | `binary-pcs` | `p3_binary_pcs.verifier.mirror.verify_query_paths` | `p3_binary_pcs::verifier::verify_query_paths` | stub | 2 |
 | `binary-pcs` | `p3_binary_pcs.verifier.mirror.verify_opening` | `{impl p3_binary_pcs::pcs::BinaryPcs<F, EF, MT, MX, E>}::verify_opening` | stub | 0 |
+| `blake2s-air` | `p3_blake2s_air.mirror.IV` | `p3_blake2s_air::constants::IV` | not translated | 9 |
+| `blake2s-air` | `p3_blake2s_air.mirror.SIGMA` | `p3_blake2s_air::constants::SIGMA` | not translated | 10 |
+| `blake2s-air` | `p3_blake2s_air.mirror.NUM_ROUNDS` | `p3_blake2s_air::binary::NUM_ROUNDS` | not translated | 9 |
+| `blake2s-air` | `p3_blake2s_air.mirror.G_PER_ROUND` | `p3_blake2s_air::binary::G_PER_ROUND` | not translated | 9 |
+| `blake2s-air` | `p3_blake2s_air.mirror.G_SCHEDULE` | `p3_blake2s_air::binary::G_SCHEDULE` | not translated | 11 |
+| `blake2s-air` | `p3_blake2s_air.mirror.NUM_INPUT_WORDS` | `p3_blake2s_air::binary::generation::NUM_INPUT_WORDS` | not translated | 1 |
+| `blake2s-air` | `p3_blake2s_air.mirror.NUM_INPUT_BITS` | `p3_blake2s_air::binary::air::NUM_INPUT_BITS` | not translated | 1 |
+| `blake2s-air` | `p3_blake2s_air.mirror.CONSTRAINTS_PER_G` | `p3_blake2s_air::binary::air::CONSTRAINTS_PER_G` | not translated | 1 |
+| `blake2s-air` | `p3_blake2s_air.mirror.NUM_G_CONSTRAINTS` | `p3_blake2s_air::binary::air::NUM_G_CONSTRAINTS` | not translated | 1 |
+| `blake2s-air` | `p3_blake2s_air.mirror.num_constraints` | `{impl p3_air::air::BaseAir<F> for p3_blake2s_air::binary::air::Blake2sBinaryAir}::num_constraints` | not translated | 1 |
+| `blake2s-air` | `p3_blake2s_air.mirror.col.chaining_value` | `p3_blake2s_air::binary::columns::Blake2sBinaryCols` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.NUM_BLAKE2S_BINARY_COLS` | `p3_blake2s_air::binary::columns::NUM_BLAKE2S_BINARY_COLS` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.u32_to_bits_le` | `p3_air::utils::u32_to_bits_le` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sBinaryGCols` | `p3_blake2s_air::binary::columns::Blake2sBinaryGCols` | not translated | 9 |
+| `blake2s-air` | `p3_blake2s_air.mirror.State` | `p3_blake2s_air::binary::air::State` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.xor_rotl` | `p3_blake2s_air::binary::air::xor_rotl` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.xor_rotl_var` | `p3_blake2s_air::binary::air::xor_rotl_var` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.maj` | `p3_blake2s_air::binary::air::maj` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.add2` | `p3_blake2s_air::binary::air::add2` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.add3` | `p3_blake2s_air::binary::air::add3` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.eval_g` | `p3_blake2s_air::binary::air::eval_g` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.eval` | `{impl p3_air::air::Air<AB> for p3_blake2s_air::binary::air::Blake2sBinaryAir}::eval` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sCompressionInput` | `p3_blake2s_air::binary::generation::Blake2sCompressionInput` | not translated | 4 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sCompressionInput.flag_word` | `p3_blake2s_air::binary::generation::Blake2sCompressionInput::flag_word` | not translated | 4 |
+| `blake2s-air` | `p3_blake2s_air.mirror.GWords` | `p3_blake2s_air::binary::generation::GWords` | not translated | 6 |
+| `blake2s-air` | `p3_blake2s_air.mirror.carries_word` | `p3_blake2s_air::binary::generation::carries_word` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.g_words` | `p3_blake2s_air::binary::generation::g_words` | not translated | 6 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sBinaryCols` | `p3_blake2s_air::binary::columns::Blake2sBinaryCols` | not translated | 6 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sBinaryCols.cells` | `p3_blake2s_air::binary::columns::Blake2sBinaryCols` | not translated | 4 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sBinaryCols.ofCells` | `{impl core::borrow::Borrow<p3_blake2s_air::binary::columns::Blake2sBinaryCols<T>> for [T]}::borrow` | not translated | 2 |
+| `blake2s-air` | `p3_blake2s_air.mirror.word_to_bits_le` | `p3_blake2s_air::binary::generation::word_to_bits_le` | not translated | 4 |
+| `blake2s-air` | `p3_blake2s_air.mirror.generate_g` | `p3_blake2s_air::binary::generation::generate_g` | not translated | 4 |
+| `blake2s-air` | `p3_blake2s_air.mirror.generate_trace_row` | `p3_blake2s_air::binary::generation::generate_trace_row` | not translated | 4 |
+| `blake2s-air` | `p3_blake2s_air.mirror.generate_binary_trace_rows` | `p3_blake2s_air::binary::generation::generate_binary_trace_rows` | not translated | 3 |
+| `blake2s-air` | `p3_blake2s_air.mirror.read_word` | `p3_blake2s_air::binary::generation::read_word` | not translated | 4 |
+| `blake2s-air` | `p3_blake2s_air.mirror.state_after_round` | `p3_blake2s_air::binary::generation::Blake2sBinaryCols::state_after_round` | not translated | 3 |
+| `blake2s-air` | `p3_blake2s_air.mirror.compression_output` | `p3_blake2s_air::binary::generation::Blake2sBinaryCols::compression_output` | not translated | 2 |
 | `blake3-air` | `p3_blake3_air.mirror.BITS_PER_LIMB` | `p3_blake3_air::constants::BITS_PER_LIMB` | not translated | 9 |
 | `blake3-air` | `p3_blake3_air.mirror.U32_LIMBS` | `p3_blake3_air::constants::U32_LIMBS` | not translated | 0 |
 | `blake3-air` | `p3_blake3_air.mirror.IV` | `p3_blake3_air::constants::IV` | not translated | 18 |
@@ -1612,7 +1655,7 @@ counts the claims (of 1615) whose dependencies include the declaration.
 | `sha256-air` | `p3_sha256_air.mirror.Sha256RoundCols` | `p3_sha256_air::columns::Sha256RoundCols` | not translated | 3 |
 | `sha256-air` | `p3_sha256_air.mirror.Sha256Cols` | `p3_sha256_air::columns::Sha256Cols` | not translated | 3 |
 | `sha256-air` | `p3_sha256_air.mirror.Sha256Cols.cells` | `p3_sha256_air::columns::Sha256Cols` | not translated | 3 |
-| `sha256-air` | `p3_sha256_air.mirror.u32_to_bits_le` | `p3_air::utils::u32_to_bits_le` | not translated | 8 |
+| `sha256-air` | `p3_sha256_air.mirror.u32_to_bits_le` | `p3_air::utils::u32_to_bits_le` | not translated | 13 |
 | `sha256-air` | `p3_sha256_air.mirror.u32_to_limbs` | `p3_sha256_air::constants::u32_to_limbs` | not translated | 3 |
 | `sha256-air` | `p3_sha256_air.mirror.WorkVars` | `p3_sha256_air::generation::generate_trace_row_for_compression` | not translated | 3 |
 | `sha256-air` | `p3_sha256_air.mirror.generate_trace_row_for_compression` | `p3_sha256_air::generation::generate_trace_row_for_compression` | not translated | 3 |
@@ -1631,7 +1674,7 @@ counts the claims (of 1615) whose dependencies include the declaration.
 | `sha256-air` | `p3_sha256_air.mirror.binary.num_constraints` | `{impl p3_air::air::BaseAir<F> for p3_sha256_air::binary::air::Sha256BinaryAir}::num_constraints` | not translated | 1 |
 | `sha256-air` | `p3_sha256_air.mirror.binary.xor3_rot` | `p3_sha256_air::binary::air::xor3_rot` | not translated | 4 |
 | `sha256-air` | `p3_sha256_air.mirror.binary.xor3_shift` | `p3_sha256_air::binary::air::xor3_shift` | not translated | 4 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.maj` | `p3_sha256_air::binary::air::maj` | not translated | 4 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.maj` | `p3_sha256_air::binary::air::maj` | not translated | 9 |
 | `sha256-air` | `p3_sha256_air.mirror.binary.add_many_step` | `p3_sha256_air::binary::air::add_many` | not translated | 4 |
 | `sha256-air` | `p3_sha256_air.mirror.binary.add_many` | `p3_sha256_air::binary::air::add_many` | not translated | 4 |
 | `sha256-air` | `p3_sha256_air.mirror.binary.eval` | `{impl p3_air::air::Air<AB> for p3_sha256_air::binary::air::Sha256BinaryAir}::eval` | not translated | 4 |
@@ -1969,6 +2012,30 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BinaryPcs.try_with_folding` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryPcs.verify_query_paths.complete` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryPcs.verify_query_paths.no_panic` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.G_SCHEDULE.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.G_SCHEDULE.eq_rfc` | `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.add_planes.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.carries_word.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.g_words.eq_rfc` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.g_words.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.g_words.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.xor_rotate_right.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.check_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.constants.IV.eq_rfc` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.constants.SIGMA.eq_rfc` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.degree_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.generate_binary_trace_rows.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.generate_trace_row.output` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.num_constraints_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.read_word.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.row_sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.sound.inputs` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.spec.hash_abc` | `Quot.sound`, `propext` |
+| `Blake2sAir.spec.rounds_abc` | `Quot.sound`, `propext` |
+| `Blake2sAir.spec.selftest` | `Quot.sound`, `propext` |
+| `Blake2sAir.state_after_round.panics` | `Quot.sound`, `propext` |
 | `Blake3Air.add2_small_field` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake3Air.add3_small_field` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake3Air.binary.complete` | `Classical.choice`, `Quot.sound`, `propext` |
