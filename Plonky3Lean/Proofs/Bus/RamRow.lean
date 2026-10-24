@@ -11,7 +11,11 @@ The constraints are evaluated by a builder that collects every asserted value.
 
 A row satisfies them when every collected value is zero.
 
-The strict comparison then gives `value(right) = value(left) + value(delta)` with a nonzero gap, whenever its enabling factor is nonzero.
+Whenever its enabling factor is nonzero, the strict comparison then gives a nonzero gap and
+
+```text
+    value(right) = value(left) + value(delta)
+```
 -/
 
 namespace Plonky3Lean.Proofs.Bus
@@ -91,7 +95,9 @@ theorem foldlM_app' (body : Collect F → ℕ → Option (Collect F)) (ls : ℕ 
 theorem getElem?_of_lt {l : List F} {i : ℕ} (h : i < l.length) : l[i]? = some (l.getD i 0) := by
   simp [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem h]
 
-/-- The running flag a digit is compared against: the digit itself, then the or of the previous flag and the digit. -/
+/-- The running flag a digit is compared against.
+
+It is the digit itself, then the or of the previous flag and the digit. -/
 def running (delta nonzero : List F) (i : ℕ) : F :=
   if i = 0 then delta.getD 0 0
   else p3_bus.ram.mirror.or (fieldExprOps F) (nonzero.getD (i - 1) 0) (delta.getD i 0)
@@ -102,7 +108,12 @@ def digitAsserts (left right delta carry nonzero : List F) (i : ℕ) : List F :=
    carry.getD (i + 1) 0 - majority (fieldExprOps F) (left.getD i 0) (delta.getD i 0) (carry.getD i 0),
    nonzero.getD i 0 - running delta nonzero i]
 
-/-- **The comparison asserts**, in order: the zero carry in, three values per digit, the zero carry out, and the nonzero gap. -/
+/-- **The comparison asserts**, in order:
+
+- the zero carry in
+- three values per digit
+- the zero carry out
+- the nonzero gap. -/
 theorem strict_increase_eq {B : AirBuilder F F (Collect F)} {c : F} (hB : IsCollect B c)
     (s : Collect F) (en : F) {left right delta carry nonzero : List F}
     (hr : right.length = left.length) (hd : left.length ≤ delta.length)
@@ -138,7 +149,15 @@ theorem strict_increase_eq {B : AirBuilder F F (Collect F)} {c : F} (hB : IsColl
     · simp [hi]
 
 
-/-- **The comparison is an unsigned strict order.** If the comparison's asserts vanish, its enabling factors are nonzero, and the earlier key and the gap are bits, then right = left + delta as k-digit numbers, with a nonzero gap. -/
+/-- **The comparison is an unsigned strict order.**
+
+Suppose that:
+
+- the comparison's asserts vanish
+- its enabling factors are nonzero
+- the earlier key and the gap are bits.
+
+Then right = left + delta as k-digit numbers, with a nonzero gap. -/
 theorem strict_increase_sound {c en : F} (hc : c ≠ 0) (hen : en ≠ 0)
     {left right delta carry nonzero : List F} (hk : 0 < left.length)
     (hl : ∀ i < left.length, IsBit (left.getD i 0)) (hd : ∀ i < left.length, IsBit (delta.getD i 0))

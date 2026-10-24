@@ -11,11 +11,13 @@ public import Plonky3Lean.Proofs.Symmetric.Compression
 
 The extraction is generic over the field and the permutation.
 
-The field enters through its trait dictionaries, and the proofs assume only what each member the code calls returns:
+The field enters through its trait dictionaries.
 
-* `ZERO` is `0`, `from_u8 k` is `k`, and `+=` adds, in some `AddMonoidWithOne` structure on the field type;
-* `clone` of a field element is the element itself;
-* the permutation computes a function `f` on states and never panics.
+The proofs assume only what each member the code calls returns:
+
+- zero is 0, the cast of a byte k is k, and in-place addition adds, in some additive monoid with one
+- cloning a field element returns the element itself
+- the permutation computes a function f on states and never panics.
 -/
 
 open CoreModels Aeneas
@@ -24,14 +26,14 @@ open Plonky3Lean.Spec.Duplex Plonky3Lean.Proofs.Symmetric
 
 namespace Plonky3Lean.Proofs.Challenger
 
-/-- The members of `PrimeCharacteristicRing` the duplexing step calls compute `0`, the cast of a byte, and addition. -/
+/-- The ring members the duplexing step calls compute 0, the cast of a byte, and addition. -/
 structure RingComputes {F : Type} [AddMonoidWithOne F] (inst : p3_field.field.PrimeCharacteristicRing F) :
     Prop where
   zero : inst.ZERO = .ok 0
   from_u8 : ∀ k : Std.U8, inst.from_u8 k = .ok (k.val : F)
   add_assign : ∀ a b : F, inst.coreopsarithAddAssignInst.add_assign a b = .ok (a + b)
 
-/-- `clone` of a value is the value. -/
+/-- Cloning a value returns the value. -/
 def CloneIsId {F : Type} (inst : core.marker.Copy F) : Prop := ∀ x, inst.cloneCloneInst.clone x = .ok x
 
 theorem vec_drain_full {T : Type} (v : alloc.vec.Vec T) :
@@ -91,7 +93,7 @@ theorem enumerate_next_none {I T : Type} (inst : core.iter.traits.iterator.Itera
   rw [e, bind_ok]
   rfl
 
-/-- Writing the drained inputs at positions `c, c + 1, ...` of the state. -/
+/-- Writing the drained inputs at positions c, c + 1, ... of the state. -/
 theorem duplexing_loop_eq {F : Type} {W : Std.Usize} :
     ∀ (xs : List F) (d : alloc.vec.drain.Drain F alloc.alloc.Global) (c : Std.Usize) (a : Std.Array F W),
       d.1.val = xs → c.val + xs.length ≤ W.val →
@@ -192,7 +194,7 @@ theorem fill_loop_eq {T : Type} (cl : core.clone.Clone T) (hcl : ∀ x, cl.clone
         List.drop_set_of_lt (by omega), List.replicate_succ]
       simp
 
-/-- `fill` writes the value at every position, for a type whose clone is the value itself. -/
+/-- Filling writes the value at every position, for a type whose clone is the value itself. -/
 theorem fill_eq {T : Type} (cl : core.clone.Clone T) (hcl : ∀ x, cl.clone x = .ok x) (s : Slice T) (v : T) :
     ∃ s', core.slice.Slice.fill cl s v = .ok s' ∧ s'.val = List.replicate s.val.length v := by
   unfold core.slice.Slice.fill
@@ -242,7 +244,7 @@ theorem extend_loop_unfold {T I : Type} (inst : core.iter.traits.iterator.Iterat
   funext r
   rcases r with ⟨v', it'⟩ | x <;> rfl
 
-/-- `Vec::extend` from an iterator that yields `xs` appends `xs`. -/
+/-- Extending a vector from an iterator that yields xs appends xs. -/
 theorem extend_loop_eq {T I : Type} (inst : core.iter.traits.iterator.Iterator I T) :
     ∀ (xs : List T) (v : alloc.vec.Vec T) (it : I), Yields inst it xs →
       v.val.length + xs.length ≤ Usize.max →
@@ -296,7 +298,11 @@ def vnil (T : Type) : alloc.vec.Vec T := Slice.new T
 def toSt {F P : Type} {W R : Std.Usize} (c : p3_challenger.duplex_challenger.DuplexChallenger F P W R) : St F :=
   ⟨c.sponge_state.val, c.input_buffer.val, c.output_buffer.val⟩
 
-/-- The padded state, written as the code builds it: the inputs, then zeros up to the rate, then the length added to cell `r`. -/
+/-- The padded state, written as the code builds it:
+
+- the inputs
+- then zeros up to the rate
+- then the length added to cell r. -/
 theorem pad_as_built {F : Type} [AddMonoidWithOne F] (r : ℕ) (s σ : List F) (hσ : σ ≠ [])
     (hle : σ.length ≤ r) (hr : r < s.length) :
     let X := (σ ++ s.drop σ.length).take σ.length ++ List.replicate (r - σ.length) 0 ++
@@ -316,9 +322,15 @@ theorem pad_as_built {F : Type} [AddMonoidWithOne F] (r : ℕ) (s σ : List F) (
     List.set_append_right _ _ (by rw [hlen]), hlen, Nat.sub_self]
   simp [pad, hσ]
 
-/-- The duplexing step returns the list machine's duplexing, and never panics, when at most `RATE` inputs are pending.
+/-- The duplexing step returns the list machine's duplexing when at most the rate of inputs are pending.
 
-The hypotheses are the constructor's shape checks, the members the step calls, and a permutation that computes `f`. -/
+It never panics then.
+
+The hypotheses are:
+
+- the constructor's shape checks
+- the members the step calls
+- a permutation that computes f. -/
 theorem duplexing_eq {F P : Type} [AddMonoidWithOne F] {W R : Std.Usize}
     (copyInst : core.marker.Copy F)
     (permInst : p3_symmetric.permutation.CryptographicPermutation P (Std.Array F W))
@@ -335,7 +347,8 @@ theorem duplexing_eq {F P : Type} [AddMonoidWithOne F] {W R : Std.Usize}
     (by simp; omega)
   have hlenv : (Slice.len c.input_buffer).val = c.input_buffer.val.length := by simp [Slice.len]
   unfold p3_challenger.duplex_challenger.DuplexChallenger.duplexing
-  -- The same program, with each pair read through its projections and each vector typed as one.
+  -- The same program, with each pair read through its projections.
+  -- Each vector is typed as one.
   show ∃ c', (do
     let n ← alloc.vec.Vec.len c.input_buffer
     massert (n ≤ R)
@@ -419,7 +432,9 @@ theorem duplexing_eq {F P : Type} [AddMonoidWithOne F] {W R : Std.Usize}
           show ((0#usize : Std.Usize) : ℕ) = 0 from rfl, List.take_zero, List.nil_append, Nat.zero_add]
       simp [toSt, St.duplexing, hv2, ha2, hsetv]
 
-/-- Observing a value returns the list machine's observation, and never panics, while fewer than `RATE` inputs are pending. -/
+/-- Observing a value returns the list machine's observation while fewer than the rate of inputs are pending.
+
+It never panics then. -/
 theorem observe_eq {F P : Type} [AddMonoidWithOne F] {W R : Std.Usize}
     (copyInst : core.marker.Copy F)
     (ringInst : p3_field.field.PrimeCharacteristicRing F)
@@ -451,9 +466,11 @@ theorem observe_eq {F P : Type} [AddMonoidWithOne F] {W R : Std.Usize}
     · simp only [hR, ↓reduceIte]
     · simp [toSt, St.observe, hv1, hfull]
 
-/-- The constructor panics exactly when `0 < RATE < WIDTH` or `RATE <= 255` fails.
+/-- The constructor panics exactly when 0 < rate < width or rate <= 255 fails.
 
-Otherwise the sponge is `WIDTH` copies of the default value and both buffers are empty. -/
+Otherwise the sponge is width copies of the default value.
+
+Both buffers are empty. -/
 theorem new_eq {F P : Type} {W : Std.Usize} (R : Std.Usize) (copyInst : core.marker.Copy F)
     (permInst : p3_symmetric.permutation.CryptographicPermutation P (Std.Array F W))
     (defInst : core.default.Default F) (hcopy : CloneIsId copyInst) (z : F)
@@ -484,7 +501,7 @@ theorem new_eq {F P : Type} {W : Std.Usize} (R : Std.Usize) (copyInst : core.mar
     · simp only [toSt, St.mk.injEq]
       refine ⟨List.eq_replicate_iff.2 ⟨by simp, ha⟩, rfl, rfl⟩
 
-/-- Finalizing duplexes once more and returns the first `RATE` cells of the new state. -/
+/-- Finalizing duplexes once more and returns the first rate cells of the new state. -/
 theorem finalize_eq {F P : Type} [AddMonoidWithOne F] [Inhabited F] {W R : Std.Usize}
     (copyInst : core.marker.Copy F)
     (ringInst : p3_field.field.PrimeCharacteristicRing F)
@@ -548,7 +565,9 @@ theorem vec_is_empty_eq {T : Type} (v : alloc.vec.Vec T) :
 
 set_option allowUnsafeReducibility true in
 attribute [local reducible] alloc.vec.Vec rust_primitives.sequence.Seq in
-/-- Sampling the base field returns the list machine's sample, and never panics, while at most `RATE` inputs are pending. -/
+/-- Sampling the base field returns the list machine's sample while at most the rate of inputs are pending.
+
+It never panics then. -/
 theorem sample_eq {F P : Type} [AddMonoidWithOne F] {W R : Std.Usize}
     (copyInst : core.marker.Copy F)
     (permInst : p3_symmetric.permutation.CryptographicPermutation P (Std.Array F W))

@@ -6,13 +6,17 @@ public import Plonky3Lean.Proofs.Dft.Glue
 @[expose] public section
 
 /-!
-# p3-circle: the butterfly network of the circle FFT computes the FFT-basis evaluation
+# p3-circle: the circle FFT network computes the FFT-basis evaluation
 
 The proof follows Theorem 2 of the paper, read backwards.
 
-The first layer splits f = f_0 + v_(n-1) f_1 over the two halves of the domain, where v_(n-1) is the constant plus or minus t.
+The first layer splits f = f_0 + v_(n-1) f_1 over the two halves of the domain.
 
-The remaining layers are two independent transforms of half the size, on the twin cosets S + <2 g> and S + g + <2 g>.
+There v_(n-1) is the constant plus or minus t.
+
+The remaining layers are two independent transforms of half the size.
+
+They run on the twin cosets S + <2 g> and S + g + <2 g>.
 
 Row 2 b of the output holds the value at S + rev(b) g, and row 2 b + 1 the value at its conjugate:
 
@@ -76,7 +80,10 @@ theorem fftEval_succ {n : ℕ} (hn : 1 ≤ n) (c : ℕ → V) (P : C K) :
 
 /-- The twiddle of layer j, block b, on the twin coset S + <g> of size 2^n.
 
-Layer 0 uses (S + rev(b) g).y, layer j >= 1 uses (2^(j-1) (S + rev(b) g)).x, with rev on n - 1 - j bits. -/
+- layer 0 uses (S + rev(b) g).y
+- layer j >= 1 uses (2^(j-1) (S + rev(b) g)).x
+
+Here rev reverses n - 1 - j bits. -/
 def twC (S g : C K) (n j b : ℕ) : K :=
   if j = 0 then (S + rev (n - 1) b • g).y else (2 ^ (j - 1) • (S + rev (n - 1 - j) b • g)).x
 
@@ -154,7 +161,9 @@ theorem layer_top (op op' : ℕ → ℕ → W → W → W × W) (m nb : ℕ) (ho
   unfold layer
   simp only [hi, ↓reduceIte, show i < 2 * nb * (2 * m) by nlinarith, hop _ hb]
 
-/-- On the second half, a layer of 2 nb blocks is the layer of the upper nb blocks, on the shifted rows. -/
+/-- On the second half, a layer of 2 nb blocks is the layer of the upper nb blocks.
+
+It acts on the shifted rows. -/
 theorem layer_bot (op : ℕ → ℕ → W → W → W × W) (m nb : ℕ) (hm : 0 < m) (x : ℕ → W) :
     ∀ i < nb * (2 * m), layer op m (2 * nb) x (nb * (2 * m) + i) =
       layer (fun b => op (nb + b)) m nb (fun r => x (nb * (2 * m) + r)) i := by
@@ -185,7 +194,7 @@ end halves
 /-- The decimation-in-time layer j with block twiddles T, on nb blocks of 2^(j+1) rows. -/
 def cl (T : ℕ → K) (j nb : ℕ) : (ℕ → V) → ℕ → V := layer (fun b _ => dit (T b)) (2 ^ j) nb
 
-/-- Layers js in order, layer j with twiddles T j on nbf j blocks. -/
+/-- A list of layers in order, each layer j with its own twiddles and block count. -/
 def runCl (T : ℕ → ℕ → K) (nbf : ℕ → ℕ) (js : List ℕ) (x : ℕ → V) : ℕ → V :=
   js.foldl (fun acc j => cl (T j) j (nbf j) acc) x
 
@@ -205,7 +214,9 @@ theorem runCl_local (T : ℕ → ℕ → K) (nbf : ℕ → ℕ) (H : ℕ) (js : 
     have := hH j (by simp)
     exact layer_local _ _ _ (by rw [this]; exact h) i (by rw [this]; exact hi)
 
-/-- The layers below the top one, on the first half: the network of half the size, on the first half's twiddles. -/
+/-- The layers below the top one, on the first half.
+
+They form the network of half the size, on the first half's twiddles. -/
 theorem runCl_top (T T' : ℕ → ℕ → K) (n : ℕ) (js : List ℕ) (hjs : ∀ j ∈ js, j < n)
     (hT : ∀ j ∈ js, ∀ b < 2 ^ (n - 1 - j), T j b = T' j b) (x : ℕ → V) :
     ∀ i < 2 ^ n, runCl T (fun j => 2 ^ (n - j)) js x i =
@@ -226,7 +237,9 @@ theorem runCl_top (T T' : ℕ → ℕ → K) (n : ℕ) (js : List ℕ) (hjs : �
     rw [e]
     exact layer_top _ _ _ _ (fun b hb => by rw [hT j (by simp) b hb]) x i (by rw [e2]; exact hi)
 
-/-- The layers below the top one, on the second half: the network of half the size, on the second half's twiddles and rows. -/
+/-- The layers below the top one, on the second half.
+
+They form the network of half the size, on the second half's twiddles and rows. -/
 theorem runCl_bot (T T' : ℕ → ℕ → K) (n : ℕ) (js : List ℕ) (hjs : ∀ j ∈ js, j < n)
     (hT : ∀ j ∈ js, ∀ b < 2 ^ (n - 1 - j), T j (2 ^ (n - 1 - j) + b) = T' j b) (x : ℕ → V) :
     ∀ i < 2 ^ n, runCl T (fun j => 2 ^ (n - j)) js x (2 ^ n + i) =
@@ -274,7 +287,9 @@ theorem cl_bot (T : ℕ → K) (n : ℕ) (x : ℕ → V) {j : ℕ} (hj : j < 2 ^
 theorem basis_one (j : ℕ) (P : C K) : basis 1 j P = P.y ^ bit j 0 := by
   simp [basis]
 
-/-- The circle FFT network on 2^n rows evaluates the coefficients in the FFT basis at the points of the output rows.
+/-- The circle FFT network on 2^n rows evaluates the coefficients in the FFT basis.
+
+It evaluates at the points of the output rows.
 
 The step g must have order 2^(n - 1), with 2^(n - 2) g = (-1, 0) when n >= 2. -/
 theorem evalNet_eq {n : ℕ} (hn : 1 ≤ n) (S g : C K) (hg : 2 ≤ n → 2 ^ (n - 2) • g = negOne)

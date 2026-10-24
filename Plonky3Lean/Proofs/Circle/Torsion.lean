@@ -8,13 +8,17 @@ public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 /-!
 # p3-circle: torsion points, and where the vanishing polynomial vanishes
 
-Over any field K with 2 nonzero, the circle embeds in the multiplicative group of the algebraic closure, by (x, y) -> x + i y.
+Take any field K with 2 nonzero.
+
+The circle embeds in the multiplicative group of the algebraic closure, by (x, y) -> x + i y.
 
 So it has at most m points P with m P = 0.
 
 A point of order m therefore generates all of them.
 
-Consequence: the vanishing polynomial of a standard domain vanishes exactly on the domain, at every point of the circle over K, the extensions included.
+Consequence: the vanishing polynomial of a standard domain vanishes exactly on the domain.
+
+This holds at every point of the circle over K, the extensions included.
 
 This is the property Lemma 4 states for the base field.
 -/
@@ -127,7 +131,9 @@ theorem vn_genPt_succ (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {n : ℕ} (hn
   have : 2 * (genPt G 2).x ^ 2 = 0 := by linear_combination hx
   exact pow_eq_zero_iff (n := 2) (by norm_num) |>.mp ((mul_eq_zero.mp this).resolve_left h2)
 
-/-- Over any field with 2 nonzero, v_n vanishes at a point of the circle exactly when the point is in the standard domain of size 2^n. -/
+/-- Take any field with 2 nonzero.
+
+Then v_n vanishes at a point of the circle exactly when the point is in the standard domain of size 2^n. -/
 theorem vn_eq_zero_iff (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {n : ℕ} (hn : 1 ≤ n)
     (hG : n + 1 ≤ G.adicity) (P : C K) :
     vn n P = 0 ↔ ∃ j, P = (2 * j + 1) • genPt G (n + 1) := by

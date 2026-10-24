@@ -19,7 +19,9 @@ An odd tree starts with one binary layer, and every other layer contracts two le
 
 Each pair is a layer's arity and its number of sumcheck rounds.
 
-The leaves past the explicit prefix are ones, and the verifier evaluates their indicator at a point by a binary threshold:
+The leaves past the explicit prefix are ones.
+
+The verifier evaluates their indicator at a point by a binary threshold:
 
 ```text
     padding(n, r) = sum_(n <= i < 2^h) eq(i, r)
@@ -47,7 +49,11 @@ theorem layersLoop_even (h : ℕ) : ∀ (k p : ℕ),
     simp [Function.comp_def]
     intro _ _; omega
 
-/-- **The schedule.** An even height contracts two levels per layer, and an odd height starts with one binary layer. -/
+/-- **The schedule.**
+
+An even height contracts two levels per layer.
+
+An odd height starts with one binary layer. -/
 theorem layers_eq (s : ProductGkrShape) :
     s.layers = if s.log_height % 2 = 0 then
         (List.range (s.log_height / 2)).map fun j => (4, 2 * j)
@@ -99,7 +105,12 @@ theorem layers_rounds (s : ProductGkrShape) :
     · simp
     · simp only [Nat.add_sub_cancel]; ring
 
-/-- **The security profile is accepted.** The dimensions the bus passes to p3-security satisfy its constructor's checks: the collapse coordinates are the height, and there is no layer exactly when the height is zero. -/
+/-- **The security profile is accepted.**
+
+The dimensions the bus passes to p3-security satisfy its constructor's checks:
+
+- the collapse coordinates are the height
+- there is no layer exactly when the height is zero. -/
 theorem security_profile_valid (s : ProductGkrShape) :
     (s.layers.map fun l => Nat.log2 l.1).sum = s.log_height ∧
       (s.log_height = 0 ↔ s.layers.length = 0) := by
@@ -165,7 +176,11 @@ def padStep (n L : ℕ) (acc : F × F) (cb : F × ℕ) : F × F :=
   if (n >>> (L - 1 - cb.2)) % 2 = 1 then (acc.1 + acc.2 * (1 - cb.1), acc.2 * cb.1)
   else (acc.1, acc.2 * (1 - cb.1))
 
-/-- **The threshold fold.** Over the coordinates from index k, it adds the mass of the vertices below the low bits of n, scaled by the running eq. -/
+/-- **The threshold fold.**
+
+It runs over the coordinates from index k.
+
+It adds the mass of the vertices below the low bits of n, scaled by the running eq. -/
 theorem foldl_padStep (n L : ℕ) : ∀ (l : List F) (k : ℕ) (b e : F), k + l.length = L →
     (l.zipIdx k).foldl (padStep n L) (b, e) =
       (b + e * prefixEq l (n % 2 ^ l.length), e * eq (vertex l.length (n % 2 ^ l.length)) l)
@@ -192,7 +207,11 @@ theorem foldl_padStep (n L : ℕ) : ∀ (l : List F) (k : ℕ) (b e : F), k + l.
         by omega, Nat.add_sub_cancel]
       congr 1 <;> ring
 
-/-- **The identity padding.** On a point of the statement's dimension and a prefix that fits, the verifier's threshold evaluation is the sum of eq(i, r) over the padded addresses. -/
+/-- **The identity padding.**
+
+Take a point of the statement's dimension and a prefix that fits.
+
+The verifier's threshold evaluation is then the sum of eq(i, r) over the padded addresses. -/
 theorem identity_padding_evaluation_eq (s : ProductGkrShape) (n : ℕ) (point : List F)
     (hp : point.length = s.log_height) (hn : n ≤ 2 ^ s.log_height) :
     s.identity_padding_evaluation n point =

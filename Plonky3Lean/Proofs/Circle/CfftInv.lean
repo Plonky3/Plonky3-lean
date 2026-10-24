@@ -7,17 +7,21 @@ public import Plonky3Lean.Proofs.Circle.Cfft
 /-!
 # p3-circle: the inverse circle FFT
 
-A decimation-in-frequency layer with the inverted twiddles undoes a decimation-in-time layer, up to a factor 2:
+A decimation-in-frequency layer with the inverted twiddles undoes a decimation-in-time layer.
+
+It does so up to a factor 2:
 
 ```text
     (a, b)  ->  (a + t b, a - t b)  ->  (2 a, 2 t^(-1) t b) = (2 a, 2 b)
 ```
 
-interpolate runs these layers in the opposite order and scales by 1 / 2^n.
+Interpolation runs these layers in the opposite order and scales by 1 / 2^n.
 
-So interpolate and evaluate are mutually inverse on a twin coset whose twiddles are nonzero.
+So interpolation and evaluation are mutually inverse on a twin coset whose twiddles are nonzero.
 
-On a standard domain they are: no twiddle is the coordinate of a point of order 2 or 4.
+On a standard domain the twiddles are nonzero.
+
+No twiddle there is the coordinate of a point of order 2 or 4.
 -/
 
 namespace Plonky3Lean.Proofs.Circle
@@ -31,7 +35,11 @@ variable {K : Type _} [Field K] {V : Type} [AddCommGroup V] [Module K V]
 
 /-! ## Telescoping -/
 
-/-- Two families of layers on the rows below H, B j undoing A j up to the factor 2, with B local and linear, for every j of the list. -/
+/-- Two families of layers A and B on the rows below H.
+
+For every j of the list, B j undoes A j up to the factor 2.
+
+The layers B are local and linear. -/
 theorem foldl_inverse (A B : ℕ → (ℕ → V) → ℕ → V) (H : ℕ) (L : List ℕ)
     (hBA : ∀ j ∈ L, ∀ (x : ℕ → V), ∀ i < H, B j (A j x) i = (2 : K) • x i)
     (hloc : ∀ j ∈ L, ∀ {x y : ℕ → V}, (∀ i < H, x i = y i) → ∀ i < H, B j x i = B j y i)
@@ -143,7 +151,7 @@ theorem layer_dit_dif (T T' : ℕ → K) (m nb : ℕ) (hT : ∀ b < nb, T b * T'
     constructor <;> module) x
 
 
-/-! ## interpolate and evaluate -/
+/-! ## Interpolation and evaluation -/
 
 section transforms
 
@@ -181,7 +189,9 @@ theorem dif_smul (t c : K) (a a' : V) : dif t (c • a) (c • a') = (c • (dif
 theorem dit_smul (t c : K) (a a' : V) : dit t (c • a) (c • a') = (c • (dit t a a').1, c • (dit t a a').2) := by
   simp only [dit, Prod.mk.injEq]; constructor <;> module
 
-/-- With nonzero twiddles, interpolate returns the decimation-in-frequency layers on the input, scaled by 1 / 2^n. -/
+/-- With nonzero twiddles, interpolation runs the decimation-in-frequency layers on the input.
+
+It then scales by 1 / 2^n. -/
 theorem interpolate_eq_layers (hV : CircleGenValid G) {n : ℕ} (hn : 1 ≤ n) (hG : n - 1 ≤ G.adicity)
     (S : C K) (htw : ∀ j < n, ∀ b < 2 ^ (n - 1 - j), twC S (genPt G (n - 1)) n j b ≠ 0)
     (v : ℕ → V) :
@@ -213,7 +223,7 @@ theorem interpolate_eq_layers (hV : CircleGenValid G) {n : ℕ} (hn : 1 ≤ n) (
   rw [List.getD_eq_getElem _ _ (by simpa using hb), List.getElem_map, List.getElem_map, List.getElem_range]
 
 
-/-- On as many coefficients as points, evaluate runs the decimation-in-time network. -/
+/-- On as many coefficients as points, evaluation runs the decimation-in-time network. -/
 theorem evaluate_eq_net (hV : CircleGenValid G) {n : ℕ} (hn : 1 ≤ n) (hG : n - 1 ≤ G.adicity)
     (S : C K) (x : ℕ → V) :
     evaluate G ⟨n, ofC S⟩ (2 ^ n) x =
@@ -243,7 +253,9 @@ theorem fl_local (S g : C K) {n j : ℕ} (hj : j < n) {x y : ℕ → V} (h : ∀
   intro i hi
   exact layer_local _ _ _ (by rw [e]; exact h) i (by rw [e]; exact hi)
 
-/-- Decimation-in-time after decimation-in-frequency, with the same twiddles, multiplies every row below 2^n by 2^n. -/
+/-- Decimation-in-time after decimation-in-frequency, with the same twiddles, scales rows by 2^n.
+
+This holds for every row below 2^n. -/
 theorem dl_fl (S g : C K) {n : ℕ} (htw : ∀ j < n, ∀ b < 2 ^ (n - 1 - j), twC S g n j b ≠ 0)
     (x : ℕ → V) :
     ∀ i < 2 ^ n, (List.range n).reverse.foldl (fun acc j => dl S g n j acc)
@@ -281,7 +293,11 @@ theorem foldl_dl_smul (S g : C K) (n : ℕ) (L : List ℕ) (c : K) (x : ℕ → 
     rw [show dl S g n a (scaleRows c x) = scaleRows c (dl S g n a x) from
       funext fun i => layer_smul_row (fun b s c a a' => dit_smul _ c a a') c x i, ih]
 
-/-- The circle FFT, Theorem 2: with nonzero twiddles, interpolate returns coefficients whose polynomial in the FFT basis takes the given values at the points of the rows. -/
+/-- The circle FFT, Theorem 2.
+
+With nonzero twiddles, interpolation returns coefficients in the FFT basis.
+
+Their polynomial takes the given values at the points of the rows. -/
 theorem interpolate_spec (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {n : ℕ} (hn : 1 ≤ n)
     (hG : n - 1 ≤ G.adicity) (S : C K)
     (htw : ∀ j < n, ∀ b < 2 ^ (n - 1 - j), twC S (genPt G (n - 1)) n j b ≠ 0) (v : ℕ → V) :
@@ -295,7 +311,7 @@ theorem interpolate_spec (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {n : ℕ} 
   rw [← hy, foldl_dl_smul, scaleRows, dl_fl _ _ htw v i hi, smul_smul,
     inv_mul_cancel₀ (pow_ne_zero n h2), one_smul]
 
-/-- interpolate undoes evaluate, on as many coefficients as points, with nonzero twiddles. -/
+/-- Interpolation undoes evaluation, on as many coefficients as points, with nonzero twiddles. -/
 theorem interpolate_evaluate (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {n : ℕ} (hn : 1 ≤ n)
     (hG : n - 1 ≤ G.adicity) (S : C K)
     (htw : ∀ j < n, ∀ b < 2 ^ (n - 1 - j), twC S (genPt G (n - 1)) n j b ≠ 0) (c : ℕ → V) :

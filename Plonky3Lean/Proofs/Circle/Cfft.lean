@@ -8,8 +8,14 @@ public import Plonky3Lean.Proofs.Circle.CfftNet
 /-!
 # p3-circle: the circle FFT
 
-* The twiddle tables are the coordinates of the half coset: layer 0 the y-coordinates, layer j >= 1 the x-coordinates after j - 1 squarings, all in bit-reversed order.
-* evaluate maps 2^m coefficients to the values, in circle FFT order, of the polynomial with those coefficients in the FFT basis, on a twin coset of size 2^n >= 2^m.
+The twiddle tables are the coordinates of the half coset, all in bit-reversed order:
+
+- layer 0 holds the y-coordinates
+- layer j >= 1 holds the x-coordinates after j - 1 squarings.
+
+Evaluation works on a twin coset of size 2^n >= 2^m.
+
+It maps 2^m coefficients in the FFT basis to the values of their polynomial, in circle FFT order.
 -/
 
 namespace Plonky3Lean.Proofs.Circle
@@ -151,7 +157,7 @@ theorem runLayer_dup {n l : ℕ} (hl : l < n) (x : ℕ → V) :
   simp only [runLayer, CfftLayer.blocks, hm]
   rw [pairLoop_blocks _ _ (by positivity)]
 
-/-- Row i of a block decomposition: i mod 2^(a+1) is i mod 2^a, plus 2^a when the high half. -/
+/-- Row i of a block decomposition: i mod 2^(a+1) is i mod 2^a, plus 2^a in the high half. -/
 theorem mod_two_pow_succ (i a : ℕ) :
     i % 2 ^ a = if i % 2 ^ (a + 1) < 2 ^ a then i % 2 ^ (a + 1) else i % 2 ^ (a + 1) - 2 ^ a := by
   have h1 : i % 2 ^ a = i % 2 ^ (a + 1) % 2 ^ a :=
@@ -288,10 +294,14 @@ theorem foldl_congr_mem {α β : Type _} (l : List α) {f g : β → α → β} 
 
 end layers
 
-/-! ## evaluate -/
+/-! ## Evaluation -/
 
 open p3_dft.butterflies.mirror in
-/-- evaluate maps 2^m coefficients to the values, in circle FFT order, of their polynomial in the FFT basis of order m, on the twin coset of size 2^n with shift S.
+/-- Evaluation on the twin coset of size 2^n with shift S.
+
+It maps 2^m coefficients to the values of their polynomial in the FFT basis of order m.
+
+The values come in circle FFT order.
 
 Row 2 b holds the value at S + rev(b) g, and row 2 b + 1 the value at its conjugate. -/
 theorem evaluate_eq {V : Type _} [AddCommGroup V] [Module K V] (hV : CircleGenValid G) {n m : ℕ}

@@ -8,13 +8,17 @@ public import Plonky3Lean.Proofs.Circle.CfftStd
 /-!
 # p3-circle: circle FRI folding
 
-The first layer folds along the involution J, with y as the odd reference function, as in equations (14) and (15):
+The first layer folds along the involution J, with y as the odd reference function.
+
+This follows equations (14) and (15):
 
 ```text
     f(P) = f_0(x) + y f_1(x),     fold(f) = f_0 + beta f_1
 ```
 
-The later layers fold along x -> -x, with x as the odd reference function, as in equations (17) and (18):
+The later layers fold along x -> -x, with x as the odd reference function.
+
+This follows equations (17) and (18):
 
 ```text
     g(x) = g_0(pi(x)) + x g_1(pi(x)),     fold(g) = g_0 + beta g_1
@@ -67,7 +71,9 @@ theorem xEval_split (m : ℕ) (d : ℕ → K) (x : K) :
 
 theorem piX_neg (x : K) : piX (-x) = piX x := by simp [piX]
 
-/-- The x-fold, equations (17) to (19): the fold of the values at x and -x is the even part plus beta times the odd part, at pi(x). -/
+/-- The x-fold, equations (17) to (19).
+
+The fold of the values at x and -x is the even part plus beta times the odd part, at pi(x). -/
 theorem foldPair_xEval (h2 : (2 : K) ≠ 0) {x : K} (hx : x ≠ 0) (m : ℕ) (d : ℕ → K) (β : K) :
     foldPair x β (xEval (m + 1) d x) (xEval (m + 1) d (-x)) =
       xEval m (fun k => d (2 * k) + β * d (2 * k + 1)) (piX x) := by
@@ -109,7 +115,9 @@ theorem fftEval_split (m : ℕ) (c : ℕ → K) (P : C K) :
   · refine sum_congr rfl fun k _ => ?_
     rw [basis_split m k 1 (by norm_num)]; simp only [smul_eq_mul]; ring
 
-/-- The first-layer fold, equations (14) to (16): the fold of the values at P and J(P) is the even part plus beta times the odd part, at P.x. -/
+/-- The first-layer fold, equations (14) to (16).
+
+The fold of the values at P and J(P) is the even part plus beta times the odd part, at P.x. -/
 theorem foldPair_fftEval (h2 : (2 : K) ≠ 0) {P : C K} (hy : P.y ≠ 0) (m : ℕ) (c : ℕ → K) (β : K) :
     foldPair P.y β (fftEval (m + 1) c P) (fftEval (m + 1) c (-P)) =
       xEval m (fun k => c (2 * k) + β * c (2 * k + 1)) P.x := by
@@ -143,7 +151,9 @@ theorem y_twiddles_eq (hV : CircleGenValid G) {n : ℕ} (S : C K) (hn : 1 ≤ n)
     Option.bind_eq_bind, Option.bind_some, chain_ofC, List.map_map]
   exact congrArg some (revList_map_range 0 (fun i => (S + i • genPt G (n - 1)).y) (n - 1))
 
-/-- The x-twiddles of layer 0 of a twin coset: the x-coordinates of its first 2^(n-2) half-coset points, in bit-reversed order. -/
+/-- The x-twiddles of layer 0 of a twin coset.
+
+They are the x-coordinates of its first 2^(n-2) half-coset points, in bit-reversed order. -/
 theorem x_twiddles_zero_eq (hV : CircleGenValid G) {n : ℕ} (S : C K) (hn : 2 ≤ n)
     (hG : n - 1 ≤ G.adicity) :
     x_twiddles G ⟨n, ofC S⟩ 0 =
@@ -182,7 +192,7 @@ theorem add_genPt_one_x (hV : CircleGenValid G) (h1 : 1 ≤ G.adicity) (P : C K)
   rw [genPt, toC_of_on (hV.on_circle 1 h1), C.add_x]
   simp [hV.gen_one h1]
 
-/-- The x-coordinate of the point b of the bit-reversed half coset of the standard domain of size 2^m. -/
+/-- The x-coordinate X(m, b) of point b of the bit-reversed half coset of the standard domain of size 2^m. -/
 noncomputable def Xp (G : p3_dft.mirror.Gen (K × K)) (m b : ℕ) : K :=
   (genPt G (m + 1) + rev (m - 1) b • genPt G (m - 1)).x
 
@@ -192,7 +202,9 @@ theorem zip_map_map {α β γ : Type _} (f : α → β) (g : α → γ) (l : Lis
   | nil => rfl
   | cons a l ih => simp [ih]
 
-/-- The first-layer fold of the codeword of f on the standard domain of size 2^n, n >= 1, rows (f(P_b), f(J(P_b))), is the codeword of f_0 + beta f_1 at the x-coordinates P_b.x. -/
+/-- Take the codeword of f on the standard domain of size 2^n, n >= 1, with rows (f(P_b), f(J(P_b))).
+
+Its first-layer fold is the codeword of f_0 + beta f_1 at the x-coordinates P_b.x. -/
 theorem fold_y_spec (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {n : ℕ} (hn : 1 ≤ n)
     (hG : n + 1 ≤ G.adicity) (c : ℕ → K) (β : K) :
     fold_y G β ((List.range (2 ^ (n - 1))).map fun b =>
@@ -219,7 +231,9 @@ theorem fold_y_spec (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {n : ℕ} (hn :
   simp only [Nat.add_sub_cancel] at hy0 ⊢
   rw [foldPair_fftEval h2 hy0, Xp, Nat.add_sub_cancel]
 
-/-- The x-fold of a codeword of 2^(r+1) values at the points Xp(r + 2, b) is the codeword of g_0 + beta g_1 at the points Xp(r + 1, c). -/
+/-- Take a codeword of 2^(r+1) values at the points X(r + 2, b).
+
+Its x-fold is the codeword of g_0 + beta g_1 at the points X(r + 1, c). -/
 theorem fold_x_spec (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {r : ℕ} (hG : r + 3 ≤ G.adicity)
     (d : ℕ → K) (β : K) :
     fold_x G β 1 ((List.range (2 ^ r)).map fun c =>
@@ -255,7 +269,9 @@ theorem fold_x_spec (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {r : ℕ} (hG :
   simp only [Function.comp_apply]
   rw [← hpt, hodd, foldPair_xEval h2 (by rw [hpt]; exact hnz _ (List.mem_map_of_mem hc)), hpi]
 
-/-- A query's x-fold of one row uses the twiddle of the matrix fold at that row, and panics exactly on an arity other than 2 or a row of another length. -/
+/-- A query's x-fold of one row uses the twiddle of the matrix fold at that row.
+
+It panics exactly on an arity other than 2 or a row of another length. -/
 theorem fold_x_row_spec (hV : CircleGenValid G) {lfh : ℕ} (hG : lfh + 3 ≤ G.adicity) (index : ℕ)
     (β e0 e1 : K) (hx : Xp G (lfh + 2) (2 * index) ≠ 0) :
     fold_x_row G index lfh 1 β [e0, e1] = some (foldPair (Xp G (lfh + 2) (2 * index)) β e0 e1) := by
@@ -272,12 +288,16 @@ theorem fold_x_row_spec (hV : CircleGenValid G) {lfh : ℕ} (hG : lfh + 3 ≤ G.
 noncomputable def Xq (G : p3_dft.mirror.Gen (K × K)) (L t r : ℕ) : K :=
   (genPt G (L + 2 - r) + rev (L - 1 - r) (t / 2 ^ (r + 1)) • genPt G (L - r)).x
 
-/-- Round r's twiddle is the one fold_x_row uses for the index t / 2^(r + 1) at folded log height L - 1 - r. -/
+/-- Round r's twiddle is the one the row x-fold uses for the index t / 2^(r + 1).
+
+The folded log height there is L - 1 - r. -/
 theorem Xq_eq_Xp {L t r : ℕ} (hr : r + 1 ≤ L) : Xq G L t r = Xp G (L - 1 - r + 2) (2 * (t / 2 ^ (r + 1))) := by
   rw [Xq, Xp, show L - 1 - r + 2 - 1 = (L - 1 - r) + 1 by omega, rev_double,
     show L - 1 - r + 2 + 1 = L + 2 - r by omega, show L - 1 - r + 1 = L - r by omega]
 
-/-- One step of the chain: squaring round k's twiddle, and negating it when the next index bit is set, gives round k + 1's. -/
+/-- One step of the chain gives round k + 1's twiddle from round k's.
+
+Square it, and negate it when the next index bit is set. -/
 theorem Xq_succ (hV : CircleGenValid G) {L t k : ℕ} (hk : k + 2 ≤ L - 1) (hG : L + 2 ≤ G.adicity) :
     (if (t / 2 ^ (k + 1)) % 2 = 1 then -Point.vnStep (Xq G L t k) else Point.vnStep (Xq G L t k)) =
       Xq G L t (k + 1) := by
@@ -300,7 +320,9 @@ theorem Xq_succ (hV : CircleGenValid G) {L t k : ℕ} (hk : k + 2 ≤ L - 1) (hG
       rev_double_add_one, add_nsmul, hmid, add_comm (genPt G 1), ← add_assoc,
       add_genPt_one_x hV (by omega), neg_neg]
 
-/-- query_x_twiddles_inv returns the inverted twiddles of every round, and never panics, for at most L - 1 rounds in an instance of log height L with L + 2 <= adicity. -/
+/-- Take an instance of log height L with L + 2 <= adicity, and at most L - 1 rounds.
+
+The query's inverted x-twiddles are then those of every round, and computing them never panics. -/
 theorem query_x_twiddles_inv_eq (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {L R : ℕ} (t : ℕ)
     (hR : 1 ≤ R) (hRL : R + 1 ≤ L) (hG : L + 2 ≤ G.adicity) :
     query_x_twiddles_inv G t L R = some ((List.range R).map fun r => (Xq G L t r)⁻¹) := by

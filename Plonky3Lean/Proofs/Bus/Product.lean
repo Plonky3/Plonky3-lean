@@ -12,7 +12,9 @@ public import Mathlib.Algebra.Order.Ring.NNRat
 /-!
 # The grand-product identity and its soundness count
 
-Two lists of tuples of 2^m slots have equal grand-product polynomials exactly when they are permutations of each other.
+Take two lists of tuples of 2^m slots.
+
+They have equal grand-product polynomials exactly when they are permutations of each other.
 
 The proof views the product as a polynomial in the offset over the ring of polynomials in the point.
 
@@ -20,7 +22,9 @@ That ring is a domain, so a product of linear factors determines its roots with 
 
 The multilinear extension of a tuple of 2^m slots determines the tuple.
 
-Unequal multisets of at most N tuples then agree on at most max(1, m) N |K|^m of the |K|^(m + 1) challenges, by Schwartz-Zippel.
+Unequal multisets of at most N tuples then rarely agree, by Schwartz-Zippel.
+
+They agree on at most max(1, m) N |K|^m of the |K|^(m + 1) challenges.
 -/
 
 namespace Plonky3Lean.Proofs.Bus
@@ -55,7 +59,9 @@ theorem finSuccEquiv_productPoly (m : ℕ) (ts : List (List K)) :
   simp [productPoly, map_list_prod, finSuccEquiv_fingerprintPoly, finSuccEquiv_X_zero,
     Function.comp_def]
 
-/-- **The multiset identity.** Tuples of 2^m slots have equal grand-product polynomials exactly when the two lists are permutations of each other. -/
+/-- **The multiset identity.**
+
+Two lists of tuples of 2^m slots have equal grand-product polynomials exactly when they permute. -/
 theorem productPoly_eq_iff {m : ℕ} {ts ss : List (List K)} (hts : ∀ t ∈ ts, t.length = 2 ^ m)
     (hss : ∀ s ∈ ss, s.length = 2 ^ m) : productPoly m ts = productPoly m ss ↔ ts.Perm ss := by
   refine ⟨fun h => ?_, fun h => (h.map _).prod_eq⟩
@@ -105,7 +111,9 @@ theorem totalDegree_productPoly_le (m : ℕ) (ts : List (List K)) :
 
 /-! ## The soundness count -/
 
-/-- **Schwartz-Zippel** over the offset and the point: a nonzero polynomial of total degree d vanishes on at most d |K|^m of the |K|^(m + 1) challenges. -/
+/-- **Schwartz-Zippel** over the offset and the point.
+
+A nonzero polynomial of total degree d vanishes on at most d |K|^m of the |K|^(m + 1) challenges. -/
 theorem card_roots_le [Fintype K] [DecidableEq K] {m : ℕ} {P : MvPolynomial (Fin (m + 1)) K}
     (hP : P ≠ 0) :
     #{x : K × (Fin m → K) | eval (Fin.cons x.1 x.2) P = 0} ≤
@@ -124,7 +132,13 @@ theorem card_roots_le [Fintype K] [DecidableEq K] {m : ℕ} {P : MvPolynomial (F
   · intro x _ y _ h
     exact Prod.ext (by simpa using congrFun h 0) (funext fun i => by simpa using congrFun h i.succ)
 
-/-- **Soundness of the grand product.** Two lists of at most N tuples of 2^m slots, not permutations of each other, have equal grand products on at most max(1, m) N |K|^m of the |K|^(m + 1) pairs of an offset and a point. -/
+/-- **Soundness of the grand product.**
+
+Take two lists of at most N tuples of 2^m slots, not permutations of each other.
+
+Their grand products agree on at most max(1, m) N |K|^m of the |K|^(m + 1) challenges.
+
+A challenge is a pair of an offset and a point. -/
 theorem card_bad_challenges_le [Fintype K] [DecidableEq K] {m N : ℕ} {ts ss : List (List K)}
     (hts : ∀ t ∈ ts, t.length = 2 ^ m) (hss : ∀ s ∈ ss, s.length = 2 ^ m) (hperm : ¬ ts.Perm ss)
     (hN : ts.length ≤ N) (hN' : ss.length ≤ N) :

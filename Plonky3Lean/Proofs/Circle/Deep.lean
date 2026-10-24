@@ -9,11 +9,17 @@ public import Plonky3Lean.Proofs.Circle.Selectors
 /-!
 # p3-circle: the DEEP quotient on the circle
 
-The crate's single-point vanishing function is v(x) = re + i im with re = 1 - (x - zeta).x and im = (x - zeta).y.
+The crate's single-point vanishing function is v(x) = re + i im, where
+
+```text
+    re = 1 - (x - zeta).x,     im = (x - zeta).y
+```
 
 It is the complex conjugate of the paper's v_P of equation (11), with the same single zero at zeta.
 
-On the circle, re^2 + im^2 = 2 re, so 1 / v = (re - i im) / (2 re) = 1/2 - i im / (2 re).
+On the circle, re^2 + im^2 = 2 re.
+
+So 1 / v = (re - i im) / (2 re) = 1/2 - i im / (2 re).
 
 For g = f(x) - f(zeta), the quotient q = g / v of Proposition 4 then has
 
@@ -21,9 +27,11 @@ For g = f(x) - f(zeta), the quotient q = g / v of Proposition 4 then has
     Re(q) = g / 2,     Im(q) = -g im / (2 re),     q v = g
 ```
 
-and the row reduction is sum_j alpha^j Re(q_j) + alpha^(W + j) Im(q_j), two powers of alpha per column.
+The row reduction is sum_j alpha^j Re(q_j) + alpha^(W + j) Im(q_j).
 
-The prover's accumulated reduction and the verifier's row reduction compute the same value at every query point.
+It uses two powers of alpha per column.
+
+The prover's accumulated reduction and the verifier's row reduction agree at every query point.
 -/
 
 namespace Plonky3Lean.Proofs.Circle
@@ -96,7 +104,11 @@ theorem dot_product_range (f : ℕ → K) (ps : List K) :
     rw [this]
     simp [add_comm]
 
-/-- The verifier's row reduction: none exactly when the query point is the opening point, and otherwise (re - alpha^W im) / (2 re) times sum_j alpha_j (p_j(x) - p_j(zeta)). -/
+/-- The verifier's row reduction.
+
+It is none exactly when the query point is the opening point.
+
+Otherwise it is (re - alpha^W im) / (2 re) times sum_j alpha_j (p_j(x) - p_j(zeta)). -/
 theorem deep_quotient_reduce_row_eq (h2 : (2 : K) ≠ 0) (αW : K) (αs : List K) (P Q : C K)
     (ps qs : List K) :
     deep_quotient_reduce_row αW αs (ofC P) (ofC Q) ps qs =
@@ -109,7 +121,9 @@ theorem deep_quotient_reduce_row_eq (h2 : (2 : K) ≠ 0) (αW : K) (αs : List K
   · simp [h, (v_p_denom_eq_zero h2 Q Q).mpr rfl]
   · simp [h, mt (v_p_denom_eq_zero h2 P Q).mp h]
 
-/-- The row reduction is sum_j alpha^j Re(q_j) + alpha^(W + j) Im(q_j), for q_j the quotient (p_j(x) - p_j(zeta)) / v. -/
+/-- The row reduction is sum_j alpha^j Re(q_j) + alpha^(W + j) Im(q_j).
+
+Here q_j is the quotient (p_j(x) - p_j(zeta)) / v. -/
 theorem reduce_row_eq_re_im (h2 : (2 : K) ≠ 0) (α : K) (P Q : C K) (hPQ : P ≠ Q) (ps qs : List K)
     (hpq : ps.length = qs.length) :
     deep_quotient_reduce_row (α ^ ps.length) ((List.range ps.length).map (α ^ ·)) (ofC P) (ofC Q) ps qs =
@@ -134,7 +148,9 @@ theorem reduce_row_eq_re_im (h2 : (2 : K) ≠ 0) (α : K) (P Q : C K) (hPQ : P �
 
 /-! ## The prover's accumulation -/
 
-/-- The prover's vanishing parts are im / (2 re) at every domain point, and panic exactly when the opening point is a domain point. -/
+/-- The prover's vanishing parts are im / (2 re) at every domain point.
+
+They panic exactly when the opening point is a domain point. -/
 theorem compute_vanishing_parts_eq (h2 : (2 : K) ≠ 0) (pts : List (C K)) (Q : C K) :
     compute_vanishing_parts (pts.map ofC) (ofC Q) =
       if Q ∈ pts then none else some (pts.map fun P =>
@@ -157,7 +173,7 @@ theorem compute_vanishing_parts_eq (h2 : (2 : K) ≠ 0) (pts : List (C K)) (Q : 
     rw [zip_map_map, List.map_map]
     rfl
 
-/-- At a query point, the prover's accumulated DEEP quotient adds offset times the verifier's row reduction. -/
+/-- At a query point, the prover's accumulated DEEP quotient adds an offset times the row reduction. -/
 theorem accumulate_eq_reduce_row (αoff αW : K) (αs ps qs : List K) (P Q : C K) (hPQ : P ≠ Q)
     (h2 : (2 : K) ≠ 0) (hpq : ps.length = qs.length) (has : ps.length ≤ αs.length) :
     (αoff / 2 - αoff * αW * ((Point.v_p (ofC P) (ofC Q)).2 *
@@ -197,7 +213,9 @@ theorem vn_sq (h2 : (2 : K) ≠ 0) (n : ℕ) (hn : 1 ≤ n) (P : C K) :
     vn n P ^ 2 = (2 : K)⁻¹ * (1 + vn (n + 1) P) := by
   rw [vn_succ_eq n hn]; field_simp; ring
 
-/-- The x-coordinates of the odd multiples of a point of order 2^(lb + 1), lb >= 1, sum to zero over 2^L terms, L >= lb. -/
+/-- Take a point of order 2^(lb + 1), with lb >= 1, and L >= lb.
+
+The x-coordinates of its odd multiples sum to zero over 2^L terms. -/
 theorem sum_odd_x_eq_zero (hV : CircleGenValid G) {lb L : ℕ} (hlb : 1 ≤ lb) (hL : lb ≤ L)
     (hG : lb + 1 ≤ G.adicity) :
     ∑ j ∈ range (2 ^ L), ((2 * j + 1) • genPt G (lb + 1)).x = 0 := by
@@ -215,7 +233,9 @@ theorem genPt_order_zero (hV : CircleGenValid G) {k : ℕ} (hk : k ≤ G.adicity
   have := genPt_nsmul hV (j := 0) (k := k) (by omega) hk
   rwa [Nat.sub_zero, genPt_zero hV] at this
 
-/-- Over the standard domain of size 2^L, the squares of v_n at the points sum to 2^(L - 1), for n = L - lb with lb >= 1 and n >= 1. -/
+/-- Take n = L - lb with lb >= 1 and n >= 1.
+
+Over the standard domain of size 2^L, the squares of v_n at the points sum to 2^(L - 1). -/
 theorem sum_vn_sq (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {L lb : ℕ} (hlb : 1 ≤ lb) (hn : lb + 1 ≤ L)
     (hG : L + 1 ≤ G.adicity) :
     ∑ j ∈ range (2 ^ L), vn (L - lb) ((2 * j + 1) • genPt G (L + 1)) ^ 2 = 2 ^ (L - 1) := by
@@ -232,7 +252,9 @@ theorem sum_vn_sq (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {L lb : ℕ} (hlb
   push_cast
   field_simp
 
-/-- The vanishing polynomial v_n at the natural point k of the LDE domain only depends on the zigzag of k mod 2 2^lb. -/
+/-- Take the vanishing polynomial v_n at the natural point k of the LDE domain.
+
+It only depends on the zigzag of k mod 2 2^lb. -/
 theorem vn_zigzag (hV : CircleGenValid G) {L lb : ℕ} (hn : lb + 1 ≤ L) (hG : L + 1 ≤ G.adicity) (k : ℕ) :
     vn (L - lb) ((2 * (if k % (2 * 2 ^ lb) < 2 ^ lb then k % (2 * 2 ^ lb)
       else 2 * 2 ^ lb - 1 - k % (2 * 2 ^ lb)) + 1) • genPt G (L + 1)) =
@@ -263,11 +285,17 @@ theorem list_sum_map_range (f : ℕ → K) (n : ℕ) : ((List.range n).map f).su
   | zero => simp
   | succ n ih => rw [List.range_succ, List.map_append, List.sum_append, ih, sum_range_succ]; simp
 
-/-- The value of the vanishing polynomial that extract_lambda reads at row i: v_n at the natural point sigma(i). -/
+/-- The value of the vanishing polynomial the lambda extraction reads at row i.
+
+It is v_n at the natural point sigma(i). -/
 noncomputable def vdAt (G : p3_dft.mirror.Gen (K × K)) (L lb i : ℕ) : K :=
   vn (L - lb) ((2 * p3_circle.ordering.mirror.cfft_permute_index i L + 1) • genPt G (L + 1))
 
-/-- extract_lambda on an LDE of 2^L values, 2^lb times the trace size, returns lambda = <lde, v_d> / 2^(L - 1) and lde - lambda v_d, where v_d is v_n on the LDE domain in circle FFT order. -/
+/-- Run the lambda extraction on an LDE of 2^L values, 2^lb times the trace size.
+
+It returns lambda = <lde, v_d> / 2^(L - 1) and lde - lambda v_d.
+
+Here v_d is v_n on the LDE domain in circle FFT order. -/
 theorem extract_lambda_eq (hV : CircleGenValid G) {L lb : ℕ} (hlb : 1 ≤ lb) (hn : lb + 1 ≤ L)
     (hG : L + 1 ≤ G.adicity) (h2 : (2 : K) ≠ 0) (lde : List K) (hlen : lde.length = 2 ^ L) :
     extract_lambda G lde lb = some

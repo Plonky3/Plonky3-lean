@@ -9,13 +9,17 @@ public import Plonky3Lean.Proofs.Challenger.Duplex
 
 The hash challenger keeps a list of pending inputs and a list of buffered outputs.
 
-A flush hashes the pending inputs, keeps the digest as the only pending input (the chaining value), and buffers the digest as the outputs.
+A flush hashes the pending inputs.
+
+It keeps the digest as the only pending input, the chaining value.
+
+It also buffers the digest as the outputs.
 
 Observing appends to the inputs and clears the outputs.
 
 Sampling flushes when no output is left and pops the last one.
 
-The hasher is abstract: it computes a function `H` of the items its iterator yields and never panics.
+The hasher is abstract: it computes a function H of the items its iterator yields and never panics.
 
 ```text
     inputs [c], observe a b, sample:   flush: d = H(c, a, b)
@@ -30,7 +34,7 @@ open Plonky3Lean.Proofs.Symmetric
 
 namespace Plonky3Lean.Proofs.Challenger
 
-/-- The hasher, through its dictionary, returns `H xs` for any iterable that yields `xs`. -/
+/-- The hasher, through its dictionary, returns H(xs) for any iterable that yields xs. -/
 def HasherComputes {Hs T : Type} {N : Std.Usize}
     (inst : p3_symmetric.hasher.CryptographicHasher Hs T (Std.Array T N)) (h : Hs)
     (H : List T → Std.Array T N) : Prop :=
@@ -123,7 +127,9 @@ theorem hash_observe_eq {T Hs : Type} {N : Std.Usize} (cl : core.clone.Clone T)
 
 set_option allowUnsafeReducibility true in
 attribute [local reducible] alloc.vec.Vec rust_primitives.sequence.Seq in
-/-- After an observation, a sample flushes and returns the last cell of the digest of every pending input. -/
+/-- After an observation, a sample flushes.
+
+It returns the last cell of the digest of every pending input. -/
 theorem hash_sample_after_observe {T Hs : Type} [Inhabited T] {N : Std.Usize} (cl : core.clone.Clone T)
     (hcl : ∀ x, cl.clone x = .ok x)
     (hashInst : p3_symmetric.hasher.CryptographicHasher Hs T (Std.Array T N)) (H : List T → Std.Array T N)

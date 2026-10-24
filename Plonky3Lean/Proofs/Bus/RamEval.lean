@@ -291,7 +291,11 @@ theorem declare_asserts {st : RamStatement} (m : RowWindow F) (first last trans 
     obtain ⟨l₂, hl₂⟩ := push_asserts m first last trans _ out' .Push image (.Boolean closing)
     exact ⟨l ++ l₁ ++ l₂, by rw [hl₂, hl₁, hl]; simp⟩
 
-/-- **The constraints of a self-contained proof on one row.** If the row's evaluation succeeds with every asserted value zero, the booleanity and order groups vanish. -/
+/-- **The constraints of a self-contained proof on one row.**
+
+Suppose the row's evaluation succeeds with every asserted value zero.
+
+Then the booleanity and order groups vanish. -/
 theorem row_holds {st : RamStatement} (hsp : st.boundary = .SingleProof) (hv : st.validate = .ok ())
     {cur nxt : List F} (hc : cur.length = (stdLayout st).width)
     (hn : nxt.length = (stdLayout st).width) {first last trans : F} {s : Collect F}

@@ -8,13 +8,23 @@ public import Plonky3Lean.Proofs.Bus.Memory
 /-!
 # Read-write memory consistency
 
-A trace of a self-contained memory is accepted when every row's constraints vanish, with p3-air's selectors: the first row, the last row, and every transition.
+A trace of a self-contained memory is accepted when every row's constraints vanish.
 
-Each row decodes to an access: the operation marker 1 is a write, the cell and clock digits are read least significant first, and the value is its components.
+The selectors are p3-air's: the first row, the last row, and every transition.
 
-An accepted trace is sorted strictly by cell, then by clock, and every read returns the value of the access above it in its cell's run, or zero at the run's start.
+Each row decodes to an access:
 
-So the decoded trace is a consistent memory starting from zero, and so is every permutation of it, which is what balancing the access channel against the machine's chips provides.
+- the operation marker 1 is a write
+- the cell and clock digits are read least significant first
+- the value is its components.
+
+An accepted trace is sorted strictly by cell, then by clock.
+
+Every read returns the value of the access above it in its cell's run, or zero at the run's start.
+
+So the decoded trace is a consistent memory starting from zero, and so is every permutation of it.
+
+That is what balancing the access channel against the machine's chips provides.
 -/
 
 namespace Plonky3Lean.Proofs.Bus
@@ -36,7 +46,11 @@ def decode (L : RamLayout) (row : List F) : Access (List F) where
 def rowSelectors (n i : ℕ) : F × F × F :=
   (if i = 0 then 1 else 0, if i = n - 1 then 1 else 0, if i ≠ n - 1 then 1 else 0)
 
-/-- **An accepted trace.** Every row has the AIR's width, and on every row the evaluation succeeds with all asserted values zero. -/
+/-- **An accepted trace.**
+
+Every row has the AIR's width.
+
+On every row the evaluation succeeds with all asserted values zero. -/
 def Accepted (air : RamAir) (rows : List (List F)) : Prop :=
   (∀ r ∈ rows, r.length = air.layout.width) ∧
   ∀ (i : ℕ) (hi : i < rows.length), ∃ s : Collect F,
@@ -73,7 +87,15 @@ theorem value_ext {L : RamLayout} {r r' : List F} (hr : L.value + L.value_width 
       List.getElem?_eq_getElem (by omega : L.value + k < r.length), Option.getD_some] at this
     simpa using this
 
-/-- **One transition of a self-contained proof.** Two rows whose booleanity groups vanish, with a vanishing order group on the transition, are strictly ordered by cell then clock, and the lower one's read returns the upper one's value on the same cell, and zero on a new cell. -/
+/-- **One transition of a self-contained proof.**
+
+Take two rows whose booleanity groups vanish, with a vanishing order group on the transition.
+
+Then:
+
+- they are strictly ordered by cell then clock
+- a read in the lower row returns the upper row's value on the same cell
+- it returns zero on a new cell. -/
 theorem transition_sound {st : RamStatement} (hv : st.validate = .ok ()) {cur nxt : List F}
     (hc : cur.length = (stdLayout st).width) (hn : nxt.length = (stdLayout st).width) (first : F)
     (hbc : ∀ x ∈ boolAsserts (stdLayout st) cur, x = 0)
@@ -148,7 +170,8 @@ theorem transition_sound {st : RamStatement} (hv : st.validate = .ok ()) {cur nx
   -- Equal digits give equal cells.
   have heq : same ≠ 0 → (decode (stdLayout st) nxt).addr = (decode (stdLayout st) cur).addr :=
     fun h => pv_drop_congr fun b hb => sub_eq_zero.1 ((mul_eq_zero.1 (hA b hb)).resolve_left h)
-  -- A read of a new cell sees zero, and a read of the same cell sees the row above.
+  -- A read of a new cell sees zero.
+  -- A read of the same cell sees the row above.
   have hval : nxt.getD (stdLayout st).operation 0 ≠ 1 → ∀ k < (stdLayout st).value_width,
       nxt.getD ((stdLayout st).value + k) 0 = same * cur.getD ((stdLayout st).value + k) 0 :=
     fun hop k hk => sub_eq_zero.1 ((mul_eq_zero.1 (hV k hk)).resolve_left
@@ -195,7 +218,14 @@ theorem air_of_new {st : RamStatement} {air : RamAir} (h : RamAir.new st = .ok a
     obtain ⟨hv, rfl⟩ := layout_of_new hl
     exact ⟨hv, rfl⟩
 
-/-- **Memory consistency of a self-contained memory.** An accepted trace of the AIR of a valid self-contained statement decodes to a consistent memory starting from zero: on each cell times are distinct, and every read returns the latest earlier write, or zero. -/
+/-- **Memory consistency of a self-contained memory.**
+
+Take an accepted trace of the AIR of a valid self-contained statement.
+
+It decodes to a consistent memory starting from zero:
+
+- on each cell, times are distinct
+- every read returns the latest earlier write, or zero. -/
 theorem accepted_consistent {st : RamStatement} (hsp : st.boundary = .SingleProof) {air : RamAir}
     (hair : RamAir.new st = .ok air) {rows : List (List F)} (hacc : Accepted air rows) :
     Consistent (fun _ => List.replicate st.value_width 0) (rows.map (decode air.layout)) := by
@@ -258,7 +288,9 @@ theorem accepted_consistent {st : RamStatement} (hsp : st.boundary = .SingleProo
   · simp only [List.length_map] at hi
     simpa using (htr i hi).2
 
-/-- The same consistency for every reordering of the accesses, which is what balancing the access channel against the machine's chips provides. -/
+/-- The same consistency holds for every reordering of the accesses.
+
+That is what balancing the access channel against the machine's chips provides. -/
 theorem accepted_consistent_perm {st : RamStatement} (hsp : st.boundary = .SingleProof)
     {air : RamAir} (hair : RamAir.new st = .ok air) {rows : List (List F)} (hacc : Accepted air rows)
     {machine : List (Access (List F))} (hperm : (rows.map (decode air.layout)).Perm machine) :

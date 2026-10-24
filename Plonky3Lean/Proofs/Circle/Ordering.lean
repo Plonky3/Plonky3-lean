@@ -83,7 +83,9 @@ theorem cfft_permute_index_bijOn (n : ℕ) :
     fun _ hi => cfft_permute_index_involutive hi⟩
     (fun i _ => cfft_permute_index_lt n i) (fun i _ => cfft_permute_index_lt n i)
 
-/-- The permuted slice reads entry i at cfft_permute_index(i), and panics exactly when the length is not a power of two. -/
+/-- The permuted slice reads entry i at sigma(i).
+
+It panics exactly when the length is not a power of two. -/
 theorem cfft_permute_slice_eq {α : Type _} (xs : List α) {n : ℕ} (hn : xs.length = 2 ^ n) :
     cfft_permute_slice xs = some ((List.range xs.length).map fun i =>
       xs[cfft_permute_index i n]'(by rw [hn]; exact cfft_permute_index_lt n i)) := by
@@ -92,7 +94,9 @@ theorem cfft_permute_slice_eq {α : Type _} (xs : List α) {n : ℕ} (hn : xs.le
   exact mapM_eq_some_map _ _ _ fun i _ => List.getElem?_eq_getElem _
 
 
-/-- One step of an in-place permutation by an involution f: swap rows i and f(i) when i < f(i). -/
+/-- One step of an in-place permutation by an involution f.
+
+It swaps rows i and f(i) when i < f(i). -/
 def invStep {V : Type _} (f : ℕ → ℕ) (acc : ℕ → V) (i : ℕ) : ℕ → V :=
   if i < f i then p3_dft.mirror.swapRows i (f i) acc else acc
 
@@ -122,7 +126,9 @@ theorem invStep_loop {V : Type _} {N : ℕ} (f : ℕ → ℕ) (hf : ∀ x < N, f
       simp only [h1, h2, ↓reduceIte, ihA]; congr 1; split <;> split <;> omega
     · simp only [hj, ↓reduceIte, ihA]; congr 1; split <;> split <;> omega
 
-/-- The in-place chunk permutation puts row sigma(r) at every row r below 2^n, and leaves the rows past the end alone. -/
+/-- The in-place chunk permutation puts row sigma(r) at every row r below 2^n.
+
+It leaves the rows past the end alone. -/
 theorem cfft_permute_slice_chunked_in_place_eq {V : Type _} (n : ℕ) (rows : ℕ → V) :
     cfft_permute_slice_chunked_in_place (2 ^ n) rows =
       some fun r => if r < 2 ^ n then rows (cfft_permute_index r n) else rows r := by

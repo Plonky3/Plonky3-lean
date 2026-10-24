@@ -11,7 +11,9 @@ public import Mathlib.Tactic.FieldSimp
 /-!
 # The timestamped memory's clock
 
-The clock ticks by a generator g, and each access proves `now = prev g^d` with `1 <= d <= 2^32`:
+The clock ticks by a generator g.
+
+Each access proves now = prev g^d with 1 <= d <= 2^32:
 
 ```text
     prev lo = now hi,   lo = g^(j + 1),   hi = g^(-2^16 m),   j, m < 2^16
@@ -20,7 +22,11 @@ The clock ticks by a generator g, and each access proves `now = prev g^d` with `
 
 A forged cycle of n accesses would climb by a sum of gaps that the order of g divides.
 
-That sum is between 1 and n 2^32, so it cannot be a multiple of an order above n 2^32, which is what the access bound checks.
+That sum is between 1 and n 2^32.
+
+So it cannot be a multiple of an order above n 2^32.
+
+The access bound checks exactly that the order is above n 2^32.
 -/
 
 namespace Plonky3Lean.Proofs.Bus
@@ -31,7 +37,11 @@ set_option linter.unusedSectionVars false
 
 variable {C : Type _} [Field C]
 
-/-- **The gap factors.** A gap from 1 to 2^32 splits into digits j, m below 2^16 with d = (j + 1) + 2^16 m, and its factors are the table entries of row j and row m. -/
+/-- **The gap factors.**
+
+A gap d from 1 to 2^32 splits into digits j, m below 2^16 with d = (j + 1) + 2^16 m.
+
+Its factors are the table entries of row j and row m. -/
 theorem gap_factors_spec (g : C) {d : ℕ} (h1 : 1 ≤ d) (h2 : d ≤ 2 ^ 32) :
     ∃ j < 2 ^ 16, ∃ m < 2 ^ 16, d = j + 1 + 2 ^ 16 * m ∧
       gap_factors g d = some (ClockRangeAir.low g j, ClockRangeAir.high g m) := by
@@ -45,7 +55,11 @@ theorem gap_factors_none (g : C) {d : ℕ} (h : d = 0 ∨ 2 ^ 32 < d) : gap_fact
   unfold gap_factors
   rw [ite_eq_left (by unfold CLOCK_GAP_BITS CLOCK_RANGE_BITS; omega)]
 
-/-- **The gap check.** With the table entries of rows j and m and a nonzero tick, prev lo = now hi exactly when now = prev g^d for d = (j + 1) + 2^16 m. -/
+/-- **The gap check.**
+
+Take the table entries of rows j and m, and a nonzero tick.
+
+Then prev lo = now hi exactly when now = prev g^d for d = (j + 1) + 2^16 m. -/
 theorem gap_sound {g : C} (hg : g ≠ 0) (j m : ℕ) (prev now : C) :
     prev * ClockRangeAir.low g j = now * ClockRangeAir.high g m ↔
       now = prev * g ^ (j + 1 + 2 ^ 16 * m) := by
@@ -64,7 +78,11 @@ theorem gap_sound {g : C} (hg : g ≠ 0) (j m : ℕ) (prev now : C) :
 theorem gap_range {j m : ℕ} (hj : j < 2 ^ 16) (hm : m < 2 ^ 16) :
     1 ≤ j + 1 + 2 ^ 16 * m ∧ j + 1 + 2 ^ 16 * m ≤ 2 ^ 32 := by omega
 
-/-- **No forged cycle.** A nonempty list of gaps from 1 to 2^32, fewer than the order of g over 2^32, does not climb back to the start. -/
+/-- **No forged cycle.**
+
+Take a nonempty list of gaps from 1 to 2^32, fewer than the order of g over 2^32.
+
+It does not climb back to the start. -/
 theorem no_cycle {G : Type _} [Monoid G] {g : G} (ds : List ℕ) (hd : ∀ d ∈ ds, 1 ≤ d ∧ d ≤ 2 ^ 32)
     (hne : ds ≠ []) (hord : ds.length * 2 ^ 32 < orderOf g) : g ^ ds.sum ≠ 1 := by
   intro h

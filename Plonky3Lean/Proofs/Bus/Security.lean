@@ -29,7 +29,11 @@ namespace Plonky3Lean.Proofs.Bus
 
 open p3_bus.security.mirror p3_bus.plan.mirror p3_bus.product.mirror
 
-/-- **The charged numerators.** With two trees, the bus charges max(1, s) N for the fingerprint, then 5 R, L and h, each omitted when zero. -/
+/-- **The charged numerators.**
+
+With two trees, the bus charges max(1, s) N for the fingerprint, then 5 R, L and h.
+
+Each is omitted when zero. -/
 theorem components_eq (plan : BusPlan) (h2 : plan.product_shape.num_trees = 2) :
     components (p3_bus.security.mirror.BusPlan.security_dims plan) =
       [max 1 plan.geometry.tuple_variables * max plan.geometry.non_padding_leaf_counts.1

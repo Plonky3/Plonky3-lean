@@ -13,7 +13,9 @@ public import Mathlib.Algebra.Polynomial.Derivative
 
 Every map on points agrees with the group law of the circle, on points of the circle.
 
-So every point the crate builds from points of the circle lies on the circle, and the constructor's debug assertion never fires.
+So every point the crate builds from points of the circle lies on the circle.
+
+The constructor's debug assertion never fires.
 -/
 
 namespace Plonky3Lean.Proofs.Circle
@@ -64,7 +66,9 @@ theorem vnStep_iterate (P : C K) (m : ℕ) : Point.vnStep^[m] P.x = (2 ^ m • P
   | zero => simp
   | succ m ih => rw [Function.iterate_succ_apply, vnStep_x, ih, smul_smul, ← pow_succ]
 
-/-- v_n is the vanishing polynomial of equation (8) for log_n >= 1, and panics at log_n = 0. -/
+/-- The code's v_n is the vanishing polynomial of equation (8) for n >= 1.
+
+It panics at n = 0. -/
 theorem v_n_ofC (P : C K) (n : ℕ) :
     Point.v_n (ofC P) n = if 1 ≤ n then some (vn n P) else none := by
   simp only [Point.v_n, ge_iff_le, ofC_x, vnStep_iterate, vn]
@@ -78,7 +82,7 @@ theorem vnProdLoop_ofC (P : C K) (n : ℕ) (out : K) :
     simp only [smul_smul, ← pow_succ, zero_add, pow_one]
     ring
 
-/-- v_n_prod is the product of v_1, ..., v_(log_n - 1). -/
+/-- The code's product of vanishing polynomials is v_1 ... v_(n - 1). -/
 theorem v_n_prod_ofC (P : C K) (n : ℕ) :
     Point.v_n_prod (ofC P) n = ∏ k ∈ range (n - 1), vn (k + 1) P := by
   unfold Point.v_n_prod
@@ -113,13 +117,20 @@ theorem mul_ofC (P : C K) (n : ℕ) : Point.mul (ofC P) n = ofC (n • P) := by
 
 /-! ## The projective line -/
 
-/-- The inverse stereographic projection of Lemma 1, t -> ((1 - t^2) / (1 + t^2), 2 t / (1 + t^2)), off t^2 = -1. -/
+/-- The inverse stereographic projection of Lemma 1, defined off t^2 = -1:
+
+```text
+    t  ->  ((1 - t^2) / (1 + t^2), 2 t / (1 + t^2))
+```
+-/
 def stereo (t : K) (ht : 1 + t * t ≠ 0) : C K :=
   C.mk ((1 - t * t) * (1 + t * t)⁻¹) ((t + t) * (1 + t * t)⁻¹) (by
     rw [mul_pow, mul_pow, ← add_mul, inv_pow, ← div_eq_mul_inv, div_eq_one_iff_eq (pow_ne_zero 2 ht)]
     ring)
 
-/-- The point from the projective line panics exactly at t^2 = -1, and lies on the circle otherwise. -/
+/-- The point from the projective line panics exactly at t^2 = -1.
+
+Otherwise it lies on the circle. -/
 theorem from_projective_line_eq (t : K) :
     Point.from_projective_line t = if ht : 1 + t * t = 0 then none else some (ofC (stereo t ht)) := by
   unfold Point.from_projective_line inv p3_commit.domain.mirror.inv
@@ -145,7 +156,9 @@ theorem to_from_projective_line (h2 : (2 : K) ≠ 0) (t : K) (ht : 1 + t * t ≠
   field_simp
   ring
 
-/-- Lemma 1, the other way: off x = -1, the point of the projection y / (x + 1) is the point itself. -/
+/-- Lemma 1, the other way.
+
+Off x = -1, the point of the projection y / (x + 1) is the point itself. -/
 theorem from_to_projective_line (h2 : (2 : K) ≠ 0) (P : C K) (hP : P.x + 1 ≠ 0) :
     ∃ ht, stereo (P.y / (P.x + 1)) ht = P := by
   have hy : P.y ^ 2 = (1 - P.x) * (P.x + 1) := by linear_combination P.eq
@@ -157,7 +170,9 @@ theorem from_to_projective_line (h2 : (2 : K) ≠ 0) (P : C K) (hP : P.x + 1 ≠
 
 /-! ## The selectors and the single-point vanishing function -/
 
-/-- v_tilde_p(p, at) projects at - p to the line, and panics exactly when (at - p).x = -1. -/
+/-- The projected single-point function at Q toward P projects Q - P to the line.
+
+It panics exactly when (Q - P).x = -1. -/
 theorem v_tilde_p_ofC (P Q : C K) :
     Point.v_tilde_p (ofC P) (ofC Q) =
       if (Q - P).x + 1 = 0 then none else some ((Q - P).y / ((Q - P).x + 1)) := by
@@ -167,7 +182,7 @@ theorem recip_v_tilde_p_num_den_ofC (P Q : C K) :
     Point.recip_v_tilde_p_num_den (ofC P) (ofC Q) = ((Q - P).x + 1, (Q - P).y) := by
   rw [Point.recip_v_tilde_p_num_den, sub_ofC]; rfl
 
-/-- v_p(p, at) is the complex conjugate of the paper's v_P(at), equation (11). -/
+/-- The code's single-point function at Q is the complex conjugate of the paper's v_P(Q), equation (11). -/
 theorem v_p_ofC (P Q : C K) :
     Point.v_p (ofC P) (ofC Q) = ((vP P Q).1, -(vP P Q).2) := by
   simp only [Point.v_p, neg_ofC, add_ofC, ofC_x, ofC_y, vP, vBlock, C.add_x, C.add_y, C.neg_x,
@@ -178,7 +193,9 @@ theorem v_p_ofC (P Q : C K) :
 /-! ## The normalizer of the single-point selector -/
 
 open Polynomial in
-/-- The vanishing polynomial v_(m+1) as a polynomial in x: v_1 = X and v_(m+2) = 2 v_(m+1)^2 - 1. -/
+/-- The vanishing polynomial v_(m+1) as a polynomial in x.
+
+It satisfies v_1 = X and v_(m+2) = 2 v_(m+1)^2 - 1. -/
 noncomputable def vnPoly : ℕ → K[X]
   | 0 => X
   | m + 1 => 2 * vnPoly m ^ 2 - 1
@@ -205,7 +222,9 @@ theorem derivative_vnPoly (m : ℕ) :
     ring
 
 open Polynomial in
-/-- s_p_at_p is the value -2 v_n'(P_x) P_y of Remark 16, and panics at log_n = 0. -/
+/-- The selector's value at its own point is -2 v_n'(P_x) P_y, as in Remark 16.
+
+It panics at n = 0. -/
 theorem s_p_at_p_ofC (P : C K) (m : ℕ) :
     Point.s_p_at_p (ofC P) (m + 1) = some (-2 * (derivative (vnPoly (K := K) m)).eval P.x * P.y) := by
   simp only [Point.s_p_at_p, ge_iff_le, show 1 ≤ m + 1 by omega, ↓reduceIte]

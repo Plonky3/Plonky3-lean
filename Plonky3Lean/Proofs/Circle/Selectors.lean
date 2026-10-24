@@ -11,13 +11,17 @@ The selector of Lemma 11 at a point P of the trace domain H is s_P = v_n / (v_0 
 
 The crate evaluates it as v_n(Q) ((Q - P).x + 1) / (Q - P).y.
 
-With D = Q - P and R = 2^(n-1) P, the doubling formulas turn it into a polynomial in D:
+Write D = Q - P and R = 2^(n-1) P.
+
+The doubling formulas turn the selector into a polynomial in D:
 
 ```text
     s_P(Q) = -R.y 2^(n-1) v_1(D) v_2(D) ... v_(n-1)(D) (D.x + 1)
 ```
 
-On H this polynomial is zero except at P, where it is -2^n R.y, the value of Remark 16.
+On H this polynomial is zero except at P.
+
+At P it is -2^n R.y, the value of Remark 16.
 
 So the crate's first-row and last-row selectors are not 0/1 on the trace domain:
 
@@ -26,7 +30,9 @@ So the crate's first-row and last-row selectors are not 0/1 on the trace domain:
     last row:    s_(-shift)(-shift) = 2^n (2^(n-1) shift).y = -s_shift(shift)
 ```
 
-The transition selector 1 - s_(-shift) / s_(-shift)(-shift) is 1 off the last row and 0 on it.
+The transition selector is 1 - s_(-shift) / s_(-shift)(-shift).
+
+It is 1 off the last row and 0 on it.
 -/
 
 namespace Plonky3Lean.Proofs.Circle
@@ -58,7 +64,9 @@ theorem vn_of_vn_zero {n : ℕ} {P : C K} (hP : vn n P = 0) (Q : C K) :
   conv_lhs => rw [hQ, smul_add, C.add_x, hP]
   ring
 
-/-- Off the pole, the crate's quotient v_n(Q) ((Q - P).x + 1) / (Q - P).y is the selector polynomial. -/
+/-- Off the pole, the crate's quotient is the selector polynomial.
+
+That quotient is v_n(Q) ((Q - P).x + 1) / (Q - P).y. -/
 theorem quotient_eq_selReg {n : ℕ} {P : C K} (hP : vn n P = 0) (Q : C K) (hy : (Q - P).y ≠ 0) :
     vn n Q * ((Q - P).x + 1) * ((Q - P).y)⁻¹ = selReg n P Q := by
   rw [vn_of_vn_zero hP, two_pow_nsmul_y (Q - P), selReg]
@@ -118,7 +126,9 @@ theorem selFactor_eq_zero (h2 : (2 : K) ≠ 0) {n : ℕ} {D : C K} (hD : 2 ^ n �
 
 variable [DecidableEq K] {G : Gen (K × K)}
 
-/-- An odd multiple of the generator Q of order 2^(n + 1), doubled n times, is the point (-1, 0). -/
+/-- Take an odd multiple of the generator Q of order 2^(n + 1).
+
+Doubled n times, it is the point (-1, 0). -/
 theorem two_pow_nsmul_odd (hV : CircleGenValid G) {n : ℕ} (hG : n + 1 ≤ G.adicity) (a : ℕ) :
     2 ^ n • ((2 * a + 1) • genPt G (n + 1)) = genPt G 1 := by
   have h1 : 2 ^ n • genPt G (n + 1) = genPt G 1 := by
@@ -127,7 +137,7 @@ theorem two_pow_nsmul_odd (hV : CircleGenValid G) {n : ℕ} (hG : n + 1 ≤ G.ad
     rw [← genPt_zero hV, ← genPt_nsmul hV (show 0 ≤ 1 by omega) (by omega)]; rfl
   rw [smul_comm, h1, add_nsmul, one_nsmul, mul_nsmul, h0, smul_zero, zero_add]
 
-/-- On the standard domain H of size 2^n, the selector polynomial of P is zero at every other point. -/
+/-- On the standard domain H of size 2^n, the selector polynomial of P vanishes at every other point. -/
 theorem selReg_on_domain (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {n : ℕ}
     (hG : n + 1 ≤ G.adicity) (a b : ℕ)
     (hne : (2 * b + 1) • genPt G (n + 1) ≠ (2 * a + 1) • genPt G (n + 1)) :
@@ -136,7 +146,7 @@ theorem selReg_on_domain (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {n : ℕ}
   rw [smul_sub, two_pow_nsmul_odd hV hG, two_pow_nsmul_odd hV hG, sub_self]
 
 open p3_circle.point.mirror in
-/-- s_p_at_p is the selector polynomial at its own point. -/
+/-- The selector's value at its own point is the selector polynomial there. -/
 theorem s_p_at_p_eq_selReg (P : C K) {n : ℕ} (hn : 1 ≤ n) :
     Point.s_p_at_p (ofC P) n = some (selReg n P P) := by
   obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩
@@ -147,12 +157,16 @@ theorem s_p_at_p_eq_selReg (P : C K) {n : ℕ} (hn : 1 ≤ n) :
   ring
 
 
-/-- At a point Q of the line through P on the y-axis direction, (Q - P).y = 0, v_n takes the value it takes at P, when that value is zero. -/
+/-- If v_n vanishes at P and (Q - P).y = 0, then v_n vanishes at Q. -/
 theorem vn_eq_zero_of_y {n : ℕ} {P Q : C K} (hP : vn n P = 0) (hy : (Q - P).y = 0) : vn n Q = 0 := by
   rw [vn_of_vn_zero hP, two_pow_nsmul_y (Q - P), hy]; ring
 
 open p3_circle.point.mirror p3_circle.domain.mirror p3_commit.domain.mirror in
-/-- Off the trace domain, selectors_at_point returns the selector polynomials of the first and last points, the normalized transition selector, and 1 / v_n.
+/-- Off the trace domain, the selectors at a point are:
+
+- the selector polynomials of the first and last points
+- the normalized transition selector
+- the inverse 1 / v_n.
 
 With S the shift and k = s_(-S)(-S):
 
@@ -203,7 +217,7 @@ theorem selectors_at_point_eq (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {n : 
 
 
 open p3_circle.point.mirror p3_circle.domain.mirror p3_commit.domain.mirror in
-/-- selectors_at_point panics on the trace domain itself, where v_n vanishes. -/
+/-- The selectors at a point panic on the trace domain itself, where v_n vanishes. -/
 theorem selectors_at_point_none (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {n : ℕ} (hn : 1 ≤ n)
     (hG : n + 1 ≤ G.adicity) (t : K) (ht : 1 + t * t ≠ 0) (hz : vn n (stereo t ht) = 0) :
     CircleDomain.selectors_at_point ⟨n, ofC (genPt G (n + 1))⟩ t = none := by
@@ -217,7 +231,9 @@ theorem selectors_at_point_none (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {n 
   simp
 
 open p3_circle.point.mirror p3_circle.domain.mirror in
-/-- selectors_at_point panics at the points t^2 = -1 of the line, which have no point on the circle. -/
+/-- The selectors at a point panic at the points t^2 = -1 of the line.
+
+Those have no point on the circle. -/
 theorem selectors_at_point_none_of_sq (n : ℕ) (S : C K) (t : K) (ht : 1 + t * t = 0) :
     CircleDomain.selectors_at_point ⟨n, ofC S⟩ t = none := by
   have hfrom : Point.from_projective_line t = none := by
@@ -225,7 +241,9 @@ theorem selectors_at_point_none_of_sq (n : ℕ) (S : C K) (t : K) (ht : 1 + t * 
   simp [CircleDomain.selectors_at_point, hfrom]
 
 open p3_circle.point.mirror p3_circle.domain.mirror p3_commit.domain.mirror in
-/-- On a domain whose points all lie off the trace domain, selectors_on_coset lists, at each point, the values of selectors_at_point. -/
+/-- Take a domain whose points all lie off the trace domain.
+
+The selectors on the coset list, at each point, the selectors at that point. -/
 theorem selectors_on_coset_eq (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {n : ℕ} (hn : 1 ≤ n)
     (hG : n + 1 ≤ G.adicity) (coset : CircleDomain K) (pts : List (C K))
     (hpts : CircleDomain.points G coset = some (pts.map ofC)) (hoff : ∀ Q ∈ pts, vn n Q ≠ 0) :

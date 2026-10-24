@@ -10,8 +10,9 @@ public import Mathlib.Data.List.Chain
 
 A list of accesses sorted strictly by cell, then by time, is consistent when two local rules hold:
 
-- the first access, if a read, returns the initial value of its cell;
-- every later read returns the value of the access before it when that access is on the same cell, and the initial value otherwise.
+- the first access, if a read, returns the initial value of its cell
+- every later read returns the value of the access before it, if that access is on the same cell
+- otherwise a later read returns the initial value.
 
 Consistency only speaks of membership, so it passes to every permutation of the list.
 -/
@@ -38,7 +39,9 @@ theorem timesDistinct_of_chain {accs : List (Access V)} (h : accs.IsChain Before
     TimesDistinct accs :=
   (List.isChain_iff_pairwise.1 h).imp fun hxy => by unfold Before at hxy; omega
 
-/-- **Consistency of a sorted trace.** A trace sorted strictly by cell then time, whose reads follow the read rule, is consistent. -/
+/-- **Consistency of a sorted trace.**
+
+A trace sorted strictly by cell then time, whose reads follow the read rule, is consistent. -/
 theorem reads_of_sorted (init : ℕ → V) :
     ∀ (accs : List (Access V)), accs.IsChain Before →
       (∀ y ∈ accs.head?, y.write = false → y.value = init y.addr) →
@@ -69,7 +72,7 @@ theorem reads_of_sorted (init : ℕ → V) :
         · rw [List.mem_singleton.1 hw] at h2' ⊢; omega
     · have hzy : z = y := List.mem_singleton.1 hz
       subst z
-      -- Every write before the new read is a member of l.
+      -- Every write before the new read is a member of the list.
       have hy : ∀ w ∈ l ++ [y], w.write = true → w ∈ l := fun w hw hw' => by
         rcases List.mem_append.1 hw with hw | hw
         · exact hw

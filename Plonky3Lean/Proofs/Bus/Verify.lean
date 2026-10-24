@@ -10,9 +10,13 @@ public import Plonky3Lean.Proofs.Sumcheck.GenericDegree
 
 The verifier checks every proof length against the statement before it replays the transcript.
 
-On a statement its constructor accepts and a field with six distinct interpolation nodes, it returns an answer for every proof: the output, or an error.
+Take a statement its constructor accepts and a field with six distinct interpolation nodes.
 
-The reason is that the layers are checked in kind and length, and each layer's sumcheck has exactly as many rounds as the point it inherits has coordinates.
+The verifier then returns an answer for every proof: the output, or an error.
+
+The layers are checked in kind and length.
+
+Each layer's sumcheck has exactly as many rounds as the point it inherits has coordinates.
 -/
 
 namespace Plonky3Lean.Proofs.Bus
@@ -120,7 +124,9 @@ theorem rounds_some : ∀ (rp : List (Fin 5 → F)) (acc : F × List F × S),
     simp only [Plonky3Lean.Proofs.Sumcheck.RoundPolyInterpolator.eval_eq node (by norm_num : 0 < 5) hw] at h ⊢
     exact h
 
-/-- A radix-four layer whose rounds match the inherited point never panics, and leaves a point two coordinates longer. -/
+/-- A radix-four layer whose rounds match the inherited point never panics.
+
+It leaves a point two coordinates longer. -/
 theorem verify_layer_radix_some (st : VerifyState F S) (li : ℕ) (rp : List (Fin 5 → F))
     (c : List (F × F × F × F)) (hlen : rp.length = st.point.length) :
     ∃ st', verify_layer node T weights st li (.RadixFour rp c) = some st' ∧
@@ -167,7 +173,11 @@ theorem fold_radix_some : ∀ (k start : ℕ) (P : List (ProductGkrLayerProof F)
 
 end Layer
 
-/-- **The verifier never panics.** On a statement its constructor accepts and a field with six distinct interpolation nodes, the verifier returns the output or an error for every proof. -/
+/-- **The verifier never panics.**
+
+Take a statement its constructor accepts and a field with six distinct interpolation nodes.
+
+The verifier returns the output or an error for every proof. -/
 theorem verify_isSome (node : ℕ → F) (T : VerifierTranscript F S) (bits : ℕ)
     (p : ProductGkrProof F) {shape : ProductGkrShape}
     (hshape : shape.root_shape = .FirstTwoShared → 2 ≤ shape.num_trees)

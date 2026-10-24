@@ -17,7 +17,9 @@ A plan pads every tuple to one width:
     [ payload 0 .. w )  [ zero w .. p )  [ identity bits p .. p + d )  [ zero .. 2^m )
 ```
 
-The identity of the i-th bus in name order is i + 1, and d = ceil(log_2(n + 1)) bits hold every identity.
+The identity of the i-th bus in name order is i + 1.
+
+So d = ceil(log_2(n + 1)) bits hold every identity.
 
 So two declarations produce the same padded tuple only when they name the same bus and carry the same payload.
 -/
@@ -65,7 +67,11 @@ theorem tuple_slot_bit {p : BusPlan} (hp : LayoutWF p) {b k : ℕ} (hb : b < p.d
     show ¬ p.payload_slots + k < p.domains[b].payload_width by omega,
     show p.payload_slots + k < p.logical_tuple_width by omega]
 
-/-- **The layout is injective.** On a valid plan, a padded tuple determines its bus and, given the bus's width, its payload. -/
+/-- **The layout is injective.**
+
+On a valid plan, a padded tuple determines its bus.
+
+Given the bus's width, it also determines its payload. -/
 theorem tupleOf_injective {F : Type _} [Field F] {p : BusPlan} (hp : LayoutWF p) {b b' : ℕ}
     (hb : b < p.domains.length) (hb' : b' < p.domains.length) {x y : List F}
     (hx : x.length = p.domains[b].payload_width) (hy : y.length = p.domains[b'].payload_width)
@@ -117,7 +123,9 @@ theorem except_bind_ok {ε α β : Type _} {x : Except ε α} {f : α → Except
   | error e => cases h
   | ok a => exact ⟨a, rfl, h⟩
 
-/-- **The planner's layout.** A plan the planner returns satisfies the layout invariants. -/
+/-- **The planner's layout.**
+
+A plan the planner returns satisfies the layout invariants. -/
 theorem build_wf {F : Type _} {inputs : List (BusPlanInput F)} {p : BusPlan}
     (h : BusPlan.build inputs = .ok (some p)) : LayoutWF p := by
   unfold BusPlan.build at h
@@ -204,7 +212,13 @@ theorem length_tupleOf {F : Type _} [Zero F] [One F] (p : BusPlan) (b : ℕ) (x 
 def Fits {F : Type _} (p : BusPlan) (d : ℕ × List F) : Prop :=
   ∃ h : d.1 < p.domains.length, d.2.length = (p.domains[d.1]'h).payload_width
 
-/-- **Soundness of the bus.** On a plan the planner returns, if the pushed declarations are not a permutation of the pulled ones, their grand products over the padded tuples agree on at most max(1, m) N |K|^m of the |K|^(m + 1) pairs of an offset and a point.
+/-- **Soundness of the bus.**
+
+Take a plan the planner returns, and pushed declarations that are not a permutation of the pulled ones.
+
+Their grand products over the padded tuples then rarely agree.
+
+They agree on at most max(1, m) N |K|^m of the |K|^(m + 1) pairs of an offset and a point.
 
 Here m is the number of tuple variables and N bounds both sides. -/
 theorem bus_soundness {K : Type _} [Field K] [Fintype K] [DecidableEq K] {p : BusPlan}
@@ -219,7 +233,8 @@ theorem bus_soundness {K : Type _} [Field K] [Fintype K] [DecidableEq K] {p : Bu
     (by simpa using hN) (by simpa using hN')
   · obtain ⟨d, -, rfl⟩ := List.mem_map.1 ht; rw [length_tupleOf, hp.pow]
   · obtain ⟨d, -, rfl⟩ := List.mem_map.1 ht; rw [length_tupleOf, hp.pow]
-  -- On fitting declarations the layout is injective, so tuples permute exactly when declarations do.
+  -- On fitting declarations the layout is injective.
+  -- So tuples permute exactly when declarations do.
   have hinj : ∀ d ∈ push ++ pull, ∀ d' ∈ push ++ pull,
       tupleOf p d.1 d.2 = tupleOf p d'.1 d'.2 → d = d' := fun d hd d' hd' he => by
     obtain ⟨hb, hx⟩ : Fits p d := by
@@ -306,7 +321,11 @@ theorem layout_aligned : ∀ (l done : List PendingBlock) (acc : List BusBlock �
           · exact ha blk (List.mem_append_left _ hb)
           · exact hcons _ (h1 ▸ hdvd) _ _ (fun b hb' => ha b (List.mem_append_right _ hb')) blk hb
 
-/-- **Every block is aligned.** After sorting by side and decreasing height, each block starts at a multiple of its own height, so the debug assertion of the planner never fails. -/
+/-- **Every block is aligned.**
+
+After sorting by side and decreasing height, each block starts at a multiple of its own height.
+
+So the debug assertion of the planner never fails. -/
 theorem layoutBlocks_aligned (pending : List PendingBlock)
     {out : List BusBlock × List BusBlock × ℕ × ℕ}
     (h : layoutBlocks (pending.mergeSort pendingLe) = .ok out) :

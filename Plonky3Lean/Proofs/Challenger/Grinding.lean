@@ -8,13 +8,15 @@ public import Plonky3Lean.Proofs.Challenger.Machine
 /-!
 # The proof-of-work search of the duplex challenger
 
-A proof-of-work witness `w` passes at difficulty `b` when, after observing `w`, the next sample has `b` low zero bits.
+A proof-of-work witness w passes at difficulty b when the sample after observing w has b low zero bits.
 
-`DuplexChallenger::grind` does not run that check per candidate.
+The search does not run that check per candidate.
 
-It builds the pre-permutation state of the absorbing call once, writes each candidate into its slot, permutes, and reads cell `RATE - 1`.
+It builds the pre-permutation state of the absorbing call once.
 
-Here that shortcut, read lane by lane, is shown to compute exactly the check.
+For each candidate, it writes the candidate into its slot, permutes, and reads cell RATE - 1.
+
+Read lane by lane, that shortcut computes exactly the check.
 
 ```text
     inputs pending: [a, b], RATE = 4, WIDTH = 6
@@ -30,7 +32,9 @@ open Plonky3Lean.Spec.Duplex p3_challenger.mirror
 
 variable {F : Type} [AddMonoidWithOne F]
 
-/-- The state the search builds for a candidate is the padded state of the absorbing call that observing it triggers. -/
+/-- The state the search builds for a candidate is a padded state.
+
+It is the padded state of the absorbing call that observing the candidate triggers. -/
 theorem grindState_eq_pad (r w : ℕ) (s inb : List F) (x : F) (hs : s.length = w) (hr : r < w)
     (hinb : inb.length < r) : grindState r w s inb x = pad r s (inb ++ [x]) := by
   have hpad : pad r s (inb ++ [x]) = inb ++ x :: (List.replicate (r - (inb.length + 1)) 0 ++
@@ -69,7 +73,7 @@ theorem grindState_eq_pad (r w : ℕ) (s inb : List F) (x : F) (hs : s.length = 
     congr 1
     omega
 
-/-- `GrindingChallenger::check_witness` on the list machine.
+/-- The witness check on the list machine.
 
 Difficulty 0 accepts.
 
@@ -79,7 +83,9 @@ def checkWitness (f : List F → List F) (r : ℕ) (val : F → ℕ) (st : St F)
 
 /-- The search accepts a candidate exactly when the check does.
 
-So the witness `grind` returns passes `check_witness`, and the final `assert!` in `grind` never fires on it. -/
+So the witness the search returns passes the check.
+
+The search's final assertion never fires on it. -/
 theorem grind_accepts_iff_check (f : List F → List F) (r w : ℕ) (val : F → ℕ) (hr : 0 < r) (hrw : r < w)
     (hf : ∀ s, s.length = w → (f s).length = w) (st : St F) (hs : st.s.length = w)
     (hinb : st.inb.length < r) (bits : ℕ) (hb : 0 < bits) (x : F) :

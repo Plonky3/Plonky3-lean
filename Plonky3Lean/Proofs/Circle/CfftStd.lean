@@ -8,9 +8,14 @@ public import Plonky3Lean.Proofs.Circle.Ordering
 /-!
 # p3-circle: the circle FFT on standard domains
 
-On a standard domain no twiddle is zero: every twiddle is a coordinate of a point of order at least 8, or a y-coordinate of a point of order at least 4.
+On a standard domain no twiddle is zero.
 
-So interpolate never panics there, and it inverts evaluate.
+Every twiddle is one of:
+
+- a coordinate of a point of order at least 8
+- a y-coordinate of a point of order at least 4.
+
+So interpolation never panics there, and it inverts evaluation.
 
 The row order of the transforms is the circle FFT order: row i holds the value at natural point sigma(i).
 -/
@@ -102,7 +107,11 @@ theorem ptAt_eq_twinPoint {n : ℕ} (hn : 1 ≤ n) (S g : C K) (hg : 2 ^ (n - 1)
     rw [show 2 ^ n - 1 - rev n a + 1 = 2 ^ n - rev n a by omega, neg_add, sub_nsmul _ hc.le, hg]
     abel
 
-/-- On the standard domain of size 2^n, evaluate of 2^m coefficients holds at row i the value of their polynomial at the natural point sigma(i), that is at (2 sigma(i) + 1) Q. -/
+/-- Evaluate 2^m coefficients on the standard domain of size 2^n.
+
+Row i holds the value of their polynomial at the natural point sigma(i).
+
+That point is (2 sigma(i) + 1) Q. -/
 theorem evaluate_standard {V : Type} [AddCommGroup V] [Module K V] (hV : CircleGenValid G)
     {n m : ℕ} (hm : 1 ≤ m) (hmn : m ≤ n) (hG : n + 1 ≤ G.adicity) (x : ℕ → V) :
     ∃ y, p3_circle.cfft.mirror.evaluate G ⟨n, ofC (genPt G (n + 1))⟩ (2 ^ m) x = some y ∧
@@ -113,7 +122,9 @@ theorem evaluate_standard {V : Type} [AddCommGroup V] [Module K V] (hV : CircleG
     rw [← genPt_zero hV, ← genPt_nsmul hV (j := 0) (k := n - 1) (Nat.zero_le _) (by omega), Nat.sub_zero]
   rw [hyi i hi, ptAt_eq_twinPoint (by omega) _ _ hg hi, twinPoint_standard hV (by omega) hG]
 
-/-- On the standard domain of size 2^n, interpolate never panics, and returns coefficients whose polynomial takes value i at the natural point sigma(i). -/
+/-- On the standard domain of size 2^n, interpolation never panics.
+
+It returns coefficients whose polynomial takes value i at the natural point sigma(i). -/
 theorem interpolate_standard {V : Type} [AddCommGroup V] [Module K V] (hV : CircleGenValid G)
     (h2 : (2 : K) ≠ 0) {n : ℕ} (hn : 1 ≤ n) (hG : n + 1 ≤ G.adicity) (v : ℕ → V) :
     ∃ cs, p3_circle.cfft.mirror.interpolate G ⟨n, ofC (genPt G (n + 1))⟩ v = some cs ∧
@@ -144,7 +155,9 @@ theorem basis_list_succ {k : ℕ} (hk : 1 ≤ k) (P : C K) :
       simp only [Function.comp_apply]
       rw [add_comm (2 ^ k) j, basis_succ_high hk (by simpa using hj)]
 
-/-- circle_basis lists the FFT basis of Definition 4 at the point, b_0, ..., b_(2^n - 1), and panics at n = 0. -/
+/-- The basis function lists the FFT basis of Definition 4 at the point: b_0, ..., b_(2^n - 1).
+
+It panics at n = 0. -/
 theorem circle_basis_eq (P : C K) {n : ℕ} (hn : 1 ≤ n) :
     p3_circle.cfft.mirror.circle_basis (ofC P) n = some ((List.range (2 ^ n)).map fun j => basis n j P) := by
   have loop : ∀ k, (List.range k).foldl

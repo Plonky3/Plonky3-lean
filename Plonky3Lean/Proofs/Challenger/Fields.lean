@@ -8,41 +8,53 @@ public import Plonky3Lean.Proofs.Challenger.Bits
 /-!
 # The reductions at BabyBear, KoalaBear, Goldilocks and Mersenne31
 
-The constants each field's `UniformSamplingField` implementation declares, checked against the arithmetic they encode.
+Each field declares sampling constants.
 
-And the multi-field challenger at every pair of these fields.
+They are checked here against the arithmetic they encode.
+
+The multi-field challenger is checked at every pair of these fields.
 -/
 
 namespace Plonky3Lean.Proofs.Challenger.Fields
 
 open p3_challenger.mirror
 
-/-- The BabyBear prime, `15 * 2^27 + 1`. -/
+/-- The BabyBear prime, 15 * 2^27 + 1. -/
 abbrev pBB : ℕ := 2013265921
-/-- The KoalaBear prime, `127 * 2^24 + 1`. -/
+/-- The KoalaBear prime, 127 * 2^24 + 1. -/
 abbrev pKB : ℕ := 2130706433
-/-- The Goldilocks prime, `2^64 - 2^32 + 1`. -/
+/-- The Goldilocks prime, 2^64 - 2^32 + 1. -/
 abbrev pGL : ℕ := 18446744069414584321
-/-- The Mersenne31 prime, `2^31 - 1`. -/
+/-- The Mersenne31 prime, 2^31 - 1. -/
 abbrev pM31 : ℕ := 2147483647
 
-/-- `SAMPLING_BITS_M[k]`, as each field computes it: `prime & !((1 << k) - 1)` in `u64`. -/
+/-- The rejection bound for k bits, as each field computes it.
+
+It is the prime with its low k bits masked off, in 64-bit arithmetic. -/
 def samplingM (p k : ℕ) : ℕ := if k = 0 then p else p &&& (2 ^ 64 - 2 ^ k)
 
-/-- The mask clears the low `k` bits: `m_k = floor(p / 2^k) 2^k`, the largest multiple of `2^k` up to `p`. -/
+/-- The mask clears the low k bits.
+
+The result is m_k = floor(p / 2^k) 2^k, the largest multiple of 2^k up to p. -/
 theorem samplingM_eq_BB : ∀ k < 64, 0 < k → samplingM pBB k = pBB / 2 ^ k * 2 ^ k := by decide +kernel
 theorem samplingM_eq_KB : ∀ k < 64, 0 < k → samplingM pKB k = pKB / 2 ^ k * 2 ^ k := by decide +kernel
 theorem samplingM_eq_GL : ∀ k < 64, 0 < k → samplingM pGL k = pGL / 2 ^ k * 2 ^ k := by decide +kernel
 theorem samplingM_eq_M31 : ∀ k < 64, 0 < k → samplingM pM31 k = pM31 / 2 ^ k * 2 ^ k := by decide +kernel
 
-/-- At `MAX_SINGLE_SAMPLE_BITS`, one canonical value in `p` is rejected for BabyBear (27), KoalaBear (24) and Goldilocks (32).
+/-- Consider each field's largest single-sample bit count.
 
-For Mersenne31 (16) the rejected values number `2^16 - 1`, a chance of about `3 * 10^-5`, as its comment says. -/
+There, one canonical value in p is rejected for BabyBear (27), KoalaBear (24) and Goldilocks (32).
+
+For Mersenne31 (16) the rejected values number 2^16 - 1.
+
+That is a chance of about 3 * 10^-5, as its comment says. -/
 theorem rejected_at_max :
     pBB % 2 ^ 27 = 1 ∧ pKB % 2 ^ 24 = 1 ∧ pGL % 2 ^ 32 = 1 ∧ pM31 % 2 ^ 16 = 2 ^ 16 - 1 := by
   decide +kernel
 
-/-- Every bit count the samplers accept, `2^bits < p`, that exceeds `MAX_SINGLE_SAMPLE_BITS` splits into two halves that do not. -/
+/-- Take a bit count the samplers accept, with 2^bits < p, above the largest single-sample count.
+
+It splits into two halves that do not exceed it. -/
 theorem halves_fit :
     (∀ b < 64, 2 ^ b < pBB → 27 < b → b - b / 2 ≤ 27) ∧
     (∀ b < 64, 2 ^ b < pKB → 24 < b → b - b / 2 ≤ 24) ∧

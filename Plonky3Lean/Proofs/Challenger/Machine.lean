@@ -9,18 +9,18 @@ public import Mathlib.Algebra.CharP.Basic
 /-!
 # The duplex challenger as a machine over lists
 
-The state of the duplex challenger, with the sponge, the input buffer and the output buffer as lists.
+The state of the duplex challenger holds the sponge, the input buffer and the output buffer as lists.
 
 Observing, sampling and the duplexing step are written exactly as the Rust code runs them.
 
-The proofs that the extracted code computes these functions are in `Duplex.lean`.
+A sibling file proves that the extracted code computes these functions.
 
-Here the machine is related to the duplex construction of `Spec.Duplex`:
+Here the machine is related to the duplex construction of the specification:
 
-* every transcript of observations and samples returns the samples the construction gives;
-* the sample after an observation reads the permutation of a block that ends with that observation;
-* one duplexing step is injective in its block when the characteristic exceeds the rate;
-* in characteristic `q <= r` the length tag repeats, and a block collides with its zero extension.
+- every transcript of observations and samples returns the samples the construction gives
+- the sample after an observation reads the permutation of a block that ends with that observation
+- one duplexing step is injective in its block when the characteristic exceeds the rate
+- in characteristic q <= r the length tag repeats, and a block collides with its zero extension.
 -/
 
 namespace Plonky3Lean.Proofs.Challenger
@@ -54,7 +54,7 @@ def St.sample (st : St F) : F × St F :=
 /-- Observe each value in order. -/
 def St.observeAll (st : St F) (xs : List F) : St F := xs.foldl (St.observe f r) st
 
-/-- Draw `k` samples in order. -/
+/-- Draw k samples in order. -/
 def St.sampleN : St F → ℕ → List F × St F
   | st, 0 => ([], st)
   | st, k + 1 =>
@@ -62,7 +62,7 @@ def St.sampleN : St F → ℕ → List F × St F
     let q := p.2.sampleN k
     (p.1 :: q.1, q.2)
 
-/-- One phase: observe `xs`, then draw `k` samples. -/
+/-- One phase: observe xs, then draw k samples. -/
 def St.phase (st : St F) (xs : List F) (k : ℕ) : List F × St F :=
   (st.observeAll f r xs).sampleN f r k
 
@@ -124,7 +124,9 @@ section Phases
 
 variable {F : Type} [AddMonoidWithOne F] (f : List F → List F) (r w : ℕ)
 
-/-- After `j` samples drawn from a fresh rate of `s₁`, the challenger holds the last state whose rate it read, and the rest of that rate. -/
+/-- Take j samples drawn from a fresh rate of a state.
+
+The challenger then holds the last state whose rate it read, and the rest of that rate. -/
 def afterSamples (s₁ : List F) : ℕ → St F
   | 0 => ⟨s₁, [], s₁.take r⟩
   | j + 1 => ⟨blank f (j / r) s₁, [], (blank f (j / r) s₁).take (r - (j % r + 1))⟩
@@ -144,7 +146,9 @@ theorem sample_buffered (s : List F) (n : ℕ) (hn : 0 < n) (hl : n ≤ s.length
   simp only [St.sample, ne_eq, not_true_eq_false, hne, or_self, ite_false]
   rw [getLastD_take _ _ _ hn hl, List.dropLast_take hl]
 
-/-- With no input pending and no output left, a sample makes a blank call and pops its last rate cell. -/
+/-- With no input pending and no output left, a sample makes a blank call.
+
+It pops the last rate cell of that call. -/
 theorem sample_empty (s : List F) (hr : 0 < r) (hl : r ≤ (f s).length) :
     (St.mk s [] []).sample f r = ((f s).getD (r - 1) 0, ⟨f s, [], (f s).take (r - 1)⟩) := by
   have hne : (f s).take r ≠ [] := List.ne_nil_of_length_pos (by simp; omega)
@@ -262,7 +266,9 @@ theorem observeAll_block (st : St F) (ys : List F) (hy : ys ≠ [])
 
 /-- Observing a run of values from an empty input buffer absorbs every whole block.
 
-If the run ends on a block boundary, the last block was absorbed by the last observation and its rate is fresh.
+If the run ends on a block boundary, the last observation absorbed the last block.
+
+Its rate is then fresh.
 
 Otherwise the last block waits in the input buffer and the outputs are cleared. -/
 theorem observeAll_eq (hr : 0 < r) (xs : List F) (st : St F) (hinb : st.inb = []) (hxs : xs ≠ []) :
@@ -410,7 +416,9 @@ theorem transcript_eq_aux (hr : 0 < r) (hrw : r < w) (hf : ∀ s, s.length = w �
       (fun q hq => Or.inl (hne q (by rcases ps with _ | ⟨a, ps⟩ <;> simp_all))), hst]
     rfl
 
-/-- Every well-formed transcript, run from a challenger with empty buffers, returns the samples of the duplex construction. -/
+/-- Run every well-formed transcript from a challenger with empty buffers.
+
+It returns the samples of the duplex construction. -/
 theorem transcript_eq (hr : 0 < r) (hrw : r < w) (hf : ∀ s, s.length = w → (f s).length = w)
     (ps : List (List F × ℕ)) (st : St F) (hwf : WellFormed ps) (hs : st.s.length = w)
     (hinb : st.inb = []) (hout : st.outb = []) : st.transcript f r ps = transcript f r st.s ps :=
@@ -445,13 +453,18 @@ section Injectivity
 
 variable {F : Type} [AddGroupWithOne F]
 
-/-- With a fixed state, the padded state determines the block, when no two lengths up to `r` have the same image in the field.
+/-- Suppose no two lengths up to r have the same image in the field.
 
-A blank call and an absorbing call never meet either: the length tag of a nonempty block is not zero. -/
+With a fixed state, the padded state then determines the block.
+
+A blank call and an absorbing call never meet either.
+
+The length tag of a nonempty block is not zero. -/
 theorem pad_injective (r : ℕ) (s : List F)
     (hchar : ∀ a b : ℕ, a ≤ r → b ≤ r → (a : F) = b → a = b)
     (σ τ : List F) (hσ : σ.length ≤ r) (hτ : τ.length ≤ r) (h : pad r s σ = pad r s τ) : σ = τ := by
-  -- Cell `r` carries `s_r` plus the length, and the first cells carry the block.
+  -- Cell r carries s_r plus the length.
+  -- The first cells carry the block.
   have cell : ∀ ρ : List F, ρ.length ≤ r → (pad r s ρ).getD r 0 = s.getD r 0 + (ρ.length : F) := by
     intro ρ hρ
     unfold pad
@@ -479,9 +492,11 @@ theorem cast_inj_of_charP (q r : ℕ) [CharP F q] (hq : r < q) :
     Nat.mod_eq_of_lt (by omega)] at h
   exact h
 
-/-- In characteristic `q`, a block collides with its extension by `q` zeros, as long as both fit the rate.
+/-- In characteristic q, a block collides with its extension by q zeros, as long as both fit the rate.
 
-The overwrite pads with zeros, and the length tags `n` and `n + q` are equal in the field.
+The overwrite pads with zeros.
+
+The length tags n and n + q are equal in the field.
 
 ```text
     q = 2, r = 4:   pad [a]        = [a, 0, 0, 0 | s_4 + 1, ...]

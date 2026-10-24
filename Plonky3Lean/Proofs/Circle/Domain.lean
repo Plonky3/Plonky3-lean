@@ -8,7 +8,9 @@ public import Plonky3Lean.Proofs.Circle.Generator
 /-!
 # p3-circle: twin cosets and standard position cosets
 
-A domain of size 2^n with shift S lists the points S + i g and -S + (i + 1) g, interleaved, for g of order 2^(n - 1).
+Take a domain of size 2^n with shift S, and g of order 2^(n - 1).
+
+It lists the points S + i g and -S + (i + 1) g, interleaved.
 
 This is the twin coset of Definition 2.
 
@@ -43,7 +45,9 @@ theorem interleave_length {α : Type _} (l₁ l₂ : List α) (h : l₁.length =
       simp only [interleave, List.length_cons] at h ⊢
       rw [ih l₂ (by omega)]; ring
 
-/-- Interleaving two maps over the same range: entry k is the first map at k / 2 for even k, the second for odd k. -/
+/-- Interleaving two maps over the same range.
+
+Entry k is the first map at k / 2 for even k, the second for odd k. -/
 theorem interleave_map_range {α : Type _} (f h : ℕ → α) (m : ℕ) :
     interleave ((List.range m).map f) ((List.range m).map h) =
       (List.range (2 * m)).map fun k => if k % 2 = 0 then f (k / 2) else h (k / 2) := by
@@ -204,7 +208,9 @@ theorem standard_disjoint (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {m n : �
   rw [Nat.mul_mod, Nat.pow_mod, show n + 1 - (m + 1) = (n - m - 1) + 1 by omega, pow_succ] at h2'
   simp at h2'
 
-/-- The squaring map sends point k of the standard domain of size 2^n to point k of the one of size 2^(n - 1), mod 2^(n - 1). -/
+/-- The squaring map acts on the standard domain of size 2^n.
+
+It sends point k to point k mod 2^(n - 1) of the standard domain of size 2^(n - 1). -/
 theorem double_standard (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {n : ℕ} (hn : 1 ≤ n)
     (hG : n + 1 ≤ G.adicity) (k : ℕ) :
     2 • ((2 * k + 1) • genPt G (n + 1)) = (2 * (k % 2 ^ (n - 1)) + 1) • genPt G (n - 1 + 1) := by
@@ -233,12 +239,16 @@ theorem is_standard_standard (hV : CircleGenValid G) {n : ℕ} (hG : n + 1 ≤ G
     CircleDomain.is_standard G ⟨n, ofC (genPt G (n + 1))⟩ = some true := by
   simp [CircleDomain.is_standard, generator_eq hV, hG]
 
-/-- The size of the disjoint domain: the ceiling log of min_size, bumped by one when it equals the current size. -/
+/-- The log size of the disjoint domain.
+
+It is the ceiling log of the minimum size, bumped by one when it equals the current log size. -/
 def disjointLog (n min_size : ℕ) : ℕ :=
   if p3_commit.domain.mirror.log2Ceil min_size = n then p3_commit.domain.mirror.log2Ceil min_size + 1
   else p3_commit.domain.mirror.log2Ceil min_size
 
-/-- From a standard domain, the disjoint domain is the standard domain of the bumped size, or none when the circle group has no shift of the needed order. -/
+/-- From a standard domain, the disjoint domain is the standard domain of the bumped size.
+
+It is none when the circle group has no shift of the needed order. -/
 theorem try_create_disjoint_domain_eq (hV : CircleGenValid G) {n : ℕ} (hG : n + 1 ≤ G.adicity)
     (min_size : ℕ) :
     CircleDomain.try_create_disjoint_domain G ⟨n, ofC (genPt G (n + 1))⟩ min_size =
@@ -251,7 +261,7 @@ theorem try_create_disjoint_domain_eq (hV : CircleGenValid G) {n : ℕ} (hG : n 
 theorem disjointLog_ne (n min_size : ℕ) : disjointLog n min_size ≠ n := by
   unfold disjointLog; split_ifs <;> omega
 
-/-- The disjoint domain holds at least min_size points. -/
+/-- The disjoint domain holds at least the minimum size of points. -/
 theorem le_two_pow_disjointLog (n min_size : ℕ) : min_size ≤ 2 ^ disjointLog n min_size := by
   have h := Nat.lt_size_self (min_size - 1)
   have : min_size ≤ 2 ^ p3_commit.domain.mirror.log2Ceil min_size := by
