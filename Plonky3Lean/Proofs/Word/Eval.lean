@@ -145,21 +145,18 @@ theorem evaluate_eq (xorf : W → W → W) (z : W) (hz : inst.ZERO = .ok z)
   simp only [constraint.Operand.evaluate, hz, bind_ok, into_iter_eq]
   exact evaluate_loop_eq inst xorf hx pub wit _ _ z rfl
 
-/-- The word a term reads, or zero for a term outside its segment. -/
-def lookupD [Zero W] (pub wit : Slice W) (i : index.ValueIndex) : W :=
-  (lookup pub wit i).getD 0
-
 /-- The outcome of evaluation when no shift panics.
 
 - The first term outside its segment names the error.
 - Otherwise the result is the XOR of every shifted word, in order. -/
-def evalSpec [Zero W] (xorf : W → W → W) (f : shift.ShiftedValue W → W → W) (pub wit : Slice W)
-    (ts : List (shift.ShiftedValue W)) (v : W) : CoreModels.core.result.Result W constraint.EvaluationError :=
+def evalSpec (xorf : W → W → W) (f : shift.ShiftedValue W → W → W) (pub wit : Slice W)
+    (ts : List (shift.ShiftedValue W)) (v : W) :
+    CoreModels.core.result.Result W constraint.EvaluationError :=
   match ts.find? (fun t => (lookup pub wit t.index).isNone) with
   | some t => .Err (missing pub wit t.index)
-  | none => .Ok (ts.foldl (fun acc t => xorf acc (f t (lookupD pub wit t.index))) v)
+  | none => .Ok (ts.foldl (fun acc t => xorf acc (f t ((lookup pub wit t.index).getD acc))) v)
 
-theorem evalTerms_eq [Zero W] (xorf : W → W → W) (f : shift.ShiftedValue W → W → W)
+theorem evalTerms_eq (xorf : W → W → W) (f : shift.ShiftedValue W → W → W)
     (pub wit : Slice W) (ts : List (shift.ShiftedValue W))
     (hf : ∀ t ∈ ts, ∀ w, shift.ShiftedValue.apply inst t w = .ok (f t w)) (v : W) :
     evalTerms inst xorf pub wit ts v = .ok (evalSpec xorf f pub wit ts v) := by
@@ -170,7 +167,7 @@ theorem evalTerms_eq [Zero W] (xorf : W → W → W) (f : shift.ShiftedValue W �
     cases h : lookup pub wit t.index with
     | none => simp
     | some w =>
-      simp only [Option.isNone_some, List.foldl_cons, hf t (by simp), bind_ok, lookupD, h,
+      simp only [Option.isNone_some, List.foldl_cons, hf t (by simp), bind_ok, h,
         Option.getD_some]
       rw [ih (fun t ht => hf t (by simp [ht]))]
       rfl

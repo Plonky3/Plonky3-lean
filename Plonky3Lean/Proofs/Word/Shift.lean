@@ -121,4 +121,48 @@ theorem apply64_of_new {k : shift.ShiftKind} {amt : Std.Usize} {s : shift.Shift 
     simp [sem64, base_zero, lanes_id]
   · simp [panics64, show amt.val < opWidth 64 k by omega]
 
+/-! ## Terms with two shifts -/
+
+/-- The identity shift, spelled as the constructor normalizes it. -/
+def idShift {W : Type} : shift.Shift W := ⟨.LogicalLeft, 0#u8, ()⟩
+
+/-- The movement a term applies first. -/
+def svInner {W : Type} (t : shift.ShiftedValue W) : shift.Shift W := t.shifts.val.getD 0 idShift
+
+/-- The movement a term applies second. -/
+def svOuter {W : Type} (t : shift.ShiftedValue W) : shift.Shift W := t.shifts.val.getD 1 idShift
+
+theorem sv_index {W : Type} (t : shift.ShiftedValue W) :
+    Std.Array.index_usize t.shifts 0#usize = .ok (svInner t) ∧
+      Std.Array.index_usize t.shifts 1#usize = .ok (svOuter t) := by
+  have hl : t.shifts.val.length = 2 := t.shifts.property
+  refine ⟨?_, ?_⟩ <;> rw [index_usize_eq _ _ (by simp [hl])] <;>
+    simp [svInner, svOuter, List.getD_eq_getElem?_getD, hl]
+
+/-- A 32-bit term applies its inner movement, then its outer one, or panics if either does. -/
+theorem sv_apply32_eq (t : shift.ShiftedValue word.Word32) (x : word.Word32) :
+    shift.ShiftedValue.apply I32w t x =
+      if panics32 (svInner t).kind (svInner t).amount.val ∨
+          panics32 (svOuter t).kind (svOuter t).amount.val then RustM.fail .panic
+      else RustM.ok ⟨sem32 (svOuter t).kind (svOuter t).amount.val
+        (sem32 (svInner t).kind (svInner t).amount.val x.bv)⟩ := by
+  obtain ⟨h0, h1⟩ := sv_index t
+  simp only [shift.ShiftedValue.apply, h0, h1, bind_ok, apply32_eq]
+  by_cases a : panics32 (svInner t).kind (svInner t).amount.val
+  · simp [a]
+  · by_cases b : panics32 (svOuter t).kind (svOuter t).amount.val <;> simp [a, b]
+
+/-- A 64-bit term applies its inner movement, then its outer one, or panics if either does. -/
+theorem sv_apply64_eq (t : shift.ShiftedValue word.Word64) (x : word.Word64) :
+    shift.ShiftedValue.apply I64w t x =
+      if panics64 (svInner t).kind (svInner t).amount.val ∨
+          panics64 (svOuter t).kind (svOuter t).amount.val then RustM.fail .panic
+      else RustM.ok ⟨sem64 (svOuter t).kind (svOuter t).amount.val
+        (sem64 (svInner t).kind (svInner t).amount.val x.bv)⟩ := by
+  obtain ⟨h0, h1⟩ := sv_index t
+  simp only [shift.ShiftedValue.apply, h0, h1, bind_ok, apply64_eq]
+  by_cases a : panics64 (svInner t).kind (svInner t).amount.val
+  · simp [a]
+  · by_cases b : panics64 (svOuter t).kind (svOuter t).amount.val <;> simp [a, b]
+
 end Plonky3Lean.Proofs.Word
