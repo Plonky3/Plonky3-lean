@@ -13,9 +13,13 @@ public import Mathlib.Tactic.FieldSimp
 
 On row i, a selector of the STARK is zero exactly where the 0/1 selector is zero.
 
-So a constraint that is a product of selectors times a selector-free polynomial vanishes on the same rows either way.
+Take a constraint that is a product of selectors times a selector-free polynomial.
 
-A constraint that adds two selector-filtered terms does not: the two terms are weighted differently.
+It vanishes on the same rows either way.
+
+A constraint that adds two selector-filtered terms does not.
+
+Its two terms are weighted differently.
 -/
 
 set_option linter.unusedSectionVars false
@@ -42,7 +46,9 @@ theorem starkRowEnv_eq_zero_iff {T : Instance F} {ω : F} (hω : IsPrimitiveRoot
   · have : ω ^ i = ω ^ (T.height - 1) ↔ i = T.height - 1 := ⟨hω.pow_inj hi (by omega), fun h => h ▸ rfl⟩
     simp [starkRowEnv, rowEnv, sub_eq_zero, this]
 
-/-- A constraint in selector form vanishes on a row with the STARK's selectors exactly when it does with 0/1 selectors. -/
+/-- Take a constraint in selector form and a row.
+
+It vanishes there with the STARK's selectors exactly when it does with 0/1 selectors. -/
 theorem eval_starkRowEnv_eq_zero_iff {T : Instance F} {ω : F} (hω : IsPrimitiveRoot ω T.height)
     (hn : (T.height : F) ≠ 0) {i : ℕ} (hi : i < T.height) {c : MvPolynomial Var F}
     (hc : SelectorSeparated c) :
@@ -63,7 +69,9 @@ theorem satisfiesStark_iff {C : List (MvPolynomial Var F)} {T : Instance F} {ω 
 
 /-! ## Adding two filtered terms -/
 
-/-- The constraint is_first_row a + is_transition b, with a and b the first two columns. -/
+/-- The first-row selector times a, plus the transition selector times b.
+
+Here a and b are the first two columns. -/
 noncomputable def firstPlusTransition : MvPolynomial Var F :=
   .X .isFirstRow * .X (.main 0 0) + .X .isTransition * .X (.main 0 1)
 

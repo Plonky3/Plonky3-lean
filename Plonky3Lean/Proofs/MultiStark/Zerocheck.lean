@@ -57,7 +57,11 @@ theorem batched_of_satisfied {A : Instance K} (hA : A.Satisfied) (α : K) {b : �
       hcs C List.mem_cons_self]
     simp [pow_succ]; ring
 
-/-- **Completeness.** A satisfied batch has a zero batched constraint on every row, so its zerocheck sum is zero at every point. -/
+/-- **Completeness.**
+
+A satisfied batch has a zero batched constraint on every row.
+
+So its zerocheck sum is zero at every point. -/
 theorem zerocheckSum_of_satisfied {batch : List (Instance K)} (h : Satisfied batch) (α β : K)
     (τ : List K) : zerocheckSum batch α β τ = 0 := by
   unfold zerocheckSum rowExt
@@ -68,7 +72,11 @@ theorem zerocheckSum_of_satisfied {batch : List (Instance K)} (h : Satisfied bat
 
 /-! ## Instances of fewer rows -/
 
-/-- **Per-instance suffixes.** The zerocheck sum is the sum over the instances of beta^i times the extension of instance i's batched constraint at the suffix of tau of its own arity. -/
+/-- **Per-instance suffixes.**
+
+The zerocheck sum is a sum over the instances, instance i weighted by beta^i.
+
+Each term is the extension of the instance's batched constraint at the suffix of tau of its arity. -/
 theorem zerocheckSum_eq_suffix (batch : List (Instance K)) (α β : K) (τ : List K)
     (h : ∀ A ∈ batch, A.log_height ≤ τ.length) :
     zerocheckSum batch α β τ = ∑ i : Fin batch.length,
@@ -180,7 +188,11 @@ theorem card_filter_product_le {α β : Type _} (s : Finset α) (t : Finset β) 
   simp only [← card_filter]
   simpa using sum_le_card_nsmul s _ n h
 
-/-- **Schwartz-Zippel at the zerocheck point.** A table nonzero somewhere on the m-cube has a zero extension at at most m (q - 1)^(m - 1) of the (q - 1)^m points with nonzero coordinates. -/
+/-- **Schwartz-Zippel at the zerocheck point.**
+
+Take a table nonzero somewhere on the m-cube, and the (q - 1)^m points with nonzero coordinates.
+
+Its extension is zero on at most m (q - 1)^(m - 1) of them. -/
 theorem card_rowExt_eq_zero_le [Fintype K] [DecidableEq K] (g : ℕ → K) {m b : ℕ} (hb : b < 2 ^ m)
     (hg : g b ≠ 0) :
     #{τ ∈ Fintype.piFinset (fun _ : Fin m => univ.erase (0 : K)) | rowExt g (List.ofFn τ) = 0}
@@ -236,11 +248,17 @@ theorem card_cube [Fintype K] [DecidableEq K] (m : ℕ) :
   rw [Fintype.card_piFinset, prod_const, card_erase_of_mem (mem_univ _), card_univ, card_univ,
     Fintype.card_fin]
 
-/-- **Soundness of the batched zerocheck.** An unsatisfied batch over cubes of at most m variables, with at most k constraints per instance, has a zero zerocheck sum on at most
+/-- **Soundness of the batched zerocheck.**
 
-(k - 1) q (q - 1)^m + q (A - 1) (q - 1)^m + q^2 m (q - 1)^(m - 1)
+Take an unsatisfied batch over cubes of at most m variables, with at most k constraints per instance.
 
-of the q^2 (q - 1)^m draws of alpha, beta and a point with nonzero coordinates. -/
+Draw alpha, beta and a point with nonzero coordinates, q^2 (q - 1)^m draws in all.
+
+Its zerocheck sum is zero on at most this many of them:
+
+```text
+    (k - 1) q (q - 1)^m  +  q (A - 1) (q - 1)^m  +  q^2 m (q - 1)^(m - 1)
+``` -/
 theorem card_zerocheck_eq_zero_le [Fintype K] [DecidableEq K] {batch : List (Instance K)}
     (hsat : ¬ Satisfied batch) {m k : ℕ} (hm : ∀ A ∈ batch, A.log_height ≤ m)
     (hk : ∀ A ∈ batch, A.constraints.length ≤ k) :

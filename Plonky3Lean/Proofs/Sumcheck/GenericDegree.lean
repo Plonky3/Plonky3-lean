@@ -10,9 +10,15 @@ public import Plonky3Lean.Proofs.Matrix.Interpolation
 
 A round of degree d sends h(x_0), h(x_2), ..., h(x_d), where x_i is the interpolation node i.
 
-The verifier rebuilds h(x_1) = c - h(x_0) from the running claim c, and interpolates h through the d + 1 nodes.
+The verifier rebuilds h(x_1) = c - h(x_0) from the running claim c.
 
-With x_0 = 0, x_1 = 1 and distinct nodes, every polynomial of degree at most d with h(0) + h(1) = c has exactly one message, so this is the verifier of Section 4.1.
+It then interpolates h through the d + 1 nodes.
+
+Take x_0 = 0, x_1 = 1 and distinct nodes.
+
+Then every polynomial of degree at most d with h(0) + h(1) = c has exactly one message.
+
+So this is the verifier of Section 4.1.
 -/
 
 namespace Plonky3Lean.Proofs.Sumcheck
@@ -31,7 +37,9 @@ def fullValues (c : EF) : List EF → List EF
 noncomputable def decGen (node : ℕ → EF) (d : ℕ) (c : EF) (m : Fin d → EF) : EF[X] :=
   interpolate univ (fun i : Fin (d + 1) => node i) fun i => (fullValues c (List.ofFn m)).getD i 0
 
-/-- RoundPolyInterpolator::eval is the interpolant through the nodes, evaluated at r, when the weights are those of the nodes. -/
+/-- The round interpolator's evaluation is the interpolant through the nodes, evaluated at r.
+
+This needs the weights to be those of the nodes. -/
 theorem RoundPolyInterpolator.eval_eq (node : ℕ → EF) {d : ℕ} (hd : 0 < d)
     {wt : Fin (d + 1) → EF} (hwt : RoundPolyInterpolator.new node d = some wt) (m : Fin d → EF)
     (c r : EF) :
@@ -106,7 +114,9 @@ def genBefore (h : List (Step F EF)) (polys : List (List EF)) (wits : List F) (p
   | 0 => h
   | i + 1 => genBefore h polys wits pow_bits i ++ genSteps polys wits pow_bits i ++ [.challenge]
 
-/-- The rejection round i raises, if any: a wrong count of values first, then a failing witness. -/
+/-- The rejection round i raises, if any.
+
+A wrong count of values comes first, then a failing witness. -/
 def genErr (S : Sponge F EF) (h : List (Step F EF)) (polys : List (List EF)) (wits : List F)
     (d pow_bits i : ℕ) : Option GenericDegreeError :=
   if (polys.getD i []).length ≠ d then some (.PolyEvalCountMismatch i d (polys.getD i []).length)
@@ -179,7 +189,12 @@ theorem foldlM_genRound (S : Sponge F EF) (node : ℕ → EF) {d : ℕ} (hd : 0 
         Except.pure, hev, htake, genChallengeAt, genBefore, genSteps]
       rw [finalClaim_snoc _ _ _ _ hrs.symm]
 
-/-- GenericDegreeProof::verify: the configuration checks, a panic on equal nodes, then the first rejected round, else the challenges and the replayed claim.
+/-- The generic-degree verification runs in this order:
+
+- the configuration checks
+- a panic on equal nodes
+- the first rejected round
+- otherwise, the challenges and the replayed claim.
 
 The claimed sum is absorbed right after the seed, before the first challenge. -/
 theorem verify_eq (S : Sponge F EF) (node : ℕ → EF) (c : EF) (polys : List (List EF)) (wits : List F)

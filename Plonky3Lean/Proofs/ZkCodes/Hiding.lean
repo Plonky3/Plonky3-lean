@@ -12,7 +12,9 @@ public import Mathlib.Tactic.Positivity
 /-!
 # Hiding of the Reed-Solomon zero-knowledge encoding
 
-At d <= t distinct nonzero points, the masks reach every value: a uniform randomness gives a uniform view.
+At d <= t distinct nonzero points, the masks reach every value.
+
+So a uniform randomness gives a uniform view.
 
 At t + 1 such points, two messages have disjoint views when l >= 1.
 
@@ -48,7 +50,9 @@ theorem restrict_rsZkEnc {l t : ℕ} (L : Fin m → K) (f : Fin l → K) (ρ : F
   funext i
   simp [Plonky3Lean.Spec.ZkCodes.restrict, rsZkEnc, rsZkPoly_eval, maskMap]
 
-/-- At d <= t distinct nonzero points the mask map is onto: interpolate y_i / x_i^l and read its coefficients. -/
+/-- At d <= t distinct nonzero points the mask map is onto.
+
+Interpolate y_i / x_i^l and read its coefficients. -/
 theorem maskMap_surjective {ι : Type _} [Fintype ι] [DecidableEq ι] (l t : ℕ) {x : ι → K}
     (hx : Function.Injective x) (h0 : ∀ i, x i ≠ 0) (hcard : Fintype.card ι ≤ t) :
     Function.Surjective (maskMap l t x) := by
@@ -112,7 +116,9 @@ theorem pushUniform_eq_uniform {α β : Type _} [Fintype α] [Fintype β] [Decid
 
 variable [Fintype K] [DecidableEq K] {S : Finset (Fin m)}
 
-/-- The view at S, for at most t distinct nonzero points: each value is reached by |K|^(t - |S|) randomness vectors. -/
+/-- The view at S, for at most t distinct nonzero points.
+
+Each value is reached by |K|^(t - |S|) randomness vectors. -/
 theorem card_view_fiber {l t : ℕ} (L : Fin m → K) (hL : Set.InjOn L S) (h0 : ∀ i ∈ S, L i ≠ 0)
     (hS : S.card ≤ t) (f : Fin l → K) (y : S → K) :
     (univ.filter fun ρ : Fin t → K => restrict (rsZkEnc L f ρ) S = y).card * Fintype.card (S → K) =
@@ -143,7 +149,9 @@ theorem view_bijective {l t : ℕ} (L : Fin m → K) (hL : Set.InjOn L S) (h0 : 
   rw [Fintype.bijective_iff_surjective_and_card]
   exact ⟨hs, by simp [hS]⟩
 
-/-- Proposition 3.19: the encoding is t-query zero knowledge with error zero, for distinct nonzero points. -/
+/-- Proposition 3.19.
+
+On distinct nonzero points, the encoding is t-query zero knowledge with error zero. -/
 theorem rsZkEnc_isZk {l t : ℕ} (L : Fin m → K) (hL : Function.Injective L) (h0 : ∀ i, L i ≠ 0) :
     IsZkEncoding (rsZkEnc (l := l) (t := t) L) t 0 uniformSim := by
   intro f S hS
@@ -160,7 +168,9 @@ theorem rsZkEnc_mem {l t : ℕ} (L : Fin m → K) (f : Fin l → K) (ρ : Fin t 
       refine (degree_C_mul_X_pow_le _ _).trans_lt ?_ <;> exact_mod_cast (by omega)
   exact mem_degreeLT.mp hmem
 
-/-- The generating matrix of Definition 3.17: rows of powers, the message block then the randomness block. -/
+/-- The generating matrix of Definition 3.17.
+
+Its rows are powers: the message block, then the randomness block. -/
 theorem rsZkEnc_generating {l t : ℕ} (L : Fin m → K) :
     IsGeneratingMatrix (rsZkEnc (l := l) (t := t) L) (rsMsgMatrix L) (rsRandMatrix (l := l) L) := by
   intro f ρ
@@ -172,7 +182,9 @@ theorem rsZkEnc_generating {l t : ℕ} (L : Fin m → K) :
 /-! ## The bound is tight, and zero must stay out of the domain -/
 
 omit [Fintype K] [DecidableEq K] in
-/-- Two distributions with disjoint supports: no function is within distance below 1/2 of both. -/
+/-- Two distributions with disjoint supports.
+
+No function is within distance below 1/2 of both. -/
 theorem one_le_statDist_add {β : Type _} [Fintype β] {p q : β → ℚ} (hp : ∑ b, p b = 1)
     (hq : ∑ b, q b = 1) (hp0 : ∀ b, 0 ≤ p b) (hq0 : ∀ b, 0 ≤ q b)
     (hdis : ∀ b, p b = 0 ∨ q b = 0) (s : β → ℚ) : 1 ≤ statDist p s + statDist q s := by
@@ -211,7 +223,9 @@ theorem pushUniform_eq_zero {α β : Type _} [Fintype α] [DecidableEq β] {g : 
     ext a; simp [h a]
   simp [pushUniform, this]
 
-/-- Two messages whose views at some S of at most t' positions never meet rule out t'-query zero knowledge with error below 1/2. -/
+/-- Take two messages whose views at some S of at most t' positions never meet.
+
+They rule out t'-query zero knowledge with error below 1/2. -/
 theorem not_isZk_of_disjoint {l r : ℕ} (enc : (Fin l → K) → (Fin r → K) → Fin m → K) {t' : ℕ}
     {ζ : ℚ} (hζ : ζ < 1 / 2) (sim : (S : Finset (Fin m)) → (S → K) → ℚ) (f f' : Fin l → K)
     (S : Finset (Fin m)) (hS : S.card ≤ t')
@@ -274,7 +288,11 @@ theorem views_disjoint {l t : ℕ} (hl : 1 ≤ l) (L : Fin m → K) (hL : Set.In
   rw [hQ0, coeff_zero] at hc
   exact zero_ne_one hc
 
-/-- The query bound is tight: with l >= 1 and m >= t + 1 distinct nonzero points, the encoding is not (t + 1)-query zero knowledge, with any simulator and any error below 1/2. -/
+/-- The query bound is tight.
+
+Take l >= 1 and m >= t + 1 distinct nonzero points.
+
+The encoding is not (t + 1)-query zero knowledge, with any simulator and any error below 1/2. -/
 theorem not_isZk_succ {l t : ℕ} (hl : 1 ≤ l) (L : Fin m → K) (hL : Function.Injective L)
     (h0 : ∀ i, L i ≠ 0) (hm : t + 1 ≤ m) {ζ : ℚ} (hζ : ζ < 1 / 2)
     (sim : (S : Finset (Fin m)) → (S → K) → ℚ) :
@@ -295,7 +313,9 @@ theorem rsZkEnc_zero_point {l t : ℕ} (hl : 1 ≤ l) (L : Fin m → K) {i : Fin
     rw [zero_pow (fun h => hb (Fin.ext h)), mul_zero]
   · simp
 
-/-- A zero point leaks the constant coefficient: with l >= 1 and t >= 1 the encoding is then not t-query zero knowledge. -/
+/-- A zero point leaks the constant coefficient.
+
+With l >= 1 and t >= 1, the encoding is then not t-query zero knowledge. -/
 theorem not_isZk_of_zero {l t : ℕ} (hl : 1 ≤ l) (ht : 1 ≤ t) (L : Fin m → K) {i : Fin m}
     (hi : L i = 0) {ζ : ℚ} (hζ : ζ < 1 / 2) (sim : (S : Finset (Fin m)) → (S → K) → ℚ) :
     ¬ IsZkEncoding (rsZkEnc (l := l) (t := t) L) t ζ sim := by

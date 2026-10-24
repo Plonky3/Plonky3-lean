@@ -9,7 +9,7 @@ public import Plonky3Lean.Proofs.Stir.Lists
 /-!
 # Newton interpolation
 
-The table of divided differences, then the Newton expansion into coefficients, then trailing zeros removed.
+It builds the table of divided differences, expands it into coefficients, and removes trailing zeros.
 -/
 
 namespace Plonky3Lean.Proofs.Stir
@@ -131,7 +131,9 @@ theorem coeffPoly_stripZeros (l : List K) :
 theorem divDiff_self (v r : ℕ → K) (i : ℕ) : divDiff v r i i = r i := by
   simp [divDiff, interpAB]
 
-/-- One stage of the table: entries k, ..., n - 1 move from f[v_(i-k+1)..v_i] to f[v_(i-k)..v_i], k = m + 1. -/
+/-- One stage of the table, with k = m + 1.
+
+Entries k, ..., n - 1 move from f[v_(i-k+1)..v_i] to f[v_(i-k)..v_i]. -/
 theorem dd_stage {n : ℕ} (v r : ℕ → K) (hv : Set.InjOn v (range n : Set ℕ)) (dinv : List K)
     (hdinv : dinv = (List.range (n - 1)).flatMap fun k' =>
       (List.range (n - (k' + 1))).map fun i' => (v (i' + (k' + 1)) - v (i' + (k' + 1) - (k' + 1)))⁻¹)
@@ -205,7 +207,7 @@ theorem coeffPoly_add_scaled (cs nb : List K) (d : K) (h : nb.length ≤ cs.leng
   · rfl
   · rw [getD_of_le nb (i := j) 0 (by omega), mul_zero, add_zero]
 
-/-- One step of interpolate_poly's Newton expansion, as the transcription writes it. -/
+/-- One step of the Newton expansion, as the transcription writes it. -/
 def newtonStep (points dd : List K) : List K × List K → ℕ → List K × List K := fun st k' =>
   let k := k' + 1
   let pk := points.getD (k - 1) 0
@@ -218,7 +220,9 @@ def newtonStep (points dd : List K) : List K × List K → ℕ → List K × Lis
     cs.set i (cs.getD i 0 + dd.getD k 0 * new_basis.getD i 0)) st.1
   (coeffs, new_basis)
 
-/-- The Newton expansion: after m steps the basis is prod_{j < m} (X - v_j) and the coefficients sum the first m + 1 terms. -/
+/-- The Newton expansion after m steps.
+
+The basis is prod_{j < m} (X - v_j), and the coefficients sum the first m + 1 terms. -/
 theorem newton_expansion (points dd : List K) {n : ℕ} (hn : 0 < n) :
     ∀ m ≤ n - 1,
       let st := (List.range m).foldl (newtonStep points dd)
@@ -274,7 +278,7 @@ theorem allDistinct_iff (points : List K) : allDistinct points = true ↔ points
     simp [List.getElem?_eq_getElem hi, List.getElem?_eq_getElem (hji.trans hi)] at this
     exact fun h' => this h'.symm
 
-/-- One stage of interpolate_poly's table, as the transcription writes it. -/
+/-- One stage of the interpolation's table, as the transcription writes it. -/
 def ddStep (n : ℕ) (dinv : List K) : List K × ℕ → ℕ → List K × ℕ := fun st k' =>
   let k := k' + 1
   let width := n - k

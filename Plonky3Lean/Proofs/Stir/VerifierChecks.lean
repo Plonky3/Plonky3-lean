@@ -8,11 +8,17 @@ public import Plonky3Lean.Proofs.Stir.QueryFold
 /-!
 # The verifier's shape checks and the query loop
 
-The answer polynomial is accepted with at most one coefficient per point, and none only when there is no point.
+The answer polynomial is accepted with at most one coefficient per point.
 
-The compact encoding interpolates the points itself, and rejects repeated points instead of panicking.
+It may have none only when there is no point.
 
-The query loop keeps the first answer of each repeated index, so the points it records are distinct.
+The compact encoding interpolates the points itself.
+
+It rejects repeated points instead of panicking.
+
+The query loop keeps the first answer of each repeated index.
+
+So the points it records are distinct.
 -/
 
 namespace Plonky3Lean.Proofs.Stir
@@ -27,7 +33,9 @@ variable {F EF : Type _} [Field F] [Field EF] [Algebra F EF] [DecidableEq F] [De
 theorem throw_ne_pure {α : Type} (e : StirError) (a : α) : (throw e : VM α) ≠ pure a := by
   intro h; cases h
 
-/-- The sent answer polynomial is accepted with at most max coefficients, and an empty list only when max = 0. -/
+/-- The sent answer polynomial is accepted with at most max coefficients.
+
+It may be empty only when max = 0. -/
 theorem check_ans_length_ok (round : ℕ) (ans : List EF) (max : ℕ) :
     check_ans_length round ans max = pure () ↔ ans.length ≤ max ∧ (ans ≠ [] ∨ max = 0) := by
   unfold check_ans_length
@@ -41,7 +49,9 @@ theorem check_ans_length_ok (round : ℕ) (ans : List EF) (max : ℕ) :
     · exact Or.inr (by by_contra hm; exact h2 ⟨he, by omega⟩)
     · exact Or.inl he
 
-/-- The compact encoding on distinct points rebuilds the interpolant, and never panics. -/
+/-- The compact encoding on distinct points rebuilds the interpolant.
+
+It never panics. -/
 theorem resolve_compact_eq (round : ℕ) (points values : List EF) (hlen : points.length = values.length)
     (hnd : points.Nodup) (hne : points ≠ []) :
     ∃ cs, resolve_ans_polynomial round true [] points values = pure cs ∧
@@ -80,7 +90,9 @@ theorem check_ans_length_run (round : ℕ) (ans : List EF) (max : ℕ) :
     (check_ans_length round ans max).run.isSome := by
   unfold check_ans_length; split_ifs <;> rfl
 
-/-- Resolving the answer polynomial never panics: every malformed answer polynomial is an error. -/
+/-- Resolving the answer polynomial never panics.
+
+Every malformed answer polynomial is an error. -/
 theorem resolve_ans_polynomial_no_panic (round : ℕ) (compact : Bool) (transmitted points values : List EF) :
     (resolve_ans_polynomial round compact transmitted points values).run.isSome := by
   unfold resolve_ans_polynomial
@@ -122,7 +134,7 @@ theorem foldlM_inv {σ : Type} (P : σ → Prop) (step : σ → ℕ → VM σ) :
       rw [this] at hr
       exact ih s r (hstep _ _ _ (by simp) h this) hr
 
-/-- Bind in VM through a step that succeeded. -/
+/-- Bind in the verifier monad through a step that succeeded. -/
 theorem bind_eq_pure {α β : Type} {x : VM α} {f : α → VM β} {b : β} (h : x >>= f = pure b) :
     ∃ a, x = pure a ∧ f a = pure b := by
   rcases hx : x.run with _ | (e | a)
@@ -133,7 +145,9 @@ theorem bind_eq_pure {α β : Type} {x : VM α} {f : α → VM β} {b : β} (h :
   · have : x = pure a := by show x = ExceptT.mk (some (Except.ok a)); rw [← hx]; rfl
     exact ⟨a, this, by rw [this] at h; exact h⟩
 
-/-- The query loop records each distinct index once, its point at the index, and one answer per point. -/
+/-- The query loop records each distinct index once.
+
+It records the index's point, and one answer per point. -/
 theorem fold_queries_seen (G : Gen F) (round : ℕ) (fold_shift : F) (fold_log_domain current_log_domain : ℕ)
     (arity : ℕ) (current_shift : F) (fold_beta : EF) (prev_ctx : Option (VirtualRoundContext EF))
     (query_indices : List ℕ) (round_rows : List (List EF)) (st : QueryState F EF)

@@ -8,9 +8,13 @@ public import Plonky3Lean.Proofs.Sumcheck.Verifier
 /-!
 # The honest sumcheck prover against the sponge
 
-Round i sends the kernel's pair on the tables folded at the challenges drawn so far, grinds when asked, and draws its challenge from the history.
+Round i sends the kernel's pair on the tables folded at the challenges drawn so far.
 
-The quadratic verifier accepts these rounds, and replays the claim sum_b f[b] w[b] to the sum over the folded tables.
+It grinds when asked, and draws its challenge from the history.
+
+The quadratic verifier accepts these rounds.
+
+It replays the claim sum_b f[b] w[b] to the sum over the folded tables.
 -/
 
 namespace Plonky3Lean.Proofs.Whir
@@ -20,7 +24,9 @@ open p3_sumcheck.mirror Plonky3Lean.Proofs.Sumcheck
 
 variable {F EF : Type _} [Field EF]
 
-/-- The kernel's pair on two tables: the sum over the lower halves and the sum of the products of the differences. -/
+/-- The kernel's pair on two tables.
+
+It is the sum over the lower halves and the sum of the products of the differences. -/
 def kernelPair (f w : List EF) : EF × EF :=
   (∑ i ∈ range (f.length / 2), w.getD i 0 * f.getD i 0,
     ∑ i ∈ range (f.length / 2), (w.getD (f.length / 2 + i) 0 - w.getD i 0) *
@@ -187,7 +193,9 @@ def honestSumcheck (S : Sponge F EF) (solve : List (Step F EF) → ℕ → F) (p
     (h : List (Step F EF)) (N : ℕ) : ProverState F EF :=
   proverRun S solve pow ⟨[], [], [], f, w, if 0 < N then h ++ [SumcheckShape.seed N pow .Evaluation] else h⟩ N
 
-/-- verify_rounds accepts the honest prover: it returns the prover's challenges, the replayed claim and the prover's history. -/
+/-- The round verification accepts the honest prover.
+
+It returns the prover's challenges, the replayed claim and the prover's history. -/
 theorem verify_rounds_honest (S : Sponge F EF) (solve : List (Step F EF) → ℕ → F)
     (hsolve : ∀ h b, 0 < b → S.grind h b (solve h b) = true) (pow : ℕ) (f w : List EF) (h : List (Step F EF))
     (c : EF) (N : ℕ) :

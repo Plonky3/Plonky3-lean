@@ -14,7 +14,9 @@ namespace Plonky3Lean.Proofs.Whir
 
 open p3_whir.mirror p3_whir.parameters.mirror
 
-/-- BabyBear, 28 variables, rate 1/4, schedule [8, 2, 18], rates [10, 10]: accepted, and round 1 queries a folded domain of 2^28 points. -/
+/-- BabyBear, 28 variables, rate 1/4, schedule [8, 2, 18], rates [10, 10] is accepted.
+
+Its round 1 queries a folded domain of 2^28 points. -/
 theorem later_fold_exceeds (cs : Counts) :
     ∃ c, schedule cs 28 2 [8, 2, 18] [10, 10] 27 = .ok c ∧
       (c.round_parameters.map (·.log_folded_domain_size)) = [22, 28] := by
@@ -98,7 +100,9 @@ theorem pairs_getElem (rates : List ℕ) {j : ℕ} (hj : j < rates.length) :
     (rates.zipIdx.map fun e => (e.2, e.1))[j]'(by simpa using hj) = (j, rates.getD j 0) := by
   simp [List.getElem_zipIdx, List.getD_eq_getElem?_getD, List.getElem?_eq_getElem hj]
 
-/-- The round loop of an accepted schedule keeps the invariant: after j rounds, the rest of the loop runs from a state of the expected shape. -/
+/-- The round loop of an accepted schedule keeps the invariant.
+
+After j rounds, the rest of the loop runs from a state of the expected shape. -/
 theorem fold_inv (cs : Counts) {n rate0 : ℕ} {folding rates : List ℕ} (hlen : rates.length + 1 = folding.length)
     (hsum : folding.sum ≤ n) {stF : LoopState}
     (hok : (rates.zipIdx.map fun e => (e.2, e.1)).foldlM (p3_whir.parameters.mirror.roundStep cs folding)
@@ -155,7 +159,11 @@ theorem getD_le_pre (folding : List ℕ) {j : ℕ} (hj : j < folding.length) :
 theorem pre_length (folding : List ℕ) : pre folding folding.length = folding.sum := by
   simp [pre]
 
-/-- An accepted schedule satisfies every hypothesis of completeness and of the absence of panics, except that later folded domains fit the two-adicity: the configuration checks only the first. -/
+/-- An accepted schedule satisfies every hypothesis of completeness and of the absence of panics.
+
+The one exception is that later folded domains fit the two-adicity.
+
+The configuration checks only the first. -/
 theorem valid_of_schedule {cs : Counts} {n rate0 : ℕ} {folding rates : List ℕ} {max_log : ℕ} {c : WhirConfig}
     (hok : schedule cs n rate0 folding rates max_log = .ok c) (hne : folding ≠ []) (hsum : folding.sum ≤ n)
     {adicity : ℕ} (had : ∀ t ≤ c.n_rounds, (queried c t).log_folded_domain_size ≤ adicity) :

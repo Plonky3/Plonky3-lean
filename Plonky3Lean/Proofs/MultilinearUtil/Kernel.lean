@@ -9,7 +9,9 @@ public import Plonky3Lean.Proofs.MultilinearUtil.SplitEq
 
 The kernel splits each packed extension weight into its basis coefficients, one packed base value each.
 
-It dots every coefficient row against the polynomial block, four entries per delayed reduction, and reassembles:
+It dots every coefficient row against the polynomial block, four entries per delayed reduction.
+
+Then it reassembles the weights:
 
 ```text
     sum_i w_i x_i = sum_k ( sum_i coeff_k(w_i) x_i ) b_k
@@ -118,7 +120,11 @@ theorem block_dot {W : ℕ} (eq1 : List (Fin W → EF)) (c : List F) (hc : c.len
       (List.zipWith (fun a x => a * algebraMap F EF x) (to_ext_iter eq1) c).sum := by
   rw [← packed_dot eq1 c (le_of_eq hc.symm), laneSum_zipWith_mulBase _ _ (by simp)]
 
-/-- compress_hi_dot_packed: sum_j eq0[j] times the dot of block j against the unpacked suffix table, on both paths. -/
+/-- The packed high compression sums, over the blocks j, prefix weight j times a dot product.
+
+That dot product is block j against the unpacked suffix table.
+
+This holds on both paths. -/
 theorem compress_hi_dot_packed_eq {D W : ℕ} (hW : 0 < W) (b : Module.Basis (Fin D) F EF)
     (eq1 : List (Fin W → EF)) (chunk : List F) (eq0 : List EF)
     (h : chunk.length = eq0.length * (eq1.length * W)) :
@@ -178,7 +184,7 @@ theorem factored_sum (s : EF) (z0 z1 : List EF) (c : List F)
   rw [getD_chunkAt _ _ hi, sTable, getD_map_mul, getD_eqTable_append _ _ hj hi, getD_map_ringHom]
   ring
 
-/-- compress_suffix_dot: on both storages, the prefix weights times the suffix dots. -/
+/-- On both storages, the suffix dot compression is the prefix weights times the suffix dots. -/
 theorem compress_suffix_dot_eq {D W : ℕ} (hW : 0 < W) (b : Module.Basis (Fin D) F EF)
     (e : EqMaybePacked EF W) (chunk : List F) (eq0 : List EF) (he : 0 < e.table.length)
     (h : chunk.length = eq0.length * e.table.length) :
@@ -196,7 +202,9 @@ theorem compress_suffix_dot_eq {D W : ℕ} (hW : 0 < W) (b : Module.Basis (Fin D
     simp only [EqMaybePacked.compress_suffix_dot, EqMaybePacked.table, length_to_ext_iter] at h he ⊢
     exact compress_hi_dot_packed_eq hW b P chunk eq0 h
 
-/-- compress_suffix_into: entry j is scale times the extension of block j at the point, the suffix variables fixed. -/
+/-- The suffix compression fixes the suffix variables at the point.
+
+Its entry j is scale times the extension of block j at the point. -/
 theorem split_compress_suffix [DecidableEq EF] {D : ℕ} (w T : ℕ) (b : Module.Basis (Fin D) F EF)
     (point : List EF) (s : EF) (h : point.length < 64) (poly : List F) (out : List EF) {k : ℕ}
     (hp : poly.length = 2 ^ k * 2 ^ point.length) (ho : out.length = 2 ^ k) :
@@ -251,7 +259,7 @@ theorem accumulate_scalar_into_eq {W : ℕ} (e : EqMaybePacked EF W) (out : List
     rw [List.drop_eq_nil_of_le (by omega), List.append_nil]
     exact congrArg (fun φ => List.zipWith φ _ _) (by funext o t; ring)
 
-/-- accumulate_into: every entry gains scale times eq(point, x), with the optional extra weight. -/
+/-- Accumulation adds scale times eq(point, x) to every entry, with the optional extra weight. -/
 theorem split_accumulate_into [DecidableEq EF] (w T : ℕ) (point : List EF) (s : EF)
     (h : point.length < 64) (out : List EF) (hout : out.length = 2 ^ point.length) (ws : Option EF) :
     (SplitEq.new_packed w T point s).bind (fun se => se.accumulate_into out ws) =
@@ -311,7 +319,7 @@ theorem split_accumulate_into [DecidableEq EF] (w T : ℕ) (point : List EF) (s 
   rw [getD_eqTable_append _ _ hj hi]
   ring
 
-/-- materialize: the scaled equality table of the point. -/
+/-- Materializing gives the scaled equality table of the point. -/
 theorem split_materialize [DecidableEq EF] (w T : ℕ) (point : List EF) (s : EF) (h : point.length < 64) :
     (SplitEq.new_packed w T point s).bind (fun se => se.materialize) = some (sTable s point) := by
   obtain ⟨e, he, ht⟩ := split_new_packed w T point s h

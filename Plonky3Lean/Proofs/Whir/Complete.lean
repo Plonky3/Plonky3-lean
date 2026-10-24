@@ -43,7 +43,9 @@ theorem oodProve_prefix (S : WSponge F EF) (P : List EF) (nv : ℕ) (h : List (S
     rw [← add_assoc, oodProve_succ]
     exact ⟨ys ++ _, by simp only [hy, List.append_assoc]; rfl⟩
 
-/-- The verifier's out-of-domain loop on the honest answers draws the prover's points and ends at its history. -/
+/-- The verifier's out-of-domain loop on the honest answers draws the prover's points.
+
+It ends at the prover's history. -/
 theorem ood_loop (S : WSponge F EF) (P : List EF) (nv : ℕ) (h : List (Step F EF)) {s : ℕ} :
     ∀ k ≤ s, (List.range k).foldl (fun (acc : List (List EF) × List (Step F EF)) i =>
         let z := S.sample acc.2
@@ -77,7 +79,7 @@ theorem row_map (P : List F) (n k : ℕ) (ω : F) (i : ℕ) :
   refine List.map_congr_left fun j _ => ?_
   simp only [Function.comp, uni_map, block, List.map_take, List.map_drop, map_pow]
 
-/-- The verifier's folds of honest rows: each is the folded table's polynomial at the row's domain point. -/
+/-- The verifier's fold of an honest row is the folded table's polynomial at the row's domain point. -/
 theorem folds_honest (thr w T : ℕ) (P : List EF) {nv : ℕ} (hP : P.length = 2 ^ nv) (r : List EF)
     (hr : r.length ≤ nv) (hr64 : r.length < 64) (ω : EF) (idx : List ℕ) :
     (idx.map (row P nv r.length ω)).mapM (fun a => (p3_multilinear_util.poly.mirror.Poly.new a).bind
@@ -132,7 +134,7 @@ theorem fns_honest {s : Statements F EF} {P : List EF} {n : ℕ} (hP : P.length 
     simp only [Statements.fns, Statements.evals, List.map_map, h2]
     exact List.map_congr_left fun v _ => cubeDot_sel P hP _
 
-/-- With honest claims, a constraint's claim is the sum of the table against the constraint's weight table. -/
+/-- With honest claims, a constraint's claim is the sum of the table against its weight table. -/
 theorem combine_evals_honest (con : Constraint F EF) (P : List EF) {n : ℕ} (hP : P.length = 2 ^ n) (σ : EF)
     (h : ∀ s ∈ con.statements, s.WF ∧ s.Dim n ∧ s.Honest P) :
     con.combine_evals σ = σ + ∑ b ∈ range (2 ^ n), P.getD b 0 * (cubeTable (weightAt con) n).getD b 0 := by
@@ -213,7 +215,9 @@ theorem play_query_indices_lt (S : WSponge F EF) (hidx : ∀ h bits count, ∀ i
 
 /-! ## The assumptions of completeness -/
 
-/-- The configuration is consistent, as the Rust derivation makes it, and every folded domain fits the two-adicity. -/
+/-- The configuration is consistent, as the Rust derivation makes it.
+
+Every folded domain fits the two-adicity. -/
 structure Valid (c : WhirConfig) (n adicity : ℕ) : Prop where
   schedule : c.n_rounds < c.folding_schedule.length
   folding : ∀ t ≤ c.n_rounds, (queried c t).folding_factor = c.folding_schedule.getD t 0
@@ -270,7 +274,9 @@ structure Inv (P0 : List F) (n : ℕ) (commitment : Com) (t : ℕ) (st : PState 
     st.prevRoot = (PE.commit (codeRows E c st.prevP st.prevNv t)).1
   rounds : st.rounds.length = t
 
-/-- The honest sumcheck on two tables of 2^nv entries, k <= nv rounds: lengths, folds and the replayed claim. -/
+/-- The honest sumcheck on two tables of 2^nv entries, for k <= nv rounds.
+
+It gives the lengths, the folds and the replayed claim. -/
 theorem honestSumcheck_spec (S : Sponge F EF) (solve : List (Step F EF) → ℕ → F) (pow : ℕ) (f w : List EF)
     (h : List (Step F EF)) {nv k : ℕ} (hf : f.length = 2 ^ nv) (hw : w.length = 2 ^ nv) (hk : k ≤ nv) :
     let H := honestSumcheck S solve pow f w h k
@@ -283,7 +289,9 @@ theorem honestSumcheck_spec (S : Sponge F EF) (solve : List (Step F EF) → ℕ 
     ⟨[], [], [], f, w, if 0 < k then h ++ [SumcheckShape.seed k pow .Evaluation] else h⟩ k
   exact ⟨by simpa [H, honestSumcheck] using hl, proverRun_tables S solve pow f w _ hf hw k hk⟩
 
-/-- The weight table after a sumcheck on it: its extension at y is the extension before, at the challenges then y. -/
+/-- The weight table after a sumcheck on it.
+
+Its extension at y is the extension before, at the challenges then y. -/
 theorem mle_fold_weight (w rs y : List EF) {nv : ℕ} (h : rs.length + y.length = nv) :
     mle (foldTable w nv rs) y = mle w (rs ++ y) := by
   rw [← h, mle_foldTable]
@@ -379,7 +387,9 @@ theorem query_pow_honest (S : WSponge F EF) (solve : List (Step F EF) → ℕ �
   · simp [hb]; rfl
   · simp [hb, hS, hsolve h bits (Nat.pos_of_ne_zero hb)]; rfl
 
-/-- The STIR phase on the honest openings: the selector statement of the folded table at the queried points. -/
+/-- The STIR phase on the honest openings.
+
+It gives the selector statement of the folded table at the queried points. -/
 theorem stir_honest {P0 : List F} {n : ℕ} {commitment : Com} (hv : Valid c n E.adicity)
     (hh : Honesty E PE c P0 n commitment) {t : ℕ} (ht : t ≤ c.n_rounds) {st : PState F EF Com MP D}
     (hinv : Inv E PE c P0 n commitment t st) {r : List EF} (hr : st.rand.getLast? = some r)
@@ -443,7 +453,9 @@ theorem stir_honest {P0 : List F} {n : ℕ} {commitment : Com} (hv : Valid c n E
   simp [two_adic_generator, hv.adicity t ht, g, hrP, map_pow]
   exact ⟨rfl, rfl⟩
 
-/-- The verifier parses the honest round: the root, then the prover's out-of-domain points and answers. -/
+/-- The verifier parses the honest round.
+
+It reads the root, then the prover's out-of-domain points and answers. -/
 theorem parse_honest (root : Com) (P : List EF) (nv s t : ℕ) (h : List (Step F EF)) (pw : F)
     (op : QueryOpenings F EF MP) (sc : SumcheckData F EF) :
     let o := oodProve E.S P nv (h ++ [.message (E.enc root)]) s
@@ -465,7 +477,7 @@ theorem queried_lt {t : ℕ} (ht : t < c.n_rounds) : c.round_parameters[t]? = so
   simp only [queried, ht, ↓reduceIte, List.getD_eq_getElem?_getD]
   rw [List.getElem?_eq_getElem ht, Option.getD_some]
 
-/-- One honest round: the verifier's round accepts it, and the invariant moves to the next round. -/
+/-- The verifier's round accepts one honest round, and the invariant moves to the next round. -/
 theorem round_honest {P0 : List F} {n : ℕ} {commitment : Com} (hv : Valid c n E.adicity)
     (hh : Honesty E PE c P0 n commitment) {t : ℕ} (ht : t < c.n_rounds) {st : PState F EF Com MP D}
     (hinv : Inv E PE c P0 n commitment t st) (proof : WhirProof F EF Com MP)
@@ -666,7 +678,9 @@ theorem stAt_canonical {P0 : List F} {n : ℕ} {commitment : Com} (hv : Valid c 
 
 /-! ## Completeness -/
 
-/-- The final check on the honest final table passes: each queried value is the table's polynomial at its point. -/
+/-- The final check on the honest final table passes.
+
+Each queried value is the table's polynomial at its point. -/
 theorem select_verify_honest (P : List EF) (nv : ℕ) (g : F) (idx : List ℕ) :
     SelectStatement.verify ⟨nv, idx.map (g ^ ·), idx.map fun i => uni P (algebraMap F EF (g ^ i))⟩ P = true := by
   simp only [SelectStatement.verify, List.all_eq_true]
@@ -778,7 +792,9 @@ theorem replay_complete {P0 : List F} {n : ℕ} {commitment : Com} (hv : Valid c
     simp only [hR, ↓reduceIte, hw, hp, Option.bind_some, pure, Except.pure, hclaim, not_true_eq_false]
     exact ⟨_, rfl⟩
 
-/-- Completeness: the verifier accepts the honest proof, and returns the concatenated folding challenges. -/
+/-- Completeness: the verifier accepts the honest proof.
+
+It returns the concatenated folding challenges. -/
 theorem verify_complete {P0 : List F} {n : ℕ} {commitment : Com} (hv : Valid c n E.adicity)
     (hh : Honesty E PE c P0 n commitment) (seed : Step F EF) (h : List (Step F EF)) :
     ∃ out, verify E c seed (honestProof E PE c P0 n commitment (h ++ [seed])) commitment h = some (.ok out) := by

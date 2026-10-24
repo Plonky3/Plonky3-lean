@@ -10,9 +10,9 @@ public import Plonky3Lean.Proofs.Air.Degree
 
 On a trace that satisfies the STARK's relation:
 
-* the prover's quotient values are the quotient polynomial Q at the quotient coset's points;
-* when every constraint fits the chunks p3-air's sizing gives, Q has degree below the quotient coset's size;
-* the verifier then recovers Q(zeta) from the honest chunk openings, and its check at zeta accepts.
+- the prover's quotient values are the quotient polynomial Q at the quotient coset's points
+- if every constraint fits the chunks p3-air's sizing gives, Q has degree below the coset's size
+- the verifier then recovers Q(zeta) from the honest chunk openings, and its check at zeta accepts.
 -/
 
 set_option linter.unusedSectionVars false
@@ -118,11 +118,11 @@ variable [DecidableEq K]
 
 /-- Completeness of the identity at zeta.
 
-* The trace satisfies the STARK's relation on the trace subgroup s H of order n.
-* Every constraint fits the 2^L chunks of n that p3-air's sizing gives.
-* The quotient coset has order 2^L n.
-* Each chunk's opening rebuilds to its interpolant of the quotient at zeta, as an honest scheme opens it.
-* zeta lies off s H.
+- The trace satisfies the STARK's relation on the trace subgroup s H of order n.
+- Every constraint fits the 2^L chunks of n that p3-air's sizing gives.
+- The quotient coset has order 2^L n.
+- Each chunk's opening rebuilds to its interpolant of the quotient at zeta, as an honest scheme opens it.
+- zeta lies off s H.
 
 Then the recombined quotient is Q(zeta), and the check at zeta accepts it. -/
 theorem honest_ood_check (GK : Gen K) (hV : GenValid GK) (hN : GenNested GK) (h2 : (2 : K) ≠ 0)

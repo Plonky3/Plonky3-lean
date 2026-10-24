@@ -7,10 +7,11 @@ public import P3UniStark
 /-!
 # The Fiat-Shamir order
 
-* Alpha is drawn after the trace commitment, the preprocessed commitment when the AIR has preprocessed columns, and the public values.
-* Zeta is drawn after every commitment of the proof and the grind.
-* The opening argument starts after zeta.
-* A preprocessed or randomization commitment that disagrees with the shape is rejected.
+- Alpha is drawn after the trace commitment and the public values.
+- When the AIR has preprocessed columns, alpha also follows the preprocessed commitment.
+- Zeta is drawn after every commitment of the proof and the grind.
+- The opening argument starts after zeta.
+- A preprocessed or randomization commitment that disagrees with the shape is rejected.
 -/
 
 set_option linter.unusedSectionVars false
@@ -19,7 +20,11 @@ namespace Plonky3Lean.Proofs.UniStark
 
 open p3_uni_stark.transcript.mirror
 
-/-- The pattern puts alpha after the trace, preprocessed and public steps, and zeta after the quotient, randomization and grind steps, with the opening argument last. -/
+/-- The pattern orders the steps:
+
+- alpha after the trace, preprocessed and public steps
+- zeta after the quotient, randomization and grind steps
+- the opening argument last. -/
 theorem pattern_order (s : StarkShape) :
     ∃ a b, s.pattern = a ++ [.alpha] ++ b ++ [.zeta, .begin_opening_argument, .end_opening_argument] ∧
       .trace_commitment ∈ a ∧ .public_values s.num_public_values ∈ a ∧
@@ -36,7 +41,10 @@ theorem pattern_order (s : StarkShape) :
 
 variable {C F E : Type}
 
-/-- The first phase accepts exactly when a preprocessed commitment is present for a positive preprocessed width, and alpha is the oracle at the trace commitment, that commitment, and the public values. -/
+/-- The first phase accepts exactly when two conditions hold:
+
+- a preprocessed commitment is present for a positive preprocessed width
+- alpha is the oracle at the trace commitment, that commitment, and the public values. -/
 theorem constraint_phase_eq (shape : StarkShape) (H : List (Msg C F) → E) (st : List (Msg C F))
     (trace : C) (prep : Option C) (pv : List F) :
     constraint_phase shape H st trace prep pv =
@@ -52,7 +60,11 @@ theorem constraint_phase_eq (shape : StarkShape) (H : List (Msg C F) → E) (st 
   rcases h : decide (shape.preprocessed_width > 0) <;> rcases prep with _ | c <;>
     simp_all [constraint_phase, optional_commitment, bind, Except.bind, pure, Except.pure]
 
-/-- When the second phase accepts, zeta is the oracle at the input state extended by the quotient commitment, the randomization commitment when present, and the grind witness when there is a grind. -/
+/-- When the second phase accepts, zeta is the oracle at the input state extended by:
+
+- the quotient commitment
+- the randomization commitment, when present
+- the grind witness, when there is a grind. -/
 theorem ood_phase_ok {shape : StarkShape} {H : List (Msg C F) → E}
     {powOk : List (Msg C F) → ℕ → F → Bool} {st st' : List (Msg C F)} {quotient : C}
     {random : Option C} {w : F} {ζ : E}
@@ -67,7 +79,11 @@ theorem ood_phase_ok {shape : StarkShape} {H : List (Msg C F) → E}
     | (split_ifs at h <;> simp_all)
     | simp at h
 
-/-- After both phases accept, zeta is the oracle at a state that holds every commitment of the proof, every public value and alpha's draw. -/
+/-- After both phases accept, zeta is the oracle at a state that holds three things:
+
+- every commitment of the proof
+- every public value
+- alpha's draw. -/
 theorem zeta_binds {shape : StarkShape} {H : List (Msg C F) → E}
     {powOk : List (Msg C F) → ℕ → F → Bool} {st st₁ st₂ : List (Msg C F)} {trace quotient : C}
     {prep random : Option C} {pv : List F} {w : F} {α ζ : E}

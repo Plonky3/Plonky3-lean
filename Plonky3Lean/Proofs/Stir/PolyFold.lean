@@ -8,9 +8,17 @@ public import Plonky3Lean.Proofs.Stir.FoldPaper
 /-!
 # PolyFold
 
-Fact 4.6 for q = X^k splits f into its k parts, f(X) = sum_{l < k} X^l f_l(X^k), with f_l reading the coefficients l, l + k, l + 2k, ....
+Fact 4.6 for q = X^k splits f into its k parts:
 
-PolyFold(f, k, r) = sum_l r^l f_l, and on the points x with x^k = y the fold of f is PolyFold(f, k, alpha)(y).
+```text
+    f(X) = sum_{l < k} X^l f_l(X^k)
+```
+
+Part f_l reads the coefficients l, l + k, l + 2k, and so on.
+
+PolyFold(f, k, r) is sum_l r^l f_l.
+
+On the points x with x^k = y, the fold of f is PolyFold(f, k, alpha)(y).
 -/
 
 namespace Plonky3Lean.Proofs.Stir
@@ -46,7 +54,9 @@ theorem eval_eq_sum_splitPart (f : K[X]) {k : ℕ} (hk : 0 < k) (x : K) :
   · refine (natDegree_sum_le_of_forall_le _ _ fun i hi => ?_).trans_lt (Nat.lt_succ_self _)
     exact (natDegree_C_mul_X_pow_le _ _).trans (Nat.lt_succ_iff.1 (mem_range.1 hi))
 
-/-- PolyFold lowers the degree bound by k: deg f < k d gives deg PolyFold(f, k, r) < d. -/
+/-- PolyFold lowers the degree bound by k.
+
+If deg f < k d, then deg PolyFold(f, k, r) < d. -/
 theorem degree_polyFold_lt {f : K[X]} {k d : ℕ} (hk : 0 < k) (hf : f.degree < (k * d : ℕ))
     (r : K) : (polyFold f k r).degree < d := by
   rw [degree_lt_iff_coeff_zero]

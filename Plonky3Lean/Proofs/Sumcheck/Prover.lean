@@ -15,9 +15,15 @@ For tables f and w of 2^(n+1) entries, the round polynomial of g = f~ w~ is
     s(X) = sum_{b in {0,1}^n} f~(X, b) w~(X, b)
 ```
 
-Each factor is linear in X, so s has degree 2, with s(0) the sum over the lower half of f w and its X^2 coefficient the sum of the products of the differences.
+Each factor is linear in X, so s has degree 2.
 
-The round kernel sends exactly these two values, and folding both tables at the challenge leaves the tables of f~(r, .) and w~(r, .).
+Its value s(0) is the sum over the lower half of f w.
+
+Its X^2 coefficient is the sum of the products of the differences.
+
+The round kernel sends exactly these two values.
+
+Folding both tables at the challenge leaves the tables of f~(r, .) and w~(r, .).
 -/
 
 namespace Plonky3Lean.Proofs.Sumcheck
@@ -59,7 +65,9 @@ theorem eval_map_finSuccEquiv {n : ℕ} (P : MvPolynomial (Fin (n + 1)) F) (b : 
     ((finSuccEquiv F n P).map (eval b)).eval a = eval (Fin.cons a b) P :=
   (eval_eq_eval_mv_eval' b a P).symm
 
-/-- The round kernel on two tables of 2^(n+1) entries sends the honest message of their product: its value at 0 and its X^2 coefficient. -/
+/-- The round kernel on two tables of 2^(n+1) entries sends the honest message of their product.
+
+That message is its value at 0 and its X^2 coefficient. -/
 theorem sumcheck_coefficients_prefix_honest (f w : List F) {n : ℕ} (hf : f.length = 2 ^ (n + 1))
     (hw : w.length = 2 ^ (n + 1)) :
     p3_sumcheck.strategy.mirror.sumcheck_coefficients_prefix f w =
@@ -87,7 +95,9 @@ theorem sumcheck_coefficients_prefix_honest (f w : List F) {n : ℕ} (hf : f.len
 
 /-! ## The honest prover over all rounds -/
 
-/-- The prover of a product, round after round: the kernel on both tables, then both tables folded at the challenge. -/
+/-- The prover of a product, round after round.
+
+Each round runs the kernel on both tables, then folds both tables at the challenge. -/
 def proveProduct (f w : List F) : List F → Option (List (F × F))
   | [] => some []
   | r :: rs => do
@@ -128,7 +138,9 @@ theorem fixFirst_mlePoly (f : List F) {n : ℕ} (hf : f.length = 2 ^ (n + 1)) (a
   rw [hz, ← e0, ← e1]
   ring
 
-/-- Completeness of the shipped quadratic sumcheck on a product: the kernel-and-fold prover's messages, replayed by the verifier's round identity, end at g(r). -/
+/-- Completeness of the shipped quadratic sumcheck on a product.
+
+The kernel-and-fold prover's messages, replayed by the verifier's round identity, end at g(r). -/
 theorem proveProduct_complete : ∀ {n : ℕ} (f w : List F), f.length = 2 ^ n → w.length = 2 ^ n →
     ∀ r : Fin n → F, ∃ ms, proveProduct f w (List.ofFn r) = some ms ∧
       eval r (mlePoly f n * mlePoly w n) =

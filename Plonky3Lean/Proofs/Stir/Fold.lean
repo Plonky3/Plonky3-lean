@@ -10,7 +10,9 @@ public import Plonky3Lean.Proofs.Dft.Glue
 
 A codeword of length 2^n is read on the subgroup of order 2^n, entry i at omega^i for omega = G_n.
 
-The fold at beta with arity 2^a returns, at index j < 2^(n - a), the fold of arity 2^a at beta: the interpolant of entries j + l 2^(n - a), l < 2^a, at beta.
+The fold at beta with arity 2^a returns, at index j < 2^(n - a), the fold of arity 2^a at beta.
+
+That is the interpolant of entries j + l 2^(n - a), l < 2^a, at beta.
 -/
 
 namespace Plonky3Lean.Proofs.Stir
@@ -38,7 +40,7 @@ theorem fold_pass_eq (G : Gen F) (hG : GenValid G) {n : ℕ} (hn : n ≤ G.adici
   simp only [map_mul, map_div₀, map_one, map_ofNat, map_pow, map_inv₀, inv_pow]
   field_simp
 
-/-- t passes at beta, beta^2, beta^4, ..., on domains of log size n, n - 1, .... -/
+/-- t passes at beta, beta^2, beta^4 and so on, on domains of log size n, n - 1 and so on. -/
 noncomputable def runPasses (G : Gen F) : List EF → EF → ℕ → ℕ → Option (List EF)
   | d, _, _, 0 => some d
   | d, β, n, t + 1 => (fold_pass G d β n).bind fun d' => runPasses G d' (β ^ 2) (n - 1) t
@@ -79,7 +81,9 @@ theorem runPasses_eq (G : Gen F) (hG : GenValid G) (hN : GenNested G) (h2 : (2 :
     simp only [out]
     rw [getD_map_range _ _ (by omega : i < c.length / 2), passVal, hlen]
 
-/-- The loop of fold_codeword after its first pass: t more passes, each squaring the challenge and shrinking the domain first. -/
+/-- The codeword fold's loop after its first pass.
+
+It runs t more passes, each squaring the challenge and shrinking the domain first. -/
 theorem fold_codeword_loop (G : Gen F) :
     ∀ (t : ℕ) (d : List EF) (b : EF) (l : ℕ), t ≤ l →
       (List.range t).foldlM (fun (st : List EF × EF × ℕ) _ =>
@@ -103,7 +107,9 @@ theorem fold_codeword_loop (G : Gen F) :
       congr 1; funext r
       rw [← pow_mul, ← pow_succ']; congr 2; omega
 
-/-- The codeword fold at beta with arity 2^a on a codeword of length 2^n, for a <= n <= adicity: entry j < 2^(n - a) is the fold of arity 2^a at index j. -/
+/-- The codeword fold at beta with arity 2^a, on a codeword of length 2^n, for a <= n <= adicity.
+
+Entry j < 2^(n - a) is the fold of arity 2^a at index j. -/
 theorem fold_codeword_eq (G : Gen F) (hG : GenValid G) (hN : GenNested G) (h2 : (2 : EF) ≠ 0)
     {a n : ℕ} (ha : a ≤ n) (hn : n ≤ G.adicity) (c : List EF) (hc : c.length = 2 ^ n) (β : EF) :
     fold_codeword G c β a n = some ((List.range (2 ^ (n - a))).map fun j =>

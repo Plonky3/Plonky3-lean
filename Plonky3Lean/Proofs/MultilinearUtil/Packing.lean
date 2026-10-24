@@ -9,7 +9,9 @@ public import Plonky3Lean.Proofs.MultilinearUtil.Kernel
 
 Packing groups W consecutive entries, so the lanes are the last log_2 W variables.
 
-Folding the first variable of a packed table pairs the two halves lane by lane, as the scalar fold pairs them entry by entry.
+Folding the first variable of a packed table pairs the two halves lane by lane.
+
+The scalar fold pairs them the same way, entry by entry.
 -/
 
 namespace Plonky3Lean.Proofs.MultilinearUtil
@@ -59,7 +61,7 @@ section Fields
 
 variable {A B : Type _} [Field A] [Field B] [Algebra A B]
 
-/-- pack, then unpack: the table comes back, W consecutive entries per packed value. -/
+/-- Packing then unpacking gives the table back, W consecutive entries per packed value. -/
 theorem pack_unpack (w : ℕ) (evals : List B) {n : ℕ} (h : evals.length = 2 ^ n) (hw : w ≤ n) :
     ∃ P, Poly.pack w evals = some P ∧ P.length = 2 ^ (n - w) ∧ Poly.unpack P = evals := by
   have hk : evals.length = 2 ^ (n - w) * 2 ^ w := by rw [h, ← pow_add]; congr 1; omega
@@ -72,7 +74,9 @@ theorem pack_panics (w : ℕ) (evals : List B) {n : ℕ} (h : evals.length = 2 ^
     Poly.pack w evals = none := by
   simp [Poly.pack, h, Nat.log_pow (by norm_num : 1 < 2), hw]
 
-/-- fix_prefix_var_to_packed: unpacked, the scalar fold of the first variable; the lanes stay the last variables. -/
+/-- Unpacked, the packed prefix fold is the scalar fold of the first variable.
+
+The lanes stay the last variables. -/
 theorem fix_prefix_var_to_packed_spec (w : ℕ) (evals : List A) (r : B) {n : ℕ}
     (h : evals.length = 2 ^ n) (hw : w < n) :
     ∃ res, Poly.fix_prefix_var_to_packed w evals r = some res ∧

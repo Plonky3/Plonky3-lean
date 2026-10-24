@@ -15,7 +15,9 @@ On the coset s H, the STARK's univariate assignment takes the STARK's row values
 
 So on a trace that satisfies the STARK's relation, the combined constraint polynomial vanishes on s H.
 
-The vanishing polynomial Z then divides it, and the quotient is C_alpha s^n / Z, of degree deg C_alpha - n.
+The vanishing polynomial Z then divides it.
+
+The quotient is C_alpha s^n / Z, of degree deg C_alpha - n.
 -/
 
 set_option linter.unusedSectionVars false
@@ -77,7 +79,9 @@ theorem eval_lagrange_node {s ω : F} {k : ℕ} (hω : IsPrimitiveRoot ω (2 ^ k
     exact Lagrange.eval_basis_self hinj (mem_univ _)
   · exact Lagrange.eval_basis_of_ne (fun e => h (congrArg Fin.val e).symm) (mem_univ _)
 
-/-- On point s omega^i of the coset, the STARK's assignment takes the STARK's values on row i of a trace it interpolates. -/
+/-- Take a trace the STARK's assignment interpolates, and the point s omega^i of the coset.
+
+There the assignment takes the STARK's values on row i of the trace. -/
 theorem eval_starkAssign {s ω : F} {k : ℕ} (hω : IsPrimitiveRoot ω (2 ^ k)) (hs : s ≠ 0)
     {T : Instance F} (hT : T.height = 2 ^ k) {main prep : ℕ → F[X]} {pub : ℕ → F}
     {periodic : ℕ → F[X]}

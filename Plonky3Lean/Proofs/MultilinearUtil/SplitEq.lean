@@ -14,7 +14,9 @@ The table of z = z_0 ++ z_1 is the outer product of the two half tables:
     eq(z, j |T_1| + i) = eq(z_0, j) eq(z_1, i)
 ```
 
-So evaluating a polynomial dots each block of |T_1| entries against the suffix table and weights it by the prefix table.
+So evaluation dots each block of |T_1| entries against the suffix table.
+
+It then weights each block by the prefix table.
 
 The packed suffix table holds the same entries, W lanes at a time.
 -/
@@ -134,7 +136,7 @@ section New
 
 variable [DecidableEq EF]
 
-/-- new_packed: a suffix table that stores eq(z_1, i) at i. -/
+/-- The packed constructor builds a suffix table that stores eq(z_1, i) at i. -/
 theorem new_packed_table (w T : ℕ) (z : List EF) (h : z.length < 64) :
     ∃ e, EqMaybePacked.new_packed w T z = some e ∧ e.table = eqTable z := by
   by_cases hw : w ≤ z.length
@@ -147,7 +149,9 @@ theorem new_packed_table (w T : ℕ) (z : List EF) (h : z.length < 64) :
     simp [EqMaybePacked.new_packed, hw, EqMaybePacked.new_unpacked, new_from_point_eq w T z 1 h,
       sTable_one]
 
-/-- SplitEq::new_packed: the prefix table scaled, and the suffix table, of the point split at n / 2. -/
+/-- The constructor splits the point at n / 2.
+
+It stores the scaled prefix table and the suffix table. -/
 theorem split_new_packed (w T : ℕ) (point : List EF) (s : EF) (h : point.length < 64) :
     ∃ e, SplitEq.new_packed w T point s = some ⟨sTable s (point.take (point.length / 2)), e⟩ ∧
       e.table = eqTable (point.drop (point.length / 2)) := by
@@ -180,7 +184,9 @@ theorem num_variables_split {W : ℕ} (s : EF) (z0 : List EF) (e : EqMaybePacked
     (ht : e.table = eqTable z1) : (SplitEq.mk (sTable s z0) e).num_variables = z0.length + z1.length := by
   simp [SplitEq.num_variables, EqMaybePacked.num_variables, num_scalar_evals_eq, ht, Nat.log_pow]
 
-/-- The factored evaluation: scale times the extension at the point, except a constant, which is returned unscaled. -/
+/-- The factored evaluation is scale times the extension at the point.
+
+A constant is the exception: it is returned unscaled. -/
 theorem split_eval_base [DecidableEq EF] (w T : ℕ) (point : List EF) (s : EF) (h : point.length < 64)
     (poly : List F) (hp : poly.length = 2 ^ point.length) (hs : s = 1 ∨ 0 < point.length) :
     (SplitEq.new_packed w T point s).bind (fun se => se.eval_base poly) =
@@ -311,7 +317,9 @@ theorem split_eval_base_panics [DecidableEq EF] (w T : ℕ) (point : List EF) (s
   rw [ite_of_pos hc]
   rfl
 
-/-- Poly::eval_base: the extension at the point, for every threshold, width and thread count. -/
+/-- Evaluation at a base-field point is the extension at the point.
+
+This holds for every threshold, width and thread count. -/
 theorem poly_eval_base_eq [DecidableEq EF] (thr w T : ℕ) (poly : List F) (point : List EF)
     (h : point.length < 64) (hp : poly.length = 2 ^ point.length) :
     Poly.eval_base thr w T poly point = some (mle (poly.map (algebraMap F EF)) point) := by
@@ -323,7 +331,7 @@ theorem poly_eval_base_eq [DecidableEq EF] (thr w T : ℕ) (poly : List F) (poin
     rw [one_mul] at this
     exact this
 
-/-- Below the threshold, a point with fewer coordinates, at most four, is evaluated as if padded with zeros in front. -/
+/-- Below the threshold, a shorter point of at most four coordinates is padded with zeros in front. -/
 theorem poly_eval_base_short [DecidableEq EF] (thr w T : ℕ) (poly : List F) (point : List EF) {n : ℕ}
     (hk : point.length ≤ 4) (hthr : point.length < thr) (hn : point.length ≤ n)
     (hp : poly.length = 2 ^ n) :
@@ -338,7 +346,9 @@ theorem poly_eval_base_mismatch_panics [DecidableEq EF] (thr w T : ℕ) (poly : 
   rw [Poly.eval_base, ite_of_neg (by omega)]
   exact split_eval_base_panics w T point 1 h poly hp hn
 
-/-- Poly::eval_ext: the extension at the point, for every threshold, width and thread count. -/
+/-- Evaluation at an extension point is the extension at the point.
+
+This holds for every threshold, width and thread count. -/
 theorem poly_eval_ext_eq [DecidableEq EF] (thr w T : ℕ) (poly point : List EF)
     (h : point.length < 64) (hp : poly.length = 2 ^ point.length) :
     Poly.eval_ext thr w T poly point = some (mle poly point) := by

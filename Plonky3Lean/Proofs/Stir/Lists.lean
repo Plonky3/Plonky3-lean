@@ -28,7 +28,9 @@ theorem getD_set_eq (l : List α) (i : ℕ) (a d : α) (j : ℕ) :
   | nil => rfl
   | cons b xs ih => simp [List.foldl_cons, ih]
 
-/-- Overwriting entries o, ..., o + m - 1 from the top down with g j (entry j - 1) (entry j) reads the original entries. -/
+/-- Overwrite entries o, ..., o + m - 1 from the top down with g j (entry j - 1) (entry j).
+
+This reads the original entries. -/
 theorem foldl_desc_set (g : ℕ → α → α → α) (d : α) (o : ℕ) (ho : 0 < o) :
     ∀ (m : ℕ) (cs : List α), o + m ≤ cs.length → ∀ j,
       ((List.range m).reverse.foldl (fun cs i' =>

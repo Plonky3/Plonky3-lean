@@ -7,9 +7,13 @@ public import Plonky3Lean.Proofs.Whir.Complete
 /-!
 # The round constraint is Construction 5.1's update
 
-The verifier batches a round's out-of-domain claims, then its shift-query claims, with the powers gamma, gamma^2, ...
+The verifier batches a round's out-of-domain claims, then its shift-query claims.
 
-Its claim is the paper's claim update, check 2(c), and its weight is the paper's weight update, step 2(e).
+It uses the powers gamma, gamma^2 and so on.
+
+Its claim is the paper's claim update, check 2(c).
+
+Its weight is the paper's weight update, step 2(e).
 -/
 
 namespace Plonky3Lean.Proofs.Whir
@@ -40,7 +44,9 @@ theorem dot_powers (γ : EF) : ∀ (l : List EF) (s m : ℕ), l.length = m →
     · exact sum_congr rfl fun j _ => by rw [List.getD_cons_succ, show s + (j + 1) = s + 1 + j by omega]
     · ring
 
-/-- The round constraint's claim is the claim update of Construction 5.1: gamma^(j+1) on the j-th out-of-domain answer, then gamma^(s+j+1) on the j-th query answer. -/
+/-- The round constraint's claim is the claim update of Construction 5.1.
+
+It puts gamma^(j+1) on the j-th out-of-domain answer, then gamma^(s+j+1) on the j-th query answer. -/
 theorem round_combine_evals (σ γ : EF) (nv : ℕ) (pts : List (List EF)) (ys : List EF) (vars : List F)
     (vs : List EF) (hp : pts.length = ys.length) (hv : vars.length = vs.length) :
     (⟨nv, [.Eq ⟨nv, pts, ys⟩, .Select ⟨nv, vars, vs⟩], γ, 1⟩ : Constraint F EF).combine_evals σ =
@@ -54,7 +60,9 @@ theorem round_combine_evals (σ γ : EF) (nv : ℕ) (pts : List (List EF)) (ys :
   · exact sum_congr rfl fun j _ => by rw [add_comm 1 j]
   · exact sum_congr rfl fun j _ => by rw [show 1 + ys.length + j = ys.length + j + 1 by omega]
 
-/-- The round constraint's weight, added to the restricted previous weight, is the weight update of Construction 5.1, with the out-of-domain points expanded to pow(z, n). -/
+/-- Add the round constraint's weight to the restricted previous weight.
+
+The sum is the weight update of Construction 5.1, with the out-of-domain points expanded to pow(z, n). -/
 theorem round_weight (w : List EF → EF) (r : List EF) (γ : EF) (n : ℕ) (zs : List EF) (vars : List F)
     (vs : List EF) (hv : vars.length = vs.length) (x : List EF) :
     w (r ++ x) + weightAt (⟨n, [.Eq ⟨n, zs.map (Point.expand_from_univariate · n), zs.map fun _ => 0⟩,

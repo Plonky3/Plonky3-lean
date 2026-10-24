@@ -7,7 +7,9 @@ public import Plonky3Lean.Proofs.UniStark.Verifier
 /-!
 # The prover's quotient values
 
-At point x_i of the quotient coset, the prover folds the constraints on rows i and i + 2^(log |Q| - log n) of the extended trace.
+Take the point x_i of the quotient coset.
+
+The prover folds the constraints on rows i and i + 2^(log |Q| - log n) of the extended trace.
 
 Those rows hold the trace polynomials at x_i and at omega x_i.
 
@@ -28,7 +30,7 @@ open Plonky3Lean.Proofs.Commit Plonky3Lean.Proofs.Dft Plonky3Lean.Proofs.Air
 
 variable {F K : Type} [Field F] [DecidableEq F] [Field K] [Algebra F K] (G : Gen F)
 
-/-- The selector vectors on the quotient coset hold the STARK's selector polynomials at each point, and 1 / Z. -/
+/-- The selector vectors on the quotient coset hold, at each point, the STARK's selector polynomials and 1 / Z. -/
 theorem selector_entries (hV : GenValid G) (hN : GenNested G) (h2 : (2 : F) ≠ 0)
     {td qd : Coset G} (h1 : td.shift = 1) (hle : td.log_size ≤ qd.log_size)
     (hdisj : qd.shift ^ 2 ^ qd.log_size ≠ 1) {sel : LagrangeSelectors (List F)}
@@ -58,7 +60,9 @@ theorem getD_wrappingRow (m : p3_commit.pcs.univariate.mirror.Mat F) {r c : ℕ}
 
 /-- The quotient's values on the quotient coset.
 
-Take the extended trace and preprocessed trace at the points x_i of the quotient coset, and a periodic table that reads each periodic polynomial at x_i.
+Take the extended trace and preprocessed trace at the points x_i of the quotient coset.
+
+Take a periodic table that reads each periodic polynomial at x_i.
 
 Then the value at x_i is C_alpha(x_i) s^n / Z(x_i), for the trace subgroup's selectors. -/
 theorem quotient_values_eq {D : ℕ} (B : Module.Basis (Fin D) F K) (hV : GenValid G)

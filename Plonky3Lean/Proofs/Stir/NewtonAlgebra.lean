@@ -7,7 +7,11 @@ public import Mathlib.LinearAlgebra.Lagrange
 /-!
 # Newton's divided differences
 
-For distinct nodes v_0, v_1, ..., the divided difference f[v_a, ..., v_b] is the top coefficient of the interpolant P_{a,b} on the nodes a, ..., b.
+Take distinct nodes v_0, v_1, and so on.
+
+Let P_{a,b} be the interpolant on the nodes a, ..., b.
+
+The divided difference f[v_a, ..., v_b] is its top coefficient.
 
 Neville's identity gives the recurrence the table computes,
 

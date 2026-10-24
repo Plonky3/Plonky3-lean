@@ -10,10 +10,14 @@ public import Plonky3Lean.Proofs.Stir.Lagrange
 /-!
 # The virtual oracle
 
-After a round with answer polynomial Ans, interpolation points G and combination challenge r, the next oracle is read at x as
+Take a round with answer polynomial Ans, interpolation points G and combination challenge r.
+
+The next oracle is read at x as
 
 ```text
-    f(x) = (g(x) - Ans(x)) / Z_G(x)  *  sum_{t <= |G|} (x r)^t,      Z_G = prod_{y in G} (X - y)
+    f(x) = (g(x) - Ans(x)) / Z_G(x)  *  sum_{t <= |G|} (x r)^t
+
+    Z_G = prod_{y in G} (X - y)
 ```
 
 which is DegCor(d, r, Quotient(g, G, Ans), d - |G|) of Definitions 4.2 and 4.12.
@@ -42,7 +46,11 @@ theorem prod_sub_eq_zero_iff (pts : List EF) (x : EF) :
     (pts.map fun y => x - y).prod = 0 ↔ x ∈ pts := by
   simp [List.prod_eq_zero_iff, sub_eq_zero]
 
-/-- The virtual oracle read on a fiber after a round: none when a fiber point is an interpolation point, else the virtual oracle at every fiber point. -/
+/-- The virtual oracle read on a fiber after a round.
+
+It is none when a fiber point is an interpolation point.
+
+Otherwise it is the virtual oracle at every fiber point. -/
 theorem materialize_virtual_fiber_eq {ζ u0 shift : F} {arity : ℕ} (hζ : IsPrimitiveRoot ζ arity)
     (harity : 0 < arity) (row : List EF) (hrow : row.length = arity) (r : EF) (ans pts : List EF) :
     materialize_virtual_fiber row (shiftedPowersList ζ u0 arity) shift

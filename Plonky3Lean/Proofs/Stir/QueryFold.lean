@@ -9,9 +9,13 @@ public import Plonky3Lean.Proofs.Stir.Virtual
 /-!
 # The verifier's fold of one query
 
-Query j of a round on L = s <g>, |L| = 2^n, opens the fiber of k = 2^a points s g^(j + l M), M = 2^(n - a).
+Query j of a round on L = s <g>, |L| = 2^n, opens a fiber of k = 2^a points.
 
-The verifier reads the fiber through the previous round's virtual oracle and interpolates it at gamma / s.
+These are the points s g^(j + l M), with M = 2^(n - a).
+
+The verifier reads the fiber through the previous round's virtual oracle.
+
+It interpolates the fiber at gamma / s.
 
 That value is Fold(f, k, gamma) of Definition 4.8 at (s g^j)^k, the queried point of L^k.
 -/
@@ -34,7 +38,9 @@ theorem lift_some {α : Type} (x : α) : (ExceptT.lift (some x) : VM α) = pure 
 theorem fiber_nodes (g : F) (j M l : ℕ) : g ^ j * (g ^ M) ^ l = g ^ (j + l * M) := by
   rw [← pow_mul, ← pow_add, mul_comm M l]
 
-/-- The interpolation of fiber values at the verifier's nodes, evaluated at gamma / s, is Definition 4.8's fold. -/
+/-- Interpolate fiber values at the verifier's nodes and evaluate at gamma / s.
+
+The result is Definition 4.8's fold. -/
 theorem lagrange_fiber_eq_fold (G : Gen F) (hG : GenValid G) {a n : ℕ} (ha : a ≤ n)
     (hn : n ≤ G.adicity) (h2 : (2 : F) ≠ 0) {shift : F} (hs : shift ≠ 0) {j : ℕ}
     (hj : j < 2 ^ (n - a)) (vals : List EF) (hvals : vals.length = 2 ^ a) (f : EF → EF)
@@ -74,7 +80,11 @@ theorem query_fold_value_initial (G : Gen F) (hG : GenValid G) {a n : ℕ} (ha :
   dsimp only
   rw [lagrange_fiber_eq_fold G hG ha hn h2 hs hj row hrow f hf γ, lift_some]
 
-/-- After a round with answers ans on the points pts: a fiber meeting pts is rejected, and otherwise the fold reads the virtual oracle DegCor(Quotient). -/
+/-- Take the round after answers ans on the points pts.
+
+A fiber meeting pts is rejected.
+
+Otherwise the fold reads the virtual oracle DegCor(Quotient). -/
 theorem query_fold_value_virtual (G : Gen F) (hG : GenValid G) {a n : ℕ} (ha : a ≤ n)
     (hn : n ≤ G.adicity) (h2 : (2 : F) ≠ 0) {shift : F} (hs : shift ≠ 0) {j : ℕ}
     (hj : j < 2 ^ (n - a)) (row : List EF) (hrow : row.length = 2 ^ a) (r : EF) (ans pts : List EF)
@@ -108,7 +118,9 @@ theorem query_fold_value_virtual (G : Gen F) (hG : GenValid G) {a n : ℕ} (ha :
     rw [lagrange_fiber_eq_fold G hG ha hn h2 hs hj _ hlen f (fun l hl => by
       rw [hf l hl, getD_map_range _ _ hl]) γ, lift_some]
 
-/-- The prover's codeword fold at gamma / s is Definition 4.8's fold of the codeword on s <g>, at every point of L^k. -/
+/-- The prover's codeword fold at gamma / s is Definition 4.8's fold of the codeword on s <g>.
+
+This holds at every point of L^k. -/
 theorem fold_codeword_fold (G : Gen F) (hG : GenValid G) (hN : GenNested G) (h2 : (2 : EF) ≠ 0)
     {a n : ℕ} (ha : a ≤ n) (hn : n ≤ G.adicity) (c : List EF) (hc : c.length = 2 ^ n) {shift : F}
     (hs : shift ≠ 0) (f : EF → EF)
@@ -130,7 +142,9 @@ theorem set_gamma_eq (γ : EF) (s : F) :
   unfold set_gamma p3_stir.mirror.inverse
   split_ifs <;> simp [div_eq_mul_inv, map_inv₀]
 
-/-- The single-fiber fold at gamma / s is Definition 4.8's fold at (s g^j)^(2^a), on L = s <g> of size 2^(m + a). -/
+/-- Take L = s <g> of size 2^(m + a).
+
+The single-fiber fold at gamma / s is Definition 4.8's fold at (s g^j)^(2^a). -/
 theorem fold_fiber_eq (G : Gen F) (hG : GenValid G) {a m : ℕ} (hn : m + a ≤ G.adicity)
     (h2 : (2 : F) ≠ 0) {shift : F} (hs : shift ≠ 0) {j : ℕ} (hj : j < 2 ^ m) (fiber : List EF)
     (hfib : fiber.length = 2 ^ a) (f : EF → EF)

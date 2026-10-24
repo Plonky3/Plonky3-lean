@@ -8,11 +8,15 @@ public import Plonky3Lean.Proofs.Air.Degree
 /-!
 # The zero-knowledge variant
 
-* The randomized trace doubles the trace's degree, and the sizing adds one to the constraint degree and doubles the chunk count.
+- The randomized trace doubles the trace's degree.
+
+  The sizing adds one to the constraint degree and doubles the chunk count.
 
   That leaves room: a constraint of degree multiple d on a randomized trace fits the doubled chunks.
 
-* The quotient chunks are masked by multiples of their own vanishing polynomials, with the last mask chosen to cancel the others.
+- The quotient chunks are masked by multiples of their own vanishing polynomials.
+
+  The last mask is chosen to cancel the others.
 
   The verifier's recombination is unchanged by such masks.
 -/
@@ -27,7 +31,9 @@ open Plonky3Lean.Proofs.Commit Plonky3Lean.Proofs.Air Plonky3Lean.Proofs.Dft
 
 /-! ## The doubled chunk count -/
 
-/-- With the zero-knowledge bit, a degree d (2n - 1) + 1 fits 2^(L + 1) chunks of n plus one, for L the sizing of d + 1. -/
+/-- Take the zero-knowledge bit, and let L be the sizing of d + 1.
+
+Then a degree d (2n - 1) + 1 fits 2^(L + 1) chunks of n, plus one. -/
 theorem zk_fits (d : ℕ) {n : ℕ} (hn : 1 ≤ n) {D : ℕ} (hD : D ≤ d * (2 * n - 1) + 1) :
     D < (2 ^ (log2_ceil_usize (max (d + 1) 2 - 1) + 1) + 1) * n := by
   have hL := le_two_pow_log2_ceil (max (d + 1) 2 - 1)
@@ -62,7 +68,9 @@ theorem chunkL_mul_chunkZ {i : ℕ} (hi : i < 2 ^ l) :
   rw [chunkL, prod_mul_distrib, ← map_prod, chunkWeight, mul_assoc,
     prod_erase_mul _ _ (mem_range.mpr hi)]
 
-/-- The masks: t_i on every chunk but the last, and on the last minus the weighted sum of the others. -/
+/-- The masks: t_i on every chunk but the last.
+
+The last gets minus the weighted sum of the others. -/
 noncomputable def mask (t : ℕ → K[X]) (i : ℕ) : K[X] :=
   if i < 2 ^ l - 1 then t i
   else -∑ j ∈ range (2 ^ l - 1),

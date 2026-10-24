@@ -7,7 +7,9 @@ public import Plonky3Lean.Proofs.Whir.Complete
 /-!
 # The verifier never panics
 
-On a consistent configuration and a Merkle scheme that accepts only rows of the stated width, every proof gives an answer: an acceptance or an error.
+Take a consistent configuration, and a Merkle scheme that accepts only rows of the stated width.
+
+Then every proof gives an answer: an acceptance or an error.
 -/
 
 namespace Plonky3Lean.Proofs.Whir
@@ -53,7 +55,9 @@ theorem folds_some (thr w T : ℕ) (r : List EF) (hr : r.length < 64) :
     have ha := h a (by simp)
     exact ⟨mle a r :: v, by simp [List.mapM_cons, Poly_new_pow a ha, poly_eval_ext_eq thr w T a r hr ha, hv]⟩
 
-/-- The STIR phase never panics, when the challenges match the fold width and the generator exists; an accepted statement has the round's variable count. -/
+/-- The STIR phase never panics when the challenges match the fold width and the generator exists.
+
+An accepted statement has the round's variable count. -/
 theorem stir_some (hw : Widths E.mmcs) (c : WhirConfig) (openings : QueryOpenings F EF MP) (pw : F)
     (params : RoundConfig) (root : Com) (r : List EF) (t : ℕ) (h : List (Step F EF))
     (hs : (c.site t).isSome) (hk : params.folding_factor = r.length) (h64 : r.length < 64)
@@ -145,7 +149,9 @@ theorem expand_points (S : WSponge F EF) (nv : ℕ) (ys : List EF) (h : List (St
     · simp only [List.mem_singleton] at hp
       simp [hp, expand_from_univariate_eq]
 
-/-- A parsed round's out-of-domain statement has the round's variable count, and so does each of its points. -/
+/-- A parsed round's out-of-domain statement has the round's variable count.
+
+So does each of its points. -/
 theorem parse_with_round_dims (rp : WhirRoundProof F EF Com MP) (nv s t : ℕ) (h : List (Step F EF))
     {root : Com} {ood : EqStatement EF} {h' : List (Step F EF)}
     (hp : parse_with_round E rp nv s t h = .ok (root, ood, h')) :
@@ -161,7 +167,10 @@ theorem parse_with_round_dims (rp : WhirRoundProof F EF Com MP) (nv s t : ℕ) (
 
 variable (c : WhirConfig)
 
-/-- The shape of the verifier's loop state after t rounds: the last challenges have the fold width, and every constraint fits the end of the challenges to come. -/
+/-- The shape of the verifier's loop state after t rounds:
+
+- the last challenges have the fold width
+- every constraint fits the end of the challenges to come. -/
 def SInv (t : ℕ) (st : LoopState F EF Com) : Prop :=
   (∃ r, st.randomness.getLast? = some r ∧ r.length = kAt c t) ∧
     ∀ con ∈ st.constraints, con.num_variables ≤ st.randomness.flatten.length + nvAt c t ∧
@@ -250,7 +259,15 @@ theorem loop_some {n : ℕ} (hv : Valid c n E.adicity) (hw : Widths E.mmcs) (pro
       simp only [loopStep, hres', Option.bind_some]
       exact ⟨res', rfl, hinv'⟩
 
-/-- The verifier never panics: on a consistent configuration, a layout of the polynomial's variable count and a Merkle scheme that checks row widths, every proof is accepted or rejected with an error. -/
+/-- The verifier never panics.
+
+Assume three things:
+
+- a consistent configuration
+- a layout of the polynomial's variable count
+- a Merkle scheme that checks row widths.
+
+Then every proof is accepted or rejected with an error. -/
 theorem verify_some {n : ℕ} (hv : Valid c n E.adicity) (hw : Widths E.mmcs)
     (hlay : ∀ α, (E.initial α).num_variables = n ∧ ∀ s ∈ (E.initial α).statements, s.Dim n)
     (seed : Step F EF) (proof : WhirProof F EF Com MP) (commitment : Com) (h : List (Step F EF)) :

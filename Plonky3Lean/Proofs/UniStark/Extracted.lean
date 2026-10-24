@@ -8,8 +8,9 @@ public import Plonky3Lean.Lib
 /-!
 # The extracted integer helpers
 
-* The power of two is defined exactly below the word size.
-* The degree-bits validation rejects with the right error, and panics only when the minimum overflows the word.
+- The power of two is defined exactly below the word size.
+- The degree-bits validation rejects with the right error.
+- It panics only when the minimum overflows the word.
 -/
 
 namespace Plonky3Lean.Proofs.UniStark.Extracted
@@ -36,10 +37,12 @@ theorem checked_pow2_spec (n : Std.Usize) :
 
 /-- The degree-bits validation, when the minimum fits the word.
 
-* Below is_zk + min, it reports the bits too small, with that minimum.
-* Above max, it reports them too large, with that maximum.
-* At the word size or above, it reports them too large, with the word size minus one.
-* Otherwise it returns the base domain's bits, degree_bits - is_zk, and the extended domain's size 2^degree_bits. -/
+Write b for the degree bits and z for the zero-knowledge bit.
+
+- Below z + min, it reports the bits too small, with that minimum.
+- Above max, it reports them too large, with that maximum.
+- At the word size or above, it reports them too large, with the word size minus one.
+- Otherwise it returns the base domain's bits b - z and the extended domain's size 2^b. -/
 theorem validate_degree_bits_spec (air : core.option.Option Std.Usize) (db zk lo hi : Std.Usize)
     (h : zk.val + lo.val ≤ Usize.max) :
     p3_uni_stark.verifier.validate_degree_bits air db zk lo hi ⦃ r =>
@@ -69,7 +72,12 @@ theorem validate_degree_bits_spec (air : core.option.Option Std.Usize) (db zk lo
       CoreModels.core.result.Result.Insts.CoreOpsTry_traitTryTResultInfallibleE.branch]
     step*
 
-/-- The opening rounds are the randomization round when hiding, then the trace, the quotient and the preprocessed trace. -/
+/-- The opening rounds, in order:
+
+- the randomization round, when hiding
+- the trace
+- the quotient
+- the preprocessed trace. -/
 theorem StarkOpeningLayout_new_spec (zk : Bool) :
     p3_uni_stark.config.StarkOpeningLayout.new zk ⦃ l =>
       l.trace.val = zk.toNat ∧ l.quotient.val = zk.toNat + 1 ∧ l.preprocessed.val = zk.toNat + 2 ⦄ := by

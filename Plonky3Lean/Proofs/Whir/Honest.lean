@@ -11,7 +11,14 @@ public import P3Whir
 
 The prover of Construction 5.1 against the verifier's sponge, in the encoding p3-whir uses.
 
-Each round commits the interleaved codeword of the current table, answers the out-of-domain samples with P~(pow(z)), grinds, opens the previous codeword at the drawn indices, adds the round's constraint to its weight table, and runs the round's sumcheck.
+Each round runs these steps:
+
+- commit the interleaved codeword of the current table
+- answer the out-of-domain samples with P~(pow(z))
+- grind
+- open the previous codeword at the drawn indices
+- add the round's constraint to its weight table
+- run the round's sumcheck.
 
 It is a model of the Rust prover, not a transcription.
 -/
@@ -30,14 +37,20 @@ variable {F EF Com MP D : Type _} [Field F] [Field EF] [Algebra F EF] [Decidable
 def queried (c : WhirConfig) (t : ℕ) : RoundConfig :=
   if t < c.n_rounds then c.round_parameters.getD t default else c.final_round_config
 
-/-- What the prover adds to the verifier's environment: a grinding solver, the Merkle commit and its openings. -/
+/-- What the prover adds to the verifier's environment:
+
+- a grinding solver
+- the Merkle commit
+- its openings. -/
 structure ProverEnv (F EF Com MP D : Type _) where
   solve : List (Step F EF) → ℕ → F
   commit : List (List EF) → Com × D
   openExt : D → List ℕ → MP
   openBase : List ℕ → MP
 
-/-- The honest out-of-domain phase: draw each point, answer the table's extension at its expansion, absorb the answer. -/
+/-- The honest out-of-domain phase.
+
+It draws each point, answers the table's extension at its expansion, and absorbs the answer. -/
 def oodProve (S : WSponge F EF) (P : List EF) (nv : ℕ) (h : List (Step F EF)) (k : ℕ) :
     List (List EF) × List EF × List (Step F EF) :=
   (List.range k).foldl (fun acc _ =>
@@ -55,7 +68,9 @@ structure PState (F EF Com MP D : Type _) where
   cons : List (Constraint F EF)
   rand : List (List EF)
   h : List (Step F EF)
-  /-- The previously committed table, its variable count, its generator, and its Merkle data, none for the initial one. -/
+  /-- The previously committed table, its variable count, its generator, and its Merkle data.
+
+  It is none for the initial one. -/
   prevP : List EF
   prevNv : ℕ
   prevData : Option D
@@ -70,7 +85,9 @@ def codeRows (P : List EF) (nv t : ℕ) : List (List EF) :=
   (List.range (q.domain_size >>> q.folding_factor)).map
     (row P nv q.folding_factor (algebraMap F EF (E.gen q.log_folded_domain_size)))
 
-/-- The openings of the previous codeword at the indices: the base-field initial rows, or the committed extension rows. -/
+/-- The openings of the previous codeword at the indices.
+
+They are the base-field initial rows, or the committed extension rows. -/
 def openPrev (P0 : List F) (n : ℕ) (st : PState F EF Com MP D) (t : ℕ) (idx : List ℕ) :
     QueryOpenings F EF MP :=
   match st.prevData with
@@ -102,7 +119,9 @@ def honestRound (P0 : List F) (n : ℕ) (st : PState F EF Com MP D) (t : ℕ) : 
     prevData := some rd.2, prevRoot := rd.1,
     rounds := st.rounds ++ [⟨some rd.1, o.2.1, wit, openPrev E PE c P0 n st t qi.1, (H.ms, H.ws)⟩] }
 
-/-- The honest initial fold: the layout's challenge and constraint, and the initial sumcheck on the weight table. -/
+/-- The honest initial fold.
+
+It takes the layout's challenge and constraint, and runs the initial sumcheck on the weight table. -/
 def honestInit (P0 : List F) (n : ℕ) (commitment : Com) (h : List (Step F EF)) :
     PState F EF Com MP D × SumcheckData F EF :=
   let con := E.initial (E.S.sample (h ++ [E.layoutSeed]))
@@ -115,7 +134,11 @@ def honestInit (P0 : List F) (n : ℕ) (commitment : Com) (h : List (Step F EF))
 def honestLoop (P0 : List F) (n : ℕ) (commitment : Com) (h : List (Step F EF)) : PState F EF Com MP D :=
   (List.range c.n_rounds).foldl (honestRound E PE c P0 n) (honestInit E PE c P0 n commitment h).1
 
-/-- The honest proof: the initial fold, every round, then the final table, its queries and the closing sumcheck. -/
+/-- The honest proof, in order:
+
+- the initial fold
+- every round
+- the final table, its queries and the closing sumcheck. -/
 def honestProof (P0 : List F) (n : ℕ) (commitment : Com) (h : List (Step F EF)) :
     WhirProof F EF Com MP :=
   let st := honestLoop E PE c P0 n commitment h

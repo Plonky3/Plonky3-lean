@@ -7,7 +7,7 @@ public import Plonky3Lean.Proofs.Sumcheck.Quadratic
 /-!
 # The quadratic sumcheck verifier, as transcribed
 
-What verify_rounds absorbs, when it rejects, and what it returns.
+What the round verification absorbs, when it rejects, and what it returns.
 
 The sponge is its history, so each challenge is a function of everything absorbed before it.
 -/
@@ -44,7 +44,7 @@ def challengeAt (S : Sponge F EF) (h : List (Step F EF)) (evals : List (EF × EF
     (pow_bits i : ℕ) : EF :=
   S.sample (before h evals wits pow_bits i ++ roundSteps evals wits pow_bits i)
 
-/-- The claim after replaying the pairs against the challenges with the round identity of the basis. -/
+/-- The claim after replaying the pairs against the challenges, with the basis's round identity. -/
 def replay (basis : Basis) (c : EF) (evals : List (EF × EF)) (rs : List EF) : EF :=
   (evals.zip rs).foldl (fun c (m, r) => basis.reduce_claim m.1 m.2 r c) c
 
@@ -89,7 +89,11 @@ theorem foldlM_verifyRound (S : Sponge F EF) (evals : List (EF × EF)) (wits : L
     · simp [verifyRound, VerifierTranscript.round, bind, Except.bind, pure, Except.pure, hp,
         grindOk, replay_snoc basis c hkN hrs, challengeAt, before, roundSteps]
 
-/-- verify_rounds: the two count checks, then the first round whose witness fails, else the challenges and the replayed claim. -/
+/-- The round verification runs in this order:
+
+- the two count checks
+- the first round whose witness fails
+- otherwise, the challenges and the replayed claim. -/
 theorem verify_rounds_eq (S : Sponge F EF) (evals : List (EF × EF)) (wits : List F)
     (h : List (Step F EF)) (c : EF) (N pow_bits : ℕ) (basis : Basis) :
     verify_rounds S evals wits h c N pow_bits basis =
@@ -113,14 +117,18 @@ theorem verify_rounds_eq (S : Sponge F EF) (evals : List (EF × EF)) (wits : Lis
   · simp only [he, ne_eq, not_false_eq_true, ↓reduceIte]
     rfl
 
-/-- The history at the start of round i: the history it was given, then every earlier round with its challenge. -/
+/-- The history at the start of round i.
+
+It is the given history, then every earlier round with its challenge. -/
 theorem before_eq (h : List (Step F EF)) (evals : List (EF × EF)) (wits : List F) (pow_bits : ℕ) :
     ∀ i, before h evals wits pow_bits i =
       h ++ (List.range i).flatMap fun j => roundSteps evals wits pow_bits j ++ [.challenge]
   | 0 => by simp [before]
   | i + 1 => by simp [before, before_eq h evals wits pow_bits i, List.range_succ]
 
-/-- The verifier never reports a missing witness: the witness count is checked first. -/
+/-- The verifier never reports a missing witness.
+
+The witness count is checked first. -/
 theorem verify_rounds_ne_missing (S : Sponge F EF) (evals : List (EF × EF)) (wits : List F)
     (h : List (Step F EF)) (c : EF) (N pow_bits : ℕ) (basis : Basis) (i b : ℕ) :
     verify_rounds S evals wits h c N pow_bits basis ≠ .error (.MissingPowWitness i b) := by

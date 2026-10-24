@@ -8,7 +8,9 @@ public import Plonky3Lean.Proofs.Stir.Virtual
 /-!
 # The domains of a round
 
-A round on L = s <g>, |L| = 2^n, folds by k = 2^a onto L^k = s^k <g^k> and commits on L' = s^k w <g^2>, w the field's generator.
+A round on L = s <g>, |L| = 2^n, folds by k = 2^a onto L^k = s^k <g^k>.
+
+It commits on L' = s^k w <g^2>, where w is the field's generator.
 
 When w^(2^adicity) != 1, L' meets neither L^k nor any out-of-domain point the filter accepted.
 

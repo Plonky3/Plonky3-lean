@@ -72,7 +72,7 @@ section Folds
 
 variable {F A : Type _} [Field F] [CommRing A] [Algebra F A]
 
-/-- fix_prefix_var_mut: the table of the restriction to x_0 = r, half as long. -/
+/-- The in-place prefix fold leaves the table of the restriction to x_0 = r, half as long. -/
 theorem fix_prefix_var_mut_spec (evals : List A) (r : F) {n : ℕ} (h : evals.length = 2 ^ (n + 1)) :
     ∃ res, Poly.fix_prefix_var_mut evals r = some res ∧ res.length = 2 ^ n ∧
       ∀ r' : List A, r'.length = n → mle res r' = mle evals (algebraMap F A r :: r') := by
@@ -85,7 +85,9 @@ theorem fix_prefix_var_mut_spec (evals : List A) (r : F) {n : ℕ} (h : evals.le
 theorem fix_prefix_var_mut_panics (evals : List A) (r : F) (h : evals.length = 1) :
     Poly.fix_prefix_var_mut evals r = none := by simp [Poly.fix_prefix_var_mut, h]
 
-/-- sum_prefix_var_mut: the table of p(0, x) + p(1, x), half as long; a constant is left alone. -/
+/-- The in-place prefix sum leaves the table of p(0, x) + p(1, x), half as long.
+
+A constant is left alone. -/
 theorem sum_prefix_var_mut_spec (evals : List A) {n : ℕ} (h : evals.length = 2 ^ (n + 1)) :
     (Poly.sum_prefix_var_mut evals).length = 2 ^ n ∧ ∀ r' : List A, r'.length = n →
       mle (Poly.sum_prefix_var_mut evals) r' = mle evals (0 :: r') + mle evals (1 :: r') := by
@@ -98,7 +100,7 @@ theorem sum_prefix_var_mut_spec (evals : List A) {n : ℕ} (h : evals.length = 2
     mle_zipWith 1 1 (by simp [h, hr, pow_succ]) (by simp [h, hr, pow_succ]; omega)]
   ring
 
-/-- fix_prefix_var_mut_monomial: in the monomial basis, the coefficients of p(r, x). -/
+/-- In the monomial basis, the prefix fold leaves the coefficients of p(r, x). -/
 theorem fix_prefix_var_mut_monomial_eq (evals : List A) (r : F) (h : evals.length ≠ 1) :
     Poly.fix_prefix_var_mut_monomial evals r = some (List.zipWith
       (fun a0 a1 => a0 + a1 * algebraMap F A r) (evals.take (evals.length / 2))
@@ -155,7 +157,9 @@ theorem fix_suffix_whole_loop (evals : List A) (r : F) {N : ℕ} (h : evals.leng
       · simp [hk', show k < j + 1 by omega]
       · simp [hk', show ¬ k < j + 1 by omega]
 
-/-- fix_suffix_var_mut: whichever path the cost model takes, the table of the restriction to x_{n-1} = r. -/
+/-- The in-place suffix fold leaves the table of the restriction to x_{n-1} = r.
+
+This holds whichever path the cost model takes. -/
 theorem fix_suffix_var_mut_eq (split : Bool) (evals : List A) (r : F) {N : ℕ}
     (h : evals.length = 2 * N) (hN : 0 < N) :
     Poly.fix_suffix_var_mut split evals r = some (pairFold (algebraMap F A r) evals N) := by
@@ -188,7 +192,7 @@ theorem Poly_new_panics {α : Type _} (l : List α) (h : ∀ n, l.length ≠ 2 ^
   simp only [Poly.new, ite_eq_right_iff, reduceCtorEq, imp_false, not_and]
   exact fun _ h' => h _ h'.symm
 
-/-- fix_prefix_var: the table of the restriction to x_0 = r, in the larger field. -/
+/-- The prefix fold into the larger field is the table of the restriction to x_0 = r. -/
 theorem fix_prefix_var_spec (evals : List A) (r : B) {n : ℕ} (h : evals.length = 2 ^ (n + 1)) :
     ∃ res, Poly.fix_prefix_var evals r = some res ∧ res.length = 2 ^ n ∧
       ∀ r' : List B, r'.length = n → mle res r' = mle (evals.map (algebraMap A B)) (r :: r') := by
@@ -207,7 +211,9 @@ theorem fix_prefix_var_spec (evals : List A) (r : B) {n : ℕ} (h : evals.length
 theorem fix_prefix_var_panics (evals : List A) (r : B) (h : evals.length ≤ 1) :
     Poly.fix_prefix_var evals r = none := by simp [Poly.fix_prefix_var, h]
 
-/-- fix_prefix_var_at: one entry of the prefix fold, and a panic past the residual cube. -/
+/-- One entry of the prefix fold interpolates entry i and entry i + n/2 at r.
+
+Past the residual cube it panics. -/
 theorem fix_prefix_var_at_eq (evals : List A) (r : B) {index : ℕ}
     (hi : index + evals.length / 2 < evals.length) :
     Poly.fix_prefix_var_at evals r index = some ((1 - r) * algebraMap A B (evals.getD index 0) +
@@ -221,7 +227,7 @@ theorem fix_prefix_var_at_panics (evals : List A) (r : B) {index : ℕ}
     (hi : evals.length ≤ index + evals.length / 2) : Poly.fix_prefix_var_at evals r index = none := by
   simp [Poly.fix_prefix_var_at, List.getElem?_eq_none hi]
 
-/-- fix_suffix_var: the table of the restriction to x_{n-1} = r, in the larger field. -/
+/-- The suffix fold into the larger field is the table of the restriction to x_{n-1} = r. -/
 theorem fix_suffix_var_eq (evals : List A) (r : B) {N : ℕ} (h : evals.length = 2 * N) (hN : 0 < N)
     (hpow : ∃ n, N = 2 ^ n) :
     Poly.fix_suffix_var evals r = some (pairFold r (evals.map (algebraMap A B)) N) := by

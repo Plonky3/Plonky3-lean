@@ -12,7 +12,9 @@ public import Mathlib.RingTheory.MvPolynomial.Tower
 
 The verifier folds each asserted value into acc alpha + x, which is Horner's rule.
 
-The prover collects the base values, and dots them with the powers of alpha, one basis coordinate at a time.
+The prover collects the base values.
+
+It dots them with the powers of alpha, one basis coordinate at a time.
 
 On a parametric AIR both give sum_i alpha^(m - 1 - i) C_i, with the constraints in emission order.
 -/
@@ -72,7 +74,9 @@ structure WindowShapes {E P : Type} (air : Air F) (main preprocessed : RowWindow
   pub : pv.length = air.num_public_values
   periodic : periodic.length = air.num_periodic_columns
 
-/-- An assignment of the AIR's variables that a window holds: every entry the AIR can read, and the three selectors. -/
+/-- An assignment of the AIR's variables that a window holds.
+
+It covers every entry the AIR can read, and the three selectors. -/
 structure Holds {E : Type} [Zero E] (air : Air F) (env : Var → E) (main preprocessed : RowWindow E)
     (pv periodic : List E) (first last trans : E) : Prop where
   shapes : WindowShapes air main preprocessed pv periodic
@@ -101,7 +105,9 @@ theorem forall₂_window {E : Type} [Zero E] {R : MvPolynomial Var F → E → P
     have := h c hc
     rwa [List.getD_eq_getElem _ _ (hl ▸ hc)] at this
 
-/-- The polynomial builder and the verifier's folder are related by evaluation at an assignment the opened values hold. -/
+/-- The polynomial builder and the verifier's folder are related by evaluation.
+
+The evaluation is at an assignment the opened values hold. -/
 theorem builderRel_verifier {air : Air F} {env : Var → K} {main preprocessed : RowWindow K}
     {pv : List F} {periodic : List K} {first last trans : K}
     (h : Holds air env main preprocessed (pv.map (algebraMap F K)) periodic first last trans) (α : K) :
@@ -150,7 +156,9 @@ section prover
 
 variable {F K : Type} [Field F] [DecidableEq F] [Field K] [Algebra F K]
 
-/-- The polynomial builder and the prover's folder are related by evaluation at an assignment the row holds. -/
+/-- The polynomial builder and the prover's folder are related by evaluation.
+
+The evaluation is at an assignment the row holds. -/
 theorem builderRel_prover {air : Air F} {env : Var → F} {main preprocessed : RowWindow F}
     {pv periodic : List F} {first last trans : F}
     (h : Holds air env main preprocessed pv periodic first last trans) :
@@ -223,7 +231,7 @@ theorem batched_linear_combination_range {R A : Type} [CommRing R] [AddCommMonoi
   simp [batched_linear_combination, hz, ← sum_map_range]
   rfl
 
-/-- The prover's combination, with the powers the layout decomposes, is the combination of the embedded values. -/
+/-- The prover's combination, with the powers the layout decomposes, is that of the embedded values. -/
 theorem finalize_decompose {D : ℕ} (B : Module.Basis (Fin D) F K) (α : K) (base : List F) :
     finalize_constraints B
         (ConstraintLayout.decompose_alpha B ⟨List.range base.length, []⟩ α).1

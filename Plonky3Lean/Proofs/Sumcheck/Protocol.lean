@@ -11,9 +11,15 @@ public import Mathlib.Algebra.BigOperators.Fin
 
 Completeness: the honest prover makes the verifier accept the true sum on every challenge vector.
 
-Soundness: against a false claim, at most n d |F|^(n-1) of the |F|^n challenge vectors accept, so the error is at most n d / |F|.
+Soundness: against a false claim, at most n d |F|^(n-1) of the |F|^n challenge vectors accept.
 
-The proof is the induction of Thaler, Section 4.1: either the first message is the honest one, and then it fails the sum check, or it differs and agrees with it at r_0, which happens for at most d values of r_0.
+So the error is at most n d / |F|.
+
+The proof is the induction of Thaler, Section 4.1.
+
+Either the first message is the honest one, and then it fails the sum check.
+
+Or it differs, and it agrees with the honest one at r_0 for at most d values of r_0.
 -/
 
 namespace Plonky3Lean.Proofs.Sumcheck

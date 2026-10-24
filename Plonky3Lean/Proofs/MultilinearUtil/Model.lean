@@ -9,7 +9,9 @@ public import P3MultilinearUtil.Model
 
 Packing groups W consecutive entries, and unpacking reads the lanes back in order.
 
-So a lane-wise operation on the packed prefix, followed by the same operation on the tail, is the operation on every entry.
+So run a lane-wise operation on the packed prefix, then the same operation on the tail.
+
+The result is the operation applied to every entry.
 -/
 
 namespace Plonky3Lean.Proofs.MultilinearUtil

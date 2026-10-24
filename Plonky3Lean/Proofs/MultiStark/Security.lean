@@ -23,7 +23,9 @@ The first three bound the zerocheck's own error, proved by counting draws.
 
 The last is the sumcheck's, at the round degree the verifier runs.
 
-That degree is one more than the degree charged: the verifier and the accounting agree on it.
+That degree is one more than the degree charged.
+
+The verifier and the accounting agree on it.
 -/
 
 namespace Plonky3Lean.Proofs.MultiStark
@@ -37,7 +39,9 @@ theorem foldl_max_eq (ds : List ℕ) (a : ℕ) : ds.foldl max a = max a (ds.fold
   | nil => simp
   | cons d ds ih => rw [List.foldl_cons, List.foldl_cons, ih, ih (max 0 d)]; omega
 
-/-- **The verifier's round degree is the charged degree plus one.** With or without a bus, the sumcheck the verifier runs has exactly the degree p3-security charges for. -/
+/-- **The verifier's round degree is the charged degree plus one.**
+
+With or without a bus, the verifier's sumcheck has exactly the degree p3-security charges for. -/
 theorem round_degree_eq (ds : List ℕ) (bus : Option ℕ) :
     p3_multi_stark.zerocheck.mirror.round_degree ds bus = charged_degree ds bus + 1 := by
   cases bus <;> simp [p3_multi_stark.zerocheck.mirror.round_degree, charged_degree]; omega
@@ -93,7 +97,17 @@ theorem sum_zerocheckTerms (q : ℕ) (p : AirParams) :
   simp [Term.value, List.filter]
   ring
 
-/-- **The charged terms bound the zerocheck.** An unsatisfied batch of A instances over at most m variables, with at most k constraints each, has a zero zerocheck sum on a fraction of the q^2 (q - 1)^m draws at most the constraint-batching, air-batching and zerocheck terms p3-security charges. -/
+/-- **The charged terms bound the zerocheck.**
+
+Take an unsatisfied batch of A instances over at most m variables, with at most k constraints each.
+
+Its zerocheck sum is zero on a fraction of the q^2 (q - 1)^m draws.
+
+That fraction is at most the sum of three terms p3-security charges:
+
+- constraint batching
+- air batching
+- zerocheck. -/
 theorem zerocheck_error_le_terms {K : Type _} [Field K] [Fintype K] [DecidableEq K]
     {batch : List (Instance K)} (hsat : ¬ Satisfied batch) {m k : ℕ}
     (hm : ∀ A ∈ batch, A.log_height ≤ m) (hk : ∀ A ∈ batch, A.constraints.length ≤ k) (d : ℕ) :

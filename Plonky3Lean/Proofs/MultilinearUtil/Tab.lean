@@ -9,7 +9,9 @@ public import Plonky3Lean.Proofs.MultilinearUtil.EqBatch
 
 Entry x of the weighted table of points z_i with weights s_i is the vector of the s_i eq(x, z_i).
 
-Splitting the variables of the points composes the tables: the table of A ++ B at (a, b) is the table of B, at b, weighted by the table of A at a.
+Splitting the variables of the points composes the tables.
+
+The table of A ++ B at (a, b) is the table of B at b, weighted by the table of A at a.
 -/
 
 namespace Plonky3Lean.Proofs.MultilinearUtil
@@ -235,7 +237,9 @@ theorem fill_loop {m : ℕ} {s : List A} (hs : s.length ≤ m) : ∀ (L S : List
     generalize 2 ^ (S.length + 1) = Y at hmono hp ⊢
     omega
 
-/-- fill_buffer_batch: started from the weights in row 0, row x holds the weighted table at x. -/
+/-- The batched buffer fill starts from the weights in row 0.
+
+It leaves the weighted table at x in row x. -/
 theorem fill_buffer_batch_eq {m : ℕ} (evals : List (List IF)) (s : List A) (hs : s.length = m)
     (hrows : ∀ r ∈ evals, m ≤ r.length) :
     fill_buffer_batch m m evals (s :: List.replicate (2 ^ evals.length - 1) (List.replicate m 0)) =

@@ -18,9 +18,13 @@ The verifier evaluates the three selectors at the bound point in closed form:
 
 Each is the multilinear extension of its row indicator.
 
-So on a row of the cube each selector is exactly 0 or 1: these are true indicators, not scaled ones.
+So on a row of the cube each selector is exactly 0 or 1.
 
-The prover folds the same selectors one coordinate at a time, and its prefix-aware form agrees with the closed form.
+These are true indicators, not scaled ones.
+
+The prover folds the same selectors one coordinate at a time.
+
+Its prefix-aware form agrees with the closed form.
 -/
 
 namespace Plonky3Lean.Proofs.MultiStark
@@ -70,14 +74,20 @@ theorem rowExt_transitionRow (r : List K) :
     · simp [transitionRow, lastRow, h, show b + 1 ≠ 2 ^ r.length by omega]
     · simp [transitionRow, lastRow, show b + 1 = 2 ^ r.length by omega]
 
-/-- **The selectors are extensions.** At any point, the closed form is the multilinear extension of the first-row, last-row and transition indicators. -/
+/-- **The selectors are extensions.**
+
+At any point, the closed form is the multilinear extension of the row indicators.
+
+These are the first-row, last-row and transition indicators. -/
 theorem at_eq_rowExt (rs : List K) :
     BoundaryEvals.at rs =
       ⟨rowExt firstRow rs, rowExt (lastRow rs.length) rs, rowExt (transitionRow rs.length) rs⟩ := by
   rw [rowExt_transitionRow, rowExt_lastRow, rowExt_firstRow, eq_vertex_zero, eq_vertex_allOnes]
   simp [BoundaryEvals.at, foldl_atStep]
 
-/-- **The selectors are 0/1 on the cube.** At row b of 2^n rows, the closed form is the row's three indicators. -/
+/-- **The selectors are 0/1 on the cube.**
+
+At row b of 2^n rows, the closed form is the row's three indicators. -/
 theorem at_vertex {n b : ℕ} (hb : b < 2 ^ n) :
     BoundaryEvals.at (vertex n b : List K) = BoundaryEvals.from_row b (2 ^ n) := by
   rw [at_eq_rowExt, length_vertex, ext_vertex _ hb, ext_vertex _ hb, ext_vertex _ hb]
@@ -99,7 +109,11 @@ theorem prod_vertex {n b : ℕ} (hb : b < 2 ^ n) :
   · simp [hbe, show 2 ^ n - 1 = b by omega]
   · simp [hbe, show 2 ^ n - 1 ≠ b by omega]
 
-/-- **The prover's prefix-aware selectors.** After binding the prefix p, the selectors at row b of the residual cube are the closed form at p followed by the row's vertex. -/
+/-- **The prover's prefix-aware selectors.**
+
+Bind the prefix p, and take row b of the residual cube.
+
+The selectors there are the closed form at p followed by the row's vertex. -/
 theorem from_row_with_prefix_at (p : List K) {n b : ℕ} (hb : b < 2 ^ n) :
     BoundaryEvals.from_row_with_prefix b (2 ^ n) (BoundaryEvals.at p) =
       BoundaryEvals.at (p ++ vertex n b) := by

@@ -8,9 +8,13 @@ public import Plonky3Lean.Proofs.Commit.Selectors
 /-!
 # The constraint check at the out-of-domain point
 
-The check panics exactly when zeta lies on the trace domain, where the selectors divide by zero.
+The check panics exactly when zeta lies on the trace domain.
 
-Off the domain, on the honest openings of a trace that satisfies the STARK's relation, the fold times 1 / Z(zeta) is the quotient at zeta.
+There the selectors divide by zero.
+
+Off the domain, take the honest openings of a trace that satisfies the STARK's relation.
+
+There the fold times 1 / Z(zeta) is the quotient at zeta.
 -/
 
 set_option linter.unusedSectionVars false
@@ -38,7 +42,10 @@ theorem verify_constraints_none_iff (hV : GenValid G) (air : Air F)
   · simp only [Option.bind_eq_bind, Option.bind_some, reduceCtorEq, iff_false]
     split_ifs <;> simp
 
-/-- When the check returns, it accepts exactly when both preprocessed rows have one width and the fold times the inverse vanishing value is the quotient. -/
+/-- When the check returns, it accepts exactly when two conditions hold:
+
+- both preprocessed rows have one width
+- the fold times the inverse vanishing value is the quotient. -/
 theorem verify_constraints_ok_iff (air : Air F) (trace_local trace_next : List K)
     (pl pn : Option (List K)) (periodic : List K) (pv : List F) (c : Coset G) (ζ α q : K)
     (r : Except VerificationError Unit)
@@ -101,9 +108,13 @@ theorem getD_openRow (σ : Var → K[X]) (row : ℕ → Var) {w c : ℕ} (hc : c
 
 /-- Completeness of the check at zeta.
 
-Take a trace that satisfies the STARK's relation on the subgroup s H, interpolated by the trace polynomials.
+Take a trace that satisfies the STARK's relation on the subgroup s H.
 
-On the honest openings of the trace at zeta, with zeta off s H, the check accepts the quotient s^n C_alpha / Z at zeta. -/
+The trace polynomials interpolate it.
+
+Open the trace honestly at zeta, with zeta off s H.
+
+Then the check accepts the quotient s^n C_alpha / Z at zeta. -/
 theorem verify_constraints_complete (hV : GenValid G) (h2 : (2 : K) ≠ 0) {air : Air F}
     (hb : air.public_boundary_io = []) (c : Coset G) {s ω : F}
     (hcs : c.shift = algebraMap F K s) (hcg : c.subgroup_generator = algebraMap F K ω)

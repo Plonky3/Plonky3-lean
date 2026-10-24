@@ -7,7 +7,9 @@ public import Plonky3Lean.Proofs.MultilinearUtil.EqBatchPacked
 /-!
 # Batched equality tables: both paths are the batched table
 
-For every packing width 2^w and every thread count, eval_eq_batch writes, or adds, sum_i g_i eq(x, z_i) at every x.
+The batched equality evaluation writes, or adds, sum_i g_i eq(x, z_i) at every x.
+
+This holds for every packing width 2^w and every thread count.
 
 The variables split into the thread bits, the middle bits and the lane bits, from the top:
 
@@ -45,7 +47,9 @@ theorem lane_sum {W m : ℕ} (packed R S : List (List EF)) (g : List EF) (hg : g
   ring
 
 omit [Field IF] [Algebra IF EF] in
-/-- eval_eq_batch: the batched table of the points, written or added, for every width and thread count. -/
+/-- The batched evaluation gives the batched table of the points, written or added.
+
+This holds for every width and thread count. -/
 theorem eval_eq_batch_eq (w T : ℕ) (initialized : Bool) {m : ℕ} (hm : 0 < m)
     (rows : List (List EF)) (out g : List EF) (hg : g.length = m)
     (hrows : ∀ r ∈ rows, m ≤ r.length) (hout : out.length = 2 ^ rows.length) :
@@ -155,7 +159,7 @@ theorem lane_sum_base {F : Type _} [Field F] [Algebra F EF] {W m : ℕ}
   ring
 
 omit [Field IF] [Algebra IF EF] in
-/-- eval_eq_base_batch: the same, for points in the base field and weights in the extension. -/
+/-- The same holds for points in the base field and weights in the extension. -/
 theorem eval_eq_base_batch_eq {F : Type _} [Field F] [Algebra F EF] (w T : ℕ) (initialized : Bool)
     {m : ℕ} (hm : 0 < m) (rows : List (List F)) (out g : List EF) (hg : g.length = m)
     (hrows : ∀ r ∈ rows, m ≤ r.length) (hout : out.length = 2 ^ rows.length) :

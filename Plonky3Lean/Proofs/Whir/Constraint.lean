@@ -8,9 +8,11 @@ public import Plonky3Lean.Proofs.MultilinearUtil.PointForms
 /-!
 # Batched constraints
 
-A constraint batches its claims s_0, s_1, ... with the powers gamma^p, gamma^(p+1), ..., p its initial power.
+A constraint batches its claims s_i with the powers gamma^(p + i), where p is its initial power.
 
-The groups follow each other: the claims of a group take the powers after those of the groups before it.
+The groups follow each other.
+
+The claims of a group take the powers after those of the groups before it.
 
 ```text
     claim:   sigma + sum_i gamma^(p + i) s_i
@@ -65,14 +67,16 @@ theorem foldl_combine (γ : EF) : ∀ (l : List (Statements F EF)) (σ : EF) (sh
     simp only [List.flatMap_cons, List.length_append, powers_add, dot_append (length_powers _ _ _).symm,
       add_assoc]
 
-/-- combine_evals: the claim plus every claimed value against its power, the groups in order. -/
+/-- The combined claim is the claim plus every claimed value against its power, the groups in order. -/
 theorem _root_.p3_sumcheck.constraints.mirror.Constraint.combine_evals_eq (c : Constraint F EF) (σ : EF)
     (h : ∀ s ∈ c.statements, s.WF) :
     c.combine_evals σ = σ + dot (c.statements.flatMap Statements.evals)
       (powers c.challenge c.initial_power (c.statements.flatMap Statements.evals).length) := by
   rw [Constraint.combine_evals, foldl_combine c.challenge _ _ _ h]
 
-/-- The weights of a group at y: eq(z, y) for an equality point, the selector of its powers for a scalar point. -/
+/-- The weights of a group at y.
+
+An equality point weighs eq(z, y), and a scalar point the selector of its powers. -/
 def _root_.p3_sumcheck.constraints.mirror.Statements.weights (y : List EF) : Statements F EF → List EF
   | .Eq s => s.points.map fun p => eq p y
   | .Select s => s.vars.map fun v => sel (algebraMap F EF v) y
@@ -134,7 +138,9 @@ def weightAt (c : Constraint F EF) (y : List EF) : EF :=
   dot (c.statements.flatMap (Statements.weights y))
     (powers c.challenge c.initial_power (c.statements.flatMap Statements.evals).length)
 
-/-- The constraint is well formed and its points fit the last num_variables coordinates of r. -/
+/-- The constraint is well formed, and its points fit the last n coordinates of r.
+
+Here n is the constraint's variable count. -/
 def FitsEnd (r : List EF) (c : Constraint F EF) : Prop :=
   c.num_variables ≤ r.length ∧ ∀ s ∈ c.statements, s.WF ∧ s.Fits (r.drop (r.length - c.num_variables))
 
@@ -150,7 +156,9 @@ theorem mapM_prefix (r : List EF) : ∀ (cs : List (Constraint F EF)), (∀ c �
       constraintValue_eq c _ hs, mapM_prefix r cs fun t ht => h t (by simp [ht]), List.map_cons]
     rfl
 
-/-- eval_constraints_poly with prefix binding: the sum of each constraint's weight at the last num_variables coordinates of the point. -/
+/-- Evaluating the constraints with prefix binding sums each constraint's weight.
+
+Each weight is taken at the last n coordinates of the point, for n that constraint's variable count. -/
 theorem eval_constraints_poly_prefix (r : List EF) (cs : List (Constraint F EF)) (h : ∀ c ∈ cs, FitsEnd r c) :
     VariableOrder.Prefix.eval_constraints_poly cs r =
       some (cs.map fun c => weightAt c (r.drop (r.length - c.num_variables))).sum := by

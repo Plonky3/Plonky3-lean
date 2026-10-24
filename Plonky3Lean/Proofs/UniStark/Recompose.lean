@@ -9,9 +9,13 @@ public import Plonky3Lean.Proofs.UniStark.Folder
 /-!
 # The verifier's chunk recombination inverts the prover's split
 
-Split the quotient coset s H' of order N = c m into the c chunks D_i = s omega^i H'^c, each of order m.
+Split the quotient coset s H' of order N = c m into c chunks of order m.
 
-Write Z_j for the vanishing polynomial of chunk j, normalized as (x / s_j)^m - 1, and s_i for the first point of chunk i.
+Chunk i is D_i = s omega^i H'^c.
+
+Write Z_j for the vanishing polynomial of chunk j, normalized as (x / s_j)^m - 1.
+
+Write s_i for the first point of chunk i.
 
 ```text
     L_i(X) = prod_(j != i) Z_j(X) / Z_j(s_i)        1 on D_i, 0 on every other chunk
@@ -19,7 +23,9 @@ Write Z_j for the vanishing polynomial of chunk j, normalized as (x / s_j)^m - 1
 
 Z_j is constant on each chunk, since x^m = s_i^m there.
 
-So for q_i the interpolant of Q on D_i, the polynomial sum_i L_i q_i agrees with Q on all N points.
+Let q_i be the interpolant of Q on D_i.
+
+Then the polynomial sum_i L_i q_i agrees with Q on all N points.
 
 Its degree is below (c - 1) m + m = N, so it is Q whenever deg Q < N.
 -/

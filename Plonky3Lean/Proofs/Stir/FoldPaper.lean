@@ -10,7 +10,9 @@ public import Plonky3Lean.Spec.Stir
 
 On L = s <omega>, the points whose k-th power is (s omega^j)^k are s omega^(j + l M), l < k, for N = k M.
 
-Interpolating at those points and evaluating at gamma is interpolating at omega^(j + l M) and evaluating at gamma / s.
+Interpolate at those points and evaluate at gamma.
+
+This is interpolating at omega^(j + l M) and evaluating at gamma / s.
 -/
 
 namespace Plonky3Lean.Proofs.Stir
@@ -84,7 +86,11 @@ theorem fiber_eq {ω s : K} {k M n : ℕ} (hω : IsPrimitiveRoot ω (2 ^ n)) (hN
     · rw [mul_pow, mul_pow, ← pow_mul, ← pow_mul, add_mul, pow_add, mul_assoc l, mul_comm M k, hN,
         mul_comm l, pow_mul ω (2 ^ n), hω.pow_eq_one, one_pow, mul_one]
 
-/-- The fold of arity k at index j and challenge gamma / s is Definition 4.8's Fold(f, k, gamma) at (s omega^j)^k, for any f taking value c_i at s omega^i. -/
+/-- Take any f with value c_i at s omega^i.
+
+The fold of arity k at index j and challenge gamma / s is Fold(f, k, gamma) at (s omega^j)^k.
+
+This is Definition 4.8. -/
 theorem foldIdx_eq_fold {ω s : K} {k M n : ℕ} (hω : IsPrimitiveRoot ω (2 ^ n)) (hN : k * M = 2 ^ n)
     (hs : s ≠ 0) (c : List K) (f : K → K) (hf : ∀ i < 2 ^ n, f (s * ω ^ i) = c.getD i 0)
     {j : ℕ} (hj : j < M) (γ : K) :
@@ -103,7 +109,11 @@ theorem foldIdx_eq_fold {ω s : K} {k M n : ℕ} (hω : IsPrimitiveRoot ω (2 ^ 
   refine Lagrange.interpolate_eq_of_values_eq_on _ _ fun l hl => ?_
   simp [hf _ (hidx l (mem_range.1 hl))]
 
-/-- Interpolating the fiber values r_l at omega^(j + l M) and evaluating at gamma / s is Fold(f, k, gamma) at (s omega^j)^k, for any f taking value r_l at s omega^(j + l M). -/
+/-- Take any f with value r_l at s omega^(j + l M).
+
+Interpolate the fiber values r_l at omega^(j + l M) and evaluate at gamma / s.
+
+The result is Fold(f, k, gamma) at (s omega^j)^k. -/
 theorem interp_fiber_eq_fold {ω s : K} {k M n : ℕ} (hω : IsPrimitiveRoot ω (2 ^ n))
     (hN : k * M = 2 ^ n) (hs : s ≠ 0) (r : ℕ → K) (f : K → K)
     {j : ℕ} (hj : j < M) (hf : ∀ l < k, f (s * ω ^ (j + l * M)) = r l) (γ : K) :

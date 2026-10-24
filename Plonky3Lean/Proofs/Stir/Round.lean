@@ -8,7 +8,9 @@ public import Plonky3Lean.Proofs.Stir.PolyFold
 /-!
 # Completeness of one round
 
-An honest round folds f, quotients the fold by its answers on G, and degree-corrects back to the next degree bound:
+An honest round folds f and quotients the fold by its answers on G.
+
+It then degree-corrects back to the next degree bound:
 
 ```text
     deg f < k d   =>   deg PolyFold(f, k, r) < d
@@ -80,14 +82,18 @@ theorem eval_polyQuotient (g : K[X]) (G : Finset K) {x : K} (hx : x ∉ G) :
     rw [eval_vanishingPoly]; exact prod_ne_zero_iff.2 fun y hy h => hx (sub_eq_zero.1 h ▸ hy)
   rw [eq_div_iff hV, mul_comm, ← eval_mul, polyQuotient_mul, eval_sub]
 
-/-- Round completeness: an input of degree below k d gives a next polynomial of degree below d. -/
+/-- Round completeness.
+
+An input of degree below k d gives a next polynomial of degree below d. -/
 theorem degree_nextPoly_lt (f : K[X]) {k d : ℕ} (hk : 0 < k) (hf : f.degree < (k * d : ℕ))
     (rFold rComb : K) (G : Finset K) (hG : G.card ≤ d) :
     (nextPoly f k rFold rComb G d).degree < d :=
   degree_polyDegCor_lt (Nat.sub_le _ _) rComb
     (degree_polyQuotient_lt _ G hG (degree_polyFold_lt hk hf rFold))
 
-/-- Off G, the next polynomial is DegCor of Definition 4.12 applied to Quotient of Definition 4.2, for any fill. -/
+/-- Off G, the next polynomial is DegCor of Definition 4.12 applied to Quotient of Definition 4.2.
+
+This holds for any fill. -/
 theorem eval_nextPoly (f : K[X]) (k : ℕ) (rFold rComb : K) (G : Finset K) (d : ℕ) (fill : K → K)
     {x : K} (hx : x ∉ G) :
     (nextPoly f k rFold rComb G d).eval x =

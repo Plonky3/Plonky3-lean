@@ -7,13 +7,17 @@ public import Plonky3Lean.Proofs.Sumcheck.Protocol
 /-!
 # Sumcheck with compressed round messages
 
-A verifier that does not receive g_i itself, but a message m_i it decodes with the running claim c_i:
+This verifier does not receive g_i itself.
+
+It receives a message m_i, which it decodes with the running claim c_i:
 
 ```text
     g_i = dec(c_i, m_i)
 ```
 
-When every decoding has degree at most d and satisfies g_i(0) + g_i(1) = c_i, the sum check passes by construction, and the verifier only keeps the claim:
+Suppose every decoding has degree at most d and satisfies g_i(0) + g_i(1) = c_i.
+
+Then the sum check passes by construction, and the verifier only keeps the claim:
 
 ```text
     c_{i+1} = dec(c_i, m_i)(r_i),    accept iff g(r) = c_n
@@ -21,7 +25,9 @@ When every decoding has degree at most d and satisfies g_i(0) + g_i(1) = c_i, th
 
 This verifier accepts exactly when the verifier of Section 4.1 accepts the decoded polynomials.
 
-Its soundness is therefore n d / |F|, and it is complete when every admissible polynomial has a message.
+Its soundness error is therefore n d / |F|.
+
+It is complete when every admissible polynomial has a message.
 -/
 
 namespace Plonky3Lean.Proofs.Sumcheck
@@ -104,7 +110,9 @@ theorem accepts_induced_iff (dec : F → Msg → Polynomial F) {d : ℕ}
     rfl
 
 open scoped Classical in
-/-- Against a false claim, at most n d |F|^(n-1) challenge vectors replay to g(r), for every causal message strategy. -/
+/-- Take a false claim and any causal message strategy.
+
+At most n d |F|^(n-1) challenge vectors replay to g(r). -/
 theorem soundness_decoded [IsDomain F] [Fintype F] (dec : F → Msg → Polynomial F) {d : ℕ}
     (hdeg : ∀ c m, (dec c m).natDegree ≤ d) (hsum : ∀ c m, (dec c m).eval 0 + (dec c m).eval 1 = c)
     {n : ℕ} (g : MvPolynomial (Fin n) F) (hg : IndividualDegreeLE g d) (H : F) (hH : H ≠ cubeSum g)
@@ -114,7 +122,9 @@ theorem soundness_decoded [IsDomain F] [Fintype F] (dec : F → Msg → Polynomi
   have := soundness g hg H hH _ (induced_causal dec H M hM)
   simpa only [accepts_induced_iff dec hdeg hsum g H M hM] using this
 
-/-- When every polynomial of degree at most d with g_i(0) + g_i(1) = c has a message, the honest messages replay to g(r). -/
+/-- Suppose every polynomial of degree at most d with g_i(0) + g_i(1) = c has a message.
+
+Then the honest messages replay to g(r). -/
 theorem completeness_decoded (dec : F → Msg → Polynomial F) (enc : Polynomial F → Msg) {d : ℕ}
     (henc : ∀ c p, p.natDegree ≤ d → p.eval 0 + p.eval 1 = c → dec c (enc p) = p) :
     ∀ {n : ℕ} (g : MvPolynomial (Fin n) F), IndividualDegreeLE g d → ∀ r,

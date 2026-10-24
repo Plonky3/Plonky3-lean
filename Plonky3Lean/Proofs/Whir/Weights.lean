@@ -59,7 +59,9 @@ theorem cubeDot_sel (P : List K) {n : ℕ} (hP : P.length = 2 ^ n) (q : K) :
   rw [uni, hP]
   exact sum_congr rfl fun b hb => by rw [sel_vertex q (mem_range.mp hb)]
 
-/-- The claim update of Construction 5.1, check 2(c), with honest answers, is the sum of the folded table against the weight update of step 2(e). -/
+/-- Take the claim update of Construction 5.1, check 2(c), with honest answers.
+
+It is the sum of the folded table against the weight update of step 2(e). -/
 theorem nextClaim_cubeDot (P : List K) {m : ℕ} (hP : P.length = 2 ^ m) (w : List K → K) (r : List K)
     (γ : K) (ood queries : List K) :
     nextClaim (cubeDot P m fun x => w (r ++ x)) γ (ood.map fun z => mle P (pow z m))

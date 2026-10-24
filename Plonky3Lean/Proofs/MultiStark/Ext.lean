@@ -13,7 +13,9 @@ The extension of a table at a vertex is the table's entry there.
 
 The equality weights of a point sum to one.
 
-A table of 2^n rows, read on the low bits of a wider cube's row index, has the same extension at p ++ s as the narrow table at s:
+Read a table of 2^n rows on the low bits of a wider cube's row index.
+
+At p ++ s it has the same extension as the narrow table at s:
 
 ```text
     sum_{b < 2^(k + n)} eq(b, p ++ s) f(b mod 2^n)  =  sum_{c < 2^n} eq(c, s) f(c)
@@ -53,7 +55,9 @@ theorem ext_vertex (f : ℕ → K) {n b : ℕ} (hb : b < 2 ^ n) : rowExt f (vert
     simp [eq_vertex_vertex (mem_range.mp hc) hb, hcb]]
   simp [eq_vertex_vertex hb hb]
 
-/-- **The suffix point.** A table read on the low n bits has, at p ++ s, the extension of the narrow table at s. -/
+/-- **The suffix point.**
+
+A table read on the low n bits has, at p ++ s, the extension of the narrow table at s. -/
 theorem ext_mod_append (f : ℕ → K) (p s : List K) :
     rowExt (fun b => f (b % 2 ^ s.length)) (p ++ s) = rowExt f s := by
   induction p generalizing f with
@@ -68,7 +72,7 @@ theorem ext_mod_append (f : ℕ → K) (p s : List K) :
       rw [List.length_append, pow_add, Nat.mul_add_mod_self_right]
     rw [hshift, ih]; ring
 
-/-- The extension as the polynomial of mathlib: the extension of the table of its first 2^m entries. -/
+/-- The extension as a mathlib polynomial is the extension of the table of its first 2^m entries. -/
 theorem ext_eq_eval_mlePoly (f : ℕ → K) {m : ℕ} (x : Fin m → K) :
     rowExt f (List.ofFn x) = MvPolynomial.eval x (mlePoly ((List.range (2 ^ m)).map f) m) := by
   rw [eval_mlePoly]

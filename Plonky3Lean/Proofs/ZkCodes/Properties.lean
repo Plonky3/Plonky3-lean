@@ -35,7 +35,10 @@ theorem encode_linear {dft_batch : ℕ → (ℕ → K) → Option (ℕ → K)} {
   obtain ⟨y, hy, hyi⟩ := encode_with_randomness_computes hd hle (List.length_ofFn) (List.length_ofFn)
   exact ⟨y, hy, fun i hi => by rw [hyi i hi]; beta_reduce; rw [encValue_ofFn, rsZkPoly_eval_add_smul]⟩
 
-/-- The codeword at position p is the message row times the message plus the randomness row times the randomness. -/
+/-- The codeword at position p is the sum of two products:
+
+- the message row times the message
+- the randomness row times the randomness. -/
 theorem encode_rows (G : Gen K) {t l k : ℕ} (hk : k ≤ G.adicity)
     {dft_batch : ℕ → (ℕ → K) → Option (ℕ → K)}
     (hd : ∀ x, Computes (dft_batch (2 ^ k) x) (2 ^ k) (dft (G.gen k) (2 ^ k) x))
@@ -63,7 +66,7 @@ theorem encode_eq_rsZkEnc (G : Gen K) {t l k : ℕ} {dft_batch : ℕ → (ℕ �
 
 /-! ## Sampling -/
 
-/-- The sampled message is the first msg_len draws, in order. -/
+/-- The sampled message is the first l draws, in order, for l the message length. -/
 theorem sample_message_eq (rs : ReedSolomonZkEncoding) (draw : ℕ → K) :
     rs.sample_message draw = List.ofFn fun i : Fin rs.msg_len => draw i := by
   apply List.ext_getElem <;> simp [ReedSolomonZkEncoding.sample_message]
@@ -112,7 +115,11 @@ theorem simulate_wraps (G : Gen K) (hG : GenValid G) {t l k : ℕ} (hk : k ≤ G
     simp [show (2 : ℕ) ≤ t from ht, List.idxOf_cons_self]
   · rw [evaluation_point_eq G hk, evaluation_point_eq G hk, pow_add, (hG k hk).pow_eq_one, mul_one]
 
-/-- The constructor accepts m = 2^k beyond the two-adicity; every evaluation point then panics, and so does every encoding with a backend that panics there. -/
+/-- The constructor accepts m = 2^k beyond the two-adicity.
+
+Every evaluation point then panics.
+
+So does every encoding with a backend that panics there. -/
 theorem beyond_adicity (G : Gen K) {t l k : ℕ} (hk : G.adicity < k) (hk64 : k < 64)
     (hle : l + t ≤ 2 ^ k) {dft_batch : ℕ → (ℕ → K) → Option (ℕ → K)}
     (hd : ∀ x, dft_batch (2 ^ k) x = none) (p : ℕ) (msg r : List K) :

@@ -10,7 +10,11 @@ public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
 
 A codeword of length N lives on the powers of omega, a primitive N-th root of unity.
 
-The fold of arity k at index j interpolates the k entries j, j + M, ..., j + (k - 1) M, for N = k M, and evaluates at beta:
+Let N = k M.
+
+The fold of arity k at index j interpolates the k entries j, j + M, ..., j + (k - 1) M.
+
+It evaluates the interpolant at beta:
 
 ```text
     nodes   omega^(j + l M),   l < k
@@ -20,7 +24,9 @@ The fold of arity k at index j interpolates the k entries j, j + M, ..., j + (k 
 One pass pairs x with -x, which sit N/2 apart, and keeps
 
 ```text
-    (c(x) + c(-x)) / 2 + beta (c(x) - c(-x)) / (2 x)  =  E(x^2) + beta O(x^2),     P(X) = E(X^2) + X O(X^2)
+    (c(x) + c(-x)) / 2 + beta (c(x) - c(-x)) / (2 x)  =  E(x^2) + beta O(x^2)
+
+    where P(X) = E(X^2) + X O(X^2)
 ```
 
 so the fold of arity 2m at beta is the fold of arity m of the pass, at beta^2.

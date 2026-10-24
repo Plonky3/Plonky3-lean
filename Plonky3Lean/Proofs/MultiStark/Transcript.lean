@@ -22,7 +22,9 @@ The pattern and the instance label together determine the shape:
     label    ->  the instance count, the difficulty, every arity, width and successor column
 ```
 
-So two statements that seed the sponge alike, up to a collision of the pattern's fingerprint, are the same statement.
+Take two statements that seed the sponge alike, up to a collision of the pattern's fingerprint.
+
+They are the same statement.
 
 The zerocheck's label alone determines its shape.
 -/
@@ -33,7 +35,11 @@ open p3_multi_stark.transcript.mirror
 
 /-! ## The statement pattern -/
 
-/-- The steps that bind the statement: the preprocessed commitment, the main commitment's bracket, and one public-value step per instance. -/
+/-- The steps that bind the statement:
+
+- the preprocessed commitment
+- the main commitment's bracket
+- one public-value step per instance. -/
 def statementSteps (s : MultiStarkShape) : List Step :=
   (if s.has_preprocessed then [.PreprocessedCommitment] else []) ++ delegation .MainCommitment ++
     s.instances.map (fun i => .PublicValues i.num_public_values)
@@ -47,7 +53,7 @@ def delegationSteps (s : MultiStarkShape) : List Step :=
 theorem pattern_eq (s : MultiStarkShape) : s.pattern = statementSteps s ++ delegationSteps s := by
   simp [MultiStarkShape.pattern, statementSteps, delegationSteps, List.append_assoc]
 
-/-- A marker of a delegation other than the main commitment: where challenges are drawn. -/
+/-- A marker of a delegation other than the main commitment, where challenges are drawn. -/
 def isDelegationMarker : Step → Bool
   | .Begin d => d != .MainCommitment
   | .End d => d != .MainCommitment
@@ -61,7 +67,13 @@ def isStatementStep : Step → Bool
   | .PublicValues _ => true
   | _ => false
 
-/-- **Everything is bound before the first challenge.** After the statement's commitments and public values, the pattern holds only the markers of delegations other than the main commitment, and every challenge is drawn inside one of them. -/
+/-- **Everything is bound before the first challenge.**
+
+After the statement's commitments and public values, the pattern holds only delegation markers.
+
+These mark delegations other than the main commitment.
+
+Every challenge is drawn inside one of them. -/
 theorem delegation_only (s : MultiStarkShape) : (delegationSteps s).all isDelegationMarker := by
   unfold delegationSteps
   split_ifs <;> decide
@@ -128,7 +140,9 @@ theorem publicCounts_pattern (s : MultiStarkShape) :
   simp only [publicCounts, MultiStarkShape.pattern, delegation, List.filterMap_append]
   split_ifs <;> simp [List.filterMap_map]
 
-/-- **The statement seed binds the shape.** Two shapes with the same pattern and the same instance label are equal. -/
+/-- **The statement seed binds the shape.**
+
+Two shapes with the same pattern and the same instance label are equal. -/
 theorem shape_injective {s t : MultiStarkShape} (hp : s.pattern = t.pattern) (hl : s.label = t.label) :
     s = t := by
   simp only [MultiStarkShape.label, List.cons_append, List.nil_append, List.cons.injEq] at hl
@@ -141,7 +155,11 @@ theorem shape_injective {s t : MultiStarkShape} (hp : s.pattern = t.pattern) (hl
 
 /-! ## The zerocheck pattern -/
 
-/-- **The zerocheck draws everything before its sumcheck.** Alpha, beta, eta, lambda and the free coordinates come first, the sumcheck's bracket last. -/
+/-- **The zerocheck draws everything before its sumcheck.**
+
+Alpha, beta, eta, lambda and the free coordinates come first.
+
+The sumcheck's bracket comes last. -/
 theorem zerocheck_pattern_eq (s : ZerocheckShape) :
     ∃ challenges, s.pattern = challenges ++ [.BeginSumcheck, .EndSumcheck] ∧
       .BeginSumcheck ∉ challenges ∧ .EndSumcheck ∉ challenges := by
@@ -161,7 +179,9 @@ theorem flatMap_degrees_inj : ∀ {as bs : List AirDegrees} {r r' : List ℕ}, a
     obtain ⟨h3, h4⟩ := flatMap_degrees_inj hl h
     exact ⟨by cases a; cases b; simp_all, h4⟩
 
-/-- **The zerocheck seed binds its shape.** Two zerocheck shapes with the same instance label are equal. -/
+/-- **The zerocheck seed binds its shape.**
+
+Two zerocheck shapes with the same instance label are equal. -/
 theorem zerocheck_shape_injective {s t : ZerocheckShape} (hl : s.label = t.label) : s = t := by
   simp only [ZerocheckShape.label, List.cons_append, List.nil_append, List.cons.injEq] at hl
   obtain ⟨h1, h2, h3, h4, h⟩ := hl

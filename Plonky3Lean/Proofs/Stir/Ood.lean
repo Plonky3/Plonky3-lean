@@ -11,7 +11,10 @@ public import Plonky3Lean.Proofs.Dft.Glue
 
 A candidate z lies in the coset s <omega> of size 2^l exactly when z^(2^l) = s^(2^l).
 
-The filter keeps z when it lies outside every excluded coset of positive size and differs from every kept point.
+The filter keeps z when two conditions hold:
+
+- z lies outside every excluded coset of positive size
+- z differs from every kept point.
 
 A coset of size one, l = 0, is never excluded.
 -/
@@ -47,7 +50,9 @@ def oodStep (logs : List ℕ) (M : ℕ) : List EF × EF → ℕ → List EF × E
     if logs.getD s 0 = l then zp.set s st.2 else zp) st.1
   (z_pows, if l < M then st.2 ^ 2 else st.2)
 
-/-- The squaring loop of the filter: after the steps l < t, slot s holds z^(2^(log_s)) for log_s < t. -/
+/-- The squaring loop of the filter, after the steps l < t.
+
+Slot s holds z^(2^(log_s)) for log_s < t. -/
 theorem ood_loop (logs : List ℕ) (M : ℕ) (z : EF) :
     ∀ t ≤ M + 1,
       let st := (List.range t).foldl (oodStep logs M) (List.replicate logs.length 1, z)
@@ -135,7 +140,10 @@ theorem oodFilter_accepts_unfold (f : OodFilter F) (z : EF) (kept : List EF) :
         (List.replicate f.log_sizes.length 1, z)).1.getD s 0 * algebraMap F EF (f.shift_inv_pows.getD s 0) != 1) &&
       kept.all fun existing => existing != z) := rfl
 
-/-- OodFilter::accepts: z is kept exactly when z^(2^l) differs from s^(2^l) for every excluded coset with l > 0, and z is new. -/
+/-- The filter keeps z exactly when two conditions hold:
+
+- z^(2^l) differs from s^(2^l) for every excluded coset with l > 0
+- z is new. -/
 theorem oodFilter_accepts_eq (doms : List (F × ℕ)) (h : ∀ d ∈ doms, d.1 ≠ 0) (z : EF) (kept : List EF) :
     ∃ f, OodFilter.new doms = some f ∧
       (f.accepts z kept = true ↔ (∀ i < doms.length, (doms.getD i (1, 0)).2 = 0 ∨

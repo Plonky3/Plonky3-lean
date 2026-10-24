@@ -11,13 +11,17 @@ public import Mathlib.Tactic.ComputeDegree
 
 A round sends h(0) and the leading coefficient h(inf) of a quadratic h.
 
-The verifier rebuilds h(1) = c - h(0) from the running claim c, and evaluates h at the challenge:
+The verifier rebuilds h(1) = c - h(0) from the running claim c.
+
+It then evaluates h at the challenge:
 
 ```text
     h(r) = h(0) (1 - r) + h(1) r + h(inf) r (r - 1)
 ```
 
-Every quadratic with h(0) + h(1) = c has exactly one such message, so this is the verifier of Section 4.1 at d = 2.
+Every quadratic with h(0) + h(1) = c has exactly one such message.
+
+So this is the verifier of Section 4.1 at d = 2.
 -/
 
 namespace Plonky3Lean.Proofs.Sumcheck

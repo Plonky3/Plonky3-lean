@@ -11,7 +11,9 @@ The recursive evaluation interpolates along the first variable, with the first f
 
 On a table of 2^n entries and a point of n coordinates it is the multilinear extension.
 
-On a shorter point of at most four coordinates it reads only the first entries, so it evaluates the extension at a point padded with zeros in front.
+On a shorter point of at most four coordinates it reads only the first entries.
+
+So it evaluates the extension at the point padded with zeros in front.
 -/
 
 namespace Plonky3Lean.Proofs.MultilinearUtil
@@ -128,7 +130,9 @@ theorem mle_zeros_prefix {K : Type _} [CommRing K] (f r : List K) (j : ℕ) :
       min_eq_left (Nat.pow_le_pow_right two_pos (by simp)), mle_take]
     ring
 
-/-- A release build on a point with fewer coordinates, at most four, evaluates the extension at the point padded with zeros in front. -/
+/-- A release build pads a shorter point, of at most four coordinates, with zeros in front.
+
+It then evaluates the extension at the padded point. -/
 theorem eval_rec_short (evals : List A) (point : List B) {n : ℕ} (hk : point.length ≤ 4)
     (hn : point.length ≤ n) (h : evals.length = 2 ^ n) :
     eval_multilinear_recursive evals point = some (mle (evals.map (algebraMap A B))

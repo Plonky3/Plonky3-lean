@@ -7,7 +7,9 @@ public import Plonky3Lean.Proofs.MultilinearUtil.Mle
 /-!
 # The multilinear extension is the unique multilinear interpolant
 
-Thaler, Lemma 3.6: the polynomial is multilinear, agrees with the table on the cube, and is the only such polynomial.
+This is Thaler, Lemma 3.6.
+
+The extension is multilinear, agrees with the table on the cube, and is the only such polynomial.
 
 Uniqueness is the combinatorial Nullstellensatz with the set {0, 1} in each variable.
 -/

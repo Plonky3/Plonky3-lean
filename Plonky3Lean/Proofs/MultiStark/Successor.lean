@@ -16,11 +16,17 @@ The successor repeats the last row instead of wrapping around to row 0:
 
 A transition constraint is gated by the transition selector, which is zero on the last row.
 
-So a gated constraint asserts exactly the 2^n - 1 transitions b -> b + 1, as it does under a wrapping successor.
+So a gated constraint asserts exactly the 2^n - 1 transitions b -> b + 1.
 
-An ungated constraint that reads the next row differs: on the last row it reads the last row twice.
+A wrapping successor gives the same assertion.
 
-The opening of the next row at the bound point is the extension of the shifted table, weighted by the successor table.
+An ungated constraint that reads the next row differs.
+
+On the last row it reads the last row twice.
+
+The opening of the next row at the bound point is the extension of the shifted table.
+
+It is weighted by the successor table.
 -/
 
 namespace Plonky3Lean.Proofs.MultiStark
@@ -41,7 +47,11 @@ theorem succRepeat_last (n : ℕ) : succRepeat n (2 ^ n - 1) = 2 ^ n - 1 := by
 theorem succRepeat_lt {n b : ℕ} (h : b < 2 ^ n) : succRepeat n b < 2 ^ n := by
   unfold succRepeat; split <;> omega
 
-/-- **Gated transitions.** A constraint gated by the transition selector holds on every row exactly when it holds on every transition b -> b + 1. -/
+/-- **Gated transitions.**
+
+Take a constraint gated by the transition selector.
+
+It holds on every row exactly when it holds on every transition b -> b + 1. -/
 theorem transition_gated_iff (n : ℕ) (Q : ℕ → ℕ → K) :
     (∀ b < 2 ^ n, transitionRow n b * Q b (succRepeat n b) = 0) ↔
       ∀ b, b + 1 < 2 ^ n → Q b (b + 1) = 0 := by
@@ -51,7 +61,12 @@ theorem transition_gated_iff (n : ℕ) (Q : ℕ → ℕ → K) :
     · simp [transitionRow, hb, succRepeat_of_lt hb, h b hb]
     · simp [transitionRow, hb]
 
-/-- **Ungated next-row reads.** An ungated constraint holds on every row exactly when it holds on every transition and on the last row paired with itself, not with row 0. -/
+/-- **Ungated next-row reads.**
+
+An ungated constraint holds on every row exactly when it holds on:
+
+- every transition
+- the last row paired with itself, not with row 0. -/
 theorem ungated_iff (n : ℕ) (Q : ℕ → ℕ → K) :
     (∀ b < 2 ^ n, Q b (succRepeat n b) = 0) ↔
       (∀ b, b + 1 < 2 ^ n → Q b (b + 1) = 0) ∧ Q (2 ^ n - 1) (2 ^ n - 1) = 0 := by
@@ -64,7 +79,9 @@ theorem ungated_iff (n : ℕ) (Q : ℕ → ℕ → K) :
     · obtain rfl : b = 2 ^ n - 1 := by omega
       rw [succRepeat_last]; exact hl
 
-/-- **The next-row opening.** The extension of the shifted table is the successor table's weighting of the table. -/
+/-- **The next-row opening.**
+
+The extension of the shifted table is the successor table's weighting of the table. -/
 theorem rowExt_succRepeat (f : ℕ → K) (r : List K) :
     rowExt (fun b => f (succRepeat r.length b)) r =
       ∑ y ∈ range (2 ^ r.length), (nextTable r).getD y 0 * f y := by

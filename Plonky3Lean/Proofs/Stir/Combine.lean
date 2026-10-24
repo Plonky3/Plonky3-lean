@@ -19,7 +19,9 @@ At every point x_p = s g^p of the coset, with step s_p = r x_p, the output is
 
 which is Definition 4.11's Combine at x_p when r_i and gap_i are its coefficients and degree gaps.
 
-The code divides 1 - s_p^(gap+1) by 1 - s_p, and gives the one lane with s_p = 1 its closed form gap + 1.
+The code divides 1 - s_p^(gap+1) by 1 - s_p.
+
+The one lane with s_p = 1 gets its closed form gap + 1.
 -/
 
 namespace Plonky3Lean.Proofs.Stir
@@ -80,7 +82,9 @@ section TwoFields
 
 variable {F EF : Type _} [Field F] [Field EF] [Algebra F EF] [DecidableEq F] [DecidableEq EF]
 
-/-- The group loop of combine_on_coset adds r_i v_i[p] (1 - s_p^(gap_i + 1)) at every p, and panics on a group of the wrong length. -/
+/-- The group loop of the coset combine adds r_i v_i[p] (1 - s_p^(gap_i + 1)) at every p.
+
+It panics on a group of the wrong length. -/
 theorem combine_groups_foldlM {c : ℕ} (hc : 0 < c) (n : ℕ) (g : F) (step_start : EF) :
     ∀ (groups : List (EF × ℕ × List EF)) (acc : List EF), acc.length = n →
       groups.foldlM (fun (result : List EF) (grp : EF × ℕ × List EF) =>
@@ -134,7 +138,9 @@ theorem foldl_set_add {α : Type _} (q : ℕ) (t : α → EF) :
     rw [List.foldl_cons, ih _ (by simpa using hq), List.set_set]
     simp [hq, add_assoc]
 
-/-- The batched sweep at x_p = s g^p: sum_i r_i v_i[p] sum_{t <= gap_i} (x_p r)^t, the lane with x_p r = 1 included, for every chunk size. -/
+/-- The batched sweep at x_p = s g^p is sum_i r_i v_i[p] sum_{t <= gap_i} (x_p r)^t.
+
+This includes the lane with x_p r = 1, and holds for every chunk size. -/
 theorem combine_on_coset_eq {c : ℕ} (hc : 0 < c) (G : Gen F) (hG : GenValid G) {log_domain : ℕ}
     (hl : log_domain ≤ G.adicity) (groups : List (EF × ℕ × List EF)) (r_comb : EF) (shift : F)
     (hgroups : ∀ grp ∈ groups, grp.2.2.length = 2 ^ log_domain) :
@@ -246,7 +252,7 @@ section Coefficients
 
 variable {K : Type _} [Field K]
 
-/-- The loop of combine_coefficients: the running exponent is the number of classes plus their gaps. -/
+/-- In the coefficient loop, the running exponent is the number of classes plus their gaps. -/
 theorem combine_coefficients_fold (r : K) (L : ℕ) (logs : List ℕ) (hlogs : ∀ l ∈ logs, l ≤ L) :
     logs.foldlM (fun (st : List (K × ℕ) × ℕ) log_d =>
       if 2 ^ log_d ≤ 2 ^ L then
@@ -291,7 +297,9 @@ theorem combine_coefficients_fold (r : K) (L : ℕ) (logs : List ℕ) (hlogs : �
         simp [List.getD_eq_getElem?_getD, hj']
     · rw [sum_range_succ, hlast, hsum _ le_rfl]; ring
 
-/-- The Combine coefficients are Definition 4.11's r_i and the gaps d* - d_i, for class degrees d_i = 2^(log d_i) <= d* = 2^L. -/
+/-- The Combine coefficients are Definition 4.11's r_i and the gaps d* - d_i.
+
+The class degrees are d_i = 2^(log d_i) <= d* = 2^L. -/
 theorem combine_coefficients_eq (r : K) (L : ℕ) (logs : List ℕ) (hlogs : ∀ l ∈ logs, l ≤ L) :
     combine_coefficients r L logs = some ((List.range logs.length).map fun i =>
       (ri (2 ^ L) (logs.map (2 ^ ·)) r i, 2 ^ L - 2 ^ logs.getD i 0)) := by

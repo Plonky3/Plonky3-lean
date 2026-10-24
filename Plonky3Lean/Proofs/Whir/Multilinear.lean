@@ -9,7 +9,9 @@ public import Plonky3Lean.Proofs.Whir.Constraint
 
 The prover keeps a weight as its table over the cube.
 
-The weights WHIR adds, eq(z, .) and the selectors, are multilinear, so the extension of their table is the weight itself.
+The weights WHIR adds, eq(z, .) and the selectors, are multilinear.
+
+So the extension of their table is the weight itself.
 -/
 
 namespace Plonky3Lean.Proofs.Whir

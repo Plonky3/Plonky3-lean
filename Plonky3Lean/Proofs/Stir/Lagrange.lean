@@ -9,9 +9,13 @@ public import Mathlib.FieldTheory.KummerExtension
 /-!
 # Barycentric evaluation on a coset of roots of unity
 
-On the nodes x_l = x_0 zeta^l, l < n, zeta a primitive n-th root, the nodal polynomial is X^n - x_0^n.
+Take the nodes x_l = x_0 zeta^l, l < n, with zeta a primitive n-th root.
 
-So the barycentric weight of x_i is 1 / (n x_i^(n-1)) = x_i / (n x_0^n), and the interpolant at a point p off the nodes is
+Their nodal polynomial is X^n - x_0^n.
+
+So the barycentric weight of x_i is 1 / (n x_i^(n-1)) = x_i / (n x_0^n).
+
+The interpolant at a point p off the nodes is
 
 ```text
     prod_l (p - x_l)  *  sum_i y_i (x_i / (n x_0^n)) / (p - x_i)
@@ -82,7 +86,9 @@ section TwoFields
 
 variable {F EF : Type _} [Field F] [Field EF] [Algebra F EF] [DecidableEq F] [DecidableEq EF]
 
-/-- The barycentric formula on the coset x_0 <zeta> of the 2^k-th roots of unity: the interpolant at the point. -/
+/-- The barycentric formula on the coset x_0 <zeta> of the 2^k-th roots of unity.
+
+It gives the interpolant at the point. -/
 theorem lagrange_interpolate_at_eq {ζ x0 : F} {k : ℕ} (hζ : IsPrimitiveRoot ζ (2 ^ k))
     (hn : ((2 ^ k : ℕ) : F) ≠ 0) (hx0 : x0 ≠ 0) (ys : List EF) (hys : ys.length = 2 ^ k)
     (point : EF) :

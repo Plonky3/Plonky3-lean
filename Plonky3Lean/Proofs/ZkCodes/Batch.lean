@@ -9,7 +9,9 @@ public import Plonky3Lean.Proofs.ZkCodes.ReedSolomon
 
 The packed batch encoding transforms one matrix whose column c is the coefficient vector of message c.
 
-The trait's default encodes each message and interleaves the codewords; the two agree entry by entry.
+The trait's default encodes each message and interleaves the codewords.
+
+The two agree entry by entry.
 -/
 
 set_option linter.unusedSectionVars false
@@ -63,7 +65,9 @@ theorem foldl_write_col {w c : ℕ} (hc : c < w) (off n : ℕ) (val : ℕ → K)
           i % w = c ∧ off ≤ i / w ∧ i / w < off + (n + 1))]
       · rw [iteF h', iteF (by omega)]
 
-/-- Entry r of the coefficient vector of a message and its randomness: the message, the randomness, then zeros. -/
+/-- Entry r of the coefficient vector of a message and its randomness.
+
+The vector is the message, the randomness, then zeros. -/
 def cell (l t : ℕ) (msg rnd : List K) (r : ℕ) : K :=
   if r < l then msg.getD r 0 else if r < l + t then rnd.getD (r - l) 0 else 0
 
@@ -268,7 +272,9 @@ theorem mapM_option_some {α β : Type _} (f : α → Option β) (L : List α)
       | zero => simpa using hb
       | succ j => simpa using hget j (by simpa using hj) (by simpa using hj')
 
-/-- The trait's default batch encoding, with the Reed-Solomon encoding: entry (r, c) is the encoding of message c with randomness c, at omega^r. -/
+/-- The trait's default batch encoding, with the Reed-Solomon encoding.
+
+Entry (r, c) is the encoding of message c with randomness c, at omega^r. -/
 theorem default_batch_computes {dft_batch : ℕ → (ℕ → K) → Option (ℕ → K)} {ω : K}
     {rs : ReedSolomonZkEncoding} (hd : ∀ x, Computes (dft_batch rs.m x) rs.m (dft ω rs.m x))
     (hle : rs.msg_len + rs.t ≤ rs.m) {ms rss : List (List K)} (hne : ms ≠ [])

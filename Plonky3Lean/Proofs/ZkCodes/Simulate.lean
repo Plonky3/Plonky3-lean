@@ -140,7 +140,7 @@ theorem foldl_simStep (draw : ℕ → K) (Q : List ℕ) {ks : List ℕ} (hnd : k
         simp
       simp [he, hidx]
 
-/-- The simulator returns, at each queried position, the draw of its rank among the distinct positions.
+/-- At each queried position, the simulator returns the draw of its rank among the distinct positions.
 
 It panics exactly when there are more than t distinct positions, whatever the positions are. -/
 theorem simulate_eq (rs : ReedSolomonZkEncoding) (Q : List ℕ) (draw : ℕ → K) :
@@ -197,7 +197,9 @@ theorem pushUniform_mask {ι : Type _} [Fintype ι] [DecidableEq ι] (l t : ℕ)
 /-- The extension of s to a stream of draws: draw n is s_n below the length, zero after. -/
 def ext {d : ℕ} (s : Fin d → K) (n : ℕ) : K := if h : n < d then s ⟨n, h⟩ else 0
 
-/-- For a message of length l and at most t distinct queried positions below m = 2^k, the codeword at the queried positions has the distribution of the simulator's output.
+/-- Take a message of length l and at most t distinct queried positions below m = 2^k.
+
+The codeword at those positions has the distribution of the simulator's output.
 
 Both are some list, and the lists agree in distribution, duplicates included. -/
 theorem simulate_matches_encode (G : Gen K) (hG : GenValid G) {t l k : ℕ} (hk : k ≤ G.adicity)

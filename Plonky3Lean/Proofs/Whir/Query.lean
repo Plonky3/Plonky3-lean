@@ -7,9 +7,13 @@ public import Plonky3Lean.Proofs.Whir.Complete
 /-!
 # The query schedule
 
-A query phase draws exactly its query count, unless that count reaches the folded domain, and then it opens every position.
+A query phase draws exactly its query count, unless that count reaches the folded domain.
 
-A stratified schedule splits the count into its binary digits 2^d and draws one index in each of the 2^d equal strata.
+Then it opens every position.
+
+A stratified schedule splits the count into its binary digits 2^d.
+
+It draws one index in each of the 2^d equal strata.
 -/
 
 namespace Plonky3Lean.Proofs.Whir
@@ -33,7 +37,9 @@ theorem sum_query_summand_depths : ∀ m, ((query_summand_depths m).map (2 ^ ·)
       have := Nat.pow_log_le_self 2 (show m ≠ 0 from h)
       omega
 
-/-- The number of indices a query phase plays: every position when nothing is drawn, else the draw count. -/
+/-- The number of indices a query phase plays.
+
+It is every position when nothing is drawn, else the draw count. -/
 theorem length_play_query_indices (S : WSponge F EF) (hlen : ∀ h bits count, (S.indices h bits count).length = count)
     (h : List (Step F EF)) (width draws : ℕ) (stratified : Bool) :
     (play_query_indices S h width draws stratified (query_summand_depths draws)).1.length =
@@ -54,7 +60,9 @@ theorem length_play_query_indices (S : WSponge F EF) (hlen : ∀ h bits count, (
     | nil => simp
     | cons d ds ih => intro acc; rw [List.foldl_cons, ih]; simp [draw, hlen]; omega
 
-/-- A stratified draw lands in its stratum: index s of depth d has top d bits equal to s. -/
+/-- A stratified draw lands in its stratum.
+
+Index s of depth d has top d bits equal to s. -/
 theorem stratified_index_stratum {width depth stratum low : ℕ}
     (hlow : low < 2 ^ (width - depth)) : stratified_index width depth stratum low >>> (width - depth) = stratum := by
   unfold stratified_index
@@ -64,9 +72,13 @@ theorem stratified_index_stratum {width depth stratum low : ℕ}
   · rw [← Nat.shiftLeft_eq]
     exact (Nat.shiftLeft_add_eq_or_of_lt hlow stratum).symm
 
-/-- When the query count is positive and below the folded domain, the phase opens at most that many distinct positions, all inside the domain.
+/-- Take a positive query count below the folded domain.
 
-This is the count the zero-knowledge encoding needs: an oracle with t randomness coefficients hides any t positions. -/
+The phase opens at most that many distinct positions, all inside the domain.
+
+The zero-knowledge encoding needs this count.
+
+An oracle with t randomness coefficients hides any t positions. -/
 theorem opened_le_queries (S : WSponge F EF) (hidx : ∀ h bits count, ∀ i ∈ S.indices h bits count, i < 2 ^ bits)
     (hlen : ∀ h bits count, (S.indices h bits count).length = count) (h : List (Step F EF)) {width q : ℕ}
     (hq0 : 0 < q) (hq : q < 2 ^ width) (stratified : Bool) :
@@ -104,7 +116,9 @@ theorem ood_foldl_history (S : WSponge F EF) (nv : ℕ) (ys : List EF) (h : List
       List.getElem?_eq_getElem (by omega), Option.toList_some, List.flatMap_append, List.append_assoc]
     simp [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem (show k < ys.length by omega)]
 
-/-- A parsed round: its claimed out-of-domain values are the proof's answers, and the history absorbs the root, then each point's challenge and answer, in order. -/
+/-- A parsed round's claimed out-of-domain values are the proof's answers.
+
+Its history absorbs the root, then each point's challenge and answer, in order. -/
 theorem parse_with_round_history (E : Env F EF Com MP) (rp : WhirRoundProof F EF Com MP) (nv s t : ℕ)
     (h : List (Step F EF)) {root : Com} {ood : p3_sumcheck.constraints.mirror.EqStatement EF}
     {h' : List (Step F EF)} (hp : parse_with_round E rp nv s t h = .ok (root, ood, h')) :

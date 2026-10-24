@@ -58,7 +58,9 @@ theorem getD_zipWith_sub {a b : List A} {i : ℕ} (ha : i < a.length) (hb : i < 
   simp [List.getD_eq_getElem?_getD, List.getElem?_zipWith, List.getElem?_eq_getElem ha,
     List.getElem?_eq_getElem hb]
 
-/-- sumcheck_coefficients_prefix: the constant term and the leading coefficient over the half-split, for equal even lengths. -/
+/-- The prefix round kernel gives the constant term and the leading coefficient over the half-split.
+
+This holds for equal even lengths. -/
 theorem sumcheck_coefficients_prefix_eq (evals weights : List A) (hl : evals.length = weights.length)
     (he : evals.length % 2 = 0) :
     sumcheck_coefficients_prefix evals weights =
