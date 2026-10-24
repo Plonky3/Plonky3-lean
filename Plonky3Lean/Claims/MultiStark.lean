@@ -11,6 +11,7 @@ public import Plonky3Lean.Proofs.MultiStark.LookupPlan
 public import Plonky3Lean.Proofs.MultiStark.LogupStar
 public import Plonky3Lean.Proofs.MultiStark.BusComposition
 public import Plonky3Lean.Proofs.MultiStark.LookupSecurity
+public import Plonky3Lean.Proofs.MultiStark.Extracted
 public import CompPoly.Fields.BabyBear.Ext4
 
 @[expose] public section
@@ -18,16 +19,20 @@ public import CompPoly.Fields.BabyBear.Ext4
 /-!
 # p3-multi-stark: claims
 
-Nothing is extracted: the crate's dependencies do not compile in the extraction variant.
+The verifier's arithmetic that needs no transcript and no AIR is extracted, generic over the field trait:
 
-These parts are transcribed instead:
+- the boundary selectors at a point and at a row;
+- the successor row rebuilt from the opened columns;
+- the zerocheck's free coordinates.
+
+These parts are transcribed:
 
 - the selectors and the next-row scatter
 - the zerocheck's claim and closing checks
 - the two transcript shapes
 - the AIR security terms.
 
-The claims are stated at the quartic extension K of BabyBear, where the challenges live.
+The transcription claims are stated at the quartic extension K of BabyBear, where the challenges live.
 
 The reduction is the multilinear AIR zerocheck of SuperSpartan (eprint 2023/552).
 
@@ -715,5 +720,80 @@ theorem logup_fingerprint (msgs : List (Key K × K)) {W : ℕ} (hW : 1 ≤ W)
         (msgs.map fun q => q.2 / msDenom x.1 x.2 W q.1.1 q.1.2).sum = 0} ≤
       msgs.length * (W + 2) * Fintype.card K :=
   logup_bad_card msgs hW hlen hbus hwidth hunbal
+
+/-! ## The extracted verifier arithmetic
+
+Each claim holds for any field L and any instance of the field trait.
+
+It assumes one thing of that instance: each member the code calls computes the operation it names.
+-/
+
+section Extracted
+
+open CoreModels Aeneas Aeneas.Std Plonky3Lean.Proofs.MultiStark.Extracted
+
+variable {L : Type} [Field L] {inst : p3_field.field.Field L}
+
+/-- The shipped selectors at a point are the multilinear extensions of the first-row, last-row and transition indicators.
+
+They never panic. -/
+theorem selectors.BoundaryEvals.at.eq_spec (h : FieldComputes inst) (rs : Slice L) :
+    p3_multi_stark.selectors.BoundaryEvals.at inst rs =
+      .ok ⟨rowExt firstRow rs.val, rowExt (lastRow rs.val.length) rs.val,
+        rowExt (transitionRow rs.val.length) rs.val⟩ := by
+  rw [at_eq h, at_eq_rowExt]; rfl
+
+/-- The shipped fold of one more coordinate r multiplies the first-row selector by 1 - r and the last-row selector by r.
+
+The transition is one minus the new last-row selector.
+
+It never panics. -/
+theorem selectors.BoundaryEvals.apply.eq_mirror (h : FieldComputes inst)
+    (b : p3_multi_stark.selectors.mirror.BoundaryEvals L) (r : L) :
+    p3_multi_stark.selectors.BoundaryEvals.apply inst (ofMirror b) r = .ok (ofMirror (b.apply r)) :=
+  apply_eq h b r
+
+/-- The shipped indicators of a row b of a 2^n-row trace are the selectors at b's vertex. -/
+theorem selectors.BoundaryEvals.from_row.eq_spec (h : FieldComputes inst) {n : ℕ} (row height : Std.Usize)
+    (hheight : height.val = 2 ^ n) (hrow : row.val < height.val) :
+    p3_multi_stark.selectors.BoundaryEvals.from_row inst row height =
+      .ok (ofMirror (BoundaryEvals.at (vertex n row.val : List L))) := by
+  rw [from_row_eq h row height (by have := height.hBounds; scalar_tac), hheight,
+    at_vertex (by omega)]
+
+/-- The shipped indicators panic on the largest row, whose successor overflows. -/
+theorem selectors.BoundaryEvals.from_row.panics (h : FieldComputes inst) (row height : Std.Usize)
+    (hrow : row.val = Usize.max) :
+    p3_multi_stark.selectors.BoundaryEvals.from_row inst row height = .fail .panic :=
+  from_row_max h row height hrow
+
+/-- Bind a prefix p.
+
+The shipped selectors at row b of the 2^n-row residual cube are the selectors at p followed by b's vertex. -/
+theorem selectors.BoundaryEvals.from_row_with_prefix.eq_spec (h : FieldComputes inst) {n : ℕ}
+    (p : List L) (row height : Std.Usize) (hheight : height.val = 2 ^ n) (hrow : row.val < height.val) :
+    p3_multi_stark.selectors.BoundaryEvals.from_row_with_prefix inst row height
+        (ofMirror (BoundaryEvals.at p)) =
+      .ok (ofMirror (BoundaryEvals.at (p ++ vertex n row.val))) := by
+  rw [from_row_with_prefix_eq h row height (by have := height.hBounds; scalar_tac), hheight,
+    from_row_with_prefix_at p (by omega)]
+
+/-- The shipped successor row writes each claimed value into its column of a zero row, in order.
+
+It panics exactly when a column lies past the width. -/
+theorem opening.OpeningClaims.next_row.eq_mirror (h : FieldComputes inst)
+    (claims : p3_multi_stark.opening.OpeningClaims L) (width : Std.Usize) :
+    Agrees (p3_multi_stark.opening.OpeningClaims.next_row inst claims width)
+      ((pairs (Slice.val claims.next)).foldl scatterStep (some (List.replicate width.val 0))) :=
+  next_row_eq h claims width
+
+/-- The shipped free coordinates are the cube's variables minus the lookup's, clamped at 0. -/
+theorem zerocheck.transcript.ZerocheckShape.free_coordinates.eq_spec
+    (s : p3_multi_stark.zerocheck.transcript.ZerocheckShape) :
+    ∃ n : Std.Usize, p3_multi_stark.zerocheck.transcript.ZerocheckShape.free_coordinates s = .ok n ∧
+      n.val = s.log_height.val - s.lookup_point_len.val :=
+  free_coordinates_eq s
+
+end Extracted
 
 end Plonky3Lean.Claims.MultiStark

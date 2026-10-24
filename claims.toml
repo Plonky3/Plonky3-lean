@@ -6885,6 +6885,34 @@ name   = "Plonky3Lean.Claims.MultiStark.zerocheck_transcript"
 axioms = ["propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.MultiStark.selectors.BoundaryEvals.at.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.MultiStark.selectors.BoundaryEvals.apply.eq_mirror"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.MultiStark.selectors.BoundaryEvals.from_row.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.MultiStark.selectors.BoundaryEvals.from_row.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.MultiStark.selectors.BoundaryEvals.from_row_with_prefix.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.MultiStark.opening.OpeningClaims.next_row.eq_mirror"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.MultiStark.zerocheck.transcript.ZerocheckShape.free_coordinates.eq_spec"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.Sha256Air.SHA256_K.eq_fips"
 axioms = ["propext"]
 

@@ -252,6 +252,7 @@ public import Plonky3Lean.Proofs.Bus.Timestamped
 public import Plonky3Lean.Proofs.Bus.Security
 public import Plonky3Lean.Proofs.MultiStark.Ext
 public import Plonky3Lean.Proofs.MultiStark.Selectors
+public import Plonky3Lean.Proofs.MultiStark.Extracted
 public import Plonky3Lean.Proofs.MultiStark.Successor
 public import Plonky3Lean.Proofs.MultiStark.Zerocheck
 public import Plonky3Lean.Proofs.MultiStark.Verifier
