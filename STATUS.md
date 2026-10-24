@@ -56,6 +56,7 @@ target `thumbv7em-none-eabi`
 | `uni-stark` | scoped | 252 | 558 | 0 | 30 | 0 | 0 / 0 |  |
 | `util` | scoped | 228 | 70 | 0 | 1 | 0 | 0 / 1 | post `010` |
 | `whir` | stub |  | 605 | 0 | 20 |  | 0 / 0 |  |
+| `word` | scoped | 4507 | 101 | 3 | 0 | 0 | 3 / 3 | pre `010`, pre `020`, pre `030` |
 | `zk-codes` | stub |  | 248 | 0 | 19 |  | 0 / 0 |  |
 
 Generated lines are `extraction/<Lib>/Extraction/{Types,Funs}.lean`. Hand-written
@@ -475,12 +476,17 @@ Nothing translated is dropped.
 charon errors: 0.
 Nothing translated is dropped.
 
+### `word`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ## Assumptions
 
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1581) whose dependencies include it; reaching one is not using it.
+(of 1603) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -512,6 +518,9 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 | `security` | `budget.shape.LookupShape.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `security` | `budget.shape.ProtocolParams.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `symmetric` | `p3_symmetric.hasher.CryptographicHasher.hash_iter_slices.default` | aeneas stops on its iterator adapters, so crate.toml makes it opaque (docs/extractor-issues.md 30) | 0 |
+| `word` | `index.IndexError.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 3 |
+| `word` | `word.Word32.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 3 |
+| `word` | `word.Word64.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 3 |
 
 ## Transcriptions
 
@@ -519,7 +528,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1581) whose dependencies include the declaration.
+counts the claims (of 1603) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -1787,6 +1796,9 @@ counts the claims (of 1581) whose dependencies include the declaration.
 | `symmetric/pre/030-reshape-pad10-sponge` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `Pad10Sponge::hash_iter` calls the reshaped body, which a differential test equates with the original. |
 | `symmetric/pre/040-reshape-compress-from-hasher` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `CompressionFunctionFromHasher::compress` hands the hasher a vector of the same items, which a differential test equates with the original. |
 | `util/post/010-exposed-saturating-sub` | `core.num.Usize.saturating_sub_exposed` in HaxExt.lean, a model of `usize::saturating_sub`, trusted as the rest of HaxExt is. |
+| `word/pre/010-shift-marker-without-fn-type` | none in a normal build: the change is behind cfg(hax_backend_lean). In the extracted variant, the width marker of a shift is `PhantomData<W>`. |
+| `word/pre/020-reshape-system-loops` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the constructor and the verifier call the reshaped bodies, which a differential test equates with the shipped ones. |
+| `word/pre/030-reshape-composition-loops` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the layout, the lowering and the resolver call the reshaped bodies, which a differential test equates with the shipped ones. |
 
 Upstream tests (`test-pre-patches.py`): 6715 of Plonky3's 6769 pass as shipped and 6715 with the pre-extraction patches, with 0 divergence(s).
 
@@ -3183,6 +3195,28 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Symmetric.sponge.PaddingFreeSponge.hash_iter.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Symmetric.sponge.PaddingFreeSponge.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Symmetric.truncated.collision_of_inverse` | `Quot.sound`, `propext` |
+| `P3Word.Component.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Composition.interface.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Composition.new.laid_out` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Composition.resolve.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Composition.resolve.injective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Composition.resolve.lt_len` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.ConstraintSystem.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.ConstraintSystem.new.ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.ConstraintSystem.verify.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Shift.apply.of_new32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Shift.apply.of_new64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Shift.apply.word32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Shift.apply.word64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Shift.new.word32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Shift.new.word64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.ShiftKind.code.round_trip` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.ShiftKind.from_code.none` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.ValueIndex.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.mul32.iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.mul64.iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.validateSpec.ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.verifySpec.ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sha256Air.SHA256_K.eq_fips` | `propext` |
 | `Sha256Air.binary.complete` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sha256Air.binary.degree_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
