@@ -3,7 +3,7 @@ Transcriptions of the mutable read-write memory: its statement, its column layou
 
 These do not extract: the constraints are generic over the builder.
 
-The crate's dependencies also fail to compile in the extraction variant (docs/extractor-issues.md 180).
+Code over `ExtensionField` also does not extract (docs/extractor-issues.md 180).
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 

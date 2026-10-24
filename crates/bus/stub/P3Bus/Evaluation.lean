@@ -3,7 +3,7 @@ Transcriptions of the evaluation of planned declarations: the leaf factor of one
 
 These do not extract: they are generic over the field traits.
 
-The crate's dependencies also fail to compile in the extraction variant (docs/extractor-issues.md 180).
+Code over `ExtensionField` also does not extract (docs/extractor-issues.md 180).
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 

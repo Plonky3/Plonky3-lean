@@ -301,17 +301,20 @@ keeps its number and says so.
 
     The check is transcribed instead, and the column check it calls is extracted.
 
-180. **p3-multilinear-util and p3-sumcheck do not compile in the extraction variant.**
+180. **p3-multilinear-util and p3-sumcheck did not compile in the extraction variant.**
 
-    Under `cfg(hax_backend_lean)`, pre-patch `baby-bear/030` moves `to_ext_iter` onto an extension trait, and the binary-field pre-patches hide items p3-sumcheck's ring switch uses.
+    Under `cfg(hax_backend_lean)`, pre-patch `baby-bear/030` moves `to_ext_iter` onto an extension trait.
 
-    p3-multilinear-util calls `to_ext_iter` in five files without importing that trait, and p3-sumcheck's `ring_switch` then fails on the hidden binary-field items.
+    Pre-patch `baby-bear/020` drops `Field`'s `RawDataSerializable` supertrait, which p3-sumcheck's bit ring switch reads through `TowerLevel`.
 
-    p3-bus depends on both, so `cargo check` stops before charon runs.
+    Pre-patches `multilinear-util/010`, `sumcheck/010` and `sumcheck/020` import the trait and state the bound, so both crates now compile there.
 
-    Its integer helpers would extract on their own, but nothing in the crate can be reached until both dependencies compile in that variant.
+    Code that names `ExtensionField` still does not extract, for two reasons:
 
-    p3-bus is transcribed instead.
+    - aeneas rejects the signature of `PackedFieldExtension::packed_ext_powers`, a required method that the packing bound of `ExtensionField` reaches ("Internal error" in `translate_fun_sigs`);
+    - the quadratic verifier's round loop keeps a transcript that holds a mutable borrow of the challenger, and aeneas finds no fixed point for the loop.
+
+    So p3-sumcheck extracts its round arithmetic only, which is generic over `Field` alone.
 
 240. **aeneas has no function types.**
 

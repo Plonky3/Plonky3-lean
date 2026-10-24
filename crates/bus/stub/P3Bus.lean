@@ -1,7 +1,7 @@
 /-
 The Lean model of p3-bus.
 
-Nothing is extracted: the crate's dependencies p3-multilinear-util and p3-sumcheck do not compile in the extraction variant (docs/extractor-issues.md 180), and most items are generic over the field traits or the builder.
+Nothing is extracted: most items are generic over the field traits or the builder, and code over `ExtensionField` does not extract (docs/extractor-issues.md 180).
 
 Each item is transcribed by hand in `P3Bus/`, one definition per Rust item.
 -/

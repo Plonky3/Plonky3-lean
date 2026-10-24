@@ -1,7 +1,7 @@
 /-
 The Lean model of p3-multi-stark.
 
-Nothing is extracted: the crate's dependencies p3-multilinear-util and p3-sumcheck do not compile in the extraction variant (docs/extractor-issues.md 180), and its items are generic over the field traits and the AIR (docs/extractor-issues.md 9).
+Nothing is extracted: its items are generic over the field traits and the AIR (docs/extractor-issues.md 9), and code over `ExtensionField` does not extract (docs/extractor-issues.md 180).
 
 Each item is transcribed by hand in `P3MultiStark/`, one definition per Rust item.
 -/

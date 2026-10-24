@@ -4,7 +4,7 @@ lean_lib = "P3Bus"
 
 # Nothing is extracted.
 #
-# The crate's dependencies p3-multilinear-util and p3-sumcheck do not compile in the extraction variant (docs/extractor-issues.md 180).
+# Code over `ExtensionField` does not extract (docs/extractor-issues.md 180).
 #
 # Most items are also generic over the field traits or the builder, which aeneas rejects (docs/extractor-issues.md 9).
 #

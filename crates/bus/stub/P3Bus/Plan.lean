@@ -3,7 +3,7 @@ Transcriptions of the bus plan: the named domains, the tuple layout, the block l
 
 These do not extract: the planner is generic over the field traits.
 
-The crate's dependencies also fail to compile in the extraction variant (docs/extractor-issues.md 180).
+Code over `ExtensionField` also does not extract (docs/extractor-issues.md 180).
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 
