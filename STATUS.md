@@ -14,47 +14,47 @@ target `thumbv7em-none-eabi`
 
 | Crate | State | Generated lines | Hand-written lines | `opaque` | Mirrored | Dropped by the extractor | Patches (pre / post) | Patches with a cost |
 |---|---|---:|---:|---:|---:|---:|---|---|
-| `air` | scoped | 364 | 913 | 0 | 67 | 0 | 0 / 1 | post `010` |
+| `air` | scoped | 364 | 931 | 0 | 67 | 0 | 0 / 1 | post `010` |
 | `baby-bear` | extracted | 2953 | 121 | 4 | 0 | 0 | 4 / 3 | pre `020`, pre `030`, pre `040` |
-| `batch-stark` | scoped | 116 | 664 | 0 | 52 | 0 | 0 / 0 |  |
-| `binary-dft` | stub |  | 528 | 0 | 50 |  | 0 / 0 |  |
+| `batch-stark` | scoped | 116 | 718 | 0 | 52 | 0 | 0 / 0 |  |
+| `binary-dft` | stub |  | 552 | 0 | 50 |  | 0 / 0 |  |
 | `binary-field` | scoped | 21777 | 66 | 0 | 0 | 139 | 7 / 2 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050`, pre `060`, pre `070` |
-| `binary-pcs` | stub |  | 759 | 0 | 10 |  | 0 / 0 |  |
+| `binary-pcs` | stub |  | 828 | 0 | 10 |  | 0 / 0 |  |
 | `blake2s` | scoped | 148 | 51 | 1 | 0 | 0 | 1 / 0 | pre `010` |
 | `blake3` | scoped | 2609 | 40 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
 | `blake3-crate` | stub |  | 26 | 0 | 3 |  | 0 / 0 |  |
-| `bus` | stub |  | 1284 | 0 | 122 |  | 0 / 0 |  |
-| `challenger` | scoped | 1552 | 200 | 0 | 12 | 6 | 1 / 1 | pre `010` |
-| `circle` | stub |  | 746 | 0 | 49 |  | 0 / 0 |  |
-| `commit` | stub |  | 762 | 0 | 59 |  | 0 / 0 |  |
-| `dft` | stub |  | 901 | 0 | 67 |  | 0 / 0 |  |
-| `field` | stub |  | 305 | 7 | 25 |  | 0 / 0 |  |
-| `fri` | stub |  | 1110 | 0 | 81 |  | 0 / 0 |  |
+| `bus` | stub |  | 1395 | 0 | 122 |  | 0 / 0 |  |
+| `challenger` | scoped | 1552 | 223 | 0 | 12 | 6 | 1 / 1 | pre `010` |
+| `circle` | stub |  | 830 | 0 | 49 |  | 0 / 0 |  |
+| `commit` | stub |  | 836 | 0 | 59 |  | 0 / 0 |  |
+| `dft` | stub |  | 992 | 0 | 67 |  | 0 / 0 |  |
+| `field` | stub |  | 342 | 7 | 25 |  | 0 / 0 |  |
+| `fri` | stub |  | 1224 | 0 | 81 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
 | `keccak` | scoped | 1109 | 39 | 0 | 0 | 6 | 2 / 2 | pre `010`, pre `020` |
 | `keccak-air` | scoped | 624 | 676 | 0 | 39 | 0 | 0 / 0 |  |
 | `koala-bear` | extracted | 3024 | 121 | 4 | 0 | 0 | 0 / 3 |  |
-| `lookup` | scoped | 275 | 801 | 0 | 58 | 0 | 0 / 0 |  |
+| `lookup` | scoped | 275 | 894 | 0 | 58 | 0 | 0 / 0 |  |
 | `matrix` | scoped | 1625 | 259 | 0 | 12 | 0 | 3 / 3 | pre `020`, pre `030`, post `020`, post `030` |
 | `mds` | scoped | 101 | 43 | 0 | 0 | 0 | 0 / 0 |  |
 | `merkle-tree` | scoped | 1306 | 43 | 0 | 0 | 0 | 2 / 0 | pre `010`, pre `020` |
 | `mersenne-31` | scoped | 1444 | 259 | 0 | 12 | 30 | 1 / 1 | pre `010` |
 | `monty-31` | scoped | 1581 | 327 | 0 | 13 | 29 | 1 / 1 | pre `010` |
-| `multi-stark` | stub |  | 502 | 0 | 45 |  | 0 / 0 |  |
-| `multilinear-util` | stub |  | 993 | 0 | 75 |  | 0 / 0 |  |
+| `multi-stark` | stub |  | 581 | 0 | 45 |  | 0 / 0 |  |
+| `multilinear-util` | stub |  | 1077 | 0 | 75 |  | 0 / 0 |  |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 68 | 2 | 4 |  | 0 / 0 |  |
 | `security` | scoped | 1414 | 130 | 6 | 13 | 0 | 2 / 1 | pre `010`, pre `020` |
 | `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
 | `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
-| `stir` | stub |  | 624 | 0 | 40 |  | 0 / 0 |  |
-| `sumcheck` | stub |  | 479 | 0 | 29 |  | 0 / 0 |  |
-| `symmetric` | scoped | 1078 | 58 | 1 | 0 | 4 | 4 / 2 | pre `010`, pre `020`, pre `030`, pre `040` |
-| `tiny-keccak` | scoped | 98 | 94 | 0 | 3 | 0 | 0 / 0 |  |
-| `uni-stark` | scoped | 252 | 500 | 0 | 30 | 0 | 0 / 0 |  |
+| `stir` | stub |  | 695 | 0 | 40 |  | 0 / 0 |  |
+| `sumcheck` | stub |  | 522 | 0 | 29 |  | 0 / 0 |  |
+| `symmetric` | scoped | 1078 | 62 | 1 | 0 | 4 | 4 / 2 | pre `010`, pre `020`, pre `030`, pre `040` |
+| `tiny-keccak` | scoped | 98 | 101 | 0 | 3 | 0 | 0 / 0 |  |
+| `uni-stark` | scoped | 252 | 558 | 0 | 30 | 0 | 0 / 0 |  |
 | `util` | scoped | 228 | 70 | 0 | 1 | 0 | 0 / 1 | post `010` |
-| `whir` | stub |  | 544 | 0 | 20 |  | 0 / 0 |  |
-| `zk-codes` | stub |  | 234 | 0 | 19 |  | 0 / 0 |  |
+| `whir` | stub |  | 605 | 0 | 20 |  | 0 / 0 |  |
+| `zk-codes` | stub |  | 248 | 0 | 19 |  | 0 / 0 |  |
 
 Generated lines are `extraction/<Lib>/Extraction/{Types,Funs}.lean`. Hand-written
 lines are every other `.lean` file of the crate. *Dropped by the extractor* counts
@@ -477,13 +477,13 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 | `baby-bear` | `poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon2.BabyBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `blake2s` | `p3_blake2s.Blake2s256.hash` | its body goes through `blake2`'s incremental `Digest`, whose buffer type aeneas rejects (docs/extractor-issues.md 16) | 3 |
-| `field` | `p3_field.exponentiation.exp_1420470955` | its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here | 1 |
-| `field` | `p3_field.exponentiation.exp_1725656503` | its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here | 1 |
-| `field` | `p3_field.field.Field.unmodelledAlgebra` | no model that builds a `Field` instance projects it | 0 |
-| `field` | `p3_field.field.Field.unmodelledBits` | no model that builds a `Field` instance projects it | 0 |
-| `field` | `p3_field.field.Field.unmodelledCopy` | no model that builds a `Field` instance projects it | 0 |
-| `field` | `p3_field.field.PrimeField.unmodelledField` | no model that builds a `PrimeField` instance projects it | 0 |
-| `field` | `p3_field.field.PrimeField.unmodelledQuotientMapU64` | no model that builds a `PrimeField` instance projects it | 0 |
+| `field` | `p3_field.exponentiation.exp_1420470955` | its body is a chain of squarings and products, and those ring methods are not modelled here | 1 |
+| `field` | `p3_field.exponentiation.exp_1725656503` | its body is a chain of squarings and products, and those ring methods are not modelled here | 1 |
+| `field` | `p3_field.field.Field.unmodelledAlgebra` | no model that builds a field instance projects it | 0 |
+| `field` | `p3_field.field.Field.unmodelledBits` | no model that builds a field instance projects it | 0 |
+| `field` | `p3_field.field.Field.unmodelledCopy` | no model that builds a field instance projects it | 0 |
+| `field` | `p3_field.field.PrimeField.unmodelledField` | no model that builds a prime field instance projects it | 0 |
+| `field` | `p3_field.field.PrimeField.unmodelledQuotientMapU64` | no model that builds a prime field instance projects it | 0 |
 | `koala-bear` | `koala_bear.KoalaBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 69 |
 | `koala-bear` | `mds.MDSKoalaBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `koala-bear` | `poseidon1.KoalaBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
@@ -499,7 +499,7 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 | `security` | `budget.shape.InstanceShape.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `security` | `budget.shape.LookupShape.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `security` | `budget.shape.ProtocolParams.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
-| `symmetric` | `p3_symmetric.hasher.CryptographicHasher.hash_iter_slices.default` | the body is opaque by `charon_args` (crate.toml), because aeneas stops on the iterator adapters it calls (docs/extractor-issues.md 30) | 0 |
+| `symmetric` | `p3_symmetric.hasher.CryptographicHasher.hash_iter_slices.default` | aeneas stops on its iterator adapters, so crate.toml makes it opaque (docs/extractor-issues.md 30) | 0 |
 
 ## Transcriptions
 
