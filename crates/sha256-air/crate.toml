@@ -1,0 +1,334 @@
+# p3-sha256-air: the SHA-256 compression function as an AIR, over a prime field and over a field of characteristic 2.
+
+lean_lib = "P3Sha256Air"
+
+# The integer code is extracted: the constants, the limb split, and the four sigma functions of the characteristic-2 generator.
+#
+# The AIR evaluations and the trace generators are generic over the builder and the field traits, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# They are transcribed in extraction/P3Sha256Air/Assumptions/Mirror/.
+state = "scoped"
+
+features = []
+
+start_from = [
+  "p3_sha256_air::constants::SHA256_K",
+  "p3_sha256_air::constants::SHA256_IV",
+  "p3_sha256_air::constants::u32_to_limbs",
+  "p3_sha256_air::binary::rotr_index",
+  "p3_sha256_air::binary::generation::big_sigma0",
+  "p3_sha256_air::binary::generation::big_sigma1",
+  "p3_sha256_air::binary::generation::small_sigma0",
+  "p3_sha256_air::binary::generation::small_sigma1",
+]
+
+watch = ["sha256-air/src", "sha256-air/Cargo.toml"]
+
+# The transcriptions in extraction/P3Sha256Air/Assumptions/Mirror/.
+# Hashes are pending tools/mirror.
+#
+# Plonky3Lean/Proofs/Sha256Air/Extracted.lean proves the transcribed constants and sigma functions equal to the extracted ones.
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.BLOCK_WORDS"
+rust = "p3_sha256_air::constants::BLOCK_WORDS"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.NUM_COMPRESSION_ROUNDS"
+rust = "p3_sha256_air::constants::NUM_COMPRESSION_ROUNDS"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.SCHEDULE_EXTENSIONS"
+rust = "p3_sha256_air::constants::SCHEDULE_EXTENSIONS"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.STATE_WORDS"
+rust = "p3_sha256_air::constants::STATE_WORDS"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.WORD_BITS"
+rust = "p3_sha256_air::constants::WORD_BITS"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.BITS_PER_LIMB"
+rust = "p3_sha256_air::constants::BITS_PER_LIMB"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.U32_LIMBS"
+rust = "p3_sha256_air::constants::U32_LIMBS"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.CHAIN_LEN"
+rust = "p3_sha256_air::columns::CHAIN_LEN"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.INPUT_WORDS"
+rust = "p3_sha256_air::generation::INPUT_WORDS"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.SHA256_K"
+rust = "p3_sha256_air::constants::SHA256_K"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.SHA256_IV"
+rust = "p3_sha256_air::constants::SHA256_IV"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.kOf"
+rust = "p3_sha256_air::constants::SHA256_K"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.col.h_in"
+rust = "p3_sha256_air::columns::Sha256Cols"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.NUM_SHA256_COLS"
+rust = "p3_sha256_air::columns::NUM_SHA256_COLS"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.double"
+rust = "p3_field::PrimeCharacteristicRing::double"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.xor"
+rust = "p3_field::PrimeCharacteristicRing::xor"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.xor3"
+rust = "p3_field::PrimeCharacteristicRing::xor3"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.exp_u64"
+rust = "p3_field::PrimeCharacteristicRing::exp_u64"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.mul_2exp_u64"
+rust = "p3_field::PrimeCharacteristicRing::mul_2exp_u64"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.pack_bits_le"
+rust = "p3_air::utils::pack_bits_le"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.add2"
+rust = "p3_air::utils::add2"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.add3"
+rust = "p3_air::utils::add3"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.add2_expr_out"
+rust = "p3_sha256_air::air::add2_expr_out"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.add3_expr_out"
+rust = "p3_sha256_air::air::add3_expr_out"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.pack_word"
+rust = "p3_sha256_air::air::pack_word"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.SigmaSpec"
+rust = "p3_sha256_air::air::SigmaSpec"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.ShiftKind"
+rust = "p3_sha256_air::air::ShiftKind"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.sigma_params"
+rust = "p3_sha256_air::air::sigma_params"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.assert_packed_equals_bits"
+rust = "p3_sha256_air::air::assert_packed_equals_bits"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.assert_sigma_matches"
+rust = "p3_sha256_air::air::assert_sigma_matches"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.assert_ch_matches"
+rust = "p3_sha256_air::air::assert_ch_matches"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.assert_maj_matches"
+rust = "p3_sha256_air::air::assert_maj_matches"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.eval_bit_range_checks"
+rust = "p3_sha256_air::air::eval_bit_range_checks"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.eval_initial_state"
+rust = "p3_sha256_air::air::eval_initial_state"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.eval_message_schedule"
+rust = "p3_sha256_air::air::eval_message_schedule"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.eval_compression"
+rust = "p3_sha256_air::air::eval_compression"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.eval_finalization"
+rust = "p3_sha256_air::air::eval_finalization"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.eval"
+rust = "{impl p3_air::air::Air<AB> for p3_sha256_air::air::Sha256Air}::eval"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.Sha256RoundCols"
+rust = "p3_sha256_air::columns::Sha256RoundCols"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.Sha256Cols"
+rust = "p3_sha256_air::columns::Sha256Cols"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.Sha256Cols.cells"
+rust = "p3_sha256_air::columns::Sha256Cols"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.u32_to_bits_le"
+rust = "p3_air::utils::u32_to_bits_le"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.u32_to_limbs"
+rust = "p3_sha256_air::constants::u32_to_limbs"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.WorkVars"
+rust = "p3_sha256_air::generation::generate_trace_row_for_compression"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.generate_trace_row_for_compression"
+rust = "p3_sha256_air::generation::generate_trace_row_for_compression"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.generate_trace_rows"
+rust = "p3_sha256_air::generation::generate_trace_rows"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.T1_CARRIES"
+rust = "p3_sha256_air::binary::T1_CARRIES"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.SCHEDULE_CARRIES"
+rust = "p3_sha256_air::binary::SCHEDULE_CARRIES"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.rotr_index"
+rust = "p3_sha256_air::binary::rotr_index"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.col.a_chain"
+rust = "p3_sha256_air::binary::columns::Sha256BinaryCols"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.NUM_SHA256_BINARY_COLS"
+rust = "p3_sha256_air::binary::columns::NUM_SHA256_BINARY_COLS"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.NUM_INPUT_BITS"
+rust = "p3_sha256_air::binary::air::NUM_INPUT_BITS"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.STORED_CARRY_ADD"
+rust = "p3_sha256_air::binary::air::STORED_CARRY_ADD"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.SUM_CARRY_ADD"
+rust = "p3_sha256_air::binary::air::SUM_CARRY_ADD"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.CONSTRAINTS_PER_SCHEDULE_WORD"
+rust = "p3_sha256_air::binary::air::CONSTRAINTS_PER_SCHEDULE_WORD"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.CONSTRAINTS_PER_ROUND"
+rust = "p3_sha256_air::binary::air::CONSTRAINTS_PER_ROUND"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.NUM_HASH_CONSTRAINTS"
+rust = "p3_sha256_air::binary::air::NUM_HASH_CONSTRAINTS"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.num_constraints"
+rust = "{impl p3_air::air::BaseAir<F> for p3_sha256_air::binary::air::Sha256BinaryAir}::num_constraints"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.xor3_rot"
+rust = "p3_sha256_air::binary::air::xor3_rot"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.xor3_shift"
+rust = "p3_sha256_air::binary::air::xor3_shift"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.maj"
+rust = "p3_sha256_air::binary::air::maj"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.add_many_step"
+rust = "p3_sha256_air::binary::air::add_many"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.add_many"
+rust = "p3_sha256_air::binary::air::add_many"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.eval"
+rust = "{impl p3_air::air::Air<AB> for p3_sha256_air::binary::air::Sha256BinaryAir}::eval"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.big_sigma0"
+rust = "p3_sha256_air::binary::generation::big_sigma0"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.big_sigma1"
+rust = "p3_sha256_air::binary::generation::big_sigma1"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.small_sigma0"
+rust = "p3_sha256_air::binary::generation::small_sigma0"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.small_sigma1"
+rust = "p3_sha256_air::binary::generation::small_sigma1"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.Sha256BinaryScheduleCols"
+rust = "p3_sha256_air::binary::columns::Sha256BinaryScheduleCols"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.Sha256BinaryRoundCols"
+rust = "p3_sha256_air::binary::columns::Sha256BinaryRoundCols"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.Sha256BinaryCols"
+rust = "p3_sha256_air::binary::columns::Sha256BinaryCols"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.Sha256BinaryCols.cells"
+rust = "p3_sha256_air::binary::columns::Sha256BinaryCols"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.carry_bits"
+rust = "p3_sha256_air::binary::generation::carry_bits"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.add_with_carries"
+rust = "p3_sha256_air::binary::generation::add_with_carries"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.generate_trace_row"
+rust = "p3_sha256_air::binary::generation::generate_trace_row"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.generate_binary_trace_rows"
+rust = "p3_sha256_air::binary::generation::generate_binary_trace_rows"
