@@ -58,6 +58,7 @@ target `thumbv7em-none-eabi`
 | `util` | scoped | 228 | 70 | 0 | 1 | 0 | 0 / 1 | post `010` |
 | `whir` | stub |  | 605 | 0 | 20 |  | 0 / 0 |  |
 | `word` | scoped | 4507 | 101 | 3 | 0 | 0 | 3 / 3 | pre `010`, pre `020`, pre `030` |
+| `word-backend` | stub |  | 419 | 0 | 26 |  | 0 / 0 |  |
 | `zk-codes` | stub |  | 248 | 0 | 19 |  | 0 / 0 |  |
 
 Generated lines are `extraction/<Lib>/Extraction/{Types,Funs}.lean`. Hand-written
@@ -492,7 +493,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1639) whose dependencies include it; reaching one is not using it.
+(of 1660) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -524,9 +525,9 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 | `security` | `budget.shape.LookupShape.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `security` | `budget.shape.ProtocolParams.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `symmetric` | `p3_symmetric.hasher.CryptographicHasher.hash_iter_slices.default` | aeneas stops on its iterator adapters, so crate.toml makes it opaque (docs/extractor-issues.md 30) | 0 |
-| `word` | `index.IndexError.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 3 |
-| `word` | `word.Word32.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 3 |
-| `word` | `word.Word64.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 3 |
+| `word` | `index.IndexError.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 6 |
+| `word` | `word.Word32.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 7 |
+| `word` | `word.Word64.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 7 |
 
 ## Transcriptions
 
@@ -534,7 +535,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1639) whose dependencies include the declaration.
+counts the claims (of 1660) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -1813,6 +1814,32 @@ counts the claims (of 1639) whose dependencies include the declaration.
 | `whir` | `p3_whir.utils.mirror.par_eval_ze_star_n` | `p3_whir::utils::par_eval_ze_star_n` | stub | 0 |
 | `whir` | `p3_whir.utils.mirror.par_add_scaled_powers` | `p3_whir::utils::par_add_scaled_powers` | stub | 0 |
 | `whir` | `p3_whir.utils.mirror.padded_ood_t1` | `p3_whir::utils::padded_ood_t1` | stub | 3 |
+| `word-backend` | `p3_word_backend.keys.code.mirror.ShiftCode.new` | `p3_word_backend::keys::code::ShiftCode::new` | stub | 2 |
+| `word-backend` | `p3_word_backend.keys.code.mirror.ShiftCode.shift` | `p3_word_backend::keys::code::ShiftCode::shift` | stub | 2 |
+| `word-backend` | `p3_word_backend.keys.code.mirror.KeyCode.new` | `p3_word_backend::keys::code::KeyCode::new` | stub | 2 |
+| `word-backend` | `p3_word_backend.keys.code.mirror.KeyCode.operation` | `p3_word_backend::keys::code::KeyCode::operation` | stub | 2 |
+| `word-backend` | `p3_word_backend.keys.code.mirror.KeyCode.sequence` | `p3_word_backend::keys::code::KeyCode::sequence` | stub | 2 |
+| `word-backend` | `p3_word_backend.keys.code.mirror.ShiftSequenceCode.new` | `p3_word_backend::keys::code::ShiftSequenceCode::new` | stub | 0 |
+| `word-backend` | `p3_word_backend.keys.code.mirror.ShiftSequenceCode.shifts` | `p3_word_backend::keys::code::ShiftSequenceCode::shifts` | stub | 2 |
+| `word-backend` | `p3_word_backend.columns.mirror.check_shape` | `p3_word_backend::statement::StatementShape::check_shape` | stub | 3 |
+| `word-backend` | `p3_word_backend.columns.mirror.packedAdd32` | `{impl core::ops::arith::Add for p3_binary_field::bitslice::packing::PackedGf2<U>}::add` | stub | 1 |
+| `word-backend` | `p3_word_backend.columns.mirror.packedAdd64` | `{impl core::ops::arith::Add for p3_binary_field::bitslice::packing::PackedGf2<U>}::add` | stub | 1 |
+| `word-backend` | `p3_word_backend.columns.mirror.readTerm` | `p3_word_backend::columns::OperationColumns::extend` | stub | 4 |
+| `word-backend` | `p3_word_backend.columns.mirror.evaluate` | `p3_word_backend::columns::OperationColumns::extend` | stub | 4 |
+| `word-backend` | `p3_word_backend.columns.mirror.OperationColumns.extend` | `p3_word_backend::columns::OperationColumns::extend` | stub | 3 |
+| `word-backend` | `p3_word_backend.columns.mirror.OperationColumns.new` | `p3_word_backend::columns::OperationColumns::new` | stub | 3 |
+| `word-backend` | `p3_word_backend.shift.wiring.mirror.evaluate_word` | `p3_word_backend::shift::wiring::evaluate_word` | stub | 0 |
+| `word-backend` | `p3_word_backend.shift.wiring.mirror.shift_transpose` | `p3_word_backend::shift::wiring::shift_transpose` | stub | 4 |
+| `word-backend` | `p3_word_backend.shift.wiring.mirror.shift_weights` | `p3_word_backend::shift::wiring::shift_weights` | stub | 2 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.Tree.depth` | `p3_word_backend::integer_mul::Tree::depth` | stub | 0 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.IntegerMulReduction.new` | `p3_word_backend::integer_mul::IntegerMulReduction::new` | stub | 1 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.check_field` | `p3_word_backend::integer_mul::IntegerMulReduction::check_field` | stub | 5 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.generator_squarings` | `p3_word_backend::integer_mul::exponent::generator_squarings` | stub | 6 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.factor_weights` | `p3_word_backend::integer_mul::exponent::factor_weights` | stub | 0 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.result_weights` | `p3_word_backend::integer_mul::exponent::result_weights` | stub | 0 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.factor_leaves` | `p3_word_backend::integer_mul::factor_leaves` | stub | 5 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.result_leaves` | `p3_word_backend::integer_mul::result_leaves` | stub | 5 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.product_layers` | `p3_word_backend::integer_mul::product_layers` | stub | 0 |
 | `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.new` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::new` | stub | 3 |
 | `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.evaluation_point` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::evaluation_point` | stub | 7 |
 | `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.message_row_iter` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::message_row_iter` | stub | 2 |
@@ -3327,6 +3354,27 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Word.mul64.iff` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Word.validateSpec.ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Word.verifySpec.ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.IntegerMulReduction.new.none` | `Quot.sound`, `propext` |
+| `P3WordBackend.KeyCode.injective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.KeyCode.round_trip` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.OperationColumns.new.flat` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.Shift.new.fixed32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.Shift.new.fixed64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.accepts.iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.backend.word32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.backend.word64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.check_field.two_pow` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.evaluate.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.factor_leaves.prod` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.result_leaves.prod` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.row.collision` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.row.sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.sem32.xor` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.sem64.xor` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.shift_transpose.word32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.shift_transpose.word64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.shift_weights.word32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.shift_weights.word64` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sha256Air.SHA256_K.eq_fips` | `propext` |
 | `Sha256Air.binary.complete` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sha256Air.binary.degree_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
