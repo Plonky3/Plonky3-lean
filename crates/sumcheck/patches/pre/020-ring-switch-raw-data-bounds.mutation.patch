@@ -1,0 +1,14 @@
+# Mutation of: 020-ring-switch-raw-data-bounds
+# Breaks:      one added bound is not implied by `TowerLevel`, so the packing no longer applies to every tower level.
+#
+--- a/sumcheck/src/ring_switch/bits/packing.rs
++++ b/sumcheck/src/ring_switch/bits/packing.rs
+@@ -50,7 +50,7 @@
+ /// Borrowed view of a packed bit witness.
+ pub type BitPackingView<'a, EF> = BitPacking<EF, &'a [EF]>;
+ 
+-impl<EF: TowerLevel + p3_field::RawDataSerializable> BitPacking<EF> { // PATCHED: the bound on `EF` was `TowerLevel`
++impl<EF: TowerLevel + p3_field::RawDataSerializable + core::fmt::LowerHex> BitPacking<EF> { // PATCHED: the bound on `EF` was `TowerLevel`
+     /// Read a packed bit witness, one element per element's worth of bytes.
+     ///
+     /// # Arguments

@@ -1,0 +1,266 @@
+# Patch:        020-ring-switch-raw-data-bounds
+# Phase:        pre
+# Target:       sumcheck/src/ring_switch/bits/claims.rs, sumcheck/src/ring_switch/bits/packing.rs, sumcheck/src/ring_switch/bits/reduction.rs, sumcheck/src/ring_switch/bits/transcript.rs, sumcheck/tests/pre_patch_020.rs
+# Hunks:        19
+# Class:        bound
+# Gap:          docs/extractor-issues.md 10 (charon#1266): baby-bear's pre 020
+#               drops `Field`'s `RawDataSerializable` supertrait under the
+#               cfg, and binary-field's pre 010 then bounds the blanket
+#               `BitCoordinates` impl on it. Without this patch p3-sumcheck
+#               does not compile there: E0277, `F: BitCoordinates` and
+#               `F: RawDataSerializable` not satisfied, 49 times.
+# Cost:         none: each added bound is implied by `TowerLevel: Field` in a
+#               normal build.
+# Upstreamable: no: the bounds are redundant upstream. Dropping baby-bear's
+#               pre 020 makes them unnecessary.
+# Drop when:    baby-bear's pre 020 is dropped.
+# Test:         test p3-sumcheck --test pre_patch_020
+# Mutation:     the bound on `BitPacking` asks for `LowerHex`, which
+#               `TowerLevel` does not imply, so the generic test no longer
+#               compiles.
+#
+# The bit ring switch reads a tower level's bytes, through `NUM_BYTES` and `BitCoordinates`.
+#
+# Under the cfg `TowerLevel` no longer implies either, so each bound that needs them states it.
+#
+# Every one of the 18 is needed: removing any one fails the cfg build.
+#
+# In a normal build `TowerLevel: Field` implies the bound, so nothing changes there.
+#
+# One supertrait on `TowerLevel` would replace all 18.
+#
+# It would also change the trait that p3-binary-field's extraction translates, so it is not used.
+#
+diff --git a/sumcheck/src/ring_switch/bits/claims.rs b/sumcheck/src/ring_switch/bits/claims.rs
+index ebec207d..8dcbc011 100644
+--- a/sumcheck/src/ring_switch/bits/claims.rs
++++ b/sumcheck/src/ring_switch/bits/claims.rs
+@@ -156,7 +156,7 @@ impl<F, EF> BitRingSwitchClaimsProof<F, EF> {
+     }
+ }
+ 
+-impl<F: TowerLevel, EF: BitCoordinates + ExtensionField<F>> BitRingSwitchClaims<F, EF> {
++impl<F: TowerLevel + p3_field::RawDataSerializable, EF: BitCoordinates + ExtensionField<F>> BitRingSwitchClaims<F, EF> { // PATCHED: the bound on `F` was `TowerLevel`
+     /// Gather claims to be reduced together.
+     ///
+     /// # Errors
+@@ -250,7 +250,7 @@ fn boolean_equality<EF: Field>(bits: &[EF], r: &[EF]) -> EF {
+ 
+ impl<F, EF> BitRingSwitchClaims<F, EF>
+ where
+-    F: TranscriptField + TowerLevel,
++    F: TranscriptField + TowerLevel + p3_field::RawDataSerializable, // PATCHED: was `TranscriptField + TowerLevel`
+     EF: BitCoordinates + ExtensionField<F>,
+ {
+     /// Each claim's second stage, over the challenges the batch drew.
+diff --git a/sumcheck/src/ring_switch/bits/packing.rs b/sumcheck/src/ring_switch/bits/packing.rs
+index 1e8a96c3..b925e15e 100644
+--- a/sumcheck/src/ring_switch/bits/packing.rs
++++ b/sumcheck/src/ring_switch/bits/packing.rs
+@@ -50,7 +50,7 @@ pub struct BitPacking<EF, S = Vec<EF>> {
+ /// Borrowed view of a packed bit witness.
+ pub type BitPackingView<'a, EF> = BitPacking<EF, &'a [EF]>;
+ 
+-impl<EF: TowerLevel> BitPacking<EF> {
++impl<EF: TowerLevel + p3_field::RawDataSerializable> BitPacking<EF> { // PATCHED: the bound on `EF` was `TowerLevel`
+     /// Read a packed bit witness, one element per element's worth of bytes.
+     ///
+     /// # Arguments
+@@ -105,7 +105,7 @@ impl<EF: TowerLevel> BitPacking<EF> {
+     }
+ }
+ 
+-impl<EF: TowerLevel, S: Borrow<[EF]>> BitPacking<EF, S> {
++impl<EF: TowerLevel + p3_field::RawDataSerializable, S: Borrow<[EF]>> BitPacking<EF, S> { // PATCHED: the bound on `EF` was `TowerLevel`
+     /// Read an already-packed multilinear as a bit witness, sweeping no byte twice.
+     ///
+     /// The packing is a bijection, so nothing needs checking beyond the shape.
+diff --git a/sumcheck/src/ring_switch/bits/reduction.rs b/sumcheck/src/ring_switch/bits/reduction.rs
+index 44cd9b84..a34b323b 100644
+--- a/sumcheck/src/ring_switch/bits/reduction.rs
++++ b/sumcheck/src/ring_switch/bits/reduction.rs
+@@ -111,7 +111,7 @@ fn materialize_compact_packing<F, EF, R, S>(
+     challenges: &[EF],
+ ) -> Poly<R>
+ where
+-    F: TowerLevel + Send + Sync,
++    F: TowerLevel + p3_field::RawDataSerializable + Send + Sync, // PATCHED: was `TowerLevel + Send + Sync`
+     EF: Field,
+     R: IntoTranscriptField<EF> + FromTable<F> + Sync,
+     S: Borrow<[F]>,
+@@ -154,7 +154,7 @@ pub(super) fn slot_packing<F, R, S>(
+     len: usize,
+ ) -> Poly<R>
+ where
+-    F: TowerLevel,
++    F: TowerLevel + p3_field::RawDataSerializable, // PATCHED: was `TowerLevel`
+     R: FromTable<F>,
+     S: Borrow<[F]>,
+ {
+@@ -284,7 +284,7 @@ pub struct BitRingSwitch<F, EF = F> {
+     _packing: PhantomData<F>,
+ }
+ 
+-impl<F: TowerLevel, EF: BitCoordinates + ExtensionField<F>> BitRingSwitch<F, EF> {
++impl<F: TowerLevel + p3_field::RawDataSerializable, EF: BitCoordinates + ExtensionField<F>> BitRingSwitch<F, EF> { // PATCHED: the bound on `F` was `TowerLevel`
+     /// Number of coordinates one packed element absorbs.
+     pub const ABSORBED: usize = Coefficients::<F>::LOG_DIMENSION;
+ 
+@@ -1054,7 +1054,7 @@ pub struct BitRingSwitchBatch<'a, F, EF = F> {
+     alpha: Option<EF>,
+ }
+ 
+-impl<F: TowerLevel, EF: BitCoordinates + ExtensionField<F>> BitRingSwitchBatch<'_, F, EF> {
++impl<F: TowerLevel + p3_field::RawDataSerializable, EF: BitCoordinates + ExtensionField<F>> BitRingSwitchBatch<'_, F, EF> { // PATCHED: the bound on `F` was `TowerLevel`
+     /// The weight multilinear the sumcheck runs against the packing.
+     ///
+     /// # Algorithm
+@@ -1530,7 +1530,7 @@ pub enum BitRingSwitchProofError {
+ /// A protocol needing a total bound supplies the grinding outside this run.
+ impl<F, EF> BitRingSwitch<F, EF>
+ where
+-    F: TranscriptField + TowerLevel,
++    F: TranscriptField + TowerLevel + p3_field::RawDataSerializable, // PATCHED: was `TranscriptField + TowerLevel`
+     EF: BitCoordinates + ExtensionField<F>,
+ {
+     /// Reduce the claims this reduction was set up over to one about the packing.
+diff --git a/sumcheck/src/ring_switch/bits/transcript.rs b/sumcheck/src/ring_switch/bits/transcript.rs
+index d7949f9c..3a6dd3c5 100644
+--- a/sumcheck/src/ring_switch/bits/transcript.rs
++++ b/sumcheck/src/ring_switch/bits/transcript.rs
+@@ -128,7 +128,7 @@ impl BitRingSwitchShape {
+     ///
+     /// Panics when the point is narrower than one element.
+     #[must_use]
+-    pub fn sumcheck_rounds<EF: TowerLevel>(&self) -> usize {
++    pub fn sumcheck_rounds<EF: TowerLevel + p3_field::RawDataSerializable>(&self) -> usize { // PATCHED: the bound on `EF` was `TowerLevel`
+         let absorbed = BitRingSwitch::<EF>::ABSORBED;
+         assert!(
+             self.num_variables >= absorbed,
+@@ -141,7 +141,7 @@ impl BitRingSwitchShape {
+     #[must_use]
+     pub fn pattern<F, EF>(&self) -> InteractionPattern
+     where
+-        F: TranscriptField + TowerLevel,
++        F: TranscriptField + TowerLevel + p3_field::RawDataSerializable, // PATCHED: was `TranscriptField + TowerLevel`
+         EF: BitCoordinates + ExtensionField<F>,
+     {
+         let rows = |label| {
+@@ -218,7 +218,7 @@ impl BitRingSwitchShape {
+     #[must_use]
+     pub fn domain_separator<F, EF>(&self) -> DomainSeparator<Alphabet<F>>
+     where
+-        F: TranscriptField + TowerLevel,
++        F: TranscriptField + TowerLevel + p3_field::RawDataSerializable, // PATCHED: was `TranscriptField + TowerLevel`
+         EF: BitCoordinates + ExtensionField<F>,
+     {
+         let mut separator = DomainSeparator::new(VERSION, NAME, self.pattern::<F, EF>());
+@@ -243,7 +243,7 @@ pub struct BitRingSwitchProverTranscript<'a, C, F: TranscriptField, EF = F> {
+ 
+ impl<'a, C, F, EF> BitRingSwitchProverTranscript<'a, C, F, EF>
+ where
+-    F: TranscriptField + TowerLevel,
++    F: TranscriptField + TowerLevel + p3_field::RawDataSerializable, // PATCHED: was `TranscriptField + TowerLevel`
+     EF: BitCoordinates + ExtensionField<F>,
+     C: CanObserve<F> + CanSample<F>,
+ {
+@@ -354,7 +354,7 @@ pub struct BitRingSwitchVerifierTranscript<'a, C, F: TranscriptField, EF = F> {
+ 
+ impl<'a, C, F, EF> BitRingSwitchVerifierTranscript<'a, C, F, EF>
+ where
+-    F: TranscriptField + TowerLevel,
++    F: TranscriptField + TowerLevel + p3_field::RawDataSerializable, // PATCHED: was `TranscriptField + TowerLevel`
+     EF: BitCoordinates + ExtensionField<F>,
+     C: CanObserve<F> + CanSample<F>,
+ {
+@@ -553,7 +553,7 @@ impl BitRingSwitchClaimsShape {
+     #[must_use]
+     pub fn pattern<F, EF>(&self) -> InteractionPattern
+     where
+-        F: TranscriptField + TowerLevel,
++        F: TranscriptField + TowerLevel + p3_field::RawDataSerializable, // PATCHED: was `TranscriptField + TowerLevel`
+         EF: BitCoordinates + ExtensionField<F>,
+     {
+         let rows = |label| {
+@@ -623,7 +623,7 @@ impl BitRingSwitchClaimsShape {
+     #[must_use]
+     pub fn domain_separator<F, EF>(&self) -> DomainSeparator<Alphabet<F>>
+     where
+-        F: TranscriptField + TowerLevel,
++        F: TranscriptField + TowerLevel + p3_field::RawDataSerializable, // PATCHED: was `TranscriptField + TowerLevel`
+         EF: BitCoordinates + ExtensionField<F>,
+     {
+         let mut separator = DomainSeparator::new(VERSION, CLAIMS_NAME, self.pattern::<F, EF>());
+@@ -650,7 +650,7 @@ pub struct BitRingSwitchClaimsProverTranscript<'a, C, F: TranscriptField, EF = F
+ 
+ impl<'a, C, F, EF> BitRingSwitchClaimsProverTranscript<'a, C, F, EF>
+ where
+-    F: TranscriptField + TowerLevel,
++    F: TranscriptField + TowerLevel + p3_field::RawDataSerializable, // PATCHED: was `TranscriptField + TowerLevel`
+     EF: BitCoordinates + ExtensionField<F>,
+     C: CanObserve<F> + CanSample<F>,
+ {
+@@ -760,7 +760,7 @@ pub struct BitRingSwitchClaimsVerifierTranscript<'a, C, F: TranscriptField, EF =
+ 
+ impl<'a, C, F, EF> BitRingSwitchClaimsVerifierTranscript<'a, C, F, EF>
+ where
+-    F: TranscriptField + TowerLevel,
++    F: TranscriptField + TowerLevel + p3_field::RawDataSerializable, // PATCHED: was `TranscriptField + TowerLevel`
+     EF: BitCoordinates + ExtensionField<F>,
+     C: CanObserve<F> + CanSample<F>,
+ {
+diff --git a/sumcheck/tests/pre_patch_020.rs b/sumcheck/tests/pre_patch_020.rs
+new file mode 100644
+index 00000000..610d9d94
+--- /dev/null
++++ b/sumcheck/tests/pre_patch_020.rs
+@@ -0,0 +1,49 @@
++//! PATCHED: added by Plonky3-lean pre-patch 020 (`ring-switch-raw-data-bounds`).
++//!
++//! The patch adds `RawDataSerializable` beside `TowerLevel` on 18 bounds of the bit ring switch.
++//!
++//! In a normal build `TowerLevel: Field` implies that bound.
++//!
++//! So the public items must still accept a generic tower level, with no other bound.
++
++use p3_binary_field::{BinaryField8, BinaryField16, BinaryField128, TowerLevel};
++use p3_sumcheck::ring_switch::bits::{
++    BitPacking, BitPackingError, BitRingSwitch, BitRingSwitchShape,
++};
++
++fn pack<F: TowerLevel>(bits: &[u8]) -> Result<BitPacking<F>, BitPackingError> {
++    BitPacking::new(bits)
++}
++
++fn absorbed<F: TowerLevel>() -> usize {
++    BitRingSwitch::<F>::ABSORBED
++}
++
++fn rounds<F: TowerLevel>(shape: &BitRingSwitchShape) -> usize {
++    shape.sumcheck_rounds::<F>()
++}
++
++#[test]
++fn the_bounded_items_accept_every_tower_level() {
++    // Invariant: one element absorbs log_2 of its bit width.
++    assert_eq!(absorbed::<BinaryField8>(), 3);
++    assert_eq!(absorbed::<BinaryField16>(), 4);
++    assert_eq!(absorbed::<BinaryField128>(), 7);
++
++    // Fixture state: a point of 10 coordinates over the 128-bit level.
++    //
++    //     10 coordinates - 7 absorbed = 3 rounds
++    let shape = BitRingSwitchShape::new(10);
++    assert_eq!(rounds::<BinaryField128>(&shape), 3);
++
++    // Fixture state: 32 bytes, so 256 cells, packed into 2 elements of 16 bytes.
++    let bits = [0xA5u8; 32];
++    let packed = pack::<BinaryField128>(&bits).unwrap().into_poly();
++    assert_eq!(packed.num_evals(), 2);
++
++    // Fixture state: 3 bytes is 24 cells, not a power of two.
++    assert_eq!(
++        pack::<BinaryField8>(&[0; 3]).err(),
++        Some(BitPackingError::NotAHypercube { cells: 24 })
++    );
++}
