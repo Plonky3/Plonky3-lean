@@ -25,6 +25,9 @@
 # The sampling methods of the duplex and serializing challengers are not rooted.
 # Their closures capture the challenger mutably (docs/extractor-issues.md 60 and 17).
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/challenger/src/hax_roots.rs b/challenger/src/hax_roots.rs
 new file mode 100644
 index 00000000..2272cda0

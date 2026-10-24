@@ -1,0 +1,14 @@
+# Mutation of: _mm256_setzero_si256
+# Breaks:      it sets every lane to one.
+#
+--- a/src/x86_64/avx2.rs
++++ b/src/x86_64/avx2.rs
+@@ -405,7 +405,7 @@
+ /// `dst[MAX:0] := 0`
+ #[inline]
+ pub unsafe fn _mm256_setzero_si256() -> __m256i {
+-    __m256i([0u32; 8])
++    __m256i([1u32; 8])
+ }
+ 
+ /// `_mm256_castsi256_ps`: a reinterpretation, no instruction. "This intrinsic is only used for

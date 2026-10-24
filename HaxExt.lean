@@ -191,6 +191,30 @@ trailing zero bits, `128` for zero. -/
 def core.num.U128.trailing_zeros (x : Std.U128) : RustM Std.U32 :=
   ok ⟨BitVec.ofNat 32 (((List.range 128).find? fun i => x.val.testBit i).getD 128)⟩
 
+/-! ## `transmute`
+
+`core::intrinsics::transmute::<Src, Dst>(x)` reinterprets the bytes of `x` as a `Dst`. What
+that means depends on the two types' layouts, which the models do not carry, so it is defined
+only at the pairs that have a `Transmute` instance. Each instance is the layout fact it rests
+on. An instance outside this file is an assumption, and its docstring says so in a sentence
+starting "Assumed", which STATUS.md lists. At a pair with no instance, the generated code does
+not elaborate. -/
+
+/-- The value `transmute` gives a `Src` read as a `Dst`. -/
+class core.intrinsics.Transmute (Src Dst : Type) where
+  transmute : Src → Dst
+
+/-- `core::intrinsics::transmute`, as aeneas calls it: the target type, then the value. -/
+def core.intrinsics.transmute {Src : Type} (Dst : Type) [inst : core.intrinsics.Transmute Src Dst]
+    (x : Src) : RustM Dst :=
+  ok (inst.transmute x)
+
+/-- A type read as itself is unchanged. This is also the instance for a `repr(transparent)`
+wrapper of an array, which the extraction erases to the array (`[u32; 8]` to
+p3-arch-shims' `__m256i`). -/
+instance core.intrinsics.Transmute.refl (α : Type) : core.intrinsics.Transmute α α where
+  transmute x := x
+
 /-- `Range::contains` (`library/core/src/ops/range.rs`), the inherent method:
 `<Self as RangeBounds<Idx>>::contains(self, item)`. The first dictionary is the
 `Idx: PartialOrd<Idx>` bound of the impl block, which the body does not use. -/

@@ -20,6 +20,9 @@
 # A charon pattern cannot tell the three impls apart (docs/extractor-issues.md 4 and 8).
 # Rooted at one-line wrappers, each method is reachable, so its own body is extracted.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/keccak/src/hax_roots.rs b/keccak/src/hax_roots.rs
 new file mode 100644
 index 00000000..92f10f27

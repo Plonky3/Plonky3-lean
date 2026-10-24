@@ -22,6 +22,9 @@
 # The wrappers keep the permutation, the derangement and the inner hasher generic.
 # The Lean model then takes each as an argument, and its theorems hold for every one.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/symmetric/src/hax_roots.rs b/symmetric/src/hax_roots.rs
 new file mode 100644
 index 0000000..534d9b9

@@ -20,6 +20,9 @@
 #
 # This adds the new name to the line baby-bear's pre 010 adds.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/Cargo.toml b/Cargo.toml
 index 5889984..e427b45 100644
 --- a/Cargo.toml

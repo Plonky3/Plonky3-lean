@@ -30,6 +30,9 @@
 #
 # An attribute keeps that variant free of unused-import warnings.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/matrix/src/bitrev.rs b/matrix/src/bitrev.rs
 index f023419..d06df04 100644
 --- a/matrix/src/bitrev.rs

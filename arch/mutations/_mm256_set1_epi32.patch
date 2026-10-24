@@ -1,0 +1,14 @@
+# Mutation of: _mm256_set1_epi32
+# Breaks:      it leaves the last lane zero.
+#
+--- a/src/x86_64/avx2.rs
++++ b/src/x86_64/avx2.rs
+@@ -375,7 +375,7 @@
+ /// `FOR j := 0 to 7; i := j*32; dst[i+31:i] := a[31:0]; ENDFOR`
+ #[inline]
+ pub unsafe fn _mm256_set1_epi32(a: i32) -> __m256i {
+-    __m256i([a as u32; 8])
++    __m256i([a as u32, a as u32, a as u32, a as u32, a as u32, a as u32, a as u32, 0])
+ }
+ 
+ /// `_mm256_setr_epi32` (a sequence).

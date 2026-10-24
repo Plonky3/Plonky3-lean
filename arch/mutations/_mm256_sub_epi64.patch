@@ -1,0 +1,14 @@
+# Mutation of: _mm256_sub_epi64
+# Breaks:      it subtracts the 32-bit halves separately, dropping the borrow.
+#
+--- a/src/x86_64/avx2.rs
++++ b/src/x86_64/avx2.rs
+@@ -77,7 +77,7 @@
+     let mut dst = [0u32; 8];
+     let mut k = 0;
+     while k < 4 {
+-        let (lo, hi) = split64(lane64(&a.0, k).wrapping_sub(lane64(&b.0, k)));
++        let (lo, hi) = (a.0[2 * k].wrapping_sub(b.0[2 * k]), a.0[2 * k + 1].wrapping_sub(b.0[2 * k + 1]));
+         dst[2 * k] = lo;
+         dst[2 * k + 1] = hi;
+         k += 1;

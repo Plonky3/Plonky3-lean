@@ -18,18 +18,24 @@
 #      then show that each pre-patch's own tests pass, and fail under its
 #      recorded mutation (check-mutations.py)
 #   3. apply every crates/*/patches/pre/ patch to plonky3/, and `cargo check`
-#      each extracted crate in the variant charon sees
+#      each extracted crate in the configuration charon sees, for each target
 #   4. run `cargo hax into lean` over each crate whose state is `extracted`
-#      (whole crate) or `scoped` (rooted at its crate.toml `start_from`)
+#      (whole crate) or `scoped` (rooted at its crate.toml `start_from`), then
+#      over each `[[variant]]`, which is renamed to its own library and
+#      namespace (rename-variant.py)
 #   5. revert the pre-extraction patches (unconditionally, even on failure)
 #   6. check each hand-written `Assumptions/*External.lean` against the template
-#      aeneas regenerated, install the output into crates/<crate>/extraction/,
-#      snapshot it as the pristine baseline for post-extraction patches, and
-#      write crates/<crate>/extraction/gaps.toml (gap-report.py)
-#   7. apply each crate's patches/post/ patches
+#      aeneas regenerated, install the output into crates/<crate>/extraction/
+#      (a variant's into crates/<crate>/variants/<name>/extraction/), snapshot
+#      it as the pristine baseline for post-extraction patches, and write
+#      its gaps.toml (gap-report.py)
+#   7. apply each crate's and variant's patches/post/ patches
 #   8. `lake build`, whose warnings must be exactly those in known-warnings.txt
 #
-# With --check, the run must also leave crates/*/extraction/ exactly as
+# A unit is a crate or a variant (config.py units); `<home>` below is the
+# directory holding its extraction/ and patches/post/.
+#
+# With --check, the run must also leave every extraction/ exactly as
 # committed: re-extraction is byte-identical, or the run fails.
 #
 # Usage:  tools/extract/extract.sh [--tools-only] [--check]
@@ -77,7 +83,6 @@ EXPECT_AENEAS="$(tc aeneas)"
 CHARON_TOOLCHAIN="$(tc rust_toolchain)"
 CHARON_COMPONENTS="$(tc rust_components | tr ' ' ',')"
 HAX_TARGET="$(tc target)"
-EXTRACT_RUSTFLAGS="$(tc rustflags)"
 
 # --- 0. tools -----------------------------------------------------------------
 echo "==> 0/8 tools"
@@ -98,6 +103,12 @@ rustup target list --toolchain "$CHARON_TOOLCHAIN" --installed 2>/dev/null \
     || missing "Rust $CHARON_TOOLCHAIN with $CHARON_COMPONENTS and $HAX_TARGET" \
         "rustup toolchain install $CHARON_TOOLCHAIN --profile minimal --component $CHARON_COMPONENTS --target $HAX_TARGET"
 echo "    rust     $CHARON_TOOLCHAIN (for charon), target $HAX_TARGET"
+for t in $("$CONFIG" units | cut -d'|' -f1 | grep '@' | while read -r u; do "$CONFIG" target "$u"; done | sort -u); do
+    rustup target list --toolchain "$CHARON_TOOLCHAIN" --installed 2>/dev/null | grep -qx "$t" \
+        || missing "Rust $CHARON_TOOLCHAIN's $t target, for a variant" \
+            "rustup target add --toolchain $CHARON_TOOLCHAIN $t"
+    echo "    rust     target $t (variants)"
+done
 
 # The `cargo-hax` on PATH is the normal path; HAX_BIN overrides it.
 HAX_BIN="${HAX_BIN:-cargo-hax}"
@@ -158,8 +169,8 @@ echo "    charon   $EXPECT_CHARON, aeneas $EXPECT_AENEAS"
 echo "    lean     $(cat "$ROOT/lean-toolchain")"
 [ "$TOOLS_ONLY" = "0" ] || exit 0
 
-# Crates to extract: every crate whose state is not `stub`.
-CRATES="$("$CONFIG" crates | awk -F'|' '$3 != "stub"')"
+# Units to extract: every crate whose state is not `stub`, then every variant.
+UNITS="$("$CONFIG" units | awk -F'|' '$3 != "stub"')"
 
 # --- the patch applier, shared by both phases ---------------------------------
 # `patch -F0` forbids fuzz: context drift fails loudly instead of applying
@@ -205,6 +216,9 @@ apply_set() {
 # bash array because macOS still ships bash 3.2.
 PRE_RECORD="$(mktemp)"
 PRE_LIST="$(mktemp)"
+# plonky3/Cargo.lock is not tracked, so no patch edits it, but cargo records
+# there the dependencies the pre-patches add. It is restored with the sources.
+LOCK_SAVE="$(mktemp)"
 revert_pre_patches() {
     [ -s "$PRE_RECORD" ] || return 0
     local ok=1 pf
@@ -212,6 +226,7 @@ revert_pre_patches() {
         patch $PATCH_FLAGS -R -d "$RUST" < "$pf" >/dev/null || ok=0
     done
     : > "$PRE_RECORD"
+    [ ! -s "$LOCK_SAVE" ] || cp "$LOCK_SAVE" "$RUST/Cargo.lock"
     if [ "$ok" = "1" ]; then
         echo "    reverted pre-extraction patches"
     else
@@ -219,7 +234,7 @@ revert_pre_patches() {
         echo "       MODIFIED -- inspect 'git -C plonky3 status' before building." >&2
     fi
 }
-cleanup() { revert_pre_patches; rm -f "$PRE_RECORD" "$PRE_LIST"; }
+cleanup() { revert_pre_patches; rm -f "$PRE_RECORD" "$PRE_LIST" "$LOCK_SAVE"; }
 trap cleanup EXIT
 
 echo "==> 1/8 checking patch conventions"
@@ -230,18 +245,23 @@ echo "==> 2/8 upstream tests, with and without the pre-extraction patches"
 echo "    -- each pre-patch's tests, and its recorded mutation"
 "$HERE/check-mutations.py"
 
-echo "==> 3/8 pre-extraction patches (plonky3/) and cargo check ($HAX_TARGET, $EXTRACT_RUSTFLAGS)"
+echo "==> 3/8 pre-extraction patches (plonky3/) and cargo check, per target"
 "$CONFIG" pre-patches > "$PRE_LIST"
 if [ -s "$PRE_LIST" ]; then
     echo "    WARNING: patching Rust source changes the artifact under" >&2
     echo "             verification. See docs/patches.md." >&2
 fi
-packages="$(printf '%s\n' "$CRATES" | cut -d'|' -f1 | while read -r c; do
-    printf -- '-p %s ' "$("$CONFIG" package "$c")"; done)"
-check() {   # check <log>: cargo check of the extracted crates in the variant charon sees
-    (cd "$RUST" && env RUSTUP_TOOLCHAIN="$CHARON_TOOLCHAIN" \
-        RUSTFLAGS="$EXTRACT_RUSTFLAGS" CARGO_TARGET_DIR="$WORK/target-check" \
-        cargo check --quiet --target "$HAX_TARGET" $packages) > "$1" 2>&1
+CHECKS="$("$CONFIG" checks)"
+check() {   # check <log>: cargo check of the extracted crates as charon sees them, per target
+    # Every target, even after one fails, so that two logs list the same warnings.
+    local target flags packages ok=0
+    : > "$1"
+    while IFS='|' read -r target flags packages; do
+        (cd "$RUST" && env RUSTUP_TOOLCHAIN="$CHARON_TOOLCHAIN" \
+            RUSTFLAGS="$flags" CARGO_TARGET_DIR="$WORK/target-check" \
+            cargo check --quiet --target "$target" $packages) >> "$1" 2>&1 || ok=1
+    done <<< "$CHECKS"
+    return "$ok"
 }
 warnings() {   # the warning headlines of a check log, one per line, sorted
     sed 's/\x1b\[[0-9;]*m//g' "$1" | grep '^warning' | sort || true
@@ -251,6 +271,7 @@ warnings() {   # the warning headlines of a check log, one per line, sorted
 # fail the run. Headlines are compared, not locations, since a patch may move lines.
 base_log="$(mktemp)"
 check "$base_log" || true
+[ ! -f "$RUST/Cargo.lock" ] || cp "$RUST/Cargo.lock" "$LOCK_SAVE"
 apply_set "$PRE_LIST" "$RUST" "$PRE_RECORD"
 # If a patch removed something that code reachable from an extracted crate still
 # uses, this is where it fails. Warnings count too: a patch that leaves an unused
@@ -276,38 +297,43 @@ fi
 rm -f "$check_log"
 echo "    cargo check: ok; the patches add no warnings ($n_base from upstream, also without them)"
 
-echo "==> 4/8 extracting with hax (backend: lean = charon + aeneas, target: $HAX_TARGET)"
+echo "==> 4/8 extracting with hax (backend: lean = charon + aeneas)"
 # Each crate gets a fresh output directory, so a removed item cannot linger.
 # Trust the exit status: aeneas exits non-zero on any translation error, and a
 # partial file is not worth building.
 rm -rf "$WORK/out"
-printf '%s\n' "$CRATES" | while IFS='|' read -r crate lib state; do
-    echo "    $crate ($state) -> $lib/Extraction/"
-    out="$WORK/out/$crate"
+printf '%s\n' "$UNITS" | while IFS='|' read -r unit lib state home; do
+    echo "    $unit ($state, $("$CONFIG" target "$unit")) -> $lib/Extraction/"
+    out="$WORK/out/$unit"
     mkdir -p "$out"
-    args="$("$CONFIG" charon-args "$crate")"
-    # A dependency outside the workspace is extracted from a copy of the source
-    # Cargo resolves it to, so that nothing is written into Cargo's registry.
-    src="$("$CONFIG" source "$crate")"
-    feats="$("$CONFIG" features "$crate")"
+    args="$("$CONFIG" charon-args "$unit")"
+    # A crate outside the workspace (a dependency, or one of this repository's)
+    # is extracted from a copy of its source, so that nothing is written into
+    # Cargo's registry or the repository.
+    src="$("$CONFIG" source "$unit")"
+    feats="$("$CONFIG" features "$unit")"
     case "$src" in
         "$RUST"/*)
            if [ -n "$feats" ]; then
-               echo "error: crates/$crate/crate.toml lists features; only a crate outside" >&2
+               echo "error: the crate.toml of $unit lists features; only a crate outside" >&2
                echo "       the workspace can have them (docs/extractor-issues.md 90)." >&2
                exit 1
            fi ;;
-        *) mkdir -p "$WORK/src"; rm -rf "${WORK:?}/src/$crate"
-           cp -R "$src" "$WORK/src/$crate"; src="$WORK/src/$crate"
+        *) mkdir -p "$WORK/src"; rm -rf "${WORK:?}/src/$unit"
+           rsync -a --exclude target/ "$src/" "$WORK/src/$unit/"; src="$WORK/src/$unit"
            # hax's lean backend does not pass cargo arguments on to charon, so the
            # crate's features become the copy's default features.
            [ -z "$feats" ] || "$HERE/default-features.py" "$src/Cargo.toml" "$feats" ;;
     esac
-    # hax's output also goes to a per-crate log, which gap-report.py reads for
+    # hax's output also goes to a per-unit log, which gap-report.py reads for
     # charon's diagnostics.
-    (cd "$src" && RUSTFLAGS="$("$CONFIG" rustflags "$crate")" CARGO_TARGET_DIR="$WORK/target-hax" \
+    (cd "$src" && RUSTFLAGS="$("$CONFIG" rustflags "$unit")" CARGO_TARGET_DIR="$WORK/target-hax" \
         "$HAX_BIN" hax into --output-dir "$out" lean --charon-args="$args" 2>&1 \
-        | tee "$WORK/hax-$crate.log"; exit "${PIPESTATUS[0]}")
+        | tee "$WORK/hax-$unit.log"; exit "${PIPESTATUS[0]}")
+    # hax names the library and namespace after the package; a variant gets its own.
+    case "$unit" in
+        *@*) "$HERE/rename-variant.py" "$out" $("$CONFIG" rename "$unit") ;;
+    esac
 done
 
 # Revert now, before the Lean build, so the rest of the run sees a clean tree.
@@ -326,14 +352,14 @@ decl_names() {
     sed -nE 's/^(noncomputable )?(axiom|opaque|def|abbrev|structure|inductive|class) ([^ :({]+).*/\3/p' "$1" | sort -u
 }
 stub_fail=0
-while IFS='|' read -r crate lib state; do
-    gen="$WORK/out/$crate/$lib/Extraction"
-    [ -d "$gen" ] || { echo "error: hax wrote no $lib/Extraction/ for $crate" >&2; exit 1; }
+while IFS='|' read -r unit lib state home; do
+    gen="$WORK/out/$unit/$lib/Extraction"
+    [ -d "$gen" ] || { echo "error: hax wrote no $lib/Extraction/ for $unit" >&2; exit 1; }
     for tpl in "$gen/"*External_Template.lean; do
         [ -e "$tpl" ] || continue
         stub="$(basename "$tpl" _Template.lean)"
-        mine="$ROOT/crates/$crate/extraction/$lib/Assumptions/$stub.lean"
-        rel_mine="crates/$crate/extraction/$lib/Assumptions/$stub.lean"
+        mine="$ROOT/$home/extraction/$lib/Assumptions/$stub.lean"
+        rel_mine="$home/extraction/$lib/Assumptions/$stub.lean"
         if [ ! -f "$mine" ]; then
             echo "error: $rel_mine is missing. Write it from $stub""_Template.lean," >&2
             echo "       with each hole an \`opaque\` constant." >&2
@@ -352,29 +378,29 @@ while IFS='|' read -r crate lib state; do
             stub_fail=1
         fi
     done
-done <<< "$CRATES"
+done <<< "$UNITS"
 [ "$stub_fail" -eq 0 ] || exit 1
 rm -rf "$PRISTINE"
-while IFS='|' read -r crate lib state; do
-    dest="$ROOT/crates/$crate/extraction/$lib"
+while IFS='|' read -r unit lib state home; do
+    dest="$ROOT/$home/extraction/$lib"
     rm -rf "$dest/Extraction" "$dest/Extraction.lean"
-    mkdir -p "$dest/Extraction" "$PRISTINE/$crate/extraction/$lib/Extraction"
-    cp "$WORK/out/$crate/$lib/Extraction"/*.lean "$dest/Extraction/"
-    cp "$WORK/out/$crate/$lib/Extraction.lean" "$dest/Extraction.lean"
-    cp "$dest/Extraction"/*.lean "$PRISTINE/$crate/extraction/$lib/Extraction/"
+    mkdir -p "$dest/Extraction" "$PRISTINE/$unit/extraction/$lib/Extraction"
+    cp "$WORK/out/$unit/$lib/Extraction"/*.lean "$dest/Extraction/"
+    cp "$WORK/out/$unit/$lib/Extraction.lean" "$dest/Extraction.lean"
+    cp "$dest/Extraction"/*.lean "$PRISTINE/$unit/extraction/$lib/Extraction/"
     # What charon translated but aeneas did not emit; read by tools/status.py.
-    "$HERE/gap-report.py" "$ROOT/crates/$crate" "$WORK/out/$crate/llbc/"*.llbc \
-        "$WORK/hax-$crate.log" > "$ROOT/crates/$crate/extraction/gaps.toml"
-done <<< "$CRATES"
+    "$HERE/gap-report.py" "$unit" "$WORK/out/$unit/llbc/"*.llbc \
+        "$WORK/hax-$unit.log" > "$ROOT/$home/extraction/gaps.toml"
+done <<< "$UNITS"
 echo "    ok; pristine output in ${PRISTINE#"$ROOT"/}/"
 
 echo "==> 7/8 applying post-extraction patches (generated Lean)"
-while IFS='|' read -r crate lib state; do
+while IFS='|' read -r unit lib state home; do
     list="$(mktemp)"
-    ls "$ROOT/crates/$crate/patches/post/"[0-9]*.patch > "$list" 2>/dev/null || true
-    [ -s "$list" ] && apply_set "$list" "$ROOT/crates/$crate" ""
+    ls "$ROOT/$home/patches/post/"[0-9]*.patch > "$list" 2>/dev/null || true
+    [ -s "$list" ] && apply_set "$list" "$ROOT/$home" ""
     rm -f "$list"
-done <<< "$CRATES"
+done <<< "$UNITS"
 
 echo "==> 8/8 lake build"
 # Aeneas's Lean library pulls in mathlib; without the prebuilt cache this is an
@@ -405,9 +431,9 @@ if [ -n "$new_w" ] || [ -n "$gone_w" ]; then
     exit 1
 fi
 n_warn="$(printf '%s\n' "$seen" | sed '/^$/d' | wc -l | tr -d ' ')"
-n_sorry=$(cd "$ROOT" && find crates/*/extraction -path '*/Extraction/*.lean' ! -name '*_Template.lean' \
+n_sorry=$(cd "$ROOT" && find crates/*/extraction crates/*/variants/*/extraction -path '*/Extraction/*.lean' ! -name '*_Template.lean' \
               | xargs cat | grep -c 'sorry' || true)
-n_opaque=$(cd "$ROOT" && find crates/*/extraction crates/*/stub -path '*/Assumptions/*.lean' -o -path '*/stub/*.lean' \
+n_opaque=$(cd "$ROOT" && find crates/*/extraction crates/*/variants/*/extraction crates/*/stub -path '*/Assumptions/*.lean' -o -path '*/stub/*.lean' \
               | xargs cat | grep -cE '^(noncomputable )?(axiom|opaque) ' || true)
 echo "    $n_warn known warning(s); generated code contains $n_sorry 'sorry'; hand-written code declares $n_opaque opaque constant(s)"
 
@@ -416,9 +442,10 @@ if [ "$CHECK" = "1" ]; then
     # A glob pathspec: a plain `crates/*/extraction` matches only a path equal to
     # it, never the files under it, and so would compare nothing.
     spec=':(glob)crates/*/extraction/**'
-    if ! (cd "$ROOT" && git diff --quiet -- "$spec" \
-            && [ -z "$(git ls-files --others --exclude-standard -- "$spec")" ]); then
-        (cd "$ROOT" && git status --short -- "$spec") >&2
+    vspec=':(glob)crates/*/variants/*/extraction/**'
+    if ! (cd "$ROOT" && git diff --quiet -- "$spec" "$vspec" \
+            && [ -z "$(git ls-files --others --exclude-standard -- "$spec" "$vspec")" ]); then
+        (cd "$ROOT" && git status --short -- "$spec" "$vspec") >&2
         echo "error: re-extraction changed the committed output above." >&2
         exit 1
     fi

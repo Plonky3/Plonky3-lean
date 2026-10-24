@@ -1,0 +1,186 @@
+# Patch:        020-redirect-avx2-intrinsics
+# Phase:        pre
+# Target:       baby-bear/Cargo.toml, baby-bear/src/x86_64_avx2/packing.rs, baby-bear/src/x86_64_avx2/poseidon2.rs, field/Cargo.toml, field/src/packed/interleaves.rs, field/src/packed/x86_64_avx.rs, monty-31/Cargo.toml, monty-31/src/x86_64_avx2/packing.rs, monty-31/src/x86_64_avx2/poseidon1.rs, monty-31/src/x86_64_avx2/poseidon2.rs, monty-31/src/x86_64_avx2/utils.rs
+# Hunks:        11
+# Class:        cfg-hide
+# Gap:          docs/extractor-issues.md 210: the `core::arch` intrinsics have no
+#               Rust bodies to extract.
+# Cost:         none in a normal build: p3-arch-shims is a dependency only
+#               under cfg(hax_backend_lean). In the extracted AVX2 variants each
+#               intrinsic is its model in `arch/` (p3-arch-shims), trusted:
+#               reviewed against Intel's pseudocode and tested against the
+#               hardware (`arch/tests/`).
+# Upstreamable: no: the models exist only for the extractor. Models of the
+#               intrinsics in the extractor's library would make it unnecessary.
+# Drop when:    the extractor models the `core::arch::x86_64` intrinsics.
+# Test:         xcheck p3-baby-bear x86_64-unknown-linux-gnu -Ctarget-feature=+avx2;
+#               xcheck p3-baby-bear x86_64-unknown-linux-gnu -Ctarget-feature=+avx2 --cfg hax_backend_lean
+# Mutation:     monty-31's packing imports the models in a normal build, which
+#               has no p3-arch-shims dependency, so the x86_64 build fails.
+#
+# Every file on BabyBear's AVX2 path that names a vector type or calls an
+# intrinsic imports `core::arch::x86_64` in a normal build and
+# `p3_arch_shims::x86_64` under the cfg. The models have the intrinsics' names
+# and signatures, over `repr(transparent)` lane arrays, so no other line
+# changes. A file that only names `__m256i` is redirected too: the types must
+# agree wherever a vector crosses a file. The AVX-512 imports are left alone;
+# they are compiled only with `avx512f`.
+#
+# The tests compile the AVX2 path for x86_64: as shipped, which can only use
+# `core::arch` since p3-arch-shims is not a dependency without the cfg; and
+# under the cfg, which shows that the models fit every call site.
+#
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
+diff --git a/baby-bear/Cargo.toml b/baby-bear/Cargo.toml
+--- a/baby-bear/Cargo.toml
++++ b/baby-bear/Cargo.toml
+@@ -19,6 +19,10 @@
+ 
+ rand.workspace = true
+ 
++# PATCHED: hax's Lean backend compiles the AVX2 backend against the intrinsic models.
++[target.'cfg(hax_backend_lean)'.dependencies]
++p3-arch-shims = { path = "../../arch" }
++
+ [dev-dependencies]
+ p3-dft = { path = "../dft" }
+ p3-field-testing = { path = "../field-testing" }
+diff --git a/baby-bear/src/x86_64_avx2/packing.rs b/baby-bear/src/x86_64_avx2/packing.rs
+--- a/baby-bear/src/x86_64_avx2/packing.rs
++++ b/baby-bear/src/x86_64_avx2/packing.rs
+@@ -1,4 +1,8 @@
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::x86_64::__m256i;
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::x86_64::__m256i;
+ use core::mem::transmute;
+ 
+ use p3_monty_31::{MontyParametersAVX2, PackedMontyField31AVX2};
+diff --git a/baby-bear/src/x86_64_avx2/poseidon2.rs b/baby-bear/src/x86_64_avx2/poseidon2.rs
+--- a/baby-bear/src/x86_64_avx2/poseidon2.rs
++++ b/baby-bear/src/x86_64_avx2/poseidon2.rs
+@@ -1,4 +1,8 @@
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::x86_64::__m256i;
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::x86_64::__m256i;
+ 
+ use p3_monty_31::{
+     InternalLayerParametersAVX2, mul_2exp_neg_8_avx2, mul_2exp_neg_n_avx2,
+diff --git a/field/Cargo.toml b/field/Cargo.toml
+--- a/field/Cargo.toml
++++ b/field/Cargo.toml
+@@ -23,6 +23,10 @@
+ serde = { workspace = true, features = ["derive"] }
+ tracing.workspace = true
+ 
++# PATCHED: hax's Lean backend compiles the AVX2 backend against the intrinsic models.
++[target.'cfg(hax_backend_lean)'.dependencies]
++p3-arch-shims = { path = "../../arch" }
++
+ [dev-dependencies]
+ p3-baby-bear = { path = "../baby-bear" }
+ p3-field-testing = { path = "../field-testing" }
+diff --git a/field/src/packed/interleaves.rs b/field/src/packed/interleaves.rs
+--- a/field/src/packed/interleaves.rs
++++ b/field/src/packed/interleaves.rs
+@@ -53,7 +53,11 @@
+     not(target_feature = "avx512f")
+ ))]
+ pub mod interleave {
++    // PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++    #[cfg(not(hax_backend_lean))]
+     use core::arch::x86_64::{self, __m256i};
++    #[cfg(hax_backend_lean)]
++    use p3_arch_shims::x86_64::{self, __m256i};
+ 
+     #[inline]
+     #[must_use]
+diff --git a/field/src/packed/x86_64_avx.rs b/field/src/packed/x86_64_avx.rs
+--- a/field/src/packed/x86_64_avx.rs
++++ b/field/src/packed/x86_64_avx.rs
+@@ -2,7 +2,11 @@
+ 
+ #[cfg(target_feature = "avx512f")]
+ use core::arch::x86_64::__m512i;
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::x86_64::{self, __m128i, __m256i};
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::x86_64::{self, __m128i, __m256i};
+ use core::mem::transmute;
+ 
+ // Goal: Compute r = lhs + rhs mod P for lhs, rhs <= P < 2^31
+diff --git a/monty-31/Cargo.toml b/monty-31/Cargo.toml
+--- a/monty-31/Cargo.toml
++++ b/monty-31/Cargo.toml
+@@ -30,6 +30,10 @@
+ spin.workspace = true
+ tracing.workspace = true
+ 
++# PATCHED: hax's Lean backend compiles the AVX2 backend against the intrinsic models.
++[target.'cfg(hax_backend_lean)'.dependencies]
++p3-arch-shims = { path = "../../arch" }
++
+ [dev-dependencies]
+ proptest.workspace = true
+ 
+diff --git a/monty-31/src/x86_64_avx2/packing.rs b/monty-31/src/x86_64_avx2/packing.rs
+--- a/monty-31/src/x86_64_avx2/packing.rs
++++ b/monty-31/src/x86_64_avx2/packing.rs
+@@ -1,5 +1,9 @@
+ use alloc::vec::Vec;
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::x86_64::{self, __m256i};
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::x86_64::{self, __m256i};
+ use core::array;
+ use core::iter::{Product, Sum};
+ use core::mem::transmute;
+diff --git a/monty-31/src/x86_64_avx2/poseidon1.rs b/monty-31/src/x86_64_avx2/poseidon1.rs
+--- a/monty-31/src/x86_64_avx2/poseidon1.rs
++++ b/monty-31/src/x86_64_avx2/poseidon1.rs
+@@ -1,7 +1,11 @@
+ //! AVX2-optimized Poseidon1 layers for MontyField31.
+ 
+ use alloc::vec::Vec;
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::x86_64::__m256i;
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::x86_64::__m256i;
+ use core::marker::PhantomData;
+ use core::mem::transmute;
+ 
+diff --git a/monty-31/src/x86_64_avx2/poseidon2.rs b/monty-31/src/x86_64_avx2/poseidon2.rs
+--- a/monty-31/src/x86_64_avx2/poseidon2.rs
++++ b/monty-31/src/x86_64_avx2/poseidon2.rs
+@@ -1,7 +1,11 @@
+ //! Vectorized AVX2 implementation of Poseidon2 for MontyField31
+ 
+ use alloc::vec::Vec;
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::x86_64::{self, __m256i};
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::x86_64::{self, __m256i};
+ use core::marker::PhantomData;
+ use core::mem::transmute;
+ 
+diff --git a/monty-31/src/x86_64_avx2/utils.rs b/monty-31/src/x86_64_avx2/utils.rs
+--- a/monty-31/src/x86_64_avx2/utils.rs
++++ b/monty-31/src/x86_64_avx2/utils.rs
+@@ -1,4 +1,8 @@
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::x86_64::{self, __m256i};
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::x86_64::{self, __m256i};
+ use core::mem::transmute;
+ 
+ use crate::{MontyParameters, MontyParametersAVX2, TwoAdicData};

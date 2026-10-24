@@ -1,0 +1,12 @@
+[package]
+name = "p3-arch-shims"
+version = "0.0.0"
+edition = "2024"
+publish = false
+description = "Verification-only models of the core::arch intrinsics Plonky3 uses, over lane arrays."
+
+[dependencies]
+
+# Its own lint settings: under the extraction cfg it is a path dependency of
+# plonky3/, not a member that inherits plonky3's `[workspace.lints]`.
+[lints]

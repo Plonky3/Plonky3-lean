@@ -16,16 +16,20 @@ scratch copy of plonky3/ with every pre-patch applied:
 
     test <package> <cargo test target args>   e.g. test p3-baby-bear --test pre_patch_020
     lint <package> <lint>                     e.g. lint p3-field unexpected_cfgs
+    xcheck <package> <target> <rustflag>...   e.g. xcheck p3-monty-31 x86_64-unknown-linux-gnu
+                                                   -Ctarget-feature=+avx2
 
 A `test` entry passes when the target builds and every test in it runs and
 passes (at least one must run). A `lint` entry runs `cargo check --all-targets`
 and passes when the build succeeds and `<lint>` is not reported for
-`<package>`. Under the mutation, any failure counts (a compile error in the
+`<package>`. An `xcheck` entry runs `cargo check` for another target with
+the given RUSTFLAGS, and passes when it compiles: code for another
+architecture is compiled, not run. Under the mutation, any failure counts (a compile error in the
 test target or one of its dependencies, a failing test, or the lint) and is
 reported as such.
 
-Results are cached on the tree state, every pre-patch's diff, the mutations,
-the `# Test:` fields, this script and `rustc --version`.
+Results are cached on the tree state, arch/, every pre-patch's diff, the
+mutations, the `# Test:` fields, this script and `rustc --version`.
 
 Usage: check-mutations.py [--list] [--no-cache]      (run from anywhere)
   --list  print each patch's tests and mutation, check they are declared and
@@ -77,6 +81,8 @@ def entries(test_field):
             out.append(("test", args[0], args[1:]))
         elif kind == "lint" and len(args) == 2:
             out.append(("lint", args[0], args[1]))
+        elif kind == "xcheck" and len(args) >= 2:
+            out.append(("xcheck", args[0], args[1:]))
         else:
             raise ValueError(f"bad `# Test:` entry '{e}'")
     return out
@@ -104,9 +110,11 @@ def declared():
     return out, bad
 
 
-def cargo(tree, args):
+def cargo(tree, args, rustflags=None):
     env = dict(os.environ, CARGO_TARGET_DIR=str(WORK / "target"), CARGO_TERM_COLOR="never",
                CARGO_PROFILE_DEV_DEBUG="0", CARGO_PROFILE_TEST_DEBUG="0", CARGO_INCREMENTAL="0")
+    if rustflags is not None:
+        env["RUSTFLAGS"] = rustflags
     r = subprocess.run(["cargo", *args, "--locked"], cwd=tree, env=env, text=True,
                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     return r.returncode, r.stdout
@@ -128,6 +136,13 @@ def run_entry(tree, entry):
         if passed == 0:
             return False, "no test ran (wrong target or name?)"
         return True, f"{passed} test(s) passed"
+    if kind == "xcheck":
+        target, *flags = arg
+        code, log = cargo(tree, ["check", "-p", pkg, "--target", target], " ".join(flags))
+        if code != 0:
+            m = COMPILE_FAIL.search(log)
+            return False, f"compile error: `{m.group(1)}` ({m.group(2)})" if m else "cargo check failed"
+        return True, f"compiles for {target} ({' '.join(flags)})"
     code, log = cargo(tree, ["check", "-p", pkg, "--all-targets", "--message-format=json"])
     hits = 0
     for line in log.splitlines():
@@ -151,6 +166,7 @@ def cache_key(decl):
     h = hashlib.sha256()
     h.update(tpp.sh(["git", "ls-tree", "-r", "HEAD"], cwd=REPO).stdout.encode())
     h.update(tpp.sh(["git", "diff", "HEAD"], cwd=REPO).stdout.encode())
+    h.update(tpp.arch_digest().encode())
     for p, ts, _, mut in decl:
         h.update(pid(p).encode())
         h.update(tpp.split_header(p.read_text())[1].encode())
@@ -179,7 +195,7 @@ def main():
         for p, ts, desc, mut in decl:
             print(f"    {pid(p)}")
             for t in ts:
-                print(f"      {t[0]:4} {t[1]} {' '.join(t[2]) if t[0] == 'test' else t[2]}")
+                print(f"      {t[0]:4} {t[1]} {t[2] if t[0] == 'lint' else ' '.join(t[2])}")
             print(f"      mutation: {mut.name}{'' if mut.exists() else ' (MISSING)'}: {desc}")
     for b in bad:
         print(f"    ERROR: {b}")

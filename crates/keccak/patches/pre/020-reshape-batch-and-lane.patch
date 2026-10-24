@@ -30,6 +30,9 @@
 # The original bodies stay compiled in the normal build, and the test runs them beside the reshaped ones.
 # The one-lane file is compiled only for targets without a vector backend, so the test includes it a second time.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 --- a/keccak/src/fallback.rs
 +++ b/keccak/src/fallback.rs
 @@ -1,6 +1,7 @@
