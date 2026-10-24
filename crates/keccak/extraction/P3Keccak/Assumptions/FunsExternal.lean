@@ -1,7 +1,7 @@
 -- [p3_keccak]: external functions.
 -- HAND-WRITTEN, from hax's seed of Extraction/FunsExternal_Template.lean.
--- The generated code imports it by this module name. extract.sh fails if the
--- regenerated template declares different names than this file does.
+-- The generated code imports it by this module name.
+-- extract.sh fails if the regenerated template declares other names than this file.
 -- The template declares nothing.
 module
 

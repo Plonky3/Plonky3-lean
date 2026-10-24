@@ -21,9 +21,10 @@ namespace p3_symmetric
 
 It hashes the slices' items in order.
 
-Assumed: the body is opaque by `charon_args` (crate.toml), because aeneas stops on the iterator adapters it calls (docs/extractor-issues.md 30).
+Assumed: aeneas stops on its iterator adapters, so crate.toml makes it opaque (docs/extractor-issues.md 30).
 
 No claim reads it.
+
 A theorem about a hasher takes its slice-hashing method as given. -/
 @[trait_default]
 opaque hasher.CryptographicHasher.hash_iter_slices.default

@@ -45,7 +45,9 @@ def BoundaryEvals.apply (b : BoundaryEvals K) (r : K) : BoundaryEvals K :=
 def BoundaryEvals.from_row (row height : ℕ) : BoundaryEvals K :=
   ⟨if row = 0 then 1 else 0, if row + 1 = height then 1 else 0, if row + 1 < height then 1 else 0⟩
 
-/-- BoundaryEvals::from_row_with_prefix: the residual indicators combined with the bound prefix. -/
+/-- The residual indicators combined with the bound prefix.
+
+Upstream: BoundaryEvals::from_row_with_prefix. -/
 def BoundaryEvals.from_row_with_prefix (row height : ℕ) (pre : BoundaryEvals K) :
     BoundaryEvals K :=
   let s : BoundaryEvals K := BoundaryEvals.from_row row height

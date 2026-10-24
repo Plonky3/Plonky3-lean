@@ -72,7 +72,9 @@ def rounds (a : List Std.U64) : List Std.U64 := Id.run do
     a := round a keccakf.RC.val[i]!
   return a
 
-/-- The Keccak-f permutation tiny_keccak::keccakf::keccakf, from the Keccak macro of src/lib.rs.
+/-- The Keccak-f permutation, from the Keccak macro of src/lib.rs.
+
+Upstream: tiny_keccak::keccakf::keccakf.
 
 The length test always passes, since a round only overwrites words. -/
 def keccakf (a : Std.Array Std.U64 25#usize) : RustM (Std.Array Std.U64 25#usize) :=

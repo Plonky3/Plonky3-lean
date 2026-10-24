@@ -97,7 +97,9 @@ def instanceWords (i : MultiStarkInstanceShape) : List ℕ :=
   [i.num_variables, i.main_width, i.preprocessed_width] ++
     columnWords i.main_next_row_columns ++ columnWords i.preprocessed_next_row_columns
 
-/-- MultiStarkShape::domain_separator: the instance label, after the version, the name and the pattern. -/
+/-- The instance label, after the version, the name and the pattern.
+
+Upstream: MultiStarkShape::domain_separator. -/
 def MultiStarkShape.label (s : MultiStarkShape) : List ℕ :=
   [s.instances.length, s.pow_bits] ++ s.instances.flatMap instanceWords
 
@@ -127,7 +129,9 @@ structure ZerocheckShape where
   bus_degree : Option ℕ
   deriving DecidableEq
 
-/-- ZerocheckShape::free_coordinates: the coordinates of the zerocheck point drawn here.
+/-- The coordinates of the zerocheck point drawn here.
+
+Upstream: ZerocheckShape::free_coordinates.
 
 They come ahead of the lookup tail. -/
 def ZerocheckShape.free_coordinates (s : ZerocheckShape) : ℕ := s.log_height - s.lookup_point_len
@@ -146,7 +150,9 @@ def ZerocheckShape.pattern (s : ZerocheckShape) : List ZerocheckStep :=
   (if s.free_coordinates > 0 then [.Tau s.free_coordinates] else []) ++
   [.BeginSumcheck, .EndSumcheck]
 
-/-- ZerocheckShape::domain_separator: the instance label, after the version, the name and the pattern. -/
+/-- The instance label, after the version, the name and the pattern.
+
+Upstream: ZerocheckShape::domain_separator. -/
 def ZerocheckShape.label (s : ZerocheckShape) : List ℕ :=
   [s.log_height, s.lookup_point_len, s.pow_bits, s.air_degrees.length] ++
     s.air_degrees.flatMap (fun d => [d.constraints, d.interactions]) ++
