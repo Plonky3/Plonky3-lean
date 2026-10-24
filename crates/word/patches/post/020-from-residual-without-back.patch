@@ -1,0 +1,44 @@
+# Patch:        020-from-residual-without-back
+# Phase:        post
+# Target:       extraction/P3Word/Extraction/Funs.lean
+# Hunks:        2
+# Class:        reshape
+# Gap:          docs/extractor-issues.md 242 (aeneas expects a back function
+#               from `from_residual` in a function returning `&mut`).
+# Cost:         none. The call and its argument are unchanged; only the
+#               destructuring of its result is.
+# Upstreamable: yes: aeneas could read the signature of CoreModels'
+#               `from_residual`, which returns the result alone.
+# Drop when:    aeneas binds the result of `from_residual` as CoreModels
+#               declares it.
+#
+# The two mutable accessors of a composition return a borrowed slice, or the error of a failed lookup.
+# On the error path, aeneas destructures `from_residual` as a pair of a result and a back function.
+# CoreModels' `from_residual` returns the result alone, so Lean rejects the pattern.
+# The patch binds the result directly.
+# The back function of that path already returns the input unchanged.
+#
+--- a/extraction/P3Word/Extraction/Funs.lean
++++ b/extraction/P3Word/Extraction/Funs.lean
+@@ -887,7 +887,9 @@
+         index_mut_back s1
+     ok (core.result.Result.Ok s, back)
+   | core.ops.control_flow.ControlFlow.Break residual =>
+-    let (r1, _) ←
++    -- PATCHED: CoreModels' `from_residual` returns the result alone, with no back function.
++    -- was: let (r1, _) ←
++    let r1 ←
+       core.result.Result.Insts.CoreOpsTry_traitFromResidualResultNeverE.from_residual
+         (Slice W) (core.convert.From.Blanket component.CompositionError)
+         residual
+@@ -921,7 +923,9 @@
+         index_mut_back s1
+     ok (core.result.Result.Ok s, back)
+   | core.ops.control_flow.ControlFlow.Break residual =>
+-    let (r1, _) ←
++    -- PATCHED: CoreModels' `from_residual` returns the result alone, with no back function.
++    -- was: let (r1, _) ←
++    let r1 ←
+       core.result.Result.Insts.CoreOpsTry_traitFromResidualResultNeverE.from_residual
+         (Slice W) (core.convert.From.Blanket component.CompositionError)
+         residual

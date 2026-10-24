@@ -313,6 +313,38 @@ keeps its number and says so.
 
     p3-bus is transcribed instead.
 
+240. **aeneas has no function types.**
+
+    p3-word marks a shift's word width with `PhantomData<fn() -> W>`.
+
+    aeneas stops on the field with "Arrow types are not supported yet".
+
+    It then drops the shift type and every item that names it.
+
+    Pre-patch `word/010` gives the extracted variant `PhantomData<W>`, which is zero-sized as well.
+
+241. **aeneas drops six bodies of p3-word.**
+
+    The system constructor bounds its three family sizes in a loop over an array, with an early return.
+
+    The address validation and the scalar verifier return early from three loops in a row.
+
+    The composition layout returns early from a loop nested in its loop over the calls.
+
+    The lowering readdresses every operand through a closure, and the resolver fails with "Could not match the contexts".
+
+    The errors are "Early returns inside of loops are not supported yet", "Returns inside of nested loops are not supported yet" and "Breaks to outer loops are not supported yet".
+
+    Pre-patches `word/020` and `word/030` give each one an equivalent body, with one loop per function.
+
+242. **aeneas expects a back function from `from_residual` in a function returning `&mut`.**
+
+    The mutable accessors of p3-word's composition return a slice borrowed from their input, or an error.
+
+    On the error path, aeneas destructures CoreModels' `from_residual` as a pair, while it returns the result alone.
+
+    Post-patch `word/020` binds the result directly.
+
 200. **charon's `--start-from` does not accept trait generics.** A pattern such
     as `{impl p3_field::integers::QuotientMap<u32> for …}::from_int` fails with
     "`--start-from` does not support trait generics", and charon exits 101.

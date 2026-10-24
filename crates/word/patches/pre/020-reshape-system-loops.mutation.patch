@@ -1,0 +1,14 @@
+# Mutation of: 020-reshape-system-loops
+# Breaks:      the reshaped verifier reports an unsatisfied AND relation as a zero relation.
+#
+--- a/word/src/system_reshaped.rs
++++ b/word/src/system_reshaped.rs
+@@ -201,7 +201,7 @@
+         while constraint < self.and_constraints.len() {
+             if !self.and_constraints[constraint].is_satisfied(public, witness) {
+                 return Err(VerificationError::Unsatisfied {
+-                    kind: ConstraintKind::And,
++                    kind: ConstraintKind::Zero,
+                     constraint,
+                 });
+             }

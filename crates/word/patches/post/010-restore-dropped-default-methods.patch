@@ -1,0 +1,170 @@
+# Patch:        010-restore-dropped-default-methods
+# Phase:        post
+# Target:       extraction/P3Word/Extraction/Funs.lean
+# Hunks:        7
+# Class:        restore
+# Gap:          docs/extractor-issues.md 2: charon's multi-target mode drops the
+#               default-method roots hax adds (`clone_from`, `ne`, and the four
+#               comparisons of `PartialOrd`).
+# Cost:         none. Each added field is the body of the CoreModels default
+#               method it stands for, inlined.
+# Upstreamable: yes: charon could keep `--start-from` roots through the
+#               multi-target merge, or hax could pass `--target` to charon's
+#               cargo (issue 1).
+# Drop when:    charon keeps `--start-from` roots through the multi-target
+#               merge, or hax can pass `--target` to charon's cargo.
+#
+# The derived `Clone`, `PartialEq` and `PartialOrd` impls come out without their default methods.
+# Lean then rejects the structure literals.
+# As for security/post/010, the fields are added by hand:
+#   clone_from := fun _ source => <clone> source           (= clone_from.default)
+#   ne := fun self other => (eq self other) = false        (= ne.default)
+#   lt, le, gt, ge := the match on partial_cmp of CoreModels' defaults
+#
+--- a/extraction/P3Word/Extraction/Funs.lean
++++ b/extraction/P3Word/Extraction/Funs.lean
+@@ -2331,6 +2331,10 @@
+ def constraint.EvaluationError.Insts.CoreCmpPartialEqEvaluationError :
+   core.cmp.PartialEq constraint.EvaluationError constraint.EvaluationError := {
+   eq := constraint.EvaluationError.Insts.CoreCmpPartialEqEvaluationError.eq
++  -- PATCHED: default method, body of `core.cmp.PartialEq.ne.default`
++  ne := fun self other => do
++    let b ← constraint.EvaluationError.Insts.CoreCmpPartialEqEvaluationError.eq self other
++    ok (b = false)
+ }
+ 
+ /-- [p3_word::constraint::{p3_word::constraint::Operand<W>[TraitClause0]}::single]:
+@@ -3395,6 +3399,8 @@
+ @[reducible]
+ def word.Word32.Insts.CoreCloneClone : core.clone.Clone word.Word32 := {
+   clone := word.Word32.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => word.Word32.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- Trait implementation: [p3_word::word::{impl core::marker::Copy for p3_word::word::Word32}]
+@@ -3439,6 +3445,10 @@
+ def word.Word32.Insts.CoreCmpPartialEqWord32 : core.cmp.PartialEq word.Word32
+   word.Word32 := {
+   eq := word.Word32.Insts.CoreCmpPartialEqWord32.eq
++  -- PATCHED: default method, body of `core.cmp.PartialEq.ne.default`
++  ne := fun self other => do
++    let b ← word.Word32.Insts.CoreCmpPartialEqWord32.eq self other
++    ok (b = false)
+ }
+ 
+ /-- Trait implementation: [p3_word::word::{impl core::cmp::Eq for p3_word::word::Word32}]
+@@ -3490,6 +3500,46 @@
+   word.Word32 := {
+   PartialEqInst := word.Word32.Insts.CoreCmpPartialEqWord32
+   partial_cmp := word.Word32.Insts.CoreCmpPartialOrdWord32.partial_cmp
++  -- PATCHED: default method, body of `core.cmp.PartialOrd.lt.default`
++  lt := fun self other => do
++    let o ← word.Word32.Insts.CoreCmpPartialOrdWord32.partial_cmp self other
++    match o with
++    | core.option.Option.Some o1 =>
++      match o1 with
++      | core.cmp.Ordering.Less => ok true
++      | core.cmp.Ordering.Equal => ok false
++      | core.cmp.Ordering.Greater => ok false
++    | core.option.Option.None => ok false
++  -- PATCHED: default method, body of `core.cmp.PartialOrd.le.default`
++  le := fun self other => do
++    let o ← word.Word32.Insts.CoreCmpPartialOrdWord32.partial_cmp self other
++    match o with
++    | core.option.Option.Some o1 =>
++      match o1 with
++      | core.cmp.Ordering.Less => ok true
++      | core.cmp.Ordering.Equal => ok true
++      | core.cmp.Ordering.Greater => ok false
++    | core.option.Option.None => ok false
++  -- PATCHED: default method, body of `core.cmp.PartialOrd.gt.default`
++  gt := fun self other => do
++    let o ← word.Word32.Insts.CoreCmpPartialOrdWord32.partial_cmp self other
++    match o with
++    | core.option.Option.Some o1 =>
++      match o1 with
++      | core.cmp.Ordering.Less => ok false
++      | core.cmp.Ordering.Equal => ok false
++      | core.cmp.Ordering.Greater => ok true
++    | core.option.Option.None => ok false
++  -- PATCHED: default method, body of `core.cmp.PartialOrd.ge.default`
++  ge := fun self other => do
++    let o ← word.Word32.Insts.CoreCmpPartialOrdWord32.partial_cmp self other
++    match o with
++    | core.option.Option.Some o1 =>
++      match o1 with
++      | core.cmp.Ordering.Less => ok false
++      | core.cmp.Ordering.Equal => ok true
++      | core.cmp.Ordering.Greater => ok true
++    | core.option.Option.None => ok false
+ }
+ 
+ /-- Trait implementation: [p3_word::word::{impl core::cmp::Ord for p3_word::word::Word32}]
+@@ -3696,6 +3746,8 @@
+ @[reducible]
+ def word.Word64.Insts.CoreCloneClone : core.clone.Clone word.Word64 := {
+   clone := word.Word64.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => word.Word64.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- Trait implementation: [p3_word::word::{impl core::marker::Copy for p3_word::word::Word64}]
+@@ -3740,6 +3792,10 @@
+ def word.Word64.Insts.CoreCmpPartialEqWord64 : core.cmp.PartialEq word.Word64
+   word.Word64 := {
+   eq := word.Word64.Insts.CoreCmpPartialEqWord64.eq
++  -- PATCHED: default method, body of `core.cmp.PartialEq.ne.default`
++  ne := fun self other => do
++    let b ← word.Word64.Insts.CoreCmpPartialEqWord64.eq self other
++    ok (b = false)
+ }
+ 
+ /-- Trait implementation: [p3_word::word::{impl core::cmp::Eq for p3_word::word::Word64}]
+@@ -3791,6 +3847,46 @@
+   word.Word64 := {
+   PartialEqInst := word.Word64.Insts.CoreCmpPartialEqWord64
+   partial_cmp := word.Word64.Insts.CoreCmpPartialOrdWord64.partial_cmp
++  -- PATCHED: default method, body of `core.cmp.PartialOrd.lt.default`
++  lt := fun self other => do
++    let o ← word.Word64.Insts.CoreCmpPartialOrdWord64.partial_cmp self other
++    match o with
++    | core.option.Option.Some o1 =>
++      match o1 with
++      | core.cmp.Ordering.Less => ok true
++      | core.cmp.Ordering.Equal => ok false
++      | core.cmp.Ordering.Greater => ok false
++    | core.option.Option.None => ok false
++  -- PATCHED: default method, body of `core.cmp.PartialOrd.le.default`
++  le := fun self other => do
++    let o ← word.Word64.Insts.CoreCmpPartialOrdWord64.partial_cmp self other
++    match o with
++    | core.option.Option.Some o1 =>
++      match o1 with
++      | core.cmp.Ordering.Less => ok true
++      | core.cmp.Ordering.Equal => ok true
++      | core.cmp.Ordering.Greater => ok false
++    | core.option.Option.None => ok false
++  -- PATCHED: default method, body of `core.cmp.PartialOrd.gt.default`
++  gt := fun self other => do
++    let o ← word.Word64.Insts.CoreCmpPartialOrdWord64.partial_cmp self other
++    match o with
++    | core.option.Option.Some o1 =>
++      match o1 with
++      | core.cmp.Ordering.Less => ok false
++      | core.cmp.Ordering.Equal => ok false
++      | core.cmp.Ordering.Greater => ok true
++    | core.option.Option.None => ok false
++  -- PATCHED: default method, body of `core.cmp.PartialOrd.ge.default`
++  ge := fun self other => do
++    let o ← word.Word64.Insts.CoreCmpPartialOrdWord64.partial_cmp self other
++    match o with
++    | core.option.Option.Some o1 =>
++      match o1 with
++      | core.cmp.Ordering.Less => ok false
++      | core.cmp.Ordering.Equal => ok true
++      | core.cmp.Ordering.Greater => ok true
++    | core.option.Option.None => ok false
+ }
+ 
+ /-- Trait implementation: [p3_word::word::{impl core::cmp::Ord for p3_word::word::Word64}]

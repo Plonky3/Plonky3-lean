@@ -1,0 +1,14 @@
+# Mutation of: 030-reshape-composition-loops
+# Breaks:      the reshaped layout counts the zero relations as AND relations.
+#
+--- a/word/src/component_reshaped.rs
++++ b/word/src/component_reshaped.rs
+@@ -68,7 +68,7 @@
+             )?;
+             and_len = CompositionError::extend_family(
+                 and_len,
+-                counts[1],
++                counts[0],
+                 call.instances,
+                 ConstraintKind::And,
+             )?;

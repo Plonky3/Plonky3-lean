@@ -1,0 +1,521 @@
+# Patch:        030-reshape-composition-loops
+# Phase:        pre
+# Target:       word/src/component.rs, word/src/component_reshaped.rs
+# Hunks:        7
+# Class:        equiv-rewrite
+# Gap:          docs/extractor-issues.md 241 (aeneas rejects the layout loop,
+#               the closures of the lowering and the borrow in the resolver).
+# Cost:         none in a normal build: only the selection is behind
+#               cfg(hax_backend_lean). In the extracted variant, the layout,
+#               the lowering and the resolver call the reshaped bodies, which a
+#               differential test equates with the shipped ones.
+# Upstreamable: no: the shipped bodies are the clearer code.
+# Drop when:    aeneas translates a `?` inside a nested loop, closures passed
+#               as `impl Fn`, and the resolver's borrow.
+# Test:         test p3-word --lib component::reshaped
+# Mutation:     the reshaped layout counts the zero relations as AND
+#               relations, so the two layouts disagree.
+#
+# aeneas drops three bodies of the composition.
+# The layout returns early from inside its loop over the three families, a break to the outer loop.
+# The lowering readdresses every operand through a closure.
+# The resolver fails with "Could not match the contexts".
+# The reshaped bodies spell the three families out, readdress with a plain loop, and give each loop a function of its own.
+# They make the same checks, in the same order, with the same errors, and build the same relations.
+# The differential test runs 2000 random compositions of valid gadgets.
+# It compares both layouts and both lowerings, and both resolvers one past every call, instance and slot.
+# A second test compares the layouts at the edges of the compact address space.
+#
+diff --git a/word/src/component.rs b/word/src/component.rs
+index ee9dead1..55403f7e 100644
+--- a/word/src/component.rs
++++ b/word/src/component.rs
+@@ -54,6 +54,8 @@ use alloc::vec::Vec;
+ 
+ use thiserror::Error;
+ 
++// PATCHED: unused under hax's Lean backend, where the reshaped lowering builds the relations.
++#[cfg_attr(hax_backend_lean, allow(unused_imports))]
+ use crate::constraint::{AndConstraint, IntegerMulConstraint, ZeroConstraint};
+ use crate::index::{Segment, ValueIndex};
+ use crate::system::{ConstraintKind, ConstraintSystem, SystemError};
+@@ -352,11 +354,18 @@ pub struct Composition<W: Word> {
+ }
+ 
+ impl<W: Word> Composition<W> {
++    // PATCHED: the extracted variant takes the same body, reshaped for the extractor.
++    #[cfg(hax_backend_lean)]
++    pub fn new(calls: Vec<ComponentCall<W>>) -> Result<Self, CompositionError> {
++        Self::reshaped_new(calls)
++    }
++
+     /// Lays out the calls, checking every instance count against the address space.
+     ///
+     /// # Errors
+     ///
+     /// Returns an error when a composed segment or family outgrows the compact address space.
++    #[cfg(not(hax_backend_lean))] // PATCHED
+     pub fn new(calls: Vec<ComponentCall<W>>) -> Result<Self, CompositionError> {
+         let mut public_len = 0_usize;
+         let mut witness_len = 0_usize;
+@@ -602,6 +611,7 @@ impl<W: Word> Composition<W> {
+     /// # Errors
+     ///
+     /// Returns an error when the composed statement outgrows the flat address space.
++    #[cfg(not(hax_backend_lean))] // PATCHED
+     pub fn lower(&self) -> Result<ConstraintSystem<W>, SystemError> {
+         let counts = self.relation_counts();
+         let mut zero = Vec::with_capacity(counts[0]);
+@@ -648,6 +658,23 @@ impl<W: Word> Composition<W> {
+         ConstraintSystem::new(self.public_len(), self.witness_len(), zero, and, product)
+     }
+ 
++    // PATCHED: the extracted variant takes the same bodies, reshaped for the extractor.
++    #[cfg(hax_backend_lean)]
++    pub fn lower(&self) -> Result<ConstraintSystem<W>, SystemError> {
++        self.reshaped_lower()
++    }
++
++    // PATCHED: as for the lowering.
++    #[cfg(hax_backend_lean)]
++    pub fn resolve(
++        &self,
++        call: usize,
++        instance: usize,
++        index: ValueIndex,
++    ) -> Result<ValueIndex, CompositionError> {
++        self.reshaped_resolve(call, instance, index)
++    }
++
+     /// Readdresses one component-local index into the composed segment.
+     ///
+     /// The slot is checked against the width of one instance's block.
+@@ -657,6 +684,7 @@ impl<W: Word> Composition<W> {
+     /// # Errors
+     ///
+     /// Returns an error when the call, the instance, or the slot does not exist.
++    #[cfg(not(hax_backend_lean))] // PATCHED
+     pub fn resolve(
+         &self,
+         call: usize,
+@@ -755,6 +783,10 @@ impl<W: Word> Composition<W> {
+     }
+ }
+ 
++// PATCHED: bodies in a shape hax's Lean backend translates.
++#[path = "component_reshaped.rs"]
++mod reshaped;
++
+ #[cfg(test)]
+ mod tests {
+     use alloc::vec;
+diff --git a/word/src/component_reshaped.rs b/word/src/component_reshaped.rs
+new file mode 100644
+index 00000000..d9c04593
+--- /dev/null
++++ b/word/src/component_reshaped.rs
+@@ -0,0 +1,404 @@
++//! PATCHED: composition bodies in a shape hax's Lean backend translates.
++//!
++//! Aeneas rejects the shipped layout loop and the closures of the lowering (Plonky3-lean, docs/extractor-issues.md, 241).
++//!
++//! Here every loop walks an index, the three families are spelled out, and readdressing is a plain loop.
++//!
++//! The checks, their order, the errors and the layout are those of the shipped bodies.
++
++// The normal build reaches these bodies only from the differential tests below.
++#![cfg_attr(not(hax_backend_lean), allow(dead_code))]
++
++use alloc::vec::Vec;
++
++use super::{CallBase, Component, ComponentCall, Composition, CompositionError, FAMILIES};
++use crate::constraint::{AndConstraint, IntegerMulConstraint, Operand, ZeroConstraint};
++use crate::index::{Segment, ValueIndex};
++use crate::system::{ConstraintKind, ConstraintSystem, SystemError};
++use crate::word::Word;
++
++impl<W: Word> Composition<W> {
++    /// What the shipped layout returns.
++    pub(super) fn reshaped_new(calls: Vec<ComponentCall<W>>) -> Result<Self, CompositionError> {
++        let mut public_len = 0_usize;
++        let mut witness_len = 0_usize;
++        let mut zero_len = 0_usize;
++        let mut and_len = 0_usize;
++        let mut product_len = 0_usize;
++        let mut bases = Vec::with_capacity(calls.len());
++
++        let mut index = 0;
++        while index < calls.len() {
++            let call = &calls[index];
++
++            // A count past the compact index space is refused before it is laid out.
++            if u32::try_from(call.instances).is_err() {
++                return Err(CompositionError::TooManyInstances {
++                    call: index,
++                    instances: call.instances,
++                });
++            }
++
++            bases.push(CallBase {
++                public: public_len,
++                witness: witness_len,
++                constraint: [zero_len, and_len, product_len],
++            });
++
++            // Segments, then families in zero, AND, then product order.
++            let component = &call.component;
++            let counts = component.relation_counts();
++            public_len = CompositionError::extend_segment(
++                public_len,
++                component.interface_slots(),
++                call.instances,
++                Segment::Public,
++            )?;
++            witness_len = CompositionError::extend_segment(
++                witness_len,
++                component.local_slots(),
++                call.instances,
++                Segment::Witness,
++            )?;
++            zero_len = CompositionError::extend_family(
++                zero_len,
++                counts[0],
++                call.instances,
++                ConstraintKind::Zero,
++            )?;
++            and_len = CompositionError::extend_family(
++                and_len,
++                counts[1],
++                call.instances,
++                ConstraintKind::And,
++            )?;
++            product_len = CompositionError::extend_family(
++                product_len,
++                counts[2],
++                call.instances,
++                ConstraintKind::IntegerMul,
++            )?;
++            index += 1;
++        }
++
++        // Narrow the totals in the shipped order: segments, then families.
++        let public = CompositionError::bound_segment(public_len, Segment::Public)?;
++        let witness = CompositionError::bound_segment(witness_len, Segment::Witness)?;
++        let zero = Self::bound_family(zero_len, ConstraintKind::Zero)?;
++        let and = Self::bound_family(and_len, ConstraintKind::And)?;
++        let product = Self::bound_family(product_len, ConstraintKind::IntegerMul)?;
++        let relation_counts: [u32; FAMILIES] = [zero, and, product];
++
++        Ok(Self {
++            calls,
++            bases,
++            public_len: public,
++            witness_len: witness,
++            relation_counts,
++        })
++    }
++
++    fn bound_family(len: usize, kind: ConstraintKind) -> Result<u32, CompositionError> {
++        u32::try_from(len).map_err(|_| CompositionError::TooManyConstraints { kind, len })
++    }
++
++    /// The per-instance width of one segment of a component.
++    fn segment_slots(component: &Component<W>, segment: Segment) -> usize {
++        match segment {
++            Segment::Public => component.interface_slots(),
++            Segment::Witness => component.local_slots(),
++        }
++    }
++
++    /// The index at a composed position, in the segment of the original.
++    fn composed_index(segment: Segment, position: usize) -> ValueIndex {
++        match segment {
++            Segment::Public => ValueIndex::public(position),
++            Segment::Witness => ValueIndex::witness(position),
++        }
++        .expect("a composed position was bounded when the layout was built")
++    }
++
++    /// What the shipped readdressing returns.
++    pub(super) fn reshaped_resolve(
++        &self,
++        call: usize,
++        instance: usize,
++        index: ValueIndex,
++    ) -> Result<ValueIndex, CompositionError> {
++        let base = *self.base(call)?;
++        let entry = self.check_instance(call, instance)?;
++
++        // A slot outside the block is another instance's word, so it is refused.
++        let slots = Self::segment_slots(&entry.component, index.segment());
++        if index.position() as usize >= slots {
++            return Err(CompositionError::UnknownSlot {
++                call,
++                segment: index.segment(),
++                slot: index.position(),
++                slots,
++            });
++        }
++
++        let position = self.position(&base, &entry.component, instance, index);
++        Ok(Self::composed_index(index.segment(), position))
++    }
++
++    /// One operand of one instance, moved to its composed positions.
++    fn remap_operand(
++        &self,
++        base: &CallBase,
++        component: &Component<W>,
++        instance: usize,
++        operand: &Operand<W>,
++    ) -> Operand<W> {
++        let terms = operand.terms();
++        let mut moved = Vec::with_capacity(terms.len());
++        let mut term = 0;
++        while term < terms.len() {
++            let index = terms[term].index();
++            let position = self.position(base, component, instance, index);
++            moved.push(terms[term].with_index(Self::composed_index(index.segment(), position)));
++            term += 1;
++        }
++        Operand::new(moved)
++    }
++
++    /// Appends one instance's zero relations.
++    fn lower_zero(
++        &self,
++        base: &CallBase,
++        component: &Component<W>,
++        instance: usize,
++        zero: &mut Vec<ZeroConstraint<W>>,
++    ) {
++        let relations = component.body().zero_constraints();
++        let mut relation = 0;
++        while relation < relations.len() {
++            let value = self.remap_operand(base, component, instance, relations[relation].value());
++            zero.push(ZeroConstraint::new(value));
++            relation += 1;
++        }
++    }
++
++    /// Appends one instance's AND relations.
++    fn lower_and(
++        &self,
++        base: &CallBase,
++        component: &Component<W>,
++        instance: usize,
++        and: &mut Vec<AndConstraint<W>>,
++    ) {
++        let relations = component.body().and_constraints();
++        let mut relation = 0;
++        while relation < relations.len() {
++            let source = &relations[relation];
++            let left = self.remap_operand(base, component, instance, source.left());
++            let right = self.remap_operand(base, component, instance, source.right());
++            let output = self.remap_operand(base, component, instance, source.output());
++            and.push(AndConstraint::new(left, right, output));
++            relation += 1;
++        }
++    }
++
++    /// Appends one instance's product relations.
++    fn lower_product(
++        &self,
++        base: &CallBase,
++        component: &Component<W>,
++        instance: usize,
++        product: &mut Vec<IntegerMulConstraint<W>>,
++    ) {
++        let relations = component.body().integer_mul_constraints();
++        let mut relation = 0;
++        while relation < relations.len() {
++            let source = &relations[relation];
++            let left = self.remap_operand(base, component, instance, source.left());
++            let right = self.remap_operand(base, component, instance, source.right());
++            let low = self.remap_operand(base, component, instance, source.low());
++            let high = self.remap_operand(base, component, instance, source.high());
++            product.push(IntegerMulConstraint::new(left, right, low, high));
++            relation += 1;
++        }
++    }
++
++    /// Appends every instance of one call, instance by instance.
++    fn lower_call(
++        &self,
++        call: usize,
++        zero: &mut Vec<ZeroConstraint<W>>,
++        and: &mut Vec<AndConstraint<W>>,
++        product: &mut Vec<IntegerMulConstraint<W>>,
++    ) {
++        let entry = &self.calls[call];
++        let base = &self.bases[call];
++        let mut instance = 0;
++        while instance < entry.instances {
++            self.lower_zero(base, &entry.component, instance, zero);
++            self.lower_and(base, &entry.component, instance, and);
++            self.lower_product(base, &entry.component, instance, product);
++            instance += 1;
++        }
++    }
++
++    /// What the shipped lowering returns.
++    pub(super) fn reshaped_lower(&self) -> Result<ConstraintSystem<W>, SystemError> {
++        let counts = self.relation_counts();
++        let mut zero = Vec::with_capacity(counts[0]);
++        let mut and = Vec::with_capacity(counts[1]);
++        let mut product = Vec::with_capacity(counts[2]);
++
++        // Calls in layout order, so each family stays grouped by call and instance.
++        let mut call = 0;
++        while call < self.calls.len() {
++            self.lower_call(call, &mut zero, &mut and, &mut product);
++            call += 1;
++        }
++
++        ConstraintSystem::new(self.public_len(), self.witness_len(), zero, and, product)
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use alloc::vec;
++    use alloc::vec::Vec;
++
++    use super::*;
++    use crate::shift::{Shift, ShiftKind, ShiftedValue};
++    use crate::word::Word64;
++
++    /// A small xorshift generator, so every run sees the same cases.
++    struct Rng(u64);
++
++    impl Rng {
++        fn next(&mut self) -> u64 {
++            self.0 ^= self.0 << 13;
++            self.0 ^= self.0 >> 7;
++            self.0 ^= self.0 << 17;
++            self.0
++        }
++
++        fn below(&mut self, bound: u64) -> usize {
++            (self.next() % bound) as usize
++        }
++    }
++
++    fn operand(rng: &mut Rng, public: usize, witness: usize) -> Operand<Word64> {
++        // Every term addresses an existing word, so the body is a valid system.
++        let mut terms = Vec::new();
++        for _ in 0..rng.below(3) {
++            let index = if public > 0 && (witness == 0 || rng.below(2) == 0) {
++                ValueIndex::public(rng.below(public as u64)).unwrap()
++            } else if witness > 0 {
++                ValueIndex::witness(rng.below(witness as u64)).unwrap()
++            } else {
++                continue;
++            };
++            let kind = ShiftKind::from_code(rng.below(8) as u8).unwrap();
++            let width = if kind.is_lane32() { 32 } else { 64 };
++            let shift = Shift::new(kind, rng.below(width)).unwrap();
++            terms.push(ShiftedValue::single(index, shift));
++        }
++        Operand::new(terms)
++    }
++
++    fn component(rng: &mut Rng) -> Component<Word64> {
++        // Fixture state: up to 3 interface slots, 2 private slots and 2 relations per family.
++        let inputs = rng.below(2);
++        let outputs = rng.below(2);
++        let public = inputs + outputs;
++        let witness = rng.below(3);
++        let zero = (0..rng.below(3))
++            .map(|_| ZeroConstraint::new(operand(rng, public, witness)))
++            .collect();
++        let and = (0..rng.below(3))
++            .map(|_| {
++                AndConstraint::new(
++                    operand(rng, public, witness),
++                    operand(rng, public, witness),
++                    operand(rng, public, witness),
++                )
++            })
++            .collect();
++        let product = (0..rng.below(3))
++            .map(|_| {
++                IntegerMulConstraint::new(
++                    operand(rng, public, witness),
++                    operand(rng, public, witness),
++                    operand(rng, public, witness),
++                    operand(rng, public, witness),
++                )
++            })
++            .collect();
++        let body = ConstraintSystem::new(public, witness, zero, and, product).unwrap();
++        Component::new(body, inputs, outputs).unwrap()
++    }
++
++    #[test]
++    fn reshaped_composition_bodies_match_the_shipped_ones() {
++        let mut rng = Rng(0x2545_f491_4f6c_dd1d);
++        for _ in 0..2000 {
++            // Fixture state: up to 3 calls of up to 3 instances each.
++            let calls: Vec<_> = (0..rng.below(4))
++                .map(|_| ComponentCall::new(component(&mut rng), rng.below(4)))
++                .collect();
++
++            // Invariant: both layouts are equal, field by field.
++            let shipped = Composition::new(calls.clone()).unwrap();
++            assert_eq!(shipped, Composition::reshaped_new(calls).unwrap());
++
++            // Invariant: both lowerings return the same flat system.
++            assert_eq!(shipped.lower(), shipped.reshaped_lower());
++
++            // Invariant: both resolvers agree, also one past every call, instance and slot.
++            for call in 0..=shipped.calls().len() {
++                for instance in 0..4 {
++                    for slot in 0..4 {
++                        for index in [
++                            ValueIndex::public(slot).unwrap(),
++                            ValueIndex::witness(slot).unwrap(),
++                        ] {
++                            assert_eq!(
++                                shipped.resolve(call, instance, index),
++                                shipped.reshaped_resolve(call, instance, index),
++                            );
++                        }
++                    }
++                }
++            }
++        }
++    }
++
++    #[cfg(target_pointer_width = "64")]
++    #[test]
++    fn reshaped_layout_refuses_counts_like_the_shipped_one() {
++        // Fixture state: an empty gadget, so only the instance counts can overflow.
++        let empty = || {
++            let body = ConstraintSystem::<Word64>::new(0, 0, vec![], vec![], vec![]).unwrap();
++            Component::new(body, 0, 0).unwrap()
++        };
++        let one_slot = || {
++            let body = ConstraintSystem::<Word64>::new(1, 0, vec![], vec![], vec![]).unwrap();
++            Component::new(body, 1, 0).unwrap()
++        };
++        let too_many = u32::MAX as usize + 1;
++        let cases = [
++            // An instance count past the compact address space.
++            vec![ComponentCall::new(empty(), too_many)],
++            // A public segment of exactly u32::MAX words is accepted.
++            vec![ComponentCall::new(one_slot(), u32::MAX as usize)],
++            // One more word overflows the compact public segment.
++            vec![
++                ComponentCall::new(one_slot(), u32::MAX as usize),
++                ComponentCall::new(one_slot(), 1),
++            ],
++        ];
++        for calls in cases {
++            assert_eq!(
++                Composition::new(calls.clone()),
++                Composition::reshaped_new(calls)
++            );
++        }
++    }
++}

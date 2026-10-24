@@ -226,3 +226,7 @@ srcDir = "crates/circle/stub"
 [[lean_lib]]
 name = "P3MultiStark"
 srcDir = "crates/multi-stark/stub"
+
+[[lean_lib]]
+name = "P3Word"
+srcDir = "crates/word/extraction"

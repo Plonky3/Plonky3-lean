@@ -1,0 +1,14 @@
+# Mutation of: 010-shift-marker-without-fn-type
+# Breaks:      the shipped marker is gated on the wrong cfg.
+#
+--- a/word/src/shift.rs
++++ b/word/src/shift.rs
+@@ -96,7 +96,7 @@
+     /// The movement distance in bits.
+     amount: u8,
+     /// The word width fixed at the type level.
+-    #[cfg(not(hax_backend_lean))] // PATCHED
++    #[cfg(hax_backend_lean)] // PATCHED
+     word: PhantomData<fn() -> W>,
+     // PATCHED: hax's Lean backend has no function types, so the marker holds the word type.
+     #[cfg(hax_backend_lean)]
