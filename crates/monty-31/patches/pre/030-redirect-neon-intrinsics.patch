@@ -1,0 +1,189 @@
+# Patch:        030-redirect-neon-intrinsics
+# Phase:        pre
+# Target:       baby-bear/src/aarch64_neon/packing.rs, baby-bear/src/aarch64_neon/poseidon2.rs, field/src/packed/aarch64_neon.rs, field/src/packed/interleaves.rs, monty-31/src/aarch64_neon/packing.rs, monty-31/src/aarch64_neon/poseidon1.rs, monty-31/src/aarch64_neon/poseidon2.rs, monty-31/src/aarch64_neon/utils.rs
+# Hunks:        10
+# Class:        cfg-hide
+# Gap:          docs/extractor-issues.md 210: the `core::arch` intrinsics have no
+#               Rust bodies to extract; and 213: aeneas rejects `asm!`.
+# Cost:         none in a normal build: every change is behind
+#               cfg(hax_backend_lean). In the extracted NEON variants each
+#               intrinsic is its model in `arch/` (p3-arch-shims), trusted:
+#               reviewed against Arm's pseudocode and tested against the
+#               hardware (`arch/tests/neon.rs`). `confuse_compiler`, an
+#               optimisation barrier written as an empty `asm!` block, is the
+#               identity: a stand-in, listed in TRUST.md.
+# Upstreamable: no: the models exist only for the extractor. Models of the
+#               intrinsics in the extractor's library, and support for `asm!`,
+#               would make it unnecessary.
+# Drop when:    the extractor models the `core::arch::aarch64` intrinsics and
+#               `asm!`.
+# Test:         xcheck p3-baby-bear aarch64-unknown-linux-gnu -Ctarget-feature=+neon;
+#               xcheck p3-baby-bear aarch64-unknown-linux-gnu -Ctarget-feature=+neon --cfg hax_backend_lean
+# Mutation:     monty-31's packing imports the models in a normal build, which
+#               has no p3-arch-shims dependency, so the aarch64 build fails.
+#
+# As 020 does for AVX2: every file on BabyBear's NEON path that names a vector
+# type or calls an intrinsic imports `core::arch::aarch64` in a normal build and
+# `p3_arch_shims::aarch64` under the cfg. The models have the intrinsics' names
+# and signatures, over `repr(transparent)` lane arrays, so no other line
+# changes. A file that only names `uint32x4_t` or `int32x4_t` is redirected
+# too: the types must agree wherever a vector crosses a file. 020 already makes
+# p3-arch-shims a dependency of field, monty-31 and baby-bear under the cfg.
+# The `#[cfg(test)]` module of field's `aarch64_neon.rs` keeps `core::arch`: it
+# is not compiled for extraction.
+#
+# `confuse_compiler` is `asm!("/*{0:v}*/", inlateout(vreg) x => y, ...)`
+# followed by a check that `y == x`: its value is `x`, and its purpose is to
+# stop LLVM from rewriting the `vmlsq_u32` that follows it. Under the cfg it is
+# the identity, and its two imports, which nothing else uses, are hidden with
+# it. The models say nothing about that optimisation; the stand-in is listed in
+# TRUST.md.
+#
+# The tests compile the NEON path for aarch64: as shipped, which can only use
+# `core::arch` since p3-arch-shims is not a dependency without the cfg; and
+# under the cfg, which shows that the models fit every call site.
+#
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
+diff --git a/baby-bear/src/aarch64_neon/packing.rs b/baby-bear/src/aarch64_neon/packing.rs
+--- a/baby-bear/src/aarch64_neon/packing.rs
++++ b/baby-bear/src/aarch64_neon/packing.rs
+@@ -1,4 +1,8 @@
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::aarch64::{int32x4_t, uint32x4_t};
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::aarch64::{int32x4_t, uint32x4_t};
+ use core::mem::transmute;
+ 
+ use p3_monty_31::{MontyParametersNeon, PackedMontyField31Neon};
+diff --git a/baby-bear/src/aarch64_neon/poseidon2.rs b/baby-bear/src/aarch64_neon/poseidon2.rs
+--- a/baby-bear/src/aarch64_neon/poseidon2.rs
++++ b/baby-bear/src/aarch64_neon/poseidon2.rs
+@@ -1,4 +1,8 @@
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::aarch64::uint32x4_t;
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::aarch64::uint32x4_t;
+ 
+ use p3_monty_31::{
+     InternalLayerParametersNeon, mul_2exp_neg_n_neon, mul_2exp_neg_two_adicity_neon,
+diff --git a/field/src/packed/aarch64_neon.rs b/field/src/packed/aarch64_neon.rs
+--- a/field/src/packed/aarch64_neon.rs
++++ b/field/src/packed/aarch64_neon.rs
+@@ -1,6 +1,10 @@
+ //! A collection of helper methods when Neon is available
+ 
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::aarch64::{self, uint32x4_t};
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::aarch64::{self, uint32x4_t};
+ use core::mem::transmute;
+ 
+ /// Convert a four element array of u32's into a packed vector.
+diff --git a/field/src/packed/interleaves.rs b/field/src/packed/interleaves.rs
+--- a/field/src/packed/interleaves.rs
++++ b/field/src/packed/interleaves.rs
+@@ -3,7 +3,11 @@
+ 
+ #[cfg(all(target_arch = "aarch64", target_feature = "neon"))]
+ pub mod interleave {
++    // PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++    #[cfg(not(hax_backend_lean))]
+     use core::arch::aarch64::{self, uint32x4_t};
++    #[cfg(hax_backend_lean)]
++    use p3_arch_shims::aarch64::{self, uint32x4_t};
+ 
+     #[inline]
+     #[must_use]
+diff --git a/monty-31/src/aarch64_neon/packing.rs b/monty-31/src/aarch64_neon/packing.rs
+--- a/monty-31/src/aarch64_neon/packing.rs
++++ b/monty-31/src/aarch64_neon/packing.rs
+@@ -1,6 +1,14 @@
+ use alloc::vec::Vec;
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::aarch64::{self, int32x4_t, uint32x4_t};
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::aarch64::{self, int32x4_t, uint32x4_t};
++// PATCHED: only the `asm!` barrier uses it, which the cfg replaces.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::asm;
++// PATCHED: only the `asm!` barrier uses it, which the cfg replaces.
++#[cfg(not(hax_backend_lean))]
+ use core::hint::unreachable_unchecked;
+ use core::iter::{Product, Sum};
+ use core::mem::transmute;
+@@ -367,6 +375,8 @@
+ /// Similar to `core::hint::black_box`, it can be used to stop the compiler applying undesirable
+ /// "optimizations". Unlike the built-in `black_box`, it does not force the value to be written to
+ /// and then read from the stack.
++// PATCHED: under hax's Lean backend, the identity below, since the extractor rejects `asm!`.
++#[cfg(not(hax_backend_lean))]
+ #[inline]
+ #[must_use]
+ fn confuse_compiler(x: uint32x4_t) -> uint32x4_t {
+@@ -386,6 +396,15 @@
+         }
+     }
+     y
++}
++
++// PATCHED: the `asm!` barrier's value: its template is a comment, and the check after it tells
++// the compiler that `y == x`. The optimisation it inhibits is not modelled.
++#[cfg(hax_backend_lean)]
++#[inline]
++#[must_use]
++fn confuse_compiler(x: uint32x4_t) -> uint32x4_t {
++    x
+ }
+ 
+ // MONTGOMERY MULTIPLICATION
+diff --git a/monty-31/src/aarch64_neon/poseidon1.rs b/monty-31/src/aarch64_neon/poseidon1.rs
+--- a/monty-31/src/aarch64_neon/poseidon1.rs
++++ b/monty-31/src/aarch64_neon/poseidon1.rs
+@@ -1,7 +1,11 @@
+ //! NEON-optimized Poseidon1 layers for MontyField31.
+ 
+ use alloc::vec::Vec;
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::aarch64::int32x4_t;
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::aarch64::int32x4_t;
+ use core::marker::PhantomData;
+ use core::mem::transmute;
+ 
+diff --git a/monty-31/src/aarch64_neon/poseidon2.rs b/monty-31/src/aarch64_neon/poseidon2.rs
+--- a/monty-31/src/aarch64_neon/poseidon2.rs
++++ b/monty-31/src/aarch64_neon/poseidon2.rs
+@@ -1,7 +1,11 @@
+ //! Vectorized Neon implementation of Poseidon2 for MontyField31
+ 
+ use alloc::vec::Vec;
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::aarch64::{self, int32x4_t, uint32x4_t};
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::aarch64::{self, int32x4_t, uint32x4_t};
+ use core::marker::PhantomData;
+ use core::mem::transmute;
+ 
+diff --git a/monty-31/src/aarch64_neon/utils.rs b/monty-31/src/aarch64_neon/utils.rs
+--- a/monty-31/src/aarch64_neon/utils.rs
++++ b/monty-31/src/aarch64_neon/utils.rs
+@@ -1,4 +1,11 @@
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::aarch64::{
++    self, uint32x4_t, vaddq_u32, vandq_u32, vdupq_n_u32, vhaddq_u32, vminq_u32, vmlsq_n_u32,
++    vtstq_u32,
++};
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::aarch64::{
+     self, uint32x4_t, vaddq_u32, vandq_u32, vdupq_n_u32, vhaddq_u32, vminq_u32, vmlsq_n_u32,
+     vtstq_u32,
+ };
