@@ -6493,6 +6493,34 @@ name   = "Plonky3Lean.Claims.Bus.clock_orbit_fields"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.Bus.direction.BusDirection.index.eq_mirror"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.builder.BusBoundary.contains_row.eq_mirror"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.builder.BusBoundary.contains_row.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.ram.statement.RamStatement.access_payload_width.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.ram.statement.RamStatement.access_payload_width.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.ram.statement.RamStatement.image_payload_width.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.ram.statement.RamStatement.image_payload_width.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.Circle.cfft.basis"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 

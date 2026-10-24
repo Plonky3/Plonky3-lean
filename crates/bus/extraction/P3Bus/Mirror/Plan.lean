@@ -21,8 +21,8 @@ Loops, branches and the order of operations are kept.
 -/
 module
 
-public import P3Bus.Builder
-public import P3Bus.Product
+public import P3Bus.Mirror.Builder
+public import P3Bus.Mirror.Product
 
 @[expose] public section
 

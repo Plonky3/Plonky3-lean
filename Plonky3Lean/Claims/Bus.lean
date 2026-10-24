@@ -5,6 +5,7 @@ public import Plonky3Lean.Proofs.Bus.Verify
 public import Plonky3Lean.Proofs.Bus.Evaluation
 public import Plonky3Lean.Proofs.Bus.Timestamped
 public import Plonky3Lean.Proofs.Bus.Security
+public import Plonky3Lean.Proofs.Bus.Extracted
 public import CompPoly.Fields.BabyBear.Ext4
 public import CompPoly.Fields.KoalaBear.Basic
 
@@ -13,7 +14,7 @@ public import CompPoly.Fields.KoalaBear.Basic
 /-!
 # p3-bus: claims
 
-Nothing is extracted: the crate's dependencies do not compile in the extraction variant.
+The integer helpers are extracted: a direction's position, the boundary rows and the RAM payload widths.
 
 These parts are transcribed:
 
@@ -23,7 +24,7 @@ These parts are transcribed:
 - the read-write memory and the timestamped clock
 - the security accounting
 
-The claims are stated at BabyBear F and its quartic extension K, where the challenges live.
+The transcription claims are stated at BabyBear F and its quartic extension K, where the challenges live.
 
 The specification is offline memory checking, in its grand-product form.
 
@@ -307,5 +308,62 @@ theorem clock_orbit_fields :
       check_orbit (BabyBear.fieldSize ^ 4) = .ok () ∧ check_orbit (KoalaBear.fieldSize ^ 4) = .ok () := by
   simp only [ne_eq, check_orbit_ok, BabyBear.fieldSize, KoalaBear.fieldSize]
   norm_num
+
+/-! ## The extracted integer helpers -/
+
+section Extracted
+
+open CoreModels Aeneas Aeneas.Std Plonky3Lean.Proofs.Bus.Extracted
+
+/-- The shipped position of a direction is 0 for a push and 1 for a pull. -/
+theorem direction.BusDirection.index.eq_mirror (d : p3_bus.direction.BusDirection) :
+    ∃ n : Std.Usize, p3_bus.direction.BusDirection.index d = .ok n ∧ n.val = (dirMirror d).index :=
+  index_eq d
+
+/-- A first-row boundary holds row 0, and a last-row boundary holds the row r with r + 1 equal to the height.
+
+The shipped check computes that for every row below the largest usize. -/
+theorem builder.BusBoundary.contains_row.eq_mirror (b : p3_bus.builder.BusBoundary) (row height : Std.Usize)
+    (hrow : row.val < Usize.max) :
+    p3_bus.builder.BusBoundary.contains_row b row height =
+      .ok ((boundaryMirror b).contains_row row.val height.val) :=
+  contains_row_eq b row height hrow
+
+/-- The shipped last-row check panics on the largest usize row, whose successor overflows. -/
+theorem builder.BusBoundary.contains_row.panics (row height : Std.Usize) (hrow : row.val = Usize.max) :
+    p3_bus.builder.BusBoundary.contains_row .Last row height = .fail .panic :=
+  contains_row_max row height hrow
+
+/-- An access payload is the operation, the address bits, the timestamp bits and the value.
+
+Its shipped width is 1 + a + t + v whenever that fits a usize. -/
+theorem ram.statement.RamStatement.access_payload_width.eq_spec (st : p3_bus.ram.statement.RamStatement)
+    (h : 1 + st.address_bits.val + st.timestamp_bits.val + st.value_width.val ≤ Usize.max) :
+    ∃ n : Std.Usize, p3_bus.ram.statement.RamStatement.access_payload_width st = .ok n ∧
+      n.val = 1 + st.address_bits.val + st.timestamp_bits.val + st.value_width.val :=
+  access_payload_width_eq st h
+
+/-- The shipped access payload width panics exactly when 1 + a + t + v overflows a usize. -/
+theorem ram.statement.RamStatement.access_payload_width.panics (st : p3_bus.ram.statement.RamStatement)
+    (h : Usize.max < 1 + st.address_bits.val + st.timestamp_bits.val + st.value_width.val) :
+    p3_bus.ram.statement.RamStatement.access_payload_width st = .fail .panic :=
+  access_payload_width_fail st h
+
+/-- An image payload is the address bits and the value.
+
+Its shipped width is a + v whenever that fits a usize. -/
+theorem ram.statement.RamStatement.image_payload_width.eq_spec (st : p3_bus.ram.statement.RamStatement)
+    (h : st.address_bits.val + st.value_width.val ≤ Usize.max) :
+    ∃ n : Std.Usize, p3_bus.ram.statement.RamStatement.image_payload_width st = .ok n ∧
+      n.val = st.address_bits.val + st.value_width.val :=
+  image_payload_width_eq st h
+
+/-- The shipped image payload width panics exactly when a + v overflows a usize. -/
+theorem ram.statement.RamStatement.image_payload_width.panics (st : p3_bus.ram.statement.RamStatement)
+    (h : Usize.max < st.address_bits.val + st.value_width.val) :
+    p3_bus.ram.statement.RamStatement.image_payload_width st = .fail .panic :=
+  image_payload_width_fail st h
+
+end Extracted
 
 end Plonky3Lean.Claims.Bus

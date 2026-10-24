@@ -19,7 +19,7 @@ Loops, branches and the order of operations are kept.
 -/
 module
 
-public import P3Bus.Builder
+public import P3Bus.Mirror.Builder
 
 @[expose] public section
 

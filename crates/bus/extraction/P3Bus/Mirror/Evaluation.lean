@@ -20,7 +20,7 @@ Loops, branches and the order of operations are kept.
 -/
 module
 
-public import P3Bus.Plan
+public import P3Bus.Mirror.Plan
 public import P3MultilinearUtil
 
 @[expose] public section

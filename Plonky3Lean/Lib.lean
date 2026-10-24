@@ -11,6 +11,7 @@ public import Plonky3Lean.Lib.Range
 public import Plonky3Lean.Lib.Slice
 public import Plonky3Lean.Lib.Scalar.Words
 public import Plonky3Lean.Lib.Yields
+public import Plonky3Lean.Lib.UsizeAdd
 
 @[expose] public section
 

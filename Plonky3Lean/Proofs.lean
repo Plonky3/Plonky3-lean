@@ -246,6 +246,7 @@ public import Plonky3Lean.Proofs.Stir.Geometry
 public import Plonky3Lean.Proofs.Stir.VerifierChecks
 public import Plonky3Lean.Proofs.Bus.Product
 public import Plonky3Lean.Proofs.Bus.Ram
+public import Plonky3Lean.Proofs.Bus.Extracted
 public import Plonky3Lean.Proofs.Bus.Verify
 public import Plonky3Lean.Proofs.Bus.Evaluation
 public import Plonky3Lean.Proofs.Bus.Timestamped

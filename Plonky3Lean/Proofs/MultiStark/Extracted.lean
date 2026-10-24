@@ -2,6 +2,7 @@ module
 
 public import P3MultiStark
 public import Plonky3Lean.Lib.Yields
+public import Plonky3Lean.Lib.UsizeAdd
 
 @[expose] public section
 
@@ -52,28 +53,14 @@ include h
 omit h in
 /-- The row after a row below the largest usize. -/
 theorem add_one_ok (row : Std.Usize) (hrow : row.val < Usize.max) :
-    ∃ i : Std.Usize, (row + 1#usize : RustM Std.Usize) = .ok i ∧ i.val = row.val + 1 := by
-  have hs := @Usize.add_spec row 1#usize
-  generalize (row + 1#usize : RustM Std.Usize) = m at hs ⊢
-  cases m with
-  | ret r => exact ⟨r, rfl, by simpa using hs⟩
-  | vis i k => cases i with | fail e => (cases e <;> simp [WP.partialSpec] at hs; omega)
-  | div => simp at hs
+    ∃ i : Std.Usize, (row + 1#usize : RustM Std.Usize) = .ok i ∧ i.val = row.val + 1 :=
+  usize_add_ok row 1#usize (by simp; omega)
 
 omit h in
 /-- The row after the largest usize overflows. -/
 theorem add_one_max (row : Std.Usize) (hrow : row.val = Usize.max) :
-    (row + 1#usize : RustM Std.Usize) = .fail .panic := by
-  have hs := @Usize.add_spec row 1#usize
-  generalize (row + 1#usize : RustM Std.Usize) = m at hs ⊢
-  cases m with
-  | ret r => simp at hs; scalar_tac
-  | vis i k =>
-    cases i with
-    | fail e =>
-      cases e <;> simp [WP.partialSpec] at hs
-      exact congrArg _ (funext fun x => nomatch x)
-  | div => simp at hs
+    (row + 1#usize : RustM Std.Usize) = .fail .panic :=
+  usize_add_fail row 1#usize (by simp; omega)
 
 /-! ## The boundary selectors -/
 

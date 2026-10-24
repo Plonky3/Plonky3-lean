@@ -2,16 +2,18 @@
 
 lean_lib = "P3Bus"
 
-# Nothing is extracted.
+# The integer helpers are extracted: a direction's position, the boundary rows, and the RAM payload widths.
 #
-# Code over `ExtensionField` does not extract (docs/extractor-issues.md 180).
+# Most other items are generic over the field traits or the builder, which aeneas rejects (docs/extractor-issues.md 9).
 #
-# Most items are also generic over the field traits or the builder, which aeneas rejects (docs/extractor-issues.md 9).
-#
-# Each item is transcribed in stub/P3Bus/, with the abstractions each file's header lists.
-state = "stub"
+# They are transcribed in extraction/P3Bus/Mirror/, with the abstractions each file's header lists.
+state = "scoped"
 
 features = []
+
+# One root: the `hax_roots` module that pre-patch 010 adds under cfg(hax_backend_lean).
+# Each of its functions calls one item.
+start_from = ["p3_bus::hax_roots"]
 
 watch = ["bus/src", "bus/Cargo.toml", "security/src/bus.rs", "multilinear-util/src/point.rs", "sumcheck/src/generic_degree"]
 
