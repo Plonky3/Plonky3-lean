@@ -13,9 +13,9 @@ A word of `n` bits is a bit vector of width `n`.
 
 Shifts follow the Rust reference, "Arithmetic and logical binary operators":
 
-- a logical shift fills with zeros;
-- an arithmetic right shift copies the sign bit;
-- a rotation moves the bits leaving one end back in at the other.
+- A logical shift fills with zeros.
+- An arithmetic right shift copies the sign bit.
+- A rotation moves the bits leaving one end back in at the other.
 
 A lane operation applies a 32-bit movement to each half of a 64-bit word on its own.
 

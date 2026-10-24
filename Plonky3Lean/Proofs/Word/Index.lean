@@ -17,7 +17,9 @@ open Plonky3Lean.Lib
 
 namespace Plonky3Lean.Proofs.Word
 
-/-- `u32::try_from(x)` for a `usize`: the same value when it fits in 32 bits, an error otherwise. -/
+/-- Converting a platform word to 32 bits keeps its value when it fits.
+
+Otherwise it reports an error. -/
 theorem u32_try_from_eq (x : Std.Usize) :
     CoreModels.core.U32.Insts.CoreConvertTryFromUsizeTryFromIntError.try_from x =
       .ok (if x.val < 2 ^ 32 then .Ok (UScalar.cast .U32 x) else .Err ()) := by

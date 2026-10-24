@@ -7,11 +7,11 @@ public import Plonky3Lean.Proofs.Word.Eval
 /-!
 # The three relation families
 
-A relation holds when every operand evaluates and the evaluated words satisfy it:
+A relation holds when every operand evaluates and the evaluated words satisfy it.
 
-- a zero relation needs its operand to vanish;
-- an AND relation needs the bitwise AND of its inputs to equal its output;
-- a product relation needs the full product of its factors to equal its two limbs.
+- A zero relation needs its operand to vanish.
+- An AND relation needs the bitwise AND of its inputs to equal its output.
+- A product relation needs the full product of its factors to equal its two limbs.
 
 An operand with a term outside its segment makes its relation fail.
 -/
