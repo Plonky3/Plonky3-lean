@@ -94,4 +94,22 @@ def lastMask (mul_coeffs : List K) (hw : ℕ) (rv : List K) (last : ℕ) : List 
       acc.set (last * hw + k) (acc.getD (last * hw + k) 0 - acc.getD (j * hw + k) 0 * mul_coeffs.getD j 0))
       acc) rv
 
+/-- The draws before the last chunk is balanced: d - 1 random blocks of hw values, then a zero block. -/
+def maskDraws (d hw : ℕ) (rnd : List K) : List K := rnd.take ((d - 1) * hw) ++ List.replicate hw 0
+
+/-- The quotient masks' values, block by block.
+
+There is one constant c_i per evaluation the caller passes, and the caller's chunk count n.
+
+- It asserts more than one chunk.
+- It reads c_(n-1), which panics past the constants, and inverts it, which panics at zero.
+- It balances chunk n - 1 against the chunks before it. -/
+def quotientMaskValues [DecidableEq K] (cis : List K) (num_chunks hw : ℕ) (rnd : List K) : Option (List K) := do
+  if num_chunks ≤ 1 then none
+  let last := num_chunks - 1
+  let clast ← cis[last]?
+  if clast = 0 then none
+  let mul_coeffs := (List.range last).map fun i => cis.getD i 0 * clast⁻¹
+  pure (lastMask mul_coeffs hw (maskDraws cis.length hw rnd) last)
+
 end p3_fri.hiding_pcs.mirror

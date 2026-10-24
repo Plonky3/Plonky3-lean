@@ -424,6 +424,14 @@ lean = "p3_fri.hiding_pcs.mirror.lastMask"
 rust = "{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::get_quotient_ldes"
 
 [[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.maskDraws"
+rust = "{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::get_quotient_ldes"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.quotientMaskValues"
+rust = "{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::get_quotient_ldes"
+
+[[mirror]]
 lean = "p3_fri.hiding_pcs.mirror.mergeHiddenPoint"
 rust = "{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::verify_with_preprocessing"
 
