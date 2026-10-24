@@ -25,6 +25,30 @@ set_option maxRecDepth 2048
 
 namespace p3_arch_shims
 
+/-- [p3_arch_shims::aarch64::types::U32x4]
+    Source: 'src/aarch64/types.rs', lines 16:0-16:31
+    Visibility: public -/
+@[reducible]
+def aarch64.types.U32x4 := Array Std.U32 4#usize
+
+/-- [p3_arch_shims::aarch64::types::I32x4]
+    Source: 'src/aarch64/types.rs', lines 21:0-21:31
+    Visibility: public -/
+@[reducible]
+def aarch64.types.I32x4 := Array Std.I32 4#usize
+
+/-- [p3_arch_shims::aarch64::types::U32x2]
+    Source: 'src/aarch64/types.rs', lines 31:0-31:31
+    Visibility: public -/
+@[reducible]
+def aarch64.types.U32x2 := Array Std.U32 2#usize
+
+/-- [p3_arch_shims::aarch64::types::U64x2]
+    Source: 'src/aarch64/types.rs', lines 26:0-26:31
+    Visibility: public -/
+@[reducible]
+def aarch64.types.U64x2 := Array Std.U64 2#usize
+
 /-- [p3_arch_shims::x86_64::types::M256i]
     Source: 'src/x86_64/types.rs', lines 16:0-16:31
     Visibility: public -/

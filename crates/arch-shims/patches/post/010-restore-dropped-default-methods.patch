@@ -1,7 +1,7 @@
 # Patch:        010-restore-dropped-default-methods
 # Phase:        post
 # Target:       extraction/P3ArchShims/Extraction/Funs.lean
-# Hunks:        3
+# Hunks:        7
 # Class:        restore
 # Gap:          docs/extractor-issues.md 2: charon's multi-target mode
 #               (`--targets`) drops the default-method roots hax adds
@@ -12,13 +12,49 @@
 # Upstreamable: yes: as for monty-31's post 010.
 # Drop when:    as for monty-31's post 010.
 #
-# The three vector types derive `Clone`, whose impls come out without
+# The seven vector types derive `Clone`, whose impls come out without
 # `clone_from`, as described in monty-31's post 010:
 #   clone_from := fun _ source => <clone> source        (= clone_from.default)
 #
 --- a/extraction/P3ArchShims/Extraction/Funs.lean
 +++ b/extraction/P3ArchShims/Extraction/Funs.lean
-@@ -1274,6 +1274,8 @@
+@@ -1655,6 +1655,8 @@
+ def aarch64.types.U32x4.Insts.CoreCloneClone : core.clone.Clone
+   aarch64.types.U32x4 := {
+   clone := aarch64.types.U32x4.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => aarch64.types.U32x4.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::marker::Copy for p3_arch_shims::aarch64::types::U32x4}]
+@@ -1678,6 +1680,8 @@
+ def aarch64.types.I32x4.Insts.CoreCloneClone : core.clone.Clone
+   aarch64.types.I32x4 := {
+   clone := aarch64.types.I32x4.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => aarch64.types.I32x4.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::marker::Copy for p3_arch_shims::aarch64::types::I32x4}]
+@@ -1701,6 +1705,8 @@
+ def aarch64.types.U64x2.Insts.CoreCloneClone : core.clone.Clone
+   aarch64.types.U64x2 := {
+   clone := aarch64.types.U64x2.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => aarch64.types.U64x2.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::marker::Copy for p3_arch_shims::aarch64::types::U64x2}]
+@@ -1724,6 +1730,8 @@
+ def aarch64.types.U32x2.Insts.CoreCloneClone : core.clone.Clone
+   aarch64.types.U32x2 := {
+   clone := aarch64.types.U32x2.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => aarch64.types.U32x2.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::marker::Copy for p3_arch_shims::aarch64::types::U32x2}]
+@@ -3011,6 +3019,8 @@
  def x86_64.types.M256i.Insts.CoreCloneClone : core.clone.Clone
    x86_64.types.M256i := {
    clone := x86_64.types.M256i.Insts.CoreCloneClone.clone
@@ -27,7 +63,7 @@
  }
  
  /-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::marker::Copy for p3_arch_shims::x86_64::types::M256i}]
-@@ -1297,6 +1299,8 @@
+@@ -3034,6 +3044,8 @@
  def x86_64.types.M128i.Insts.CoreCloneClone : core.clone.Clone
    x86_64.types.M128i := {
    clone := x86_64.types.M128i.Insts.CoreCloneClone.clone
@@ -36,7 +72,7 @@
  }
  
  /-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::marker::Copy for p3_arch_shims::x86_64::types::M128i}]
-@@ -1320,6 +1324,8 @@
+@@ -3057,6 +3069,8 @@
  def x86_64.types.M256.Insts.CoreCloneClone : core.clone.Clone x86_64.types.M256
    := {
    clone := x86_64.types.M256.Insts.CoreCloneClone.clone
