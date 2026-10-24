@@ -8,11 +8,16 @@ public import Mathlib.Algebra.Polynomial.Div
 /-!
 # STIR's operators
 
-The definitions follow Arnon, Chiesa, Fenzi and Yogev, "STIR: Reed-Solomon Proximity Testing with Fewer Queries", eprint 2024/390, Sections 4 and 5.
+The definitions follow Arnon, Chiesa, Fenzi and Yogev, eprint 2024/390, Sections 4 and 5.
+
+Their paper is "STIR: Reed-Solomon Proximity Testing with Fewer Queries".
 
 They are stated over one field K.
 
-Where ArkLib's STIR formalization has the same object, the definition here is the same: ansPoly, vanishingPoly and quotient follow ArkLib.ProofSystem.Stir.Quotienting, and degCor, ri and combine follow ArkLib.ProofSystem.Stir.Combine.
+Where ArkLib's STIR formalization has the same object, the definition here is the same.
+
+- The answer polynomial, vanishing polynomial and quotient follow ArkLib's quotienting module.
+- Degree correction, the weights r_i and the combination follow ArkLib's combine module.
 
 A coefficient list reads as a polynomial, constant term first:
 
@@ -23,8 +28,10 @@ A coefficient list reads as a polynomial, constant term first:
 A smooth coset of size 2^n is s <omega> for omega of order 2^n:
 
 ```text
-    L = { s, s omega, ..., s omega^(2^n - 1) },   entry i of a codeword is the value at s omega^i
+    L = { s, s omega, ..., s omega^(2^n - 1) }
 ```
+
+Entry i of a codeword is the value at s omega^i.
 -/
 
 namespace Plonky3Lean.Spec.Stir
@@ -69,7 +76,9 @@ noncomputable def splitPart (f : K[X]) (k l : ℕ) : K[X] :=
 noncomputable def polyFold (f : K[X]) (k : ℕ) (r : K) : K[X] :=
   ∑ l ∈ range k, C (r ^ l) * splitPart f k l
 
-/-- Definition 4.8: Fold(f, k, alpha)(y) is p_y(alpha), where p_y interpolates f on the points of L whose k-th power is y. -/
+/-- Definition 4.8: Fold(f, k, alpha)(y) is p_y(alpha).
+
+Here p_y interpolates f on the points of L whose k-th power is y. -/
 noncomputable def fold [DecidableEq K] (L : Finset K) (f : K → K) (k : ℕ) (α y : K) : K :=
   (Lagrange.interpolate (L.filter fun x => x ^ k = y) id f).eval α
 
@@ -87,14 +96,23 @@ noncomputable def polyDegCor (dstar d : ℕ) (r : K) (f : K[X]) : K[X] :=
 def ri (dstar : ℕ) (degs : List ℕ) (r : K) (i : ℕ) : K :=
   r ^ (i + ∑ j ∈ range i, (dstar - degs.getD j 0))
 
-/-- Definition 4.11: Combine(d*, r, (f_i, d_i)_i)(x) = sum_i r_i f_i(x) sum_{l <= d* - d_i} (x r)^l. -/
+/-- Definition 4.11, the combination of the functions f_i of degrees d_i:
+
+```text
+    Combine(d*, r, (f_i, d_i)_i)(x) = sum_i r_i f_i(x) sum_{l <= d* - d_i} (x r)^l
+```
+-/
 def combine (dstar : ℕ) (r : K) (fs : List (K → K)) (degs : List ℕ) (x : K) : K :=
   ∑ i ∈ range fs.length,
     ri dstar degs r i * (fs.getD i 0) x * ∑ l ∈ range (dstar - degs.getD i 0 + 1), (x * r) ^ l
 
 /-! ## One round (Construction 5.2) -/
 
-/-- The honest next polynomial of a round: fold f by k at r_fold, quotient by G, and degree-correct to d_next at r_comb. -/
+/-- The honest next polynomial of a round:
+
+- fold f by k at r_fold
+- take the quotient by G
+- degree-correct to d_next at r_comb. -/
 noncomputable def nextPoly [DecidableEq K] (f : K[X]) (k : ℕ) (rFold rComb : K) (G : Finset K)
     (dNext : ℕ) : K[X] :=
   polyDegCor dNext (dNext - G.card) rComb (polyQuotient (polyFold f k rFold) G)

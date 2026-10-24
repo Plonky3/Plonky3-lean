@@ -10,7 +10,9 @@ public import Mathlib.Data.List.Pairwise
 
 A bus is a multiset equality between the tuples one side pushes and the tuples the other side pulls.
 
-The check follows Blum, Evans, Gemmell, Kannan and Naor, "Checking the correctness of memories" (FOCS 1991), in its grand-product form.
+The check follows Blum, Evans, Gemmell, Kannan and Naor (FOCS 1991), in its grand-product form.
+
+Their paper is "Checking the correctness of memories".
 
 A tuple of 2^m slots is compressed to its multilinear extension at a random point r.
 
@@ -26,7 +28,9 @@ An inactive row contributes the identity, through the gate 1 + (x - 1) s with s 
 
 A memory is a list of accesses: a read or a write, a cell, a time and a value.
 
-It is consistent when every read returns the value of the latest earlier write to its cell, or the initial value when there is none.
+It is consistent when every read returns the value of the latest earlier write to its cell.
+
+A read with no earlier write returns the initial value.
 -/
 
 namespace Plonky3Lean.Spec.Bus
@@ -73,7 +77,9 @@ variable {V : Type _}
 def TimesDistinct (accs : List (Access V)) : Prop :=
   accs.Pairwise fun x y => x.addr = y.addr → x.time ≠ y.time
 
-/-- Every read returns the value of the latest earlier write to its cell, or the cell's initial value when no write precedes it. -/
+/-- Every read returns the value of the latest earlier write to its cell.
+
+A read with no earlier write returns the cell's initial value. -/
 def ReadsLastWrite (init : ℕ → V) (accs : List (Access V)) : Prop :=
   ∀ y ∈ accs, y.write = false →
     (∃ w ∈ accs, w.write ∧ w.addr = y.addr ∧ w.time < y.time ∧ w.value = y.value ∧

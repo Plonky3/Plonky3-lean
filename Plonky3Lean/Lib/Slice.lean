@@ -5,11 +5,13 @@ public import Plonky3Lean.Lib.Range
 @[expose] public section
 
 /-!
-# Arrays and slices, as `CoreModels` builds and indexes them
+# Arrays and slices, as the core models build and index them
 
-`core::array::from_fn` with a closure that keeps its state is a map over the indices.
+Building an array from a closure that keeps its state is a map over the indices.
 
-Indexing by `start..`, then `..end`, and converting the result to an array, take a sublist.
+Indexing by a range from a start, or up to an end, takes a sublist.
+
+Converting that sublist to an array keeps its elements.
 -/
 
 open Aeneas Aeneas.Std CoreModels
@@ -39,7 +41,7 @@ theorem slice_index_eq {α : Type} (s : Slice α) (i : Std.Usize) (h : i.val < s
   simp only [Slice.index_usize]
   rw [show s[i]? = some (s.val[i.val]) from List.getElem?_eq_getElem h]
 
-/-- `s.get(i)` returns the entry at `i`, or nothing past the end. -/
+/-- Checked lookup returns the entry at an index, or nothing past the end. -/
 theorem slice_get_usize_eq {α : Type} (s : Slice α) (i : Std.Usize) :
     CoreModels.core.slice.Slice.get (CoreModels.core.Usize.Insts.CoreSliceIndexSliceIndexSliceT α)
       s i = .ok (match s.val[i.val]? with
@@ -57,7 +59,7 @@ theorem slice_get_usize_eq {α : Type} (s : Slice α) (i : Std.Usize) :
     simp only [this, ↓reduceIte]
     rw [List.getElem?_eq_none (by omega)]
 
-/-- A slice of length `N` converts to the array of its elements. -/
+/-- A slice of length N converts to the array of its elements. -/
 theorem try_from_eq {T : Type} [Inhabited T] (N : Std.Usize) (inst : CoreModels.core.marker.Copy T)
     (x : Slice T) (h : x.val.length = N.val) (hN : N.val < 2 ^ 32) :
     CoreModels.core.Array.Insts.CoreConvertTryFromShared0SliceTryFromSliceError.try_from N inst x =
@@ -79,7 +81,7 @@ theorem try_from_eq {T : Type} [Inhabited T] (N : Std.Usize) (inst : CoreModels.
   intro i h1 h2
   simp [List.getElem!_eq_getElem?_getD, List.getElem?_eq_getElem h2]
 
-/-- `&a[start..]` of an array. -/
+/-- Indexing an array from a start index to its end. -/
 theorem index_rangeFrom_eq {T : Type} {N : Std.Usize} (a : Std.Array T N) (st : Std.Usize)
     (h : st.val ≤ a.val.length) :
     CoreModels.core.Array.Insts.CoreOpsIndexIndex.index
@@ -100,7 +102,7 @@ theorem index_rangeFrom_eq {T : Type} {N : Std.Usize} (a : Std.Array T N) (st : 
   have hN : st.val ≤ N.val := by simpa using h
   simp [Slice.subslice, Std.Array.to_slice, hN]
 
-/-- `&s[start..]` of a slice. -/
+/-- Indexing a slice from a start index to its end. -/
 theorem slice_index_rangeFrom_eq {T : Type} (sl : Slice T) (st : Std.Usize)
     (h : st.val ≤ sl.val.length) :
     CoreModels.core.Slice.Insts.CoreOpsIndexIndex.index
@@ -122,7 +124,7 @@ theorem slice_update_eq {α : Type} (s : Slice α) (i : Std.Usize) (x : α) (h :
   simp only [Slice.update]
   rw [List.getElem?_eq_getElem h]
 
-/-- `&s[..end]` of a slice. -/
+/-- Indexing a slice from its start up to an end index. -/
 theorem index_rangeTo_eq {T : Type} (sl : Slice T) (e : Std.Usize) (h : e.val ≤ sl.val.length) :
     CoreModels.core.Slice.Insts.CoreOpsIndexIndex.index
       (CoreModels.core.ops.range.RangeToUsize.Insts.CoreSliceIndexSliceIndexSliceSlice T)
@@ -152,7 +154,7 @@ theorem seq_remove_head {T : Type} (s : Slice T) (a : T) (rest : List T) (hs : s
   rw [dite_eq_left_of_eq_true (eq_true (by simp [hs]))]
   exact ⟨_, by congr 2; simp [hs], by simp [hs]⟩
 
-/-- The closure of `core::array::repeat` hands out the next clone and keeps the rest. -/
+/-- The closure behind array repetition hands out the next clone and keeps the rest. -/
 theorem repeat_go_eq {T : Type} {N : Std.Usize} (cl : CoreModels.core.clone.Clone T) (v : T)
     (m : ℕ) (c : CoreModels.core.array.repeat.closure T N)
     (hc : Slice.val (α := T) c = List.replicate m v) :
@@ -174,7 +176,7 @@ theorem repeat_go_eq {T : Type} {N : Std.Usize} (cl : CoreModels.core.clone.Clon
     rw [List.replicate_succ', e', bind_ok]
     exact bind_ok _ _
 
-/-- `[v; N]`, for a type whose clone is the value itself. -/
+/-- The array of N copies of v, for a type whose clone is the value itself. -/
 theorem repeat_eq {T : Type} (N : Std.Usize) (cl : CoreModels.core.clone.Clone T) (v : T)
     (hcl : ∀ x, cl.clone x = .ok x) (hN : 0 < N.val) :
     CoreModels.core.array.repeat N cl v = .ok (Std.Array.from (List.replicate N.val v) (by simp)) := by

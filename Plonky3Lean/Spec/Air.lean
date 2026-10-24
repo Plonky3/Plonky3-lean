@@ -10,7 +10,11 @@ public import Mathlib.Algebra.Polynomial.AlgebraMap
 
 An AIR constrains a trace: a table of field elements with n rows.
 
-Each constraint is a polynomial in the cells of two consecutive rows, the public values, and the periodic columns.
+Each constraint is a polynomial in:
+
+- the cells of two consecutive rows
+- the public values
+- the periodic columns.
 
 A trace satisfies the AIR when every constraint vanishes on every row it applies to.
 
@@ -18,7 +22,9 @@ This follows the AIR of the ethSTARK documentation (eprint 2021/582).
 
 Ben-Sasson, Bentov, Horesh and Riabzev introduce it in eprint 2018/046.
 
-Plonky3 writes every constraint as one polynomial that applies on every row, and restricts it with three selector variables:
+Plonky3 writes every constraint as one polynomial that applies on every row.
+
+Three selector variables restrict it:
 
 ```text
     row i of n:     is_first_row = [i = 0]
@@ -56,7 +62,9 @@ The prover commits to Q in c chunks of n coefficients, so it needs deg C < (c + 
 
 namespace Plonky3Lean.Spec.Air
 
-/-- A variable of a constraint: a cell of the current or next row, a public value, a periodic value, or a selector. -/
+/-- A variable of a constraint.
+
+It is a cell of the current or next row, a public value, a periodic value, or a selector. -/
 inductive Var where
   | main (offset : Fin 2) (col : ℕ)
   | prep (offset : Fin 2) (col : ℕ)
@@ -67,7 +75,9 @@ inductive Var where
   | isTransition
   deriving DecidableEq
 
-/-- A trace with its public data: n rows of main and preprocessed cells, public values, and periodic columns. -/
+/-- A trace with its public data.
+
+It holds n rows of main and preprocessed cells, public values, and periodic columns. -/
 structure Instance (F : Type _) where
   height : ℕ
   main : ℕ → ℕ → F
@@ -127,7 +137,9 @@ def SatisfiesOn (C : List (Constraint F)) (T : Instance F) : Prop :=
   ∀ c ∈ C, ∀ i < T.height, c.domain.Contains T.height i →
     MvPolynomial.eval (rowEnv T i) c.poly = 0
 
-/-- Degree bounds for an assignment of univariate polynomials to the variables, on a trace of n rows.
+/-- Degree bounds for an assignment of univariate polynomials to the variables.
+
+The trace has n rows.
 
 * A cell and a boundary selector have degree at most n - 1.
 * The transition selector has degree at most 1.
@@ -147,7 +159,7 @@ structure DegreeBounds (σ : Var → Polynomial F) (n : ℕ) (periods : List ℕ
 noncomputable def constraintPoly (σ : Var → Polynomial F) (c : MvPolynomial Var F) : Polynomial F :=
   MvPolynomial.aeval σ c
 
-/-- A quotient split into c chunks of n coefficients holds a constraint polynomial when deg C < (c + 1) n. -/
+/-- A quotient in c chunks of n coefficients holds a constraint polynomial when deg C < (c + 1) n. -/
 def FitsChunks (n c : ℕ) (C : Polynomial F) : Prop := C.natDegree < (c + 1) * n
 
 end Plonky3Lean.Spec.Air

@@ -3,7 +3,7 @@ module
 public import Plonky3Lean.Lib.Scalar
 public import Plonky3Lean.Lib.Scalar.U64
 public import HaxExt
--- `IScalar.overflowing_add`'s body, which Aeneas does not expose and which the proofs below unfold.
+-- The body of signed overflowing addition: Aeneas does not expose it, and the proofs below unfold it.
 import all Aeneas.Std.Scalar.OverflowingOps.Add
 
 @[expose] public section
@@ -11,9 +11,15 @@ import all Aeneas.Std.Scalar.OverflowingOps.Add
 /-!
 # Signed integer primitives, as natural numbers and integers
 
-Specifications of the `core::num` methods on signed integers, and of the casts between signed and unsigned integers, that the field crates call.
+Specifications of the signed integer methods that the field crates call.
 
-The `HaxExt` models `Ord::min`, `bool::then` and `i64::unsigned_abs` are specified here too.
+They also cover the casts between signed and unsigned integers.
+
+The hax extension models of three more methods are specified here too:
+
+- the minimum of two values
+- the conditional value of a boolean
+- the magnitude of a signed 64-bit value.
 -/
 
 open Aeneas Aeneas.Std CoreModels
@@ -22,14 +28,17 @@ namespace Plonky3Lean.Lib
 
 /-! ## `u32` and `i32` -/
 
-/-- A `u32` below `2^31` keeps its value as an `i32`. -/
+/-- An unsigned 32-bit value below 2^31 keeps its value as a signed one. -/
 theorem hcast_u32_i32_val (x : Std.U32) (hx : x.val < 2 ^ 31) :
     (UScalar.hcast .I32 x).val = x.val := by
   rw [UScalar.hcast_val_eq]
   simp only [IScalarTy.I32_numBits_eq]
   rw [Int.bmod_def]; split <;> omega
 
-/-- The sum of two non-negative 32-bit signed values: its bits read as unsigned are the exact sum, and it overflows exactly when the sum reaches `2^31`. -/
+/-- The sum of two non-negative 32-bit signed values.
+
+- Its bits, read as unsigned, are the exact sum.
+- It overflows exactly when the sum reaches 2^31. -/
 theorem bv32_add_nonneg (a b : BitVec 32) (ha : a.toNat < 2 ^ 31) (hb : b.toNat < 2 ^ 31) :
     (a + b).toNat = a.toNat + b.toNat ∧
       BitVec.saddOverflow a b = decide (2 ^ 31 ≤ a.toNat + b.toNat) := by
@@ -43,7 +52,10 @@ theorem bv32_add_nonneg (a b : BitVec 32) (ha : a.toNat < 2 ^ 31) (hb : b.toNat 
   · rw [decide_eq_true h, decide_eq_true (by omega)]; rfl
   · rw [decide_eq_false h, decide_eq_false (by omega), decide_eq_false (by omega)]; rfl
 
-/-- `(x as i32).overflowing_add(y as i32)` for `x, y < 2^31`, read back as a `u32`: the exact sum, with the overflow flag set exactly when the sum reaches `2^31`. -/
+/-- Overflowing signed addition of two 32-bit values below 2^31, read back as unsigned.
+
+- The result is the exact sum.
+- The overflow flag is set exactly when the sum reaches 2^31. -/
 theorem i32_overflowing_add_of_u32 (x y : Std.U32) (hx : x.val < 2 ^ 31) (hy : y.val < 2 ^ 31) :
     let r := IScalar.overflowing_add (UScalar.hcast .I32 x) (UScalar.hcast .I32 y)
     (IScalar.hcast .U32 r.1).val = x.val + y.val ∧ r.2 = decide (2 ^ 31 ≤ x.val + y.val) := by
@@ -55,7 +67,7 @@ theorem i32_overflowing_add_of_u32 (x y : Std.U32) (hx : x.val < 2 ^ 31) (hy : y
   rw [BitVec.signExtend_eq]
   exact h.1
 
-/-- A non-negative `i32` keeps its value as a `u32`. -/
+/-- A non-negative signed 32-bit value keeps its value as an unsigned one. -/
 theorem hcast_i32_u32_val (x : Std.I32) (hx : 0 ≤ x.val) :
     ((IScalar.hcast .U32 x).val : Int) = x.val := by
   have := x.hBounds
@@ -63,14 +75,14 @@ theorem hcast_i32_u32_val (x : Std.I32) (hx : 0 ≤ x.val) :
   simp only [IScalarTy.I32_numBits_eq] at this
   omega
 
-/-- An `i64` in the `i32` range keeps its value as an `i32`. -/
+/-- A signed 64-bit value in the 32-bit range keeps its value as a 32-bit one. -/
 theorem cast_i64_i32_val (x : Std.I64) (h1 : -2147483648 ≤ x.val) (h2 : x.val < 2147483648) :
     (IScalar.cast .I32 x).val = x.val := by
   rw [IScalar.cast_val_eq, IScalarTy.I32_numBits_eq, IScalarTy.I64_numBits_eq, Int.bmod_def]
   simp only [show min 32 64 = 32 from rfl]
   split <;> omega
 
-/-- An `i128` in the `i32` range keeps its value as an `i32`. -/
+/-- A signed 128-bit value in the 32-bit range keeps its value as a 32-bit one. -/
 theorem cast_i128_i32_val (x : Std.I128) (h1 : -2147483648 ≤ x.val) (h2 : x.val < 2147483648) :
     (IScalar.cast .I32 x).val = x.val := by
   rw [IScalar.cast_val_eq, IScalarTy.I32_numBits_eq, IScalarTy.I128_numBits_eq, Int.bmod_def]
@@ -87,7 +99,7 @@ theorem core.num.U32.wrapping_sub.spec (x y : Std.U32) :
   rw [UScalarTy.U32_numBits_eq] at this
   congr 1; omega
 
-/-- `i64::unsigned_abs`: the magnitude. -/
+/-- The unsigned magnitude of a signed 64-bit value. -/
 @[step]
 theorem core.num.I64.unsigned_abs.spec (x : Std.I64) :
     CoreModels.core.num.I64.unsigned_abs x ⦃ r => r.val = x.val.natAbs ⦄ := by
@@ -98,13 +110,13 @@ theorem core.num.I64.unsigned_abs.spec (x : Std.I64) :
 
 /-! ## Conversions and comparisons -/
 
-/-- `u64::from(x)` for a `u32` `x`. -/
+/-- Widening an unsigned 32-bit value to 64 bits keeps its value. -/
 @[step]
 theorem core.U64.Insts.CoreConvertFromU32.from.spec (x : Std.U32) :
     CoreModels.core.U64.Insts.CoreConvertFromU32.from x ⦃ r => r.val = x.val ⦄ := by
   simp only [CoreModels.core.U64.Insts.CoreConvertFromU32.from, WP.spec_ok, cast_u32_u64_val]
 
-/-- `x.min(y)` on `u32`s. -/
+/-- The minimum of two unsigned 32-bit values. -/
 @[step]
 theorem core.cmp.Ord.min.default_u32.spec (x y : Std.U32) :
     CoreModels.core.cmp.Ord.min.default CoreModels.core.U32.Insts.CoreCmpOrd x y
@@ -116,13 +128,13 @@ theorem core.cmp.Ord.min.default_u32.spec (x y : Std.U32) :
   · simp [h]
   · simp [compare_gt_iff_gt.mpr h]; omega
 
-/-- `x.min(y)` on `u32`s, called as the method of `u32`'s `Ord` instance. -/
+/-- The minimum of two unsigned 32-bit values, called through their ordering instance. -/
 @[step]
 theorem core.U32.Insts.CoreCmpOrd.min.spec (x y : Std.U32) :
     CoreModels.core.U32.Insts.CoreCmpOrd.min x y ⦃ r => r.val = min x.val y.val ⦄ :=
   core.cmp.Ord.min.default_u32.spec x y
 
-/-- `x.min(y)` on `usize`s, called as the method of `usize`'s `Ord` instance. -/
+/-- The minimum of two machine-size values, called through their ordering instance. -/
 @[step]
 theorem core.Usize.Insts.CoreCmpOrd.min.spec (x y : Std.Usize) :
     CoreModels.core.Usize.Insts.CoreCmpOrd.min x y ⦃ r => r.val = min x.val y.val ⦄ := by
@@ -133,7 +145,7 @@ theorem core.Usize.Insts.CoreCmpOrd.min.spec (x y : Std.Usize) :
   · simp [h]
   · simp [compare_gt_iff_gt.mpr h]; omega
 
-/-- `x.cmp(y)` on `u32`s. -/
+/-- The comparison of two unsigned 32-bit values. -/
 theorem core.U32.Insts.CoreCmpOrd.cmp.eq (x y : Std.U32) :
     CoreModels.core.U32.Insts.CoreCmpOrd.cmp x y =
       .ok (match compare x.val y.val with

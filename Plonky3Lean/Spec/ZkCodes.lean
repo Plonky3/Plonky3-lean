@@ -17,7 +17,11 @@ A code has positions 0, ..., m - 1, and a word assigns a symbol to each.
 
 An encoding maps a message of l field elements and a randomness of r field elements to a word.
 
-It is t-query zero knowledge with error zeta when a simulator, given only a set S of at most t positions, samples a restriction to S whose distance from the real one is at most zeta:
+It is t-query zero knowledge with error zeta when a simulator exists with this property.
+
+Given only a set S of at most t positions, it samples a restriction to S.
+
+That sample is within distance zeta of the real restriction:
 
 ```text
     Delta( Enc(msg, rho)[S]  with rho uniform ,  Sim(S) )  <=  zeta
@@ -25,9 +29,13 @@ It is t-query zero knowledge with error zeta when a simulator, given only a set 
 
 A distribution on a finite set is the probability of each outcome, a rational number.
 
-The paper also asks the simulator to run in polynomial time, which is not stated here.
+The paper also asks the simulator to run in polynomial time.
 
-The Reed-Solomon encoding of Proposition 3.19 puts the message in the low coefficients and the randomness in the next t:
+That requirement is not stated here.
+
+The Reed-Solomon encoding of Proposition 3.19 puts the message in the low coefficients.
+
+The randomness goes in the next t:
 
 ```text
     p_{f,rho}(X) = f_0 + f_1 X + ... + f_{l-1} X^{l-1} + rho_0 X^l + ... + rho_{t-1} X^{l+t-1}
@@ -47,7 +55,9 @@ def pushUniform {α β : Type _} [Fintype α] [DecidableEq β] (g : α → β) (
 /-- The uniform distribution on a finite set. -/
 def uniform (β : Type _) [Fintype β] (_ : β) : ℚ := 1 / Fintype.card β
 
-/-- The statistical distance between two distributions on a finite set: half the sum of the gaps. -/
+/-- The statistical distance between two distributions on a finite set.
+
+It is half the sum of the gaps. -/
 def statDist {β : Type _} [Fintype β] (p q : β → ℚ) : ℚ :=
   (∑ b, |p b - q b|) / 2
 
@@ -62,7 +72,9 @@ def realView {l r m : ℕ} {A : Type _} [DecidableEq A]
     (S → A) → ℚ :=
   pushUniform fun ρ => restrict (enc msg ρ) S
 
-/-- Definition 3.16: a t-query zero-knowledge encoding with error zeta, witnessed by the simulator sim. -/
+/-- Definition 3.16: a t-query zero-knowledge encoding with error zeta.
+
+The given simulator witnesses it. -/
 def IsZkEncoding {l r m : ℕ} {A : Type _} [Fintype A] [DecidableEq A]
     (enc : (Fin l → K) → (Fin r → K) → Fin m → A) (t : ℕ) (ζ : ℚ)
     (sim : (S : Finset (Fin m)) → (S → A) → ℚ) : Prop :=
@@ -77,7 +89,9 @@ def IsGeneratingMatrix {l r m : ℕ} (enc : (Fin l → K) → (Fin r → K) → 
 def rsCode {m : ℕ} (L : Fin m → K) (l : ℕ) : Set (Fin m → K) :=
   {c | ∃ p : K[X], p.degree < l ∧ ∀ i, p.eval (L i) = c i}
 
-/-- The polynomial of Proposition 3.19: the message in degrees below l, the randomness in the next t. -/
+/-- The polynomial of Proposition 3.19.
+
+The message fills degrees below l and the randomness the next t. -/
 noncomputable def rsZkPoly {l t : ℕ} (f : Fin l → K) (ρ : Fin t → K) : K[X] :=
   ∑ j, C (f j) * X ^ (j : ℕ) + ∑ j, C (ρ j) * X ^ (l + (j : ℕ))
 

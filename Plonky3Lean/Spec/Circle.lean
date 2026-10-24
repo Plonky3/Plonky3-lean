@@ -11,7 +11,9 @@ public import Mathlib.Tactic.Ring
 /-!
 # The circle curve and its FFT
 
-The definitions follow Haböck, Levit and Papini, "Circle STARKs", eprint 2024/278 (revision of December 2024).
+The definitions follow Haböck, Levit and Papini, "Circle STARKs", eprint 2024/278.
+
+The revision used is that of December 2024.
 
 The circle over a field K is the set of points with x^2 + y^2 = 1.
 
@@ -26,7 +28,9 @@ The group is written additively here, as Plonky3 writes it, so the paper's P . Q
 * The squaring map pi of equation (1) is P + P.
 * The inverse map J of equation (2) is the negation (x, -y).
 * The vanishing polynomial v_n of equation (8) is the x-coordinate of pi^(n-1)(P).
-* The FFT basis of Definition 4 is b_j = y^(j_0) v_1^(j_1) ... v_(n-1)^(j_(n-1)), for the bits j_k of j.
+* The FFT basis of Definition 4 is b_j = y^(j_0) v_1^(j_1) ... v_(n-1)^(j_(n-1)).
+
+Here j_k is bit k of j.
 -/
 
 namespace Plonky3Lean.Spec.Circle
@@ -115,7 +119,9 @@ def vn (n : ℕ) (P : C K) : K := (2 ^ (n - 1) • P).x
 /-- Bit k of j. -/
 def bit (j k : ℕ) : ℕ := j / 2 ^ k % 2
 
-/-- The FFT basis b_j^(n)(P) = y^(j_0) v_1(P)^(j_1) ... v_(n-1)(P)^(j_(n-1)) of Definition 4. -/
+/-- The FFT basis of Definition 4.
+
+It is b_j^(n)(P) = y^(j_0) v_1(P)^(j_1) ... v_(n-1)(P)^(j_(n-1)). -/
 def basis (n j : ℕ) (P : C K) : K :=
   P.y ^ bit j 0 * ∏ k ∈ Ico 1 n, vn k P ^ bit j k
 
@@ -123,23 +129,39 @@ def basis (n j : ℕ) (P : C K) : K :=
 def fftEval {V : Type _} [AddCommGroup V] [Module K V] (n : ℕ) (c : ℕ → V) (P : C K) : V :=
   ∑ j ∈ range (2 ^ n), basis n j P • c j
 
-/-- The x-only part of the FFT basis on the projected domain S_j of Section 4.1: x^(k_0) pi(x)^(k_1) ... pi^(m-1)(x)^(k_(m-1)). -/
+/-- The x-only part of the FFT basis on the projected domain S_j of Section 4.1.
+
+It is x^(k_0) pi(x)^(k_1) ... pi^(m-1)(x)^(k_(m-1)). -/
 def xBasis (m k : ℕ) (x : K) : K := ∏ t ∈ range m, (piX^[t] x) ^ bit k t
 
 /-- The value at x of the function with coefficients d in the x-only basis of order m. -/
 def xEval {V : Type _} [AddCommGroup V] [Module K V] (m : ℕ) (d : ℕ → V) (x : K) : V :=
   ∑ k ∈ range (2 ^ m), xBasis m k x • d k
 
-/-- The vanishing polynomial v_D(P) = v_n(P) - v_n(Q) of the twin coset D = Q + G_(n-1) ∪ -Q + G_(n-1), equation (7). -/
+/-- The vanishing polynomial v_D(P) = v_n(P) - v_n(Q) of equation (7).
+
+Its domain is the twin coset D = (Q + G_(n-1)) union (-Q + G_(n-1)). -/
 def vD (n : ℕ) (Q P : C K) : K := vn n P - vn n Q
 
-/-- The building block v(x, y) = 1 - (x + i y) of the DEEP quotient, as the pair (1 - x, -y) of its real and imaginary parts. -/
+/-- The building block v(x, y) = 1 - (x + i y) of the DEEP quotient.
+
+It is stored as the pair (1 - x, -y) of its real and imaginary parts. -/
 def vBlock (x y : K) : K × K := (1 - x, -y)
 
-/-- The single-point vanishing function v_P(x, y) = v(P_x x + P_y y, -P_y x + P_x y) of equation (11), as real and imaginary parts. -/
+/-- The single-point vanishing function of equation (11), as real and imaginary parts.
+
+It is v_P(x, y) = v(P_x x + P_y y, -P_y x + P_x y). -/
 def vP (P Q : C K) : K × K := vBlock (P.x * Q.x + P.y * Q.y) (-P.y * Q.x + P.x * Q.y)
 
-/-- The folding of Section 4.2, equations (14) to (19), with the challenge beta: f_0 + beta f_1, where f_0 = (f(P) + f(P'))/2 and f_1 = (f(P) - f(P'))/(2 t) for the fibre {P, P'} and its odd reference function t. -/
+/-- The folding of Section 4.2, equations (14) to (19), with the challenge beta.
+
+It is f_0 + beta f_1, for the fibre {P, P'} and its odd reference function t:
+
+```text
+    f_0 = (f(P) + f(P')) / 2
+    f_1 = (f(P) - f(P')) / (2 t)
+```
+-/
 def foldPair {F : Type _} [Field F] {V : Type _} [AddCommGroup V] [Module F V] (t β : F) (lo hi : V) : V :=
   (2 : F)⁻¹ • (lo + hi) + (β / (2 * t)) • (lo - hi)
 

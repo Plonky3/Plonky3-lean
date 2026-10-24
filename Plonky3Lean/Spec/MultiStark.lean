@@ -7,7 +7,10 @@ public import Plonky3Lean.Spec.MultilinearUtil
 /-!
 # The multilinear AIR zerocheck
 
-The reduction follows Setty, Thaler and Wahby, "Customizable constraint systems for succinct arguments" (eprint 2023/552), Section 5, and Spartan (eprint 2019/550), Section 4.
+The reduction follows two sources:
+
+- the CCS paper of Setty, Thaler and Wahby (eprint 2023/552), Section 5
+- Spartan (eprint 2019/550), Section 4.
 
 A trace of 2^n rows is a table on the Boolean cube {0,1}^n.
 
@@ -26,7 +29,9 @@ The constraint values of row b read the row itself, its successor, and three sel
 
 The successor repeats the last row: it does not wrap around to row 0.
 
-The constraints of one AIR are batched by the powers of alpha, and the AIRs by the powers of beta.
+The constraints of one AIR are batched by the powers of alpha.
+
+The AIRs are batched by the powers of beta.
 
 A table of fewer rows than the batch's cube reads the low bits of the row index:
 
@@ -53,7 +58,9 @@ variable {K : Type _} [CommRing K]
 
 /-! ## Rows and selectors -/
 
-/-- The extension at r of the table f on the cube of r's dimension: the sum of eq(b, r) f(b). -/
+/-- The extension at r of the table f on the cube of r's dimension.
+
+It is the sum of eq(b, r) f(b). -/
 def rowExt (f : ℕ → K) (r : List K) : K :=
   ∑ b ∈ range (2 ^ r.length), eq (vertex r.length b) r * f b
 
@@ -80,11 +87,15 @@ def Instance.Satisfied (A : Instance K) : Prop :=
 /-- The batch is satisfied: every instance is. -/
 def Satisfied (batch : List (Instance K)) : Prop := ∀ A ∈ batch, A.Satisfied
 
-/-- The constraints of one instance at row b, batched by alpha in Horner order: C_0 alpha^(k-1) + ... + C_(k-1). -/
+/-- The constraints of one instance at row b, batched by alpha in Horner order.
+
+The result is C_0 alpha^(k-1) + ... + C_(k-1). -/
 def Instance.batched (A : Instance K) (α : K) (b : ℕ) : K :=
   A.constraints.foldl (fun acc C => acc * α + C b) 0
 
-/-- The batched constraint of the batch at row b of the batch's cube: instance i weighted by beta^i, on the low bits of b. -/
+/-- The batched constraint of the batch at row b of the batch's cube.
+
+Instance i is weighted by beta^i and reads the low bits of b. -/
 def batchedRow (batch : List (Instance K)) (α β : K) (b : ℕ) : K :=
   ∑ i : Fin batch.length, β ^ (i : ℕ) * batch[i].batched α (b % 2 ^ batch[i].log_height)
 

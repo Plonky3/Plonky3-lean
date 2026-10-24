@@ -7,11 +7,13 @@ public import Plonky3Lean.Spec.MultilinearUtil
 /-!
 # WHIR
 
-The protocol of Arnon, Chiesa, Fenzi and Yogev, "WHIR: Reed–Solomon Proximity Testing with Super-Fast Verification", eprint 2024/1586, Construction 5.1.
+The protocol of Arnon, Chiesa, Fenzi and Yogev, eprint 2024/1586, Construction 5.1.
+
+Their paper is "WHIR: Reed-Solomon Proximity Testing with Super-Fast Verification".
 
 The polynomial is a table P of 2^n entries, read two ways:
 
-- the sumcheck runs on its multilinear extension P~, as in Thaler, Section 3.5;
+- the sumcheck runs on its multilinear extension P~, as in Thaler, Section 3.5
 - the code encodes the univariate polynomial with coefficients P.
 
 ```text
@@ -21,7 +23,9 @@ The polynomial is a table P of 2^n entries, read two ways:
 
 The codeword of P at fold width k is interleaved.
 
-Block j holds the entries j 2^(n-k), ..., (j + 1) 2^(n-k) - 1, and row i holds every block's polynomial at omega^i:
+Block j holds the entries j 2^(n-k), ..., (j + 1) 2^(n-k) - 1.
+
+Row i holds every block's polynomial at omega^i:
 
 ```text
     row_i = (block_0^(omega^i), ..., block_(2^k - 1)^(omega^i))
@@ -38,7 +42,9 @@ The paper's weight update, step 2(e) of Construction 5.1, then reads:
 
 An out-of-domain sample z_j asks for y_j = P~(pow(z_j)).
 
-A shift query q_j asks for v_j = P^(q_j), whose weight is the selector of the powers of q_j.
+A shift query q_j asks for v_j = P^(q_j).
+
+Its weight is the selector of the powers of q_j.
 -/
 
 namespace Plonky3Lean.Spec.Whir
@@ -50,7 +56,9 @@ variable {K : Type _} [CommRing K]
 /-- The univariate polynomial with coefficients c, at y. -/
 def uni (c : List K) (y : K) : K := ∑ b ∈ range c.length, c.getD b 0 * y ^ b
 
-/-- pow(z, n): coordinate i is z^(2^(n - 1 - i)), so coordinate 0 carries the top bit. -/
+/-- The point pow(z, n).
+
+Coordinate i is z^(2^(n - 1 - i)), so coordinate 0 carries the top bit. -/
 def pow (z : K) (n : ℕ) : List K := (List.range n).map fun i => z ^ 2 ^ (n - 1 - i)
 
 /-- The selector of the powers of q: the multilinear polynomial equal to q^b at the vertex b. -/

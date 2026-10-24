@@ -216,7 +216,11 @@ public import Plonky3Lean.Proofs.MultiStark.Security
 /-!
 # Proofs
 
-Proofs of the statements in `Plonky3Lean.Claims`, laid out by subject
-(`Proofs/Field/BabyBear/Constants.lean`). Proofs may be restructured freely: the
-claims pin what they must establish.
+Proofs of the statements in the claims tree, laid out by subject.
+
+For example, Proofs/Field/BabyBear/Constants.lean.
+
+Proofs may be restructured freely.
+
+The claims pin what they must establish.
 -/

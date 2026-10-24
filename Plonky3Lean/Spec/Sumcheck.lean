@@ -8,7 +8,9 @@ public import Mathlib.Data.Fintype.Pi
 /-!
 # The sumcheck protocol
 
-The protocol of Lund, Fortnow, Karloff and Nisan (1992), as Thaler states it in "Proofs, Arguments, and Zero-Knowledge", Section 4.1.
+The protocol of Lund, Fortnow, Karloff and Nisan (1992).
+
+It is stated as in Thaler, "Proofs, Arguments, and Zero-Knowledge", Section 4.1.
 
 The prover claims that a polynomial g in n variables sums to H over the Boolean cube:
 
@@ -30,7 +32,9 @@ A prover is a strategy: its message in round i is a function of the challenges.
 
 It is causal when round i reads only the challenges r_0, ..., r_{i-1}.
 
-An interactive verifier draws the challenges uniformly at random, and the soundness error counts the challenge vectors that accept.
+An interactive verifier draws the challenges uniformly at random.
+
+The soundness error counts the challenge vectors that accept.
 -/
 
 namespace Plonky3Lean.Spec.Sumcheck
@@ -46,11 +50,11 @@ def cube (n : ℕ) : Finset (Fin n → F) := Fintype.piFinset fun _ => {0, 1}
 noncomputable def cubeSum {n : ℕ} (g : MvPolynomial (Fin n) F) : F :=
   ∑ b ∈ cube n, eval b g
 
-/-- g has degree at most d in each variable. -/
+/-- The polynomial g has degree at most d in each variable. -/
 def IndividualDegreeLE {n : ℕ} (g : MvPolynomial (Fin n) F) (d : ℕ) : Prop :=
   ∀ i, g.degreeOf i ≤ d
 
-/-- g with its first variable set to a. -/
+/-- The polynomial g with its first variable set to a. -/
 noncomputable def fixFirst {n : ℕ} (a : F) (g : MvPolynomial (Fin (n + 1)) F) :
     MvPolynomial (Fin n) F :=
   Polynomial.eval (C a) (finSuccEquiv F n g)
@@ -64,7 +68,11 @@ noncomputable def fixFirst {n : ℕ} (a : F) (g : MvPolynomial (Fin (n + 1)) F) 
 noncomputable def honestMessage {n : ℕ} (g : MvPolynomial (Fin (n + 1)) F) : Polynomial F :=
   ∑ b ∈ cube n, (finSuccEquiv F n g).map (eval b)
 
-/-- The honest prover: round 0 sends the honest first message, and later rounds recurse on g with its first variable set to r_0. -/
+/-- The honest prover.
+
+Round 0 sends the honest first message.
+
+Later rounds recurse on g with its first variable set to r_0. -/
 noncomputable def honestProver : {n : ℕ} → MvPolynomial (Fin n) F → Fin n → (Fin n → F) → Polynomial F
   | 0, _ => fun i => i.elim0
   | _ + 1, g => fun i r =>

@@ -8,7 +8,10 @@ public import Plonky3Lean.Spec.Commit
 /-!
 # The STARK IOP
 
-This follows the ethSTARK documentation (eprint 2021/582), Section 3, and Haböck's summary (eprint 2022/1216).
+This follows two sources:
+
+- the ethSTARK documentation (eprint 2021/582), Section 3
+- Haböck's summary of FRI (eprint 2022/1216).
 
 The prover interpolates the trace over a coset s H of order n = 2^k, with generator omega.
 
@@ -18,9 +21,13 @@ It combines the constraint polynomials with powers of a random alpha:
     C_alpha(X) = sum_i alpha^(m - 1 - i) C_i(X)        for m constraints, in emission order
 ```
 
-On a satisfying trace C_alpha vanishes on s H, so the quotient Q = C_alpha / Z is a polynomial.
+On a satisfying trace C_alpha vanishes on s H.
 
-The prover splits Q into chunks, and the verifier checks C_alpha(zeta) / Z(zeta) = Q(zeta) at a random zeta.
+So the quotient Q = C_alpha / Z is a polynomial.
+
+The prover splits Q into chunks.
+
+The verifier checks C_alpha(zeta) / Z(zeta) = Q(zeta) at a random zeta.
 
 ## Selectors
 
@@ -35,7 +42,9 @@ Its selectors are the unnormalized Lagrange selectors of p3-commit:
                                            value omega^i - omega^(n-1) on row i
 ```
 
-So the STARK checks the constraints with these row values, not with the 0/1 values of the AIR's reference semantics.
+So the STARK checks the constraints with these row values.
+
+It does not use the 0/1 values of the AIR's reference semantics.
 
 Both agree on constraints that are a product of selectors times a selector-free polynomial.
 -/
@@ -46,7 +55,9 @@ namespace Plonky3Lean.Spec.UniStark
 
 variable {K : Type _} [Field K]
 
-/-- The random linear combination of values v_0, ..., v_(m-1): sum_i alpha^(m - 1 - i) v_i. -/
+/-- The random linear combination of values v_0, ..., v_(m-1).
+
+It is sum_i alpha^(m - 1 - i) v_i. -/
 def combine (α : K) (vs : List K) : K :=
   ∑ i ∈ Finset.range vs.length, α ^ (vs.length - 1 - i) * vs.getD i 0
 
@@ -57,7 +68,9 @@ def IsSelector : Var → Prop
   | .isFirstRow | .isLastRow | .isTransition => True
   | _ => False
 
-/-- The values of the variables on row i as the STARK evaluates them, over a subgroup with generator omega.
+/-- The values of the variables on row i as the STARK evaluates them.
+
+The subgroup has generator omega.
 
 The cells, public values and periodic values are those of the reference semantics.
 
@@ -68,18 +81,25 @@ def starkRowEnv (T : Instance K) (ω : K) (i : ℕ) : Var → K
   | .isTransition => ω ^ i - ω ^ (T.height - 1)
   | v => rowEnv T i v
 
-/-- The relation the STARK proves: each constraint vanishes on each row, with the STARK's selector values. -/
+/-- The relation the STARK proves.
+
+Each constraint vanishes on each row, with the STARK's selector values. -/
 def SatisfiesStark (C : List (MvPolynomial Var K)) (T : Instance K) (ω : K) : Prop :=
   ∀ i < T.height, ∀ c ∈ C, MvPolynomial.eval (starkRowEnv T ω i) c = 0
 
-/-- A constraint in selector form: a product of selector variables times a polynomial with no selector variable. -/
+/-- A constraint in selector form.
+
+It is a product of selector variables times a polynomial with no selector variable. -/
 def SelectorSeparated (c : MvPolynomial Var K) : Prop :=
   ∃ (ss : List Var) (p : MvPolynomial Var K), (∀ s ∈ ss, IsSelector s) ∧
     (∀ v ∈ p.vars, ¬ IsSelector v) ∧ c = (ss.map MvPolynomial.X).prod * p
 
 /-! ## The univariate polynomials -/
 
-/-- The unnormalized Lagrange selectors of s H as polynomials, and the trace columns read on the current or next row. -/
+/-- The univariate polynomials substituted for the variables.
+
+- The selectors are the unnormalized Lagrange selectors of s H.
+- The trace columns are read on the current or next row. -/
 noncomputable def starkAssign (s ω : K) (k : ℕ) (main prep : ℕ → K[X]) (pub : ℕ → K)
     (periodic : ℕ → K[X]) : Var → K[X]
   | .main 0 c => main c
@@ -92,9 +112,11 @@ noncomputable def starkAssign (s ω : K) (k : ℕ) (main prep : ℕ → K[X]) (p
   | .isLastRow => C (2 ^ k * ω : K) * lagrange s ω k ⟨2 ^ k - 1, Nat.sub_lt (by positivity) one_pos⟩
   | .isTransition => C s⁻¹ * (X - C (s * ω ^ (2 ^ k - 1)))
 
-/-- The combined constraint polynomial: sum_i alpha^(m - 1 - i) C_i(X) for the constraints in order.
+/-- The combined constraint polynomial sum_i alpha^(m - 1 - i) C_i(X), for the constraints in order.
 
-The constraints have coefficients in a base field F, and alpha and the polynomials lie in an extension K. -/
+The constraints have coefficients in a base field F.
+
+The challenge alpha and the polynomials lie in an extension K. -/
 noncomputable def combinedPoly {F : Type _} [CommRing F] [Algebra F K] (α : K) (σ : Var → K[X])
     (C : List (MvPolynomial Var F)) : K[X] :=
   ∑ i ∈ Finset.range C.length, Polynomial.C (α ^ (C.length - 1 - i)) * MvPolynomial.aeval σ (C.getD i 0)

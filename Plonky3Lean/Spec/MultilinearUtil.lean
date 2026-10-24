@@ -13,7 +13,9 @@ The definitions follow Thaler, "Proofs, Arguments, and Zero-Knowledge", Section 
 
 A table f of 2^n values is a function on the Boolean cube {0,1}^n.
 
-Its multilinear extension is the unique polynomial of degree at most 1 in each variable that agrees with f on the cube:
+Its multilinear extension is the unique polynomial that agrees with f on the cube.
+
+It has degree at most 1 in each variable:
 
 ```text
     f~(r) = sum_{b in {0,1}^n} eq(b, r) f(b)
@@ -68,7 +70,9 @@ Entry b is the coefficient of the product of the X_i whose bit n - 1 - i is set 
 noncomputable def coeffPoly (c : List K) (n : ℕ) : MvPolynomial (Fin n) K :=
   ∑ b ∈ range (2 ^ n), C (c.getD b 0) * ∏ i : Fin n, if b.testBit (n - 1 - i) then X i else 1
 
-/-- The successor on the n-cube that repeats the last vertex: x + 1 below 2^n - 1, and 2^n - 1 itself. -/
+/-- The successor on the n-cube that repeats the last vertex.
+
+It maps x to x + 1 below 2^n - 1, and fixes 2^n - 1. -/
 def succRepeat (n x : ℕ) : ℕ := if x + 1 < 2 ^ n then x + 1 else x
 
 /-- The successor table: entry y sums eq(x, r) over the x whose successor is y. -/

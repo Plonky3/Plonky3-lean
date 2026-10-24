@@ -7,15 +7,19 @@ public import Mathlib.Data.List.Basic
 /-!
 # The multi-height Merkle tree
 
-This is the tree Plonky3's Merkle MMCS commits to, read from its documentation and from the builder's description of one node.
+This is the tree Plonky3's Merkle MMCS commits to.
+
+It is read from that crate's documentation and from the builder's description of one node.
 
 # Overview
 
-The tallest matrices fill the leaf layer: leaf `i` is the hash of row `i` of each of them, concatenated.
+The tallest matrices fill the leaf layer.
 
-The layer is padded with a default digest `z` to the width the next fold needs.
+Leaf i is the hash of row i of each of them, concatenated.
 
-Each layer above folds `s` children into one node, where `s` is 2 or the full arity `N`.
+The layer is padded with a default digest z to the width the next fold needs.
+
+Each layer above folds s children into one node, where s is 2 or the full arity N.
 
 Some layers also take in the rows of shorter matrices:
 
@@ -26,7 +30,7 @@ Some layers also take in the rows of shorter matrices:
     node_j = C(folded, z, z, ...)           matrices enter here, j at or past their height
 ```
 
-The padding slots of a fold, and the slots past the second of an injection, hold `z`.
+The padding slots of a fold, and the slots past the second of an injection, hold z.
 -/
 
 namespace Plonky3Lean.Spec.MerkleTree
@@ -35,23 +39,23 @@ variable {F D : Type _}
 
 /-- One layer of the tree: how many children each node folds, and what enters it.
 
-`inj` is `none`, or the height of the entering matrices and the hash of their rows at each node. -/
+What enters is either nothing, or the matrices' height and the hash of their rows at each node. -/
 structure LayerSpec (D : Type _) where
   step : ℕ
   inj : Option (ℕ × (ℕ → D))
 
-/-- The fold of `s` children starting at `start` of the layer `L`, padded with `pad`. -/
+/-- The fold of s children starting at start of the layer L, padded with pad. -/
 def fold (c : List D → D) (pad : List D) (z : D) (L : ℕ → D) (s start : ℕ) : D :=
   c ((List.range pad.length).map fun k => if k < s then L (start + k) else pad.getD k z)
 
-/-- Node `j` of the layer above `L`. -/
+/-- Node j of the layer above L. -/
 def node (c : List D → D) (pad : List D) (z : D) (L : ℕ → D) (l : LayerSpec D) (j : ℕ) : D :=
   let folded := fold c pad z L l.step (j * l.step)
   match l.inj with
   | none => folded
   | some (height, rows) => c ((pad.set 0 folded).set 1 (if j < height then rows j else z))
 
-/-- The layers of the tree, from the leaf layer `L0` up through `ls`. -/
+/-- The layers of the tree, from the leaf layer L0 up through the given layer specifications. -/
 def layers (c : List D → D) (pad : List D) (z : D) (L0 : ℕ → D) : List (LayerSpec D) → List (ℕ → D)
   | [] => [L0]
   | l :: rest => L0 :: layers c pad z (node c pad z L0 l) rest
@@ -61,7 +65,9 @@ def top (c : List D → D) (pad : List D) (z : D) (L0 : ℕ → D) : List (Layer
   | [] => L0
   | l :: rest => top c pad z (node c pad z L0 l) rest
 
-/-- The siblings an honest prover sends for leaf `i`: at each layer, the other children of the path's node, in order. -/
+/-- The siblings an honest prover sends for leaf i.
+
+At each layer, they are the other children of the path's node, in order. -/
 def path (c : List D → D) (pad : List D) (z : D) (L0 : ℕ → D) : List (LayerSpec D) → ℕ → List D
   | [], _ => []
   | l :: rest, i =>
