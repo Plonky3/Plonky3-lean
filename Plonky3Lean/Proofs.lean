@@ -214,6 +214,11 @@ public import Plonky3Lean.Proofs.Circle.Query
 public import Plonky3Lean.Proofs.Fri.Transcript
 public import Plonky3Lean.Proofs.Fri.Hiding
 public import Plonky3Lean.Proofs.Fri.Packed
+public import Plonky3Lean.Proofs.Fri.Pcs
+public import Plonky3Lean.Proofs.Fri.Deep
+public import Plonky3Lean.Proofs.Fri.Chain
+public import Plonky3Lean.Proofs.Fri.Complete
+public import Plonky3Lean.Proofs.Fri.Edge
 public import Plonky3Lean.Proofs.Stir.Horner
 public import Plonky3Lean.Proofs.Stir.Lists
 public import Plonky3Lean.Proofs.Stir.Vanishing
