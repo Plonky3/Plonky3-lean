@@ -2,7 +2,7 @@ module
 
 public import Plonky3Lean.Proofs.MultilinearUtil.EqBatchCommon
 public import Plonky3Lean.Proofs.MultilinearUtil.Next
-public import P3MultilinearUtil.Poly
+public import P3MultilinearUtil.Mirror.Poly
 
 @[expose] public section
 

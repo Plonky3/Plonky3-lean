@@ -1,7 +1,7 @@
 module
 
 public import Plonky3Lean.Proofs.MultilinearUtil.Point
-public import P3MultilinearUtil.EqBatch
+public import P3MultilinearUtil.Mirror.EqBatch
 
 @[expose] public section
 

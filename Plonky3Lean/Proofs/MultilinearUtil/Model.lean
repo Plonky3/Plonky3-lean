@@ -1,6 +1,6 @@
 module
 
-public import P3MultilinearUtil.Model
+public import P3MultilinearUtil.Mirror.Model
 
 @[expose] public section
 

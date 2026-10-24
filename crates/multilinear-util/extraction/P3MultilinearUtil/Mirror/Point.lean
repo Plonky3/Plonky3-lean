@@ -9,7 +9,7 @@ The thread split of the equality table is a task-length parameter.
 -/
 module
 
-public import P3MultilinearUtil.Model
+public import P3MultilinearUtil.Mirror.Model
 public import Mathlib.Algebra.Field.Basic
 public import Mathlib.Data.Nat.Log
 

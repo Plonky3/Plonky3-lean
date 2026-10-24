@@ -14,7 +14,7 @@ The delayed-reduction dot products of the packing return the exact dot product.
 -/
 module
 
-public import P3MultilinearUtil.Poly
+public import P3MultilinearUtil.Mirror.Poly
 public import Mathlib.LinearAlgebra.Basis.Defs
 public import Mathlib.Algebra.BigOperators.Fin
 

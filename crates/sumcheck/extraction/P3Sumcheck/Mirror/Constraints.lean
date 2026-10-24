@@ -7,7 +7,7 @@ The successor statement is not transcribed.
 -/
 module
 
-public import P3MultilinearUtil.Point
+public import P3MultilinearUtil.Mirror.Point
 
 @[expose] public section
 

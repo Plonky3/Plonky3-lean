@@ -10,6 +10,7 @@ public import Plonky3Lean.Lib.Scalar.U64
 public import Plonky3Lean.Lib.Range
 public import Plonky3Lean.Lib.Slice
 public import Plonky3Lean.Lib.Scalar.Words
+public import Plonky3Lean.Lib.Yields
 
 @[expose] public section
 

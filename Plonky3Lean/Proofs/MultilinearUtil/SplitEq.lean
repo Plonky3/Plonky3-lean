@@ -1,7 +1,7 @@
 module
 
 public import Plonky3Lean.Proofs.MultilinearUtil.PackedTable
-public import P3MultilinearUtil.SplitEq
+public import P3MultilinearUtil.Mirror.SplitEq
 
 @[expose] public section
 

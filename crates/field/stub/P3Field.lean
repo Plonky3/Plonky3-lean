@@ -29,6 +29,7 @@ module
 
 public import Aeneas
 public import CoreModels
+public import HaxExt
 
 @[expose] public section
 open CoreModels Aeneas
@@ -56,8 +57,11 @@ structure field.PrimeCharacteristicRing (Self : Type) where
   div_2exp_u64 : Self → Std.U64 → RustM Self
   ZERO : RustM Self
   ONE : RustM Self
+  NEG_ONE : RustM Self
+  square : Self → RustM Self
   from_u8 : Std.U8 → RustM Self
   from_u16 : Std.U16 → RustM Self
+  coreitertraitsaccumProductInst : core.iter.traits.accum.Product Self Self
 
 /-- The algebra trait, restricted to the members the extraction uses.
 
@@ -68,6 +72,7 @@ structure field.Algebra (Self F : Type) where
   coreopsarithSubInst : core.ops.arith.Sub Self F Self
   coreopsarithAddAssignInst : core.ops.arith.AddAssign Self F
   coreopsarithMulInst : core.ops.arith.Mul Self F Self
+  coreopsarithMulAssignInst : core.ops.arith.MulAssign Self F
 
 /-- The quotient map trait, restricted to the member the extraction uses.
 
@@ -86,12 +91,16 @@ instance {Self : Type} : Inhabited (field.Algebra Self Self) :=
         div_2exp_u64 := fun _ _ => fail .panic
         ZERO := fail .panic
         ONE := fail .panic
+        NEG_ONE := fail .panic
+        square := fun _ => fail .panic
         from_u8 := fun _ => fail .panic
-        from_u16 := fun _ => fail .panic }
+        from_u16 := fun _ => fail .panic
+        coreitertraitsaccumProductInst := ⟨fun _ _ => fail .panic⟩ }
      coreopsarithAddInst := ⟨fun _ _ => fail .panic⟩
      coreopsarithSubInst := ⟨fun _ _ => fail .panic⟩
      coreopsarithAddAssignInst := ⟨fun _ _ => fail .panic⟩
-     coreopsarithMulInst := ⟨fun _ _ => fail .panic⟩ }⟩
+     coreopsarithMulInst := ⟨fun _ _ => fail .panic⟩
+     coreopsarithMulAssignInst := ⟨fun _ _ => fail .panic⟩ }⟩
 
 /-- The copy witness of a field whose model does not give one.
 
@@ -122,6 +131,20 @@ structure field.Field (Self : Type) where
   bits : RustM Std.Usize := field.Field.unmodelledBits Self
 
 instance {Self : Type} : Inhabited (field.Field Self) := ⟨{}⟩
+
+/-- The field's algebra over itself, under the name aeneas gives it in code that also names the extension field trait. -/
+abbrev field.Field.AlgebraSelfSelfSelf_Clause0_Clause0_PrimeSubfieldInst {Self : Type}
+    (inst : field.Field Self) : field.Algebra Self Self :=
+  inst.AlgebraInst
+
+/-- The extension field trait, restricted to the members the extraction uses.
+
+Upstream: field/src/field.rs:1336.
+
+It names two rings on the extension: the field's own, and the algebra's over the base. -/
+structure field.ExtensionField (Self Base : Type) where
+  FieldInst : field.Field Self
+  AlgebraSelfBaseSelf_Clause1_Clause0_PrimeSubfieldInst : field.Algebra Self Base
 
 instance {Self : Type} : Inhabited (integers.QuotientMap Self Std.U64) :=
   ⟨⟨fun _ => fail .panic⟩⟩

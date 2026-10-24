@@ -2,7 +2,7 @@ module
 
 public import Plonky3Lean.Proofs.MultilinearUtil.Model
 public import Plonky3Lean.Proofs.MultilinearUtil.Unique
-public import P3MultilinearUtil.Point
+public import P3MultilinearUtil.Mirror.Point
 
 @[expose] public section
 

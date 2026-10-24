@@ -11,7 +11,7 @@ The evaluation dispatch and the in-place folds take the cost model's choice as a
 -/
 module
 
-public import P3MultilinearUtil.EqBatch
+public import P3MultilinearUtil.Mirror.EqBatch
 
 @[expose] public section
 

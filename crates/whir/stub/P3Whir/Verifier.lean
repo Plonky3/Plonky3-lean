@@ -8,7 +8,7 @@ The domain is the two-adic one, whose query points are powers of the generator.
 module
 
 public import P3Whir.Query
-public import P3MultilinearUtil.SplitEq
+public import P3MultilinearUtil.Mirror.SplitEq
 
 @[expose] public section
 

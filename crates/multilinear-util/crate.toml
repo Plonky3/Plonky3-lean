@@ -2,14 +2,18 @@
 
 lean_lib = "P3MultilinearUtil"
 
-# Nothing is extracted.
+# The equality polynomial of two points is extracted.
 #
-# The crate is generic over p3-field's trait hierarchy and over its packed types, which aeneas rejects (docs/extractor-issues.md 9).
+# The rest is generic over p3-field's packed types, which aeneas rejects (docs/extractor-issues.md 9).
 #
-# Each item is transcribed over a field in stub/P3MultilinearUtil/, with the abstractions stub/P3MultilinearUtil/Model.lean lists.
-state = "stub"
+# It is transcribed over a field in extraction/P3MultilinearUtil/Mirror/, with the abstractions Mirror/Model.lean lists.
+state = "scoped"
 
 features = []
+
+# One root: the `hax_roots` module that pre-patch 020 adds under cfg(hax_backend_lean).
+# Its one function calls one item, with the fields left generic.
+start_from = ["p3_multilinear_util::hax_roots"]
 
 watch = ["multilinear-util/src", "multilinear-util/Cargo.toml", "field/src/packed", "maybe-rayon/src/task_size.rs"]
 

@@ -13,7 +13,7 @@ What a transcription abstracts:
 -/
 module
 
-public import P3MultilinearUtil.Model
+public import P3MultilinearUtil.Mirror.Model
 public import Mathlib.Algebra.Field.Basic
 public import Mathlib.Algebra.Algebra.Pi
 public import Mathlib.Data.Nat.Log

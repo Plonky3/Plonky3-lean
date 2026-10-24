@@ -126,6 +126,14 @@ def core.fmt.rt.Argument.new_display {T : Type} (_displayInst : core.fmt.Display
     RustM core.fmt.rt.Argument :=
   ok ⟨.Placeholder ()⟩
 
+/-- `fmt::Arguments::from_str` (`library/core/src/fmt/mod.rs`): a message with no arguments.
+
+`fmt.Arguments` is `Unit`, so the text is not modelled; only the panic it reaches is.
+
+p3-multilinear-util's equality polynomial formats its `assert_eq!` message with it. -/
+def core.fmt.Arguments.from_str (_s : Str) : RustM core.fmt.Arguments :=
+  ok ()
+
 /-! ## Iterators
 
 aeneas projects `fold` and `reduce` from an `Iterator` dictionary, and refers to the

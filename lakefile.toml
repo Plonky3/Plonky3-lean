@@ -114,7 +114,7 @@ srcDir = "crates/zk-codes/stub"
 
 [[lean_lib]]
 name = "P3MultilinearUtil"
-srcDir = "crates/multilinear-util/stub"
+srcDir = "crates/multilinear-util/extraction"
 
 [[lean_lib]]
 name = "P3Sumcheck"
