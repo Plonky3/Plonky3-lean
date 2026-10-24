@@ -95,6 +95,19 @@ theorem recombination_masked (hl : l ≤ qd.log_size) (q t : ℕ → K[X]) :
   simp only [← mul_assoc, ← C_mul, mul_div_cancel₀ _ hw]
   exact add_neg_cancel _
 
+/-- Openings of the masked chunks recompose to the quotient at zeta, as the unmasked openings do. -/
+theorem recompose_quotient_masked {D : ℕ} {F : Type} [Field F] [Algebra F K] (B : Module.Basis (Fin D) F K)
+    (hN : GenNested G) (hl : l ≤ qd.log_size) (Q : K[X]) (hQ : Q.degree < (2 ^ qd.log_size : ℕ))
+    (t : ℕ → K[X]) (ζ : K) (chunks : List (List K)) (hlen : chunks.length = 2 ^ l)
+    (hv : ∀ i (hi : i < 2 ^ l), p3_uni_stark.verifier.mirror.from_ext_basis_coefficients B (chunks[i]'(hlen ▸ hi)) =
+      some ((chunkInterp hV qd l Q i + chunkZ hV qd l i * mask hV qd l t i).eval ζ)) :
+    p3_uni_stark.verifier.mirror.recompose_quotient_from_chunks G B
+      ((List.range (2 ^ l)).map (chunk G hV qd l)) chunks ζ = some (Q.eval ζ) := by
+  rw [recompose_eq hV qd l B hl chunks hlen _ hv, ← recombine hV qd l hN hl Q hQ ζ]
+  have := congrArg (Polynomial.eval ζ) (recombination_masked hV qd l hl (chunkInterp hV qd l Q) t)
+  simp only [eval_finsetSum, eval_mul, eval_add] at this
+  simp only [eval_mul, eval_add, this]
+
 /-- A mask of degree below m keeps a chunk below the randomized chunk's size 2m. -/
 theorem natDegree_masked_lt {m : ℕ} (hm : m = 2 ^ (qd.log_size - l)) {q t : K[X]} {i : ℕ}
     (hq : q.natDegree < m) (ht : t.natDegree < m) :
