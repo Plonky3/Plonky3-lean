@@ -1,0 +1,88 @@
+# Patch:        030-extraction-roots
+# Phase:        pre
+# Target:       multi-stark/src/hax_roots.rs, multi-stark/src/lib.rs
+# Hunks:        2
+# Class:        bound
+# Gap:          docs/extractor-issues.md 4 (aeneas drops a method that no free
+#               function calls). Each rooted item is a method, and three are
+#               crate-private.
+# Cost:         none in a normal build: the module exists only under
+#               cfg(hax_backend_lean). In the extracted variant it adds free
+#               functions, each of which calls one item of the crate.
+#               No existing body changes.
+# Upstreamable: no: the module exists only for the extractor.
+# Drop when:    charon orders `--start-from` methods, so that the methods
+#               themselves can be roots.
+# Test:         lint p3-multi-stark unexpected_cfgs
+# Mutation:     the module is gated on a misspelled cfg, so a normal
+#               `cargo check` reports `unexpected_cfgs`.
+#
+# The roots are the verifier's field arithmetic that needs no transcript and no AIR:
+#
+# - the boundary selectors at a point, one more coordinate folded in, at one row, and at one row behind a prefix;
+# - the successor row rebuilt from the opened columns;
+# - the number of free coordinates of the zerocheck.
+#
+# The field stays generic, so the Lean model quantifies over every implementation.
+#
+diff --git a/multi-stark/src/hax_roots.rs b/multi-stark/src/hax_roots.rs
+new file mode 100644
+--- /dev/null
++++ b/multi-stark/src/hax_roots.rs
+@@ -0,0 +1,43 @@
++//! PATCHED: extraction roots for hax's Lean backend, compiled only under `cfg(hax_backend_lean)`.
++//!
++//! Aeneas drops a method that no free function calls (Plonky3-lean, docs/extractor-issues.md, 4).
++//! Each function here calls one item and does nothing else, so that the item's own body is extracted.
++//!
++//! The field stays generic.
++//! The Lean model then quantifies over every implementation of it.
++
++use alloc::vec::Vec;
++
++use p3_field::Field;
++
++use crate::opening::OpeningClaims;
++use crate::selectors::BoundaryEvals;
++use crate::zerocheck::transcript::ZerocheckShape;
++
++pub fn boundary_at<EF: Field>(rs: &[EF]) -> BoundaryEvals<EF> {
++    BoundaryEvals::at(rs)
++}
++
++pub fn boundary_apply<EF: Field>(b: &mut BoundaryEvals<EF>, r: EF) {
++    b.apply(r)
++}
++
++pub fn boundary_from_row<EF: Field>(row: usize, height: usize) -> BoundaryEvals<EF> {
++    BoundaryEvals::from_row(row, height)
++}
++
++pub fn boundary_from_row_with_prefix<EF: Field>(
++    row: usize,
++    height: usize,
++    prefix: BoundaryEvals<EF>,
++) -> BoundaryEvals<EF> {
++    BoundaryEvals::from_row_with_prefix(row, height, prefix)
++}
++
++pub fn next_row<EF: Field>(claims: &OpeningClaims<EF>, width: usize) -> Vec<EF> {
++    claims.next_row(width)
++}
++
++pub fn free_coordinates(shape: &ZerocheckShape) -> usize {
++    shape.free_coordinates()
++}
+diff --git a/multi-stark/src/lib.rs b/multi-stark/src/lib.rs
+--- a/multi-stark/src/lib.rs
++++ b/multi-stark/src/lib.rs
+@@ -39,6 +39,9 @@ pub mod subfield;
+ pub mod transcript;
+ pub mod verifier;
+ pub mod zerocheck;
++// PATCHED: extraction roots, only under hax's Lean backend.
++#[cfg(hax_backend_lean)]
++pub mod hax_roots;
+ 
+ pub use backend::{GenericBackend, ReprBackend, SubfieldBackend, ZerocheckBackend};
+ pub use bus::BusBindingError;

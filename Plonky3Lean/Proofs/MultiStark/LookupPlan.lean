@@ -1,6 +1,6 @@
 module
 
-public import P3MultiStark.Lookup
+public import P3MultiStark.Mirror.Lookup
 public import Plonky3Lean.Proofs.MultiStark.LookupLink
 public import Plonky3Lean.Proofs.MultilinearUtil.PointForms
 public import Mathlib.Algebra.CharP.Basic

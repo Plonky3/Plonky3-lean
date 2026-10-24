@@ -1,6 +1,6 @@
 module
 
-public import P3MultiStark.LogupStar
+public import P3MultiStark.Mirror.LogupStar
 public import Plonky3Lean.Proofs.MultiStark.Blocks
 public import Plonky3Lean.Proofs.Lookup.LogUp
 public import Mathlib.Algebra.CharP.Basic

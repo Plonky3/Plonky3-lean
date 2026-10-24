@@ -1,8 +1,9 @@
 /-
 Transcriptions of the boundary selectors of p3-multi-stark.
 
-These do not extract.
-They are generic over the field traits, which aeneas rejects.
+The four scalar items are also extracted.
+
+The extracted ones compute these, so the theorems about these hold for the shipped code.
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 

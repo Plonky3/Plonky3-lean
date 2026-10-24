@@ -2,16 +2,18 @@
 
 lean_lib = "P3MultiStark"
 
-# Nothing is extracted.
+# The verifier's field arithmetic that needs no transcript and no AIR is extracted: the boundary selectors, the successor row and the zerocheck's free coordinates.
 #
-# Code over `ExtensionField` does not extract (docs/extractor-issues.md 180).
+# The rest is generic over the AIR and the challenger, or keeps a transcript holding a mutable borrow, which aeneas rejects (docs/extractor-issues.md 9 and 180).
 #
-# Its items are also generic over the field traits and the AIR, which aeneas rejects (docs/extractor-issues.md 9).
-#
-# The verifier's own checks are transcribed in stub/P3MultiStark/, with the abstractions each file's header lists.
-state = "stub"
+# It is transcribed in extraction/P3MultiStark/Mirror/, with the abstractions each file's header lists.
+state = "scoped"
 
 features = []
+
+# One root: the `hax_roots` module that pre-patch 030 adds under cfg(hax_backend_lean).
+# Each of its functions calls one item, with the field left generic.
+start_from = ["p3_multi_stark::hax_roots"]
 
 watch = ["multi-stark/src", "multi-stark/Cargo.toml", "security/src/multilinear.rs", "multilinear-util/src/point.rs", "sumcheck/src/generic_degree/util.rs", "lookup/src/challenges.rs", "bus/src/plan/mod.rs"]
 

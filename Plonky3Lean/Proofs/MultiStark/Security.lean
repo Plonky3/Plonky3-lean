@@ -1,7 +1,7 @@
 module
 
-public import P3MultiStark.Security
-public import P3MultiStark.Zerocheck
+public import P3MultiStark.Mirror.Security
+public import P3MultiStark.Mirror.Zerocheck
 public import Plonky3Lean.Proofs.MultiStark.Zerocheck
 public import Mathlib.Tactic.FieldSimp
 

@@ -22,8 +22,8 @@ Loops, branches and the order of checks are kept.
 -/
 module
 
-public import P3MultiStark.Selectors
-public import P3MultiStark.Opening
+public import P3MultiStark.Mirror.Selectors
+public import P3MultiStark.Mirror.Opening
 public import P3MultilinearUtil
 
 @[expose] public section

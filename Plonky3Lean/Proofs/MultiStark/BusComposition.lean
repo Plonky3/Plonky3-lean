@@ -1,6 +1,6 @@
 module
 
-public import P3MultiStark.Bus
+public import P3MultiStark.Mirror.Bus
 public import Plonky3Lean.Proofs.MultiStark.LookupLink
 public import Plonky3Lean.Proofs.MultiStark.Selectors
 public import Plonky3Lean.Proofs.MultilinearUtil.PointForms

@@ -1,6 +1,6 @@
 module
 
-public import P3MultiStark.Zerocheck
+public import P3MultiStark.Mirror.Zerocheck
 public import Plonky3Lean.Proofs.MultiStark.Selectors
 public import Plonky3Lean.Proofs.MultilinearUtil.PointForms
 

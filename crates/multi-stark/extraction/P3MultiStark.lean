@@ -1,20 +1,25 @@
 /-
 The Lean model of p3-multi-stark.
 
-Nothing is extracted: its items are generic over the field traits and the AIR (docs/extractor-issues.md 9), and code over `ExtensionField` does not extract (docs/extractor-issues.md 180).
+`P3MultiStark/Extraction/` is hax's scoped extraction, rooted at `start_from` in crate.toml.
 
-Each item is transcribed by hand in `P3MultiStark/`, one definition per Rust item.
+It holds the boundary selectors, the successor row and the zerocheck's free coordinates.
+
+`P3MultiStark/Mirror/` transcribes the rest of the verifier by hand, one definition per Rust item.
+
+Each transcription has a `[[mirror]]` entry in crate.toml.
 -/
 module
 
-public import P3MultiStark.Selectors
-public import P3MultiStark.Opening
-public import P3MultiStark.Zerocheck
-public import P3MultiStark.Transcript
-public import P3MultiStark.Security
-public import P3MultiStark.FractionalGkr
-public import P3MultiStark.Lookup
-public import P3MultiStark.LogupStar
-public import P3MultiStark.Bus
+public import P3MultiStark.Extraction
+public import P3MultiStark.Mirror.Selectors
+public import P3MultiStark.Mirror.Opening
+public import P3MultiStark.Mirror.Zerocheck
+public import P3MultiStark.Mirror.Transcript
+public import P3MultiStark.Mirror.Security
+public import P3MultiStark.Mirror.FractionalGkr
+public import P3MultiStark.Mirror.Lookup
+public import P3MultiStark.Mirror.LogupStar
+public import P3MultiStark.Mirror.Bus
 
 @[expose] public section

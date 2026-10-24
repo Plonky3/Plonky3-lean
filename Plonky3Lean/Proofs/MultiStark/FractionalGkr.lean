@@ -1,6 +1,6 @@
 module
 
-public import P3MultiStark.FractionalGkr
+public import P3MultiStark.Mirror.FractionalGkr
 public import Plonky3Lean.Proofs.MultiStark.FractionTree
 public import Plonky3Lean.Proofs.Sumcheck.GenericDegree
 public import Plonky3Lean.Proofs.MultilinearUtil.PointForms

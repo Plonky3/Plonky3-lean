@@ -1,7 +1,7 @@
 module
 
 public import Plonky3Lean.Proofs.MultiStark.Ext
-public import P3MultiStark.Selectors
+public import P3MultiStark.Mirror.Selectors
 
 @[expose] public section
 

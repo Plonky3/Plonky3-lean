@@ -1,6 +1,6 @@
 module
 
-public import P3MultiStark.Security
+public import P3MultiStark.Mirror.Security
 public import Plonky3Lean.Proofs.Lookup.Soundness
 
 @[expose] public section

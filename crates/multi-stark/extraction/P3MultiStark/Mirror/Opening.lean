@@ -1,8 +1,9 @@
 /-
 Transcriptions of the opening claims of p3-multi-stark.
 
-These do not extract.
-They are generic over the field traits, which aeneas rejects.
+The successor row is also extracted.
+
+It computes this scatter, so the theorems about it hold for the shipped code.
 
 Each definition transcribes one Rust item, named in the crate's mirror entries.
 

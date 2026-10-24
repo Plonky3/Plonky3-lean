@@ -59,6 +59,8 @@ structure field.PrimeCharacteristicRing (Self : Type) where
   ONE : RustM Self
   NEG_ONE : RustM Self
   square : Self → RustM Self
+  from_bool : Bool → RustM Self
+  zero_vec : Std.Usize → RustM (alloc.vec.Vec Self)
   from_u8 : Std.U8 → RustM Self
   from_u16 : Std.U16 → RustM Self
   coreitertraitsaccumProductInst : core.iter.traits.accum.Product Self Self
@@ -93,6 +95,8 @@ instance {Self : Type} : Inhabited (field.Algebra Self Self) :=
         ONE := fail .panic
         NEG_ONE := fail .panic
         square := fun _ => fail .panic
+        from_bool := fun _ => fail .panic
+        zero_vec := fun _ => fail .panic
         from_u8 := fun _ => fail .panic
         from_u16 := fun _ => fail .panic
         coreitertraitsaccumProductInst := ⟨fun _ _ => fail .panic⟩ }

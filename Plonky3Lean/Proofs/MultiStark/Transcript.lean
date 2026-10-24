@@ -1,6 +1,6 @@
 module
 
-public import P3MultiStark.Transcript
+public import P3MultiStark.Mirror.Transcript
 
 @[expose] public section
 
