@@ -7,7 +7,7 @@ A parallel fold adds its partial results, which field addition makes independent
 -/
 module
 
-public import P3Sumcheck.Model
+public import P3Sumcheck.Mirror.Model
 public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 
 @[expose] public section

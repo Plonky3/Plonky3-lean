@@ -5,7 +5,7 @@ They cover strategy.rs (the round identity), transcript.rs and data.rs.
 -/
 module
 
-public import P3Sumcheck.Lagrange
+public import P3Sumcheck.Mirror.Lagrange
 
 @[expose] public section
 

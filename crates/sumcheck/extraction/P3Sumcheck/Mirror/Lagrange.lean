@@ -3,7 +3,7 @@ Transcriptions of p3-sumcheck's lagrange.rs: interpolation through 0, 1 and infi
 -/
 module
 
-public import P3Sumcheck.Model
+public import P3Sumcheck.Mirror.Model
 
 @[expose] public section
 

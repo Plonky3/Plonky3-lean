@@ -2,18 +2,25 @@
 
 lean_lib = "P3Sumcheck"
 
-# Nothing is extracted.
+# The round arithmetic of the quadratic verifier: interpolation through 0, 1 and infinity, and the claim reduction of both bases.
 #
-# The crate is generic over p3-field's trait hierarchy and over p3-challenger's sponges, which aeneas rejects (docs/extractor-issues.md 9).
+# The round loop is generic over p3-challenger's sponges and needs `ExtensionField`, which aeneas rejects (pre-patch 030 says why).
 #
-# The verifier core is transcribed over a field in stub/P3Sumcheck/, with the abstractions stub/P3Sumcheck/Model.lean lists.
-state = "stub"
+# The loop and the rest of the verifier core are transcribed over a field in extraction/P3Sumcheck/Mirror/, with the abstractions Mirror/Model.lean lists.
+state = "scoped"
 
 features = []
+
+# One root: the `hax_roots` module that pre-patch 030 adds under cfg(hax_backend_lean).
+# Each of its functions calls one item, with the field left generic.
+start_from = ["p3_sumcheck::hax_roots"]
 
 watch = ["sumcheck/src", "sumcheck/Cargo.toml", "field/src/helpers.rs"]
 
 # The transcriptions. Hashes are pending tools/mirror.
+#
+# The three lagrange transcriptions and `Basis::reduce_claim` are also extracted.
+# Claims/Sumcheck.lean proves each extracted item returns what its transcription computes.
 
 [[mirror]]
 lean = "p3_sumcheck.lagrange.mirror.lagrange_weights_01inf"

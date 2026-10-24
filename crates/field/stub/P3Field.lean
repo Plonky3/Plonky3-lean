@@ -55,6 +55,7 @@ structure field.PrimeCharacteristicRing (Self : Type) where
   halve : Self → RustM Self
   div_2exp_u64 : Self → Std.U64 → RustM Self
   ZERO : RustM Self
+  ONE : RustM Self
   from_u8 : Std.U8 → RustM Self
   from_u16 : Std.U16 → RustM Self
 
@@ -64,6 +65,7 @@ Upstream: field/src/field.rs:711. -/
 structure field.Algebra (Self F : Type) where
   PrimeCharacteristicRingInst : field.PrimeCharacteristicRing Self
   coreopsarithAddInst : core.ops.arith.Add Self F Self
+  coreopsarithSubInst : core.ops.arith.Sub Self F Self
   coreopsarithAddAssignInst : core.ops.arith.AddAssign Self F
   coreopsarithMulInst : core.ops.arith.Mul Self F Self
 
@@ -83,9 +85,11 @@ instance {Self : Type} : Inhabited (field.Algebra Self Self) :=
         halve := fun _ => fail .panic
         div_2exp_u64 := fun _ _ => fail .panic
         ZERO := fail .panic
+        ONE := fail .panic
         from_u8 := fun _ => fail .panic
         from_u16 := fun _ => fail .panic }
      coreopsarithAddInst := ⟨fun _ _ => fail .panic⟩
+     coreopsarithSubInst := ⟨fun _ _ => fail .panic⟩
      coreopsarithAddAssignInst := ⟨fun _ _ => fail .panic⟩
      coreopsarithMulInst := ⟨fun _ _ => fail .panic⟩ }⟩
 

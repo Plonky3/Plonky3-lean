@@ -7,7 +7,7 @@ The interpolation node i is a parameter, the field's i-th interpolation node.
 -/
 module
 
-public import P3Sumcheck.Model
+public import P3Sumcheck.Mirror.Model
 public import P3Matrix.Assumptions.Mirror
 public import Mathlib.Data.List.FinRange
 

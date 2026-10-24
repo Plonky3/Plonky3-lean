@@ -118,7 +118,7 @@ srcDir = "crates/multilinear-util/stub"
 
 [[lean_lib]]
 name = "P3Sumcheck"
-srcDir = "crates/sumcheck/stub"
+srcDir = "crates/sumcheck/extraction"
 
 [[lean_lib]]
 name = "P3Stir"

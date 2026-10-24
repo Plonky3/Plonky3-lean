@@ -1,0 +1,14 @@
+# Mutation of: 030-extraction-roots
+# Breaks:      the module is gated on a misspelled cfg.
+#
+--- a/sumcheck/src/lib.rs
++++ b/sumcheck/src/lib.rs
+@@ -48,7 +48,7 @@
+ pub mod univariate_skip;
+ pub mod zk;
+ // PATCHED: extraction roots, only under hax's Lean backend.
+-#[cfg(hax_backend_lean)]
++#[cfg(hax_backend_lea)]
+ pub mod hax_roots;
+ 
+ pub use data::{SumcheckData, verify_final_sumcheck_rounds};
