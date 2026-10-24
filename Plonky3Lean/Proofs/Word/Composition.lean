@@ -267,4 +267,82 @@ theorem resolve_eq (inst : word.Word W) (comp : component.Composition W) (hl : L
       CoreModels.core.result.Result.Insts.CoreOpsTry_traitFromResidualResultInfallibleE.from_residual,
       CoreModels.core.convert.From.Blanket.from]
 
+/-- A successful readdressing names an in-range triple, at its packed position. -/
+theorem resolveSpec_ok {comp : component.Composition W} {k i : Std.Usize} {idx r : index.ValueIndex}
+    (h : resolveSpec comp k i idx = .Ok r) :
+    ∃ hk : k.val < (callsOf comp).length,
+      i.val < ((callsOf comp)[k.val]).instances.val ∧
+      idx.position.val < slotsOf (callsOf comp)[k.val] idx.segment ∧
+      r = ⟨idx.segment, ⟨BitVec.ofNat 32
+        (packed (counts comp) (widths comp idx.segment) k.val i.val idx.position.val)⟩⟩ := by
+  unfold resolveSpec at h
+  by_cases hk : k.val < (callsOf comp).length
+  · rw [List.getElem?_eq_getElem hk] at h
+    simp only at h
+    split_ifs at h with h1 h2
+    cases h
+    exact ⟨hk, by omega, by omega, rfl⟩
+  · rw [List.getElem?_eq_none (by omega)] at h
+    cases h
+
+/-- Two successful readdressings into one segment name the same word only for the same triple. -/
+theorem resolve_injective (inst : word.Word W) (comp : component.Composition W) (hl : LaidOut comp)
+    {k₁ k₂ i₁ i₂ : Std.Usize} {idx₁ idx₂ r : index.ValueIndex}
+    (h₁ : component.Composition.resolve inst comp k₁ i₁ idx₁ = .ok (.Ok r))
+    (h₂ : component.Composition.resolve inst comp k₂ i₂ idx₂ = .ok (.Ok r)) :
+    k₁ = k₂ ∧ i₁ = i₂ ∧ idx₁ = idx₂ := by
+  rw [resolve_eq inst comp hl, RustM.ok.injEq] at h₁ h₂
+  obtain ⟨hk₁, hi₁, hs₁, rfl⟩ := resolveSpec_ok h₁
+  obtain ⟨hk₂, hi₂, hs₂, he⟩ := resolveSpec_ok h₂
+  obtain ⟨seg₁, pos₁⟩ := idx₁
+  obtain ⟨seg₂, pos₂⟩ := idx₂
+  simp only [index.ValueIndex.mk.injEq] at he ⊢
+  obtain ⟨rfl, hp⟩ := he
+  simp only at hs₁ hs₂
+  have hlenw : (counts comp).length = (widths comp seg₁).length := by simp [counts, widths]
+  have hm : (counts comp).length = (callsOf comp).length := by simp [counts]
+  have gm : ∀ k (hk : k < (callsOf comp).length),
+      (counts comp).getD k 0 = ((callsOf comp)[k]).instances.val := by
+    intro k hk; simp [counts, hk, List.getD_eq_getElem?_getD]
+  have gw : ∀ k (hk : k < (callsOf comp).length),
+      (widths comp seg₁).getD k 0 = slotsOf (callsOf comp)[k] seg₁ := by
+    intro k hk; simp [widths, hk, List.getD_eq_getElem?_getD]
+  have hlen : lenOf comp seg₁ < 2 ^ 32 := by
+    cases seg₁
+    · exact comp.public_len.hBounds
+    · exact comp.witness_len.hBounds
+  have t₁ := packed_lt_total _ _ hlenw (hm ▸ hk₁) (i := i₁.val) (s := pos₁.val)
+    (by rw [gm _ hk₁]; exact hi₁) (by rw [gw _ hk₁]; exact hs₁)
+  have t₂ := packed_lt_total _ _ hlenw (hm ▸ hk₂) (i := i₂.val) (s := pos₂.val)
+    (by rw [gm _ hk₂]; exact hi₂) (by rw [gw _ hk₂]; exact hs₂)
+  rw [hl.total] at t₁ t₂
+  have hv := congrArg UScalar.val hp
+  rw [ofNat32_val, ofNat32_val, Nat.mod_eq_of_lt (by omega), Nat.mod_eq_of_lt (by omega)] at hv
+  obtain ⟨a, b, c⟩ := packed_injective _ _ hlenw (hm ▸ hk₁) (by rw [gm _ hk₁]; exact hi₁)
+    (by rw [gw _ hk₁]; exact hs₁) (hm ▸ hk₂) (by rw [gm _ hk₂]; exact hi₂)
+    (by rw [gw _ hk₂]; exact hs₂) hv
+  exact ⟨UScalar.eq_of_val_eq a, UScalar.eq_of_val_eq b, rfl, UScalar.eq_of_val_eq c⟩
+
+/-- A successful readdressing lands inside the composed segment. -/
+theorem resolve_lt_len (inst : word.Word W) (comp : component.Composition W) (hl : LaidOut comp)
+    {k i : Std.Usize} {idx r : index.ValueIndex}
+    (h : component.Composition.resolve inst comp k i idx = .ok (.Ok r)) :
+    r.segment = idx.segment ∧ r.position.val < lenOf comp idx.segment := by
+  rw [resolve_eq inst comp hl, RustM.ok.injEq] at h
+  obtain ⟨hk, hi, hs, rfl⟩ := resolveSpec_ok h
+  have hlenw : (counts comp).length = (widths comp idx.segment).length := by simp [counts, widths]
+  have hm : (counts comp).length = (callsOf comp).length := by simp [counts]
+  have t := packed_lt_total _ _ hlenw (hm ▸ hk) (i := i.val) (s := idx.position.val)
+    (by simp [counts, hk, List.getD_eq_getElem?_getD]; exact hi)
+    (by simp [widths, hk, List.getD_eq_getElem?_getD]; exact hs)
+  rw [hl.total] at t
+  have hlen : lenOf comp idx.segment < 2 ^ 32 := by
+    cases idx.segment
+    · exact comp.public_len.hBounds
+    · exact comp.witness_len.hBounds
+  refine ⟨rfl, ?_⟩
+  show (⟨BitVec.ofNat 32 _⟩ : Std.U32).val < _
+  rw [ofNat32_val, Nat.mod_eq_of_lt (by omega)]
+  exact t
+
 end Plonky3Lean.Proofs.Word
