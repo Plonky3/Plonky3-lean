@@ -12,5 +12,6 @@ public import P3MultiStark.Opening
 public import P3MultiStark.Zerocheck
 public import P3MultiStark.Transcript
 public import P3MultiStark.Security
+public import P3MultiStark.FractionalGkr
 
 @[expose] public section

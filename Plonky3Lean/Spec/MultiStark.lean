@@ -103,4 +103,38 @@ def batchedRow (batch : List (Instance K)) (α β : K) (b : ℕ) : K :=
 def zerocheckSum (batch : List (Instance K)) (α β : K) (τ : List K) : K :=
   rowExt (batchedRow batch α β) τ
 
+/-! ## The fraction tree
+
+The fractional sum-check follows Papini and Haböck (eprint 2023/1284), Section 3.
+
+A fraction is a pair (numerator, denominator).
+
+Two fractions add without a division:
+
+```text
+    n0 / d0 + n1 / d1 = (n0 d1 + n1 d0) / (d0 d1)
+```
+
+A table of 2^n fractions folds its two halves into a table of 2^(n - 1):
+
+```text
+    level k (x) = level (k + 1) (x)  +  level (k + 1) (2^k + x),     x < 2^k
+```
+
+The root, at level 0, carries the sum of every fraction as one numerator over one denominator.
+-/
+
+/-- The sum of two fractions, kept as a numerator and a denominator. -/
+def addFrac (a b : K × K) : K × K := (a.1 * b.2 + b.1 * a.2, a.2 * b.2)
+
+/-- Level k of the tree over a table t of 2^n fractions.
+
+It is t at k = n, and each level adds the two halves of the level below. -/
+def fracLevel (t : ℕ → K × K) (n k : ℕ) : ℕ → K × K :=
+  if n ≤ k then t else fun x => addFrac (fracLevel t n (k + 1) x) (fracLevel t n (k + 1) (2 ^ k + x))
+termination_by n - k
+
+/-- The batched value of a fraction: numerator + lambda denominator. -/
+def batchFrac (lambda : K) (a : K × K) : K := a.1 + lambda * a.2
+
 end Plonky3Lean.Spec.MultiStark
