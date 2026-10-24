@@ -4,11 +4,11 @@
 # Hunks:        2
 # Class:        bound
 # Gap:          docs/extractor-issues.md 4 (aeneas drops a method that no free
-#               function calls). The equality polynomial is an associated
-#               function of `Point`.
+#               function calls). Both rooted items are associated functions
+#               of `Point`.
 # Cost:         none in a normal build: the module exists only under
-#               cfg(hax_backend_lean). In the extracted variant it adds one
-#               free function, which calls one item of the crate.
+#               cfg(hax_backend_lean). In the extracted variant it adds free
+#               functions, each of which calls one item of the crate.
 #               No existing body changes.
 # Upstreamable: no: the module exists only for the extractor.
 # Drop when:    charon orders `--start-from` methods, so that the methods
@@ -17,7 +17,10 @@
 # Mutation:     the module is gated on a misspelled cfg, so a normal
 #               `cargo check` reports `unexpected_cfgs`.
 #
-# The root is the equality polynomial of two points, the product over i of p_i q_i + (1 - p_i)(1 - q_i).
+# The roots are:
+#
+# - the equality polynomial of two points, the product over i of p_i q_i + (1 - p_i)(1 - q_i);
+# - the point constructor, which brings the point type into the model for the crates that store points.
 #
 # Two sibling evaluations are not rooted:
 #
@@ -30,14 +33,16 @@ diff --git a/multilinear-util/src/hax_roots.rs b/multilinear-util/src/hax_roots.
 new file mode 100644
 --- /dev/null
 +++ b/multilinear-util/src/hax_roots.rs
-@@ -0,0 +1,15 @@
+@@ -0,0 +1,21 @@
 +//! PATCHED: extraction roots for hax's Lean backend, compiled only under `cfg(hax_backend_lean)`.
 +//!
 +//! Aeneas drops a method that no free function calls (Plonky3-lean, docs/extractor-issues.md, 4).
-+//! The function here calls one item and does nothing else, so that the item's own body is extracted.
++//! Each function here calls one item and does nothing else, so that the item's own body is extracted.
 +//!
 +//! The fields stay generic.
 +//! The Lean model then quantifies over every implementation of them.
++
++use alloc::vec::Vec;
 +
 +use p3_field::{ExtensionField, Field};
 +
@@ -45,6 +50,10 @@ new file mode 100644
 +
 +pub fn eval_eq<F: Field, EF: ExtensionField<F>>(p: &[F], q: &[EF]) -> EF {
 +    Point::<F>::eval_eq(p, q)
++}
++
++pub fn point_new<F>(coords: Vec<F>) -> Point<F> {
++    Point::new(coords)
 +}
 diff --git a/multilinear-util/src/lib.rs b/multilinear-util/src/lib.rs
 --- a/multilinear-util/src/lib.rs

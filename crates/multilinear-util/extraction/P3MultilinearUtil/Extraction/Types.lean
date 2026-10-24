@@ -33,4 +33,9 @@ def point.PointFVec.eval_eq.closure {F : Type _} {EF : Type _}
   (p3_fieldfieldExtensionFieldInst : p3_field.field.ExtensionField EF F) :=
 Unit
 
+/-- [p3_multilinear_util::point::Point]
+    Source: 'multilinear-util/src/point.rs', lines 38:0-38:62
+    Visibility: public -/
+def point.Point (F : Type _) (S : Type _) := S × core.marker.PhantomData F
+
 end p3_multilinear_util

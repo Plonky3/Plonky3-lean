@@ -148,7 +148,7 @@ def point.PointFVec.eval_eq
     fail panic
 
 /-- [p3_multilinear_util::hax_roots::eval_eq]:
-    Source: 'multilinear-util/src/hax_roots.rs', lines 13:0-15:1
+    Source: 'multilinear-util/src/hax_roots.rs', lines 15:0-17:1
     Visibility: public -/
 def hax_roots.eval_eq
   {F : Type _} {EF : Type _} (p3_fieldfieldFieldInst : p3_field.field.Field F)
@@ -158,5 +158,24 @@ def hax_roots.eval_eq
   := do
   point.PointFVec.eval_eq p3_fieldfieldFieldInst
     p3_fieldfieldExtensionFieldInst p q
+
+/-- [p3_multilinear_util::point::{p3_multilinear_util::point::Point<F, S>}::new]:
+    Source: 'multilinear-util/src/point.rs', lines 60:4-62:5
+    Visibility: public -/
+def point.Point.new
+  {F : Type _} {S : Type _} (coreborrowBorrowSSliceInst : core.borrow.Borrow S
+  (Slice F)) (coords : S) :
+  RustM (point.Point F S)
+  := do
+  ok (coords, ())
+
+/-- [p3_multilinear_util::hax_roots::point_new]:
+    Source: 'multilinear-util/src/hax_roots.rs', lines 19:0-21:1
+    Visibility: public -/
+def hax_roots.point_new
+  {F : Type _} (coords : alloc.vec.Vec F) :
+  RustM (point.Point F (alloc.vec.Vec F))
+  := do
+  point.Point.new (alloc.vec.Vec.Insts.CoreBorrowBorrowSlice F) coords
 
 end p3_multilinear_util
