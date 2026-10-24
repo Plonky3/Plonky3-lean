@@ -220,6 +220,7 @@ public import Plonky3Lean.Proofs.Fri.Deep
 public import Plonky3Lean.Proofs.Fri.Chain
 public import Plonky3Lean.Proofs.Fri.Complete
 public import Plonky3Lean.Proofs.Fri.Edge
+public import Plonky3Lean.Proofs.Fri.Honest
 public import Plonky3Lean.Proofs.Stir.Horner
 public import Plonky3Lean.Proofs.Stir.Lists
 public import Plonky3Lean.Proofs.Stir.Vanishing
