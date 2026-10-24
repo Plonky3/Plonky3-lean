@@ -1,0 +1,273 @@
+# Patch:        050-field-cfg-packed-ext-powers
+# Phase:        pre
+# Target:       baby-bear/tests/pre_patch_050.rs, binary-field/src/extension.rs, binary-field/src/packed/x86_64/poly192.rs, binary-field/src/poly192.rs, field/src/extension/packed_binomial_extension.rs, field/src/extension/packed_cubic_extension.rs, field/src/extension/packed_quintic_extension.rs, field/src/packed/packed_traits.rs, mersenne-31/src/qm31.rs
+# Hunks:        17
+# Class:        cfg-hide
+# Gap:          docs/extractor-issues.md 180: aeneas rejects the signature of
+#               `PackedFieldExtension::packed_ext_powers` ("Internal error" in
+#               `translate_fun_sigs`), and every item bounded by
+#               `ExtensionField` reaches it through `ExtensionPacking`.
+# Cost:         none in a normal build: every change is behind
+#               cfg(hax_backend_lean). In the extracted variant,
+#               `PackedFieldExtension::packed_ext_powers` and its 8 impls are
+#               absent.
+# Upstreamable: no: hiding a required method serves the extractor only; an
+#               aeneas fix of the signature is the better fix.
+# Drop when:    aeneas translates the signature of `packed_ext_powers`.
+# Test:         test p3-baby-bear --test pre_patch_050
+# Mutation:     the trait method is gated on the wrong cfg, so a normal build
+#               lacks it and its impls no longer compile.
+#
+# The method returns `Powers<Self>`, a struct over the packed extension type.
+#
+# aeneas stops on that signature, and so on any item whose bounds name `ExtensionField`.
+#
+# Under the cfg the trait method and its 8 impls are absent:
+#
+# - p3-field: the trait, the base field's packing, and the binomial, cubic and quintic packings;
+# - p3-binary-field: the tower extensions, Poly192, and its x86-64 packing;
+# - p3-mersenne-31: the packed QM31.
+#
+# Its one caller in the library, `packed_ext_powers_capped`, is already absent there (030).
+#
+# Seven files import `Powers` only for this method, so their import may go unused under the cfg.
+#
+# A `cfg_attr` allows that, and is inert in a normal build.
+#
+# Each attribute shares a line with an existing one, so no line of the extracted source moves.
+#
+# In a normal build the method is where it was, unchanged, and field-testing's tests run against every impl as shipped.
+#
+diff --git a/baby-bear/tests/pre_patch_050.rs b/baby-bear/tests/pre_patch_050.rs
+new file mode 100644
+index 00000000..5783d4cd
+--- /dev/null
++++ b/baby-bear/tests/pre_patch_050.rs
+@@ -0,0 +1,51 @@
++//! PATCHED: added by Plonky3-lean pre-patch 050 (`field-cfg-packed-ext-powers`).
++//!
++//! The patch removes the packed powers of an extension element from the extracted variant only.
++//!
++//! In a normal build the method must still be reachable through the extension field bound alone.
++//!
++//! Its lanes, read in order, must be the powers 1, b, b^2, ... of the base b.
++
++use p3_baby_bear::BabyBear;
++use p3_field::extension::BinomialExtensionField;
++use p3_field::{
++    BasedVectorSpace, ExtensionField, Field, PackedFieldExtension, PackedValue,
++    PrimeCharacteristicRing,
++};
++
++type F = BabyBear;
++
++const W: usize = <<F as Field>::Packing as PackedValue>::WIDTH;
++
++// The first `n` packed powers of `b`, unpacked lane by lane.
++fn packed_powers<EF: ExtensionField<F>>(b: EF, n: usize) -> Vec<EF> {
++    EF::ExtensionPacking::packed_ext_powers(b)
++        .take(n)
++        .flat_map(|p| (0..W).map(move |l| p.extract(l)))
++        .collect()
++}
++
++// Checks the lanes against repeated scalar multiplication.
++fn check<EF: ExtensionField<F>>(b: EF) {
++    // Fixture state: 3 packed elements, so 3 W lanes, holding b^0 .. b^(3 W - 1).
++    let lanes = packed_powers(b, 3);
++    assert_eq!(lanes.len(), 3 * W);
++    let mut power = EF::ONE;
++    for (i, &x) in lanes.iter().enumerate() {
++        assert_eq!(x, power, "power {i}");
++        power *= b;
++    }
++}
++
++#[test]
++fn packed_ext_powers_is_the_powers_in_lane_order() {
++    // The degree-1 case: the base field is its own extension.
++    check(F::from_u32(7));
++    // Degrees 4 and 5, with a base that has every coordinate nonzero.
++    check(BinomialExtensionField::<F, 4>::from_basis_coefficients_fn(
++        |d| F::from_usize(3 + d),
++    ));
++    check(BinomialExtensionField::<F, 5>::from_basis_coefficients_fn(
++        |d| F::from_usize(11 + 2 * d),
++    ));
++}
+diff --git a/binary-field/src/extension.rs b/binary-field/src/extension.rs
+index 16efaa5f..cf27ad58 100644
+--- a/binary-field/src/extension.rs
++++ b/binary-field/src/extension.rs
+@@ -16,7 +16,7 @@ use core::{ptr, slice};
+ 
+ use p3_field::extension::HasFrobenius;
+ use p3_field::op_assign_macros::{impl_add_base_field, impl_sub_base_field};
+-use p3_field::{
++#[cfg_attr(hax_backend_lean, allow(unused_imports))] use p3_field::{ // PATCHED: only `packed_ext_powers` uses `Powers`
+     Algebra, BasedVectorSpace, ExtensionField, Field, PackedFieldExtension, Powers,
+     PrimeCharacteristicRing,
+ };
+@@ -242,7 +242,7 @@ macro_rules! binary_tower_extension {
+                 *self += value;
+             }
+ 
+-            #[inline]
++            #[inline] #[cfg(not(hax_backend_lean))] // PATCHED: aeneas rejects this signature
+             fn packed_ext_powers(base: Self) -> Powers<Self> {
+                 base.powers()
+             }
+diff --git a/binary-field/src/packed/x86_64/poly192.rs b/binary-field/src/packed/x86_64/poly192.rs
+index 819ca8f0..ae12b1c6 100644
+--- a/binary-field/src/packed/x86_64/poly192.rs
++++ b/binary-field/src/packed/x86_64/poly192.rs
+@@ -20,7 +20,7 @@ use core::array;
+ use core::iter::{Product, Sum};
+ use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+ 
+-use p3_field::{
++#[cfg_attr(hax_backend_lean, allow(unused_imports))] use p3_field::{ // PATCHED: only `packed_ext_powers` uses `Powers`
+     Algebra, BasedVectorSpace, Dup, Field, PackedFieldExtension, PackedValue, Powers,
+     PrimeCharacteristicRing,
+ };
+@@ -457,7 +457,7 @@ impl PackedFieldExtension<Poly64, Poly192> for PackedPoly192 {
+         }
+     }
+ 
+-    #[inline]
++    #[inline] #[cfg(not(hax_backend_lean))] // PATCHED: aeneas rejects this signature
+     fn packed_ext_powers(base: Poly192) -> Powers<Self> {
+         // The first W powers transposed into lanes, then stepped by base^W.
+         //
+diff --git a/binary-field/src/poly192.rs b/binary-field/src/poly192.rs
+index cec06151..c2d8a593 100644
+--- a/binary-field/src/poly192.rs
++++ b/binary-field/src/poly192.rs
+@@ -30,7 +30,7 @@ use p3_field::{
+     target_feature = "vpclmulqdq",
+     any(target_feature = "avx2", target_feature = "avx512f")
+ )))]
+-use p3_field::{PackedFieldExtension, Powers};
++#[cfg_attr(hax_backend_lean, allow(unused_imports))] use p3_field::{PackedFieldExtension, Powers}; // PATCHED: only `packed_ext_powers` uses `Powers`
+ use rand::Rng;
+ use rand::distr::{Distribution, StandardUniform};
+ use serde::{Deserialize, Serialize};
+@@ -523,7 +523,7 @@ impl PackedFieldExtension<Poly64, Self> for Poly192 {
+         *self += value;
+     }
+ 
+-    #[inline]
++    #[inline] #[cfg(not(hax_backend_lean))] // PATCHED: aeneas rejects this signature
+     fn packed_ext_powers(base: Self) -> Powers<Self> {
+         base.powers()
+     }
+diff --git a/field/src/extension/packed_binomial_extension.rs b/field/src/extension/packed_binomial_extension.rs
+index 25c1e44d..c58c674a 100644
+--- a/field/src/extension/packed_binomial_extension.rs
++++ b/field/src/extension/packed_binomial_extension.rs
+@@ -11,7 +11,7 @@ use super::{
+     vector_sub,
+ };
+ use crate::extension::{Binomial, BinomiallyExtendable, binomial_square};
+-use crate::{
++#[cfg_attr(hax_backend_lean, allow(unused_imports))] use crate::{ // PATCHED: only `packed_ext_powers` uses `Powers`
+     Algebra, BasedVectorSpace, Dup, Field, PackedField, PackedFieldExtension, PackedValue, Powers,
+     PrimeCharacteristicRing, field_to_array,
+ };
+@@ -208,7 +208,7 @@ where
+         }
+     }
+ 
+-    #[inline]
++    #[inline] #[cfg(not(hax_backend_lean))] // PATCHED: aeneas rejects this signature
+     fn packed_ext_powers(base: BinomialExtensionField<F, D>) -> crate::Powers<Self> {
+         let width = F::Packing::WIDTH;
+         let powers = base.powers().collect_n(width + 1);
+diff --git a/field/src/extension/packed_cubic_extension.rs b/field/src/extension/packed_cubic_extension.rs
+index 2d2af2b7..e24fa996 100644
+--- a/field/src/extension/packed_cubic_extension.rs
++++ b/field/src/extension/packed_cubic_extension.rs
+@@ -13,7 +13,7 @@ use rand::distr::{Distribution, StandardUniform};
+ use super::cubic_extension::{cubic_square, trinomial_cubic_mul};
+ use super::{CubicTrinomialExtensionField, PackedExtField, vector_add, vector_sub};
+ use crate::extension::{CubicTrinomial, CubicTrinomialExtendable};
+-use crate::{
++#[cfg_attr(hax_backend_lean, allow(unused_imports))] use crate::{ // PATCHED: only `packed_ext_powers` uses `Powers`
+     Algebra, BasedVectorSpace, Field, PackedField, PackedFieldExtension, PackedValue, Powers,
+     PrimeCharacteristicRing, field_to_array,
+ };
+@@ -175,7 +175,7 @@ impl<F: CubicTrinomialExtendable> PackedFieldExtension<F, CubicTrinomialExtensio
+         }
+     }
+ 
+-    #[inline]
++    #[inline] #[cfg(not(hax_backend_lean))] // PATCHED: aeneas rejects this signature
+     fn packed_ext_powers(base: CubicTrinomialExtensionField<F>) -> Powers<Self> {
+         let width = F::Packing::WIDTH;
+         let powers = base.powers().collect_n(width + 1);
+diff --git a/field/src/extension/packed_quintic_extension.rs b/field/src/extension/packed_quintic_extension.rs
+index 827a19bb..b32d19f0 100644
+--- a/field/src/extension/packed_quintic_extension.rs
++++ b/field/src/extension/packed_quintic_extension.rs
+@@ -13,7 +13,7 @@ use rand::distr::{Distribution, StandardUniform};
+ use super::quintic_extension::{quintic_square, trinomial_quintic_mul};
+ use super::{PackedExtField, QuinticTrinomialExtensionField, vector_add, vector_sub};
+ use crate::extension::{QuinticTrinomial, QuinticTrinomialExtendable};
+-use crate::{
++#[cfg_attr(hax_backend_lean, allow(unused_imports))] use crate::{ // PATCHED: only `packed_ext_powers` uses `Powers`
+     Algebra, BasedVectorSpace, Field, PackedField, PackedFieldExtension, PackedValue, Powers,
+     PrimeCharacteristicRing, field_to_array,
+ };
+@@ -179,7 +179,7 @@ impl<F: QuinticTrinomialExtendable> PackedFieldExtension<F, QuinticTrinomialExte
+         }
+     }
+ 
+-    #[inline]
++    #[inline] #[cfg(not(hax_backend_lean))] // PATCHED: aeneas rejects this signature
+     fn packed_ext_powers(base: QuinticTrinomialExtensionField<F>) -> Powers<Self> {
+         let width = F::Packing::WIDTH;
+         let powers = base.powers().collect_n(width + 1);
+diff --git a/field/src/packed/packed_traits.rs b/field/src/packed/packed_traits.rs
+index 15c9175a..f3b71019 100644
+--- a/field/src/packed/packed_traits.rs
++++ b/field/src/packed/packed_traits.rs
+@@ -602,7 +602,7 @@ pub trait PackedFieldExtension<
+ 
+     /// Similar to `packed_powers`, construct an iterator which returns
+     /// powers of `base` packed into `PackedFieldExtension` elements.
+-    #[must_use]
++    #[must_use] #[cfg(not(hax_backend_lean))] // PATCHED: aeneas rejects this signature
+     fn packed_ext_powers(base: ExtField) -> Powers<Self>;
+ 
+     /// Similar to `packed_ext_powers` but only returns `unpacked_len` powers of `base`.
+@@ -707,7 +707,7 @@ impl<F: Field> PackedFieldExtension<F, F> for F::Packing {
+         *F::Packing::from_slice(slice)
+     }
+ 
+-    #[inline]
++    #[inline] #[cfg(not(hax_backend_lean))] // PATCHED: aeneas rejects this signature
+     fn packed_ext_powers(base: F) -> Powers<Self> {
+         F::Packing::packed_powers(base)
+     }
+diff --git a/mersenne-31/src/qm31.rs b/mersenne-31/src/qm31.rs
+index c29bb9bc..69275dc4 100644
+--- a/mersenne-31/src/qm31.rs
++++ b/mersenne-31/src/qm31.rs
+@@ -18,7 +18,7 @@ use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+ use core::slice;
+ 
+ use p3_field::extension::{BinomialExtensionField, Complex};
+-use p3_field::{
++#[cfg_attr(hax_backend_lean, allow(unused_imports))] use p3_field::{ // PATCHED: only `packed_ext_powers` uses `Powers` and `PackedValue`
+     Algebra, BasedVectorSpace, ExtensionField, Field, PackedFieldExtension, PackedValue, Powers,
+     PrimeCharacteristicRing,
+ };
+@@ -478,7 +478,7 @@ impl rand::distr::Distribution<PackedQM31> for rand::distr::StandardUniform {
+ }
+ 
+ impl PackedFieldExtension<Mersenne31, QM31> for PackedQM31 {
+-    #[inline]
++    #[inline] #[cfg(not(hax_backend_lean))] // PATCHED: aeneas rejects this signature
+     fn packed_ext_powers(base: QM31) -> Powers<Self> {
+         let width = PackedM31::WIDTH;
+         let powers = base.powers().collect_n(width + 1);
