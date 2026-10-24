@@ -13,5 +13,7 @@ public import P3Circle.Ordering
 public import P3Circle.Cfft
 public import P3Circle.Folding
 public import P3Circle.DeepQuotient
+public import P3Circle.Verifier
+public import P3Circle.Pcs
 
 @[expose] public section
