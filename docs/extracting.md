@@ -85,6 +85,7 @@ lean_lib = "P3Monty31Avx2"             # the variant's library
 namespace = "p3_monty_31_avx2"         # and namespace
 start_from = ["..."]                   # its roots, as for a scoped crate
 opaque = ["p3_monty_31::monty_31"]     # charon --opaque: the crate's portable modules
+renames = { p3_monty_31 = "p3_monty_31_avx2" }   # optional: other crates' variants
 ```
 
 A variant is a unit of its own (`<crate>@<name>`, `config.py units`): step 3
@@ -95,7 +96,11 @@ install it into `crates/<crate>/variants/<name>/extraction/`, with its own
 its own crate's items by names relative to the namespace and to other crates' by
 absolute names, so only the `namespace`/`open`/`end` lines and the module root
 change. Its `Assumptions/` bind each external from an `opaque` module to the
-crate's own model, rather than assume it. A variant whose items other variants
+crate's own model, rather than assume it. A variant whose code refers to
+another crate's items that the target re-declares, such as p3-baby-bear's AVX2
+variant implementing p3-monty-31's AVX2 traits, maps that crate's namespace to
+its variant's with `renames`, which rewrites every absolute `p3_monty_31.`
+reference to `p3_monty_31_avx2.`. A variant whose items other variants
 call by absolute name keeps the crate's namespace (p3-field's).
 
 The SIMD backends call `core::arch` intrinsics, which have no Rust bodies.
