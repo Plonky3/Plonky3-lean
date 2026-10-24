@@ -149,4 +149,59 @@ end Row
 def fracSum (terms : List (K × K)) : K :=
   ∑ i ∈ Finset.range terms.length, mul terms i / den terms i
 
+/-! ## The constraints of one AIR
+
+A lookup column carries tuples, their multiplicities, optional flags, and a pair (alpha, beta).
+
+Over a commutative ring, the column's fraction is N / D:
+
+```text
+    no flags:   N / D = sum_i m_i / (alpha - fingerprint(e_i)),   cleared of denominators
+    flags f_k:  N = sum_k f_k m_k,
+                D = sum_k f_k (alpha - fingerprint(e_k)) + 1 - sum_k f_k
+```
+
+With one-hot flags the second form selects one branch.
+
+The constraints are polynomial identities in the column values.
+
+So one definition serves for the values on a row, at a point, and for the polynomials themselves.
+-/
+
+section Constraints
+
+variable {R : Type _} [CommRing R]
+
+/-- One lookup column: selector flags, tuples, multiplicities, and its pair (alpha, beta). -/
+structure Column (R : Type _) where
+  flags : List R
+  tuples : List (List R)
+  mults : List R
+  alpha : R
+  beta : R
+
+/-- The numerator and the denominator of a column's fraction. -/
+def Column.numDen (c : Column R) : R × R :=
+  let ds := c.tuples.map fun e => c.alpha - fingerprint c.beta e
+  if c.flags = [] then (numerator (ds.zip c.mults), denominator (ds.zip c.mults))
+  else
+    let xs := (c.flags.zip ds).zip c.mults
+    ((xs.map fun x => x.1.1 * x.2).sum,
+      (xs.map fun x => x.1.1 * x.1.2).sum + (1 - (xs.map fun x => x.1.1).sum))
+
+/-- The LogUp constraints of one AIR with at least one column, in emission order:
+
+- the pin D_c f_c - N_c of each column c, with fraction f_c
+- the first-row selector times acc
+- the transition selector times acc' - acc - sum_c f_c
+- the last-row selector times T - acc - sum_c f_c.
+
+Here acc is the accumulator, acc' its next row, and T the terminal. -/
+def logUpConstraints (cols : List (Column R)) (fracs : List R) (acc acc' T first last trans : R) :
+    List R :=
+  (cols.zip fracs).map (fun p => p.1.numDen.2 * p.2 - p.1.numDen.1) ++
+    [acc * first, (acc' - acc - fracs.sum) * trans, (T - acc - fracs.sum) * last]
+
+end Constraints
+
 end Plonky3Lean.Spec.Lookup

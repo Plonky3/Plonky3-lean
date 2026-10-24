@@ -121,4 +121,10 @@ noncomputable def combinedPoly {F : Type _} [CommRing F] [Algebra F K] (α : K) 
     (C : List (MvPolynomial Var F)) : K[X] :=
   ∑ i ∈ Finset.range C.length, Polynomial.C (α ^ (C.length - 1 - i)) * MvPolynomial.aeval σ (C.getD i 0)
 
+/-- The combination sum_i alpha^(m - 1 - i) P_i(X) of m polynomials, in order.
+
+The lookup constraints have coefficients in K, so they enter here rather than as constraints over F. -/
+noncomputable def combinePolys (α : K) (ps : List K[X]) : K[X] :=
+  ∑ i ∈ Finset.range ps.length, Polynomial.C (α ^ (ps.length - 1 - i)) * ps.getD i 0
+
 end Plonky3Lean.Spec.UniStark
