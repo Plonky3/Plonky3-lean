@@ -24,7 +24,7 @@ namespace Plonky3Lean.Proofs.Circle
 
 open Plonky3Lean.Spec.Circle Plonky3Lean.Proofs.Dft Finset
 open p3_dft.mirror p3_fri.mirror p3_fri.config.mirror p3_circle.point.mirror p3_circle.folding.mirror
-open p3_circle.verifier.mirror
+open p3_circle.verifier.mirror p3_circle.ordering.mirror
 
 set_option linter.unusedSectionVars false
 
@@ -397,5 +397,92 @@ theorem verify_queries_complete (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {IE
   dsimp only
   rw [hrows, pow_one, show L - i - 1 = L - (i + 1) by omega,
     hmmcs i hiR c o (by rw [hc]; simp) (by rw [ho]; simp)]
+
+/-! ## The first layer -/
+
+local notation "rev" => Plonky3Lean.Spec.Matrix.bitRev
+
+/-- A point of a standard domain of size 2^(n+1), read in circle FFT order at index i'.
+
+Its x-coordinate is the circle FRI twiddle of the pair i' / 2, signed by the pair's parity. -/
+theorem twinPoint_cfft_x (hV : CircleGenValid G) {n : ℕ} (hn : 1 ≤ n) (hG : n + 2 ≤ G.adicity) {i' : ℕ}
+    (hi : i' < 2 ^ (n + 1)) :
+    (twinPoint (genPt G (n + 2)) (genPt G n) (cfft_permute_index i' (n + 1))).x =
+      (if (i' / 2) % 2 = 0 then 1 else -1) * (genPt G (n + 2) + rev (n - 1) (i' / 2 / 2) • genPt G n).x := by
+  set Q := genPt G (n + 2)
+  have htw : ∀ k, twinPoint Q (genPt G n) k = (2 * k + 1) • Q := fun k => by
+    have := twinPoint_standard hV (n := n + 1) (by omega) hG k
+    rwa [show n + 1 - 1 = n by omega] at this
+  have h4 : genPt G n = 4 • Q := by
+    have := genPt_nsmul hV (j := n) (k := n + 2) (by omega) hG
+    rw [show n + 2 - n = 2 by omega] at this
+    rw [← this]; norm_num [Q]
+  have hzero : 2 ^ (n + 2) • Q = 0 := by
+    have := genPt_nsmul hV (j := 0) (k := n + 2) (by omega) hG
+    rwa [Nat.sub_zero, genPt_zero hV] at this
+  have hone : 2 ^ (n + 1) • Q = genPt G 1 := by
+    have := genPt_nsmul hV (j := 1) (k := n + 2) (by omega) hG
+    rwa [show n + 2 - 1 = n + 1 by omega] at this
+  set a := i' / 2
+  have ha : a < 2 ^ n := by rw [pow_succ] at hi; omega
+  -- Both members of the pair have the x-coordinate of (4 rev_n(a) + 1) Q.
+  have hpair : (twinPoint Q (genPt G n) (cfft_permute_index i' (n + 1))).x = ((4 * rev n a + 1) • Q).x := by
+    rcases Nat.even_or_odd' i' with ⟨b, hb | hb⟩
+    · obtain rfl : b = a := by omega
+      rw [hb, cfft_permute_index_even ha, htw]; ring_nf
+    · obtain rfl : b = a := by omega
+      rw [hb, cfft_permute_index_odd ha, htw, rev_complement n ha]
+      have hr := Plonky3Lean.Proofs.Matrix.bitRev_lt n a
+      have : (2 * (2 * (2 ^ n - 1 - rev n a) + 1) + 1) + (4 * rev n a + 1) = 2 ^ (n + 2) := by
+        rw [pow_add]; omega
+      have hneg : (2 * (2 * (2 ^ n - 1 - rev n a) + 1) + 1) • Q = -((4 * rev n a + 1) • Q) := by
+        rw [eq_neg_iff_add_eq_zero, ← add_nsmul, this, hzero]
+      rw [hneg, C.neg_x]
+  obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩
+  rw [hpair, Nat.add_sub_cancel, h4, smul_smul]
+  have hrev : rev (m + 1) a = (a % 2) * 2 ^ m + rev m (a / 2) := rfl
+  have hQ : Q + (rev m (a / 2) * 4) • Q = (4 * rev m (a / 2) + 1) • Q := by
+    rw [add_nsmul, one_nsmul, add_comm, mul_comm]
+  rw [hQ, hrev]
+  rcases Nat.mod_two_eq_zero_or_one a with h0 | h1
+  · rw [h0]; simp
+  · rw [h1, show 4 * (1 * 2 ^ m + rev m (a / 2)) + 1 = 2 ^ (m + 1 + 1) + (4 * rev m (a / 2) + 1)
+      by ring, add_nsmul, hone, add_comm, add_genPt_one_x hV (by omega)]
+    simp
+
+/-- The first-layer point of a query at height h, read in circle FFT order, sits at the circle FRI point of round H - h.
+
+Its x-coordinate is sigma_r x_r, for r = H - h. -/
+theorem firstLayer_point_x (hV : CircleGenValid G) {H h : ℕ} (hh : 2 ≤ h) (hhH : h ≤ H) (hG : H + 1 ≤ G.adicity)
+    {i : ℕ} (hi : i < 2 ^ H) :
+    (twinPoint (genPt G (h + 1)) (genPt G (h - 1)) (cfft_permute_index (i / 2 ^ (H - h)) h)).x =
+      sgn (i / 2) (H - h) * Xq G (H - 1) (i / 2) (H - h) := by
+  obtain ⟨n, rfl⟩ : ∃ n, h = n + 1 := ⟨h - 1, by omega⟩
+  have hi' : i / 2 ^ (H - (n + 1)) < 2 ^ (n + 1) := by
+    rw [Nat.div_lt_iff_lt_mul (by positivity), ← pow_add, show n + 1 + (H - (n + 1)) = H by omega]; exact hi
+  rw [show n + 1 + 1 = n + 2 by omega, Nat.add_sub_cancel, twinPoint_cfft_x hV (by omega) (by omega) hi']
+  have e1 : i / 2 ^ (H - (n + 1)) / 2 = i / 2 / 2 ^ (H - (n + 1)) := by
+    rw [Nat.div_div_eq_div_mul, Nat.div_div_eq_div_mul, mul_comm]
+  have e2 : i / 2 / 2 ^ (H - (n + 1)) / 2 = i / 2 / 2 ^ (H - (n + 1) + 1) := by
+    rw [Nat.div_div_eq_div_mul, ← pow_succ]
+  rw [e1, e2, sgn, Xq, show H - 1 + 2 - (H - (n + 1)) = n + 2 by omega,
+    show H - 1 - 1 - (H - (n + 1)) = n - 1 by omega, show H - 1 - (H - (n + 1)) = n by omega]
+
+/-- The first-layer fold of an honest pair is equation (14) to (16): f_0 + beta f_1 at P.x.
+
+The verifier holds the pair in the order its parity bit b gives, with the y-twiddle signed to match. -/
+theorem firstLayer_fold (h2 : (2 : K) ≠ 0) {P : C K} (hy : P.y ≠ 0) (b : ℕ) (m : ℕ) (c : ℕ → K) (β : K) :
+    fold_row_with_inv_twiddle (if b = 0 then P.y else -P.y)⁻¹ β
+        (if b = 0 then [fftEval (m + 1) c P, fftEval (m + 1) c (-P)]
+          else [fftEval (m + 1) c (-P), fftEval (m + 1) c P]) =
+      some (xEval m (foldCoeffs c β) P.x) := by
+  split_ifs
+  · simp only [fold_row_with_inv_twiddle, Option.some.injEq]
+    rw [fold_formula, foldPair_fftEval h2 hy]; rfl
+  · simp only [fold_row_with_inv_twiddle, Option.some.injEq]
+    have hy' : (-P).y ≠ 0 := by rw [C.neg_y]; exact neg_ne_zero.mpr hy
+    have := foldPair_fftEval h2 hy' m c β
+    rw [neg_neg, C.neg_x, C.neg_y] at this
+    rw [fold_formula, this]; rfl
 
 end Plonky3Lean.Proofs.Circle
