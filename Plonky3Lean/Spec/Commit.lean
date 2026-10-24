@@ -63,7 +63,7 @@ For a hash-based scheme it is a hash collision, or an unlucky challenge.
 
 The probability of Broken is the scheme's soundness error, bounded separately.
 
-A panic is none.
+A panic is modelled as a missing result.
 -/
 
 namespace Plonky3Lean.Spec.Commit

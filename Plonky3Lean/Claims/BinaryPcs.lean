@@ -8,21 +8,31 @@ public import Plonky3Lean.Proofs.BinaryPcs.Walk
 /-!
 # p3-binary-pcs: claims
 
-The schedule, the fold and the verifier's query phase are transcribed over fields of characteristic 2, not extracted.
+The schedule, the fold and the verifier's query phase are transcribed, not extracted.
 
-The specification is the folding of FRI-Binius (Diamond and Posen, eprint 2024/504, section 4), over the additive NTT of Lin, Chung and Han:
+They work over fields of characteristic 2.
+
+The specification is the folding of FRI-Binius (Diamond and Posen, eprint 2024/504, section 4).
+
+It runs over the additive NTT of Lin, Chung and Han:
 
 ```text
     codeword of d over S_l:   ntt(d)_i = sum_k X_k(point(i)) d_k
-    fold at beta:             (lo, hi) -> f_0 + beta (f_0 + f_1),  f_1 = lo + hi,  f_0 = lo + point(2 j) f_1
+    fold at beta:             (lo, hi) -> f_0 + beta (f_0 + f_1)
+                              f_1 = lo + hi,  f_0 = lo + point(2 j) f_1
     bound coefficients:       d'_k = (1 - beta) d_(2k) + beta d_(2k+1)
 ```
 
-The security model is that of p3-security for this scheme: each fold over words of N symbols costs (N + 1) / |K|, and each sumcheck round 2 / |K| (eprint 2024/1553, Appendix A, Theorem 8).
+The security model is that of p3-security (eprint 2024/1553, Appendix A, Theorem 8):
 
-The sponge is its history; the Merkle schemes and the query draw are functions of what they read.
+- each fold over words of N symbols costs (N + 1) / |K|
+- each sumcheck round costs 2 / |K|
 
-A panic is none.
+The sponge is modelled by its history.
+
+The Merkle schemes and the query draw are functions of what they read.
+
+A panic is modelled as a missing result.
 -/
 
 open Finset Plonky3Lean.Spec.BinaryDft Plonky3Lean.Proofs.BinaryDft Plonky3Lean.Proofs.BinaryPcs
@@ -35,7 +45,14 @@ namespace Plonky3Lean.Claims.BinaryPcs
 
 /-! ## The schedule -/
 
-/-- The constructor accepts a schedule exactly when its invariants hold: a nonzero arity and rate, a factor between 1 and the arity, a codeword inside a word and inside the alphabet's domain, a priced challenge width, grinding below the witness capacity and the target, and a target the field leaves room for. -/
+/-- The constructor accepts a schedule exactly when its invariants hold:
+
+- the arity and the rate are nonzero
+- the factor lies between 1 and the arity
+- the codeword fits in a word and in the alphabet's domain
+- the challenge width is priced
+- grinding stays below the witness capacity and the target
+- the field leaves room for the target. -/
 theorem try_new_with_folding.ok (Q : ℕ → ℕ → ℕ → ℕ) (fBits efBits n : ℕ) (params : BinaryPcsParams)
     (lff : ℕ) (c : BinaryPcsConfig) :
     try_new_with_folding Q fBits efBits n params lff = some (.ok c) ↔
@@ -43,7 +60,9 @@ theorem try_new_with_folding.ok (Q : ℕ → ℕ → ℕ → ℕ) (fBits efBits 
         Inv c :=
   try_new_with_folding_ok Q fBits efBits n params lff c
 
-/-- The constructor panics only when the alphabet is narrower than a byte, which no encodable level is. -/
+/-- The constructor panics only when the alphabet is narrower than a byte.
+
+No encodable level is that narrow. -/
 theorem try_new_with_folding.panics (Q : ℕ → ℕ → ℕ → ℕ) (fBits efBits n : ℕ)
     (params : BinaryPcsParams) (lff : ℕ) :
     try_new_with_folding Q fBits efBits n params lff = none ↔
@@ -51,7 +70,9 @@ theorem try_new_with_folding.panics (Q : ℕ → ℕ → ℕ → ℕ) (fBits efB
         fBits < 8 :=
   try_new_with_folding_none Q fBits efBits n params lff
 
-/-- Changing the folding factor of an accepted schedule never panics, and accepts exactly the factors that keep the invariants. -/
+/-- Changing the folding factor of an accepted schedule never panics.
+
+It accepts exactly the factors that keep the invariants. -/
 theorem try_with_folding {c : BinaryPcsConfig} (h : Inv c) (lff : ℕ) :
     (∃ r, c.try_with_folding lff = some r) ∧
       ∀ c', c.try_with_folding lff = some (.ok c') ↔ c' = { c with log_folding_factor := lff } ∧ Inv c' :=
@@ -61,7 +82,9 @@ theorem try_with_folding {c : BinaryPcsConfig} (h : Inv c) (lff : ℕ) :
 theorem security_regime {c : BinaryPcsConfig} (h : Inv c) : c.security_regime = some (regimeOf c) :=
   h.security_regime
 
-/-- The transcript shape of an accepted schedule never panics: n + r - lff index bits, and min(q, 2^(n+r-lff)) distinct pairs. -/
+/-- The transcript shape of an accepted schedule never panics.
+
+It has n + r - lff index bits and min(q, 2^(n+r-lff)) distinct pairs. -/
 theorem shape {c : BinaryPcsConfig} (h : Inv c) :
     BinaryPcsShape.new c = some ⟨c.num_variables, c.log_folding_factor,
       (c.num_variables + c.log_folding_factor - 1) / c.log_folding_factor - 1,
@@ -70,13 +93,17 @@ theorem shape {c : BinaryPcsConfig} (h : Inv c) :
       min c.num_queries (2 ^ (c.num_variables + c.params.log_inv_rate - c.log_folding_factor))⟩ :=
   h.shape
 
-/-- Batch b starts at variable b lff and folds min(lff, n - b lff) variables, for b below ceil(n / lff). -/
+/-- For b below ceil(n / lff), batch b starts at variable b lff and folds min(lff, n - b lff) variables. -/
 theorem fold_batches {c : BinaryPcsConfig} (h : Inv c) :
     c.fold_batches = some ((List.range ((c.num_variables + c.log_folding_factor - 1) / c.log_folding_factor)).map
       fun b => (b * c.log_folding_factor, min c.log_folding_factor (c.num_variables - b * c.log_folding_factor))) :=
   h.fold_batches
 
-/-- The fold and sumcheck errors fit the target: sum_j (2^(r+j+1) + 1 + 2) 2^(lambda + reserve) <= 2^K, with one reserved bit unless every coset is queried. -/
+/-- The fold and sumcheck errors fit the target.
+
+The bound is sum_j (2^(r+j+1) + 1 + 2) 2^(lambda + reserve) <= 2^K.
+
+One bit is reserved unless every coset is queried. -/
 theorem field_error {c : BinaryPcsConfig} (h : Inv c) :
     (∑ j ∈ range c.num_variables, (2 ^ (c.params.log_inv_rate + j + 1) + 1 + 2)) *
         2 ^ (c.params.security_level + if (regimeOf c).queries_are_exhaustive then 0 else 1) ≤
@@ -89,7 +116,11 @@ section Fold
 
 variable {F EF : Type} [Field F] [CharP F 2] [Field EF] [Algebra F EF]
 
-/-- FRI-Binius folding lemma: the fold of the pair above point(j) of the codeword of d over S_(l+1) is the codeword over S_l of the bound coefficients. -/
+/-- The FRI-Binius folding lemma.
+
+Take the codeword of d over S_(l+1) and fold its pair above point(j).
+
+The result is the codeword over S_l of the bound coefficients. -/
 theorem fold_pair.ntt {L : Level F} (hL : Cantor L) {l : ℕ} (hl : l + 1 ≤ 2 ^ L.logBits) (hw : l < 64)
     (d : ℕ → F) {j : ℕ} (hj : j < 2 ^ l) (beta : EF) :
     fold_pair L j beta (ntt L.cantor (l + 1) 0 d (2 * j)) (ntt L.cantor (l + 1) 0 d (2 * j + 1)) =
@@ -97,12 +128,14 @@ theorem fold_pair.ntt {L : Level F} (hL : Cantor L) {l : ℕ} (hl : l + 1 ≤ 2 
         (fun k => (1 - beta) * algebraMap F EF (d (2 * k)) + beta * algebraMap F EF (d (2 * k + 1))) j) :=
   fold_pair_ntt hL hl hw d hj beta
 
-/-- fold_pair panics exactly when the doubled index, wrapped at the word, leaves the alphabet's domain. -/
+/-- Folding a pair panics exactly when the doubled index, wrapped at the word, leaves the alphabet's domain. -/
 theorem fold_pair.panics (L : Level F) (index : ℕ) (beta : EF) (lo hi : F) :
     fold_pair L index beta lo hi = none ↔ ¬ 2 * index % 2 ^ 64 < 2 ^ 2 ^ L.logBits := by
   rw [fold_pair_eq]; split_ifs <;> simp_all
 
-/-- The coset fold of an honest coset of 2^a symbols is the codeword over S_l of d with its a lowest variables bound. -/
+/-- Folding an honest coset of 2^a symbols gives a codeword over S_l.
+
+It is the codeword of d with its a lowest variables bound. -/
 theorem fold_coset.ntt [CharP EF 2] {LF : Level F} {LE : Level EF} (hF : Cantor LF) (hE : Cantor LE)
     (hpre : ∀ r < 2 ^ LF.logBits, LE.cantor r = algebraMap F EF (LF.cantor r)) {l a : ℕ} (ha : 0 < a)
     (hla : l + a ≤ 2 ^ LF.logBits) (hlaE : l + a ≤ 2 ^ LE.logBits) (hw : l + a ≤ 64) (d : ℕ → F)
@@ -125,7 +158,9 @@ theorem bindAll.mle {EF : Type} [Field EF] (bs : List EF) (e : ℕ → EF) :
     bindAll bs e 0 = ∑ k ∈ range (2 ^ bs.length), eqWeight bs k * e k :=
   bindAll_zero bs e
 
-/-- After every fold, the honest final codeword over S_r is uniform, each symbol the multilinear extension at the challenges. -/
+/-- After every fold, the honest final codeword over S_r is uniform.
+
+Each symbol is the multilinear extension at the challenges. -/
 theorem final.uniform {EF : Type} [Field EF] {β : ℕ → EF} (r : ℕ) (bs : List EF) (e : ℕ → EF)
     (he : ∀ k, 2 ^ bs.length ≤ k → e k = 0) (i : ℕ) :
     ntt β r 0 (bindAll bs e) i = ∑ k ∈ range (2 ^ bs.length), eqWeight bs k * e k :=
@@ -138,7 +173,9 @@ section Verifier
 variable {F EF ComT ComX MPT MPX E : Type} [Field F] [Field EF] [Algebra F EF] [DecidableEq F]
   [DecidableEq EF] (V : Env F EF ComT ComX MPT MPX E)
 
-/-- On an accepted schedule, the query phase answers every proof with an acceptance or a typed rejection, never a panic. -/
+/-- On an accepted schedule, the query phase never panics.
+
+It answers every proof with an acceptance or a typed rejection. -/
 theorem verify_query_paths.no_panic {c : BinaryPcsConfig} (hc : Inv c)
     (hLF : c.committed_field_bits ≤ 2 ^ V.LF.logBits) (hLE : c.committed_field_bits ≤ 2 ^ V.LE.logBits)
     {s : BinaryPcsShape} (hs : BinaryPcsShape.new c = some s) (base_commitment : ComT) (betas : List EF)
@@ -146,7 +183,9 @@ theorem verify_query_paths.no_panic {c : BinaryPcsConfig} (hc : Inv c)
     (h : List (Step F EF)) : verify_query_paths V c base_commitment betas proof s h ≠ none :=
   verify_query_paths_ne_none V hc hLF hLE hs base_commitment betas hb proof h
 
-/-- On an accepted schedule, the query phase accepts an honest proof whose openings the Merkle schemes accept. -/
+/-- On an accepted schedule, the query phase accepts an honest proof.
+
+This needs the Merkle schemes to accept its openings. -/
 theorem verify_query_paths.complete [CharP F 2] [CharP EF 2] {c : BinaryPcsConfig} (hc : Inv c)
     (hLF : Cantor V.LF) (hLE : Cantor V.LE)
     (hpre : ∀ t < 2 ^ V.LF.logBits, V.LE.cantor t = algebraMap F EF (V.LF.cantor t))
@@ -182,7 +221,9 @@ end Verifier
 
 /-! ## The tower levels -/
 
-/-- Over GF(2^128), the FRI-Binius folding lemma holds for every codeword up to the field's 128 dimensions inside a word. -/
+/-- Over GF(2^128), the FRI-Binius folding lemma holds for every codeword that fits in a word.
+
+The codeword dimension may go up to the field's 128 dimensions. -/
 theorem towerLevel.fold_pair {l : ℕ} (hw : l < 64) (b : ℕ)
     (d : ℕ → ConcreteBinaryTower.ConcreteBTField 7) {j : ℕ} (hj : j < 2 ^ l)
     (beta : ConcreteBinaryTower.ConcreteBTField 7) :

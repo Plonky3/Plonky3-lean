@@ -21,7 +21,7 @@ The specification is the FRI folding operator of Ben-Sasson, Bentov, Horesh and 
     p(X) = sum_{j < a} X^j p_j(X^a),     fold(p, a, beta) = sum_{j < a} beta^j p_j
 ```
 
-and the reduced opening of Haböck's summary, eprint 2022/1216:
+The reduced opening follows Haböck's summary, eprint 2022/1216:
 
 ```text
     R(x) = sum_k sum_i alpha^(off_k + i) (y_(k,i) - c_(k,i)) / (z_k - x)
@@ -29,7 +29,10 @@ and the reduced opening of Haböck's summary, eprint 2022/1216:
 
 A codeword of log height N stores P(G_N^rev_N(i)) at index i, for the generator table G.
 
-The field facts are hypotheses: the table is primitive and nested, and 2 is invertible.
+The field facts are hypotheses:
+
+- the generator table is primitive and nested
+- 2 is invertible
 
 BabyBear and every extension of it satisfy them, the quartic one included.
 -/
@@ -89,14 +92,17 @@ theorem lagrange_interpolate_at {s ω : K} {k : ℕ} (hω : IsPrimitiveRoot ω (
       some (foldValue s ω k y z) :=
   lagrange_interpolate_at_revCoset hω hs h2 y z
 
-/-- The row fold returns the value at beta of the polynomial through the opened row, on its coset, for every row. -/
+/-- For every row, the row fold evaluates at beta the polynomial through the opened row on its coset. -/
 theorem fold_row (G : Gen K) (hV : GenValid G) (h2 : (2 : K) ≠ 0) {index h k : ℕ} (hk : 1 ≤ k)
     (hhk : h + k ≤ G.adicity) (evals : Fin (2 ^ k) → K) (β : K) :
     p3_fri.two_adic_pcs.mirror.fold_row G index h k β (List.ofFn evals) =
       some (foldValue (G.gen (h + k) ^ bitRev h index) (G.gen k) k evals β) :=
   fold_row_eq G hV h2 hk hhk evals β
 
-/-- The row fold panics exactly when the table is too short or the row does not hold 2^k values. -/
+/-- The row fold panics exactly in two cases:
+
+- the table is too short
+- the row does not hold 2^k values. -/
 theorem fold_row.panics (G : Gen K) (hV : GenValid G) (h2 : (2 : K) ≠ 0) {index h k : ℕ} (hk : 1 ≤ k)
     (β : K) (evals : List K) :
     p3_fri.two_adic_pcs.mirror.fold_row G index h k β evals = none ↔
@@ -110,14 +116,16 @@ theorem fold_matrix_scalar.codeword (G : Gen K) (hV : GenValid G) (hN : GenNeste
     ∃ L, fold_matrix_scalar G β k v = some L ∧ IsCodeword G (polyFold P (2 ^ k) β) n L :=
   fold_matrix_scalar_codeword G hV hN h2 hk hnk hv β
 
-/-- The prover's scalar matrix fold returns, row by row, the verifier's row fold, on every word. -/
+/-- On every word, the prover's scalar matrix fold returns the verifier's row fold, row by row. -/
 theorem fold_matrix_scalar.rows (G : Gen K) (hV : GenValid G) (hN : GenNested G) (h2 : (2 : K) ≠ 0)
     {n k : ℕ} (hk : 1 ≤ k) (hnk : n + k ≤ G.adicity) {v : List K} (hv : v.length = 2 ^ (n + k)) (β : K) :
     fold_matrix_scalar G β k v = some ((List.range (2 ^ n)).map fun t =>
       foldValue (G.gen (n + k) ^ bitRev n t) (G.gen k) k (fun j => v.getD (t * 2 ^ k + j.val) 0) β) :=
   fold_matrix_scalar_rows G hV hN h2 hk hnk hv β
 
-/-- fold_matrix, on its packed path for every packing width and every scratch buffer, or on its scalar paths, returns the verifier's row fold for every row. -/
+/-- The matrix fold returns the verifier's row fold for every row.
+
+This holds on its scalar paths, and on its packed path for every packing width and scratch buffer. -/
 theorem fold_matrix.rows (G : Gen K) (hV : GenValid G) (hN : GenNested G) (h2 : (2 : K) ≠ 0)
     (W field_bits : ℕ) {n k : ℕ} (hk : 1 ≤ k) (hnk : n + k ≤ G.adicity) {v : List K} (hv : v.length = 2 ^ (n + k))
     (init : List (Fin W → K)) (hinit : init.length = 2 ^ (k - 1)) (β : K) :
@@ -130,7 +138,13 @@ end rows
 
 /-! ## The folding schedule -/
 
-/-- From the tallest height above the final height: every arity lies in [1, cap], they sum to the distance, and the descent stops at every input height at or above the final one. -/
+/-- Start from a tallest height above the final height.
+
+The schedule then satisfies:
+
+- every arity lies in [1, cap]
+- the arities sum to the distance
+- the descent stops at every input height at or above the final one. -/
 theorem fold_schedule.spec {h0 : ℕ} {rest : List ℕ} (hdec : (h0 :: rest).IsChain (· > ·)) {F A : ℕ}
     (hA : 0 < A) (hF : F < h0) :
     ∃ L, fold_schedule (h0 :: rest) F A = some L ∧ (∀ a ∈ L, 1 ≤ a ∧ a ≤ A) ∧ L.sum = h0 - F ∧
@@ -142,7 +156,10 @@ theorem fold_schedule.nil {hs : List ℕ} (hdec : hs.IsChain (· > ·)) {F A : �
     (h : ∀ h0 ∈ hs.head?, h0 ≤ F) : fold_schedule hs F A = some [] :=
   fold_schedule_nil hdec h
 
-/-- The schedule panics exactly on heights that are not strictly decreasing, or on a zero cap with a round to schedule. -/
+/-- The schedule panics exactly in two cases:
+
+- the heights are not strictly decreasing
+- the cap is zero and a round remains to schedule. -/
 theorem fold_schedule.panics {hs : List ℕ} {F A : ℕ} :
     fold_schedule hs F A = none ↔ ¬ hs.IsChain (· > ·) ∨ (A = 0 ∧ ∃ h0 ∈ hs.head?, F < h0) :=
   fold_schedule_eq_none
@@ -163,7 +180,13 @@ theorem fold_query.rebuild (row : List K) {p : ℕ} (hp : p < row.length) :
     rebuildRow row.length p row[p] (row.eraseIdx p) = row :=
   rebuildRow_eraseIdx row hp
 
-/-- Completeness of one query: on an honest chain, fold_query returns the final word's value at the shifted index, that index, and every round's group index and row. -/
+/-- Completeness of one query.
+
+On an honest chain, the query fold returns:
+
+- the final word's value at the shifted index
+- that shifted index
+- every round's group index and row. -/
 theorem fold_query.complete {ME IE : Type} (G : Gen K) (q idx : ℕ) (rs : List (Rd K)) (wF : List K)
     {H Hf : ℕ} (hc : ChainOK G q H idx rs wF) (h64 : ∀ r ∈ rs, r.a < 64) (hHf : H - totalA rs = Hf) :
     fold_query (ME := ME) (IE := IE) G q idx (rs.map Rd.β) (rs.map Rd.a) (rs.map Rd.sv)
@@ -171,7 +194,13 @@ theorem fold_query.complete {ME IE : Type} (G : Gen K) (q idx : ℕ) (rs : List 
       pure (wF.getD (idx / 2 ^ totalA rs) 0, idx / 2 ^ totalA rs, recordedOf rs idx) :=
   fold_query_complete G q idx rs wF hc h64 hHf
 
-/-- Soundness of one query's checks: an accepted chain records rows that each hold the running value at the queried position and fold to the next running value with any rolled-in opening, and it ends at the returned value at the final height. -/
+/-- Soundness of one query's checks.
+
+An accepted chain records rows that satisfy:
+
+- each row holds the running value at the queried position
+- each row folds to the next running value, with any rolled-in opening
+- the chain ends at the returned value at the final height. -/
 theorem fold_query.sound {ME IE : Type} (G : Gen K) (q idx : ℕ) (betas : List K) (las : List ℕ)
     (svs : List (List (List K))) (ro : List (ℕ × K)) (H Hf : ℕ) {f : K} {i' : ℕ}
     {recorded : List (ℕ × List K)}
@@ -182,7 +211,7 @@ theorem fold_query.sound {ME IE : Type} (G : Gen K) (q idx : ℕ) (betas : List 
       H - ((List.zip betas (List.zip las svs)).map fun r => r.2.1).sum = Hf :=
   fold_query_sound G q idx betas las svs ro H Hf h
 
-/-- An honest round: the prover's scalar matrix fold returns, at every row, the verifier's row fold. -/
+/-- In an honest round, the prover's scalar matrix fold returns the verifier's row fold at every row. -/
 theorem honest_round (G : Gen K) (hV : GenValid G) (hN : GenNested G) (h2 : (2 : K) ≠ 0) {n a : ℕ}
     (ha : 1 ≤ a) (hna : n + a ≤ G.adicity) {w : List K} (hw : w.length = 2 ^ (n + a)) (β : K) :
     ∃ f, fold_matrix_scalar G β a w = some f ∧ f.length = 2 ^ n ∧
@@ -200,7 +229,11 @@ theorem honest_round.degree (G : Gen K) (hV : GenValid G) (hN : GenNested G) (h2
       (polyFold P (2 ^ a) β + C (β ^ 2 ^ a) * R).degree < ↑(2 ^ (n - b)) :=
   honest_round_degree G hV hN h2 ha hna hbn hw hP hu hR β
 
-/-- The final check passes on an honest final codeword: the inverse transform of its first 2^L values, un-bit-reversed, evaluates with Horner's rule at G_H^rev_H(i) to its value at i. -/
+/-- The final check passes on an honest final codeword.
+
+Take the inverse transform of its first 2^L values, un-bit-reversed.
+
+Evaluated with Horner's rule at G_H^rev_H(i), it gives the codeword's value at i. -/
 theorem final_poly (G : Gen K) (hV : GenValid G) (hN : GenNested G) {P : K[X]} {L b : ℕ}
     (hLb : L + b ≤ G.adicity) {wF : List K} (hc : IsCodeword G P (L + b) wF) (hdeg : P.degree < ↑(2 ^ L))
     {coeffs : List K} (hlen : coeffs.length = 2 ^ L)
@@ -222,7 +255,11 @@ section reduce
 
 variable {K : Type} [Field K] [DecidableEq K]
 
-/-- The verifier's reduction of one query: at each height present, the reduced opening of the claims at that height, with the opened rows as column values. -/
+/-- The verifier's reduction of one query.
+
+At each height present, it is the reduced opening of the claims at that height.
+
+The opened rows serve as column values. -/
 theorem reduceQuery.spec {ME IE : Type} (G : Gen K) (g : K) {C : Type} (b H : ℕ) (α : K)
     (claims : List (Claim G C)) (rows : List (List (List K))) (index : ℕ) (ro : List (ℕ × K))
     (halign : List.Forall₂ (fun c r => r.length = c.matrices.length) claims rows)
@@ -231,7 +268,11 @@ theorem reduceQuery.spec {ME IE : Type} (G : Gen K) (g : K) {C : Type} (b H : �
       (((matsEntries b (queryMats claims rows)).filter (·.1 = e.1)).map (·.2)) :=
   reduceQuery_spec G g b H α claims rows index ro halign h
 
-/-- The prover's reduced vectors: at each height present, the entry at the row of query idx is the reduced opening of the claims at that height, with the matrices' rows as column values. -/
+/-- The prover's reduced vectors.
+
+At each height present, take the entry at the row of query idx.
+
+It is the reduced opening of the claims at that height, with the matrices' rows as column values. -/
 theorem reduced_openings.spec (G : Gen K) (hN : GenNested G) (g α : K)
     (mats : List (MatToOpen K)) {H : ℕ} (hHmax : (mats.map fun m => Nat.log 2 m.mat.height).max? = some H)
     (hHa : H ≤ G.adicity) (hpow : ∀ m ∈ mats, m.mat.height = 2 ^ Nat.log 2 m.mat.height)
@@ -243,7 +284,9 @@ theorem reduced_openings.spec (G : Gen K) (hN : GenNested G) (g α : K)
       reducedOpening α (xOfQuery G g H idx e.1) 0 (((proverAllEntries H idx mats).filter (·.1 = e.1)).map (·.2)) :=
   reduced_openings_spec G hN g α mats hHmax hHa hpow h32 hw hout h hidx
 
-/-- The verifier recomputes exactly the prover's reduced opening: same claims in the same order, same powers of alpha, same query point. -/
+/-- The verifier recomputes exactly the prover's reduced opening.
+
+Both use the same claims in the same order, the same powers of alpha and the same query point. -/
 theorem reduced_openings.agree {ME IE : Type} (G : Gen K) (hN : GenNested G) (g α : K) {C : Type} (b : ℕ)
     (claims : List (Claim G C)) (rows : List (List (List K))) (mats : List (MatToOpen K)) {H : ℕ}
     (hHmax : (mats.map fun m => Nat.log 2 m.mat.height).max? = some H)
@@ -266,7 +309,9 @@ end reduce
 
 /-! ## The verifier never panics -/
 
-/-- The verifier never panics: on every proof, transcript, commitment schemes and claims, it accepts or rejects. -/
+/-- The verifier never panics.
+
+On every proof, transcript, commitment schemes and claims, it accepts or rejects. -/
 theorem verify_fri.never_panics {K : Type} [Field K] [DecidableEq K] (G : Gen K) (hV : GenValid G)
     (h2 : (2 : K) ≠ 0) (g : K) {C S : Type} (fmmcs immcs : MmcsOps K) (tx : VerifierTx K fmmcs.Commitment S)
     (params : FriParameters) (proof : FriProof K fmmcs.Commitment fmmcs.MultiProof immcs.MultiProof) (s : S)
@@ -309,7 +354,9 @@ theorem hiding_pcs.even_rows (v : List K) {w r h : ℕ} (hw : 0 < w) (hv : v.len
     (randomize v w r rnd).1.getD (2 * i * (w + r) + c) 0 = v.getD (i * w + c) 0 :=
   randomize_even_row v hw hv rnd hrnd hi hc
 
-/-- The quotient mask adds r(X) (p X^h - 1) to every column, r with coefficients g^i r_(i,j). -/
+/-- The quotient mask adds r(X) (p X^h - 1) to every column.
+
+The coefficients of r are g^i r_(i,j). -/
 theorem hiding_pcs.mask_column (g p x : K) {h w : ℕ} (rv coeffs : List K) (hlen : 2 * h * w ≤ coeffs.length)
     {j : ℕ} (hj : j < w) :
     ∑ i ∈ range (2 * h), (maskCoeffs g p h w rv coeffs).getD (i * w + j) 0 * x ^ i =
@@ -317,7 +364,9 @@ theorem hiding_pcs.mask_column (g p x : K) {h w : ℕ} (rv coeffs : List K) (hle
         (∑ i ∈ range h, g ^ i * rv.getD (i * w + j) 0 * x ^ i) * (p * x ^ h - 1) :=
   maskCoeffs_column g p x rv coeffs hlen hj
 
-/-- The chunk masks cancel in the recombination when the last mask is minus the others scaled by c_i / c_last. -/
+/-- The chunk masks cancel in the recombination.
+
+This needs the last mask to be minus the others, each scaled by c_i / c_last. -/
 theorem hiding_pcs.masks_cancel {d : ℕ} (c v : Fin (d + 1) → K) (R : Fin d → K) (hc : c (Fin.last d) ≠ 0) :
     ∑ i : Fin (d + 1), (c i * ∏ j ∈ univ.erase i, v j) *
       (v i * Fin.lastCases (-∑ i : Fin d, c i.castSucc / c (Fin.last d) * R i) R i) = 0 :=
@@ -344,7 +393,10 @@ end hidingPcs
 
 section babyBear
 
-/-- At every extension E of BabyBear, the quartic one included, the generator table is primitive and nested, and 2 is invertible. -/
+/-- In every extension E of BabyBear, the quartic one included, the field facts hold:
+
+- the generator table is primitive and nested
+- 2 is invertible. -/
 theorem babyBear.facts (E : Type) [Field E] [Algebra BabyBear.Field E] :
     ∃ t, Plonky3Lean.Spec.BabyBear.TwoAdicParams.TWO_ADIC_GENERATORS = .ok t ∧
       (Plonky3Lean.Proofs.Commit.Gen.map (genOfTable (t.val.map Plonky3Lean.Spec.BabyBear.toField))

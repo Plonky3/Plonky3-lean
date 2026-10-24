@@ -27,7 +27,7 @@ A matrix of width w is its rows in a vector space V over the field.
 
 Rows at the height and above are not part of the matrix.
 
-A panic is none.
+A panic is modelled as a missing result.
 -/
 
 open Plonky3Lean.Spec.BinaryDft Plonky3Lean.Proofs.BinaryDft Finset
@@ -76,14 +76,18 @@ theorem twiddle.cantor {β : ℕ → F} {n : ℕ} (hβ : IsCantor β n) (shift :
     twiddle β shift j b = sqAddIter j shift + point β (2 * b) :=
   Proofs.BinaryDft.twiddle_cantor hβ shift hj hb
 
-/-- From block c - 1 to block c, point(2c) adds beta_1 + ... + beta_(t+1), t the trailing zeros of c. -/
+/-- From block c - 1 to block c, point(2c) adds beta_1 + ... + beta_(t+1).
+
+Here t is the number of trailing zeros of c. -/
 theorem point.step (β : ℕ → F) {c : ℕ} (hc : 0 < c) :
     point β (2 * c) = point β (2 * (c - 1)) + ∑ q ∈ range (trailingZeros c + 1), β (q + 1) :=
   Proofs.BinaryDft.point_step β hc
 
 /-! ## The network -/
 
-/-- Lin, Chung and Han, section III: the network of the twiddles W^_j at the block points computes the additive NTT. -/
+/-- The butterfly network computes the additive NTT.
+
+Its twiddles are the values of W^_j at the block points (Lin, Chung and Han, section III). -/
 theorem network_ntt (β : ℕ → F) {n l : ℕ} (hβ : Independent β n) (hl : l ≤ n) (shift : F)
     (d : ℕ → V) {i : ℕ} (hi : i < 2 ^ l) :
     network (twiddle β shift) l d i = ntt β l shift d i :=
@@ -103,7 +107,9 @@ theorem inetwork_ntt (β : ℕ → F) {n l : ℕ} (hβ : Independent β n) (hl :
     inetwork (twiddle β shift) l y i = d i :=
   Proofs.BinaryDft.inetwork_ntt β hβ hl shift d y hy hi
 
-/-- Coefficients zero from 2^m on: row c 2^m + i over S_(m+r) is row i over the coset point(c 2^m) + S_m. -/
+/-- Let the coefficients vanish from index 2^m on.
+
+Then row c 2^m + i over S_(m+r) is row i over the coset point(c 2^m) + S_m. -/
 theorem ntt_pad (β : ℕ → F) {m : ℕ} (r : ℕ) (shift : F) (d : ℕ → V)
     (hd : ∀ k, 2 ^ m ≤ k → d k = 0) (c : ℕ) {i : ℕ} (hi : i < 2 ^ m) :
     ntt β (m + r) shift d (c * 2 ^ m + i) = ntt β m (shift + point β (c * 2 ^ m)) d i :=
@@ -122,7 +128,9 @@ theorem IsCantor.map' {F G : Type _} [Field F] [Field G] (φ : F →+* G) {β : 
     (h : IsCantor β n) : IsCantor (φ ∘ β) n :=
   Proofs.BinaryDft.IsCantor.map φ h
 
-/-- CompPoly's W_i, the product of X - u over the span U_i of an independent basis over GF(2), evaluates to W_i here. -/
+/-- CompPoly's W_i evaluates to W_i here.
+
+CompPoly defines it as the product of X - u over the span U_i of an independent basis over GF(2). -/
 theorem compPoly_W_eval {r : ℕ} [NeZero r] {L : Type u} [Field L] [Fintype L] [DecidableEq L]
     (𝔽q : Type u) [Field 𝔽q] [Fintype 𝔽q] [Fact (Fintype.card 𝔽q = 2)] [Algebra 𝔽q L]
     (β : Fin r → L) [Fact (LinearIndependent 𝔽q β)] (i : Fin r) (x : L) :
@@ -228,13 +236,19 @@ theorem transform_intt {l : ℕ} (hl : l ≤ 2 ^ L.logBits) (shift : F) {width :
     (transform L true width (2 ^ l) shift y).map (· i) = some (d i) :=
   Proofs.BinaryDft.transform_intt hL hl shift hw d y hy hi
 
-/-- The transform panics on a height that is not a power of two, a domain wider than the level, or width zero. -/
+/-- The transform panics in three cases:
+
+- the height is not a power of two
+- the domain is wider than the level
+- the width is zero. -/
 theorem transform.panics (inverse : Bool) {n width : ℕ} (shift : F)
     (h : (∀ k, n ≠ 2 ^ k) ∨ (∃ l, n = 2 ^ l ∧ 2 ^ L.logBits < l) ∨ width = 0) (x : ℕ → V) :
     transform L inverse width n shift x = none :=
   Proofs.BinaryDft.transform_panics inverse shift h x
 
-/-- The padded transform of a message of 2^m rows within one tile is the additive NTT of the padded message over S_(m+r). -/
+/-- Take a message of 2^m rows that fits in one tile.
+
+Its padded transform is the additive NTT of the padded message over S_(m+r). -/
 theorem LchNtt.ntt_batch_padded.eq {m r width : ℕ} (hmr : m + r ≤ 2 ^ L.logBits) (hw : 0 < width)
     (hsmall : L.bytes * (width * 2 ^ m) ≤ DEEP_TILE_BYTES) (x : ℕ → V) :
     LchNtt.ntt_batch_padded L width (2 ^ (m + r)) x r =

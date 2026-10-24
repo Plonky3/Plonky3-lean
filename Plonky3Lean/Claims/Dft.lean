@@ -16,7 +16,9 @@ A matrix of height h is its rows: entries of a vector space V over K, K^w for wi
 
 A result agrees with its specification on the first h rows.
 
-The field's generators are a table G: G_b generates the subgroup of order 2^b, for b up to the two-adicity.
+The field's generators form a table G.
+
+Entry G_b generates the subgroup of order 2^b, for b up to the two-adicity.
 
 The specifications follow Cormen et al., Introduction to Algorithms, chapter 30.
 
@@ -27,7 +29,7 @@ The specifications follow Cormen et al., Introduction to Algorithms, chapter 30.
     c = idft_omega(x),  padded with zeros to the larger height:  the coefficients of the interpolant
 ```
 
-rev_k(i) reverses the k low bits of i.
+The map rev_k(i) reverses the k low bits of i.
 -/
 
 open p3_dft.mirror Plonky3Lean.Spec.Dft Plonky3Lean.Proofs.Dft
@@ -85,7 +87,9 @@ end spec
 
 /-! ## Butterfly networks
 
-The iterative Cooley-Tukey network runs k decimation-in-time layers on bit-reversed input (Cooley and Tukey, 1965).
+The iterative Cooley-Tukey network (Cooley and Tukey, 1965) runs k decimation-in-time layers.
+
+It reads its input in bit-reversed order.
 
 The Gentleman-Sande network runs k decimation-in-frequency layers on natural input. -/
 
@@ -110,8 +114,9 @@ theorem cooley_tukey.coset {c ω : K} {k : ℕ} (hω : IsPrimitiveRoot ω (2 ^ k
 
 /-- Conjugating a layer by the bit reversal of 2^(L+1+j) rows exchanges blocks and offsets.
 
-The layer with half block 2^L, and twiddle t(s) at offset s, becomes the layer with half block 2^j,
-and twiddle t(rev_L(sigma)) at block sigma. -/
+Before, the layer has half block 2^L and twiddle t(s) at offset s.
+
+After, it has half block 2^j and twiddle t(rev_L(sigma)) at block sigma. -/
 theorem layer.bit_reversed (f : K → V → V → V × V) (tw : ℕ → K) (L j : ℕ) (y : ℕ → V) {i : ℕ}
     (hi : i < 2 ^ (L + 1 + j)) :
     layer (fun _ s => f (tw s)) (2 ^ L) (2 ^ j) y (rev (L + 1 + j) i) =
@@ -158,7 +163,7 @@ theorem radix2Dit.dft_batch.panics_too_big (G : Gen K) {k : ℕ} (hk : G.adicity
 
 /-- The radix-2 decimation-in-time extension sees the coefficients in natural order.
 
-It evaluates the transformed coefficients, padded with zeros, on the coset s times the subgroup of order 2^(k+a).
+It evaluates the zero-padded transformed coefficients on s times the subgroup of order 2^(k+a).
 
 It needs a nonzero width when the shift is not one, and a padded length below 2^64. -/
 theorem radix2Dit.coset_lde_batch_with_transform (G : Gen K) (hG : GenValid G) {k a w : ℕ}
@@ -235,9 +240,13 @@ theorem parallel.coset_idft_batch (G : Gen K) (hG : GenValid G) {k : ℕ} (hk : 
 
 /-- The parallel extension, for nested generators, sees coefficient j at row rev_k(j).
 
-Read through its bit-reversed view, it evaluates the transformed coefficients on s times the subgroup of order 2^(k+a).
+Read through its bit-reversed view, it evaluates the transformed coefficients.
 
-Each coset of the large subgroup is evaluated with the small generator G_k, so the result needs G_(k+a)^(2^a) = G_k. -/
+The evaluation points are s times the subgroup of order 2^(k+a).
+
+Each coset of the large subgroup is evaluated with the small generator G_k.
+
+So the result needs G_(k+a)^(2^a) = G_k. -/
 theorem parallel.lde (G : Gen K) (hG : GenValid G) (hN : GenNested G) {k a w : ℕ}
     (hka : k + a ≤ G.adicity) (s : K) (ha : a < 64) (hlen : w * (2 ^ k * 2 ^ a) < 2 ^ 64)
     (T : (ℕ → V) → ℕ → V) (x : ℕ → V) :
@@ -256,7 +265,9 @@ theorem smallBatch.dft_batch (G : Gen K) (hG : GenValid G) (hN : GenNested G) {k
     Computes (Radix2DFTSmallBatch.dft_batch G L c w (2 ^ k) x) (2 ^ k) (dft (G.gen k) (2 ^ k) x) :=
   Proofs.Dft.smallBatch_dft_batch G hG hN hkL hL c w x
 
-/-- The small-batch inverse of 2^k rows is the inverse transform at G_k, for nested generators and any cache size 2^L >= 2^k. -/
+/-- The small-batch inverse of 2^k rows is the inverse transform at G_k.
+
+This holds for nested generators and any cache size 2^L >= 2^k. -/
 theorem smallBatch.idft_batch (G : Gen K) (hG : GenValid G) (hN : GenNested G) {k L : ℕ}
     (hkL : k ≤ L) (hL : L ≤ G.adicity) (c w : ℕ) (x : ℕ → V) :
     Computes (Radix2DFTSmallBatch.idft_batch G L c w (2 ^ k) x) (2 ^ k) (idft (G.gen k) (2 ^ k) x) :=
@@ -320,7 +331,9 @@ theorem default.algebra {W U : Type _} [AddCommGroup W] [Module K W] [AddCommGro
     Computes (p3_dft.traits.mirror.via_base e e.symm base x) n (spec x) :=
   Proofs.Dft.via_base_spec e hb x
 
-/-- Linear maps commute with the transform, so the coordinates of an algebra transform are base-field transforms. -/
+/-- Linear maps commute with the transform.
+
+So the coordinates of an algebra transform are base-field transforms. -/
 theorem dft.linear {U : Type _} [AddCommGroup U] [Module K U] (f : V →ₗ[K] U) (ω : K) (n : ℕ)
     (x : ℕ → V) (i : ℕ) : dft ω n (f ∘ x) i = f (dft ω n x i) :=
   Proofs.Dft.dft_map f ω n x i
@@ -382,7 +395,9 @@ end rows
 
 /-! ## The fields
 
-Each table, read in its field, holds nested generators: entry b has order 2^b and squares to entry b - 1. -/
+Each table, read in its field, holds nested generators.
+
+Entry b has order 2^b and squares to entry b - 1. -/
 
 /-- BabyBear: 28 entries, two-adicity 27. -/
 theorem babyBear.generators :
@@ -408,7 +423,9 @@ theorem goldilocks.generators :
       GenNested (genOfTable (t.val.map Plonky3Lean.Spec.Goldilocks.toField)) :=
   Proofs.Dft.goldilocks_generators
 
-/-- Mersenne31 is not two-adic; its complex extension has 33 entries, two-adicity 32. -/
+/-- Mersenne31 is not two-adic.
+
+Its complex extension has 33 entries, two-adicity 32. -/
 theorem mersenne31Complex.generators :
     ∃ t, p3_mersenne_31.mersenne_31.Mersenne31.EXT_TWO_ADIC_GENERATORS = .ok t ∧
       (genOfTable (t.val.map Plonky3Lean.Spec.Mersenne31.toComplex)).adicity = 32 ∧

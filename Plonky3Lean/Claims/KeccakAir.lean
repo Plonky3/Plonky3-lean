@@ -12,8 +12,6 @@ public import Plonky3Lean.Proofs.KeccakAir.Binary.Extracted
 /-!
 # p3-keccak-air: claims
 
-# Overview
-
 These claims hold at the Plonky3 commit pinned in `plonky3/`.
 
 The tables and the characteristic-2 round on words are extracted.
@@ -22,13 +20,19 @@ The two AIR evaluations and the two trace generators are transcriptions with mir
 
 Each evaluation is parametric, so it is an AIR of the p3-air model.
 
-A trace satisfies an AIR when every constraint polynomial vanishes on every row, the last row's next row being row 0.
+A trace satisfies an AIR when every constraint polynomial vanishes on every row.
 
-The specification is FIPS 202, in `Plonky3Lean.Spec.Keccak`.
+The last row's next row is row 0.
 
-# The AIR over a field of size at least 2^16
+The specification is FIPS 202, as transcribed in the Keccak specification module.
 
-A row holds one round: 24 one-hot flags, the round's input as 16-bit limbs, and the bits of C, C', A' and A''[0, 0].
+## The AIR over a field of size at least 2^16
+
+A row holds one round:
+
+- 24 one-hot flags
+- the round's input as 16-bit limbs
+- the bits of C, C', A' and A''[0, 0]
 
 ```text
     rows 24 m .. 24 m + 23    one permutation, round k on row 24 m + k
@@ -36,20 +40,30 @@ A row holds one round: 24 one-hot flags, the round's input as 16-bit limbs, and 
     A''' on row 24 m + 23     the permutation's output
 ```
 
-- Soundness needs a characteristic of at least 2^16, where a limb determines its 16 bits.
-- Every row's flags are one-hot at the row index mod 24.
-- On each whole permutation, the input limbs of row 24 m + k are those of Rnd^k(A), and the output limbs are those of Keccak-f[1600](A), A being the state the preimage holds.
-- The generator's trace satisfies the AIR in every field, and the debug checker accepts it.
-- Every constraint has degree multiple at most 3 and at most one transition selector along a product, so every constraint polynomial fits the quotient's at most 2 chunks.
+The claims:
 
-# The AIR over a field of characteristic 2
+- soundness needs a characteristic of at least 2^16, where a limb determines its 16 bits
+- every row's flags are one-hot at the row index mod 24
+- on a whole permutation with preimage state A, row 24 m + k holds the limbs of Rnd^k(A)
+- the permutation's output limbs are those of Keccak-f[1600](A)
+- the generator's trace satisfies the AIR in every field, and the debug checker accepts it
+- every constraint has degree multiple at most 3 and at most one transition selector along a product
+- so every constraint polynomial fits the quotient's at most 2 chunks
 
-A row holds 25 one-hot flags, round r < 24 or an output row, and the 1600 state bits.
+## The AIR over a field of characteristic 2
 
-- Every row is one-hot, and a round-0 row starts 24 round rows whose successor holds Keccak-f[1600] of its state.
-- This holds when the AIR states the booleanity of the state, and, without it, when the trace's state cells are bits.
-- The generator's trace satisfies the AIR, with or without the booleanity.
-- The extracted round on words computes Rnd of FIPS 202 below round 24, and panics from round 24.
+A row holds 25 one-hot flags and the 1600 state bits.
+
+The flags mark a round r < 24 or an output row.
+
+The claims:
+
+- every row is one-hot
+- a round-0 row starts 24 round rows, whose successor holds Keccak-f[1600] of its state
+- this holds when the AIR states the booleanity of the state
+- without the booleanity, it holds when the trace's state cells are bits
+- the generator's trace satisfies the AIR, with or without the booleanity
+- the extracted round on words computes Rnd of FIPS 202 below round 24, and panics from round 24
 -/
 
 open Plonky3Lean.Spec.Air Plonky3Lean.Spec.Keccak Plonky3Lean.Proofs.Air
@@ -68,7 +82,13 @@ theorem flags {T : Instance F} (hT : Satisfies (constraints keccakAir) T) :
   rw [← cur_eq T i (by simp only [col.step_flags, NUM_KECCAK_COLS]; omega)]
   exact flags_eq hT i hi r hr
 
-/-- Soundness: on rows 24 m to 24 m + 23 of a satisfying trace, with A the state the preimage limbs hold, row 24 m + k holds the limbs of Rnd^k(A), and the output limbs are those of Keccak-f[1600](A). -/
+/-- Soundness on one permutation.
+
+Take rows 24 m to 24 m + 23 of a satisfying trace, and let A be the state the preimage limbs hold.
+
+Row 24 m + k holds the limbs of Rnd^k(A).
+
+The output limbs are those of Keccak-f[1600](A). -/
 theorem sound (hp : 2 ^ 16 ≤ ringChar F) {T : Instance F} (hT : Satisfies (constraints keccakAir) T)
     {m : ℕ} (hm : 24 * m + 24 ≤ T.height) :
     ∃ A : State,
@@ -109,7 +129,9 @@ theorem check_complete [Inhabited F] (inputs : List (List Word)) (e : ℕ) :
 
 /-! ## Constraint degrees and the quotient -/
 
-/-- Over BabyBear, every symbolic constraint has degree multiple at most 3 and at most one transition selector along a product. -/
+/-- Over BabyBear, every symbolic constraint has degree multiple at most 3.
+
+It also has at most one transition selector along a product. -/
 theorem degree_babyBear :
     ∀ e ∈ (keccakAir (F := BabyBear.Field)).eval
         (symbolicBuilder (AirLayout.from_air (keccakAir (F := BabyBear.Field)))) [],
@@ -137,7 +159,9 @@ theorem degree_mersenne31 :
       e.degree_multiple ≤ 3 ∧ transitionCount e ≤ 1 :=
   keccak_constraints_bounded top_mersenne31
 
-/-- Over BabyBear, the quotient sizing gives at most 2 chunks, and every constraint polynomial fits them, for degree bounds of a trace of n rows. -/
+/-- Over BabyBear, the quotient sizing gives at most 2 chunks.
+
+Every constraint polynomial fits them, for degree bounds of a trace of n rows. -/
 theorem quotient_fits_babyBear {n : ℕ} (hn : 1 ≤ n) {σ : Var → Polynomial BabyBear.Field}
     {periods : List ℕ} (hσ : DegreeBounds σ n periods)
     (hp : ∀ j p : ℕ, periods[j]? = some p → 0 < p → p < n → p ∣ n) :
@@ -184,7 +208,9 @@ open Plonky3Lean.Proofs.KeccakAir.Binary p3_keccak_air.mirror.binary
 theorem binary.keccak_round.eq_fips (S : LState) {k : ℕ} (hk : k < 24) :
     lanesState (keccak_round S k) = rnd (lanesState S) k := keccak_round_eq S hk
 
-/-- The extracted characteristic-2 round never panics for a round below 24, and computes Rnd(A, k) of FIPS 202 on the state its 25 words hold. -/
+/-- The extracted characteristic-2 round never panics for a round below 24.
+
+It computes Rnd(A, k) of FIPS 202 on the state its 25 words hold. -/
 theorem binary.generation.keccak_round.eq_fips (state : Aeneas.Std.Array Aeneas.Std.U64 25#usize)
     (round : Aeneas.Std.Usize) (hr : round.val < 24) :
     ∃ out, p3_keccak_air.binary.generation.keccak_round state round = .ok out ∧
@@ -210,7 +236,11 @@ theorem binary.onehot (h2 : (2 : F) = 0) {cb : Bool} {T : Instance F}
   obtain ⟨k, hk, h⟩ := onehot_all h2 hT i hi
   exact ⟨k, hk, (onehot_curB T i k).mp h⟩
 
-/-- Soundness with the booleanity: from a round-0 row i, rows i + k mod n are rounds k < 24, and row i + 24 mod n holds Keccak-f[1600] of row i's state. -/
+/-- Soundness with the booleanity.
+
+From a round-0 row i, rows i + k mod n are rounds k < 24.
+
+Row i + 24 mod n holds Keccak-f[1600] of row i's state. -/
 theorem binary.sound (h2 : (2 : F) = 0) {T : Instance F}
     (hT : Satisfies (constraints (binaryAir true)) T) {i : ℕ} (hi : i < T.height)
     (h0 : ∀ r < 25, T.main i r = if r = 0 then 1 else 0) :
@@ -237,21 +267,29 @@ theorem binary.sound_boolean_trace (h2 : (2 : F) = 0) {T : Instance F}
   refine ⟨fun k hk => (onehot_curB T _ k).mp (h1 k hk), ?_⟩
   rw [← stateOf_curB, ← stateOf_curB, h2']
 
-/-- Completeness: over a field of characteristic 2, the generator succeeds on a nonempty list of inputs, and its trace satisfies the AIR with or without the booleanity. -/
+/-- Completeness over a field of characteristic 2.
+
+The generator succeeds on a nonempty list of inputs.
+
+Its trace satisfies the AIR, with or without the booleanity. -/
 theorem binary.complete [Inhabited F] (h2 : (2 : F) = 0) (cb : Bool) {inputs : List LState}
     (hne : inputs ≠ []) (e : ℕ) :
     ∃ M, generate_binary_trace_rows (F := F) inputs e = some M ∧
       Satisfies (constraints (binaryAir cb)) (instOf (binaryAir cb) M []) :=
   Proofs.KeccakAir.Binary.complete h2 cb hne e
 
-/-- Over GF(2), every symbolic constraint has degree multiple at most 3, the AIR's hint, and at most one transition selector along a product. -/
+/-- Over GF(2), every symbolic constraint has degree multiple at most 3, the AIR's hint.
+
+It also has at most one transition selector along a product. -/
 theorem binary.degree_gf2 (cb : Bool) :
     ∀ e ∈ (binaryAir (F := ZMod 2) cb).eval
         (symbolicBuilder (AirLayout.from_air (binaryAir (F := ZMod 2) cb))) [],
       e.degree_multiple ≤ 3 ∧ transitionCount e ≤ 1 :=
   binary_constraints_bounded (top_binary_gf2 cb)
 
-/-- Over GF(2), the AIR asserts exactly the number of constraints it reports, with or without the booleanity. -/
+/-- Over GF(2), the AIR asserts exactly the number of constraints it reports.
+
+This holds with or without the booleanity. -/
 theorem binary.num_constraints_gf2 (cb : Bool) :
     some ((binaryAir (F := ZMod 2) cb).eval
         (symbolicBuilder (AirLayout.from_air (binaryAir (F := ZMod 2) cb))) []).length =

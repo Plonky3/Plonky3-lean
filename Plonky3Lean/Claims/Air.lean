@@ -16,9 +16,13 @@ The builders, the symbolic expressions and the debug checker are transcribed ove
 
 An AIR's evaluation is a function generic in the builder.
 
-It is parametric: related builders give related results, as every Rust evaluation generic in the builder is.
+It is parametric: related builders give related results.
 
-The constraint polynomials of an AIR are what its evaluation asserts over the polynomial ring in the variables of a row.
+Every Rust evaluation generic in the builder is parametric in this way.
+
+The constraint polynomials of an AIR are what its evaluation asserts.
+
+They live in the polynomial ring over the variables of a row.
 
 A trace satisfies an AIR when every constraint polynomial vanishes on every row:
 
@@ -54,7 +58,9 @@ variable {F : Type} [Field F] [DecidableEq F]
 
 /-! ## AIR semantics -/
 
-/-- Restricting constraints by selectors describes the same traces as restricting them to rows: every row, row 0, row n - 1, or the rows with a successor. -/
+/-- Restricting constraints by selectors describes the same traces as restricting them to rows.
+
+The row domains are every row, row 0, row n - 1, or the rows with a successor. -/
 theorem selector_form_iff_domain_form (C : List (Constraint F)) (T : Instance F) :
     Satisfies (C.map fun c => c.domain.selector * c.poly) T ↔ SatisfiesOn C T :=
   satisfies_selector_iff C T
@@ -83,14 +89,23 @@ theorem next_row_of_last_row (T : Instance F) (h : 0 < T.height) (c : ℕ) :
 
 variable [Inhabited F]
 
-/-- With the trace, the preprocessed trace, the public values and the periodic columns of the AIR's widths, the checker accepts exactly when the preprocessed height matches, every periodic column has a power-of-two length dividing the height, every boundary cell holds its public value, and every constraint polynomial vanishes on every row. -/
+/-- The debug checker accepts exactly when four conditions hold.
+
+The trace, the preprocessed trace, the public values and the periodic columns have the AIR's widths.
+
+The conditions are:
+
+- the preprocessed height matches
+- every periodic column has a power-of-two length dividing the height
+- every boundary cell holds its public value
+- every constraint polynomial vanishes on every row. -/
 theorem check_constraints_ok_iff {air : Air F} {M : Mat F} {pv : List F} (hs : Shapes air M pv) :
     check_constraints air M pv = .ok () ↔
       PrepHeight air M ∧ PeriodicShapes air M.height ∧
         boundary_io_mismatches air M pv = .ok [] ∧ Satisfies (constraints air) (instOf air M pv) :=
   Proofs.Air.check_constraints_ok_iff hs
 
-/-- At row i, the debug builder asserts the values of the constraint polynomials on row i, in order. -/
+/-- At row i, the debug builder asserts the constraint polynomials evaluated on row i, in order. -/
 theorem debug_row_asserts {air : Air F} {M : Mat F} {pv : List F} (hs : Shapes air M pv)
     (hp : PrepHeight air M) {i : ℕ} (hi : i < M.height) :
     air.eval (rowBuilder air M pv i) (DebugState.new i) =
@@ -154,7 +169,7 @@ theorem assert_zeros_accepts (xs : List F) :
       s.failures ↔ ∀ x ∈ xs, x = 0 :=
   dbg_assert_zeros main preprocessed pv first last trans periodic s xs
 
-/-- Resolving a symbolic expression in scope evaluates the polynomial it denotes at the builder's values. -/
+/-- Resolving an in-scope symbolic expression evaluates its polynomial at the builder's values. -/
 theorem resolve_eval (e : SymbolicExpression F) (he : InScope main preprocessed pv periodic e) :
     resolve (debugBuilder main preprocessed pv first last trans periodic) s e =
       some (MvPolynomial.eval (windowEnv main preprocessed pv first last trans periodic)
@@ -283,20 +298,22 @@ theorem symbolic_constraints_cache (air : Air F) (layout : AirLayout) :
 
 /-! ## Degrees -/
 
-/-- The polynomial degree walk bounds the degree of the constraint polynomial, when the periods divide n. -/
+/-- When the periods divide n, the degree walk bounds the degree of the constraint polynomial. -/
 theorem poly_degree_bound {σ : Var → Polynomial F} {n : ℕ} {periods : List ℕ}
     (hσ : DegreeBounds σ n periods)
     (hp : ∀ j p : ℕ, periods[j]? = some p → 0 < p → p < n → p ∣ n) (e : SymbolicExpression F) :
     (constraintPoly σ (toPoly e)).natDegree ≤ e.poly_degree n periods :=
   natDegree_le_poly_degree hσ hp e
 
-/-- A well-formed expression's polynomial degree is at most d (n - 1) plus its transition selectors along a product, for its degree multiple d. -/
+/-- A well-formed expression of degree multiple d has polynomial degree at most d (n - 1) + t.
+
+Here t counts its transition selectors along a product. -/
 theorem degree_multiple_bound {e : SymbolicExpression F} (he : SymbolicExpr.WF e) (n : ℕ)
     (periods : List ℕ) :
     e.poly_degree n periods ≤ e.degree_multiple * (n - 1) + transitionCount e :=
   poly_degree_le_degree_multiple he
 
-/-- Over BabyBear's quartic extension, the walk bounds the degree of an extension constraint polynomial. -/
+/-- Over BabyBear's quartic extension, the degree walk bounds an extension constraint polynomial. -/
 theorem bb_ext_poly_degree_bound
     {σ : Var ⊕ SymbolicVariableExt → Polynomial BabyBear.Ext4} {n : ℕ} {periods : List ℕ}
     (hσ : ExtDegreeBounds σ n periods)
@@ -318,7 +335,9 @@ theorem constraint_degree_least (D : ℕ) {n : ℕ} (hn : 2 ≤ n) :
 
 /-! ## Quotient chunks -/
 
-/-- The chunk count 2^(ceil(log_2(max(d + z, 2) - 1)) + z) is 2^z times the least power of two at least max(d + z, 2) - 1, as p3-security assumes. -/
+/-- The quotient chunk count is 2^(ceil(log_2(max(d + z, 2) - 1)) + z).
+
+It is 2^z times the least power of two at least max(d + z, 2) - 1, as p3-security assumes. -/
 theorem num_quotient_chunks (d z : ℕ) :
     2 ^ (log2_ceil_usize (max (d + z) 2 - 1) + z) =
       2 ^ z * 2 ^ log2_ceil_usize (max (d + z) 2 - 1) ∧
@@ -326,7 +345,7 @@ theorem num_quotient_chunks (d z : ℕ) :
     ∀ k, max (d + z) 2 - 1 ≤ 2 ^ k → log2_ceil_usize (max (d + z) 2 - 1) ≤ k :=
   num_quotient_chunks_eq d z
 
-/-- With periodic columns and n >= 2, every constraint polynomial fits the quotient chunks the sizing gives. -/
+/-- With periodic columns and n >= 2, every constraint polynomial fits the sized quotient chunks. -/
 theorem quotient_fits_with_periodic {air : Air F} {σ : Var → Polynomial F} {n L : ℕ} (hn : 2 ≤ n)
     (hper : (AirLayout.from_air air).num_periodic_columns ≠ 0)
     (h : get_log_quotient_degree air (AirLayout.from_air air) n 0 = .ok L)
@@ -337,7 +356,9 @@ theorem quotient_fits_with_periodic {air : Air F} {σ : Var → Polynomial F} {n
       FitsChunks n (2 ^ L) (constraintPoly σ (toPoly e)) :=
   quotient_fits_periodic hn hper h hσ hp
 
-/-- Without periodic columns, every constraint polynomial fits the quotient chunks when each constraint has at most one transition selector along a product. -/
+/-- Without periodic columns, every constraint polynomial fits the sized quotient chunks.
+
+This needs at most one transition selector along a product in each constraint. -/
 theorem quotient_fits_one_transition {air : Air F} {σ : Var → Polynomial F} {n L : ℕ}
     {periods : List ℕ} (hn : 1 ≤ n)
     (hper : (AirLayout.from_air air).num_periodic_columns = 0)
@@ -349,7 +370,13 @@ theorem quotient_fits_one_transition {air : Air F} {σ : Var → Polynomial F} {
       FitsChunks n (2 ^ L) (constraintPoly σ (toPoly e)) :=
   quotient_fits_fast hn hper h hσ hp ht
 
-/-- An AIR asserting a^2 = b through two transition filters gets one quotient chunk, yet its constraint polynomial reaches degree 2n within the degree bounds, which one chunk of n coefficients cannot hold. -/
+/-- Two transition filters can overflow the quotient chunks.
+
+An AIR asserting a^2 = b through two transition filters gets one quotient chunk.
+
+Yet its constraint polynomial reaches degree 2n within the degree bounds.
+
+One chunk of n coefficients cannot hold it. -/
 theorem two_transitions_overflow {n : ℕ} (hn : 1 ≤ n) :
     get_log_quotient_degree (squareAir (F := F)) (AirLayout.from_air (squareAir (F := F))) n 0 =
         .ok 0 ∧
@@ -363,7 +390,9 @@ theorem two_transitions_overflow {n : ℕ} (hn : 1 ≤ n) :
 
 /-! ## Virtual columns -/
 
-/-- A virtual column with every column in range evaluates to its constant plus the weighted columns, in any commutative F-algebra. -/
+/-- A virtual column with every column in range evaluates to its constant plus the weighted columns.
+
+This holds in any commutative F-algebra. -/
 theorem virtual_column_apply {R V : Type} [CommRing R] [Algebra F R] (into : V → R)
     (vc : VirtualPairCol F) (preprocessed main : List V) (val : PairCol → V)
     (h : ∀ cw ∈ vc.column_weights, cw.1.get preprocessed main = some (val cw.1)) :
@@ -381,7 +410,9 @@ theorem virtual_column_panics {R V : Type} [CommRing R] [Algebra F R] (into : V 
 
 /-! ## Boundary cells -/
 
-/-- The declaration check accepts column 0 bound on the first row and on the last row, though on a one-row trace both name one cell. -/
+/-- The declaration check accepts column 0 bound on both the first and the last row.
+
+On a one-row trace, both bindings name the same cell. -/
 theorem boundary_first_last_one_row :
     validate [⟨0, .First, 0⟩, ⟨0, .Last, 1⟩] 1 2 = .ok () ∧
       BoundaryPublic.row ⟨0, .First, 0⟩ 1 = BoundaryPublic.row ⟨0, .Last, 1⟩ 1 :=
@@ -406,7 +437,7 @@ theorem boundary_row_panics (cell : boundary.BoundaryPublic) (height : Std.Usize
     (h : height.val = 0) : boundary.BoundaryPublic.row cell height = .fail .panic :=
   row_panics cell height h
 
-/-- The conversion of a polynomial degree to a constraint degree never panics and matches its transcription. -/
+/-- Converting a polynomial degree to a constraint degree never panics and matches its transcription. -/
 theorem constraint_degree_from_poly_degree_extracted (pd n : Std.Usize) :
     symbolic.builder.constraint_degree_from_poly_degree pd n ⦃ d =>
       d.val = p3_air.air.mirror.constraint_degree_from_poly_degree pd.val n.val ⦄ :=
@@ -439,7 +470,9 @@ theorem ext_variable_poly_degree {G EG : Type} (v : symbolic.variable.SymbolicVa
       d.val = (varExtOf v).poly_degree n.val ⦄ :=
   ext_poly_degree_spec v n
 
-/-- The duplicate scan of the extracted declaration check never panics, and reports whether an earlier cell has the same column and end. -/
+/-- The duplicate scan of the declaration check never panics.
+
+It reports whether an earlier cell has the same column and end. -/
 theorem boundary_duplicate_scan (c : boundary.validate.closure) (l : List boundary.BoundaryPublic)
     (s : CoreModels.core.slice.iter.Iter boundary.BoundaryPublic)
     (hs : (show Slice boundary.BoundaryPublic from s).val = l) :
