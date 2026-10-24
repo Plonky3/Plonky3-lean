@@ -17,7 +17,10 @@ Two quantities do not move from level to level:
 - the product of the denominators
 - the sum of the fractions, while no denominator vanishes.
 
-So the root is (0, d) with d nonzero exactly when every leaf denominator is nonzero and the leaves sum to zero.
+So the root is (0, d) with d nonzero exactly when two things hold:
+
+- every leaf denominator is nonzero
+- the leaves sum to zero.
 
 One layer of the reduction is a sum-check over the polynomial
 

@@ -6,6 +6,11 @@ public import Plonky3Lean.Proofs.MultiStark.Zerocheck
 public import Plonky3Lean.Proofs.MultiStark.Verifier
 public import Plonky3Lean.Proofs.MultiStark.Transcript
 public import Plonky3Lean.Proofs.MultiStark.Security
+public import Plonky3Lean.Proofs.MultiStark.FractionalGkr
+public import Plonky3Lean.Proofs.MultiStark.LookupPlan
+public import Plonky3Lean.Proofs.MultiStark.LogupStar
+public import Plonky3Lean.Proofs.MultiStark.BusComposition
+public import Plonky3Lean.Proofs.MultiStark.LookupSecurity
 public import CompPoly.Fields.BabyBear.Ext4
 
 @[expose] public section
@@ -42,12 +47,17 @@ A row also reads three selectors, which are exact 0/1 indicators on the cube.
 open Plonky3Lean.Spec.MultiStark Plonky3Lean.Spec.MultilinearUtil Plonky3Lean.Proofs.MultiStark
   p3_multi_stark.selectors.mirror p3_multi_stark.opening.mirror p3_multi_stark.zerocheck.mirror
   p3_multi_stark.transcript.mirror p3_multi_stark.security.mirror Finset
+open Plonky3Lean.Spec.Lookup Plonky3Lean.Spec.Sumcheck Plonky3Lean.Proofs.Sumcheck
+  p3_sumcheck.generic_degree.mirror
+open Plonky3Lean.Proofs.Lookup (Key)
 
 set_option linter.unusedSectionVars false
 
 namespace Plonky3Lean.Claims.MultiStark
 
 local notation "K" => BabyBear.Ext4
+instance : CharP K BabyBear.fieldSize :=
+  charP_of_injective_algebraMap (algebraMap BabyBear.Field K).injective _
 
 /-! ## Selectors and the next row -/
 
@@ -328,5 +338,382 @@ theorem zerocheck_transcript (s t : ZerocheckShape) :
       .BeginSumcheck ∉ challenges ∧ .EndSumcheck ∉ challenges) ∧
       (s.label = t.label → s = t) :=
   ⟨zerocheck_pattern_eq s, zerocheck_shape_injective⟩
+
+/-! ## The fraction tree -/
+
+/-- **The root of the fraction tree.**
+
+Fold a table of 2^n fractions in halves down to one fraction.
+
+It is a zero numerator over a nonzero denominator exactly when two things hold:
+
+- every leaf denominator is nonzero
+- the leaves sum to zero. -/
+theorem fraction_root (t : ℕ → K × K) (n : ℕ) :
+    (fracLevel t n 0 0).1 = 0 ∧ (fracLevel t n 0 0).2 ≠ 0 ↔
+      (∀ x < 2 ^ n, (t x).2 ≠ 0) ∧ ∑ x ∈ range (2 ^ n), (t x).1 / (t x).2 = 0 :=
+  root_iff t n
+
+/-! ## The fractional-GKR verifier -/
+
+section Gkr
+
+open p3_multi_stark.fractional_gkr.mirror
+
+variable {S : Type} (node : ℕ → K) (T : p3_multi_stark.fractional_gkr.mirror.VerifierTranscript K S)
+
+/-- **The verifier.**
+
+It checks, in order:
+
+- the variable count, the layer count, then each layer's round count
+- the root denominator.
+
+It then panics exactly when two of the nodes 0, 1, 2, 3 coincide.
+
+Otherwise it replays every layer from the claim (0, d) at the empty point.
+
+It rejects at the first layer whose final check fails, and returns the last claim otherwise. -/
+theorem gkr_verifier (proof : FractionGkrProof K) (n : ℕ) :
+    verify_fractional_gkr node T proof n =
+      if n < 1 then some (.error .InvalidVariableCount)
+      else if proof.layers.length ≠ n then some (.error (.InvalidLayerCount n proof.layers.length))
+      else match firstBadRound proof.layers with
+        | some (i, a) => some (.error (.InvalidRoundCount i i a))
+        | none =>
+          if proof.root_denominator = 0 then some (.error .ZeroRootDenominator)
+          else if ¬ Function.Injective (fun i : Fin 4 => node i) then none
+          else
+            let R := replay T [] 0 proof.root_denominator
+              (T.init n proof.root_denominator) proof.layers
+            some (match firstFail node R.records with
+              | some k => .error (.LayerConsistency k)
+              | none => .ok ⟨R.point, R.num, R.den⟩) :=
+  verify_fractional_gkr_eq node T proof n
+
+/-- **The round-count check.**
+
+It passes exactly when layer i carries i round polynomials. -/
+theorem gkr_round_counts (ls : List (FractionGkrLayerProof K)) :
+    firstBadRound ls = none ↔ ∀ i (h : i < ls.length), ls[i].round_polys.length = i :=
+  firstBadRound_eq_none ls
+
+/-- **One layer of the verifier.**
+
+The rounds reduce the batched claim N + lambda D to one value, by interpolating each cubic.
+
+The layer then checks that value against eq(rho, r) times the batched sum of the two children.
+
+It passes down the line through the children at the branch challenge, at the point (b, r). -/
+theorem gkr_layer {weights : Fin 4 → K} (hw : RoundPolyInterpolator.new node 3 = some weights)
+    (st : VerifyState K S) (k : ℕ) (l : FractionGkrLayerProof K)
+    (hlen : st.point.length = l.round_polys.length) :
+    verify_layer node T weights st k l =
+      let L := layerRec T st.point st.numerator st.denominator st.transcript l
+      some ⟨L.nextPoint, L.nextNum, L.nextDen,
+        if L.passes node then st.inconsistent else st.inconsistent.or (some k),
+        layerEnd T st.transcript l⟩ :=
+  verify_layer_eq node T hw st k l hlen
+
+/-- **Soundness of one layer.**
+
+Take a passing layer that passes down the true claim of the level below.
+
+Its own claim is then the true claim of its level, unless one of three events happened:
+
+- lambda mapped a false claim onto the true one
+- the rounds carried a false batched claim to the true value
+- the branch carried false children to the true claim below. -/
+theorem gkr_layer_sound (t : ℕ → K × K) (n : ℕ) {k : ℕ} (L : LayerRec K) (hpass : L.passes node)
+    (hnext : L.nextNum = trueNum t n (k + 1) L.nextPoint ∧
+      L.nextDen = trueDen t n (k + 1) L.nextPoint) :
+    (L.num = trueNum t n k L.point ∧ L.den = trueDen t n k L.point) ∨ L.bad node t n k :=
+  layer_sound node t n L hpass hnext
+
+/-- **Lambda is bad at most once.** -/
+theorem gkr_lambda_bad {N D N' D' : K} (h : N ≠ N' ∨ D ≠ D') :
+    #{lam | N + lam * D = N' + lam * D'} ≤ 1 :=
+  lam_bad_card h
+
+/-- **The branch is bad at most once.** -/
+theorem gkr_branch_bad (t : ℕ → K × K) (n : ℕ) {k : ℕ} {rs : List K} (hrs : rs.length = k)
+    {c : SplitFraction K} (hc : c ≠ trueChildren t n k rs) :
+    #{b | c.n0 + b * (c.n1 - c.n0) = trueNum t n (k + 1) (b :: rs) ∧
+      c.d0 + b * (c.d1 - c.d0) = trueDen t n (k + 1) (b :: rs)} ≤ 1 :=
+  branch_bad_card t n hrs hc
+
+open scoped Classical in
+/-- **The rounds are bad rarely.**
+
+Take a false batched claim at layer k, and any causal strategy for the round polynomials.
+
+At most 3 k |K|^(k - 1) of the |K|^k challenge vectors carry it to the true value. -/
+theorem gkr_rounds_bad (t : ℕ → K × K) (n : ℕ) (h0 : node 0 = 0) (h1 : node 1 = 1)
+    (hinj : Function.Injective fun i : Fin 4 => node i) {k : ℕ} (hk : k < n) {ρ : List K}
+    (hρ : ρ.length = k) {num den lam : K}
+    (hb : num + lam * den ≠ trueNum t n k ρ + lam * trueDen t n k ρ)
+    (M : Fin k → (Fin k → K) → Fin 3 → K) (hM : Causal M) :
+    #{r | finalClaim (decGen node 3) (num + lam * den) (List.ofFn fun i => M i r) (List.ofFn r) =
+      eq ρ (List.ofFn r) * (trueChildren t n k (List.ofFn r)).gate lam} * Fintype.card K ≤
+        k * 3 * Fintype.card K ^ k :=
+  round_bad_card node t n h0 h1 hinj hk hρ hb M hM
+
+/-- **Completeness of one layer.**
+
+From the true batched claim, the honest round polynomials replay to the right side of the check.
+
+That right side reads the true children, whose line at any branch is the true claim below. -/
+theorem gkr_layer_complete (t : ℕ → K × K) (n : ℕ) (h0 : node 0 = 0) (h1 : node 1 = 1)
+    (hinj : Function.Injective fun i : Fin 4 => node i) {k : ℕ} (hk : k < n) {ρ : List K}
+    (hρ : ρ.length = k) (lam : K) (r : Fin k → K) :
+    finalClaim (decGen node 3) (trueNum t n k ρ + lam * trueDen t n k ρ)
+        (List.ofFn fun i => encGen node (honestProver (levelPoly t n k ρ lam) i r)) (List.ofFn r) =
+      eq ρ (List.ofFn r) * (trueChildren t n k (List.ofFn r)).gate lam ∧
+    ∀ b, (trueChildren t n k (List.ofFn r)).n0 + b * ((trueChildren t n k (List.ofFn r)).n1 -
+        (trueChildren t n k (List.ofFn r)).n0) = trueNum t n (k + 1) (b :: List.ofFn r) ∧
+      (trueChildren t n k (List.ofFn r)).d0 + b * ((trueChildren t n k (List.ofFn r)).d1 -
+        (trueChildren t n k (List.ofFn r)).d0) = trueDen t n (k + 1) (b :: List.ofFn r) :=
+  ⟨layer_complete node t n h0 h1 hinj hk hρ lam r,
+    fun b => trueChildren_line t n (by simp) b⟩
+
+/-- **Soundness of the fractional-GKR verifier.**
+
+Take an accepting run whose output claim is the true extension of the leaves at the output point.
+
+Then every leaf denominator is nonzero and the leaves sum to zero.
+
+Otherwise some layer i had one of its three events. -/
+theorem gkr_sound (t : ℕ → K × K) (n : ℕ) {proof : FractionGkrProof K} {out : FractionGkrOutput K}
+    (hacc : verify_fractional_gkr node T proof n = some (.ok out))
+    (hnum : out.numerator = rowExt (fun x => (t x).1) out.point)
+    (hden : out.denominator = rowExt (fun x => (t x).2) out.point) :
+    ((∀ x < 2 ^ n, (t x).2 ≠ 0) ∧ ∑ x ∈ range (2 ^ n), (t x).1 / (t x).2 = 0) ∨
+      ∃ i, ∃ h : i < (replay T [] 0 proof.root_denominator
+          (T.init n proof.root_denominator) proof.layers).records.length,
+        ((replay T [] 0 proof.root_denominator
+          (T.init n proof.root_denominator) proof.layers).records[i]).bad node t n i :=
+  verify_sound node T t n hacc hnum hden
+
+end Gkr
+
+/-! ## The lookup link -/
+
+section Link
+
+open p3_multi_stark.lookup.mirror
+
+/-- **The bus capacity.**
+
+The plan's bus-count check passes exactly when the coefficients 1, ..., B of beta^W are distinct. -/
+theorem bus_capacity (B : ℕ) :
+    bus_capacity_ok BabyBear.fieldSize B = true ↔ ∀ i < B, ∀ j < B, ((i : K) + 1 = (j : K) + 1 → i = j) :=
+  bus_capacity_ok_iff BabyBear.fieldSize B
+
+/-- **Placement.**
+
+Instances sorted by decreasing height, placed from zero, own aligned blocks.
+
+The blocks never overlap and fit the next power of two. -/
+theorem lookup_placed (insts : List LookupInstancePlan)
+    (hs : insts.Pairwise fun a b => b.num_variables ≤ a.num_variables) (m d : ℕ → ℕ → ℕ → K) :
+    Placed (planFracBlocks (place 0 insts).1 m d) (log2_ceil_usize (place 0 insts).2) :=
+  plan_placed insts hs m d
+
+/-- **The verifier's weights.**
+
+For an instance at an offset its height divides, the verifier computes eq(vertex c, prefix).
+
+There is one weight per tuple, for the blocks c in order. -/
+theorem lookup_weights {M : ℕ} {point : List K} {inst : LookupInstancePlan}
+    (hn : inst.num_variables ≤ M) (hlen : point.length = M) (hpl : M - inst.num_variables < 64)
+    (hfit : inst.base_offset / 2 ^ inst.num_variables + inst.tuple_counts.sum ≤
+      2 ^ (M - inst.num_variables)) :
+    ∃ ws, blockWeights (F := K) M point inst = some ws ∧
+      ws.flatten = (List.range inst.tuple_counts.sum).map fun t =>
+        eq (vertex (M - inst.num_variables) (inst.base_offset / 2 ^ inst.num_variables + t))
+          (point.take (M - inst.num_variables)) :=
+  blockWeights_eq hn hlen hpl hfit
+
+/-- **The link.**
+
+The folded claim N(q) + theta (D(q) - 1) is the sum, over the blocks, of each block's share.
+
+A block's share is its weight times m~ + theta (d~ - 1), read at the point's suffix.
+
+The padding drops out. -/
+theorem lookup_link (insts : List LookupInstancePlan)
+    (hs : insts.Pairwise fun a b => b.num_variables ≤ a.num_variables) (m d : ℕ → ℕ → ℕ → K)
+    (q : List K) (hq : q.length = log2_ceil_usize (place 0 insts).2) (θ : K) :
+    claimed_sum (rowExt (numTable (planFracBlocks (place 0 insts).1 m d)) q)
+        (rowExt (denTable (planFracBlocks (place 0 insts).1 m d)) q) θ =
+      ((planBlocks (place 0 insts).1).map fun nc =>
+        eq (vertex (q.length - nc.1) nc.2) (q.take (q.length - nc.1)) *
+          (rowExt (m nc.1 nc.2) (q.drop (q.length - nc.1)) +
+            θ * (rowExt (d nc.1 nc.2) (q.drop (q.length - nc.1)) - 1))).sum :=
+  plan_link insts hs m d q hq θ
+
+/-- **The leaf sum.**
+
+The leaves of placed blocks sum to the sum, over every block and row, of m / d. -/
+theorem lookup_leaf_sum {bs : List (FracBlock K)} {M : ℕ} (hp : Placed bs M) :
+    ∑ x ∈ range (2 ^ M), numTable bs x / denTable bs x =
+      (bs.map fun b => ∑ y ∈ range (2 ^ b.n), b.m y / b.d y).sum :=
+  leaf_sum hp
+
+/-- **The leaf denominators.**
+
+On placed blocks, every leaf denominator is nonzero exactly when every block's is. -/
+theorem lookup_leaf_denominators {bs : List (FracBlock K)} {M : ℕ} (hp : Placed bs M) :
+    (∀ x < 2 ^ M, denTable bs x ≠ 0) ↔ ∀ b ∈ bs, ∀ y < 2 ^ b.n, b.d y ≠ 0 :=
+  leaf_den_iff hp
+
+/-- **The denominator opening.**
+
+The padded denominator's opening is the blocks' openings, each times its weight.
+
+The padding adds one minus the sum of the weights. -/
+theorem padded_denominator (bs : List (FracBlock K)) (q : List K)
+    (hb : ∀ b ∈ bs, b.n ≤ q.length ∧ b.c < 2 ^ (q.length - b.n)) :
+    rowExt (denTable bs) q =
+      (bs.map fun b => b.weight q * rowExt b.d (q.drop (q.length - b.n))).sum +
+        (1 - (bs.map fun b => b.weight q).sum) :=
+  rowExt_denTable bs q hb
+
+end Link
+
+/-! ## The indexed lookup -/
+
+section LogupStar
+
+open p3_multi_stark.logup_star.mirror
+
+/-- **The closed form is the extension.**
+
+For a point of at most 64 coordinates, sum_s y_s iota(2^(m - 1 - s)) is the extension of the embedding. -/
+theorem position_closed_form (node : ℕ → K) (y : List K) (hy : y.length ≤ 64) :
+    eval (F := K) node y = rowExt (fun v => embed node v) y := by
+  simpa using eval_eq_rowExt node y hy
+
+/-- **The size check.**
+
+Over BabyBear, of 31 bits, a table that fits has distinct embeddings for its entries. -/
+theorem position_fits {m : ℕ} (hfit : fits 31 m = true) {v w : ℕ} (hv : v < 2 ^ m) (hw : w < 2 ^ m)
+    (h : embed (fun i => (i : BabyBear.Field)) v = embed (fun i => (i : BabyBear.Field)) w) :
+    v = w :=
+  fits_injective BabyBear.fieldSize (by norm_num [BabyBear.fieldSize]) (by norm_num) hfit hv hw h
+
+/-- **The pushforward identity.**
+
+The readers' sum of w / (X - I), minus the table's sum of Y / (X - iota), vanishes in K(X).
+
+That holds exactly when two things hold:
+
+- the table's weight on each entry is the readers' net weight on its embedding
+- every other key carries net weight zero. -/
+theorem pushforward_identity (msgs : List (K × K)) (ι Y : ℕ → K) (m : ℕ)
+    (hinj : ∀ v < 2 ^ m, ∀ w < 2 ^ m, ι v = ι w → v = w) :
+    logDerivSum (msgs ++ tableMsgs ι Y m) = 0 ↔
+      (∀ v < 2 ^ m, Y v = netMult msgs (ι v)) ∧
+        ∀ a, (∀ v < 2 ^ m, ι v ≠ a) → netMult msgs a = 0 :=
+  logDerivSum_eq_zero_iff_pushforward msgs ι Y m hinj
+
+/-- **The claimed identity.**
+
+Weigh reader j's rows by rho^j eq(r_j, i), and keep its positions inside the table.
+
+The inner product of the pushforward with T is then the readers' batched claim.
+
+```text
+    sum_v Y(v) T(v)  =  sum_j rho^j X_j~(r_j),     X_j(i) = T(pos_j(i))
+``` -/
+theorem logup_star_claim {J : ℕ} (r : Fin J → List K) (pos : Fin J → ℕ → ℕ) (ρ : K) (T : ℕ → K)
+    {m : ℕ} (hpos : ∀ j, ∀ i < 2 ^ (r j).length, pos j i < 2 ^ m) :
+    ∑ v ∈ range (2 ^ m),
+        pushforward (fun j => (r j).length) pos
+          (fun j i => ρ ^ (j : ℕ) * eq (vertex (r j).length i) (r j)) v * T v =
+      ∑ j : Fin J, ρ ^ (j : ℕ) * rowExt (fun i => T (pos j i)) (r j) :=
+  pushforward_claim r pos ρ T hpos
+
+end LogupStar
+
+/-! ## The bus family -/
+
+section BusFamily
+
+open p3_multi_stark.bus.mirror
+
+/-- **The closing value.**
+
+With the plan's dimensions and every factor evaluating, the closing value is the sum of the share terms.
+
+The push shares come first, then the pull shares. -/
+theorem bus_closing (shares : List TerminalShare) {M H : ℕ}
+    (factor : TerminalShare → List K → Except Unit K) {pp : List K} (lam : K) {r : List K}
+    (h1 : M ≤ r.length) (h2 : pp.length = H) (v : TerminalShare → K)
+    (hv : ∀ s ∈ shares, shareTerm H factor pp lam r s = .ok (v s)) :
+    terminal_composition shares M H factor pp lam r =
+      .ok (((shares.filter (!·.pull) ++ shares.filter (·.pull)).map v).sum) :=
+  terminal_composition_eq shares factor lam h1 h2 v hv
+
+/-- **One share's term.**
+
+It is the direction weight, times eq(c, q_prefix), times the product of the unused coordinates.
+
+It is then times eq(q_rows, r_rows), and times the factor minus one. -/
+theorem bus_share_term (H : ℕ) (factor : TerminalShare → List K → Except Unit K) (pp : List K)
+    (lam : K) (r : List K) (s : TerminalShare) (hrow : s.row_variables ≤ r.length)
+    (hpp : s.prefix_variables + s.row_variables = pp.length)
+    (hidx : s.prefix_index < 2 ^ s.prefix_variables) (h64 : s.prefix_index < 2 ^ 64) {f : K}
+    (hf : factor s (r.drop (r.length - s.row_variables)) = .ok f) :
+    shareTerm H factor pp lam r s = .ok ((if s.pull then lam else 1) *
+      eq (vertex s.prefix_variables s.prefix_index) (pp.take s.prefix_variables) *
+      (r.take (r.length - s.row_variables)).prod *
+      eq (pp.drop s.prefix_variables) (r.drop (r.length - s.row_variables)) * (f - 1)) :=
+  shareTerm_eq H factor pp lam r s hrow hpp hidx h64 hf
+
+/-- **The cube sum of the bus family.**
+
+Lift every block of the two product trees onto the shared cube, on its all-ones prefix.
+
+The family sums over the cube to the two product claims:
+
+```text
+    (L_push(q) - 1) + lambda (L_pull(q) - 1)
+``` -/
+theorem bus_family (push pull : List (FracBlock K)) (q : List K) (lam : K) (M : ℕ)
+    (hpush : ∀ b ∈ push, b.n ≤ q.length ∧ b.c < 2 ^ (q.length - b.n) ∧ b.n ≤ M)
+    (hpull : ∀ b ∈ pull, b.n ≤ q.length ∧ b.c < 2 ^ (q.length - b.n) ∧ b.n ≤ M) :
+    ∑ y ∈ range (2 ^ M),
+        ((push.map fun b => b.weight q * shareTable M b.n (q.drop (q.length - b.n)) b.d y).sum +
+          lam * (pull.map fun b => b.weight q * shareTable M b.n (q.drop (q.length - b.n)) b.d y).sum) =
+      (rowExt (denTable push) q - 1) + lam * (rowExt (denTable pull) q - 1) :=
+  bus_family_sum push pull q lam M hpush hpull
+
+end BusFamily
+
+/-! ## The lookup terms of the security report -/
+
+/-- **The reduction's charge is its count of bad draws.**
+
+Layer i has one bad lambda, 3 i bad round challenges per |K| draws, and one bad branch. -/
+theorem gkr_charge (L : ℕ) : 2 * L + 3 * (L * (L - 1) / 2) = ∑ i ∈ range L, (3 * i + 2) :=
+  gkr_charge_eq L
+
+/-- **The fingerprint's soundness.**
+
+Take an unbalanced list of N messages, at most W wide, with at most p buses and one width per bus.
+
+Count the pairs (alpha, beta) where a denominator vanishes or the fractions sum to zero.
+
+There are at most N (W + 2) |K| of them, out of |K|^2. -/
+theorem logup_fingerprint (msgs : List (Key K × K)) {W : ℕ} (hW : 1 ≤ W)
+    (hlen : ∀ q ∈ msgs, q.1.2.length ≤ W)
+    (hbus : ∀ a ∈ msgs, ∀ b ∈ msgs, (a.1.1 : K) = b.1.1 → a.1.1 = b.1.1)
+    (hwidth : ∀ a ∈ msgs, ∀ b ∈ msgs, a.1.1 = b.1.1 → a.1.2.length = b.1.2.length)
+    (hunbal : ¬ Balanced msgs) :
+    #{x : K × K | (∃ q ∈ msgs, msDenom x.1 x.2 W q.1.1 q.1.2 = 0) ∨
+        (msgs.map fun q => q.2 / msDenom x.1 x.2 W q.1.1 q.1.2).sum = 0} ≤
+      msgs.length * (W + 2) * Fintype.card K :=
+  logup_bad_card msgs hW hlen hbus hwidth hunbal
 
 end Plonky3Lean.Claims.MultiStark

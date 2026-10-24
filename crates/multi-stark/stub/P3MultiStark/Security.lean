@@ -11,8 +11,8 @@ What a transcription abstracts:
 * an error term is its numerator over a field order, before p3-security takes logarithms in floating point
 * the denominator is the challenge field's order, or one less for a draw rejecting zero
 * a term with a zero numerator is omitted, as p3-security omits it
-* only the four AIR terms are kept, for a statement with no skip round
-* the lookup terms have their own transcriptions.
+* the four AIR terms are kept, for a statement with no skip round
+* the lookup terms are kept, and the indexed-lookup terms are not.
 
 Loops, branches and the order of terms are kept.
 -/
@@ -71,5 +71,26 @@ def charged_degree (air_degrees : List ℕ) (bus_degree : Option ℕ) : ℕ :=
   match bus_degree with
   | none => d
   | some b => max d (b - 1)
+
+/-- MultilinearLookupParams. -/
+structure LookupParams where
+  num_variables : ℕ
+  num_fractions : ℕ
+  max_message_width : ℕ
+
+/-- p3_security::multilinear::reduction_terms, its lookup terms:
+
+- the fingerprint, over every fraction and the widest payload
+- the fractional reduction: two draws per layer, and three per round of layer i
+- the challenge folding the two openings
+- the challenge linking them to the AIR sumcheck.
+
+The reduction's count 2 L + 3 L (L - 1) / 2 is an integer, since L (L - 1) is even. -/
+def lookup_terms (p : LookupParams) : List Term :=
+  [⟨"logup-fingerprint", p.num_fractions * (p.max_message_width + 2), .Field⟩,
+   ⟨"fractional-gkr", 2 * p.num_variables + 3 * (p.num_variables * (p.num_variables - 1) / 2),
+     .NonZero⟩,
+   ⟨"lookup-opening-link", 1, .Field⟩,
+   ⟨"lookup-air-link", 1, .Field⟩].filter (·.numerator ≠ 0)
 
 end p3_multi_stark.security.mirror

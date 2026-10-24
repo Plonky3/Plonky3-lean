@@ -13,7 +13,7 @@ state = "stub"
 
 features = []
 
-watch = ["multi-stark/src", "multi-stark/Cargo.toml", "security/src/multilinear.rs", "multilinear-util/src/point.rs"]
+watch = ["multi-stark/src", "multi-stark/Cargo.toml", "security/src/multilinear.rs", "multilinear-util/src/point.rs", "sumcheck/src/generic_degree/util.rs", "lookup/src/challenges.rs", "bus/src/plan/mod.rs"]
 
 # The transcriptions. Hashes are pending tools/mirror.
 
@@ -195,4 +195,132 @@ rust = "p3_security::SecurityTerm"
 
 [[mirror]]
 lean = "p3_multi_stark.security.mirror.Denominator"
+rust = "p3_security::multilinear::reduction_terms"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.SplitFraction"
+rust = "p3_multi_stark::fractional_gkr::SplitFraction"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.SplitFraction.gate"
+rust = "p3_multi_stark::fractional_gkr::SplitFraction::gate"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.FractionGkrError"
+rust = "p3_multi_stark::fractional_gkr::FractionGkrError"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.ROUND_POLY_LEN"
+rust = "p3_multi_stark::fractional_gkr::transcript::ROUND_POLY_LEN"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.FractionGkrLayerProof"
+rust = "p3_multi_stark::fractional_gkr::FractionGkrLayerProof"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.FractionGkrProof"
+rust = "p3_multi_stark::fractional_gkr::FractionGkrProof"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.FractionGkrOutput"
+rust = "p3_multi_stark::fractional_gkr::FractionGkrOutput"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.VerifierTranscript"
+rust = "p3_multi_stark::fractional_gkr::transcript::FractionGkrVerifierTranscript"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.VerifyState"
+rust = "p3_multi_stark::fractional_gkr::verify_fractional_gkr"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.firstBadRound"
+rust = "p3_multi_stark::fractional_gkr::verify_fractional_gkr"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.roundStep"
+rust = "p3_multi_stark::fractional_gkr::verify_fractional_gkr"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.verify_layer"
+rust = "p3_multi_stark::fractional_gkr::verify_fractional_gkr"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.verify_fractional_gkr"
+rust = "p3_multi_stark::fractional_gkr::verify_fractional_gkr"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.LookupInstancePlan"
+rust = "p3_multi_stark::lookup::LookupInstancePlan"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.log2_ceil_usize"
+rust = "p3_util::log2_ceil_usize"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.place"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.bus_capacity_ok"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.tupleWeights"
+rust = "p3_multi_stark::lookup::AirLinkClaim::new"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.blockWeights"
+rust = "p3_multi_stark::lookup::AirLinkClaim::new"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.claimed_sum"
+rust = "p3_multi_stark::lookup::AirLinkClaim::new"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.theta_bus_offset"
+rust = "p3_multi_stark::lookup::AirLinkClaim::new"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.bus_prefixes"
+rust = "p3_lookup::Challenges::new"
+
+[[mirror]]
+lean = "p3_multi_stark.logup_star.mirror.embed"
+rust = "p3_multi_stark::logup_star::position::embed"
+
+[[mirror]]
+lean = "p3_multi_stark.logup_star.mirror.fits"
+rust = "p3_multi_stark::logup_star::position::fits"
+
+[[mirror]]
+lean = "p3_multi_stark.logup_star.mirror.eval"
+rust = "p3_multi_stark::logup_star::position::eval"
+
+[[mirror]]
+lean = "p3_multi_stark.logup_star.mirror.claimed_sum"
+rust = "p3_multi_stark::logup_star::product::claimed_sum"
+
+[[mirror]]
+lean = "p3_multi_stark.bus.mirror.TerminalShare"
+rust = "p3_bus::BusTerminalShare"
+
+[[mirror]]
+lean = "p3_multi_stark.bus.mirror.BusBindingError"
+rust = "p3_multi_stark::bus::BusBindingError"
+
+[[mirror]]
+lean = "p3_multi_stark.bus.mirror.shareTerm"
+rust = "p3_multi_stark::bus::BusContext::terminal_composition"
+
+[[mirror]]
+lean = "p3_multi_stark.bus.mirror.terminal_composition"
+rust = "p3_multi_stark::bus::BusContext::terminal_composition"
+
+[[mirror]]
+lean = "p3_multi_stark.security.mirror.LookupParams"
+rust = "p3_security::multilinear::MultilinearLookupParams"
+
+[[mirror]]
+lean = "p3_multi_stark.security.mirror.lookup_terms"
 rust = "p3_security::multilinear::reduction_terms"

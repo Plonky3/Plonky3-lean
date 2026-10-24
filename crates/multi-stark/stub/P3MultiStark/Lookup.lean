@@ -44,9 +44,9 @@ def place (height : ℕ) : List LookupInstancePlan → List LookupInstancePlan �
     let rest := place (height + i.tuple_counts.sum * 2 ^ i.num_variables) is
     ({ i with base_offset := height } :: rest.1, rest.2)
 
-/-- The equality weights AirLinkClaim::new gives one declaration's tuples, from a block index.
+/-- AirLinkClaim::new's equality weights for one declaration's tuples.
 
-Each tuple takes the next block. -/
+They start at a block index, and each tuple takes the next block. -/
 def tupleWeights {F EF : Type _} [Field F] [Field EF] [Algebra F EF] (prefix_len : ℕ)
     (point_prefix : List EF) : ℕ → ℕ → Option (List EF)
   | _, 0 => some []
@@ -83,7 +83,9 @@ def theta_bus_offset {EF : Type _} [Field EF] (theta bus_prefix : EF) : EF := th
 def bus_prefixes {EF : Type _} [Field EF] (alpha beta : EF) (max_width num_buses : ℕ) : List EF :=
   (List.range num_buses).map fun i => alpha + ((i : EF) + 1) * beta ^ max_width
 
-/-- The bus-count check of LookupPlan::build: the identifiers must stay distinct modulo p. -/
+/-- LookupPlan::build's bus-count check.
+
+The identifiers must stay distinct modulo p. -/
 def bus_capacity_ok (p num_buses : ℕ) : Bool := !(p < num_buses)
 
 end p3_multi_stark.lookup.mirror

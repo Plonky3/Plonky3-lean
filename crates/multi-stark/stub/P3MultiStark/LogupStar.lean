@@ -33,7 +33,9 @@ variable {F EF : Type _} [Field F] [Field EF] [Algebra F EF]
 def embed (node : ℕ → F) (entry : ℕ) : F :=
   (((List.range 64).filter fun bit => entry.testBit bit).map fun bit => node (2 ^ bit)).sum
 
-/-- position::fits: a table of 2^m entries embeds injectively when m is below the field's bits. -/
+/-- position::fits.
+
+A table of 2^m entries embeds injectively when m is below the field's bits. -/
 def fits (bits num_variables : ℕ) : Bool := decide (num_variables < bits)
 
 /-- position::eval: the sum over the coordinates s of y_s embed(2^(m - 1 - s)). -/
