@@ -1,6 +1,7 @@
 module
 
 public import Plonky3Lean.Proofs.MultilinearUtil.Packing
+public import Plonky3Lean.Proofs.MultilinearUtil.Extracted
 public import CompPoly.Fields.BabyBear.Ext4
 
 @[expose] public section
@@ -8,9 +9,11 @@ public import CompPoly.Fields.BabyBear.Ext4
 /-!
 # p3-multilinear-util: claims
 
-The crate is transcribed over a field, not extracted.
+The equality polynomial of two points is extracted, generic over the field traits.
 
-The claims are stated at BabyBear F and its quartic extension EF = F[X] / (X^4 - 11).
+The rest of the crate is transcribed over a field.
+
+The transcription claims are stated at BabyBear F and its quartic extension EF = F[X] / (X^4 - 11).
 
 The specification is the multilinear extension of a table, Thaler, Section 3.5:
 
@@ -398,5 +401,45 @@ theorem materialize (w T : ℕ) (point : List EF) (s : EF) (h : point.length < 6
     (SplitEq.new_packed w T point s).bind (fun se => se.materialize) =
       some ((eqTable point).map (s * ·)) :=
   split_materialize w T point s h
+
+/-! ## The extracted equality polynomial
+
+Each claim holds for any base field K, any extension L of it, and any instances of the field traits.
+
+It assumes one thing of those instances: each member the code calls computes the operation it names.
+-/
+
+section Extracted
+
+open CoreModels Aeneas Aeneas.Std
+
+variable {K L : Type} [Field K] [Field L] [Algebra K L]
+  {inst : p3_field.field.Field K} {einst : p3_field.field.ExtensionField L K}
+
+/-- The shipped equality polynomial returns what its transcription returns, panics included. -/
+theorem point.eval_eq.eq_mirror (h : ExtComputes inst einst) (p : Slice K) (q : Slice L) :
+    p3_multilinear_util.hax_roots.eval_eq inst einst p q = ofOption (Point.eval_eq p.val q.val) :=
+  eval_eq_eq_mirror h p q
+
+/-- On points of the same length, the shipped equality polynomial is the product over i of
+
+```text
+    p_i q_i + (1 - p_i)(1 - q_i)
+```
+
+with each base coordinate p_i mapped into the extension. -/
+theorem point.eval_eq.eq_spec (h : ExtComputes inst einst) {p : Slice K} {q : Slice L}
+    (hl : p.val.length = q.val.length) :
+    p3_multilinear_util.hax_roots.eval_eq inst einst p q =
+      .ok (eq (p.val.map (algebraMap K L)) q.val) := by
+  rw [eval_eq_eq_mirror h, eval_eq_eq hl, ofOption]
+
+/-- The shipped equality polynomial panics exactly on points of different lengths. -/
+theorem point.eval_eq.panics (h : ExtComputes inst einst) {p : Slice K} {q : Slice L}
+    (hl : p.val.length ≠ q.val.length) :
+    p3_multilinear_util.hax_roots.eval_eq inst einst p q = .fail .panic := by
+  rw [eval_eq_eq_mirror h, eval_eq_panics hl, ofOption]
+
+end Extracted
 
 end Plonky3Lean.Claims.MultilinearUtil

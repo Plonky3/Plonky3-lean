@@ -5057,6 +5057,18 @@ name   = "Plonky3Lean.Claims.MultilinearUtil.materialize"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.MultilinearUtil.point.eval_eq.eq_mirror"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.MultilinearUtil.point.eval_eq.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.MultilinearUtil.point.eval_eq.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3Keccak.tiny_keccak.keccakf.eq_fips"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
