@@ -21,6 +21,7 @@ module
 public import P3Fri.Config
 public import P3Fri.Fold
 public import P3Fri.Types
+public import P3Fri.Transcript
 public import P3Commit.Domain
 
 @[expose] public section
@@ -62,6 +63,7 @@ inductive FriError (ME IE : Type) where
   | InvalidPowWitness
   | NonCanonicalPowWitness
   | OpeningPointMatchesQueryPoint
+  | ClaimedEvaluationCountMismatch
 
 /-- The transcript's rejections, as the verifier reports them. -/
 def FriError.ofTranscript {ME IE : Type} : TranscriptFailure → FriError ME IE
@@ -69,6 +71,11 @@ def FriError.ofTranscript {ME IE : Type} : TranscriptFailure → FriError ME IE
   | .FinalPolyLen _ _ => .FinalPolyLengthMismatch
   | .CommitRoundCount _ _ => .CommitRoundCountMismatch
   | .CommitPowWitnessCount _ _ => .CommitPowWitnessCountMismatch
+
+/-- The PCS transcript's rejections, as the verifier reports them. -/
+def FriError.ofPcsTranscript {ME IE : Type} : PcsTranscriptFailure → FriError ME IE
+  | .PowWitness | .MissingPowWitness => .InvalidPowWitness
+  | .ClaimedEvaluationCount _ _ _ => .ClaimedEvaluationCountMismatch
 
 /-- The outcome of a verifier step: a panic is none, a rejection an error. -/
 abbrev Res (ME IE : Type) := ExceptT (FriError ME IE) Option
@@ -308,9 +315,11 @@ def open_inputs' (G : Gen K) (g : K) {C : Type} (fmmcs immcs : MmcsOps K) (log_b
 /-- The full verifier.
 
 It rejects vacuous instances, derives the shape, checks the proof's lengths, and replays the transcript.
-Then it checks the input openings, each query's fold chain and final value, and every round's openings. -/
+Then it checks the input openings, each query's fold chain and final value, and every round's openings.
+
+The transcript is built from the shape the run derives. -/
 def verify_fri (G : Gen K) (g : K) {C S : Type} (fmmcs : MmcsOps K) (immcs : MmcsOps K)
-    (tx : VerifierTx K fmmcs.Commitment S) (params : FriParameters)
+    (mkTx : p3_fri.transcript.mirror.FriShape → VerifierTx K fmmcs.Commitment S) (params : FriParameters)
     (proof : FriProof K fmmcs.Commitment fmmcs.MultiProof immcs.MultiProof) (s : S)
     (claims : List (Claim G C)) (commit_of : C → immcs.Commitment) (alpha : K) :
     Res fmmcs.Error immcs.Error Unit := do
@@ -333,10 +342,12 @@ def verify_fri (G : Gen K) (g : K) {C S : Type} (fmmcs : MmcsOps K) (immcs : Mmc
   | none => pure ()
   if ¬ check_canonical_pow_witnesses params proof then throw .NonCanonicalPowWitness
   if proof.final_poly.length ≠ params.final_poly_len then throw .FinalPolyLengthMismatch
-  let (betas, s1) ← match tx.commit_rounds s proof.commit_phase_commits proof.commit_pow_witnesses with
+  let tx := mkTx (p3_fri.transcript.mirror.FriShape.with_schedule params log_arities log_global_max_height)
+  let (betas, s1) ← match ← lift (tx.commit_rounds s proof.commit_phase_commits
+      proof.commit_pow_witnesses).run with
     | .error f => throw (.ofTranscript f)
     | .ok r => pure r
-  let (indices, _) ← match tx.query_phase s1 proof.final_poly (some proof.query_pow_witness) with
+  let (indices, _) ← match ← lift (tx.query_phase s1 proof.final_poly (some proof.query_pow_witness)).run with
     | .error f => throw (.ofTranscript f)
     | .ok r => pure r
   let log_final_height := params.log_blowup + params.log_final_poly_len

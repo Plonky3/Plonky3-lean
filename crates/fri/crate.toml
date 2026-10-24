@@ -11,7 +11,7 @@ state = "stub"
 
 features = []
 
-watch = ["fri/src", "fri/Cargo.toml", "util/src/lib.rs", "field/src/helpers.rs"]
+watch = ["fri/src", "fri/Cargo.toml", "util/src/lib.rs", "field/src/helpers.rs", "challenger/src/grinding_challenger.rs", "challenger/src/duplex_challenger.rs"]
 
 # The transcriptions. Hashes are pending tools/mirror.
 
@@ -338,3 +338,55 @@ rust = "p3_fri::pcs_transcript::PcsShape"
 [[mirror]]
 lean = "p3_fri.transcript.mirror.PcsShape.pattern"
 rust = "p3_fri::pcs_transcript::PcsShape::pattern"
+
+[[mirror]]
+lean = "p3_fri.mirror.PcsTranscriptFailure"
+rust = "p3_fri::pcs_transcript::PcsTranscriptFailure"
+
+[[mirror]]
+lean = "p3_fri.verifier.mirror.FriError.ofPcsTranscript"
+rust = "{impl core::convert::From<p3_fri::pcs_transcript::PcsTranscriptFailure> for p3_fri::verifier::FriError<CommitMmcsErr, InputError>}::from"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.Sponge"
+rust = "p3_challenger::DuplexChallenger"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.sample_bits"
+rust = "{impl p3_challenger::CanSampleBits<usize> for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::sample_bits"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.check_witness"
+rust = "p3_challenger::grinding_challenger::GrindingChallenger::check_witness"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.commit_round"
+rust = "p3_fri::transcript::VerifierTranscript::commit_round"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.commit_rounds"
+rust = "p3_fri::transcript::VerifierTranscript::commit_rounds"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.query_phase"
+rust = "p3_fri::transcript::VerifierTranscript::query_phase"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.verifierTx"
+rust = "p3_fri::transcript::VerifierTranscript"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.PcsShape.from_claims"
+rust = "p3_fri::pcs_transcript::PcsShape::from_claims"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.claimed_openings"
+rust = "p3_fri::pcs_transcript::PcsVerifierTranscript::claimed_openings"
+
+[[mirror]]
+lean = "p3_fri.transcript.mirror.batch_phase"
+rust = "p3_fri::pcs_transcript::PcsVerifierTranscript::batch_phase"
+
+[[mirror]]
+lean = "p3_fri.two_adic_pcs.mirror.verify"
+rust = "{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::verify"

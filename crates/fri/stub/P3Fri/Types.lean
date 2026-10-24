@@ -77,11 +77,20 @@ structure ProverTx (K Com S : Type _) where
   commit_round : S → Com → K × Option K × S
   query_phase : S → List K → List ℕ × Option K × S
 
+/-- The reasons the PCS transcript rejects a run. -/
+inductive PcsTranscriptFailure where
+  | ClaimedEvaluationCount (opening expected got : ℕ)
+  | PowWitness
+  | MissingPowWitness
+  deriving DecidableEq
+
 /-- The verifier's FRI transcript.
 
-It replays the same steps, failing on a count or a witness the description rejects. -/
+It replays the same steps, failing on a count or a witness the description rejects.
+
+A step that panics is none. -/
 structure VerifierTx (K Com S : Type _) where
-  commit_rounds : S → List Com → List K → Except TranscriptFailure (List K × S)
-  query_phase : S → List K → Option K → Except TranscriptFailure (List ℕ × S)
+  commit_rounds : S → List Com → List K → ExceptT TranscriptFailure Option (List K × S)
+  query_phase : S → List K → Option K → ExceptT TranscriptFailure Option (List ℕ × S)
 
 end p3_fri.mirror

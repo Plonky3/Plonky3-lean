@@ -236,14 +236,24 @@ theorem le_headD_inputLogHeights {G : Gen K} {C : Type} (b : ℕ) (claims : List
     · exact le_of_lt (hpw 0 i h0 hi hi0)
   omega
 
-/-- The verifier never panics.
+/-- A transcript whose two phases never panic. -/
+def TxTotal {Com S : Type} (tx : VerifierTx K Com S) : Prop :=
+  (∀ s c w, (tx.commit_rounds s c w).run.isSome) ∧ ∀ s f w, (tx.query_phase s f w).run.isSome
 
-On every proof, transcript, commitment schemes and claims, it accepts or rejects. -/
+theorem total_lift_isSome {ME IE α : Type} {o : Option α} (h : o.isSome) :
+    Total (lift o : Res ME IE α) := by
+  obtain ⟨a, rfl⟩ := Option.isSome_iff_exists.1 h; exact total_lift_some a
+
+/-- The verifier never panics on a transcript that never panics at the shapes it can build.
+
+This holds on every proof, commitment schemes and claims. -/
 theorem verify_fri_total (G : Gen K) (hV : GenValid G) (h2 : (2 : K) ≠ 0) (g : K) {C S : Type}
-    (fmmcs immcs : MmcsOps K) (tx : VerifierTx K fmmcs.Commitment S) (params : FriParameters)
+    (fmmcs immcs : MmcsOps K) (mkTx : p3_fri.transcript.mirror.FriShape → VerifierTx K fmmcs.Commitment S)
+    (params : FriParameters)
+    (htx : ∀ L H, H ≤ G.adicity → TxTotal (mkTx (p3_fri.transcript.mirror.FriShape.with_schedule params L H)))
     (proof : FriProof K fmmcs.Commitment fmmcs.MultiProof immcs.MultiProof) (s : S)
     (claims : List (Claim G C)) (commit_of : C → immcs.Commitment) (alpha : K) :
-    Total (verify_fri G g fmmcs immcs tx params proof s claims commit_of alpha) := by
+    Total (verify_fri G g fmmcs immcs mkTx params proof s claims commit_of alpha) := by
   unfold verify_fri
   by_cases h1 : params.num_queries = 0
   · simp only [h1, ↓reduceIte, throw_bind']; exact total_throw _
@@ -273,9 +283,11 @@ theorem verify_fri_total (G : Gen K) (hV : GenValid G) (h2 : (2 : K) ≠ 0) (g :
   · exact total_ite (fun _ => total_throw _) fun _ => total_throw _
   refine total_ite (fun _ => total_throw _) fun _ => ?_
   refine total_ite (fun _ => total_throw _) fun _ => ?_
-  split
+  refine total_bind (total_lift_isSome ((htx L _ hbig).1 _ _ _)) fun r _ => ?_
+  rcases r with f | r1
   · exact total_throw _
-  split
+  refine total_bind (total_lift_isSome ((htx L _ hbig).2 _ _ _)) fun r _ => ?_
+  rcases r with f | r2
   · exact total_throw _
   refine total_bind (open_inputs_total (ME := fmmcs.Error) G g immcs _ _ _ _ _ claims commit_of hok)
     fun ro _ => ?_
