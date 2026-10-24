@@ -10,6 +10,9 @@ public import Plonky3Lean.Proofs.Commit.BabyBear
 public import Plonky3Lean.Proofs.Fri.Deep
 public import Plonky3Lean.Proofs.Fri.Complete
 public import Plonky3Lean.Proofs.Fri.Edge
+public import Plonky3Lean.Proofs.Fri.Honest
+public import Plonky3Lean.Proofs.Fri.HidingPcs
+public import Plonky3Lean.Proofs.Fri.Pow
 
 @[expose] public section
 
@@ -443,6 +446,38 @@ theorem pcs.panics_iff : type_of% @Plonky3Lean.Proofs.Fri.verify_panics_iff :=
 theorem pcs.babyBear_difficulty (b : ℕ) : (b = 0 ∨ (b < 64 ∧ 2 ^ b < 2013265921)) ↔ b ≤ 30 :=
   powSafe_babyBear b
 
+/-! ## The first committed word -/
+
+/-- The prover's first word, and every reduced vector, is the DEEP word on the coset g H.
+
+At log height h it lists D_h(g G_h^rev_h(t)) at index t.
+
+Here D_h is the batched DEEP polynomial of the claims at height h.
+
+This needs honest matrices, and opening points off the coset. -/
+theorem first_word.prover : type_of% @reduced_openings_deep := @reduced_openings_deep
+
+/-- On honest openings, the verifier's reduction of one query is the DEEP word at every height.
+
+At each height h of the claims, tallest first, it returns D_h at the query point g G_h^rev_h(i >> (H - h)). -/
+theorem first_word.verifier : type_of% @reduceQuery_eq_deep := @reduceQuery_eq_deep
+
+/-- On honest openings, the input checks pass and leave the DEEP word of every height, for every query. -/
+theorem first_word.inputs : type_of% @open_inputs_deep := @open_inputs_deep
+
+/-- The honest rounds roll in exactly the inputs below the tallest height, tallest first. -/
+theorem first_word.rolls : type_of% @chainRolls_eq_inputs := @chainRolls_eq_inputs
+
+/-- Rounds that fold the running polynomial, and roll in the DEEP words, form an honest chain. -/
+theorem first_word.chain : type_of% @honestRds_chain := @honestRds_chain
+
+/-- Folding keeps low degree.
+
+Start from degree below 2^(H - b), with every input at height h below 2^(h - b).
+
+The last polynomial then has degree below 2^(H - s - b), for s the total arity. -/
+theorem first_word.degree : type_of% @degree_honestFinal := @degree_honestFinal
+
 /-! ## The PCS verifier: completeness -/
 
 /-- The FRI verifier accepts when:
@@ -452,14 +487,35 @@ theorem pcs.babyBear_difficulty (b : ℕ) : (b = 0 ∨ (b < 64 ∧ 2 ^ b < 20132
 - each query sees an honest chain of codewords
 - the final polynomial agrees with the final word
 - the commit-phase scheme accepts the honest rows. -/
-theorem pcs.fri_complete : type_of% @verify_fri_complete := @verify_fri_complete
+theorem pcs.fri_complete_of_chain : type_of% @verify_fri_complete := @verify_fri_complete
 
-/-- The PCS verifier accepts when:
+/-- The FRI verifier accepts from honest claims and honest commitments.
 
-- the zero-difficulty witnesses are zero
-- the batching grind passes
-- the FRI verifier accepts. -/
-theorem pcs.complete : type_of% @pcs_verify_complete := @pcs_verify_complete
+The first word and the rolled-in inputs are proven to be the DEEP words, not assumed. -/
+theorem pcs.fri_complete : type_of% @verify_fri_complete_honest := @verify_fri_complete_honest
+
+/-- The PCS verifier accepts when the batching grind passes and the FRI verifier accepts. -/
+theorem pcs.complete_of_fri : type_of% @pcs_verify_complete := @pcs_verify_complete
+
+/-- The PCS verifier accepts from honest commitments alone.
+
+The claims are honest, the honest grinding witnesses pass, and the prover's messages are honest:
+
+- the input rows are the columns at each query point
+- the rounds fold the DEEP word of the tallest height, and roll in the DEEP words below
+- the siblings are each round's rows without the queried values
+- the final polynomial is the inverse transform of the final word
+- both commitment schemes accept the honest rows.
+
+The query indices and the challenge count come from the transcript itself. -/
+theorem pcs.complete : type_of% @pcs_verify_complete_honest := @pcs_verify_complete_honest
+
+/-- The commit rounds return one challenge per scheduled round. -/
+theorem pcs.commit_rounds_length : type_of% @Plonky3Lean.Proofs.Fri.commit_rounds_length :=
+  @Plonky3Lean.Proofs.Fri.commit_rounds_length
+
+/-- Every drawn query index lies below 2^b, for b the shape's index width. -/
+theorem pcs.query_indices_lt : type_of% @query_phase_indices_lt := @query_phase_indices_lt
 
 /-- The input checks pass on honest openings, and leave each query's reduction. -/
 theorem pcs.inputs_honest : type_of% @open_inputs_honest := @open_inputs_honest
@@ -551,6 +607,91 @@ theorem hiding_pcs.mask_heights (N b : ℕ) (hb : b < 64) :
   mask_heights_agree N b hb
 
 end hidingPcs
+
+/-! ## The hiding PCS: opening and verification -/
+
+section hidingOpen
+
+variable {K : Type} [Field K] [DecidableEq K]
+
+/-- The prover's split panics exactly when a point has fewer opened values than it hides. -/
+theorem hiding_pcs.split_panics (k : ℕ) (vals : List K) : splitHidden k vals = none ↔ vals.length < k :=
+  splitHidden_eq_none k vals
+
+/-- The verifier's merge of one point undoes the prover's split. -/
+theorem hiding_pcs.merge_split : type_of% @mergeHiddenPoint_split := @mergeHiddenPoint_split
+
+/-- The verifier's merge of one point rejects exactly a hidden part of the wrong count. -/
+theorem hiding_pcs.merge_rejects : type_of% @mergeHiddenPoint_eq := @mergeHiddenPoint_eq
+
+/-- The verifier's merge returns or rejects, and never panics. -/
+theorem hiding_pcs.merge_total : type_of% @mergeHidden_total := @mergeHidden_total
+
+/-- The hiding verifier never panics at safe difficulties. -/
+theorem hiding_pcs.never_panics : type_of% @verify_hiding_total := @verify_hiding_total
+
+/-- Once the merge returns a batch, the hiding verifier is the plain verifier on that batch. -/
+theorem hiding_pcs.of_merge : type_of% @verify_hiding_of_merge := @verify_hiding_of_merge
+
+/-- On an honest split, the merge rebuilds the randomized batch. -/
+theorem hiding_pcs.merge_honest : type_of% @mergeHidden_hideClaims := @mergeHidden_hideClaims
+
+/-- On an honest split, the hiding verifier is exactly the plain verifier on the randomized batch. -/
+theorem hiding_pcs.exact : type_of% @verify_hiding_hideClaims := @verify_hiding_hideClaims
+
+/-- The hiding verifier accepts the honest split of a randomized batch the plain verifier accepts. -/
+theorem hiding_pcs.complete : type_of% @verify_hiding_complete := @verify_hiding_complete
+
+/-- The opening returns the split of the inner opening, and marks every private round opened. -/
+theorem hiding_pcs.open_ok : type_of% @open_hiding_ok := @open_hiding_ok
+
+/-- Opening a private round a second time panics. -/
+theorem hiding_pcs.open_reopened : type_of% @open_hiding_reopened := @open_hiding_reopened
+
+/-- The opening panics when a private point holds fewer values than it hides. -/
+theorem hiding_pcs.open_short : type_of% @open_hiding_short := @open_hiding_short
+
+/-- Zero random codewords are rejected by the verifier, for a positive extension degree. -/
+theorem hiding_pcs.zero_codewords : type_of% @mergeHidden_zero_codewords := @mergeHidden_zero_codewords
+
+/-- Zero random codewords are rejected by the prover, for a positive extension degree. -/
+theorem hiding_pcs.zero_codewords_prover (q mask D n : ℕ) (hD : 0 < D) :
+    check_hiding_budget 0 q mask D n = .error (.InsufficientRandomCodewords D 0) :=
+  check_hiding_budget_zero_codewords q mask D n hD
+
+/-- The required mask is at least 2 D. -/
+theorem hiding_pcs.budget_min {q D n req : ℕ} (h : hiding_budget q D n = some req) : 2 * D ≤ req :=
+  hiding_budget_ge h
+
+/-- The verifier rejects blinding on a domain of 1 or 2 points: its mask is at most one value. -/
+theorem hiding_pcs.small_domain : type_of% @mergeHiddenMatrix_small := @mergeHiddenMatrix_small
+
+/-- The prover refuses to blind a one-row trace at commit: one mask value is below the budget. -/
+theorem hiding_pcs.one_row (r q D : ℕ) (hD : 0 < D) (hr : D ≤ r) {req : ℕ}
+    (hb : hiding_budget q D 1 = some req) :
+    check_hiding_budget r q 1 D 1 = .error (.HidingBudgetExceeded 1 q 1 D) :=
+  check_hiding_budget_one_row r q D hD hr hb
+
+end hidingOpen
+
+/-! ## The grinding difficulty -/
+
+/-- A b-bit grind accepts the canonical values below p whose low b bits are zero.
+
+There are (p - 1) / 2^b + 1 of them. -/
+theorem pow.accepting_card (p b : ℕ) (hp : 0 < p) :
+    ((range p).filter fun v => v % 2 ^ b = 0).card = (p - 1) / 2 ^ b + 1 :=
+  pow_accepting_card p b hp
+
+/-- For BabyBear and b from 27 to 30, a b-bit grind accepts 2^(31 - b) values.
+
+Its success probability 2^31 / (2^b p) lies strictly between 2^(-b) and (16/15) 2^(-b).
+
+So the grind buys less than b bits, by under log_2(16/15) bits. -/
+theorem pow.babyBear_count :
+    (∀ b ∈ [27, 28, 29, 30], ((2013265921 - 1) / 2 ^ b + 1) * 2 ^ b = 2 ^ 31) ∧
+      2013265921 < 2 ^ 31 ∧ 15 * 2 ^ 31 < 16 * 2013265921 :=
+  pow_babyBear_count
 
 /-! ## BabyBear and its extensions -/
 

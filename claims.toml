@@ -5497,6 +5497,14 @@ name   = "Plonky3Lean.Claims.Fri.hiding_pcs.masks_cancel"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.merge_rejects"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.merge_split"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.Fri.honest_round"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -5599,6 +5607,114 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 [[claim]]
 name   = "Plonky3Lean.Claims.Fri.verify_fri.never_panics"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.first_word.chain"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.first_word.degree"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.first_word.inputs"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.first_word.prover"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.first_word.rolls"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.first_word.verifier"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.budget_min"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.complete"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.exact"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.merge_honest"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.merge_total"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.never_panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.of_merge"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.one_row"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.open_ok"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.open_reopened"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.open_short"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.small_domain"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.split_panics"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.zero_codewords"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.hiding_pcs.zero_codewords_prover"
+axioms = ["propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.pcs.commit_rounds_length"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.pcs.complete_of_fri"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.pcs.fri_complete_of_chain"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.pcs.query_indices_lt"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.pow.accepting_card"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.pow.babyBear_count"
+axioms = ["propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.Lookup.accepts_bus_relation"
