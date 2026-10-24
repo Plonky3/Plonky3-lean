@@ -50,8 +50,8 @@ theorem folds_some (thr w T : ℕ) (r : List EF) (hr : r.length < 64) :
       ∃ v, answers.mapM (fun a => (p3_multilinear_util.poly.mirror.Poly.new a).bind
         fun p => p3_multilinear_util.split_eq.mirror.Poly.eval_ext thr w T p r) = some v
   | [], _ => ⟨[], rfl⟩
-  | a :: as, h => by
-    obtain ⟨v, hv⟩ := folds_some thr w T r hr as fun b hb => h b (by simp [hb])
+  | a :: rest, h => by
+    obtain ⟨v, hv⟩ := folds_some thr w T r hr rest fun b hb => h b (by simp [hb])
     have ha := h a (by simp)
     exact ⟨mle a r :: v, by simp [List.mapM_cons, Poly_new_pow a ha, poly_eval_ext_eq thr w T a r hr ha, hv]⟩
 
