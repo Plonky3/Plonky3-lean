@@ -744,6 +744,20 @@ structure HonestOpenings (G : Gen K) (g : K) {C MP : Type} (b H : ℕ)
     (fun m row => row = (cols m).map (·.eval (xOfQuery G g H indices[q] (m.domain.log_size + b))))
     c.matrices (bo.opened_values.getD q [])) claims openings
 
+/-- Every claimed height, with the blowup, lies at or below the tallest input height. -/
+theorem le_inputLogHeights_head {G : Gen K} {C : Type} (b : ℕ) (claims : List (Claim G C)) :
+    ∀ c ∈ claims, ∀ m ∈ c.matrices, m.domain.log_size + b ≤ (inputLogHeights b claims).headD 0 := by
+  intro c hc m hm
+  have hmem := (mem_inputLogHeights b claims _).2 ⟨c, hc, m, hm, rfl⟩
+  rcases hS : inputLogHeights b claims with _ | ⟨H', T⟩
+  · rw [hS] at hmem; simp at hmem
+  · have hp := inputLogHeights_pairwise b claims
+    rw [hS] at hmem hp
+    rw [List.headD_cons]
+    rcases List.mem_cons.1 hmem with h | h
+    · omega
+    · exact le_of_lt (List.rel_of_pairwise_cons hp h)
+
 /-- On honest openings, the input checks pass and leave, for each query index i, the DEEP word at every height:
 
 ```text
@@ -769,18 +783,7 @@ theorem open_inputs_deep {ME : Type} (G : Gen K) (hN : GenNested G) (g : K) {C :
         (h, (deepOn g α b cols claims h).eval
           (dom G h (i / 2 ^ ((inputLogHeights b claims).headD 0 - h))))) := by
   set H := (inputLogHeights b claims).headD 0 with hHdef
-  -- Every claimed height lies at or below the tallest one.
-  have hle : ∀ c ∈ claims, ∀ m ∈ c.matrices, m.domain.log_size + b ≤ H := by
-    intro c hc m hm
-    have hmem := (mem_inputLogHeights b claims _).2 ⟨c, hc, m, hm, rfl⟩
-    rcases hS : inputLogHeights b claims with _ | ⟨H', T⟩
-    · rw [hS] at hmem; simp at hmem
-    · have hp := inputLogHeights_pairwise b claims
-      rw [hS] at hmem hp
-      rw [hHdef, hS, List.headD_cons]
-      rcases List.mem_cons.1 hmem with h | h
-      · omega
-      · exact le_of_lt (List.rel_of_pairwise_cons hp h)
+  have hle : ∀ c ∈ claims, ∀ m ∈ c.matrices, m.domain.log_size + b ≤ H := le_inputLogHeights_head b claims
   have hHa' : ∀ c ∈ claims, ∀ m ∈ c.matrices, m.domain.log_size + b ≤ G.adicity :=
     fun c hc m hm => (hle c hc m hm).trans hHa
   -- The query point of every height is a point of the tallest coset.
@@ -855,6 +858,60 @@ noncomputable def proofFinal (G : Gen K) (g α : K) {C Com MP IMP : Type} (param
   honestFinal (deepInput g α params.log_blowup cols claims) ((inputLogHeights params.log_blowup claims).headD 0)
     (deepOn g α params.log_blowup cols claims ((inputLogHeights params.log_blowup claims).headD 0))
     (proofRounds proof betas L)
+
+/-- The schedule of a proof whose pre-transcript checks pass:
+
+- there is an input height
+- every input height lies at or above the final height b + l_F
+- every arity is at least 1
+- the arities sum to H - (b + l_F), for H the tallest input height. -/
+theorem schedule_facts (G : Gen K) {C Com MP IMP : Type} (params : FriParameters) (claims : List (Claim G C))
+    (proof : FriProof K Com MP IMP) {L : List ℕ} (hpre : FriPre G params claims proof L)
+    (hF : ∀ c ∈ claims, ∀ m ∈ c.matrices, params.log_final_poly_len ≤ m.domain.log_size) :
+    inputLogHeights params.log_blowup claims ≠ [] ∧
+    (∀ h ∈ inputLogHeights params.log_blowup claims, params.log_blowup + params.log_final_poly_len ≤ h) ∧
+    (∀ a ∈ L, 1 ≤ a) ∧
+    L.sum = (inputLogHeights params.log_blowup claims).headD 0 - (params.log_blowup + params.log_final_poly_len) := by
+  set b := params.log_blowup
+  set Lf := params.log_final_poly_len
+  set H := (inputLogHeights b claims).headD 0 with hHdef
+  -- Every input height lies between the final height and the tallest one.
+  have hS : inputLogHeights b claims ≠ [] := by
+    obtain ⟨c, hc, hm⟩ : ∃ c ∈ claims, c.matrices ≠ [] := by
+      have := hpre.matrices; simp only [List.all_eq_false, decide_eq_true_eq] at this; exact this
+    obtain ⟨m, hm⟩ := List.exists_mem_of_ne_nil _ hm
+    exact List.ne_nil_of_mem ((mem_inputLogHeights b claims _).2 ⟨c, hc, m, hm, rfl⟩)
+  have hFall : ∀ h ∈ inputLogHeights b claims, b + Lf ≤ h := by
+    intro h hh
+    obtain ⟨c, hc, m, hm, rfl⟩ := (mem_inputLogHeights b claims h).1 hh
+    have := hF c hc m hm; omega
+  have hFH : b + Lf ≤ H := by
+    apply hFall
+    rcases hSc : inputLogHeights b claims with _ | ⟨x, T⟩
+    · exact absurd hSc hS
+    · rw [hHdef, hSc]; simp
+  -- The schedule descends from H to the final height, by arities of at least 1.
+  obtain ⟨hpos, hsum⟩ : (∀ a ∈ L, 1 ≤ a) ∧ L.sum = H - (b + Lf) := by
+    have hdec := (inputLogHeights_pairwise b claims).isChain
+    rcases Nat.lt_or_ge (b + Lf) H with hlt | hge
+    · rcases hSc : inputLogHeights b claims with _ | ⟨x, T⟩
+      · exact absurd hSc hS
+      rw [hSc] at hdec
+      have hx : H = x := by rw [hHdef, hSc]; rfl
+      obtain ⟨L', hL', ha, hs, -⟩ := fold_schedule_spec hdec (Nat.pos_of_ne_zero hpre.arity) (hx ▸ hlt)
+      have := hpre.schedule
+      rw [hSc] at this
+      obtain rfl := Option.some.inj (this.symm.trans hL')
+      exact ⟨fun a h => (ha a h).1, by rw [hs, hx]⟩
+    · have := hpre.schedule
+      rw [fold_schedule_nil hdec (fun h0 hh0 => by
+        rcases hSc : inputLogHeights b claims with _ | ⟨x, T⟩
+        · rw [hSc] at hh0; simp at hh0
+        · rw [hSc] at hh0; simp only [List.head?_cons, Option.mem_def, Option.some.injEq] at hh0
+          subst hh0; rw [hHdef, hSc] at hge; simpa using hge)] at this
+      obtain rfl := (Option.some.inj this).symm
+      exact ⟨by simp, by simp; omega⟩
+  exact ⟨hS, hFall, hpos, hsum⟩
 
 /-- Completeness of the FRI verifier from honest commitments.
 
@@ -943,43 +1000,13 @@ theorem verify_fri_complete_honest (G : Gen K) (hV : GenValid G) (hN : GenNested
       ← List.map_map, List.map_snd_zip (by rw [List.length_zip, hsvl, hβ, min_self]),
       List.map_snd_zip (by rw [hsvl])]
   obtain ⟨hrsβ, hrsa, hrssv⟩ := honestRds_map G inp H P0 rounds
-  -- Every input height lies between the final height and the tallest one.
-  have hS : inputLogHeights b claims ≠ [] := by
-    obtain ⟨c, hc, hm⟩ : ∃ c ∈ claims, c.matrices ≠ [] := by
-      have := hpre.matrices; simp only [List.all_eq_false, decide_eq_true_eq] at this; exact this
-    obtain ⟨m, hm⟩ := List.exists_mem_of_ne_nil _ hm
-    exact List.ne_nil_of_mem ((mem_inputLogHeights b claims _).2 ⟨c, hc, m, hm, rfl⟩)
-  have hFall : ∀ h ∈ inputLogHeights b claims, b + Lf ≤ h := by
-    intro h hh
-    obtain ⟨c, hc, m, hm, rfl⟩ := (mem_inputLogHeights b claims h).1 hh
-    have := hF c hc m hm; omega
-  have hFH : b + Lf ≤ H := by
-    apply hFall
+  have hHa : H ≤ G.adicity := hpre.height
+  obtain ⟨hS, hFall, hpos, hsum⟩ : inputLogHeights b claims ≠ [] ∧ (∀ h ∈ inputLogHeights b claims, b + Lf ≤ h) ∧
+      (∀ a ∈ L, 1 ≤ a) ∧ L.sum = H - (b + Lf) := schedule_facts G params claims proof hpre hF
+  have hFH : b + Lf ≤ H := hFall _ (by
     rcases hSc : inputLogHeights b claims with _ | ⟨x, T⟩
     · exact absurd hSc hS
-    · rw [hHdef, hSc]; simp
-  have hHa : H ≤ G.adicity := hpre.height
-  -- The schedule descends from H to the final height, by arities of at least 1.
-  obtain ⟨hpos, hsum⟩ : (∀ a ∈ L, 1 ≤ a) ∧ L.sum = H - (b + Lf) := by
-    have hdec := (inputLogHeights_pairwise b claims).isChain
-    rcases Nat.lt_or_ge (b + Lf) H with hlt | hge
-    · rcases hSc : inputLogHeights b claims with _ | ⟨x, T⟩
-      · exact absurd hSc hS
-      rw [hSc] at hdec
-      have hx : H = x := by rw [hHdef, hSc]; rfl
-      obtain ⟨L', hL', ha, hs, -⟩ := fold_schedule_spec hdec (Nat.pos_of_ne_zero hpre.arity) (hx ▸ hlt)
-      have := hpre.schedule
-      rw [hSc] at this
-      obtain rfl := Option.some.inj (this.symm.trans hL')
-      exact ⟨fun a h => (ha a h).1, by rw [hs, hx]⟩
-    · have := hpre.schedule
-      rw [fold_schedule_nil hdec (fun h0 hh0 => by
-        rcases hSc : inputLogHeights b claims with _ | ⟨x, T⟩
-        · rw [hSc] at hh0; simp at hh0
-        · rw [hSc] at hh0; simp only [List.head?_cons, Option.mem_def, Option.some.injEq] at hh0
-          subst hh0; rw [hHdef, hSc] at hge; simpa using hge)] at this
-      obtain rfl := (Option.some.inj this).symm
-      exact ⟨by simp, by simp; omega⟩
+    · rw [hHdef, hSc]; simp)
   have hpos' : ∀ r ∈ rounds, 1 ≤ r.2.1 := fun r hr => hpos _ (hrmap ▸ List.mem_map_of_mem hr)
   have hsum' : (rounds.map (·.2.1)).sum ≤ H := by rw [hrmap, hsum]; omega
   have hHF : H - (rounds.map (·.2.1)).sum = Lf + b := by rw [hrmap, hsum]; omega
