@@ -4,6 +4,7 @@ public import Plonky3Lean.Proofs.Sha256Air.Complete
 public import Plonky3Lean.Proofs.Sha256Air.Degree
 public import Plonky3Lean.Proofs.Sha256Air.Extracted
 public import Plonky3Lean.Proofs.Sha256Air.Binary.Sound
+public import Plonky3Lean.Proofs.Sha256Air.Binary.Complete
 
 @[expose] public section
 
@@ -57,6 +58,7 @@ A row holds, all as bits:
 
 - On a row whose input cells are bits, the output is the compression of the input.
 - With the booleanity stated, the input cells are bits by the constraints.
+- In characteristic 2, on a power-of-two number of inputs, the generator's trace satisfies the AIR.
 - Every constraint has degree multiple at most 2.
 - The AIR asserts exactly the number of constraints it reports.
 -/
@@ -210,6 +212,22 @@ theorem binary.sound [DecidableEq F] (h2 : (2 : F) = 0) {cb : Bool} {T : Instanc
       (∀ j < 8, ∀ b < 32,
         T.main i (binary.col.h_out j b) = bitF (((compress H M).getD j 0).getLsbD b)) :=
   Proofs.Sha256Air.Binary.binary_sound h2 hT hi hbits
+
+/-- Completeness in characteristic 2: on a power-of-two number of inputs, the generator's trace satisfies the AIR.
+
+This holds with or without the booleanity. -/
+theorem binary.complete [Inhabited F] [DecidableEq F] (h2 : (2 : F) = 0) (cb : Bool)
+    {inputs : List (List (BitVec 32))}
+    (h : inputs.length ≠ 0 ∧ 2 ^ Nat.log 2 inputs.length = inputs.length) (e : ℕ) :
+    ∃ M, p3_sha256_air.mirror.binary.generate_binary_trace_rows (F := F) inputs e = some M ∧
+      Satisfies (constraints (binaryAir cb)) (instOf (binaryAir cb) M []) :=
+  Proofs.Sha256Air.Binary.binary_complete h2 cb h e
+
+/-- The characteristic-2 generator panics unless 2 is 0 and the number of inputs is a power of two. -/
+theorem binary.generate_binary_trace_rows.panics [DecidableEq F] {inputs : List (List (BitVec 32))}
+    (h : ¬ ((2 : F) = 0 ∧ (inputs.length ≠ 0 ∧ 2 ^ Nat.log 2 inputs.length = inputs.length))) (e : ℕ) :
+    p3_sha256_air.mirror.binary.generate_binary_trace_rows (F := F) inputs e = none := by
+  simp only [Proofs.Sha256Air.Binary.generate_eqB, h, ↓reduceIte]
 
 /-- Over GF(2), every symbolic constraint has degree multiple at most 2, the declared bound.
 
