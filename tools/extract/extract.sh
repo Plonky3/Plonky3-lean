@@ -298,13 +298,15 @@ if [ -s "$PRE_LIST" ]; then
 fi
 CHECKS="$("$CONFIG" checks)"
 check() {   # check <log>: cargo check of the extracted crates as charon sees them, per target
-    local target flags packages
+    # Every target, even after one fails, so that two logs list the same warnings.
+    local target flags packages ok=0
     : > "$1"
     while IFS='|' read -r target flags packages; do
         (cd "$RUST" && env RUSTUP_TOOLCHAIN="$CHARON_TOOLCHAIN" \
             RUSTFLAGS="$flags" CARGO_TARGET_DIR="$WORK/target-check" \
-            cargo check --quiet --target "$target" $packages) >> "$1" 2>&1 || return 1
+            cargo check --quiet --target "$target" $packages) >> "$1" 2>&1 || ok=1
     done <<< "$CHECKS"
+    return "$ok"
 }
 warnings() {   # the warning headlines of a check log, one per line, sorted
     sed 's/\x1b\[[0-9;]*m//g' "$1" | grep '^warning' | sort || true
