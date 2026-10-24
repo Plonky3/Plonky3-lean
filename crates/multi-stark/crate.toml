@@ -1,0 +1,198 @@
+# p3-multi-stark: the multilinear SuperSpartan-style STARK prover and verifier for AIRs.
+
+lean_lib = "P3MultiStark"
+
+# Nothing is extracted.
+#
+# The crate's dependencies p3-multilinear-util and p3-sumcheck do not compile in the extraction variant (docs/extractor-issues.md 180).
+#
+# Its items are also generic over the field traits and the AIR, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# The verifier's own checks are transcribed in stub/P3MultiStark/, with the abstractions each file's header lists.
+state = "stub"
+
+features = []
+
+watch = ["multi-stark/src", "multi-stark/Cargo.toml", "security/src/multilinear.rs", "multilinear-util/src/point.rs"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_multi_stark.selectors.mirror.BoundaryEvals"
+rust = "p3_multi_stark::selectors::BoundaryEvals"
+
+[[mirror]]
+lean = "p3_multi_stark.selectors.mirror.atStep"
+rust = "p3_multi_stark::selectors::BoundaryEvals::at"
+
+[[mirror]]
+lean = "p3_multi_stark.selectors.mirror.BoundaryEvals.at"
+rust = "p3_multi_stark::selectors::BoundaryEvals::at"
+
+[[mirror]]
+lean = "p3_multi_stark.selectors.mirror.BoundaryEvals.apply"
+rust = "p3_multi_stark::selectors::BoundaryEvals::apply"
+
+[[mirror]]
+lean = "p3_multi_stark.selectors.mirror.BoundaryEvals.from_row"
+rust = "p3_multi_stark::selectors::BoundaryEvals::from_row"
+
+[[mirror]]
+lean = "p3_multi_stark.selectors.mirror.BoundaryEvals.from_row_with_prefix"
+rust = "p3_multi_stark::selectors::BoundaryEvals::from_row_with_prefix"
+
+[[mirror]]
+lean = "p3_multi_stark.opening.mirror.TableOpening"
+rust = "p3_multi_stark::opening::TableOpening"
+
+[[mirror]]
+lean = "p3_multi_stark.opening.mirror.TableOpening.empty"
+rust = "p3_multi_stark::opening::TableOpening::empty"
+
+[[mirror]]
+lean = "p3_multi_stark.opening.mirror.scatterStep"
+rust = "p3_multi_stark::opening::OpeningClaims::next_row"
+
+[[mirror]]
+lean = "p3_multi_stark.opening.mirror.next_row"
+rust = "p3_multi_stark::opening::OpeningClaims::next_row"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.ZerocheckError"
+rust = "p3_multi_stark::zerocheck::ZerocheckError"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.ZerocheckReduction"
+rust = "p3_multi_stark::zerocheck::ZerocheckReduction"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.checkAir"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.accumulate"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.entries"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.closing"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.check_constraint"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.round_degree"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::verify_reduction_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.check_claimed_sum"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::verify_reduction_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.MultiStarkInstanceShape"
+rust = "p3_multi_stark::transcript::MultiStarkInstanceShape"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.MultiStarkShape"
+rust = "p3_multi_stark::transcript::MultiStarkShape"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.MultiStarkShape.has_preprocessed"
+rust = "p3_multi_stark::transcript::MultiStarkShape::has_preprocessed"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.Step"
+rust = "p3_multi_stark::transcript::MultiStarkShape::pattern"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.Delegation"
+rust = "p3_multi_stark::transcript::MultiStarkShape::pattern"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.delegation"
+rust = "p3_multi_stark::transcript::delegation"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.MultiStarkShape.pattern"
+rust = "p3_multi_stark::transcript::MultiStarkShape::pattern"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.columnWords"
+rust = "p3_multi_stark::transcript::MultiStarkShape::domain_separator"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.instanceWords"
+rust = "p3_multi_stark::transcript::MultiStarkShape::domain_separator"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.MultiStarkShape.label"
+rust = "p3_multi_stark::transcript::MultiStarkShape::domain_separator"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.AirDegrees"
+rust = "p3_multi_stark::rounds::AirDegrees"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.ZerocheckStep"
+rust = "p3_multi_stark::zerocheck::transcript::ZerocheckShape::pattern"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.ZerocheckShape"
+rust = "p3_multi_stark::zerocheck::transcript::ZerocheckShape"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.ZerocheckShape.free_coordinates"
+rust = "p3_multi_stark::zerocheck::transcript::ZerocheckShape::free_coordinates"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.ZerocheckShape.pattern"
+rust = "p3_multi_stark::zerocheck::transcript::ZerocheckShape::pattern"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.ZerocheckShape.label"
+rust = "p3_multi_stark::zerocheck::transcript::ZerocheckShape::domain_separator"
+
+[[mirror]]
+lean = "p3_multi_stark.security.mirror.AirParams"
+rust = "p3_security::multilinear::MultilinearAirParams"
+
+[[mirror]]
+lean = "p3_multi_stark.security.mirror.air_terms"
+rust = "p3_security::multilinear::reduction_terms"
+
+[[mirror]]
+lean = "p3_multi_stark.security.mirror.num_variables"
+rust = "p3_multi_stark::security::assess_statement"
+
+[[mirror]]
+lean = "p3_multi_stark.security.mirror.charged_degree"
+rust = "p3_multi_stark::security::assess_statement"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.M"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.AirView"
+rust = "p3_multi_stark::folder::VerifierAir"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.BusTerm"
+rust = "p3_multi_stark::bus::BusContext::terminal_composition"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.Entry"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.security.mirror.Term"
+rust = "p3_security::SecurityTerm"
+
+[[mirror]]
+lean = "p3_multi_stark.security.mirror.Denominator"
+rust = "p3_security::multilinear::reduction_terms"
