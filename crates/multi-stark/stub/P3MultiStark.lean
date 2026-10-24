@@ -13,5 +13,6 @@ public import P3MultiStark.Zerocheck
 public import P3MultiStark.Transcript
 public import P3MultiStark.Security
 public import P3MultiStark.FractionalGkr
+public import P3MultiStark.Lookup
 
 @[expose] public section
