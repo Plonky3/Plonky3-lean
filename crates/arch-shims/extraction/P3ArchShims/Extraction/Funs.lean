@@ -29,6 +29,1751 @@ noncomputable section
 
 namespace p3_arch_shims
 
+/-- [p3_arch_shims::aarch64::neon::signed_sat_q32]:
+    Source: 'src/aarch64/neon.rs', lines 19:0-27:1 -/
+def aarch64.neon.signed_sat_q32 (i : Std.I64) : RustM Std.I32 := do
+  let i1 ← lift (IScalar.cast .I64 core.num.I32.MAX)
+  if i > i1
+  then ok core.num.I32.MAX
+  else
+    let i2 ← lift (IScalar.cast .I64 core.num.I32.MIN)
+    if i < i2
+    then ok core.num.I32.MIN
+    else ok (IScalar.cast .I32 i)
+
+/-- [p3_arch_shims::aarch64::neon::vdupq_n_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 36:4-39:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vdupq_n_u32_loop.body
+  (value : Std.U32) (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow ((Array Std.U32 4#usize) × Std.Usize) (Array Std.U32
+    4#usize))
+  := do
+  if e < 4#usize
+  then
+    let a ← Array.update dst e value
+    let e1 ← e + 1#usize
+    ok (cont (a, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vdupq_n_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 36:4-39:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vdupq_n_u32_loop
+  (value : Std.U32) (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (dst1, e1) => aarch64.neon.vdupq_n_u32_loop.body value dst1 e1)
+    (dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vdupq_n_u32]:
+    Source: 'src/aarch64/neon.rs', lines 33:0-41:1
+    Visibility: public -/
+def aarch64.neon.vdupq_n_u32
+  (value : Std.U32) : RustM aarch64.types.U32x4 := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vdupq_n_u32_loop value dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vdupq_n_s32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 48:4-51:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vdupq_n_s32_loop.body
+  (value : Std.I32) (dst : Array Std.I32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow ((Array Std.I32 4#usize) × Std.Usize) (Array Std.I32
+    4#usize))
+  := do
+  if e < 4#usize
+  then
+    let a ← Array.update dst e value
+    let e1 ← e + 1#usize
+    ok (cont (a, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vdupq_n_s32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 48:4-51:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vdupq_n_s32_loop
+  (value : Std.I32) (dst : Array Std.I32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.I32 4#usize)
+  := do
+  loop
+    (fun (dst1, e1) => aarch64.neon.vdupq_n_s32_loop.body value dst1 e1)
+    (dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vdupq_n_s32]:
+    Source: 'src/aarch64/neon.rs', lines 45:0-53:1
+    Visibility: public -/
+def aarch64.neon.vdupq_n_s32
+  (value : Std.I32) : RustM aarch64.types.I32x4 := do
+  let dst ← core.array.repeat 4#usize core.I32.Insts.CoreCloneClone 0#i32
+  let dst1 ← aarch64.neon.vdupq_n_s32_loop value dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vaddq_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 63:4-66:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vaddq_u32_loop.body
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × aarch64.types.U32x4 × (Array
+    Std.U32 4#usize) × Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← Array.index_usize b e
+    let i2 ← core.num.U32.wrapping_add i i1
+    let a1 ← Array.update dst e i2
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vaddq_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 63:4-66:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vaddq_u32_loop
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vaddq_u32_loop.body a1 b1 dst1 e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vaddq_u32]:
+    Source: 'src/aarch64/neon.rs', lines 60:0-68:1
+    Visibility: public -/
+def aarch64.neon.vaddq_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) :
+  RustM aarch64.types.U32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vaddq_u32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vaddq_s32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 75:4-78:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vaddq_s32_loop.body
+  (a : aarch64.types.I32x4) (b : aarch64.types.I32x4)
+  (dst : Array Std.I32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.I32x4 × aarch64.types.I32x4 × (Array
+    Std.I32 4#usize) × Std.Usize) (Array Std.I32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← Array.index_usize b e
+    let i2 ← core.num.I32.wrapping_add i i1
+    let a1 ← Array.update dst e i2
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vaddq_s32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 75:4-78:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vaddq_s32_loop
+  (a : aarch64.types.I32x4) (b : aarch64.types.I32x4)
+  (dst : Array Std.I32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.I32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vaddq_s32_loop.body a1 b1 dst1 e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vaddq_s32]:
+    Source: 'src/aarch64/neon.rs', lines 72:0-80:1
+    Visibility: public -/
+def aarch64.neon.vaddq_s32
+  (a : aarch64.types.I32x4) (b : aarch64.types.I32x4) :
+  RustM aarch64.types.I32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.I32.Insts.CoreCloneClone 0#i32
+  let dst1 ← aarch64.neon.vaddq_s32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vsubq_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 90:4-93:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vsubq_u32_loop.body
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × aarch64.types.U32x4 × (Array
+    Std.U32 4#usize) × Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← Array.index_usize b e
+    let i2 ← core.num.U32.wrapping_sub i i1
+    let a1 ← Array.update dst e i2
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vsubq_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 90:4-93:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vsubq_u32_loop
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vsubq_u32_loop.body a1 b1 dst1 e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vsubq_u32]:
+    Source: 'src/aarch64/neon.rs', lines 87:0-95:1
+    Visibility: public -/
+def aarch64.neon.vsubq_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) :
+  RustM aarch64.types.U32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vsubq_u32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vandq_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 104:4-107:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vandq_u32_loop.body
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × aarch64.types.U32x4 × (Array
+    Std.U32 4#usize) × Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← Array.index_usize b e
+    let i2 ← lift (i &&& i1)
+    let a1 ← Array.update dst e i2
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vandq_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 104:4-107:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vandq_u32_loop
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vandq_u32_loop.body a1 b1 dst1 e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vandq_u32]:
+    Source: 'src/aarch64/neon.rs', lines 101:0-109:1
+    Visibility: public -/
+def aarch64.neon.vandq_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) :
+  RustM aarch64.types.U32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vandq_u32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vbicq_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 118:4-121:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vbicq_u32_loop.body
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × aarch64.types.U32x4 × (Array
+    Std.U32 4#usize) × Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← Array.index_usize b e
+    let i2 ← lift (~~~ i1)
+    let i3 ← lift (i &&& i2)
+    let a1 ← Array.update dst e i3
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vbicq_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 118:4-121:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vbicq_u32_loop
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vbicq_u32_loop.body a1 b1 dst1 e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vbicq_u32]:
+    Source: 'src/aarch64/neon.rs', lines 115:0-123:1
+    Visibility: public -/
+def aarch64.neon.vbicq_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) :
+  RustM aarch64.types.U32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vbicq_u32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vminq_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 134:4-137:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vminq_u32_loop.body
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × aarch64.types.U32x4 × (Array
+    Std.U32 4#usize) × Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← Array.index_usize b e
+    let i2 ← if i <= i1
+               then ok i
+               else ok i1
+    let a1 ← Array.update dst e i2
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vminq_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 134:4-137:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vminq_u32_loop
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vminq_u32_loop.body a1 b1 dst1 e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vminq_u32]:
+    Source: 'src/aarch64/neon.rs', lines 131:0-139:1
+    Visibility: public -/
+def aarch64.neon.vminq_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) :
+  RustM aarch64.types.U32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vminq_u32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vtstq_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 150:4-153:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vtstq_u32_loop.body
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × aarch64.types.U32x4 × (Array
+    Std.U32 4#usize) × Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← Array.index_usize b e
+    let i2 ← lift (i &&& i1)
+    let i3 ← if i2 != 0#u32
+               then ok core.num.U32.MAX
+               else ok 0#u32
+    let a1 ← Array.update dst e i3
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vtstq_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 150:4-153:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vtstq_u32_loop
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vtstq_u32_loop.body a1 b1 dst1 e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vtstq_u32]:
+    Source: 'src/aarch64/neon.rs', lines 147:0-155:1
+    Visibility: public -/
+def aarch64.neon.vtstq_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) :
+  RustM aarch64.types.U32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vtstq_u32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vceqzq_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 165:4-168:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vceqzq_u32_loop.body
+  (a : aarch64.types.U32x4) (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × (Array Std.U32 4#usize) ×
+    Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← if i = 0#u32
+               then ok core.num.U32.MAX
+               else ok 0#u32
+    let a1 ← Array.update dst e i1
+    let e1 ← e + 1#usize
+    ok (cont (a, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vceqzq_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 165:4-168:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vceqzq_u32_loop
+  (a : aarch64.types.U32x4) (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, dst1, e1) => aarch64.neon.vceqzq_u32_loop.body a1 dst1 e1)
+    (a, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vceqzq_u32]:
+    Source: 'src/aarch64/neon.rs', lines 162:0-170:1
+    Visibility: public -/
+def aarch64.neon.vceqzq_u32
+  (a : aarch64.types.U32x4) : RustM aarch64.types.U32x4 := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vceqzq_u32_loop a dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vcltq_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 182:4-185:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vcltq_u32_loop.body
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × aarch64.types.U32x4 × (Array
+    Std.U32 4#usize) × Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize b e
+    let i1 ← Array.index_usize a e
+    let i2 ← if i > i1
+               then ok core.num.U32.MAX
+               else ok 0#u32
+    let a1 ← Array.update dst e i2
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vcltq_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 182:4-185:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vcltq_u32_loop
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vcltq_u32_loop.body a1 b1 dst1 e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vcltq_u32]:
+    Source: 'src/aarch64/neon.rs', lines 179:0-187:1
+    Visibility: public -/
+def aarch64.neon.vcltq_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) :
+  RustM aarch64.types.U32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vcltq_u32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vcgeq_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 198:4-201:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vcgeq_u32_loop.body
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × aarch64.types.U32x4 × (Array
+    Std.U32 4#usize) × Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← Array.index_usize b e
+    let i2 ← if i >= i1
+               then ok core.num.U32.MAX
+               else ok 0#u32
+    let a1 ← Array.update dst e i2
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vcgeq_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 198:4-201:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vcgeq_u32_loop
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vcgeq_u32_loop.body a1 b1 dst1 e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vcgeq_u32]:
+    Source: 'src/aarch64/neon.rs', lines 195:0-203:1
+    Visibility: public -/
+def aarch64.neon.vcgeq_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) :
+  RustM aarch64.types.U32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vcgeq_u32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vcltq_s32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 214:4-217:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vcltq_s32_loop.body
+  (a : aarch64.types.I32x4) (b : aarch64.types.I32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.I32x4 × aarch64.types.I32x4 × (Array
+    Std.U32 4#usize) × Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize b e
+    let i1 ← Array.index_usize a e
+    let i2 ← if i > i1
+               then ok core.num.U32.MAX
+               else ok 0#u32
+    let a1 ← Array.update dst e i2
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vcltq_s32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 214:4-217:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vcltq_s32_loop
+  (a : aarch64.types.I32x4) (b : aarch64.types.I32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vcltq_s32_loop.body a1 b1 dst1 e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vcltq_s32]:
+    Source: 'src/aarch64/neon.rs', lines 211:0-219:1
+    Visibility: public -/
+def aarch64.neon.vcltq_s32
+  (a : aarch64.types.I32x4) (b : aarch64.types.I32x4) :
+  RustM aarch64.types.U32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vcltq_s32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vhaddq_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 230:4-234:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vhaddq_u32_loop.body
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × aarch64.types.U32x4 × (Array
+    Std.U32 4#usize) × Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← lift (UScalar.cast .U64 i)
+    let i2 ← Array.index_usize b e
+    let i3 ← lift (UScalar.cast .U64 i2)
+    let sum ← i1 + i3
+    let i4 ← sum >>> 1#i32
+    let i5 ← lift (UScalar.cast .U32 i4)
+    let a1 ← Array.update dst e i5
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vhaddq_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 230:4-234:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vhaddq_u32_loop
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vhaddq_u32_loop.body a1 b1 dst1 e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vhaddq_u32]:
+    Source: 'src/aarch64/neon.rs', lines 227:0-236:1
+    Visibility: public -/
+def aarch64.neon.vhaddq_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) :
+  RustM aarch64.types.U32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vhaddq_u32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vhsubq_s32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 247:4-251:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vhsubq_s32_loop.body
+  (a : aarch64.types.I32x4) (b : aarch64.types.I32x4)
+  (dst : Array Std.I32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.I32x4 × aarch64.types.I32x4 × (Array
+    Std.I32 4#usize) × Std.Usize) (Array Std.I32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← lift (IScalar.cast .I64 i)
+    let i2 ← Array.index_usize b e
+    let i3 ← lift (IScalar.cast .I64 i2)
+    let diff ← i1 - i3
+    let i4 ← diff >>> 1#i32
+    let i5 ← lift (IScalar.cast .I32 i4)
+    let a1 ← Array.update dst e i5
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vhsubq_s32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 247:4-251:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vhsubq_s32_loop
+  (a : aarch64.types.I32x4) (b : aarch64.types.I32x4)
+  (dst : Array Std.I32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.I32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vhsubq_s32_loop.body a1 b1 dst1 e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vhsubq_s32]:
+    Source: 'src/aarch64/neon.rs', lines 244:0-253:1
+    Visibility: public -/
+def aarch64.neon.vhsubq_s32
+  (a : aarch64.types.I32x4) (b : aarch64.types.I32x4) :
+  RustM aarch64.types.I32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.I32.Insts.CoreCloneClone 0#i32
+  let dst1 ← aarch64.neon.vhsubq_s32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vmulq_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 264:4-267:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vmulq_u32_loop.body
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × aarch64.types.U32x4 × (Array
+    Std.U32 4#usize) × Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← Array.index_usize b e
+    let i2 ← core.num.U32.wrapping_mul i i1
+    let a1 ← Array.update dst e i2
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vmulq_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 264:4-267:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vmulq_u32_loop
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vmulq_u32_loop.body a1 b1 dst1 e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vmulq_u32]:
+    Source: 'src/aarch64/neon.rs', lines 261:0-269:1
+    Visibility: public -/
+def aarch64.neon.vmulq_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) :
+  RustM aarch64.types.U32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vmulq_u32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vmulq_s32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 277:4-280:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vmulq_s32_loop.body
+  (a : aarch64.types.I32x4) (b : aarch64.types.I32x4)
+  (dst : Array Std.I32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.I32x4 × aarch64.types.I32x4 × (Array
+    Std.I32 4#usize) × Std.Usize) (Array Std.I32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← Array.index_usize b e
+    let i2 ← core.num.I32.wrapping_mul i i1
+    let a1 ← Array.update dst e i2
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vmulq_s32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 277:4-280:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vmulq_s32_loop
+  (a : aarch64.types.I32x4) (b : aarch64.types.I32x4)
+  (dst : Array Std.I32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.I32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vmulq_s32_loop.body a1 b1 dst1 e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vmulq_s32]:
+    Source: 'src/aarch64/neon.rs', lines 274:0-282:1
+    Visibility: public -/
+def aarch64.neon.vmulq_s32
+  (a : aarch64.types.I32x4) (b : aarch64.types.I32x4) :
+  RustM aarch64.types.I32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.I32.Insts.CoreCloneClone 0#i32
+  let dst1 ← aarch64.neon.vmulq_s32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vmlsq_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 294:4-297:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vmlsq_u32_loop.body
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) (c : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × aarch64.types.U32x4 ×
+    aarch64.types.U32x4 × (Array Std.U32 4#usize) × Std.Usize) (Array Std.U32
+    4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← Array.index_usize b e
+    let i2 ← Array.index_usize c e
+    let i3 ← core.num.U32.wrapping_mul i1 i2
+    let i4 ← core.num.U32.wrapping_sub i i3
+    let a1 ← Array.update dst e i4
+    let e1 ← e + 1#usize
+    ok (cont (a, b, c, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vmlsq_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 294:4-297:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vmlsq_u32_loop
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) (c : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, c1, dst1, e1) => aarch64.neon.vmlsq_u32_loop.body a1 b1 c1
+      dst1 e1)
+    (a, b, c, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vmlsq_u32]:
+    Source: 'src/aarch64/neon.rs', lines 291:0-299:1
+    Visibility: public -/
+def aarch64.neon.vmlsq_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) (c : aarch64.types.U32x4)
+  :
+  RustM aarch64.types.U32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vmlsq_u32_loop a b c dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vmlsq_n_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 306:4-309:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vmlsq_n_u32_loop.body
+  (c : Std.U32) (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × aarch64.types.U32x4 × (Array
+    Std.U32 4#usize) × Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← Array.index_usize b e
+    let i2 ← core.num.U32.wrapping_mul i1 c
+    let i3 ← core.num.U32.wrapping_sub i i2
+    let a1 ← Array.update dst e i3
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vmlsq_n_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 306:4-309:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vmlsq_n_u32_loop
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) (c : Std.U32)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vmlsq_n_u32_loop.body c a1 b1 dst1
+      e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vmlsq_n_u32]:
+    Source: 'src/aarch64/neon.rs', lines 303:0-311:1
+    Visibility: public -/
+def aarch64.neon.vmlsq_n_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) (c : Std.U32) :
+  RustM aarch64.types.U32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vmlsq_n_u32_loop a b c dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vqdmulhq_s32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 327:4-331:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vqdmulhq_s32_loop.body
+  (a : aarch64.types.I32x4) (b : aarch64.types.I32x4)
+  (dst : Array Std.I32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.I32x4 × aarch64.types.I32x4 × (Array
+    Std.I32 4#usize) × Std.Usize) (Array Std.I32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← lift (IScalar.cast .I64 i)
+    let i2 ← Array.index_usize b e
+    let i3 ← lift (IScalar.cast .I64 i2)
+    let product ← i1 * i3
+    let i4 ← product >>> 31#i32
+    let i5 ← aarch64.neon.signed_sat_q32 i4
+    let a1 ← Array.update dst e i5
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vqdmulhq_s32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 327:4-331:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vqdmulhq_s32_loop
+  (a : aarch64.types.I32x4) (b : aarch64.types.I32x4)
+  (dst : Array Std.I32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.I32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vqdmulhq_s32_loop.body a1 b1 dst1
+      e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vqdmulhq_s32]:
+    Source: 'src/aarch64/neon.rs', lines 324:0-333:1
+    Visibility: public -/
+def aarch64.neon.vqdmulhq_s32
+  (a : aarch64.types.I32x4) (b : aarch64.types.I32x4) :
+  RustM aarch64.types.I32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.I32.Insts.CoreCloneClone 0#i32
+  let dst1 ← aarch64.neon.vqdmulhq_s32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vshrq_n_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 344:4-351:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vshrq_n_u32_loop.body
+  (N : Std.I32) (a : aarch64.types.U32x4) (dst : Array Std.U32 4#usize)
+  (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × (Array Std.U32 4#usize) ×
+    Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← lift (IScalar.hcast .U32 N)
+    let (a1, i1) ←
+      if i >= 32#u32
+      then ok (a, 0#u32)
+      else
+        do
+        let i2 ← Array.index_usize a e
+        let i3 ← lift (IScalar.hcast .U32 N)
+        let i4 ← i2 >>> i3
+        ok (a, i4)
+    let a2 ← Array.update dst e i1
+    let e1 ← e + 1#usize
+    ok (cont (a1, a2, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vshrq_n_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 344:4-351:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vshrq_n_u32_loop
+  (N : Std.I32) (a : aarch64.types.U32x4) (dst : Array Std.U32 4#usize)
+  (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, dst1, e1) => aarch64.neon.vshrq_n_u32_loop.body N a1 dst1 e1)
+    (a, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vshrq_n_u32]:
+    Source: 'src/aarch64/neon.rs', lines 341:0-353:1
+    Visibility: public -/
+def aarch64.neon.vshrq_n_u32
+  (N : Std.I32) (a : aarch64.types.U32x4) : RustM aarch64.types.U32x4 := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vshrq_n_u32_loop N a dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vsraq_n_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 361:4-369:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vsraq_n_u32_loop.body
+  (N : Std.I32) (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × aarch64.types.U32x4 × (Array
+    Std.U32 4#usize) × Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← lift (IScalar.hcast .U32 N)
+    let (b1, element) ←
+      if i >= 32#u32
+      then ok (b, 0#u32)
+      else
+        do
+        let i1 ← Array.index_usize b e
+        let i2 ← lift (IScalar.hcast .U32 N)
+        let element1 ← i1 >>> i2
+        ok (b, element1)
+    let i1 ← Array.index_usize a e
+    let i2 ← core.num.U32.wrapping_add i1 element
+    let a1 ← Array.update dst e i2
+    let e1 ← e + 1#usize
+    ok (cont (a, b1, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vsraq_n_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 361:4-369:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vsraq_n_u32_loop
+  (N : Std.I32) (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vsraq_n_u32_loop.body N a1 b1 dst1
+      e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vsraq_n_u32]:
+    Source: 'src/aarch64/neon.rs', lines 358:0-371:1
+    Visibility: public -/
+def aarch64.neon.vsraq_n_u32
+  (N : Std.I32) (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) :
+  RustM aarch64.types.U32x4
+  := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vsraq_n_u32_loop N a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vshlq_n_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 381:4-388:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vshlq_n_u32_loop.body
+  (N : Std.I32) (a : aarch64.types.U32x4) (dst : Array Std.U32 4#usize)
+  (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × (Array Std.U32 4#usize) ×
+    Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← lift (IScalar.hcast .U32 N)
+    let (a1, i1) ←
+      if i >= 32#u32
+      then ok (a, 0#u32)
+      else
+        do
+        let i2 ← Array.index_usize a e
+        let i3 ← lift (IScalar.hcast .U32 N)
+        let i4 ← i2 <<< i3
+        ok (a, i4)
+    let a2 ← Array.update dst e i1
+    let e1 ← e + 1#usize
+    ok (cont (a1, a2, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vshlq_n_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 381:4-388:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vshlq_n_u32_loop
+  (N : Std.I32) (a : aarch64.types.U32x4) (dst : Array Std.U32 4#usize)
+  (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, dst1, e1) => aarch64.neon.vshlq_n_u32_loop.body N a1 dst1 e1)
+    (a, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vshlq_n_u32]:
+    Source: 'src/aarch64/neon.rs', lines 378:0-390:1
+    Visibility: public -/
+def aarch64.neon.vshlq_n_u32
+  (N : Std.I32) (a : aarch64.types.U32x4) : RustM aarch64.types.U32x4 := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vshlq_n_u32_loop N a dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vget_low_u32]:
+    Source: 'src/aarch64/neon.rs', lines 396:0-398:1
+    Visibility: public -/
+def aarch64.neon.vget_low_u32
+  (a : aarch64.types.U32x4) : RustM aarch64.types.U32x2 := do
+  let i ← Array.index_usize a 0#usize
+  let i1 ← Array.index_usize a 1#usize
+  ok (Array.make 2#usize [ i, i1 ])
+
+/-- [p3_arch_shims::aarch64::neon::vmull_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 409:4-412:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vmull_u32_loop.body
+  (a : aarch64.types.U32x2) (b : aarch64.types.U32x2)
+  (dst : Array Std.U64 2#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x2 × aarch64.types.U32x2 × (Array
+    Std.U64 2#usize) × Std.Usize) (Array Std.U64 2#usize))
+  := do
+  if e < 2#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← lift (UScalar.cast .U64 i)
+    let i2 ← Array.index_usize b e
+    let i3 ← lift (UScalar.cast .U64 i2)
+    let i4 ← i1 * i3
+    let a1 ← Array.update dst e i4
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vmull_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 409:4-412:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vmull_u32_loop
+  (a : aarch64.types.U32x2) (b : aarch64.types.U32x2)
+  (dst : Array Std.U64 2#usize) (e : Std.Usize) :
+  RustM (Array Std.U64 2#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vmull_u32_loop.body a1 b1 dst1 e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vmull_u32]:
+    Source: 'src/aarch64/neon.rs', lines 406:0-414:1
+    Visibility: public -/
+def aarch64.neon.vmull_u32
+  (a : aarch64.types.U32x2) (b : aarch64.types.U32x2) :
+  RustM aarch64.types.U64x2
+  := do
+  let dst ← core.array.repeat 2#usize core.U64.Insts.CoreCloneClone 0#u64
+  let dst1 ← aarch64.neon.vmull_u32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vmull_high_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 421:4-424:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vmull_high_u32_loop.body
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U64 2#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × aarch64.types.U32x4 × (Array
+    Std.U64 2#usize) × Std.Usize) (Array Std.U64 2#usize))
+  := do
+  if e < 2#usize
+  then
+    let i ← 2#usize + e
+    let i1 ← Array.index_usize a i
+    let i2 ← lift (UScalar.cast .U64 i1)
+    let i3 ← Array.index_usize b i
+    let i4 ← lift (UScalar.cast .U64 i3)
+    let i5 ← i2 * i4
+    let a1 ← Array.update dst e i5
+    let e1 ← e + 1#usize
+    ok (cont (a, b, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vmull_high_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 421:4-424:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vmull_high_u32_loop
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4)
+  (dst : Array Std.U64 2#usize) (e : Std.Usize) :
+  RustM (Array Std.U64 2#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, e1) => aarch64.neon.vmull_high_u32_loop.body a1 b1 dst1
+      e1)
+    (a, b, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vmull_high_u32]:
+    Source: 'src/aarch64/neon.rs', lines 418:0-426:1
+    Visibility: public -/
+def aarch64.neon.vmull_high_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) :
+  RustM aarch64.types.U64x2
+  := do
+  let dst ← core.array.repeat 2#usize core.U64.Insts.CoreCloneClone 0#u64
+  let dst1 ← aarch64.neon.vmull_high_u32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vmlal_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 438:4-441:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vmlal_u32_loop.body
+  (a : aarch64.types.U64x2) (b : aarch64.types.U32x2) (c : aarch64.types.U32x2)
+  (dst : Array Std.U64 2#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U64x2 × aarch64.types.U32x2 ×
+    aarch64.types.U32x2 × (Array Std.U64 2#usize) × Std.Usize) (Array Std.U64
+    2#usize))
+  := do
+  if e < 2#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← Array.index_usize b e
+    let i2 ← lift (UScalar.cast .U64 i1)
+    let i3 ← Array.index_usize c e
+    let i4 ← lift (UScalar.cast .U64 i3)
+    let i5 ← i2 * i4
+    let i6 ← core.num.U64.wrapping_add i i5
+    let a1 ← Array.update dst e i6
+    let e1 ← e + 1#usize
+    ok (cont (a, b, c, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vmlal_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 438:4-441:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vmlal_u32_loop
+  (a : aarch64.types.U64x2) (b : aarch64.types.U32x2) (c : aarch64.types.U32x2)
+  (dst : Array Std.U64 2#usize) (e : Std.Usize) :
+  RustM (Array Std.U64 2#usize)
+  := do
+  loop
+    (fun (a1, b1, c1, dst1, e1) => aarch64.neon.vmlal_u32_loop.body a1 b1 c1
+      dst1 e1)
+    (a, b, c, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vmlal_u32]:
+    Source: 'src/aarch64/neon.rs', lines 435:0-443:1
+    Visibility: public -/
+def aarch64.neon.vmlal_u32
+  (a : aarch64.types.U64x2) (b : aarch64.types.U32x2) (c : aarch64.types.U32x2)
+  :
+  RustM aarch64.types.U64x2
+  := do
+  let dst ← core.array.repeat 2#usize core.U64.Insts.CoreCloneClone 0#u64
+  let dst1 ← aarch64.neon.vmlal_u32_loop a b c dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vmlal_high_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 450:4-453:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vmlal_high_u32_loop.body
+  (a : aarch64.types.U64x2) (b : aarch64.types.U32x4) (c : aarch64.types.U32x4)
+  (dst : Array Std.U64 2#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U64x2 × aarch64.types.U32x4 ×
+    aarch64.types.U32x4 × (Array Std.U64 2#usize) × Std.Usize) (Array Std.U64
+    2#usize))
+  := do
+  if e < 2#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← 2#usize + e
+    let i2 ← Array.index_usize b i1
+    let i3 ← lift (UScalar.cast .U64 i2)
+    let i4 ← Array.index_usize c i1
+    let i5 ← lift (UScalar.cast .U64 i4)
+    let i6 ← i3 * i5
+    let i7 ← core.num.U64.wrapping_add i i6
+    let a1 ← Array.update dst e i7
+    let e1 ← e + 1#usize
+    ok (cont (a, b, c, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vmlal_high_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 450:4-453:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vmlal_high_u32_loop
+  (a : aarch64.types.U64x2) (b : aarch64.types.U32x4) (c : aarch64.types.U32x4)
+  (dst : Array Std.U64 2#usize) (e : Std.Usize) :
+  RustM (Array Std.U64 2#usize)
+  := do
+  loop
+    (fun (a1, b1, c1, dst1, e1) => aarch64.neon.vmlal_high_u32_loop.body a1 b1
+      c1 dst1 e1)
+    (a, b, c, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vmlal_high_u32]:
+    Source: 'src/aarch64/neon.rs', lines 447:0-455:1
+    Visibility: public -/
+def aarch64.neon.vmlal_high_u32
+  (a : aarch64.types.U64x2) (b : aarch64.types.U32x4) (c : aarch64.types.U32x4)
+  :
+  RustM aarch64.types.U64x2
+  := do
+  let dst ← core.array.repeat 2#usize core.U64.Insts.CoreCloneClone 0#u64
+  let dst1 ← aarch64.neon.vmlal_high_u32_loop a b c dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vmlsl_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 462:4-465:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vmlsl_u32_loop.body
+  (a : aarch64.types.U64x2) (b : aarch64.types.U32x2) (c : aarch64.types.U32x2)
+  (dst : Array Std.U64 2#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U64x2 × aarch64.types.U32x2 ×
+    aarch64.types.U32x2 × (Array Std.U64 2#usize) × Std.Usize) (Array Std.U64
+    2#usize))
+  := do
+  if e < 2#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← Array.index_usize b e
+    let i2 ← lift (UScalar.cast .U64 i1)
+    let i3 ← Array.index_usize c e
+    let i4 ← lift (UScalar.cast .U64 i3)
+    let i5 ← i2 * i4
+    let i6 ← core.num.U64.wrapping_sub i i5
+    let a1 ← Array.update dst e i6
+    let e1 ← e + 1#usize
+    ok (cont (a, b, c, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vmlsl_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 462:4-465:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vmlsl_u32_loop
+  (a : aarch64.types.U64x2) (b : aarch64.types.U32x2) (c : aarch64.types.U32x2)
+  (dst : Array Std.U64 2#usize) (e : Std.Usize) :
+  RustM (Array Std.U64 2#usize)
+  := do
+  loop
+    (fun (a1, b1, c1, dst1, e1) => aarch64.neon.vmlsl_u32_loop.body a1 b1 c1
+      dst1 e1)
+    (a, b, c, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vmlsl_u32]:
+    Source: 'src/aarch64/neon.rs', lines 459:0-467:1
+    Visibility: public -/
+def aarch64.neon.vmlsl_u32
+  (a : aarch64.types.U64x2) (b : aarch64.types.U32x2) (c : aarch64.types.U32x2)
+  :
+  RustM aarch64.types.U64x2
+  := do
+  let dst ← core.array.repeat 2#usize core.U64.Insts.CoreCloneClone 0#u64
+  let dst1 ← aarch64.neon.vmlsl_u32_loop a b c dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vmlsl_high_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 474:4-477:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vmlsl_high_u32_loop.body
+  (a : aarch64.types.U64x2) (b : aarch64.types.U32x4) (c : aarch64.types.U32x4)
+  (dst : Array Std.U64 2#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U64x2 × aarch64.types.U32x4 ×
+    aarch64.types.U32x4 × (Array Std.U64 2#usize) × Std.Usize) (Array Std.U64
+    2#usize))
+  := do
+  if e < 2#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← 2#usize + e
+    let i2 ← Array.index_usize b i1
+    let i3 ← lift (UScalar.cast .U64 i2)
+    let i4 ← Array.index_usize c i1
+    let i5 ← lift (UScalar.cast .U64 i4)
+    let i6 ← i3 * i5
+    let i7 ← core.num.U64.wrapping_sub i i6
+    let a1 ← Array.update dst e i7
+    let e1 ← e + 1#usize
+    ok (cont (a, b, c, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vmlsl_high_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 474:4-477:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vmlsl_high_u32_loop
+  (a : aarch64.types.U64x2) (b : aarch64.types.U32x4) (c : aarch64.types.U32x4)
+  (dst : Array Std.U64 2#usize) (e : Std.Usize) :
+  RustM (Array Std.U64 2#usize)
+  := do
+  loop
+    (fun (a1, b1, c1, dst1, e1) => aarch64.neon.vmlsl_high_u32_loop.body a1 b1
+      c1 dst1 e1)
+    (a, b, c, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vmlsl_high_u32]:
+    Source: 'src/aarch64/neon.rs', lines 471:0-479:1
+    Visibility: public -/
+def aarch64.neon.vmlsl_high_u32
+  (a : aarch64.types.U64x2) (b : aarch64.types.U32x4) (c : aarch64.types.U32x4)
+  :
+  RustM aarch64.types.U64x2
+  := do
+  let dst ← core.array.repeat 2#usize core.U64.Insts.CoreCloneClone 0#u64
+  let dst1 ← aarch64.neon.vmlsl_high_u32_loop a b c dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vuzp1q_u32]:
+    Source: 'src/aarch64/neon.rs', lines 486:0-488:1
+    Visibility: public -/
+def aarch64.neon.vuzp1q_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) :
+  RustM aarch64.types.U32x4
+  := do
+  let i ← Array.index_usize a 0#usize
+  let i1 ← Array.index_usize a 2#usize
+  let i2 ← Array.index_usize b 0#usize
+  let i3 ← Array.index_usize b 2#usize
+  ok (Array.make 4#usize [ i, i1, i2, i3 ])
+
+/-- [p3_arch_shims::aarch64::neon::vuzp2q_u32]:
+    Source: 'src/aarch64/neon.rs', lines 492:0-494:1
+    Visibility: public -/
+def aarch64.neon.vuzp2q_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) :
+  RustM aarch64.types.U32x4
+  := do
+  let i ← Array.index_usize a 1#usize
+  let i1 ← Array.index_usize a 3#usize
+  let i2 ← Array.index_usize b 1#usize
+  let i3 ← Array.index_usize b 3#usize
+  ok (Array.make 4#usize [ i, i1, i2, i3 ])
+
+/-- [p3_arch_shims::aarch64::neon::vtrn1q_u32]:
+    Source: 'src/aarch64/neon.rs', lines 501:0-503:1
+    Visibility: public -/
+def aarch64.neon.vtrn1q_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) :
+  RustM aarch64.types.U32x4
+  := do
+  let i ← Array.index_usize a 0#usize
+  let i1 ← Array.index_usize b 0#usize
+  let i2 ← Array.index_usize a 2#usize
+  let i3 ← Array.index_usize b 2#usize
+  ok (Array.make 4#usize [ i, i1, i2, i3 ])
+
+/-- [p3_arch_shims::aarch64::neon::vtrn2q_u32]:
+    Source: 'src/aarch64/neon.rs', lines 507:0-509:1
+    Visibility: public -/
+def aarch64.neon.vtrn2q_u32
+  (a : aarch64.types.U32x4) (b : aarch64.types.U32x4) :
+  RustM aarch64.types.U32x4
+  := do
+  let i ← Array.index_usize a 1#usize
+  let i1 ← Array.index_usize b 1#usize
+  let i2 ← Array.index_usize a 3#usize
+  let i3 ← Array.index_usize b 3#usize
+  ok (Array.make 4#usize [ i, i1, i2, i3 ])
+
+/-- [p3_arch_shims::aarch64::neon::vtrn1q_u64]:
+    Source: 'src/aarch64/neon.rs', lines 513:0-515:1
+    Visibility: public -/
+def aarch64.neon.vtrn1q_u64
+  (a : aarch64.types.U64x2) (b : aarch64.types.U64x2) :
+  RustM aarch64.types.U64x2
+  := do
+  let i ← Array.index_usize a 0#usize
+  let i1 ← Array.index_usize b 0#usize
+  ok (Array.make 2#usize [ i, i1 ])
+
+/-- [p3_arch_shims::aarch64::neon::vtrn2q_u64]:
+    Source: 'src/aarch64/neon.rs', lines 519:0-521:1
+    Visibility: public -/
+def aarch64.neon.vtrn2q_u64
+  (a : aarch64.types.U64x2) (b : aarch64.types.U64x2) :
+  RustM aarch64.types.U64x2
+  := do
+  let i ← Array.index_usize a 1#usize
+  let i1 ← Array.index_usize b 1#usize
+  ok (Array.make 2#usize [ i, i1 ])
+
+/-- [p3_arch_shims::aarch64::neon::vreinterpretq_s32_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 528:4-531:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vreinterpretq_s32_u32_loop.body
+  (a : aarch64.types.U32x4) (dst : Array Std.I32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × (Array Std.I32 4#usize) ×
+    Std.Usize) (Array Std.I32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← lift (UScalar.hcast .I32 i)
+    let a1 ← Array.update dst e i1
+    let e1 ← e + 1#usize
+    ok (cont (a, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vreinterpretq_s32_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 528:4-531:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vreinterpretq_s32_u32_loop
+  (a : aarch64.types.U32x4) (dst : Array Std.I32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.I32 4#usize)
+  := do
+  loop
+    (fun (a1, dst1, e1) => aarch64.neon.vreinterpretq_s32_u32_loop.body a1 dst1
+      e1)
+    (a, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vreinterpretq_s32_u32]:
+    Source: 'src/aarch64/neon.rs', lines 525:0-533:1
+    Visibility: public -/
+def aarch64.neon.vreinterpretq_s32_u32
+  (a : aarch64.types.U32x4) : RustM aarch64.types.I32x4 := do
+  let dst ← core.array.repeat 4#usize core.I32.Insts.CoreCloneClone 0#i32
+  let dst1 ← aarch64.neon.vreinterpretq_s32_u32_loop a dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vreinterpretq_u32_s32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 540:4-543:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vreinterpretq_u32_s32_loop.body
+  (a : aarch64.types.I32x4) (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.I32x4 × (Array Std.U32 4#usize) ×
+    Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← Array.index_usize a e
+    let i1 ← lift (IScalar.hcast .U32 i)
+    let a1 ← Array.update dst e i1
+    let e1 ← e + 1#usize
+    ok (cont (a, a1, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vreinterpretq_u32_s32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 540:4-543:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vreinterpretq_u32_s32_loop
+  (a : aarch64.types.I32x4) (dst : Array Std.U32 4#usize) (e : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, dst1, e1) => aarch64.neon.vreinterpretq_u32_s32_loop.body a1 dst1
+      e1)
+    (a, dst, e)
+
+/-- [p3_arch_shims::aarch64::neon::vreinterpretq_u32_s32]:
+    Source: 'src/aarch64/neon.rs', lines 537:0-545:1
+    Visibility: public -/
+def aarch64.neon.vreinterpretq_u32_s32
+  (a : aarch64.types.I32x4) : RustM aarch64.types.U32x4 := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vreinterpretq_u32_s32_loop a dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vreinterpretq_u64_u32]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 553:4-556:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vreinterpretq_u64_u32_loop.body
+  (a : aarch64.types.U32x4) (dst : Array Std.U64 2#usize) (k : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U32x4 × (Array Std.U64 2#usize) ×
+    Std.Usize) (Array Std.U64 2#usize))
+  := do
+  if k < 2#usize
+  then
+    let i ← 2#usize * k
+    let i1 ← Array.index_usize a i
+    let i2 ← lift (UScalar.cast .U64 i1)
+    let i3 ← i + 1#usize
+    let i4 ← Array.index_usize a i3
+    let i5 ← lift (UScalar.cast .U64 i4)
+    let i6 ← i5 <<< 32#i32
+    let i7 ← lift (i2 ||| i6)
+    let a1 ← Array.update dst k i7
+    let k1 ← k + 1#usize
+    ok (cont (a, a1, k1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vreinterpretq_u64_u32]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 553:4-556:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vreinterpretq_u64_u32_loop
+  (a : aarch64.types.U32x4) (dst : Array Std.U64 2#usize) (k : Std.Usize) :
+  RustM (Array Std.U64 2#usize)
+  := do
+  loop
+    (fun (a1, dst1, k1) => aarch64.neon.vreinterpretq_u64_u32_loop.body a1 dst1
+      k1)
+    (a, dst, k)
+
+/-- [p3_arch_shims::aarch64::neon::vreinterpretq_u64_u32]:
+    Source: 'src/aarch64/neon.rs', lines 550:0-558:1
+    Visibility: public -/
+def aarch64.neon.vreinterpretq_u64_u32
+  (a : aarch64.types.U32x4) : RustM aarch64.types.U64x2 := do
+  let dst ← core.array.repeat 2#usize core.U64.Insts.CoreCloneClone 0#u64
+  let dst1 ← aarch64.neon.vreinterpretq_u64_u32_loop a dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::neon::vreinterpretq_u32_u64]: loop body 0:
+    Source: 'src/aarch64/neon.rs', lines 565:4-569:5
+    Visibility: public -/
+@[rust_loop_body]
+def aarch64.neon.vreinterpretq_u32_u64_loop.body
+  (a : aarch64.types.U64x2) (dst : Array Std.U32 4#usize) (k : Std.Usize) :
+  RustM (ControlFlow (aarch64.types.U64x2 × (Array Std.U32 4#usize) ×
+    Std.Usize) (Array Std.U32 4#usize))
+  := do
+  if k < 2#usize
+  then
+    let i ← Array.index_usize a k
+    let i1 ← 2#usize * k
+    let i2 ← lift (UScalar.cast .U32 i)
+    let dst1 ← Array.update dst i1 i2
+    let i3 ← i >>> 32#i32
+    let i4 ← i1 + 1#usize
+    let i5 ← lift (UScalar.cast .U32 i3)
+    let a1 ← Array.update dst1 i4 i5
+    let k1 ← k + 1#usize
+    ok (cont (a, a1, k1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::aarch64::neon::vreinterpretq_u32_u64]: loop 0:
+    Source: 'src/aarch64/neon.rs', lines 565:4-569:5
+    Visibility: public -/
+@[rust_loop]
+def aarch64.neon.vreinterpretq_u32_u64_loop
+  (a : aarch64.types.U64x2) (dst : Array Std.U32 4#usize) (k : Std.Usize) :
+  RustM (Array Std.U32 4#usize)
+  := do
+  loop
+    (fun (a1, dst1, k1) => aarch64.neon.vreinterpretq_u32_u64_loop.body a1 dst1
+      k1)
+    (a, dst, k)
+
+/-- [p3_arch_shims::aarch64::neon::vreinterpretq_u32_u64]:
+    Source: 'src/aarch64/neon.rs', lines 562:0-571:1
+    Visibility: public -/
+def aarch64.neon.vreinterpretq_u32_u64
+  (a : aarch64.types.U64x2) : RustM aarch64.types.U32x4 := do
+  let dst ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← aarch64.neon.vreinterpretq_u32_u64_loop a dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::aarch64::types::{impl core::clone::Clone for p3_arch_shims::aarch64::types::U32x4}::clone]:
+    Source: 'src/aarch64/types.rs', lines 14:9-14:14
+    Visibility: public -/
+def aarch64.types.U32x4.Insts.CoreCloneClone.clone
+  (self : aarch64.types.U32x4) : RustM aarch64.types.U32x4 := do
+  ok self
+
+/-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::clone::Clone for p3_arch_shims::aarch64::types::U32x4}]
+    Source: 'src/aarch64/types.rs', lines 14:9-14:14 -/
+@[reducible]
+def aarch64.types.U32x4.Insts.CoreCloneClone : core.clone.Clone
+  aarch64.types.U32x4 := {
+  clone := aarch64.types.U32x4.Insts.CoreCloneClone.clone
+  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
+  clone_from := fun _ source => aarch64.types.U32x4.Insts.CoreCloneClone.clone source
+}
+
+/-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::marker::Copy for p3_arch_shims::aarch64::types::U32x4}]
+    Source: 'src/aarch64/types.rs', lines 14:16-14:20 -/
+@[reducible]
+def aarch64.types.U32x4.Insts.CoreMarkerCopy : core.marker.Copy
+  aarch64.types.U32x4 := {
+  cloneCloneInst := aarch64.types.U32x4.Insts.CoreCloneClone
+}
+
+/-- [p3_arch_shims::aarch64::types::{impl core::clone::Clone for p3_arch_shims::aarch64::types::I32x4}::clone]:
+    Source: 'src/aarch64/types.rs', lines 19:9-19:14
+    Visibility: public -/
+def aarch64.types.I32x4.Insts.CoreCloneClone.clone
+  (self : aarch64.types.I32x4) : RustM aarch64.types.I32x4 := do
+  ok self
+
+/-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::clone::Clone for p3_arch_shims::aarch64::types::I32x4}]
+    Source: 'src/aarch64/types.rs', lines 19:9-19:14 -/
+@[reducible]
+def aarch64.types.I32x4.Insts.CoreCloneClone : core.clone.Clone
+  aarch64.types.I32x4 := {
+  clone := aarch64.types.I32x4.Insts.CoreCloneClone.clone
+  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
+  clone_from := fun _ source => aarch64.types.I32x4.Insts.CoreCloneClone.clone source
+}
+
+/-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::marker::Copy for p3_arch_shims::aarch64::types::I32x4}]
+    Source: 'src/aarch64/types.rs', lines 19:16-19:20 -/
+@[reducible]
+def aarch64.types.I32x4.Insts.CoreMarkerCopy : core.marker.Copy
+  aarch64.types.I32x4 := {
+  cloneCloneInst := aarch64.types.I32x4.Insts.CoreCloneClone
+}
+
+/-- [p3_arch_shims::aarch64::types::{impl core::clone::Clone for p3_arch_shims::aarch64::types::U64x2}::clone]:
+    Source: 'src/aarch64/types.rs', lines 24:9-24:14
+    Visibility: public -/
+def aarch64.types.U64x2.Insts.CoreCloneClone.clone
+  (self : aarch64.types.U64x2) : RustM aarch64.types.U64x2 := do
+  ok self
+
+/-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::clone::Clone for p3_arch_shims::aarch64::types::U64x2}]
+    Source: 'src/aarch64/types.rs', lines 24:9-24:14 -/
+@[reducible]
+def aarch64.types.U64x2.Insts.CoreCloneClone : core.clone.Clone
+  aarch64.types.U64x2 := {
+  clone := aarch64.types.U64x2.Insts.CoreCloneClone.clone
+  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
+  clone_from := fun _ source => aarch64.types.U64x2.Insts.CoreCloneClone.clone source
+}
+
+/-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::marker::Copy for p3_arch_shims::aarch64::types::U64x2}]
+    Source: 'src/aarch64/types.rs', lines 24:16-24:20 -/
+@[reducible]
+def aarch64.types.U64x2.Insts.CoreMarkerCopy : core.marker.Copy
+  aarch64.types.U64x2 := {
+  cloneCloneInst := aarch64.types.U64x2.Insts.CoreCloneClone
+}
+
+/-- [p3_arch_shims::aarch64::types::{impl core::clone::Clone for p3_arch_shims::aarch64::types::U32x2}::clone]:
+    Source: 'src/aarch64/types.rs', lines 29:9-29:14
+    Visibility: public -/
+def aarch64.types.U32x2.Insts.CoreCloneClone.clone
+  (self : aarch64.types.U32x2) : RustM aarch64.types.U32x2 := do
+  ok self
+
+/-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::clone::Clone for p3_arch_shims::aarch64::types::U32x2}]
+    Source: 'src/aarch64/types.rs', lines 29:9-29:14 -/
+@[reducible]
+def aarch64.types.U32x2.Insts.CoreCloneClone : core.clone.Clone
+  aarch64.types.U32x2 := {
+  clone := aarch64.types.U32x2.Insts.CoreCloneClone.clone
+  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
+  clone_from := fun _ source => aarch64.types.U32x2.Insts.CoreCloneClone.clone source
+}
+
+/-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::marker::Copy for p3_arch_shims::aarch64::types::U32x2}]
+    Source: 'src/aarch64/types.rs', lines 29:16-29:20 -/
+@[reducible]
+def aarch64.types.U32x2.Insts.CoreMarkerCopy : core.marker.Copy
+  aarch64.types.U32x2 := {
+  cloneCloneInst := aarch64.types.U32x2.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::fmt::Debug for p3_arch_shims::aarch64::types::U32x4}]
+    Source: 'src/aarch64/types.rs', lines 36:8-40:9; this code is generated from a macro invocation at: 'src/aarch64/types.rs', lines 44:0-44:33 -/
+@[reducible]
+def aarch64.types.U32x4.Insts.CoreFmtDebug : core.fmt.Debug aarch64.types.U32x4
+  := {
+  fmt := aarch64.types.U32x4.Insts.CoreFmtDebug.fmt
+}
+
+/-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::fmt::Debug for p3_arch_shims::aarch64::types::I32x4}]
+    Source: 'src/aarch64/types.rs', lines 36:8-40:9; this code is generated from a macro invocation at: 'src/aarch64/types.rs', lines 45:0-45:32 -/
+@[reducible]
+def aarch64.types.I32x4.Insts.CoreFmtDebug : core.fmt.Debug aarch64.types.I32x4
+  := {
+  fmt := aarch64.types.I32x4.Insts.CoreFmtDebug.fmt
+}
+
+/-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::fmt::Debug for p3_arch_shims::aarch64::types::U64x2}]
+    Source: 'src/aarch64/types.rs', lines 36:8-40:9; this code is generated from a macro invocation at: 'src/aarch64/types.rs', lines 46:0-46:33 -/
+@[reducible]
+def aarch64.types.U64x2.Insts.CoreFmtDebug : core.fmt.Debug aarch64.types.U64x2
+  := {
+  fmt := aarch64.types.U64x2.Insts.CoreFmtDebug.fmt
+}
+
+/-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::fmt::Debug for p3_arch_shims::aarch64::types::U32x2}]
+    Source: 'src/aarch64/types.rs', lines 36:8-40:9; this code is generated from a macro invocation at: 'src/aarch64/types.rs', lines 47:0-47:33 -/
+@[reducible]
+def aarch64.types.U32x2.Insts.CoreFmtDebug : core.fmt.Debug aarch64.types.U32x2
+  := {
+  fmt := aarch64.types.U32x2.Insts.CoreFmtDebug.fmt
+}
+
 /-- [p3_arch_shims::x86_64::avx2::lane64]:
     Source: 'src/x86_64/avx2.rs', lines 14:0-16:1 -/
 def x86_64.avx2.lane64
