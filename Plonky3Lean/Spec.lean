@@ -3,6 +3,7 @@ module
 public import Plonky3Lean.Spec.Air
 public import Plonky3Lean.Spec.BabyBear
 public import Plonky3Lean.Spec.BinaryField
+public import Plonky3Lean.Spec.Blake2s
 public import Plonky3Lean.Spec.BinaryDft
 public import Plonky3Lean.Spec.Bus
 public import Plonky3Lean.Spec.Blake3
