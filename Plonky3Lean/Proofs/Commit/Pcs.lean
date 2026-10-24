@@ -72,6 +72,43 @@ theorem open_with_preprocessing_eq {R C α : Type _} (zk : Bool) (open_ : R → 
     (p : Option ℕ) : open_with_preprocessing zk open_ r c p = if zk then none else some (open_ r c) :=
   rfl
 
+/-! ## The quotient commit passes as many chunks as it counts -/
+
+theorem split_domains_length (c : Coset G) {nc : ℕ} {l : List (Coset G)} (h : Coset.split_domains G c nc = some l) :
+    l.length = nc := by
+  unfold Coset.split_domains at h
+  rcases hl : log2Strict nc with _ | lc
+  · simp [hl] at h
+  · simp only [hl, Option.bind_eq_bind, Option.bind_some] at h
+    split_ifs at h
+    simpa using ((mapM_eq_some_iff _ _ _).1 h).length_eq.symm
+
+theorem split_evals_length {V : Type _} [Zero V] (c : Coset G) {nc height : ℕ} {rows : ℕ → V}
+    {l : List (ℕ → V)} (h : Coset.split_evals G c nc height rows = some l) : l.length = nc := by
+  unfold Coset.split_evals at h
+  split_ifs at h
+  split at h
+  · cases h
+  · split_ifs at h
+    cases h
+    simp
+
+/-- The quotient commit hands the masking step exactly as many evaluations as its chunk count.
+
+So guarding that step with a count check changes nothing. -/
+theorem commit_quotient_counts {α : Type _} (get_quotient_ldes : List (Coset G × Mat K) → ℕ → Option (List (Mat K)))
+    (commit_ldes : List (Mat K) → Option α) (quotient_domain : Coset G) (evals : Mat K) (num_chunks : ℕ) :
+    commit_quotient G (fun l n => if l.length = n then get_quotient_ldes l n else none) commit_ldes quotient_domain
+      evals num_chunks = commit_quotient G get_quotient_ldes commit_ldes quotient_domain evals num_chunks := by
+  unfold commit_quotient
+  rcases he : Coset.split_evals G quotient_domain num_chunks evals.height evals.entry with _ | le
+  · rfl
+  rcases hd : Coset.split_domains G quotient_domain num_chunks with _ | ld
+  · simp
+  have h2 : min ld.length le.length = num_chunks := by
+    rw [split_domains_length G _ hd, split_evals_length G _ he, min_self]
+  simp [h2]
+
 end defaults
 
 end Plonky3Lean.Proofs.Commit
