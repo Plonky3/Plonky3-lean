@@ -5937,11 +5937,39 @@ name   = "Plonky3Lean.Claims.BatchStark.bus_ids"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.BatchStark.bus_width_check"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BatchStark.bus_width_check_before_layout"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BatchStark.bus_width_check_layout"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.BatchStark.challenge_layout"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.BatchStark.check_at_zeta"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BatchStark.check_at_zeta_complete"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BatchStark.check_at_zeta_in_domain"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.BatchStark.checker_accepts"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BatchStark.checks_at_zeta"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -5950,6 +5978,10 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.BatchStark.cross_table_soundness"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BatchStark.empty_group_panics"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -5965,7 +5997,31 @@ name   = "Plonky3Lean.Claims.BatchStark.layout_panics"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.BatchStark.logup_charge_bounds_batch"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BatchStark.logup_exact_count"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BatchStark.lookup_pair_layout"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BatchStark.one_row_trace"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BatchStark.one_sender_unbalanced"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.BatchStark.opening_count_sum"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BatchStark.p_sends_balance"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]

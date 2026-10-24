@@ -4,6 +4,9 @@ public import Plonky3Lean.Proofs.BatchStark.Accept
 public import Plonky3Lean.Proofs.BatchStark.Soundness
 public import Plonky3Lean.Proofs.BatchStark.Check
 public import Plonky3Lean.Proofs.BatchStark.Extracted
+public import Plonky3Lean.Proofs.BatchStark.Zeta
+public import Plonky3Lean.Proofs.BatchStark.BusWidths
+public import Plonky3Lean.Proofs.BatchStark.LogUpCount
 public import CompPoly.Fields.BabyBear.Ext4
 
 @[expose] public section
@@ -27,13 +30,18 @@ One batch proves several tables at once:
 
 The challenger is a random oracle of the messages absorbed so far.
 
-The opening argument and each table's check at zeta enter as predicates.
+The opening argument enters as a predicate.
+
+Each table's check at zeta is transcribed, and compared with its constraint polynomial.
 -/
 
 open p3_batch_stark.transcript.mirror p3_batch_stark.verifier.mirror p3_batch_stark.checker.mirror
   p3_lookup.mirror p3_air.air.mirror p3_air.builder.mirror Plonky3Lean.Spec.Lookup
   Plonky3Lean.Spec.UniStark Plonky3Lean.Spec.Air Plonky3Lean.Proofs.BatchStark
   Plonky3Lean.Proofs.BatchStark.Extracted Plonky3Lean.Proofs.Lookup Finset
+  p3_batch_stark.constraints.mirror p3_uni_stark.verifier.mirror p3_commit.domain.mirror
+  p3_field.coset.mirror p3_dft.mirror Plonky3Lean.Spec.Commit Plonky3Lean.Proofs.UniStark
+  Plonky3Lean.Proofs.Dft Polynomial
 
 set_option linter.unusedSectionVars false
 
@@ -346,5 +354,211 @@ theorem selector_count_balance (k : ℕ × List K) :
   · have := hb k
     simp [netMult] at this
     linear_combination -this
+
+/-! ## The check at zeta -/
+
+section zeta
+
+variable (G : Gen K)
+
+/-- **The check at zeta, against the constraint polynomial.**
+
+Take one table with its trace coset s H of size n, its trace polynomials and its permutation columns.
+
+Open them honestly at zeta, off s H.
+
+The verifier folds the AIR's constraints, then the lookup constraints, with the Lagrange selectors at zeta.
+
+That fold is C(zeta), with C the table's combined constraint polynomial:
+
+- the AIR's constraint polynomials
+- the pin D_c P_(c+1) - N_c of each lookup column c
+- L_first P_0, for the accumulator P_0
+- L_trans (P_0(omega X) - P_0 - sum_c P_(c+1))
+- L_last (T - P_0 - sum_c P_(c+1)), for the terminal T.
+
+So the check accepts exactly when C(zeta) s^n / Z(zeta) is the quotient value. -/
+theorem check_at_zeta (hV : GenValid G) (h2 : (2 : K) ≠ 0) {air : Air F}
+    (hb : air.public_boundary_io = []) (c : Coset G) (main prep periodic : ℕ → K[X]) {pv : List F}
+    (hpv : pv.length = air.num_public_values) (P : ℕ → K[X]) {ch : List K}
+    {lookups : List (Lookup F)} (hL : LaidOut air ch lookups) (T α q : K) {ζ : K}
+    (hζ : ¬ InCoset c.shift c.subgroup_generator c.log_size ζ) :
+    let σ := instAssign G c main prep periodic pv
+    let perm := permOpening c.subgroup_generator ζ P lookups
+    verify_constraints_with_lookups G air (openRow σ (.main 0) air.width ζ)
+      (openRow σ (.main 1) air.width ζ) (openRow σ (.prep 0) air.preprocessed_width ζ)
+      (openRow σ (.prep 1) air.preprocessed_width ζ) perm.current perm.next ch
+      (if lookups = [] then [] else [T]) (openRow σ .periodic air.num_periodic_columns ζ) lookups pv c
+      ζ α q =
+      some (if (instancePoly G air c main prep periodic pv P ch T α lookups).eval ζ *
+          (c.shift ^ 2 ^ c.log_size / (vanishing c.shift c.subgroup_generator c.log_size).eval ζ) = q
+        then .ok () else .error .OodEvaluationMismatch) :=
+  verify_constraints_with_lookups_eq G hV h2 hb c main prep periodic hpv P hL T α q hζ
+
+/-- A zeta on the trace coset is rejected with the domain error, whatever the openings. -/
+theorem check_at_zeta_in_domain (hV : GenValid G) {air : Air F} (hb : air.public_boundary_io = [])
+    (tl tn pl pn ml mn ch vals per : List K) (lookups : List (Lookup F)) (pv : List F) (c : Coset G)
+    {ζ : K} (hζ : InCoset c.shift c.subgroup_generator c.log_size ζ) (α q : K) :
+    verify_constraints_with_lookups G air tl tn pl pn ml mn ch vals per lookups pv c ζ α q =
+      some (.error .OodPointInDomain) :=
+  verify_constraints_with_lookups_in_domain G hV hb tl tn pl pn ml mn ch vals per lookups pv c hζ α q
+
+/-- **Completeness at zeta.**
+
+Assume Z divides the table's constraint polynomial C.
+
+Then the honest quotient s^n C / Z passes the check at zeta. -/
+theorem check_at_zeta_complete (hV : GenValid G) (h2 : (2 : K) ≠ 0) {air : Air F}
+    (hb : air.public_boundary_io = []) (c : Coset G) (main prep periodic : ℕ → K[X]) {pv : List F}
+    (hpv : pv.length = air.num_public_values) (P : ℕ → K[X]) {ch : List K}
+    {lookups : List (Lookup F)} (hL : LaidOut air ch lookups) (T α : K) {ζ : K}
+    (hζ : ¬ InCoset c.shift c.subgroup_generator c.log_size ζ)
+    (hdvd : vanishing c.shift c.subgroup_generator c.log_size ∣
+      instancePoly G air c main prep periodic pv P ch T α lookups) :
+    let σ := instAssign G c main prep periodic pv
+    let perm := permOpening c.subgroup_generator ζ P lookups
+    verify_constraints_with_lookups G air (openRow σ (.main 0) air.width ζ)
+      (openRow σ (.main 1) air.width ζ) (openRow σ (.prep 0) air.preprocessed_width ζ)
+      (openRow σ (.prep 1) air.preprocessed_width ζ) perm.current perm.next ch
+      (if lookups = [] then [] else [T]) (openRow σ .periodic air.num_periodic_columns ζ) lookups pv c
+      ζ α ((quotientPoly c.shift c.subgroup_generator c.log_size
+        (instancePoly G air c main prep periodic pv P ch T α lookups)).eval ζ) = some (.ok ()) :=
+  verify_constraints_with_lookups_complete G hV h2 hb c main prep periodic hpv P hL T α hζ hdvd
+
+/-- **Several tables at one zeta.**
+
+Each table has its own trace coset, of its own size.
+
+All share zeta and alpha.
+
+Every check passes exactly when each table's constraint polynomial meets its quotient at zeta. -/
+theorem checks_at_zeta (hV : GenValid G) (h2 : (2 : K) ≠ 0) (n : ℕ) (airs : ℕ → Air F)
+    (hb : ∀ i < n, (airs i).public_boundary_io = []) (cs : ℕ → Coset G) (mains preps pers : ℕ → ℕ → K[X])
+    (pvs : ℕ → List F) (hpv : ∀ i < n, (pvs i).length = (airs i).num_public_values)
+    (Ps : ℕ → ℕ → K[X]) (ch : List (List K)) (all : List (List (Lookup F)))
+    (hL : ∀ i < n, LaidOut (airs i) (ch.getD i []) (all.getD i [])) (Ts : ℕ → K) (α ζ : K) (qs : ℕ → K)
+    (hζ : ∀ i < n, ¬ InCoset (cs i).shift (cs i).subgroup_generator (cs i).log_size ζ) :
+    (∀ i < n,
+      let σ := instAssign G (cs i) (mains i) (preps i) (pers i) (pvs i)
+      let perm := permOpening (cs i).subgroup_generator ζ (Ps i) (all.getD i [])
+      verify_constraints_with_lookups G (airs i) (openRow σ (.main 0) (airs i).width ζ)
+        (openRow σ (.main 1) (airs i).width ζ) (openRow σ (.prep 0) (airs i).preprocessed_width ζ)
+        (openRow σ (.prep 1) (airs i).preprocessed_width ζ) perm.current perm.next (ch.getD i [])
+        (if all.getD i [] = [] then [] else [Ts i]) (openRow σ .periodic (airs i).num_periodic_columns ζ)
+        (all.getD i []) (pvs i) (cs i) ζ α (qs i) = some (.ok ())) ↔
+      ∀ i < n,
+        (instancePoly G (airs i) (cs i) (mains i) (preps i) (pers i) (pvs i) (Ps i) (ch.getD i []) (Ts i)
+          α (all.getD i [])).eval ζ *
+          ((cs i).shift ^ 2 ^ (cs i).log_size /
+            (vanishing (cs i).shift (cs i).subgroup_generator (cs i).log_size).eval ζ) = qs i :=
+  batch_checks_at_zeta G hV h2 n airs hb cs mains preps pers pvs hpv Ps ch all hL Ts α ζ qs hζ
+
+end zeta
+
+/-- **A lookup column's pair under the batch layout.**
+
+Lookup j of table i, in slot j, reads alpha + (id + 1) beta^W and beta, with id its bus id.
+
+So each tuple's denominator is the domain-separated denominator of its bus. -/
+theorem lookup_pair_layout {all : List (List (Lookup F))} {ids : List (List ℕ)} {st : LayoutState}
+    (h : busIds all = some (ids, st)) (αL βL : K) (env : Var → K) {i j : ℕ} (hi : i < ids.length)
+    (hj : j < ids[i].length) (l : Lookup F) (hl : l.column = j) :
+    ∃ ch, lay_out_lookup_challenges 2 all αL βL = some ch ∧
+      ∀ e, (columnAt env (ch.getD i []) l).alpha - fingerprint (columnAt env (ch.getD i []) l).beta e =
+        busDenom αL βL st.max_message_width ids[i][j] e := by
+  obtain ⟨ch, h1, -, -, h4⟩ := columnAt_layout h αL βL env hi hj l hl
+  exact ⟨ch, h1, h4⟩
+
+/-- **A one-row trace.**
+
+On a coset of one point s, the boundary selectors are the constant 1.
+
+The transition selector is (X - s) / s, a multiple of the vanishing polynomial. -/
+theorem one_row_trace (s : K) (main prep : ℕ → K[X]) (pub : ℕ → K) (periodic : ℕ → K[X]) :
+    starkAssign s 1 0 main prep pub periodic .isFirstRow = 1 ∧
+      starkAssign s 1 0 main prep pub periodic .isLastRow = 1 ∧
+      starkAssign s 1 0 main prep pub periodic .isTransition = Polynomial.C s⁻¹ * vanishing s 1 0 :=
+  one_row_selectors s main prep pub periodic
+
+/-! ## One width per bus -/
+
+/-- **p3-lookup's width check** passes exactly when every tuple on one bus has one width. -/
+theorem bus_width_check (all : List (List (Lookup F))) :
+    (∃ w, check_bus_widths all = .ok w) ↔
+      ∀ c ∈ all.flatten, ∀ d ∈ all.flatten, ∀ n, c.kind = .Global n → d.kind = .Global n →
+        ∀ e ∈ c.elements, ∀ e' ∈ d.elements, e.length = e'.length :=
+  check_bus_widths_ok_iff all
+
+/-- **The width check rejects nothing the layout accepts.**
+
+Run before the transcript, it turns the layout's width panic into an error.
+
+An honest batch never meets it. -/
+theorem bus_width_check_before_layout (all : List (List (Lookup F))) (α β : K)
+    (h : lay_out_lookup_challenges 2 all α β ≠ none) : ∃ w, check_bus_widths all = .ok w :=
+  (check_bus_widths_ok_iff all).2 (busWidthsOk_of_widthsOk (not_not.1 fun hn =>
+    h ((lay_out_none_iff all α β).2 hn)))
+
+/-- **What the width check leaves to the layout.**
+
+The layout accepts a batch the width check accepts, given two more conditions:
+
+- every lookup's own tuples have one width
+- every global lookup has a tuple. -/
+theorem bus_width_check_layout (all : List (List (Lookup F))) (α β : K)
+    (hc : ∃ w, check_bus_widths all = .ok w) (hu : ∀ c ∈ all.flatten, (width c).isSome)
+    (hne : ∀ c ∈ all.flatten, ∀ n, c.kind = .Global n → c.elements ≠ []) :
+    lay_out_lookup_challenges 2 all α β ≠ none := fun h =>
+  (lay_out_none_iff all α β).1 h (widthsOk_of_busWidthsOk ((check_bus_widths_ok_iff all).1 hc) hu hne)
+
+/-- **A bus the width check passes and the layout panics on.**
+
+An exclusive group with no branch shares a bus with a send of width 2.
+
+The width check sees only the send.
+
+The layout gives the group width 0, and panics. -/
+theorem empty_group_panics (x : F) (α β : K) :
+    check_bus_widths [[emptyGroup], [widthTwoSend x]] = .ok 2 ∧
+      lay_out_lookup_challenges 2 [[(emptyGroup : Lookup F)], [widthTwoSend x]] α β = none :=
+  empty_group_gap x α β
+
+/-! ## The LogUp count -/
+
+open Classical in
+/-- **p3-security's LogUp charge bounds a batch of several heights.**
+
+Table i emits at most n_i messages per row, over at most 2^L rows.
+
+An unbalanced bus then passes on at most (sum_i n_i) 2^L (W + 2) |K| of the |K|^2 pairs.
+
+That is the rate p3-security charges with the summed per-row count and the largest height. -/
+theorem logup_charge_bounds_batch {all : List (List (Lookup F))} {ids : List (List ℕ)}
+    {st : LayoutState} (h : busIds all = some (ids, st)) (hp : all.flatten.length ≤ p)
+    (airs : List (AirMessages K)) (hkey : KeyedBy all.flatten ids.flatten (allMessages airs))
+    (hunbal : ¬ Balanced (allMessages airs)) (n : ℕ → ℕ) (L : ℕ)
+    (hrow : ∀ i (h : i < airs.length), ∀ r < airs[i].height, (rowMessages airs[i] r).length ≤ n i)
+    (hh : ∀ a ∈ airs, a.height ≤ 2 ^ L) :
+    #{x : K × K | ∃ cols, Accepts x.1 x.2 st.max_message_width airs cols}
+      ≤ (∑ i ∈ range airs.length, n i) * 2 ^ L * (st.max_message_width + 2) * Fintype.card K :=
+  batch_soundness_max_height h hp airs hkey hunbal n L hrow hh
+
+/-- **The exact count** of a batch is at most sum_i n_i h_i. -/
+theorem logup_exact_count (airs : List (AirMessages K)) (n : ℕ → ℕ)
+    (hrow : ∀ i (h : i < airs.length), ∀ r < airs[i].height, (rowMessages airs[i] r).length ≤ n i) :
+    (allMessages airs).length ≤
+      ∑ i ∈ range airs.length, n i * (airs.getD i ⟨0, 0, fun _ _ => []⟩).height :=
+  length_allMessages_le airs n hrow
+
+/-- **p sends with no receiver balance.**
+
+This is why the height bound keeps every multiplicity below p. -/
+theorem p_sends_balance (k : Key K) : Balanced (List.replicate p (k, (1 : K))) :=
+  balanced_replicate_char k
+
+/-- **A bus with one sender** is unbalanced once it sends anything, with fewer than p unit sends. -/
+theorem one_sender_unbalanced (msgs : List (Key K × K)) (hne : msgs ≠ []) (hone : ∀ q ∈ msgs, q.2 = 1)
+    (hlen : msgs.length < p) : ¬ Balanced msgs :=
+  one_sided_unbalanced msgs hne hone hlen
 
 end Plonky3Lean.Claims.BatchStark
