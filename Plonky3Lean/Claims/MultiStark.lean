@@ -734,7 +734,9 @@ open CoreModels Aeneas Aeneas.Std Plonky3Lean.Proofs.MultiStark.Extracted
 
 variable {L : Type} [Field L] {inst : p3_field.field.Field L}
 
-/-- The shipped selectors at a point are the multilinear extensions of the first-row, last-row and transition indicators.
+/-- The shipped selectors at a point are multilinear extensions.
+
+They extend the first-row, last-row and transition indicators.
 
 They never panic. -/
 theorem selectors.BoundaryEvals.at.eq_spec (h : FieldComputes inst) (rs : Slice L) :
@@ -743,7 +745,9 @@ theorem selectors.BoundaryEvals.at.eq_spec (h : FieldComputes inst) (rs : Slice 
         rowExt (transitionRow rs.val.length) rs.val⟩ := by
   rw [at_eq h, at_eq_rowExt]; rfl
 
-/-- The shipped fold of one more coordinate r multiplies the first-row selector by 1 - r and the last-row selector by r.
+/-- The shipped fold of one more coordinate r multiplies the first-row selector by 1 - r.
+
+It multiplies the last-row selector by r.
 
 The transition is one minus the new last-row selector.
 

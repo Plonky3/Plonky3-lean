@@ -136,7 +136,9 @@ structure field.Field (Self : Type) where
 
 instance {Self : Type} : Inhabited (field.Field Self) := ⟨{}⟩
 
-/-- The field's algebra over itself, under the name aeneas gives it in code that also names the extension field trait. -/
+/-- The field's algebra over itself.
+
+This is the name aeneas gives it in code that also names the extension field trait. -/
 abbrev field.Field.AlgebraSelfSelfSelf_Clause0_Clause0_PrimeSubfieldInst {Self : Type}
     (inst : field.Field Self) : field.Algebra Self Self :=
   inst.AlgebraInst

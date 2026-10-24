@@ -13,7 +13,9 @@ hax extracts the equality polynomial of two points, generic over the field trait
 
 Its theorems assume one thing of the two instances: each member it calls computes the operation it names.
 
-Under that assumption it returns what its transcription computes, and panics exactly when the transcription does.
+Under that assumption it returns what its transcription computes.
+
+It panics exactly when the transcription does.
 
 So every theorem about the transcription holds for the shipped code.
 -/
