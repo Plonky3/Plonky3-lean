@@ -221,20 +221,6 @@ theorem masks_cancel {d : ℕ} (c v : Fin (d + 1) → K) (R : Fin d → K) (hc :
           fun i => by field_simp
         rw [mul_neg, Finset.mul_sum, Finset.sum_congr rfl fun i _ => e i, add_neg_cancel, mul_zero]
 
-omit [Field K] in
-/-- The verifier's merge undoes the prover's split.
-
-Hidden values of the configured count rejoin the public ones. -/
-theorem merge_split {k : ℕ} (z : K) (vals : List K) (hk : k ≤ vals.length) :
-    mergePoint k ⟨z, (splitPoint k vals).1⟩ (splitPoint k vals).2 = some ⟨z, vals⟩ := by
-  simp [mergePoint, splitPoint, show vals.length - (vals.length - k) = k by omega]
-
-omit [Field K] in
-/-- The verifier's merge rejects exactly a hidden part of the wrong count. -/
-theorem mergePoint_eq_none (k : ℕ) (pt : p3_commit.pcs.univariate.mirror.PointOpening K) (rand : List K) :
-    mergePoint k pt rand = none ↔ rand.length ≠ k := by
-  unfold mergePoint; split_ifs with h <;> simp [h]
-
 /-- The three hiding budgets read the same mask height:
 
 - the trace height N at commit

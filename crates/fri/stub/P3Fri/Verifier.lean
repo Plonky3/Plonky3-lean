@@ -64,6 +64,13 @@ inductive FriError (ME IE : Type) where
   | NonCanonicalPowWitness
   | OpeningPointMatchesQueryPoint
   | ClaimedEvaluationCountMismatch
+  | HidingRandomOpeningRoundCountMismatch
+  | HidingRandomOpeningMatrixCountMismatch
+  | HidingRandomOpeningPointCountMismatch
+  | HidingRandomOpeningValueCountMismatch
+  | HidingPreprocessedCommitmentOutOfBounds
+  | InsufficientHidingRandomCodewords
+  | HidingBudgetExceeded
 
 /-- The transcript's rejections, as the verifier reports them. -/
 def FriError.ofTranscript {ME IE : Type} : TranscriptFailure → FriError ME IE

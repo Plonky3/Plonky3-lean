@@ -545,16 +545,6 @@ theorem hiding_pcs.masks_cancel {d : ℕ} (c v : Fin (d + 1) → K) (R : Fin d �
       (v i * Fin.lastCases (-∑ i : Fin d, c i.castSucc / c (Fin.last d) * R i) R i) = 0 :=
   Plonky3Lean.Proofs.Fri.masks_cancel c v R hc
 
-/-- The verifier's merge undoes the prover's split. -/
-theorem hiding_pcs.merge_split {k : ℕ} (z : K) (vals : List K) (hk : k ≤ vals.length) :
-    mergePoint k ⟨z, (splitPoint k vals).1⟩ (splitPoint k vals).2 = some ⟨z, vals⟩ :=
-  Plonky3Lean.Proofs.Fri.merge_split z vals hk
-
-/-- The merge rejects exactly a hidden part of the wrong count. -/
-theorem hiding_pcs.merge_rejects (k : ℕ) (pt : PointOpening K) (rand : List K) :
-    mergePoint k pt rand = none ↔ rand.length ≠ k :=
-  mergePoint_eq_none k pt rand
-
 /-- The commit, open and verify budgets read the same mask height N. -/
 theorem hiding_pcs.mask_heights (N b : ℕ) (hb : b < 64) :
     lde_mask_height b (2 * N * 2 ^ b) = N ∧ (2 * N) / 2 = N :=

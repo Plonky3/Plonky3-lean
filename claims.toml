@@ -5497,14 +5497,6 @@ name   = "Plonky3Lean.Claims.Fri.hiding_pcs.masks_cancel"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
-name   = "Plonky3Lean.Claims.Fri.hiding_pcs.merge_rejects"
-axioms = ["Quot.sound", "propext"]
-
-[[claim]]
-name   = "Plonky3Lean.Claims.Fri.hiding_pcs.merge_split"
-axioms = ["Quot.sound", "propext"]
-
-[[claim]]
 name   = "Plonky3Lean.Claims.Fri.honest_round"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 

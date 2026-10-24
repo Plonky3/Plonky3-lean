@@ -17,5 +17,6 @@ public import P3Fri.Transcript
 public import P3Fri.Hiding
 public import P3Fri.Replay
 public import P3Fri.PcsVerify
+public import P3Fri.HidingPcs
 
 @[expose] public section

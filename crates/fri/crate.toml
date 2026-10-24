@@ -390,3 +390,75 @@ rust = "p3_fri::pcs_transcript::PcsVerifierTranscript::batch_phase"
 [[mirror]]
 lean = "p3_fri.two_adic_pcs.mirror.verify"
 rust = "{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::verify"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.withRandomCols"
+rust = "{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::commit"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.randomize"
+rust = "{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::commit"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.hiding_budget"
+rust = "p3_fri::hiding_pcs::HidingFriPcs::hiding_budget"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.HidingFriProverError"
+rust = "p3_fri::hiding_pcs::HidingFriProverError"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.check_hiding_budget"
+rust = "p3_fri::hiding_pcs::HidingFriPcs::check_hiding_budget"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.lde_mask_height"
+rust = "p3_fri::hiding_pcs::HidingFriPcs::lde_mask_height"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.maskCoeffs"
+rust = "{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::get_quotient_ldes"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.lastMask"
+rust = "{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::get_quotient_ldes"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.mergeHiddenPoint"
+rust = "{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::verify_with_preprocessing"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.mergeHiddenMatrix"
+rust = "{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::verify_with_preprocessing"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.mergeHiddenRound"
+rust = "{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::verify_with_preprocessing"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.mergeHidden"
+rust = "{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::verify_with_preprocessing"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.verify_hiding"
+rust = "{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::verify_with_preprocessing"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.splitHidden"
+rust = "{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::open_with_preprocessing"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.HidingRound"
+rust = "p3_fri::hiding_pcs::HidingFriPcsProverData"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.checkHidingRound"
+rust = "{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::open_with_preprocessing"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.checkHidingRounds"
+rust = "{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::open_with_preprocessing"
+
+[[mirror]]
+lean = "p3_fri.hiding_pcs.mirror.open_hiding"
+rust = "{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::open_with_preprocessing"

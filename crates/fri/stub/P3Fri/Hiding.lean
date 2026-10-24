@@ -1,7 +1,9 @@
 /-
 Transcriptions of the hiding FRI PCS.
 
-They cover the randomized commitment, the quotient masks, the budget, and the random openings.
+They cover the randomized commitment, the quotient masks and the budget.
+
+The opening and the verifier are in HidingPcs.lean.
 
 What a transcription abstracts:
 
@@ -16,6 +18,7 @@ Loops, branches and early returns are kept.
 module
 
 public import P3Commit.Types
+public import P3Fri.Config
 public import Mathlib.Data.List.Basic
 public import Mathlib.Algebra.Field.Basic
 
@@ -48,6 +51,7 @@ def hiding_budget (num_queries extension_degree num_points : ℕ) : Option ℕ :
 
 /-- The reasons a hiding prover refuses. -/
 inductive HidingFriProverError where
+  | Fri (e : p3_fri.config.mirror.FriProverError)
   | InsufficientRandomCodewords (required got : ℕ)
   | BudgetOverflow
   | HidingBudgetExceeded (mask_height num_queries num_opening_points extension_degree : ℕ)
@@ -89,15 +93,5 @@ def lastMask (mul_coeffs : List K) (hw : ℕ) (rv : List K) (last : ℕ) : List 
     (List.range hw).foldl (fun acc k =>
       acc.set (last * hw + k) (acc.getD (last * hw + k) 0 - acc.getD (j * hw + k) 0 * mul_coeffs.getD j 0))
       acc) rv
-
-/-- The verifier's merge of one point.
-
-After a count check, it appends the hidden values to the public ones. -/
-def mergePoint (expected : ℕ) (p : PointOpening K) (rand : List K) : Option (PointOpening K) :=
-  if rand.length ≠ expected then none else some ⟨p.point, p.values ++ rand⟩
-
-/-- The prover's split of one point's values: the last k values are hidden. -/
-def splitPoint (k : ℕ) (values : List K) : List K × List K :=
-  (values.take (values.length - k), values.drop (values.length - k))
 
 end p3_fri.hiding_pcs.mirror
