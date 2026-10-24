@@ -1,0 +1,14 @@
+# Mutation of: 010-import-packed-extension-iter
+# Breaks:      the import loses its cfg, so a normal build names a trait that does not exist there.
+#
+--- a/multi-stark/src/rounds.rs
++++ b/multi-stark/src/rounds.rs
+@@ -17,7 +17,7 @@
+     Algebra, ExtensionField, Field, PackedFieldExtension, PackedValue, PrimeCharacteristicRing,
+     dot_product,
+ };
+-use p3_maybe_rayon::prelude::*; #[cfg(hax_backend_lean)] use p3_field::PackedFieldExtensionIter; // PATCHED: `to_ext_iter` lives on this trait in the extracted variant
++use p3_maybe_rayon::prelude::*; use p3_field::PackedFieldExtensionIter; // PATCHED: `to_ext_iter` lives on this trait in the extracted variant
+ use p3_multilinear_util::point::Point;
+ use p3_multilinear_util::poly::{Poly, PolyView};
+ use p3_sumcheck::generic_degree::RoundPolyInterpolator;

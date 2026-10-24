@@ -1,0 +1,57 @@
+# Patch:        010-import-packed-extension-iter
+# Phase:        pre
+# Target:       multi-stark/src/fractional_gkr/prover.rs, multi-stark/src/rounds.rs
+# Hunks:        2
+# Class:        bound
+# Gap:          docs/extractor-issues.md 10 (charon#1266): baby-bear's pre 030
+#               moves `to_ext_iter` to the extension trait
+#               `PackedFieldExtensionIter` under the cfg. Without this patch
+#               p3-multi-stark does not compile there: E0599, `to_ext_iter` not
+#               found, 7 times.
+# Cost:         none: the added items are behind cfg(hax_backend_lean), so a
+#               normal build is token for token as shipped.
+# Upstreamable: no: the imported trait exists only in the extracted variant.
+#               Dropping baby-bear's pre 030 makes this patch unnecessary.
+# Drop when:    baby-bear's pre 030 is dropped.
+# Test:         lint p3-multi-stark unused_imports
+# Mutation:     the import in the round loop loses its cfg, so a normal build
+#               names a trait that does not exist there.
+#
+# The same change as sumcheck's pre 010, for the two files of p3-multi-stark that call `to_ext_iter`.
+#
+# The prover of the fractional GKR imports the packed extension trait only for that call.
+#
+# So under the cfg that import goes unused, and a `cfg_attr` allows it.
+#
+# Each item shares a line with an existing one, so no line of the source moves.
+#
+diff --git a/multi-stark/src/fractional_gkr/prover.rs b/multi-stark/src/fractional_gkr/prover.rs
+--- a/multi-stark/src/fractional_gkr/prover.rs
++++ b/multi-stark/src/fractional_gkr/prover.rs
+@@ -3,12 +3,12 @@ use alloc::vec::Vec;
+ 
+ use p3_challenger::FieldChallenger;
+ use p3_challenger::fs::TranscriptField;
+-use p3_field::{
++#[cfg_attr(hax_backend_lean, allow(unused_imports))] use p3_field::{ // PATCHED: only `to_ext_iter` uses `PackedFieldExtension`
+     Algebra, ExtensionField, Field, PackedFieldExtension, PackedValue, PrimeCharacteristicRing,
+ };
+ #[cfg(test)]
+ use p3_field::{batch_multiplicative_inverse, dot_product};
+-use p3_maybe_rayon::prelude::*;
++use p3_maybe_rayon::prelude::*; #[cfg(hax_backend_lean)] use p3_field::PackedFieldExtensionIter; // PATCHED: `to_ext_iter` lives on this trait in the extracted variant
+ use p3_multilinear_util::point::Point;
+ use p3_multilinear_util::poly::{Poly, PolyMaybePacked};
+ use p3_sumcheck::generic_degree::RoundPolyInterpolator;
+diff --git a/multi-stark/src/rounds.rs b/multi-stark/src/rounds.rs
+--- a/multi-stark/src/rounds.rs
++++ b/multi-stark/src/rounds.rs
+@@ -17,7 +17,7 @@ use p3_field::{
+     Algebra, ExtensionField, Field, PackedFieldExtension, PackedValue, PrimeCharacteristicRing,
+     dot_product,
+ };
+-use p3_maybe_rayon::prelude::*;
++use p3_maybe_rayon::prelude::*; #[cfg(hax_backend_lean)] use p3_field::PackedFieldExtensionIter; // PATCHED: `to_ext_iter` lives on this trait in the extracted variant
+ use p3_multilinear_util::point::Point;
+ use p3_multilinear_util::poly::{Poly, PolyView};
+ use p3_sumcheck::generic_degree::RoundPolyInterpolator;
