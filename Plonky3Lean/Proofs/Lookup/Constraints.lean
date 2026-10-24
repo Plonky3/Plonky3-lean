@@ -8,9 +8,14 @@ public import Plonky3Lean.Proofs.Air.Semantics
 /-!
 # The lookup constraints on a row
 
-On the debug builder of one row, the transcribed fraction pin asserts U f - V, and the accumulator asserts its three selector-gated equations.
+On the debug builder of one row, the transcribed fraction pin asserts U f - V.
 
-Over every row of a trace, the constraints hold exactly when the columns form a constrained running sum and every fraction is pinned.
+The accumulator asserts its three selector-gated equations.
+
+Over every row of a trace, the constraints hold exactly when:
+
+- the columns form a constrained running sum
+- every fraction is pinned.
 -/
 
 namespace Plonky3Lean.Proofs.Lookup
@@ -22,7 +27,11 @@ set_option linter.unusedSectionVars false
 
 variable {F : Type} [Field F] [DecidableEq F] {K : Type} [Field K] [Algebra F K] [DecidableEq K]
 
-/-- The debug permutation builder of one row: the debug extension builder, the extension field, and the permutation window, challenges and values. -/
+/-- The debug permutation builder of one row:
+
+- the debug extension builder
+- the extension field
+- the permutation window, challenges and values. -/
 def rowPermBuilder (main preprocessed : RowWindow F) (pv : List F) (first last trans : F)
     (periodic : List F) (perm : RowWindow K) (randomness values : List K) :
     PermBuilder F F K DebugState where
@@ -47,7 +56,10 @@ theorem foldl_exclusive (xs : List ((K × K) × K)) (a b c : K) :
   | nil => simp
   | cons x xs ih => rw [List.foldl_cons, ih]; simp [add_assoc]
 
-/-- **The exclusive fold**: N = sum_k f_k m_k and D = sum_k f_k t_k + 1 - sum_k f_k, over the branches (f_k, t_k, m_k). -/
+/-- **The exclusive fold** over the branches (f_k, t_k, m_k):
+
+- N = sum_k f_k m_k
+- D = sum_k f_k t_k + 1 - sum_k f_k. -/
 theorem compute_exclusive_terms_field (flags : List K) (elements : List (List K)) (mults : List K)
     (α β : K) (hf : flags.length = elements.length) (hm : mults.length = elements.length) :
     let xs := (flags.zip (elements.map fun e => α - fingerprint β e)).zip mults
@@ -105,7 +117,9 @@ section Row
 variable (main preprocessed : RowWindow F) (pv : List F) (first last trans : F) (periodic : List F)
   (perm : RowWindow K) (randomness values : List K) (s : DebugState)
 
-/-- **The additive fraction pin on a row** asserts U f - V, for the resolved tuples and multiplicities and the lookup's challenges. -/
+/-- **The additive fraction pin on a row** asserts U f - V.
+
+It uses the resolved tuples, the multiplicities and the lookup's challenges. -/
 theorem eval_fraction_additive (lookup : Lookup F) (hflags : lookup.flags = none)
     (hlen : lookup.elements.length = lookup.multiplicities.length) {ev : List (List K)} {mv : List K}
     (hev : lookup.elements.mapM (fun exprs => exprs.mapM fun e =>
@@ -175,7 +189,11 @@ section AccRow
 variable (main preprocessed : RowWindow F) (pv : List F) (first last trans : F) (periodic : List F)
   (randomness values : List K) (s : DebugState)
 
-/-- **The accumulator on a row** asserts acc = 0 through the first-row selector, acc' = acc + row sum through the transition selector, and terminal = acc + row sum through the last-row selector. -/
+/-- **The accumulator on a row** asserts three equations:
+
+- acc = 0, through the first-row selector
+- acc' = acc + row sum, through the transition selector
+- terminal = acc + row sum, through the last-row selector. -/
 theorem eval_accumulator_row (P : ℕ → ℕ → K) (n r : ℕ) (lookups : List (Lookup F))
     (hcol : ∀ i (h : i < lookups.length), lookups[i].column = i) (T : K) :
     ∃ s', eval_accumulator (rowPermBuilder main preprocessed pv first last trans periodic
@@ -204,10 +222,16 @@ theorem eval_accumulator_row (P : ℕ → ℕ → K) (n r : ℕ) (lookups : List
 
 end AccRow
 
-/-- The running sum read from permutation columns: column 0 is the accumulator, column c + 1 the fraction of lookup c. -/
+/-- The running sum read from permutation columns.
+
+Column 0 is the accumulator, and column c + 1 the fraction of lookup c. -/
 def columnsOf (P : ℕ → ℕ → K) (T : K) : RunningSum K := ⟨fun r => P r 0, fun r c => P r (c + 1), T⟩
 
-/-- **The accumulator over a trace.** On a trace of n >= 1 rows, the accumulator constraints pass on every row exactly when the columns form a constrained running sum. -/
+/-- **The accumulator over a trace.**
+
+Take a trace of n >= 1 rows.
+
+The accumulator constraints pass on every row exactly when the columns form a constrained running sum. -/
 theorem accumulator_trace_iff (main preprocessed : ℕ → RowWindow F) (pv : List F)
     (periodic : ℕ → List F) (randomness values : List K) (s : ℕ → DebugState)
     (P : ℕ → ℕ → K) {n : ℕ} (hn : 0 < n) (lookups : List (Lookup F))

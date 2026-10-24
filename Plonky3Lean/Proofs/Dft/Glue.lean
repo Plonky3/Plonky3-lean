@@ -8,11 +8,18 @@ public import Plonky3Lean.Proofs.Dft.Algebra
 /-!
 # The objects of the transcriptions
 
-The logarithm, the generators, the in-place bit reversal, the loops over butterflies, the
-twiddle tables, the coset shift and the division by the height.
+This file covers:
 
-Also the bit-reversed form of a layer: conjugating a layer by the bit reversal of the rows
-gives a layer with the block and offset roles exchanged, and bit-reversed twiddles.
+- the logarithm and the generators
+- the in-place bit reversal
+- the loops over butterflies
+- the twiddle tables
+- the coset shift and the division by the height
+- the bit-reversed form of a layer.
+
+Conjugating a layer by the bit reversal of the rows exchanges the block and offset roles.
+
+It also bit-reverses the twiddles.
 -/
 
 namespace Plonky3Lean.Proofs.Dft
@@ -37,7 +44,9 @@ theorem log2Strict_eq_some {h k : ℕ} (hk : log2Strict h = some k) : h = 2 ^ k 
   split_ifs at hk with hh
   · cases hk; exact hh.2.symm
 
-/-- The generators the field promises: entry b generates the subgroup of order 2^b, for b up to the adicity. -/
+/-- The generators the field promises.
+
+Entry b generates the subgroup of order 2^b, for b up to the adicity. -/
 def GenValid {K : Type _} [Field K] (G : Gen K) : Prop :=
   ∀ b ≤ G.adicity, IsPrimitiveRoot (G.gen b) (2 ^ b)
 
@@ -130,8 +139,9 @@ theorem dm_mod {σ r m : ℕ} (hr : r < m) : (σ * m + r) % m = r := by
 
 /-- Conjugating a layer by the bit reversal exchanges the roles of blocks and offsets.
 
-A layer with half block 2^L, whose twiddle depends on the offset s, becomes a layer with half
-block 2^j, whose block sigma uses the twiddle of offset rev_L(sigma). -/
+Take a layer with half block 2^L, whose twiddle depends on the offset s.
+
+It becomes a layer with half block 2^j, whose block sigma uses the twiddle of offset rev_L(sigma). -/
 theorem conj_layer {K V : Type _} (f : K → V → V → V × V) (tw : ℕ → K) (L j : ℕ) (y : ℕ → V)
     {i : ℕ} (hi : i < 2 ^ (L + 1 + j)) :
     layer (fun _ s => f (tw s)) (2 ^ L) (2 ^ j) y (rev (L + 1 + j) i) =

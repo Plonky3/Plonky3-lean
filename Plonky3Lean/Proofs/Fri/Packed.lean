@@ -9,9 +9,13 @@ public import Plonky3Lean.Proofs.Fri.Matrix
 
 The packed kernel folds W rows at once, one row per lane.
 
-Each round folds pairs in place; a pair is never read after it is overwritten.
+Each round folds pairs in place.
 
-Its factors split the scalar table into a per-row part and a per-pair part, so every lane computes the scalar fold of its row.
+A pair is never read after it is overwritten.
+
+Its factors split the scalar table into a per-row part and a per-pair part.
+
+So every lane computes the scalar fold of its row.
 -/
 
 namespace Plonky3Lean.Proofs.Fri
@@ -77,7 +81,9 @@ theorem writeInPlace_spec {A γ : Type _} [Zero A] [Inhabited γ] (F : A → A �
 
 variable {K : Type} [Field K] [DecidableEq K]
 
-/-- The packed factors of pair kk of row t after s squarings are the scalar table's entry: the pair part times the squared row part. -/
+/-- The packed factors of pair kk of row t after s squarings are the scalar table's entry.
+
+That entry is the pair part times the squared row part. -/
 theorem packed_factor (G : Gen K) (hN : GenNested G) {n k s kk t : ℕ} (hnk : n + k ≤ G.adicity)
     (hs : s + 1 ≤ k) (hkk : kk < 2 ^ (k - 1 - s)) :
     (G.gen k)⁻¹ ^ bitRev (k - 1) kk * ((G.gen (n + k))⁻¹ ^ bitRev n t) ^ 2 ^ s =
@@ -109,7 +115,9 @@ theorem revIndex_powers_getD (x : K) {m kk : ℕ} (hkk : kk < 2 ^ m) :
     List.getD_eq_getElem _ _ (by simpa using bitRev_lt' m kk)]
   simp
 
-/-- The invariant after round r of the packed kernel: pair kk of lane l holds the fold of P by 2^(r + 1) at the matching point. -/
+/-- The invariant after round r of the packed kernel.
+
+Pair kk of lane l holds the fold of P by 2^(r + 1) at the matching point. -/
 def PackedInv (G : Gen K) (P : K[X]) (β : K) (n k W b r : ℕ) (pairs : List (Fin W → K)) : Prop :=
   pairs.length = 2 ^ (k - 1) ∧ ∀ kk < 2 ^ (k - 1 - r), ∀ l : Fin W,
     (pairs.getD kk 0) l = (polyFold P (2 ^ (r + 1)) β).eval (dom G (n + k - 1 - r) ((b * W + l.val) * 2 ^ (k - 1 - r) + kk))
@@ -117,7 +125,9 @@ def PackedInv (G : Gen K) (P : K[X]) (β : K) (n k W b r : ℕ) (pairs : List (F
 theorem packedRound_eq {W : ℕ} (scalars : List K) (rf : Fin W → K) (pairs : List (Fin W → K)) :
     packedRound scalars rf pairs = writeInPlace (fun lo hi sc => foldPacked lo hi sc rf) scalars 0 pairs := rfl
 
-/-- One later round keeps the invariant: pair kk folds pairs 2 kk and 2 kk + 1 with the next challenge power. -/
+/-- One later round keeps the invariant.
+
+Pair kk folds pairs 2 kk and 2 kk + 1 with the next challenge power. -/
 theorem packedRound_step (G : Gen K) (hV : GenValid G) (hN : GenNested G) (h2 : (2 : K) ≠ 0)
     {P : K[X]} {n k W b r : ℕ} (hnk : n + k ≤ G.adicity) (hr : r + 2 ≤ k) (hb : (b + 1) * W ≤ 2 ^ n)
     (β : K) {wf : List K} (hwfl : wf.length = 2 ^ (k - 1))
@@ -234,7 +244,9 @@ theorem packedRounds_spec (G : Gen K) (hV : GenValid G) (hN : GenNested G) (h2 :
       simp only [Function.comp_apply]; congr 1; omega
     · simp [roundScalars]
 
-/-- The packed kernel returns the scalar fold, for every power-of-two packing width no taller than the matrix and every scratch buffer. -/
+/-- The packed kernel returns the scalar fold.
+
+This holds for every power-of-two packing width no taller than the matrix, and every scratch buffer. -/
 theorem fold_matrix_packed_eq (G : Gen K) (hV : GenValid G) (hN : GenNested G) (h2 : (2 : K) ≠ 0)
     {W lw n k : ℕ} (hW : W = 2 ^ lw) (hlw : lw ≤ n) (hk : 1 ≤ k) (hnk : n + k ≤ G.adicity)
     {v : List K} (hv : v.length = 2 ^ (n + k)) (init : List (Fin W → K)) (hinit : init.length = 2 ^ (k - 1))

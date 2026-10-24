@@ -16,7 +16,9 @@ A tuple is compressed by its fingerprint, and a bus is separated by one more pow
 
 Equal-width tuples have distinct fingerprint polynomials, so distinct messages have distinct denominators.
 
-An unbalanced bus then leaves a nonzero polynomial in (alpha, beta), and Schwartz-Zippel bounds the challenges that hide it.
+An unbalanced bus then leaves a nonzero polynomial in (alpha, beta).
+
+Schwartz-Zippel bounds the challenges that hide it.
 -/
 
 namespace Plonky3Lean.Proofs.Lookup
@@ -70,7 +72,9 @@ theorem coeff_fingerprintPoly (e : List R) (j : ℕ) : (fingerprintPoly e).coeff
   · simp
   · rw [List.getD_eq_getElem?_getD, List.getElem?_eq_none (by simp at hj ⊢; omega)]; simp
 
-/-- **Injectivity.** Tuples of one width with equal fingerprint polynomials are equal. -/
+/-- **Injectivity.**
+
+Tuples of one width with equal fingerprint polynomials are equal. -/
 theorem fingerprintPoly_inj {e e' : List R} (hl : e.length = e'.length)
     (h : fingerprintPoly e = fingerprintPoly e') : e = e' := by
   have hr : e.reverse = e'.reverse := List.ext_getElem (by simpa using hl) fun j h1 h2 => by
@@ -80,7 +84,11 @@ theorem fingerprintPoly_inj {e e' : List R} (hl : e.length = e'.length)
     exact this
   simpa using hr
 
-/-- **The width rule.** A shorter tuple is a longer one padded with zeros in front: [x] and [0, x] share every fingerprint. -/
+/-- **The width rule.**
+
+A shorter tuple is a longer one padded with zeros in front.
+
+For example, [x] and [0, x] share every fingerprint. -/
 theorem fingerprint_pad (β x : R) : fingerprint β [x] = fingerprint β [0, x] := by
   simp [fingerprint, sum_range_succ]
 

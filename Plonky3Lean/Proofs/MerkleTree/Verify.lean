@@ -9,7 +9,12 @@ public import Plonky3Lean.Proofs.MerkleTree.Binding
 /-!
 # An accepting run of the single-index verifier
 
-A run that accepts checked every row's width, hashed the leaf rows, folded its plan, and found the result in the cap.
+A run that accepts:
+
+- checked every row's width
+- hashed the leaf rows
+- folded its plan
+- found the result in the cap.
 -/
 
 open CoreModels Aeneas
@@ -85,7 +90,7 @@ theorem check_widths_ok {T : Type} {dims : Slice p3_matrix.Dimensions}
       _ _ h (by intro m hm; simp at hm)
     exact key rfl
 
-/-- Two arrays that compare equal, with an equality that only says `true` of equal elements, are equal. -/
+/-- Two arrays that compare equal, with an equality that only says true of equal elements, are equal. -/
 theorem array_eq_true {T : Type} {N : Std.Usize} (inst : core.cmp.PartialEq T T)
     (hinst : ∀ x y, inst.eq x y = RustM.ok true → x = y) {a b : Std.Array T N}
     (h : core.Array.Insts.CoreCmpPartialEqArray.eq inst a b = RustM.ok true) : a = b := by
@@ -163,7 +168,9 @@ variable {P PW F W H C : Type} {N DIGEST_ELEMS : Std.Usize}
 
 /-- What an accepting run of the verifier did.
 
-Every value named here except the leaf digest, the final digest and the width facts is computed from the dimensions, the arity and the cap height alone. -/
+Most values named here are computed from the dimensions, the arity and the cap height alone.
+
+The exceptions are the leaf digest, the final digest and the width facts. -/
 theorem verify_accepts (cl : core.clone.Clone F) (cp : core.marker.Copy W)
     (dfInst : core.default.Default W) (eqInst : core.cmp.PartialEq W W)
     (hInst : p3_symmetric.hasher.CryptographicHasher H F (Std.Array W DIGEST_ELEMS))

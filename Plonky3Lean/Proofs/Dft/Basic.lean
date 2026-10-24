@@ -324,8 +324,9 @@ theorem radix2Dit_dft_batch_too_big (G : Gen K) {k : ℕ} (hk : G.adicity < k) (
 
 The transform sees the coefficients in natural order, coefficient j at row j.
 
-The result evaluates the transformed coefficients, padded with zeros, on the coset shift times the
-subgroup of order 2^(k+a). -/
+The result evaluates the transformed coefficients, padded with zeros, on a coset.
+
+That coset is the shift times the subgroup of order 2^(k+a). -/
 theorem radix2Dit_coset_lde_batch_with_transform (G : Gen K) (hG : GenValid G) {k a w : ℕ}
     (hka : k + a ≤ G.adicity) (shift : K) (hw : w ≠ 0 ∨ shift = 1) (ha : a < 64)
     (hlen : w * 2 ^ (k + a) < 2 ^ 64) (T : (ℕ → V) → ℕ → V) (x : ℕ → V) :

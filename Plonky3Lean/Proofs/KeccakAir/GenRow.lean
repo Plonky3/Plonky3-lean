@@ -12,7 +12,9 @@ The generator fills the row of round k from the round's input state S.
 
 Whatever S and k < 24, and in every field, the row meets each constraint that reads only its own row.
 
-This needs the row's input limbs to be those of S and its flags to be one-hot at k, which the generator provides.
+This needs the row's input limbs to be those of S, and its flags to be one-hot at k.
+
+The generator provides both.
 -/
 
 set_option linter.unusedSectionVars false

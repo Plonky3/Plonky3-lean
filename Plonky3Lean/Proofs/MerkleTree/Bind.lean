@@ -7,7 +7,9 @@ public import Plonky3Lean.Proofs.MerkleTree.Verify
 /-!
 # The single-index verifier binds every matrix it reads
 
-Two openings at one index that both verify against one cap agree on every matrix row the verifier reads, or they exhibit a collision.
+Two openings at one index that verify against one cap agree on every row the verifier reads.
+
+Otherwise they exhibit a collision.
 -/
 
 open CoreModels Aeneas
@@ -16,7 +18,9 @@ open p3_merkle_tree
 
 namespace Plonky3Lean.Proofs.MerkleTree
 
-/-- The verifier reads matrix `m`: it hashes the leaf rows, or it injects `m` at some level the proof walks. -/
+/-- The verifier reads matrix m.
+
+Either m is among the leaf rows it hashes, or it injects m at some level the proof walks. -/
 def Reads (N cap : Std.Usize) (dims : Slice p3_matrix.Dimensions) (m : ℕ) : Prop :=
   ∃ (val : Std.Usize) (sched : alloc.vec.Vec Std.Usize) (pl : Std.Usize)
     (sched1 order : alloc.vec.Vec Std.Usize) (curr lnpt pos : Std.Usize),
@@ -38,9 +42,13 @@ theorem result_ok_inj {T E : Type _} {a b : T}
 
 /-- Merkle's binding argument, on the extracted verifier.
 
-Two openings at one index, under one cap and one set of dimensions, that both verify agree on every row the verifier reads, unless the hasher or the compression has a collision.
+Take two openings at one index, under one cap and one set of dimensions, that both verify.
 
-The hasher's collision is between two row lists of equal row lengths, so a hash that is collision resistant only on inputs of one length suffices. -/
+They agree on every row the verifier reads, unless the hasher or the compression has a collision.
+
+The hasher's collision is between two row lists of equal row lengths.
+
+So a hash that is collision resistant only on inputs of one length suffices. -/
 theorem verify_binding {P PW F W H C : Type} {N DIGEST_ELEMS : Std.Usize}
     (cl : core.clone.Clone F) (cp : core.marker.Copy W)
     (dfInst : core.default.Default W) (eqInst : core.cmp.PartialEq W W)
@@ -111,7 +119,7 @@ theorem verify_binding {P PW F W H C : Type} {N DIGEST_ELEMS : Std.Usize}
   subst hci
   rw [ha1] at ha2; cases ok_inj ha2
   have hdf : df1 = df2 := (array_eq_true eqInst heq heq1).symm.trans (array_eq_true eqInst heq heq2)
-  -- The plan's arities are 2 or `N`.
+  -- The plan's arities are 2 or N.
   have hsteps : ∀ l ∈ pl0, 0 < l.1 ∧ l.1 ≤ padA.val.length := by
     intro l hl
     have hmem := plan_steps _ _ _ _ _ _ l hl

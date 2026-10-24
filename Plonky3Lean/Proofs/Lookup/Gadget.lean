@@ -8,7 +8,9 @@ public import P3Lookup
 /-!
 # The LogUp gadget
 
-The transcribed tuple combiners compute the fingerprint, and the rational folds compute the cleared fraction U f = V of the specification.
+The transcribed tuple combiners compute the fingerprint.
+
+The rational folds compute the cleared fraction U f = V of the specification.
 -/
 
 namespace Plonky3Lean.Proofs.Lookup
@@ -111,7 +113,10 @@ theorem foldl_range_add (n : ℕ) (g : ℕ → K) (a : K) :
   | zero => simp
   | succ n ih => rw [List.range_succ, List.foldl_append, ih, sum_range_succ]; simp [add_assoc]
 
-/-- **The additive fold** computes V and U: the sum of each multiplicity times the other denominators, and the product of all. -/
+/-- **The additive fold** computes V and U:
+
+- V is the sum of each multiplicity times the other denominators
+- U is the product of all denominators. -/
 theorem compute_combined_sum_terms_field (elements : List (List K)) (mults : List K) (α β : K)
     (h : mults.length = elements.length) :
     compute_combined_sum_terms (fieldOps K) elements mults α β =

@@ -7,8 +7,9 @@ public import Plonky3Lean.Proofs.Dft.Parallel
 /-!
 # The small-batch backend
 
-Its forward layers are the bit-reversed Cooley-Tukey layers of the parallel backend's second half,
-run from the one-block layer down, followed by a bit reversal.
+Its forward layers are the bit-reversed Cooley-Tukey layers of the parallel backend's second half.
+
+They run from the one-block layer down, and a bit reversal follows.
 
 Its inverse is the Bowers G network at the inverse generator, on bit-reversed rows divided by the height.
 
@@ -414,7 +415,9 @@ theorem take_drop_fw (g : K) {k lnpr n : ℕ} (h : lnpr + n ≤ k) :
   · intro j h1 h2
     simp [List.getElem_range']
 
-/-- The small-batch forward transform of 2^k rows is the transform at G_k, for nested generators and a cache of any size 2^L >= 2^k. -/
+/-- The small-batch forward transform of 2^k rows is the transform at G_k.
+
+This needs nested generators, and holds for a cache of any size 2^L >= 2^k. -/
 theorem smallBatch_dft_batch (G : Gen K) (hG : GenValid G) (hN : GenNested G) {k L : ℕ}
     (hkL : k ≤ L) (hL : L ≤ G.adicity) (c w : ℕ) (x : ℕ → V) :
     Computes (Radix2DFTSmallBatch.dft_batch G L c w (2 ^ k) x) (2 ^ k) (dft (G.gen k) (2 ^ k) x) := by
@@ -478,7 +481,9 @@ theorem smallBatch_dft_batch (G : Gen K) (hG : GenValid G) (hN : GenNested G) {k
 
 /-! ## The inverse -/
 
-/-- Layer l of the G network at the root g: half blocks of 2^l rows, block sigma with g^(rev_(k-1-l)(sigma) 2^l). -/
+/-- Layer l of the G network at the root g.
+
+It has half blocks of 2^l rows, and block sigma uses g^(rev_(k-1-l)(sigma) 2^l). -/
 abbrev BL (g : K) (k l : ℕ) : (ℕ → V) → ℕ → V :=
   layer (fun σ _ => dif (g ^ (rev (k - 1 - l) σ * 2 ^ l))) (2 ^ l) (2 ^ (k - 1 - l))
 
@@ -719,7 +724,9 @@ theorem drop_map_range {α : Type _} (f : ℕ → α) {k m : ℕ} :
   · simp
   · intro j h1 h2; simp [List.getElem_range']
 
-/-- The small-batch inverse of 2^k rows is the inverse transform at G_k, for nested generators and a cache of any size 2^L >= 2^k. -/
+/-- The small-batch inverse of 2^k rows is the inverse transform at G_k.
+
+This needs nested generators, and holds for a cache of any size 2^L >= 2^k. -/
 theorem smallBatch_idft_batch (G : Gen K) (hG : GenValid G) (hN : GenNested G) {k L : ℕ}
     (hkL : k ≤ L) (hL : L ≤ G.adicity) (c w : ℕ) (x : ℕ → V) :
     Computes (Radix2DFTSmallBatch.idft_batch G L c w (2 ^ k) x) (2 ^ k) (idft (G.gen k) (2 ^ k) x) := by

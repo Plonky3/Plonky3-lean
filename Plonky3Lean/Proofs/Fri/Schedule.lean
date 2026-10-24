@@ -9,7 +9,11 @@ public import Mathlib.Tactic.Linarith
 /-!
 # The folding schedule
 
-From the tallest input height down to the final height, every round folds by at least 1 and at most the cap, the arities sum to the distance, and the descent stops at every input height on the way.
+From the tallest input height down to the final height:
+
+- every round folds by at least 1 and at most the cap
+- the arities sum to the distance
+- the descent stops at every input height on the way.
 -/
 
 namespace Plonky3Lean.Proofs.Fri
@@ -99,7 +103,11 @@ theorem fold_schedule_loop_spec {hs : List ℕ} (hdec : hs.IsChain (· > ·)) {F
       · obtain ⟨r, hr, hr'⟩ := hLc j hj h1 (by omega)
         exact ⟨r + 1, by simp; omega, by simp [List.take_succ_cons]; omega⟩
 
-/-- The schedule of strictly decreasing heights above the final height: every arity lies in [1, cap], they sum to the distance from the tallest height to the final one, and the descent stops at every input height at or above the final one. -/
+/-- The schedule of strictly decreasing heights above the final height:
+
+- every arity lies in [1, cap]
+- the arities sum to the distance from the tallest height to the final one
+- the descent stops at every input height at or above the final one. -/
 theorem fold_schedule_spec {h0 : ℕ} {rest : List ℕ} (hdec : (h0 :: rest).IsChain (· > ·)) {F A : ℕ}
     (hA : 0 < A) (hF : F < h0) :
     ∃ L, fold_schedule (h0 :: rest) F A = some L ∧ (∀ a ∈ L, 1 ≤ a ∧ a ≤ A) ∧ L.sum = h0 - F ∧
@@ -127,7 +135,10 @@ theorem fold_schedule_nil {hs : List ℕ} (hdec : hs.IsChain (· > ·)) {F A : �
   · simp [fold_schedule]
   · simp_all [fold_schedule]
 
-/-- The schedule panics exactly on heights that are not strictly decreasing, or on a zero cap with a round to schedule. -/
+/-- The schedule panics exactly when:
+
+- the heights are not strictly decreasing
+- the cap is zero and a round is left to schedule. -/
 theorem fold_schedule_eq_none {hs : List ℕ} {F A : ℕ} :
     fold_schedule hs F A = none ↔
       ¬ hs.IsChain (· > ·) ∨ (A = 0 ∧ ∃ h0 ∈ hs.head?, F < h0) := by

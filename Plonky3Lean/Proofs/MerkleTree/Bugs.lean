@@ -12,7 +12,7 @@ public import Plonky3Lean.Proofs.MerkleTree.Forward
 Both are fixed on Plonky3 main by Plonky3/Plonky3#2471, after the commit this model is pinned to.
 
 - With arity 8, heights 4 and 2 make the schedule loop run forever.
-- With arity 2 and a cap two layers below the root, a matrix of height 1 next to one of height 8 is never read.
+- With arity 2 and a cap two layers below the root, a height-1 matrix beside a height-8 one is never read.
 -/
 
 open CoreModels Aeneas
@@ -100,7 +100,9 @@ theorem sched_8_1 (height : ℕ → ℕ) (h1 : height 1 = 1) (f : ℕ) (v : List
     simp [h1, npt_one, npt_two, npt_four, npt_eight, padded, a1, schedRun] at h
   exact h.symm
 
-/-- With arity 2 and the cap two layers below the root, the pinned verifier never reads a matrix of height 1 next to one of height 8.
+/-- Take arity 2 and the cap two layers below the root.
+
+The pinned verifier never reads a matrix of height 1 next to one of height 8.
 
 Its rows are bound by no check: any row of the right width verifies. -/
 theorem short_matrix_unread (w0 w1 : Std.Usize) :

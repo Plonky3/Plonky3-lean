@@ -8,7 +8,7 @@ public import Plonky3Lean.Proofs.Fri.Res
 /-!
 # The verifier never panics
 
-On every proof, every transcript and every commitment scheme, each verifier step returns a value or a rejection.
+On every proof, transcript and commitment scheme, each verifier step returns a value or a rejection.
 
 The field facts it needs: the generator table is primitive, and 2 is invertible.
 -/
@@ -23,7 +23,9 @@ set_option linter.unusedSectionVars false
 
 variable {K : Type} [Field K] [DecidableEq K]
 
-/-- The fold chain never panics once its shape checks pass: every round folds a row of the right length below the adicity. -/
+/-- The fold chain never panics once its shape checks pass.
+
+Every round folds a row of the right length below the adicity. -/
 theorem foldlM_foldStep_isSome (G : Gen K) (hV : GenValid G) (h2 : (2 : K) ≠ 0) (q : ℕ) :
     ∀ (rounds : List (K × ℕ × List (List K))) (st : ChainState K),
       (∀ r ∈ rounds, 1 ≤ r.2.1 ∧ ∃ s, r.2.2[q]? = some s ∧ s.length = 2 ^ r.2.1 - 1) →
@@ -234,7 +236,9 @@ theorem le_headD_inputLogHeights {G : Gen K} {C : Type} (b : ℕ) (claims : List
     · exact le_of_lt (hpw 0 i h0 hi hi0)
   omega
 
-/-- The verifier never panics: on every proof, transcript, commitment schemes and claims, it accepts or rejects. -/
+/-- The verifier never panics.
+
+On every proof, transcript, commitment schemes and claims, it accepts or rejects. -/
 theorem verify_fri_total (G : Gen K) (hV : GenValid G) (h2 : (2 : K) ≠ 0) (g : K) {C S : Type}
     (fmmcs immcs : MmcsOps K) (tx : VerifierTx K fmmcs.Commitment S) (params : FriParameters)
     (proof : FriProof K fmmcs.Commitment fmmcs.MultiProof immcs.MultiProof) (s : S)

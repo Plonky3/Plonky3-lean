@@ -9,7 +9,9 @@ public import Plonky3Lean.Proofs.Dft.Glue
 /-!
 # The row fold computes the fold of the opened word
 
-The barycentric interpolation over a two-adic coset, and the closed form at arity 2, both return the value at beta of the polynomial through the row.
+Two computations agree: barycentric interpolation over a two-adic coset, and the closed form at arity 2.
+
+Both return the value at beta of the polynomial through the row.
 -/
 
 namespace Plonky3Lean.Proofs.Fri
@@ -62,7 +64,9 @@ theorem nodalWeight_revCoset (hω : IsPrimitiveRoot ω (2 ^ k)) (hs : s ≠ 0) (
   rw [hm, Nat.cast_add_one] at h2k
   field_simp
 
-/-- Barycentric interpolation over a coset in bit-reversed order returns the value at z of the polynomial through the values. -/
+/-- Barycentric interpolation over a coset in bit-reversed order.
+
+It returns the value at z of the polynomial through the values. -/
 theorem lagrange_interpolate_at_revCoset (hω : IsPrimitiveRoot ω (2 ^ k)) (hs : s ≠ 0) (h2 : (2 : K) ≠ 0)
     (y : Fin (2 ^ k) → K) (z : K) :
     lagrange_interpolate_at (List.ofFn (revCoset s ω k)) (List.ofFn y) z = some (foldValue s ω k y z) := by
@@ -170,7 +174,10 @@ theorem fold_row_eq (G : Gen K) (hV : Plonky3Lean.Proofs.Dft.GenValid G) (h2 : (
       revIndex_shiftedPowers]
     exact lagrange_interpolate_at_revCoset hw hs h2 evals β
 
-/-- The row fold panics exactly when the generator table is too short or the row does not hold 2^k values. -/
+/-- The row fold panics exactly when:
+
+- the generator table is too short
+- the row does not hold 2^k values. -/
 theorem fold_row_eq_none (G : Gen K) (hV : Plonky3Lean.Proofs.Dft.GenValid G) (h2 : (2 : K) ≠ 0)
     {index h k : ℕ} (hk : 1 ≤ k) (β : K) (evals : List K) :
     fold_row G index h k β evals = none ↔ G.adicity < h + k ∨ evals.length ≠ 2 ^ k := by

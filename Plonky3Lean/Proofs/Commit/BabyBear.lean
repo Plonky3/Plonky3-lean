@@ -10,9 +10,9 @@ public import Plonky3Lean.Proofs.Dft.Fields
 
 The domain theorems need three facts about the field, all true for BabyBear:
 
-* the table of two-adic generators is primitive and nested;
-* 2 is invertible;
-* the multiplicative generator lies outside the largest two-adic subgroup.
+- the table of two-adic generators is primitive and nested
+- 2 is invertible
+- the multiplicative generator lies outside the largest two-adic subgroup.
 
 The generator 31 has order p - 1 = 2^27 * 15, so its 2^27-th power is not one.
 
@@ -45,7 +45,11 @@ theorem babyBear_outside {x : BabyBear.Field} (hx : orderOf x = BabyBear.fieldSi
   revert this
   decide
 
-/-- BabyBear's tables: the generators are primitive and nested up to 27, and the generator lies outside the subgroup of order 2^27. -/
+/-- BabyBear's tables.
+
+The generators are primitive and nested up to 27.
+
+The multiplicative generator lies outside the subgroup of order 2^27. -/
 theorem babyBear_facts :
     ∃ t g, Plonky3Lean.Spec.BabyBear.TwoAdicParams.TWO_ADIC_GENERATORS = .ok t ∧
       Plonky3Lean.Spec.BabyBear.FieldParams.MONTY_GEN = .ok g ∧

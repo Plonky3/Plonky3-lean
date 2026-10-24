@@ -56,7 +56,11 @@ theorem chunks_ne_nil {α : Type _} {n : ℕ} (hn : 0 < n) {l : List α} (hl : l
   refine ⟨(a :: l').take n, chunks.go n l'.length ((a :: l').drop n), ?_, by simp; omega⟩
   simp [chunks, Nat.pos_iff_ne_zero.1 hn, chunks.go]
 
-/-- **A periodic count stops the prover.** On every trace with a row, the permutation-trace generator fails for a lookup list holding an additive lookup whose first count reads a periodic column. -/
+/-- **A periodic count stops the prover.**
+
+Take a lookup list holding an additive lookup whose first count reads a periodic column.
+
+On every trace with a row, the permutation-trace generator fails. -/
 theorem generate_permutation_periodic (main : Mat F) (preprocessed : Option (Mat F)) (pv : List F)
     (lookups : List (Lookup F)) (challenges : List K) (num_threads min_task_len : ℕ)
     (hh : 0 < main.height) {lookup : Lookup F} (hl : lookup ∈ lookups) (hflags : lookup.flags = none)

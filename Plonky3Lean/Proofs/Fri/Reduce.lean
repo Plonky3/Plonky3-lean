@@ -13,9 +13,13 @@ public import Plonky3Lean.Proofs.Dft.Network
 /-!
 # The reduced openings
 
-The verifier's reduction of one query, and the prover's reduced vectors, both compute the reduced opening of the claims at each height.
+The verifier's reduction of one query and the prover's reduced vectors compute the same values.
 
-Their ladders of powers of alpha agree: a claim starts at the number of claimed values before it at its height.
+Both give the reduced opening of the claims at each height.
+
+Their ladders of powers of alpha agree.
+
+A claim starts at the number of claimed values before it at its height.
 -/
 
 namespace Plonky3Lean.Proofs.Fri
@@ -43,7 +47,9 @@ theorem reducedOpening_cons (α x : K) (off : ℕ) (e : K × List K × List K) (
     reducedOpening α x off (e :: L) = entryTerm α x off (0, e) + reducedOpening α x (off + e.2.1.length) L := by
   rfl
 
-/-- Running the per-height sums over a list of claims gives, at each height, the reduced opening of the claims at that height. -/
+/-- Running the per-height sums over a list of claims gives the reduced openings.
+
+At each height, the result is the reduced opening of the claims at that height. -/
 theorem foldl_ladderStep (α : K) (xOf : ℕ → K) : ∀ (E : List (Entry K)) (acc : ℕ → K) (cnt : ℕ → ℕ) (h : ℕ),
     (E.foldl (ladderStep α xOf) (acc, cnt)).1 h =
       acc h + reducedOpening α (xOf h) (cnt h) ((E.filter (·.1 = h)).map (·.2))
@@ -94,7 +100,9 @@ theorem pointTerm_eq {α x : K} {off : ℕ} {p : PointOpening K} {row : List K}
 def xOfQuery (G : Gen K) (g : K) (H index : ℕ) (h : ℕ) : K :=
   (queryPoint G g H h index).getD 0
 
-/-- One matrix of the verifier's reduction adds its claims' terms at its height, reading the ladder starts in order. -/
+/-- One matrix of the verifier's reduction adds its claims' terms at its height.
+
+It reads the ladder starts in order. -/
 theorem reduceMatrix_spec {ME IE : Type} (G : Gen K) (g : K) (b H : ℕ) (α : K) (index : ℕ)
     (acc : ℕ → K) (keys : List ℕ) (cnt : ℕ → ℕ) (rest : List ℕ)
     (m : MatrixOpening K (p3_field.coset.mirror.TwoAdicMultiplicativeCoset K G.adicity G.gen))
@@ -228,7 +236,11 @@ theorem matsPoints_queryMats {G : Gen K} {C : Type} (b : ℕ) {claims : List (Cl
         · simp only [List.zip_cons_cons, List.flatMap_cons, ihm rb (by simpa using hl)]
     exact this _ _ hcr
 
-/-- The verifier's reduction of one query: at each height present, the reduced opening of the claims at that height, with the opened rows as column values and the query point of that height. -/
+/-- The verifier's reduction of one query.
+
+At each height present, it is the reduced opening of the claims at that height.
+
+The column values are the opened rows, and the point is the query point of that height. -/
 theorem reduceQuery_spec {ME IE : Type} (G : Gen K) (g : K) {C : Type} (b H : ℕ) (α : K)
     (claims : List (Claim G C)) (rows : List (List (List K))) (index : ℕ) (ro : List (ℕ × K))
     (halign : List.Forall₂ (fun c r => r.length = c.matrices.length) claims rows)
@@ -257,7 +269,9 @@ theorem reduceQuery_spec {ME IE : Type} (G : Gen K) (g : K) {C : Type} (b H : �
 /-- Row r of a matrix, as a list. -/
 def matRow (M : Mat K) (r : ℕ) : List K := (List.finRange M.width).map (M.entry r)
 
-/-- One point of the prover: the weighted claimed values less the rescaled compressed row, over z - x, is the claim's term at the ladder position. -/
+/-- One point of the prover yields the claim's term at the ladder position.
+
+It takes the weighted claimed values, less the rescaled compressed row, over z - x. -/
 theorem proverTerm_eq (α x z : K) (num k : ℕ) (M : Mat K) (r : ℕ) (ys : List K)
     (hys : ys.length = M.width) :
     (α ^ (num + k * M.width) * ((List.range ys.length).map fun i => α ^ i * ys.getD i 0).sum -
@@ -288,7 +302,9 @@ theorem getD_map_range {α : Type _} [Zero α] (f : ℕ → α) {n r : ℕ} (hr 
     ((List.range n).map f).getD r 0 = f r := by
   rw [List.getD_eq_getElem _ _ (by simpa using hr)]; simp
 
-/-- The points of one matrix of the prover, from ladder position num lh + k0 w: each row gains the reduced opening of the claims left. -/
+/-- The points of one matrix of the prover, from ladder position num lh + k0 w.
+
+Each row gains the reduced opening of the claims left. -/
 theorem foldlM_reducePoint (α : K) (inv_denoms : K → Option (List K)) (m : MatToOpen K) {lh : ℕ}
     (hlh : m.mat.height = 2 ^ lh) (xr : ℕ → K) (num : ℕ → ℕ) :
     ∀ (l : List (K × List K)) (k0 : ℕ) (num2 : ℕ → ℕ) (ro1 : List K) (res : (ℕ → ℕ) × List K),
@@ -325,7 +341,11 @@ theorem foldlM_reducePoint (α : K) (inv_denoms : K → Option (List K)) (m : Ma
       rw [proverTerm_eq α (xr r) zy.1 (num lh) k0 m.mat r zy.2 hw0, entryTerm]
       simp only [div_eq_mul_inv, add_assoc, hw0]
 
-/-- One matrix of the prover: at its height, each row gains the reduced opening of its claims at that row's point, from the ladder position reached so far. -/
+/-- One matrix of the prover, at its height.
+
+Each row gains the reduced opening of its claims at that row's point.
+
+The ladder starts at the position reached so far. -/
 theorem reduceMat_spec (α : K) (inv_denoms : K → Option (List K)) (m : MatToOpen K) {lh : ℕ}
     (hlh : m.mat.height = 2 ^ lh) (h32 : lh ≤ 32)
     (hw : ∀ zy ∈ m.points.zip m.openings, zy.2.length = m.mat.width) (xr : ℕ → K)
@@ -406,7 +426,9 @@ theorem bitrevCoset_getD (G : Gen K) (hN : Plonky3Lean.Proofs.Dft.GenNested G) (
     ← Plonky3Lean.Proofs.Commit.gen_sub G hN (show lh + (H - lh) ≤ G.adicity by omega) (by omega),
     show lh + (H - lh) - (H - lh) = lh by omega]
 
-/-- The inverse denominators of a point opened in a matrix of log height lh: 1 / (z - x) at the first 2^lh coset points. -/
+/-- The inverse denominators of a point opened in a matrix of log height lh.
+
+They are 1 / (z - x) at the first 2^lh coset points. -/
 theorem compute_inverse_denominators_spec (G : Gen K) (hN : Plonky3Lean.Proofs.Dft.GenNested G) (g : K)
     {H : ℕ} (hHa : H ≤ G.adicity) (mats : List (MatToOpen K))
     (hH : ∀ m ∈ mats, Nat.log 2 m.mat.height ≤ H) {coset : List K}
@@ -513,7 +535,13 @@ theorem foldlM_reduceMat (G : Gen K) (hN : Plonky3Lean.Proofs.Dft.GenNested G) (
       (fun x hx => hms x (List.mem_cons_of_mem _ hx)) _ _ _ _ st hI' hrest
     simpa [proverAllEntries, List.foldl_append, ← hlh] using this
 
-/-- The prover's reduced vectors: at each height present, the entry at the row of query idx is the reduced opening of the claims at that height, with the matrices' rows as column values and the query point of that height. -/
+/-- The prover's reduced vectors.
+
+At each height present, take the entry at the row of query idx.
+
+It is the reduced opening of the claims at that height.
+
+The column values are the matrices' rows, and the point is the query point of that height. -/
 theorem reduced_openings_spec (G : Gen K) (hN : Plonky3Lean.Proofs.Dft.GenNested G) (g α : K)
     (mats : List (MatToOpen K)) {H : ℕ} (hHmax : (mats.map fun m => Nat.log 2 m.mat.height).max? = some H)
     (hHa : H ≤ G.adicity) (hpow : ∀ m ∈ mats, m.mat.height = 2 ^ Nat.log 2 m.mat.height)

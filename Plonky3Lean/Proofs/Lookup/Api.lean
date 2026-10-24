@@ -38,7 +38,11 @@ theorem foldl_prefix {K : Type _} [Field K] (α γ : K) (n : ℕ) :
     rw [List.range_succ, List.foldl_append, ih]
     simp; ring
 
-/-- **The challenge table.** A width of 0 panics; otherwise bus i gets alpha + (i + 1) beta^W. -/
+/-- **The challenge table.**
+
+A width of 0 panics.
+
+Otherwise bus i gets alpha + (i + 1) beta^W. -/
 theorem challenges_new {K : Type _} [Field K] (α β : K) (W n : ℕ) :
     Challenges.new α β W n =
       if W = 0 then none else
@@ -93,7 +97,11 @@ theorem foldlM_checked_add (ws : List ℕ) (a : ℕ) (ha : a ≤ U32_MAX) :
       simp only [Option.bind_eq_bind, Option.bind_none]
       rw [ite_eq_right_iff.2 (fun h => absurd h (by omega))]
 
-/-- **The local weight is summed exactly.** A local lookup's weight is the sum of its tuples' weights, and a sum above u32::MAX panics rather than clamps. -/
+/-- **The local weight is summed exactly.**
+
+A local lookup's weight is the sum of its tuples' weights.
+
+A sum above 2^32 - 1 panics rather than clamps. -/
 theorem local_weight {F : Type} (i : SymbolicLocalInteraction F) :
     i.tuples.foldlM (fun acc t => checked_add_u32 acc t.2.2) 0 =
       if (i.tuples.map (·.2.2)).sum ≤ U32_MAX then some (i.tuples.map (·.2.2)).sum else none := by
@@ -103,7 +111,11 @@ theorem local_weight {F : Type} (i : SymbolicLocalInteraction F) :
 
 /-! ## The height bound -/
 
-/-- **The height bound.** Unequal lengths panic; otherwise it accepts exactly when sum_i w_i h_i < p. -/
+/-- **The height bound.**
+
+Unequal lengths panic.
+
+Otherwise it accepts exactly when sum_i w_i h_i < p. -/
 theorem check_multiplicity_height_bound_iff {F : Type} (p : ℕ) (lookups : List (List (Lookup F)))
     (heights : List ℕ) (h : lookups.length = heights.length) :
     check_multiplicity_height_bound p lookups heights = some (.ok ()) ↔

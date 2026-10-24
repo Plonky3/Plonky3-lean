@@ -12,7 +12,9 @@ A codeword of log height N stores P(G_N^rev_N(i)) at index i.
 
 One arity-2 pass maps it to the codeword of the fold of P by 2, of log height N - 1.
 
-The scalar paths of the matrix fold are such passes, so they return, row by row, the row fold the verifier computes.
+The scalar paths of the matrix fold are such passes.
+
+So they return, row by row, the row fold the verifier computes.
 -/
 
 namespace Plonky3Lean.Proofs.Fri
@@ -95,7 +97,9 @@ theorem fold_row_codeword {P : K[X]} {n k : ℕ} (hnk : n + k ≤ G.adicity) {d 
 def IsHalveTable (N : ℕ) (tbl : List K) : Prop :=
   ∀ M, 1 ≤ M → M ≤ N → ∀ i < 2 ^ (M - 1), tbl.getD i 0 = 1 / 2 * (G.gen M)⁻¹ ^ bitRev (M - 1) i
 
-/-- The bit-reversed table of G_N^(-i) / 2 is valid at every log height up to N: its prefixes are the smaller tables. -/
+/-- The bit-reversed table of G_N^(-i) / 2 is valid at every log height up to N.
+
+Its prefixes are the smaller tables. -/
 theorem halveTable_full {N : ℕ} (hN1 : 1 ≤ N) (hNa : N ≤ G.adicity) :
     IsHalveTable G N (revIndex (2 ^ (N - 1)) (shiftedPowersList (G.gen N)⁻¹ (1 / 2) (2 ^ (N - 1)))) := by
   intro M hM1 hMN i hi
@@ -141,7 +145,9 @@ theorem foldRounds_codeword {N : ℕ} (hNa : N ≤ G.adicity) {tbl : List K} (ht
     have := foldRounds_codeword hNa ht r (M - 1) _ (β ^ 2) _ (by omega) (by omega) hp
     rwa [← polyFold_two_pow, show M - 1 - r = M - (r + 1) by omega] at this
 
-/-- The scalar matrix fold maps the codeword of P at log height n + k to the codeword of its fold by 2^k at log height n. -/
+/-- The scalar matrix fold maps the codeword of P at log height n + k to the codeword of its fold.
+
+The fold is by 2^k, at log height n. -/
 theorem fold_matrix_scalar_codeword {P : K[X]} {n k : ℕ} (hk : 1 ≤ k) (hnk : n + k ≤ G.adicity)
     {v : List K} (hv : IsCodeword G P (n + k) v) (β : K) :
     ∃ L, fold_matrix_scalar G β k v = some L ∧ IsCodeword G (polyFold P (2 ^ k) β) n L := by
@@ -193,7 +199,9 @@ theorem isCodeword_wordPoly {N : ℕ} (hNa : N ≤ G.adicity) {v : List K} (hv :
     (mem_univ ⟨i, hi⟩)
   exact this.symm
 
-/-- The prover's matrix fold returns, for each row, the verifier's row fold: on every word, not only on codewords. -/
+/-- The prover's matrix fold returns, for each row, the verifier's row fold.
+
+This holds on every word, not only on codewords. -/
 theorem fold_matrix_scalar_rows {n k : ℕ} (hk : 1 ≤ k) (hnk : n + k ≤ G.adicity) {v : List K}
     (hv : v.length = 2 ^ (n + k)) (β : K) :
     fold_matrix_scalar G β k v = some ((List.range (2 ^ n)).map fun t =>
@@ -209,7 +217,9 @@ theorem fold_matrix_scalar_rows {n k : ℕ} (hk : 1 ≤ k) (hnk : n + k ≤ G.ad
     rw [List.getElem_map, List.getElem_range, fold_row_codeword G hV hN h2 hnk hc ht β, ← hLc.2 t ht,
       List.getD_eq_getElem]
 
-/-- One arity-2 fold of two codeword values of Q at log height m + 1 gives the fold of Q by 2 at point i of log height m. -/
+/-- Fold two codeword values of Q at log height m + 1 with arity 2.
+
+This gives the fold of Q by 2 at point i of log height m. -/
 theorem foldPair_dom (Q : K[X]) {m i : ℕ} (hm : m + 1 ≤ G.adicity) (hi : i < 2 ^ m) (β : K) :
     foldPair (Q.eval (dom G (m + 1) (2 * i))) (Q.eval (dom G (m + 1) (2 * i + 1))) β
         (1 / 2 * (G.gen (m + 1))⁻¹ ^ bitRev m i) = (polyFold Q 2 β).eval (dom G m i) := by

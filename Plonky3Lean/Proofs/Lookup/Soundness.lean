@@ -11,10 +11,14 @@ The challenges (alpha, beta) are drawn uniformly from a finite field K after the
 
 An unbalanced list of N messages passes one of two ways:
 
-- a denominator vanishes, which leaves a fraction column free: at most N |K| pairs;
-- the sum of m / d vanishes with every denominator nonzero: a root of the cleared polynomial, at most (N - 1) W |K| pairs.
+- a denominator vanishes, which leaves a fraction column free
+- the sum of m / d vanishes with every denominator nonzero, at a root of the cleared polynomial.
 
-Together at most N (W + 1) |K| of the |K|^2 pairs, below the N (W + 2) / |K| that p3-security charges.
+The first happens for at most N |K| pairs, the second for at most (N - 1) W |K|.
+
+Together that is at most N (W + 1) |K| of the |K|^2 pairs.
+
+This is below the rate N (W + 2) / |K| that p3-security charges.
 -/
 
 namespace Plonky3Lean.Proofs.Lookup
@@ -30,7 +34,9 @@ theorem eval_clearedMv (α β : K) (W : ℕ) (G : Finset (Key K)) (M : Key K →
       ∑ c ∈ G, M c * ∏ c' ∈ G.erase c, busDenom α β W c'.1 c'.2 := by
   simp [clearedMv, eval_busDenomMv]
 
-/-- With no vanishing denominator, the sum of M_c / D_c is the cleared polynomial over the product of the denominators. -/
+/-- Assume no denominator vanishes.
+
+Then the sum of M_c / D_c is the cleared polynomial over the product of the denominators. -/
 theorem sum_div_eq_cleared (α β : K) (W : ℕ) (G : Finset (Key K)) (M : Key K → K)
     (hD : ∀ c ∈ G, busDenom α β W c.1 c.2 ≠ 0) :
     ∑ c ∈ G, M c / busDenom α β W c.1 c.2 =
@@ -82,7 +88,11 @@ theorem card_denom_zero_le (W bus : ℕ) (e : List K) :
   refine Prod.ext ?_ h
   rw [h] at hx'; linear_combination hx' - hy'
 
-/-- **Soundness of the bus sum.** An unbalanced list of messages, with widths at most W and one width per bus, passes on at most N (W + 1) |K| of the |K|^2 challenge pairs.
+/-- **Soundness of the bus sum.**
+
+Take an unbalanced list of messages, with widths at most W and one width per bus.
+
+It passes on at most N (W + 1) |K| of the |K|^2 challenge pairs.
 
 Passing means that a denominator vanishes, or that the sum of m / d vanishes. -/
 theorem card_bad_challenges_le (msgs : List (Key K × K)) {W : ℕ} (hW : 1 ≤ W)

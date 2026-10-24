@@ -10,7 +10,9 @@ public import Plonky3Lean.Proofs.Commit.Trivial
 
 Binding follows from soundness: two accepted openings of one column at one point agree.
 
-The default quotient commit hands the extension step chunk i of the quotient domain with the quotient's values on that chunk.
+The default quotient commit gives the extension step chunk i of the quotient domain.
+
+With it go the quotient's values on that chunk.
 -/
 
 open Polynomial Finset
@@ -21,7 +23,9 @@ namespace Plonky3Lean.Proofs.Commit
 
 set_option linter.unusedSectionVars false
 
-/-- Binding: two accepted claims about one commitment, matrix, domain and point carry the same values, unless Broken. -/
+/-- Binding: two accepted claims about one commitment, matrix, domain and point agree.
+
+They carry the same values, unless the contract's failure event occurs. -/
 theorem UnivariatePcs.Contract.binding {K : Type _} [Field K] {pcs : UnivariatePcs K}
     (C : pcs.Contract) {cl₁ cl₂ : List (CommitmentOpening K pcs.Commitment pcs.Domain)}
     {pf₁ pf₂ : pcs.Proof} {ch₁ ch₂ b₁ b₂ : pcs.Challenger}
@@ -41,7 +45,9 @@ section defaults
 
 variable {K : Type _} [Field K] [DecidableEq K] (G : Gen K)
 
-/-- The default quotient commit extends chunk i of a quotient domain of order 2^k, split into 2^l, with the values at its points i + 2^l j. -/
+/-- The default quotient commit splits a quotient domain of order 2^k into 2^l chunks.
+
+It extends chunk i with the values at its points i + 2^l j. -/
 theorem commit_quotient_eq (hV : GenValid G) {α : Type _}
     (get_quotient_ldes : List (Coset G × Mat K) → ℕ → Option (List (Mat K)))
     (commit_ldes : List (Mat K) → Option α) (qd : Coset G) (evals : Mat K)

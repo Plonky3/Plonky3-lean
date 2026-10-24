@@ -17,9 +17,11 @@ On a byte message the bit string is a whole number of 136-byte blocks:
                  len % 136               135
 ```
 
-When the message ends one byte short of a block, both marks share the byte, `d ^ 0x80`.
+When the message ends one byte short of a block, both marks share the byte, d ^ 0x80.
 
-Each block XORs into the first 17 lanes as little-endian words, and the digest is the first 32 bytes of lanes 0 to 3.
+Each block XORs into the first 17 lanes as little-endian words.
+
+The digest is the first 32 bytes of lanes 0 to 3.
 -/
 
 namespace Plonky3Lean.Proofs.Keccak
@@ -32,7 +34,7 @@ open Plonky3Lean.Spec.Keccak
 def wordOfBytes (bs : List Byte) : Word :=
   BitVec.ofFnLE fun z : Fin 64 => (bs.getD (z.val / 8) 0).getLsbD (z.val % 8)
 
-/-- The first `n` words of a byte string, 8 bytes each. -/
+/-- The first n words of a byte string, 8 bytes each. -/
 def wordsOfBytes (bs : List Byte) (n : ℕ) : List Word :=
   (List.range n).map fun k => wordOfBytes ((bs.drop (8 * k)).take 8)
 
@@ -42,7 +44,9 @@ def bytesOfWord (w : Word) : List Byte := (List.range 8).map fun j => w.extractL
 /-- Lanes XORed word by word. -/
 def xorLanes (L W : List Word) : List Word := List.zipWith (· ^^^ ·) L W
 
-/-- The bytes after a message of `k` bytes mod 136 that complete its last block: the marks `d` and `0x80`. -/
+/-- The bytes that complete the last block of a message of k bytes mod 136.
+
+They hold the marks d and 0x80. -/
 def padTail (d : Byte) (k : ℕ) : List Byte :=
   ((List.replicate (136 - k) 0).modify 0 (· ^^^ d)).modify (135 - k) (· ^^^ 0x80)
 
@@ -59,11 +63,11 @@ def spongeBytes (d : Byte) (M : List Byte) : List Byte :=
 
 /-! ## The padding -/
 
-/-- The tail bytes of Keccak-256 are `pad10*1`, for each of the 136 positions the message can end at. -/
+/-- The tail bytes of Keccak-256 are pad10*1, for each of the 136 positions the message can end at. -/
 theorem padTail_keccak : ∀ k : Fin 136, bitsOfBytes (padTail 0x01 k) = pad101 1088 (8 * k) := by
   decide +kernel
 
-/-- The tail bytes of SHA3-256 are the suffix `01` followed by `pad10*1`. -/
+/-- The tail bytes of SHA3-256 are the suffix 01 followed by pad10*1. -/
 theorem padTail_sha3 : ∀ k : Fin 136, bitsOfBytes (padTail 0x06 k) = [false, true] ++ pad101 1088 (8 * k + 2) := by
   decide +kernel
 
@@ -85,7 +89,7 @@ theorem bitsOfBytes_append (l l' : List Byte) : bitsOfBytes (l ++ l') = bitsOfBy
 theorem length_bitsOfBytes (l : List Byte) : (bitsOfBytes l).length = 8 * l.length := by
   simp [bitsOfBytes, List.length_flatMap, Nat.mul_comm]
 
-/-- Keccak-256's padded message, in bits, is the message followed by `pad10*1`. -/
+/-- Keccak-256's padded message, in bits, is the message followed by pad10*1. -/
 theorem bits_padBytes_keccak (M : List Byte) :
     bitsOfBytes (padBytes 0x01 M) = bitsOfBytes M ++ pad101 1088 (bitsOfBytes M).length := by
   rw [padBytes, bitsOfBytes_append, padTail_keccak ⟨_, Nat.mod_lt _ (by decide)⟩, length_bitsOfBytes,
@@ -93,7 +97,7 @@ theorem bits_padBytes_keccak (M : List Byte) :
   congr 2
   omega
 
-/-- SHA3-256's padded message, in bits, is the message, the suffix `01`, and `pad10*1`. -/
+/-- SHA3-256's padded message, in bits, is the message, the suffix 01, and pad10*1. -/
 theorem bits_padBytes_sha3 (M : List Byte) :
     bitsOfBytes (padBytes 0x06 M) =
       (bitsOfBytes M ++ [false, true]) ++ pad101 1088 (bitsOfBytes M ++ [false, true]).length := by
@@ -253,11 +257,11 @@ theorem keccakC_eq (d : Byte) (M : List Byte) (N : List Bool)
   rw [h0, key _ (fun t h => by simpa using h) _ (by simp), show 256 / 1088 + 1 = 1 by rfl, squeeze, squeeze,
     List.append_nil, List.take_take, show min 256 1088 = 64 * 4 by rfl, toBits_take, bytesOfBits_toBits]
 
-/-- Keccak-256 of a byte message is the sponge on lanes with first padding byte `0x01`. -/
+/-- Keccak-256 of a byte message is the sponge on lanes with first padding byte 0x01. -/
 theorem keccak256_eq (M : List Byte) : keccak256 M = spongeBytes 0x01 M :=
   keccakC_eq _ _ _ (bits_padBytes_keccak M)
 
-/-- SHA3-256 of a byte message is the sponge on lanes with first padding byte `0x06`. -/
+/-- SHA3-256 of a byte message is the sponge on lanes with first padding byte 0x06. -/
 theorem sha3_256_eq (M : List Byte) : sha3_256 M = spongeBytes 0x06 M :=
   keccakC_eq _ _ _ (bits_padBytes_sha3 M)
 

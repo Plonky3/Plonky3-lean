@@ -9,7 +9,9 @@ public import Plonky3Lean.Proofs.KeccakAir.Complete
 /-!
 # Completeness of the characteristic-2 Keccak-f AIR
 
-Over a field of characteristic 2, the generator's trace satisfies the AIR, with or without the state booleanity.
+Over a field of characteristic 2, the generator's trace satisfies the AIR.
+
+This holds with or without the state booleanity.
 
 Row 25 j + r of the trace is round r of permutation j for r < 24, and its output row for r = 24.
 
@@ -84,7 +86,11 @@ theorem perm_rowsB (input : LState) :
 
 /-! ## The constraints of one row, from the kinds and states of two rows -/
 
-/-- Flags k may be followed by flags k': k + 1 below round 23, an output row after round 23, and round 0 or an output row after an output row. -/
+/-- Flags k may be followed by flags k':
+
+- k + 1 below round 23
+- an output row after round 23
+- round 0 or an output row after an output row. -/
 def Succ (k k' : ℕ) : Prop := (k < 23 ∧ k' = k + 1) ∨ (k = 23 ∧ k' = 24) ∨ (k = 24 ∧ (k' = 0 ∨ k' = 24))
 
 section local_
@@ -98,7 +104,11 @@ theorem bitF_self_add (b : Bool) : (bitF b : F) + bitF b = 0 := by
 theorem bitF_cancel (c r : Bool) : (bitF c : F) + bitF (c ^^ r) + bitF r = 0 := by
   cases c <;> cases r <;> simp [bitF, one_add_one_eq_two, h2]
 
-/-- Two rows whose kinds follow each other, whose states are words, and whose states follow by the round, meet the row constraints. -/
+/-- Two rows meet the row constraints when:
+
+- their kinds follow each other
+- their states are words
+- their states follow by the round. -/
 theorem rowSpecB_local (cb : Bool) {loc nxt : ℕ → F} {first : F} {k k' : ℕ} {Sl Sn : LState}
     (hk : k < 25) (hf : OneHot loc k) (hf' : OneHot nxt k') (hs : Succ k k')
     (hl : ∀ y < 5, ∀ x < 5, ∀ z < 64, loc (binary.col.a y x z) = bitF ((Sl (5 * y + x)).getLsbD z))
@@ -297,7 +307,9 @@ theorem row_state {j : ℕ} (hj : j < (inputs.length * 25).nextPowerOfTwo) :
 
 end rows
 
-/-- Completeness: over a field of characteristic 2, the generator's trace satisfies the AIR, with or without the state booleanity. -/
+/-- Completeness: over a field of characteristic 2, the generator's trace satisfies the AIR.
+
+This holds with or without the state booleanity. -/
 theorem complete [Inhabited F] [DecidableEq F] (h2 : (2 : F) = 0) (cb : Bool) {inputs : List LState}
     (hne : inputs ≠ []) (e : ℕ) :
     ∃ M, generate_binary_trace_rows (F := F) inputs e = some M ∧

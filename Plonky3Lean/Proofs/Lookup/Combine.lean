@@ -58,7 +58,11 @@ theorem dot_product_eq (l : List K) (r : List F) (h : l.length = r.length) :
   have hi := mem_range.1 hi
   simp [List.getD_eq_getElem?_getD, hi, h ▸ hi]
 
-/-- **The prover's combiner is the fingerprint.** For entries resolving to v and a power table at least as wide, it computes fingerprint(v) in the extension. -/
+/-- **The prover's combiner is the fingerprint.**
+
+Take entries resolving to v and a power table at least as wide.
+
+The combiner computes fingerprint(v) in the extension. -/
 theorem combine_tuple_eq (elts : List (SymbolicExpression F)) (β : K) {W : ℕ}
     (ctx : p3_air.builder.mirror.AirBuilder F F Unit) {v : List F}
     (hv : elts.mapM (resolve ctx ()) = some v) (hW : elts.length ≤ W) :
@@ -91,7 +95,9 @@ theorem combine_tuple_eq (elts : List (SymbolicExpression F)) (β : K) {W : ℕ}
         simp [List.getD_eq_getElem?_getD, List.getElem?_append_left (by simp; omega : i < (vd.map _).length),
           hi, hk ▸ hi, mul_comm]
 
-/-- The prover's pairs of an additive lookup on a row: denominator 1 for a zero count, else alpha - fingerprint. -/
+/-- The prover's pairs of an additive lookup on a row.
+
+The denominator is 1 for a zero count, else alpha - fingerprint. -/
 def proverTerms (α β : K) (ev : List (List F)) (mv : List F) : List (K × F) :=
   (ev.zip mv).map fun x => (if x.2 = 0 then 1 else α - fingerprint β (x.1.map (algebraMap F K)), x.2)
 
@@ -115,7 +121,11 @@ theorem mapM_getElem {α β : Type _} {f : α → Option β} {l : List α} {v : 
     | zero => simpa using hb
     | succ i => simpa using ih hw (by simpa using hi)
 
-/-- **The prover's pairs on a row**, for an additive lookup whose entries resolve to ev and counts to mv, with a power table at least as wide as every tuple. -/
+/-- **The prover's pairs on a row**, for an additive lookup.
+
+Its entries resolve to ev and its counts to mv.
+
+The power table is at least as wide as every tuple. -/
 theorem lookup_row_terms_additive (ctx : p3_air.builder.mirror.AirBuilder F F Unit)
     (lookup : Lookup F) (hflags : lookup.flags = none) (α β : K) {W : ℕ}
     (hW : ∀ e ∈ lookup.elements, e.length ≤ W) {ev : List (List F)} {mv : List F}
@@ -151,7 +161,11 @@ theorem lookup_row_terms_additive (ctx : p3_air.builder.mirror.AirBuilder F F Un
       List.getElem?_eq_getElem (show j < ev.length by omega), Option.getD_some]
     split_ifs <;> rfl
 
-/-- **The prover's fraction is the honest one.** The inverses times the counts sum to the fraction of the true denominators, the zero-count skip included. -/
+/-- **The prover's fraction is the honest one.**
+
+The inverses times the counts sum to the fraction of the true denominators.
+
+This includes the zero-count skip. -/
 theorem prover_fraction (α β : K) (ev : List (List F)) (mv : List F) (hlen : mv.length = ev.length) :
     dot_product ((proverTerms α β ev mv).map fun x => x.1⁻¹) ((proverTerms α β ev mv).map (·.2)) =
       fracSum (rowTerms (ev.map (·.map (algebraMap F K))) (mv.map (algebraMap F K)) α β) := by

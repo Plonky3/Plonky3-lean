@@ -11,7 +11,7 @@ The lanes the batch computes for one message are the lanes of the sponge on byte
 
 A whole block XORs its 17 little-endian words into the rate.
 
-The final block XORs the leftover bytes, the first padding byte and the closing mark `0x80`:
+The final block XORs the leftover bytes, the first padding byte and the closing mark 0x80:
 
 ```text
     word k / 8:   [ leftover bytes | d | 0 ... 0 ]          (k / 8 < 16)
@@ -119,7 +119,7 @@ theorem closing_bit : ∀ z : Fin 64, closing.bv.getLsbD z = (z.val == 63) := by
 
 theorem mark_bit : ∀ i : Fin 8, (0x80#8 : BitVec 8).getLsbD i = (i.val == 7) := by decide
 
-/-- A word equals the word of a byte list when bit `z` is bit `z % 8` of byte `z / 8`. -/
+/-- A word equals the word of a byte list when bit z is bit z % 8 of byte z / 8. -/
 theorem eq_wordOfBytes (x : Word) (l : List (BitVec 8))
     (h : ∀ z < 64, x.getLsbD z = (l.getD (z / 8) 0).getLsbD (z % 8)) : x = wordOfBytes l := by
   apply BitVec.eq_of_getLsbD_eq
@@ -181,7 +181,7 @@ theorem getD_drop_take (l : List (BitVec 8)) (a i : ℕ) (hi : i < 8) :
     ((l.drop a).take 8).getD i 0 = l.getD (a + i) 0 := by
   simp [List.getD_eq_getElem?_getD, hi]
 
-/-- Byte `m` of the last padded block: a leftover byte, or a byte of the padding. -/
+/-- Byte m of the last padded block: a leftover byte, or a byte of the padding. -/
 theorem getD_lastBlock (input : Slice Std.U8) (q k : ℕ) (d : BitVec 8) (hq : q + k ≤ input.val.length)
     (m : ℕ) :
     (((bvs input).drop q).take k ++ padTail d k).getD m 0 =
@@ -337,7 +337,7 @@ theorem finalL_bv (L : List Std.U64) (hL : L.length = 25) (input : Slice Std.U8)
 
 /-! ## One digest -/
 
-/-- The sponge's lanes after the first `b` blocks of the padded message. -/
+/-- The sponge's lanes after the first b blocks of the padded message. -/
 def spongeLanes (P : List (BitVec 8)) (b : ℕ) : List Word :=
   (List.range b).foldl
     (fun L i => keccakFL (xorLanes L (wordsOfBytes ((P.drop (136 * i)).take 136) 17 ++ List.replicate 8 0)))
@@ -395,7 +395,7 @@ theorem digestAt_bv (L : List Std.U64) (hL : L.length = 25) :
   rw [List.getElem?_take, ite_eq_left_of_eq_true _ _ (eq_true (by omega : i / 8 < 4)), List.getElem?_map]
   cases L[i / 8]? <;> rfl
 
-/-- Digest `j` of the batch is the sponge on its message, with first padding byte `d`. -/
+/-- Digest j of the batch is the sponge on its message, with first padding byte d. -/
 theorem length_msgLanes (input : Slice Std.U8) (p len : ℕ) (d : Std.U8) : (msgLanes input p len d).length = 25 :=
   (rounds_eq _ (by rw [length_finalL, length_blocksL])).2
 
@@ -407,7 +407,7 @@ theorem digestOf_bv (input : Slice Std.U8) (len : ℕ) (d : Std.U8) (j : ℕ) (h
   rw [length_padBytes, hM, Nat.mul_div_cancel_left _ (by decide)]
   rfl
 
-/-- The state array of 25 words: lane `(x, y)` is word `x + 5 y`, and `A[x, y, z]` is its bit `z`. -/
+/-- The state array of 25 words: lane (x, y) is word x + 5 y, and A[x, y, z] is its bit z. -/
 def stateOfWords (w : List Std.U64) : State := fun x y z => (w.getD (x.val + 5 * y.val) 0#u64).bv.getLsbD z.val
 
 theorem stateOfWords_eq (w : List Std.U64) : stateOfWords w = ofLanes (w.map UScalar.bv) := by
@@ -417,7 +417,9 @@ theorem stateOfWords_eq (w : List Std.U64) : stateOfWords w = ofLanes (w.map USc
 
 /-! ## The two batched hashes -/
 
-/-- With `n > 0` digests requested and an input of `n * len` bytes, digest `j` is `H` of bytes `j len` to `(j + 1) len - 1`. -/
+/-- Take n > 0 digests requested and an input of n * len bytes.
+
+Digest j is H of bytes j len to (j + 1) len - 1. -/
 theorem hash_many_digests (d : Std.U8) (input : Slice Std.U8) (out : Slice (Std.Array Std.U8 32#usize)) (len : ℕ)
     (hn : 0 < out.val.length) (hlen : input.val.length = out.val.length * len) :
     ∃ r, p3_keccak.hax_reshaped.hash_many_with_domain d input out = .ok r ∧ r.val.length = out.val.length ∧

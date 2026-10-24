@@ -266,7 +266,11 @@ theorem mapInsert_ne_nil (k v : ℕ) (L : List (ℕ × List ℕ)) (hL : ∀ e �
       · exact hL.1
       · exact ih e he
 
-/-- The grouping invariant: every group is nonempty, its members are known indices of its length, and every known index has a group. -/
+/-- The grouping invariant:
+
+- every group is nonempty
+- its members are known indices of its length
+- every known index has a group. -/
 def GroupInv (cols : List (List K)) (M : List (ℕ × List ℕ)) (S : ℕ → Prop) : Prop :=
   (∀ e ∈ M, e.2 ≠ [] ∧ ∀ j ∈ e.2, S j ∧ (cols.getD j []).length = e.1) ∧
     ∀ j, S j → ∃ e ∈ M, j ∈ e.2

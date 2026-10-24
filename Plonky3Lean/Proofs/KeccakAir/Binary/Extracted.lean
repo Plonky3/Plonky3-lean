@@ -27,7 +27,7 @@ open Aeneas Aeneas.Std CoreModels Plonky3Lean.Lib p3_keccak_air.mirror p3_keccak
 open Plonky3Lean.Proofs.Keccak (u32k u32k_val eq_u32k u32k_rem u64_shr usz_div rotateLeft_zero
   cast_usz_u32k)
 
-/-- Folding a step that always succeeds over `start..end`, with the index, folds it over the range. -/
+/-- Folding a step that always succeeds over an index range, with the index, folds it over the range. -/
 theorem iter_fold_loop_range_idx {B F : Type}
     (inst : CoreModels.core.ops.function.FnMut F (B × Std.Usize) B) (f : F) (g : B → ℕ → B)
     (K : ℕ) (hstep : ∀ b (i : Std.Usize), i.val < K → inst.call_mut f (b, i) = .ok (g b i.val, f)) :
@@ -322,7 +322,9 @@ theorem RC_bv {r : ℕ} (h : r < p3_keccak_air.constants.RC.val.length) :
   simp only [Option.map_some, Option.getD_some]
   apply BitVec.eq_of_toNat_eq; simp
 
-/-- The extracted round on an array of words never panics for a round below 24, and computes the transcribed round, word for word. -/
+/-- The extracted round on an array of words never panics for a round below 24.
+
+It computes the transcribed round, word for word. -/
 theorem keccak_round_extracted (state : Std.Array Std.U64 25#usize) (round : Std.Usize)
     (hr : round.val < 24) :
     ∃ out, p3_keccak_air.binary.generation.keccak_round state round = .ok out ∧

@@ -45,7 +45,9 @@ theorem first_point_eq (c : Coset G) :
     Coset.first_point G c = cosetPoints c.shift c.subgroup_generator c.log_size ⟨0, by simp⟩ := by
   simp [Coset.first_point, cosetPoints]
 
-/-- The next point of s omega^i is s omega^(i + 1); after point n - 1 it wraps to point 0. -/
+/-- The next point of s omega^i is s omega^(i + 1).
+
+After point n - 1 it wraps to point 0. -/
 theorem next_point_eq (hV : GenValid G) (c : Coset G) (i : ℕ) :
     Coset.next_point G c (c.shift * c.subgroup_generator ^ i) =
       some (c.shift * c.subgroup_generator ^ ((i + 1) % 2 ^ c.log_size)) := by
@@ -59,7 +61,9 @@ theorem log2Ceil_le_iff (m A : ℕ) : log2Ceil m ≤ A ↔ m ≤ 2 ^ A := by
 theorem le_pow_log2Ceil (m : ℕ) : m ≤ 2 ^ log2Ceil m := by
   have := Nat.lt_size_self (m - 1); rw [log2Ceil]; omega
 
-/-- A disjoint domain exists exactly for min_size <= 2^adicity, with shift s g and size at least min_size. -/
+/-- A disjoint domain exists exactly when the minimum size is at most 2^adicity.
+
+It has shift s g and size at least the minimum size. -/
 theorem try_create_disjoint_domain_eq (c : Coset G) (g : K) (hg : g ≠ 0) (m : ℕ) :
     (Coset.try_create_disjoint_domain G c g m).isSome ↔ m ≤ 2 ^ G.adicity := by
   simp [Coset.try_create_disjoint_domain, TwoAdicMultiplicativeCoset.new, c.shift_ne_zero, hg,
@@ -209,7 +213,9 @@ theorem foldl_rows {V : Type _} (rows : ℕ → V) (nc m : ℕ) (acc : ℕ → �
     · simp
     · simp [hr, show r < m + 1 ↔ r < m by omega]
 
-/-- Splitting the evaluations into 2^l chunks: row j of chunk i is row i + 2^l j, the value at point j of chunk i. -/
+/-- Splitting the evaluations into 2^l chunks.
+
+Row j of chunk i is row i + 2^l j, the value at point j of chunk i. -/
 theorem split_evals_eq {V : Type _} [Zero V] (c : Coset G) {l : ℕ} (hl : l ≤ c.log_size)
     (rows : ℕ → V) :
     Coset.split_evals G c (2 ^ l) (Coset.size G c) rows =
@@ -304,7 +310,12 @@ theorem selectors_at_point_none (hV : GenValid G) (c : Coset G) (x : K) :
       rw [mul_pow, inv_pow, h, mul_inv_cancel₀ (pow_ne_zero _ hs), sub_self]
     simp [h3]
 
-/-- Off the coset the selectors are n L_0(x), n omega L_(n-1)(x), (x - s omega^(n-1)) / s and s^n / Z(x), for Z the monic vanishing polynomial. -/
+/-- Off the coset the selectors are:
+
+- n L_0(x)
+- n omega L_(n-1)(x)
+- (x - s omega^(n-1)) / s
+- s^n / Z(x), for Z the monic vanishing polynomial. -/
 theorem selectors_at_point_some (hV : GenValid G) (h2 : (2 : K) ≠ 0) (c : Coset G) (x : K)
     (hx : ¬ InCoset c.shift c.subgroup_generator c.log_size x) :
     Coset.selectors_at_point G c x = some

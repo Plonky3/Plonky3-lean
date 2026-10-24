@@ -7,7 +7,9 @@ public import Plonky3Lean.Proofs.Commit.Domain
 /-!
 # p3-commit: evaluating periodic columns at a point
 
-A column of length p = 2^l over a trace coset s H of order n = 2^k defines the polynomial P of degree below n with
+Take a column of length p = 2^l over a trace coset s H of order n = 2^k.
+
+It defines the polynomial P of degree below n with
 
 ```text
     P(s omega^i) = col[i mod p]          for 0 <= i < n
@@ -15,7 +17,9 @@ A column of length p = 2^l over a trace coset s H of order n = 2^k defines the p
 
 Write f = k - l.
 
-The code evaluates Q(x^(2^f)) instead, for Q the interpolant of the column over the coset s^(2^f) H^(2^f) of order p.
+The code evaluates Q(x^(2^f)) instead.
+
+Here Q interpolates the column over the coset s^(2^f) H^(2^f) of order p.
 
 The two agree because Q(X^(2^f)) has degree below n and takes the same values on s H.
 -/
@@ -48,7 +52,9 @@ theorem evaluate_polynomial_at_none (c : Coset G) (evals : List K)
     (hlen : ∀ k, evals.length ≠ 2 ^ k) (x : K) : Coset.evaluate_polynomial_at G c evals x = none := by
   simp [Coset.evaluate_polynomial_at, log2Strict_eq_none hlen]
 
-/-- Q(X^(2^f)), for Q of degree below 2^l through values on s^(2^f) H_l, is the periodic polynomial over s H_k. -/
+/-- Q(X^(2^f)) is the periodic polynomial over s H_k.
+
+Here Q has degree below 2^l and passes through the values on s^(2^f) H_l. -/
 theorem comp_eq_periodicPoly (hV : GenValid G) (hN : GenNested G) {s : K} (hs : s ≠ 0) {k l : ℕ}
     (hk : k ≤ G.adicity) (hl : l ≤ k) (col : List K) (hcol : col.length = 2 ^ l) :
     (interpolant (s ^ 2 ^ (k - l)) (G.gen l) l fun i => col.getD i.val 0).comp (X ^ 2 ^ (k - l)) =

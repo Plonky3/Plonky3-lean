@@ -9,7 +9,9 @@ public import Plonky3Lean.Proofs.KeccakAir.GenRow
 
 The generator fills the 24 rows of a permutation one round at a time.
 
-Row k holds round k: its input limbs are those of the state after k rounds, and its preimage is the input state.
+Row k holds round k.
+
+Its input limbs are those of the state after k rounds, and its preimage is the input state.
 -/
 
 set_option linter.unusedSectionVars false

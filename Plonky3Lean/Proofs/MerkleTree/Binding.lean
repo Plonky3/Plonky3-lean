@@ -54,7 +54,11 @@ theorem group_lengths (order : List ℕ) (o1 o2 : List (List F))
   intro m _
   exact hlen m
 
-/-- Two walks over one plan that reach one digest started from one digest and read the same injected rows, or one of the two functions has a collision. -/
+/-- Take two walks over one plan that reach one digest.
+
+They started from one digest and read the same injected rows.
+
+Otherwise one of the two functions has a collision. -/
 theorem walk_binding (h : List (List F) → D) (c : List D → D) (pad : List D) (z : D)
     (order : List ℕ) (o1 o2 : List (List F)) (p1 p2 : List D)
     (hlen : ∀ m, (o1.getD m []).length = (o2.getD m []).length) (hpad : 2 ≤ pad.length) :

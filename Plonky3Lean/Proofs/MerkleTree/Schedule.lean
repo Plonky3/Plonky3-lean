@@ -9,7 +9,9 @@ public import Plonky3Lean.Proofs.MerkleTree.Geometry
 
 Each dimension-only computation of the verifier, read backwards, is a function of the heights.
 
-The schedule loop may not return, so its function takes a fuel bound and answers `none` when the fuel runs out.
+The schedule loop may not return.
+
+So its function takes a fuel bound and returns no schedule when the fuel runs out.
 -/
 
 open CoreModels Aeneas
@@ -22,11 +24,11 @@ namespace Plonky3Lean.Proofs.MerkleTree
 def maxHeight (dims : Slice p3_matrix.Dimensions) : ℕ :=
   (dims.val.map fun d => d.height.val).foldl max 0
 
-/-- Where a matrix of height `h` goes in an order sorted tallest first: after every matrix at least as tall. -/
+/-- Where a matrix of height h goes in an order sorted tallest first: after every matrix at least as tall. -/
 def insertPos (height : ℕ → ℕ) (order : List ℕ) (h : ℕ) : ℕ :=
   order.findIdx fun j => decide (height j < h)
 
-/-- The matrix indices `0 .. n`, tallest first, ties in input order, built by insertion. -/
+/-- The matrix indices below n, tallest first, ties in input order, built by insertion. -/
 def sortTallest (height : ℕ → ℕ) : ℕ → List ℕ
   | 0 => []
   | n + 1 =>
@@ -34,19 +36,21 @@ def sortTallest (height : ℕ → ℕ) : ℕ → List ℕ
     let j := insertPos height o (height n)
     o.take j ++ n :: o.drop j
 
-/-- The first position at or after `p` whose matrix does not round up to `lnpt`. -/
+/-- The first position at or after p whose matrix height does not round up to the given power of two. -/
 def leafEnd (height : ℕ → ℕ) (order : List ℕ) (lnpt : ℕ) (p : ℕ) : ℕ :=
   if p < order.length ∧ npt (height (order.getD p 0)) = lnpt then leafEnd height order lnpt (p + 1)
   else p
 termination_by order.length - p
 
-/-- The arity the verifier picks at a layer of padded width `curr`, with the matrices `order[from..]` still to enter. -/
+/-- The arity the verifier picks at a layer of the given padded width.
+
+The matrices of the order from the given position on are still to enter. -/
 def selectSpec (N curr lnpt : ℕ) (height : ℕ → ℕ) (order : List ℕ) (from' : ℕ) : ℕ :=
   if curr < N then 2
   else if (order.drop from').any (fun k => decide (npt (height k) ≠ lnpt) && decide (npt (height k) > npt (curr / N)))
   then 2 else N
 
-/-- The schedule loop, run for at most `fuel` levels. -/
+/-- The schedule loop, run for at most the given number of levels. -/
 def schedRun (N lnpt : ℕ) (height : ℕ → ℕ) (order : List ℕ) :
     ℕ → ℕ → ℕ → List ℕ → Option (List ℕ)
   | 0, _, _, _ => none

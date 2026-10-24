@@ -69,7 +69,9 @@ theorem dft_pad_eval {w : ℕ} (ω : K) {k N : ℕ} (hkN : 2 ^ k ≤ N) (x f : �
   have hj' := Finset.mem_range.mp hj
   rw [hx j (by omega), ite_eq_left_of_eq_true _ _ (eq_true hj'), Pi.smul_apply, ← pow_mul]
 
-/-- A message of height 2^k encodes, at rate 2^(-r), to the message polynomials at the 2^(k + r) powers of G_(k + r). -/
+/-- A message of height 2^k encodes at rate 2^(-r).
+
+The codeword lists the message polynomials at the 2^(k + r) powers of G_(k + r). -/
 theorem encode_batch_eq {dft : (w : ℕ) → ℕ → (ℕ → Fin w → K) → Option (ℕ → Fin w → K)}
     (hdft : DftComputes G dft) (m : Mat K) {k r : ℕ} (hh : m.height = 2 ^ k) (hw : m.width ≠ 0)
     (hk : k + r ≤ G.adicity) (hr : r < 64) (hword : m.height * m.width * 2 ^ r < 2 ^ 64) :

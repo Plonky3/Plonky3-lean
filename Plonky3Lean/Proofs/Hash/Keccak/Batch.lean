@@ -10,7 +10,9 @@ public import Plonky3Lean.Lib.Iter
 
 On the extraction target a packed state has one lane, so each group holds one message.
 
-A message of `len` bytes is absorbed in `len / 136` whole blocks, then a final block of `len % 136` bytes closed by the padding.
+A message of len bytes is absorbed in len / 136 whole blocks.
+
+A final block of len % 136 bytes follows, closed by the padding.
 -/
 
 open Aeneas Aeneas.Std CoreModels
@@ -53,7 +55,7 @@ theorem CLOSING_MARK_eq : p3_keccak.CLOSING_MARK = .ok (0x8000000000000000#u64) 
     bind_ok, usz_mul (by decide) (by decide) (by decide), bind_ok, u64_shl_usz _ _ (by decide)]
   rfl
 
-/-- A loop over the range `0..1`: one step, then the exit. -/
+/-- A loop over the range 0..1: one step, then the exit. -/
 theorem loop_once {S : Type}
     (body : CoreModels.core.ops.range.Range Std.Usize × S →
       RustM (ControlFlow (CoreModels.core.ops.range.Range Std.Usize × S) S)) (x y : S)
@@ -91,7 +93,7 @@ theorem getElem_one (a : Std.Array Std.U64 1#usize) (i : ℕ) (hi : i = 0) (h) :
   subst hi
   simp [List.getD_eq_getElem?_getD]
 
-/-- Word `w` of the lanes XORed with `x`. -/
+/-- Word w of the lanes XORed with x. -/
 def xorAt (L : List Std.U64) (w : ℕ) (x : Std.U64) : List Std.U64 := L.set w (L.getD w 0#u64 ^^^ x)
 
 theorem length_xorAt (L : List Std.U64) (w : ℕ) (x : Std.U64) : (xorAt L w x).length = L.length := by
@@ -142,7 +144,7 @@ theorem xor_state_word_eq (st : Std.Array (Std.Array Std.U64 1#usize) 25#usize) 
 
 /-! ## Reading message bytes -/
 
-/-- Arithmetic on `usize` values bounded by the value `n` of some `usize`. -/
+/-- Arithmetic on machine words bounded by the value n of some machine word. -/
 theorem usz_add_le {a b : ℕ} (n : Std.Usize) (h : a + b ≤ n.val) :
     (usz a + usz b : RustM Std.Usize) = .ok (usz (a + b)) := by
   have hmax : (usz a).val + (usz b).val ≤ UScalar.max .Usize := by
@@ -178,7 +180,7 @@ theorem usz_rem_le {a b : ℕ} (n : Std.Usize) (ha : a ≤ n.val) (hb : b ≤ n.
   rw [hz, eq_usz_le (x := z) (k := a % b) n (by have := Nat.mod_le a b; omega)
     (by rw [hv, usz_val_le n ha, usz_val_le n hb])]
 
-/-- The eight bytes at `p`, zero past the end. -/
+/-- The eight bytes at p, zero past the end. -/
 def bytes8 (input : Slice Std.U8) (p : ℕ) : Std.Array Std.U8 8#usize :=
   Std.Array.from (((input.val.drop p).take 8 ++ List.replicate 8 0#u8).take 8) (by simp)
 
@@ -187,7 +189,7 @@ theorem bytes8_val (input : Slice Std.U8) (p : ℕ) (hp : p + 8 ≤ input.val.le
   simp only [bytes8, Std.Array.from_val]
   rw [List.take_append_of_le_length (by simp; omega), List.take_take, Nat.min_self]
 
-/-- `u64::from_le_bytes(input[p..][..8].try_into().unwrap())`. -/
+/-- The code's read of the eight bytes at p, as a little-endian word. -/
 theorem read_word {β : Type} (input : Slice Std.U8) (p : ℕ) (hp : p + 8 ≤ input.val.length)
     (f : Std.U64 → RustM β) :
     (do
@@ -251,10 +253,10 @@ theorem gather_word_eq (input : Slice Std.U8) (starts : Std.Array Std.Usize 1#us
 theorem massert_of (p : Prop) [Decidable p] (h : p) : massert p = .ok () := by
   simp [massert, h]
 
-/-- The message word at byte `q`. -/
+/-- The message word at byte q. -/
 def wordAt (input : Slice Std.U8) (q : ℕ) : Std.U64 := Aeneas.Std.core.num.U64.from_le_bytes (bytes8 input q)
 
-/-- The lanes after XORing the `n` message words from byte `p` into words `0, ..., n - 1`. -/
+/-- The lanes after XORing the n message words from byte p into words 0, ..., n - 1. -/
 def absorbL (L : List Std.U64) (input : Slice Std.U8) (p n : ℕ) : List Std.U64 :=
   (List.range n).foldl (fun L j => xorAt L j (wordAt input (p + 8 * j))) L
 
@@ -314,14 +316,14 @@ theorem eight_mul (w : ℕ) (n : Std.Usize) (h : 8 * w ≤ n.val) :
 
 /-! ## The final block -/
 
-/-- The closing mark `0x80`, in the last byte of a word. -/
+/-- The closing mark 0x80, in the last byte of a word. -/
 def closing : Std.U64 := 0x8000000000000000#u64
 
-/-- The first `j` of the `t` leftover bytes from byte `q`, zero-padded to a word. -/
+/-- The first j of the t leftover bytes from byte q, zero-padded to a word. -/
 def tailBytes (input : Slice Std.U8) (q j : ℕ) : Std.Array Std.U8 8#usize :=
   Std.Array.from ((List.range 8).map fun i => if i < j then input.val.getD (q + i) 0#u8 else 0#u8) (by simp)
 
-/-- The lanes after the final block of `k < 136` bytes from byte `p`, with first padding byte `d`. -/
+/-- The lanes after the final block of k < 136 bytes from byte p, with first padding byte d. -/
 def finalL (L : List Std.U64) (input : Slice Std.U8) (p k : ℕ) (d : Std.U8) : List Std.U64 :=
   let w := k / 8
   let t := k % 8
@@ -460,10 +462,10 @@ theorem absorb_final_block_eq (d : Std.U8) (st : Std.Array (Std.Array Std.U64 1#
 
 /-! ## Squeezing -/
 
-/-- Byte `p` of the lanes, little-endian. -/
+/-- Byte p of the lanes, little-endian. -/
 def byteOf (L : List Std.U64) (p : ℕ) : Std.U8 := ⟨(bytesOfWord (L.getD (p / 8) 0#u64).bv).getD (p % 8) 0⟩
 
-/-- The digest with its first `m` bytes written. -/
+/-- The digest with its first m bytes written. -/
 def digestAt (L : List Std.U64) (m : ℕ) : Std.Array Std.U8 32#usize :=
   Std.Array.from ((List.range 32).map fun p => if p < m then byteOf L p else 0#u8) (by simp)
 
@@ -577,7 +579,7 @@ theorem starts_loop (len g : ℕ) (N : Std.Usize) (hN : g * len ≤ N.val) (hg :
     rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next, range_stop, bind_ok]
     rfl
 
-/-- The lanes after the first `k` whole blocks of the message from byte `p`. -/
+/-- The lanes after the first k whole blocks of the message from byte p. -/
 def blocksL (input : Slice Std.U8) (p k : ℕ) : List Std.U64 :=
   (List.range k).foldl (fun L b => tiny_keccak.keccakf.rounds (absorbL L input (p + b * 136) 17))
     (List.replicate 25 0#u64)
@@ -643,11 +645,11 @@ theorem blocks_loop (input : Slice Std.U8) (starts : Std.Array Std.Usize 1#usize
     rw [CoreModels.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next, range_stop, bind_ok]
     rfl
 
-/-- The lanes after the whole blocks and the final block of the `len` bytes from byte `p`, permuted. -/
+/-- The lanes after the whole blocks and the final block of the len bytes from byte p, permuted. -/
 def msgLanes (input : Slice Std.U8) (p len : ℕ) (d : Std.U8) : List Std.U64 :=
   tiny_keccak.keccakf.rounds (finalL (blocksL input p (len / 136)) input (p + len / 136 * 136) (len % 136) d)
 
-/-- The digests after the first `m` groups: the first `m` digests, then what `out` held. -/
+/-- The digests after the first m groups: the first m digests, then what the output held. -/
 def outAt (out : Slice (Std.Array Std.U8 32#usize)) (D : ℕ → Std.Array Std.U8 32#usize) (m : ℕ) :
     Slice (Std.Array Std.U8 32#usize) :=
   Slice.from ((List.range out.val.length).map fun j => if j < m then D j else out.val[j]!) (by simp)
@@ -709,7 +711,7 @@ theorem repeat_usize (N : Std.Usize) (hN : 0 < N.val) (v : Std.Usize) :
       .ok (Std.Array.from (List.replicate N.val v) (by simp)) :=
   repeat_eq N _ v (fun _ => rfl) hN
 
-/-- Digest `j` of the batch: message `j`, bytes `j len` to `(j + 1) len - 1`. -/
+/-- Digest j of the batch: message j, bytes j len to (j + 1) len - 1. -/
 def digestOf (input : Slice Std.U8) (len : ℕ) (d : Std.U8) (j : ℕ) : Std.Array Std.U8 32#usize :=
   digestAt (msgLanes input (j * len) len d) 32
 
@@ -820,7 +822,7 @@ theorem usz_rem_lit {a c : ℕ} (n : Std.Usize) (ha : a ≤ n.val) (hc : c < 2 ^
 
 /-! ## The batched hash -/
 
-/-- No digests requested: `out` comes back unchanged, whatever the input. -/
+/-- No digests requested: the output comes back unchanged, whatever the input. -/
 theorem hash_many_empty (d : Std.U8) (input : Slice Std.U8) (out : Slice (Std.Array Std.U8 32#usize))
     (h : out.val = []) : p3_keccak.hax_reshaped.hash_many_with_domain d input out = .ok out := by
   unfold p3_keccak.hax_reshaped.hash_many_with_domain
@@ -849,7 +851,9 @@ theorem digestOf_zero (input : Slice Std.U8) (d : Std.U8) (j : ℕ) :
     digestOf input 0 d j = digestAt (tiny_keccak.keccakf.rounds (finalL (List.replicate 25 0#u64) input 0 0 d)) 32 := by
   simp [digestOf, msgLanes, blocksL]
 
-/-- `n` digests of messages of `len` bytes: digest `j` is the sponge of bytes `j len` to `(j + 1) len - 1`. -/
+/-- Take n digests of messages of len bytes.
+
+Digest j is the sponge of bytes j len to (j + 1) len - 1. -/
 theorem hash_many_eq (d : Std.U8) (input : Slice Std.U8) (out : Slice (Std.Array Std.U8 32#usize)) (len : ℕ)
     (hn : 0 < out.val.length) (hlen : input.val.length = out.val.length * len) :
     p3_keccak.hax_reshaped.hash_many_with_domain d input out =

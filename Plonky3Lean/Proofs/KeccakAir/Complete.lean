@@ -11,7 +11,9 @@ public import Plonky3Lean.Proofs.Air.Check
 
 The generator's trace satisfies the AIR, for any list of inputs and in any field.
 
-Row i of the trace is row i mod 24 of permutation i / 24, and the permutations past the inputs are those of the zero state.
+Row i of the trace is row i mod 24 of permutation i / 24.
+
+The permutations past the inputs are those of the zero state.
 -/
 
 set_option linter.unusedSectionVars false

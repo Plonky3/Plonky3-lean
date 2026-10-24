@@ -9,7 +9,9 @@ public import Mathlib.Algebra.Field.ZMod
 /-!
 # The constraint degrees of the characteristic-2 Keccak-f AIR
 
-Every symbolic constraint has degree multiple at most 3, the AIR's own hint, and at most one transition selector along a product.
+Every symbolic constraint has degree multiple at most 3, the AIR's own hint.
+
+It also has at most one transition selector along a product.
 
 The bounding builder checks this over GF(2).
 -/
@@ -32,7 +34,9 @@ theorem top_binary_gf2 (cb : Bool) : TopOkB (ZMod 2) cb := by
 
 variable {F : Type} [Field F] [DecidableEq F]
 
-/-- Every symbolic constraint has degree multiple at most 3 and at most one transition selector along a product. -/
+/-- Every symbolic constraint has degree multiple at most 3.
+
+It also has at most one transition selector along a product. -/
 theorem binary_constraints_bounded {cb : Bool} (htop : TopOkB F cb) :
     ∀ e ∈ (binaryAir (F := F) cb).eval (symbolicBuilder (AirLayout.from_air (binaryAir (F := F) cb))) [],
       e.degree_multiple ≤ 3 ∧ transitionCount e ≤ 1 :=

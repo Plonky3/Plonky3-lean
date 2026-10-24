@@ -9,9 +9,13 @@ public import Plonky3Lean.Proofs.Dft.Basic
 
 The G network runs decimation-in-frequency layers on bit-reversed input, with bit-reversed twiddles.
 
-It is the Gentleman-Sande network conjugated by the bit reversal, so it returns the transform in natural order.
+It is the Gentleman-Sande network conjugated by the bit reversal.
 
-The G^T network is the Cooley-Tukey network conjugated the same way, so it returns the transform bit-reversed.
+So it returns the transform in natural order.
+
+The G^T network is the Cooley-Tukey network conjugated the same way.
+
+So it returns the transform bit-reversed.
 
 The networks are those of Bowers et al., Improved Twiddle Access for Fast Fourier Transforms (2009).
 -/
@@ -167,8 +171,7 @@ theorem bowers_coeffs (G : Gen K) (hG : GenValid G) {k : ℕ} (hk : k ≤ G.adic
   rw [rev_involutive hj, idft]
   congr 1; push_cast; ring
 
-/-- Bit-reversed zero padding of bit-reversed coefficients, read in bit-reversed order, is the
-coefficients padded with zeros. -/
+/-- Bit-reversed zero padding of bit-reversed coefficients, read bit-reversed, is zero padding. -/
 theorem zero_pad_rev {k a : ℕ} (c b : ℕ → V) (hb : ∀ i < 2 ^ k, b i = c (rev k i)) {j : ℕ}
     (hj : j < 2 ^ (k + a)) :
     bit_reversed_zero_pad (2 ^ k) a b (rev (k + a) j) = if j < 2 ^ k then c j else 0 := by
@@ -212,8 +215,9 @@ theorem bowers_lde_batch (G : Gen K) (hG : GenValid G) {k a : ℕ} (hka : k + a 
         rev_involutive hi]) hj]
     rfl
 
-/-- The Bowers coset extension evaluates the padded coefficients on the coset shift times the
-subgroup of order 2^(k+a). -/
+/-- The Bowers coset extension evaluates the padded coefficients on a coset.
+
+That coset is the shift times the subgroup of order 2^(k+a). -/
 theorem bowers_coset_lde_batch (G : Gen K) (hG : GenValid G) {k a : ℕ} (hka : k + a ≤ G.adicity)
     (shift : K) (x : ℕ → V) :
     Computes (Radix2Bowers.coset_lde_batch G (2 ^ k) a shift x) (2 ^ (k + a))
@@ -236,8 +240,11 @@ theorem bowers_coset_lde_batch (G : Gen K) (hG : GenValid G) {k a : ℕ} (hka : 
     simp only [padCoeffs]
     split_ifs <;> simp
 
-/-- The Bowers coset extension with a transform: the transform sees the scaled coefficients in
-bit-reversed order, coefficient j at row rev(j), as the bit-reversed layout promises. -/
+/-- The Bowers coset extension with a transform.
+
+The transform sees the scaled coefficients in bit-reversed order, coefficient j at row rev(j).
+
+This is what the bit-reversed layout promises. -/
 theorem bowers_coset_lde_batch_with_transform (G : Gen K) (hG : GenValid G) {k a : ℕ}
     (hka : k + a ≤ G.adicity) (shift : K) (T : (ℕ → V) → ℕ → V) (x : ℕ → V) :
     ∃ c : ℕ → V, (∀ i < 2 ^ k, c (rev k i) = idft (G.gen k) (2 ^ k) x i) ∧

@@ -9,7 +9,11 @@ public import Plonky3Lean.Proofs.Lookup.Api
 
 Quotient sizing reads the degree of U f - V in multiples of the trace length n.
 
-Substitute polynomials of degree at most deg_e n for the tuple entries, deg_m n for the counts, and n for the fraction column.
+Substitute polynomials of degree at most:
+
+- deg_e n for the tuple entries
+- deg_m n for the counts
+- n for the fraction column.
 
 Then the pin has degree at most d n, for the degree d the gadget reports:
 
@@ -44,7 +48,15 @@ theorem natDegree_denom_le (α β : K) (e : List K[X]) (D N : ℕ)
     (he : ∀ x ∈ e, x.natDegree ≤ D * N) : (C α - fingerprint (C β) e).natDegree ≤ D * N :=
   (natDegree_sub_le _ _).trans (max_le (by simp) (natDegree_fingerprint_le β e D N he))
 
-/-- **The pin's degree.** With denominators of degree at most D_i n, counts of degree at most M_i n, and a fraction of degree at most n, U f - V has degree at most d n. -/
+/-- **The pin's degree.**
+
+Assume degrees at most:
+
+- D_i n for the denominators
+- M_i n for the counts
+- n for the fraction.
+
+Then U f - V has degree at most d n. -/
 theorem natDegree_pin_le (terms : List (K[X] × K[X])) (f : K[X]) (N : ℕ) (D M : ℕ → ℕ)
     (hd : ∀ i < terms.length, (den terms i).natDegree ≤ D i * N)
     (hm : ∀ i < terms.length, (mul terms i).natDegree ≤ M i * N) (hf : f.natDegree ≤ N) :
@@ -97,7 +109,9 @@ def tupleDegree (lookup : Lookup F) (t i : ℕ) : ℕ :=
 def countDegree (lookup : Lookup F) (t i : ℕ) : ℕ :=
   ((lookup.multiplicities[i]?).map (·.degree_multiple_with_transition t)).getD 0
 
-/-- **The reported degree, additive column.** It is max(1 + sum_i D_i, max_i (deg m_i + sum_(j != i) D_j)). -/
+/-- **The reported degree, additive column.**
+
+It is max(1 + sum_i D_i, max_i (deg m_i + sum_(j != i) D_j)). -/
 theorem constraint_degree_additive (lookup : Lookup F) (hflags : lookup.flags = none)
     (hlen : lookup.multiplicities.length = lookup.elements.length) (t : ℕ) :
     constraint_degree_with_transition lookup t =

@@ -7,7 +7,9 @@ public import Plonky3Lean.Proofs.MerkleTree.Total
 /-!
 # What the prover cannot make the verifier do
 
-Once the dimensions pass the verifier's own checks, no index, opened rows, siblings or cap make it panic or loop.
+Once the dimensions pass the verifier's own checks, the verifier cannot panic or loop.
+
+No index, opened rows, siblings or cap can make it.
 -/
 
 open CoreModels Aeneas
@@ -16,12 +18,12 @@ open p3_merkle_tree
 
 namespace Plonky3Lean.Proofs.MerkleTree
 
-/-- A bind whose first step returns `a`, and whose rest returns from `a`, returns. -/
+/-- A bind whose first step returns a, and whose rest returns from a, returns. -/
 theorem bind_exists {α β : Type _} {x : RustM α} {f : α → RustM β} {a : α} (hx : x = RustM.ok a)
     (h : ∃ r, f a = RustM.ok r) : ∃ r, Std.bind x f = RustM.ok r := by
   rw [hx, bind_ok]; exact h
 
-/-- A bind whose first step returns `a` computes the rest at `a`. -/
+/-- A bind whose first step returns a computes the rest at a. -/
 theorem bind_eq_of {α β : Type _} {x : RustM α} {f : α → RustM β} {a : α} {v : RustM β}
     (hx : x = RustM.ok a) (h : f a = v) : Std.bind x f = v := by
   rw [hx, bind_ok]; exact h
@@ -44,7 +46,9 @@ theorem branch_total {T E : Type _} (r : core.result.Result T E) :
   | Ok v => exact Or.inl ⟨v, rfl, rfl⟩
   | Err e => exact Or.inr ⟨e, rfl⟩
 
-/-- The verifier's checks on the dimensions alone: each returns, and every height is at most half the word range.
+/-- The verifier's checks on the dimensions alone.
+
+Each returns, and every height is at most half the word range.
 
 None of these read the index, the opened rows, the siblings or the cap. -/
 def DimsPass (N cap : Std.Usize) (dims : Slice p3_matrix.Dimensions) : Prop :=

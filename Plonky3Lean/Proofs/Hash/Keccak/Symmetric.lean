@@ -8,9 +8,11 @@ public import Plonky3Lean.Proofs.Symmetric.Sponge
 /-!
 # p3-keccak in the sponges of p3-symmetric
 
-Merkle trees and challengers over `u64` use Keccak-f as the permutation of a padding-free sponge.
+Merkle trees and challengers over 64-bit words use Keccak-f as the permutation of a padding-free sponge.
 
-The impl of the permutation on `[u64; 25]` computes tiny-keccak's 24 rounds, so the sponge theorems of p3-symmetric apply to it.
+The impl of the permutation on 25 words of 64 bits computes tiny-keccak's 24 rounds.
+
+So the sponge theorems of p3-symmetric apply to it.
 -/
 
 open Aeneas Aeneas.Std CoreModels
@@ -18,7 +20,9 @@ open Plonky3Lean.Lib Plonky3Lean.Proofs.Symmetric
 
 namespace Plonky3Lean.Proofs.Keccak
 
-/-- The permutation as a `CryptographicPermutation<[u64; 25]>`; the Rust impl adds no items. -/
+/-- The permutation as a cryptographic permutation on 25 words of 64 bits.
+
+The Rust impl adds no items. -/
 def keccakPerm : p3_symmetric.permutation.CryptographicPermutation p3_keccak.KeccakF (Std.Array Std.U64 25#usize) :=
   { PermutationInst := p3_keccak.KeccakF.Insts.P3_symmetricPermutationPermutationArrayU6425
     corecloneCloneInst := CoreModels.core.Array.Insts.CoreCloneClone 25#usize CoreModels.core.U64.Insts.CoreCloneClone }

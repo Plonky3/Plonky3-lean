@@ -8,7 +8,9 @@ public import Plonky3Lean.Spec.MerkleTree
 /-!
 # The verifier's walk recomputes the tree along an honest path
 
-Fold the verifier's plan over an honest opening: the rows of every matrix at the path's node, and the siblings of the path.
+Fold the verifier's plan over an honest opening.
+
+The opening holds the rows of every matrix at the path's node, and the siblings of the path.
 
 The walk reaches the node of the top layer above the leaf, as the tree defines it.
 -/
@@ -19,9 +21,13 @@ open Plonky3Lean.Spec.MerkleTree
 
 variable {F D : Type _}
 
-/-- The verifier's plan matches the tree's layers along the path of leaf `i`.
+/-- The verifier's plan matches the tree's layers along the path of leaf i.
 
-Each level folds as many children, and where matrices enter, the verifier hashes the rows the tree takes in at the path's node, which is below their height. -/
+Each level folds as many children as the tree's layer.
+
+Where matrices enter, the verifier hashes the rows the tree takes in at the path's node.
+
+That node is below their height. -/
 def Matches (h : List (List F) → D) (pad : List D) (order : List ℕ) (opened : List (List F)) :
     List Level → List (LayerSpec D) → ℕ → Prop
   | [], [], _ => True

@@ -114,7 +114,7 @@ theorem sum_div_X_sub_C_eq_zero_iff (S : Finset F) (n : F → F) :
       have := hne v
       field_simp
     rw [this, h, zero_mul, map_zero]
-  -- Evaluate at v₀: only the v₀ term survives.
+  -- Evaluate at v_0: only the v_0 term survives.
   have := congrArg (eval v₀) hP
   rw [eval_finsetSum, sum_eq_single_of_mem v₀ hv₀ fun v hv hvne => by
     rw [eval_mul, eval_prod, prod_eq_zero (mem_erase.2 ⟨Ne.symm hvne, hv₀⟩) (by simp), mul_zero],
@@ -124,7 +124,9 @@ theorem sum_div_X_sub_C_eq_zero_iff (S : Finset F) (n : F → F) :
   simp only [eval_sub, eval_X, eval_C, sub_eq_zero] at h0
   exact (mem_erase.1 hw).1 h0.symm
 
-/-- **The log-derivative identity.** The sum of m / (X - v) vanishes in F(X) exactly when the messages balance. -/
+/-- **The log-derivative identity.**
+
+The sum of m / (X - v) vanishes in F(X) exactly when the messages balance. -/
 theorem logDerivSum_eq_zero_iff (l : List (F × F)) : logDerivSum l = 0 ↔ Balanced l := by
   classical
   rw [logDerivSum_eq_sum l (l.map (·.1)).toFinset (fun p hp => by simpa using ⟨p.2, hp⟩),
@@ -186,7 +188,15 @@ theorem netMult_lastMults (f t : List F) (w : F) :
     · have := hw.symm
       by_cases ht : w ∈ t <;> simp_all
 
-/-- **Set inclusion (Lemma 5).** In characteristic above the number of queries, the queries lie in the table exactly when sum_j 1 / (X - f_j) = sum_i m_i / (X - t_i) for some multiplicities. -/
+/-- **Set inclusion (Lemma 5).**
+
+Assume the characteristic is above the number of queries.
+
+The queries lie in the table exactly when some multiplicities m_i satisfy
+
+```text
+    sum_j 1 / (X - f_j) = sum_i m_i / (X - t_i)
+``` -/
 theorem lookupRelation_iff_logDeriv (f t : List F)
     (hp : ∀ n : ℕ, 0 < n → n ≤ f.length → (n : F) ≠ 0) :
     LookupRelation f t ↔
@@ -207,7 +217,11 @@ theorem lookupRelation_iff_logDeriv (f t : List F)
       rw [List.map_fst_zip (by omega)]; exact hvt)] at h1
     exact hp _ (List.count_pos_iff.2 hv) (List.count_le_length) h1
 
-/-- **Permutations (Lemma 3).** In characteristic above both lengths, two lists are permutations of each other exactly when sum_j 1 / (X - a_j) = sum_j 1 / (X - b_j). -/
+/-- **Permutations (Lemma 3).**
+
+Assume the characteristic is above both lengths.
+
+Two lists are permutations of each other exactly when sum_j 1 / (X - a_j) = sum_j 1 / (X - b_j). -/
 theorem perm_iff_logDeriv (a b : List F) {L : ℕ} (ha : a.length ≤ L)
     (hb : b.length ≤ L) (hp : ∀ n : ℕ, 0 < n → n ≤ L → (n : F) ≠ 0) :
     a.Perm b ↔ logDerivSum (a.map (·, 1)) = logDerivSum (b.map (·, 1)) := by
@@ -217,7 +231,9 @@ theorem perm_iff_logDeriv (a b : List F) {L : ℕ} (ha : a.length ≤ L)
   exact ⟨fun h => by rw [h], cast_inj_of_le hp ((List.count_le_length).trans ha)
     ((List.count_le_length).trans hb)⟩
 
-/-- **Overflow.** In characteristic p, p queries of one value satisfy the identity against an empty table. -/
+/-- **Overflow.**
+
+In characteristic p, p queries of one value satisfy the identity against an empty table. -/
 theorem logDeriv_overflow (p : ℕ) [CharP F p] (v : F) :
     logDerivSum ((List.replicate p v).map (·, (1 : F))) = logDerivSum [] := by
   classical
@@ -242,7 +258,11 @@ theorem natAbs_netMult_le {κ : Type _} [DecidableEq κ] (l : List (κ × ℤ)) 
     refine (Int.natAbs_add_le _ _).trans (Nat.add_le_add ?_ ih)
     split_ifs <;> simp
 
-/-- **Multiplicity bound.** When the absolute counts sum below p, integer messages balance in characteristic p exactly when they balance over the integers. -/
+/-- **Multiplicity bound.**
+
+Assume the absolute counts sum below p.
+
+Then integer messages balance in characteristic p exactly when they balance over the integers. -/
 theorem balanced_cast_iff {κ : Type _} [DecidableEq κ] (p : ℕ) [CharP F p] (l : List (κ × ℤ))
     (hl : (l.map fun q => q.2.natAbs).sum < p) :
     Balanced (l.map fun q => (q.1, (q.2 : F))) ↔ Balanced l := by
@@ -252,7 +272,11 @@ theorem balanced_cast_iff {κ : Type _} [DecidableEq κ] (p : ℕ) [CharP F p] (
   rw [h]
   exact intCast_eq_zero_iff_of_natAbs_lt p ((natAbs_netMult_le l k).trans_lt hl)
 
-/-- **Lookup soundness with provided entries.** Queries carry integer counts whose absolute values sum below p, and provided entries carry any multiplicity in F.
+/-- **Lookup soundness with provided entries.**
+
+Queries carry integer counts whose absolute values sum below p.
+
+Provided entries carry any multiplicity in F.
 
 If the messages balance in F, a key no entry provides has integer net query count zero. -/
 theorem query_net_zero_of_not_provided {κ : Type _} [DecidableEq κ] (p : ℕ) [CharP F p]

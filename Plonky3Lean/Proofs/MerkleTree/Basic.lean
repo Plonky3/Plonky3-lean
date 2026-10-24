@@ -86,7 +86,9 @@ theorem admissible_ok {β : Type _} (Q : β → Prop) :
   intro c hc hall v hv
   exact hall _ (Aeneas.Data.Coinductive.ITree.csup_ret_mem hc hv) v rfl
 
-/-- An invariant that the body keeps, and that gives `post` when the body stops, gives `post` of any value the loop returns. -/
+/-- Take an invariant that the body keeps, and that implies the postcondition when the body stops.
+
+Then the postcondition holds of any value the loop returns. -/
 theorem loop_inv {α β : Type _} (body : α → RustM (ControlFlow α β)) (inv : α → Prop)
     (post : β → Prop)
     (hb : ∀ x, inv x → ∀ r, body x = RustM.ok r →

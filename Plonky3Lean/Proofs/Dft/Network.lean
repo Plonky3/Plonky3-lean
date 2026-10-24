@@ -352,8 +352,9 @@ theorem ditNet_eq_dft {ω : K} {k : ℕ} (hω : IsPrimitiveRoot ω (2 ^ k)) (x :
 
 /-- The first c decimation-in-frequency layers of the transform of size 2^k at the root omega.
 
-They are the layers with blocks of 2^k, 2^(k-1), ..., rows; the layer with half block 2^l has
-twiddle omega^(s 2^(k-1-l)) at offset s. -/
+They are the layers with blocks of 2^k, 2^(k-1), and so on down.
+
+The layer with half block 2^l has twiddle omega^(s 2^(k-1-l)) at offset s. -/
 def difNet (ω : K) (k : ℕ) : ℕ → (ℕ → V) → ℕ → V
   | 0, x => x
   | c + 1, x => difLayer (2 ^ (k - 1 - c)) (2 ^ c) (fun _ s => ω ^ (s * 2 ^ c)) (difNet ω k c x)

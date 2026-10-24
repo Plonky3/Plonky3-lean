@@ -11,9 +11,13 @@ public import P3Fri.Verifier
 
 The prover keeps the first 2^L values of the final codeword, un-bit-reverses them and inverse-transforms them.
 
-When the final codeword is the codeword of a polynomial of degree below 2^L, this gives its coefficients, constant term first.
+Suppose the final codeword is the codeword of a polynomial of degree below 2^L.
 
-The verifier evaluates them with Horner's rule at G_H^rev_H(i), which is the point of index i of the final codeword.
+Then this gives its coefficients, constant term first.
+
+The verifier evaluates them with Horner's rule at G_H^rev_H(i).
+
+That is the point of index i of the final codeword.
 -/
 
 namespace Plonky3Lean.Proofs.Fri
@@ -48,7 +52,11 @@ theorem dom_eq_of_le {F H i : ℕ} (hFH : F ≤ H) (hHa : H ≤ G.adicity) (hi :
     ← bitRev_eq, mul_comm, pow_mul, ← Plonky3Lean.Proofs.Commit.gen_sub G hN (show F + (H - F) ≤ G.adicity by omega)
       (by omega), show F + (H - F) - (H - F) = F by omega]
 
-/-- The final check passes on an honest final codeword: the inverse transform of its first 2^L values, un-bit-reversed, evaluates back to every value of the codeword. -/
+/-- The final check passes on an honest final codeword.
+
+Take its first 2^L values, un-bit-reverse them and inverse-transform them.
+
+The result evaluates back to every value of the codeword. -/
 theorem final_poly_eval {P : K[X]} {L b : ℕ} (hLb : L + b ≤ G.adicity) {wF : List K}
     (hc : IsCodeword G P (L + b) wF) (hdeg : P.degree < ↑(2 ^ L)) {coeffs : List K}
     (hlen : coeffs.length = 2 ^ L)

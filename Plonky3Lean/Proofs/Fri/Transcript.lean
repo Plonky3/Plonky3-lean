@@ -10,7 +10,9 @@ public import Mathlib.Tactic.Positivity
 /-!
 # The described transcripts
 
-Each grinding step sits where its parameter says, with that parameter's difficulty, and only when the difficulty is positive.
+Each grinding step sits where its parameter says, with that parameter's difficulty.
+
+It appears only when the difficulty is positive.
 
 The query indices are the last step, drawn with the index bits of the shape.
 -/

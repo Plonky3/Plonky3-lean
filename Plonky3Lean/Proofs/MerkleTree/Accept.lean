@@ -8,7 +8,13 @@ public import Plonky3Lean.Proofs.MerkleTree.Complete
 /-!
 # When the single-index verifier accepts
 
-It accepts an opening whose rows have their matrices' widths, whose siblings number as the walked levels take, whose index is below the tallest height, whose cap holds as many roots as the top layers produce, and whose walk reaches the cap entry at its index.
+The verifier accepts an opening when:
+
+- its rows have their matrices' widths
+- its siblings number as the walked levels take
+- its index is below the tallest height
+- its cap holds as many roots as the top layers produce
+- its walk reaches the cap entry at its index.
 -/
 
 open CoreModels Aeneas
@@ -144,7 +150,13 @@ theorem verify_ok_of {P PW F W H C : Type} {N DIGEST_ELEMS : Std.Usize}
 open Plonky3Lean.Spec.MerkleTree in
 /-- Completeness: the verifier accepts an honest opening of the tree.
 
-The tree's padding digest and padded children are the verifier's own, its layers match the verifier's plan along the path, the leaf is the hash of the leaf rows, the siblings are the path's, and the cap holds the top layer. -/
+In an honest opening:
+
+- the tree's padding digest and padded children are the verifier's own
+- its layers match the verifier's plan along the path
+- the leaf is the hash of the leaf rows
+- the siblings are the path's
+- the cap holds the top layer. -/
 theorem verify_complete {P PW F W H C : Type} {N DIGEST_ELEMS : Std.Usize}
     (cl : core.clone.Clone F) (cp : core.marker.Copy W)
     (dfInst : core.default.Default W) (eqInst : core.cmp.PartialEq W W)

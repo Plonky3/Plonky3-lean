@@ -129,7 +129,11 @@ theorem selectors_on_coset_eq (hV : GenValid G) (hN : GenNested G) {c coset : Co
     size_eq, hlast, batchInv_map _ _ fun m _ => sub_ne_zero.mpr (hpow1 m), Option.pure_def, hget,
     hcyc, b0, bl, zipCycle_map]
 
-/-- The selectors on a coset panic exactly when the subgroup's shift is not one, the coset is smaller, or the coset meets the subgroup (t^N = 1). -/
+/-- The selectors on a coset panic exactly when:
+
+- the subgroup's shift is not one
+- the coset is smaller than the subgroup
+- the coset meets the subgroup, that is t^N = 1. -/
 theorem selectors_on_coset_none (hV : GenValid G) (hN : GenNested G) (c coset : Coset G) :
     Coset.selectors_on_coset G c coset = none ↔
       c.shift ≠ 1 ∨ coset.log_size < c.log_size ∨ coset.shift ^ 2 ^ coset.log_size = 1 := by
@@ -192,7 +196,11 @@ theorem selectors_on_coset_at_point (hV : GenValid G) (hN : GenNested G) {c cose
     TwoAdicMultiplicativeCoset.shift_inverse, h1, gen_ne_zero G hV c, ha, hb, hz, hm,
     List.getD_eq_getElem?_getD, div_eq_mul_inv]
 
-/-- The prover's coset never panics: a disjoint domain built with a generator g outside the largest two-adic subgroup, over a subgroup of shift one. -/
+/-- The prover's coset never panics.
+
+It is a disjoint domain built with a generator g outside the largest two-adic subgroup.
+
+It sits over a subgroup of shift one. -/
 theorem selectors_on_disjoint_domain (hV : GenValid G) (hN : GenNested G) {c d : Coset G} {g : K}
     {m : ℕ} (h1 : c.shift = 1) (hg : g ^ 2 ^ G.adicity ≠ 1)
     (hd : Coset.try_create_disjoint_domain G c g m = some d) (hle : c.log_size ≤ d.log_size) :

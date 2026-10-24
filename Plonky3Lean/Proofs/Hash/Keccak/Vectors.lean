@@ -8,18 +8,20 @@ public import Plonky3Lean.Proofs.Hash.Keccak.Sponge
 /-!
 # Keccak-f[1600]: the Keccak team's known answer
 
-The file `KeccakF-1600-IntermediateValues.txt` of the Keccak team permutes the all-zero state twice.
+The Keccak team's file KeccakF-1600-IntermediateValues.txt permutes the all-zero state twice.
 
 The first output, lane by lane, is checked here by the kernel on the transcription.
 
-The digests of the empty string and of `"abc"`, as published by the Keccak team and by NIST's examples, are checked on the specification.
+The digests of the empty string and of "abc" are checked on the specification.
+
+They are the values the Keccak team and NIST's examples publish.
 -/
 
 open Aeneas Aeneas.Std Plonky3Lean.Spec.Keccak
 
 namespace Plonky3Lean.Proofs.Keccak
 
-/-- The all-zero state after one permutation, word `x + 5 y` holding lane `(x, y)`. -/
+/-- The all-zero state after one permutation, word x + 5 y holding lane (x, y). -/
 def zeroOnce : List Std.U64 := [
   0xF1258F7940E1DDE7#u64, 0x84D5CCF933C0478A#u64, 0xD598261EA65AA9EE#u64, 0xBD1547306F80494D#u64,
   0x8B284E056253D057#u64, 0xFF97A42D7F8E6FD4#u64, 0x90FEE5A0A44647C4#u64, 0x8C5BDA0CD6192E76#u64,

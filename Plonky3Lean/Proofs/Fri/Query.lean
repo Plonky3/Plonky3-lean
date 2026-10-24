@@ -11,7 +11,9 @@ public import Plonky3Lean.Proofs.Fri.Res
 /-!
 # The query phase
 
-The siblings a prover sends are its row without the queried value, and the verifier rebuilds the row from them.
+The siblings a prover sends are its row without the queried value.
+
+The verifier rebuilds the row from them.
 
 On an honest chain of codewords, a query's fold chain reaches the final codeword's value at the shifted index.
 
@@ -64,7 +66,13 @@ theorem rebuildRow_eraseIdx (row : List K) {p : ℕ} (hp : p < row.length) :
     simp only [show ¬ j - 1 < p by omega, ↓reduceDIte]
     congr 1; omega
 
-/-- One commit round as the verifier sees it: the challenge, the log arity, the word committed, the input rolled in after the fold, and every query's siblings. -/
+/-- One commit round as the verifier sees it:
+
+- the challenge
+- the log arity
+- the word committed
+- the input rolled in after the fold
+- every query's siblings. -/
 structure Rd (K : Type) where
   β : K
   a : ℕ
@@ -99,7 +107,11 @@ def recordedOf : List (Rd K) → ℕ → List (ℕ × List K)
   | [], _ => []
   | r :: rs, idx => (idx / 2 ^ r.a, rowList r.w r.a (idx / 2 ^ r.a)) :: recordedOf rs (idx / 2 ^ r.a)
 
-/-- An honest chain for query q at index idx: each word has its height, each round's siblings are its row without the queried value, and each round folds its row to the next word's value, less the input term. -/
+/-- An honest chain for query q at index idx:
+
+- each word has its height
+- each round's siblings are its row without the queried value
+- each round folds its row to the next word's value, less the input term. -/
 def ChainOK (G : Gen K) (q : ℕ) : ℕ → ℕ → List (Rd K) → List K → Prop
   | lh, idx, [], wF => wF.length = 2 ^ lh ∧ idx < 2 ^ lh
   | lh, idx, r :: rs, wF => 1 ≤ r.a ∧ r.a ≤ lh ∧ r.w.length = 2 ^ lh ∧ idx < 2 ^ lh ∧
@@ -128,7 +140,11 @@ theorem rolls_lt {G : Gen K} {q : ℕ} : ∀ (rs : List (Rd K)) (lh idx : ℕ) (
     · rcases hr : r.roll with _ | u <;> simp [hr] at hx; rw [hx]; simp; omega
     · have := rolls_lt rs _ _ wF hrest x hx; omega
 
-/-- On an honest chain, the fold chain of a query reaches the final word's value at the shifted index, records every round's row, and consumes every rolled-in input. -/
+/-- On an honest chain, the fold chain of a query:
+
+- reaches the final word's value at the shifted index
+- records every round's row
+- consumes every rolled-in input. -/
 theorem foldlM_chain (G : Gen K) (q : ℕ) : ∀ (rs : List (Rd K)) (lh idx : ℕ) (wF : List K)
     (acc : List (ℕ × List K)), ChainOK G q lh idx rs wF →
     (rs.map fun r => (r.β, r.a, r.sv)).foldlM (foldStep G q)
@@ -190,7 +206,15 @@ theorem zip_map_three {α β γ δ : Type _} (l : List α) (f : α → β) (g : 
     List.zip (l.map f) (List.zip (l.map g) (l.map h)) = l.map fun x => (f x, g x, h x) := by
   induction l <;> simp_all
 
-/-- Completeness of one query: on an honest chain from the tallest height H down to the final height, fold_query returns the final word's value at the shifted index, that index, and every round's group index and row. -/
+/-- Completeness of one query.
+
+Take an honest chain from the tallest height H down to the final height.
+
+The query's fold returns:
+
+- the final word's value at the shifted index
+- that index
+- every round's group index and row. -/
 theorem fold_query_complete {ME IE : Type} (G : Gen K) (q idx : ℕ) (rs : List (Rd K)) (wF : List K)
     {H Hf : ℕ} (hc : ChainOK G q H idx rs wF) (h64 : ∀ r ∈ rs, r.a < 64) (hHf : H - totalA rs = Hf) :
     fold_query (ME := ME) (IE := IE) G q idx (rs.map Rd.β) (rs.map Rd.a) (rs.map Rd.sv)
@@ -214,12 +238,18 @@ theorem fold_query_complete {ME IE : Type} (G : Gen K) (q idx : ℕ) (rs : List 
   simp only [fold_query, hany, Bool.false_eq_true, ↓reduceIte, hfind, hsum, zip_map_three, lift,
     pure_bind, ne_eq, not_true_eq_false, hch, hHf, lift_some_bind]
 
-/-- The value a round passes on: the fold, plus beta^(2^a) times the next opening if it sits at the folded height. -/
+/-- The value a round passes on: the fold, plus beta^(2^a) times the next opening.
+
+The opening counts only if it sits at the folded height. -/
 def rollIn (lh' : ℕ) (β : K) (a : ℕ) (u : K) : List (ℕ × K) → K × List (ℕ × K)
   | (h, v) :: ro => if h = lh' then (u + β ^ 2 ^ a * v, ro) else (u, (h, v) :: ro)
   | [] => (u, [])
 
-/-- Round consistency of a recorded chain: each recorded row holds the running value at the queried position, its fold is the next running value (with any rolled-in opening), and the last running value is the final value. -/
+/-- Round consistency of a recorded chain:
+
+- each recorded row holds the running value at the queried position
+- its fold, with any rolled-in opening, is the next running value
+- the last running value is the final value. -/
 def Consistent (G : Gen K) : ℕ → ℕ → K → List (ℕ × K) → List (K × ℕ) → List (ℕ × List K) → K →
     List (ℕ × K) → Prop
   | _, _, v, ro, [], [], fin, roF => fin = v ∧ roF = ro
@@ -266,7 +296,15 @@ theorem foldlM_consistent (G : Gen K) (q : ℕ) :
     · simp only [List.map_cons, List.sum_cons, h3, Nat.div_div_eq_div_mul, ← pow_add]
     · exact ⟨rfl, hlen, hget, u, hu, h4⟩
 
-/-- Soundness of one query's checks: an accepted fold chain starts at the opening of the tallest height, records rows that each hold the running value at the queried position, folds each row to the next running value with any rolled-in opening, ends at the returned value at the final height, and consumes every opening. -/
+/-- Soundness of one query's checks.
+
+An accepted fold chain:
+
+- starts at the opening of the tallest height
+- records rows that each hold the running value at the queried position
+- folds each row to the next running value, with any rolled-in opening
+- ends at the returned value at the final height
+- consumes every opening. -/
 theorem fold_query_sound {ME IE : Type} (G : Gen K) (q idx : ℕ) (betas : List K) (las : List ℕ)
     (svs : List (List (List K))) (ro : List (ℕ × K)) (H Hf : ℕ) {f : K} {i' : ℕ}
     {recorded : List (ℕ × List K)}
@@ -333,7 +371,13 @@ theorem honest_round (G : Gen K) (hV : GenValid G) (hN : GenNested G) (h2 : (2 :
   rw [rowList, fold_row_eq G hV h2 ha hna, List.getD_eq_getElem _ _ (by simpa using ht)]
   simp
 
-/-- Honest folding preserves low degree: folding the codeword of P of degree below 2^(n + a - b) by 2^a, and adding beta^(2^a) times the codeword of R of degree below 2^(n - b), gives a codeword of degree below 2^(n - b). -/
+/-- Honest folding preserves low degree.
+
+Fold the codeword of P, of degree below 2^(n + a - b), by 2^a.
+
+Add beta^(2^a) times the codeword of R, of degree below 2^(n - b).
+
+The result is a codeword of degree below 2^(n - b). -/
 theorem honest_round_degree (G : Gen K) (hV : GenValid G) (hN : GenNested G) (h2 : (2 : K) ≠ 0)
     {n a b : ℕ} (ha : 1 ≤ a) (hna : n + a ≤ G.adicity) (hbn : b ≤ n) {P R : K[X]} {w u : List K}
     (hw : IsCodeword G P (n + a) w) (hP : P.degree < ↑(2 ^ (n + a - b)))

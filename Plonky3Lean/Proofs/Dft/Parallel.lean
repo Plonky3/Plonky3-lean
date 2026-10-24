@@ -10,8 +10,9 @@ public import Plonky3Lean.Proofs.Dft.Bowers
 
 The first half runs the first ceil(log_h / 2) Cooley-Tukey layers, chunk by chunk.
 
-The second half runs the remaining layers in bit-reversed order: each is a Cooley-Tukey layer
-conjugated by the bit reversal, again chunk by chunk.
+The second half runs the remaining layers in bit-reversed order, again chunk by chunk.
+
+Each is a Cooley-Tukey layer conjugated by the bit reversal.
 -/
 
 set_option linter.unusedSectionVars false
@@ -224,8 +225,9 @@ theorem layerOn_op_congr {op op' : ℕ → ℕ → W → W → W × W} {m lo hi 
 
 end second
 
-/-- A layer of the second half on chunk c: the global layer, restricted to the chunk, with block b
-using twiddle function entry b. -/
+/-- A layer of the second half on chunk c.
+
+It is the global layer restricted to the chunk, with block b using twiddle function entry b. -/
 theorem second_half_step {k mid c lyr : ℕ} (hmid : mid ≤ lyr) (hl : lyr < k)
     (hc : c < 2 ^ mid) (twf : ℕ → K) (fly : K → V → V → V × V) (bw : Bool) (acc : ℕ → V) :
     dit_layer_rev c (2 ^ (k - mid)) k lyr (c * 2 ^ (lyr - mid)) twf fly bw acc =
@@ -522,7 +524,9 @@ theorem coset_table_first (ω c : K) {k l i : ℕ} (hl : l < (k + 1) / 2) (hk : 
   simp only [show ¬ ((k + 1) / 2 ≤ k - 1 - (k - 1 - l)) by omega, ↓reduceIte, hlen]
   rw [getD_shiftedPowersList _ _ hi, Tcoset, mul_pow, ← pow_mul, ← pow_mul, mul_comm (2 ^ (k - 1 - l)) i]
 
-/-- The second-half reading of a coset table: layer l >= mid reads block b as (c omega^(rev_l(b)))^(2^(k-1-l)). -/
+/-- The second-half reading of a coset table.
+
+Layer l >= mid reads block b as (c omega^(rev_l(b)))^(2^(k-1-l)). -/
 theorem coset_table_second (ω c : K) {k l b : ℕ} (hl : (k + 1) / 2 ≤ l) (hk : l < k) (hb : b < 2 ^ l) :
     (((List.range k).map fun t =>
       let tw := shiftedPowersList (ω ^ 2 ^ t) (c ^ 2 ^ t) (2 ^ k / 2 ^ (t + 1))
@@ -688,7 +692,7 @@ theorem mapM_some {α β : Type _} (l : List α) (f : α → Option β) (g : α 
     rw [List.mapM_cons, h a (by simp), ih (fun a ha => h a (by simp [ha]))]
     rfl
 
-/-- The parallel backend's inverse coset transform computes the inverse coset transform, for a nonzero shift. -/
+/-- For a nonzero shift, the parallel backend's inverse coset transform is the inverse coset transform. -/
 theorem parallel_coset_idft_batch (G : Gen K) (hG : GenValid G) {k : ℕ} (hk : k ≤ G.adicity)
     {w : ℕ} {s : K} (hs : s ≠ 0) (hw : w ≠ 0 ∨ s = 1) (x : ℕ → V) :
     Computes (Radix2DitParallel.coset_idft_batch G w (2 ^ k) s x) (2 ^ k)
@@ -699,11 +703,13 @@ theorem parallel_coset_idft_batch (G : Gen K) (hG : GenValid G) {k : ℕ} (hk : 
 
 /-- The parallel extension with a transform, for nested generators.
 
-The transform sees the coefficients in bit-reversed order, coefficient j at row rev(j), as the
-bit-reversed layout promises.
+The transform sees the coefficients in bit-reversed order, coefficient j at row rev(j).
 
-The result, read through the bit-reversed view, evaluates the transformed coefficients on the
-coset shift times the subgroup of order 2^(k+a). -/
+This is what the bit-reversed layout promises.
+
+Read through the bit-reversed view, the result evaluates the transformed coefficients on a coset.
+
+That coset is the shift times the subgroup of order 2^(k+a). -/
 theorem parallel_lde (G : Gen K) (hG : GenValid G) (hN : GenNested G) {k a w : ℕ}
     (hka : k + a ≤ G.adicity) (shift : K) (ha : a < 64) (hlen : w * (2 ^ k * 2 ^ a) < 2 ^ 64)
     (T : (ℕ → V) → ℕ → V) (x : ℕ → V) :

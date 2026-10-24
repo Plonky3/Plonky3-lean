@@ -13,7 +13,9 @@ public import Plonky3Lean.Spec.Commit
 
 The commitment is the coefficient matrix of each committed matrix, flattened.
 
-On a coset s H of order n with generator omega, the inverse transform of the evaluations e gives the coefficients c of q with q(omega^i) = e_i.
+Take a coset s H of order n with generator omega.
+
+The inverse transform of the evaluations e gives the coefficients c of q with q(omega^i) = e_i.
 
 Scaling coefficient r by s^(-r) gives p(X) = q(X / s), so p(s omega^i) = e_i:
 
@@ -118,7 +120,9 @@ theorem flatValues_getD (m : Mat K) {r : ℕ} (hr : r < m.height) (c : Fin m.wid
   rw [this]
   simp [hr]
 
-/-- The polynomials a flat coefficient vector holds over a domain of size n: width |v| / n, and coefficient r of column c at r w + c. -/
+/-- The polynomials a flat coefficient vector holds over a domain of size n.
+
+The width is w = |v| / n, and coefficient r of column c sits at r w + c. -/
 noncomputable def flatPolys (v : List K) (n : ℕ) : List K[X] :=
   (List.finRange (v.length / n)).map fun c => Spec.Dft.poly n fun r => v.getD (r * (v.length / n) + c.val) 0
 
@@ -239,7 +243,9 @@ theorem commit_eq_some (idft : (w : ℕ) → ℕ → (ℕ → Fin w → K) → O
       simp only [hy, Option.bind_some, Option.pure_def, Option.some.injEq] at hdc
       exact ⟨h1, h2, y, hy, hdc.symm⟩
 
-/-- The coefficient matrix of a committed matrix holds, column by column, the interpolant of the evaluations over the domain. -/
+/-- The coefficient matrix of a committed matrix holds the interpolants of the evaluations.
+
+Column by column, each interpolates over the domain. -/
 theorem commitsTo_poly (hV : GenValid G) {idft : (w : ℕ) → ℕ → (ℕ → Fin w → K) → Option (ℕ → Fin w → K)}
     (hidft : IdftComputes G idft) {pcs : TrivialPcs} {de : Coset G × Mat K} {c : Mat K}
     (h : CommitsTo G idft pcs de c) (col : Fin de.2.width) :
@@ -405,7 +411,9 @@ theorem parallel_idftComputes (hV : GenValid G) :
     IdftComputes G fun _ h x => p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.idft_batch G h x :=
   fun _ _ hk x => parallel_idft_batch G hV hk x
 
-/-- The evaluations on a domain of 2^D points have height h 2^(D - log_n), for a committed coefficient matrix of height h. -/
+/-- Take a committed coefficient matrix of height h.
+
+Its evaluations on a domain of 2^D points have height h 2^(D - log_n). -/
 theorem get_evaluations_on_domain_height
     (coset_dft : (w : ℕ) → ℕ → K → (ℕ → Fin w → K) → Option (ℕ → Fin w → K))
     (pd : List (Mat K)) (idx : ℕ) (domain : Coset G) (c : Mat K) (hc : pd[idx]? = some c)

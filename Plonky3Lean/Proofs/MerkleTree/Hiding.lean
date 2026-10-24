@@ -9,7 +9,9 @@ public import Plonky3Lean.Proofs.MerkleTree.Bind
 
 The hiding commitment appends a salt to every row of every matrix before committing.
 
-Its verifier checks the unsalted widths, appends each salt to its row, widens each width by the salt length, and runs the plain verifier.
+Its verifier checks the unsalted widths and appends each salt to its row.
+
+It then widens each width by the salt length and runs the plain verifier.
 -/
 
 open CoreModels Aeneas
@@ -20,7 +22,7 @@ namespace Plonky3Lean.Proofs.MerkleTree
 
 variable {F : Type}
 
-/-- Copying the items of a vector from position `j` on appends them. -/
+/-- Copying the items of a vector from position j on appends them. -/
 theorem copy_loop_ok (cl : core.clone.Clone F) (hcl : ∀ x, cl.clone x = RustM.ok x)
     (src : Slice (alloc.vec.Vec F)) (i : Std.Usize) (row out : alloc.vec.Vec F) (j : Std.Usize)
     (v : alloc.vec.Vec F) (hv : src.val[i.val]? = some v)
@@ -188,7 +190,9 @@ theorem widen_loop_ok (SALT : Std.Usize) (dims : Slice p3_matrix.Dimensions)
     _ _ h ⟨by simp, by simp [hacc], by simp [hacc]⟩
   exact key
 
-/-- What an accepting run of the hiding verifier did: the plain verifier accepted the salted rows against the widened dimensions. -/
+/-- What an accepting run of the hiding verifier did.
+
+The plain verifier accepted the salted rows against the widened dimensions. -/
 theorem hiding_accepts {P PW W H C : Type} {N DIGEST_ELEMS : Std.Usize} (SALT : Std.Usize)
     (cl : core.clone.Clone F) (cp : core.marker.Copy W)
     (dfInst : core.default.Default W) (eqInst : core.cmp.PartialEq W W)
@@ -255,7 +259,9 @@ theorem rowsL_getD_salted {so : alloc.vec.Vec (alloc.vec.Vec F)} {o s : Slice (a
 
 /-- Merkle's binding argument for the hiding commitment.
 
-Two hiding openings at one index that both verify agree on every row and every salt the verifier reads, unless the hasher or the compression has a collision. -/
+Two hiding openings at one index that both verify agree on every row and salt the verifier reads.
+
+The exception is a collision of the hasher or the compression. -/
 theorem hiding_binding {P PW W H C : Type} {N DIGEST_ELEMS : Std.Usize} (SALT : Std.Usize)
     (cl : core.clone.Clone F) (cp : core.marker.Copy W)
     (dfInst : core.default.Default W) (eqInst : core.cmp.PartialEq W W)
@@ -302,9 +308,11 @@ theorem hiding_binding {P PW W H C : Type} {N DIGEST_ELEMS : Std.Usize} (SALT : 
     rw [hwd1 m hm (by omega), hwd2 m hm (by omega)]
   exact List.append_inj e hlen
 
-/-- A salt drawn uniformly from `k`-tuples hits a fixed set `Q` of hash inputs after the row `m` with probability at most `|Q| / |F|^k`.
+/-- Append a salt drawn uniformly from k-tuples to row m.
 
-Salting is injective, so at most `|Q|` salts land in `Q`. -/
+The result lands in a fixed set Q of hash inputs with probability at most |Q| / |F|^k.
+
+Salting is injective, so at most |Q| salts land in Q. -/
 theorem salt_hits_le [Fintype F] [DecidableEq F] (m : List F) (k : ℕ) (Q : Finset (List F)) :
     (Finset.univ.filter fun s : Fin k → F => m ++ List.ofFn s ∈ Q).card ≤ Q.card := by
   apply Finset.card_le_card_of_injOn (fun s => m ++ List.ofFn s)

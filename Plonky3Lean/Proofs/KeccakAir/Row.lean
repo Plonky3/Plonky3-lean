@@ -10,7 +10,9 @@ public import Plonky3Lean.Spec.Air
 
 A builder can evaluate an AIR at one row and conjoin what it asserts.
 
-On a parametric AIR, a trace satisfies the constraint polynomials exactly when that conjunction holds on every row.
+Take a parametric AIR.
+
+A trace satisfies its constraint polynomials exactly when that conjunction holds on every row.
 
 For the Keccak-f AIR, the conjunction is written out loop by loop.
 -/
@@ -90,7 +92,7 @@ def fieldOps : ExprOps F F := ⟨(· + ·), (· - ·), (· * ·), (- ·), id⟩
 theorem propBuilder_ops (env : Var → F) (L : AirLayout) : (propBuilder env L).toExprOps = fieldOps :=
   rfl
 
-/-- Row `o` of the window the row builder holds, with 0 past its width. -/
+/-- Row o of the window the row builder holds, with 0 past its width. -/
 def rowOf (env : Var → F) (L : AirLayout) (o : Fin 2) (i : ℕ) : F :=
   ((List.range L.main_width).map (fun c => env (.main o c))).getD i 0
 
@@ -186,7 +188,9 @@ theorem prop_output : assert_output (propBuilder env L) loc nxt c s =
 
 end steps
 
-/-- The constraints of the Keccak-f AIR on one row, given the current row, the next row and the two selectors. -/
+/-- The constraints of the Keccak-f AIR on one row.
+
+They read the current row, the next row and the two selectors. -/
 structure RowSpec (loc nxt : ℕ → F) (first trans : F) : Prop where
   first_flag : first * (loc (col.step_flags 0) - 1) = 0
   first_zero : ∀ i < 23, first * loc (col.step_flags (i + 1)) = 0

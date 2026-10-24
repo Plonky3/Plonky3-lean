@@ -9,7 +9,12 @@ public import Plonky3Lean.Proofs.MerkleTree.Total
 /-!
 # What an accepting run rules out, and what the commitment does not bind
 
-An accepting run had a nonempty batch with a positive tallest height, an index below it, one row per matrix at its width, and exactly the siblings the walked levels take.
+An accepting run had:
+
+- a nonempty batch with a positive tallest height
+- an index below it
+- one row per matrix, at its width
+- exactly the siblings the walked levels take.
 
 The commitment binds rows only to the dimensions the verifier is given.
 -/

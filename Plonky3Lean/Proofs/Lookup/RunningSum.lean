@@ -66,7 +66,9 @@ theorem pinned_of_zero_mul {terms : List (K × K)} {i : ℕ} (hi : i < terms.len
   · subst hk'; rw [hmi, zero_mul]
   · rw [prod_eq_zero (mem_erase.2 ⟨Ne.symm hk', mem_range.2 hi⟩) hdi, mul_zero]
 
-/-- One vanishing denominator with a nonzero multiplicity, the others nonzero, satisfies no pin: an honest prover fails. -/
+/-- One vanishing denominator with a nonzero multiplicity, the others nonzero, satisfies no pin.
+
+So an honest prover fails. -/
 theorem not_pinned_of_one_zero {terms : List (K × K)} {i : ℕ} (hi : i < terms.length)
     (hdi : den terms i = 0) (hmi : mul terms i ≠ 0)
     (hrest : ∀ j < terms.length, j ≠ i → den terms j ≠ 0) (f : K) : ¬ Pinned terms f := by
@@ -111,7 +113,9 @@ def honest (frac : ℕ → ℕ → K) (n w : ℕ) : RunningSum K where
   frac := frac
   terminal := ∑ r ∈ range n, ∑ c ∈ range w, frac r c
 
-/-- **Completeness.** The honest columns satisfy the accumulator constraints on every nonempty trace. -/
+/-- **Completeness.**
+
+The honest columns satisfy the accumulator constraints on every nonempty trace. -/
 theorem honest_constrained (frac : ℕ → ℕ → K) {n : ℕ} (hn : 0 < n) (w : ℕ) :
     (honest frac n w).Constrained n w where
   first := by simp [honest]
@@ -122,7 +126,11 @@ theorem honest_constrained (frac : ℕ → ℕ → K) {n : ℕ} (hn : 0 < n) (w 
 
 /-! ## Every AIR together -/
 
-/-- The messages of one AIR: its height, its lookup columns, and the messages each column folds on each row. -/
+/-- The messages of one AIR:
+
+- its height
+- its lookup columns
+- the messages each column folds on each row. -/
 structure AirMessages (K : Type _) where
   height : ℕ
   width : ℕ
@@ -136,7 +144,10 @@ def AirMessages.terms (a : AirMessages K) (α β : K) (W r c : ℕ) : List (K ×
 def AirMessages.all (a : AirMessages K) : List (Key K × K) :=
   ((List.range a.height).flatMap fun r => (List.range a.width).flatMap fun c => a.msgs r c)
 
-/-- The verifier accepts the permutation columns of every AIR: each is pinned and constrained, and the terminals sum to zero. -/
+/-- The verifier accepts the permutation columns of every AIR:
+
+- each is pinned and constrained
+- the terminals sum to zero. -/
 def Accepts (α β : K) (W : ℕ) (airs : List (AirMessages K)) (cols : ℕ → RunningSum K) : Prop :=
   (∀ i (h : i < airs.length), 0 < airs[i].height ∧ (cols i).Constrained airs[i].height airs[i].width ∧
     ∀ r < airs[i].height, ∀ c < airs[i].width, Pinned (airs[i].terms α β W r c) ((cols i).frac r c)) ∧
@@ -193,7 +204,11 @@ theorem mem_allMessages {airs : List (AirMessages K)} {p : Key K × K} :
     exact ⟨i, hi, r, hr, c, hc, hp⟩
   · rintro ⟨i, hi, r, hr, c, hc, hp⟩; exact ⟨_, List.getElem_mem hi, r, hr, c, hc, hp⟩
 
-/-- **Satisfied constraints imply the bus relation.** When the verifier accepts and no denominator vanishes, the sum of m / d over every message of every AIR is zero. -/
+/-- **Satisfied constraints imply the bus relation.**
+
+Suppose the verifier accepts and no denominator vanishes.
+
+Then the sum of m / d over every message of every AIR is zero. -/
 theorem busSum_eq_zero_of_accepts {α β : K} {W : ℕ} {airs : List (AirMessages K)}
     {cols : ℕ → RunningSum K} (h : Accepts α β W airs cols)
     (hD : ∀ p ∈ allMessages airs, busDenom α β W p.1.1 p.1.2 ≠ 0) :
@@ -216,7 +231,11 @@ theorem busSum_eq_zero_of_accepts {α β : K} {W : ℕ} {airs : List (AirMessage
   rw [← fracSum_terms, ← (pinned_iff hden _).1 (hp r (mem_range.1 hr) c (mem_range.1 hcw))]
 
 open Classical in
-/-- **Soundness of the AIR encoding.** For an unbalanced set of messages, the challenge pairs at which some permutation columns are accepted number at most N (W + 1) |K|, for N messages.
+/-- **Soundness of the AIR encoding.**
+
+Take an unbalanced set of N messages.
+
+At most N (W + 1) |K| challenge pairs let some permutation columns be accepted.
 
 The columns may be chosen after the challenges. -/
 theorem card_accepting_le [Fintype K] [DecidableEq K] (airs : List (AirMessages K)) {W : ℕ}

@@ -10,7 +10,9 @@ public import Plonky3Lean.Proofs.Commit.PeriodicBatch
 
 The screen accepts exactly the columns whose length is a power of two dividing the height.
 
-The compact table holds max_period * blowup rows, and reading it modulo its height gives the periodic polynomial at every quotient-domain point.
+The compact table holds the longest period times the blowup rows.
+
+Read modulo its height, it gives the periodic polynomial at every quotient-domain point.
 -/
 
 open Polynomial Finset
@@ -217,7 +219,9 @@ theorem periodicPoly_pad (s ω : K) (k : ℕ) (col : List K) (mp : ℕ) (hmp : 0
   funext i
   simp [List.getD_eq_getElem?_getD, Nat.mod_lt _ hmp, Nat.mod_mod_of_dvd _ hdvd]
 
-/-- The periodic polynomial of a column of length 2^l repeats on the points of a coset of order 2^(k + b) with period 2^(l + b). -/
+/-- The periodic polynomial of a column of length 2^l repeats on a coset of order 2^(k + b).
+
+Its period there is 2^(l + b). -/
 theorem periodicPoly_periodic (hV : GenValid G) (hN : GenNested G) {s : K} (hs : s ≠ 0)
     {k l b : ℕ} (hkb : k + b ≤ G.adicity) (hl : l ≤ k) (col : List K) (hcol : col.length = 2 ^ l)
     (t : K) (i : ℕ) :
@@ -247,7 +251,13 @@ theorem flatten_getElem? {α : Type _} (rows : List (List α)) (w : ℕ)
         ih (fun row' h => hw row' (List.mem_cons_of_mem _ h))]
       simp
 
-/-- On a nonempty set of good columns over a trace of order 2^k and a quotient of order 2^(k + b), the table holds max_period * 2^b rows, and a read at any index i is column c's periodic polynomial at quotient point i. -/
+/-- The table of a nonempty set of good columns.
+
+Take a trace of order 2^k and a quotient of order 2^(k + b).
+
+The table holds the longest period times 2^b rows.
+
+A read at any index i is column c's periodic polynomial at quotient point i. -/
 theorem build_periodic_lde_table_eq (hV : GenValid G) (hN : GenNested G) (h2 : (2 : K) ≠ 0)
     (trace quotient : Coset G) (cols : List (List K)) (hle : trace.log_size ≤ quotient.log_size)
     (hcols : ∀ col ∈ cols, ∃ l, col.length = 2 ^ l ∧ l ≤ trace.log_size) (hne : cols ≠ [])

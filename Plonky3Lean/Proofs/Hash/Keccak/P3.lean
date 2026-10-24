@@ -11,11 +11,15 @@ public import Plonky3Lean.Proofs.Hash.Keccak.Sponge
 /-!
 # p3-keccak: the permutation on words and on bytes
 
-On `[u64; 25]` the permutation is tiny-keccak's.
+On an array of 25 words of 64 bits, the permutation is tiny-keccak's.
 
-On `[u8; 200]` it reads lane `i` from bytes `8 i` to `8 i + 7`, little-endian, permutes, and writes the lanes back the same way.
+On an array of 200 bytes, it reads lane i from bytes 8 i to 8 i + 7, little-endian.
 
-That is the byte order of FIPS 202, B.1, so the byte permutation is Keccak-f[1600] on the bit string of the bytes.
+It permutes, then writes the lanes back the same way.
+
+That is the byte order of FIPS 202, B.1.
+
+So the byte permutation is Keccak-f[1600] on the bit string of the bytes.
 -/
 
 open Aeneas Aeneas.Std CoreModels
@@ -65,7 +69,7 @@ theorem u64_from_le_bytes_bv (a : Std.Array Std.U8 8#usize) :
   rw [List.getD_eq_getElem _ _ (by simp [ha]; omega)]
   rfl
 
-/-- Bytes `8 k` to `8 k + 7` of a byte array, zero past the end. -/
+/-- Bytes 8 k to 8 k + 7 of a byte array, zero past the end. -/
 def lane8 (b : Std.Array Std.U8 200#usize) (k : ℕ) : Std.Array Std.U8 8#usize :=
   Std.Array.from (((b.val.drop (8 * k)).take 8 ++ List.replicate 8 0#u8).take 8) (by simp)
 
@@ -75,7 +79,7 @@ theorem lane8_val (b : Std.Array Std.U8 200#usize) (k : ℕ) (hk : k < 25) :
   simp only [lane8, Std.Array.from_val]
   rw [List.take_append_of_le_length (by simp [hb]; omega), List.take_take, Nat.min_self]
 
-/-- The closure that reads lane `k` from the bytes. -/
+/-- The closure that reads lane k from the bytes. -/
 theorem read_lane (c : Std.Array Std.U8 200#usize) (k : ℕ) (hk : k < 25) :
     p3_keccak.PermutationKeccakFArrayU8200.permute.closure.Insts.CoreOpsFunctionFnMutTupleUsizeU64.call_mut c
         (usz k) =
@@ -96,7 +100,7 @@ theorem read_lane (c : Std.Array Std.U8 200#usize) (k : ℕ) (hk : k < 25) :
 
 /-! ## Machine integers of known value -/
 
-/-- The `u32` of value `k`. -/
+/-- The 32-bit machine integer of value k. -/
 def u32k (k : ℕ) : Std.U32 := ⟨BitVec.ofNat 32 k⟩
 
 theorem u32k_val {k : ℕ} (h : k < 2 ^ 32) : (u32k k).val = k := by
@@ -139,7 +143,7 @@ theorem usz_div {a b : ℕ} (ha : a < 2 ^ 32) (hb : b < 2 ^ 32) (h0 : b ≠ 0) :
   rw [hz, eq_usz (x := z) (k := a / b) (by have := Nat.div_le_self a b; omega)
     (by rw [hv, usz_val ha, usz_val hb])]
 
-/-- Byte `j` of the little-endian bytes of a word. -/
+/-- Byte j of the little-endian bytes of a word. -/
 theorem le_byte (x : Std.U64) (j : ℕ) (hj : j < 8) :
     CoreModels.core.num.U64.to_le_bytes.closure.Insts.CoreOpsFunctionFnMutTupleUsizeU8.call_mut x (usz j) =
       .ok (⟨x.bv.extractLsb' (8 * j) 8⟩, x) := by
@@ -167,7 +171,7 @@ theorem usz_rem8 {k : ℕ} (hk : k < 2 ^ 32) : (usz k % 8#usize : RustM Std.Usiz
   rw [show (8#usize : Std.Usize) = usz 8 from ofNatCore_eq_usz _ _ (by decide)]
   exact usz_rem hk (by decide) (by decide)
 
-/-- The closure that writes byte `k` from the lanes. -/
+/-- The closure that writes byte k from the lanes. -/
 theorem write_byte (c : Std.Array Std.U64 25#usize) (k : ℕ) (hk : k < 200) :
     p3_keccak.PermutationKeccakFArrayU8200.permute.closure_1.Insts.CoreOpsFunctionFnMutTupleUsizeU8.call_mut c
         (usz k) =
@@ -208,7 +212,9 @@ theorem write_bytes_bv (c : List Std.U64) (hc : c.length = 25) :
   simp only [List.length_map, List.length_range] at h1
   simp [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem h2]
 
-/-- The byte permutation is Keccak-f[1600] on the bit string of the bytes, read back as bytes (FIPS 202, B.1). -/
+/-- The byte permutation is Keccak-f[1600] on the bit string of the bytes (FIPS 202, B.1).
+
+The result is read back as bytes. -/
 theorem permute_u8_spec (b : Std.Array Std.U8 200#usize) :
     ∃ out, p3_keccak.hax_roots.permute_u8 b = .ok out ∧
       out.val.map UScalar.bv = bytesOfBits (keccakF (bitsOfBytes (b.val.map UScalar.bv))) := by
@@ -247,7 +253,9 @@ theorem array_clone_u8 (a : Std.Array Std.U8 200#usize) :
   apply Std.Array.ext
   simp
 
-/-- `permute_mut` on bytes clones the array and permutes the clone: the same bytes as `permute`. -/
+/-- The in-place permutation on bytes clones the array and permutes the clone.
+
+It gives the same bytes as the out-of-place permutation. -/
 theorem permute_mut_u8_spec (b : Std.Array Std.U8 200#usize) :
     ∃ out, p3_keccak.hax_roots.permute_mut_u8 b = .ok out ∧
       out.val.map UScalar.bv = bytesOfBits (keccakF (bitsOfBytes (b.val.map UScalar.bv))) := by
@@ -273,7 +281,7 @@ theorem length_unpack (st : Std.Array (Std.Array Std.U64 1#usize) 25#usize) : (u
 
 theorem twentyfive_val : (25#usize : Std.Usize).val = 25 := rfl
 
-/-- The words copied out of the packed state before step `k`. -/
+/-- The words copied out of the packed state before step k. -/
 def outWords (st : Std.Array (Std.Array Std.U64 1#usize) 25#usize) (k : ℕ) : Std.Array Std.U64 25#usize :=
   Std.Array.from ((unpack st).take k ++ List.replicate (25 - k) 0#u64) (by simp [length_unpack]; omega)
 
@@ -311,7 +319,7 @@ theorem copy_out_done (st : Std.Array (Std.Array Std.U64 1#usize) 25#usize) :
   apply Std.Array.ext
   simp [outWords, length_unpack]
 
-/-- The packed state after the words are copied back into its first `k` entries. -/
+/-- The packed state after the words are copied back into its first k entries. -/
 def inWords (w : Std.Array Std.U64 25#usize) (st : Std.Array (Std.Array Std.U64 1#usize) 25#usize) (k : ℕ) :
     Std.Array (Std.Array Std.U64 1#usize) 25#usize :=
   Std.Array.from ((List.range (min k 25)).map (fun i => single (w.val.getD i 0#u64)) ++ st.val.drop k)

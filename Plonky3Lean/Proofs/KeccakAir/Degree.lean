@@ -8,7 +8,9 @@ public import Plonky3Lean.Proofs.Air.Degree
 /-!
 # The constraint degrees of the Keccak-f AIR
 
-Every symbolic constraint of the AIR has degree multiple at most 3, and at most one transition selector along a product.
+Every symbolic constraint of the AIR has degree multiple at most 3.
+
+It also has at most one transition selector along a product.
 
 A builder over pairs of naturals bounds both: a sum takes the larger bound, a product adds them.
 
@@ -77,7 +79,11 @@ end walk
 
 /-- Bounds of (degree multiple, transition count): sums take the larger bound, products add them.
 
-Every cell and constant is bounded by (1, 0), the boundary selectors by (1, 0), and the transition selector by (0, 1).
+The base bounds:
+
+- every cell and constant: (1, 0)
+- the boundary selectors: (1, 0)
+- the transition selector: (0, 1).
 
 The state records whether every assertion so far is bounded by (3, 1). -/
 def topBuilder (layout : AirLayout) : AirBuilder F (ℕ × ℕ) Bool where
@@ -135,7 +141,11 @@ theorem builderRel_top (layout : AirLayout) :
       exact ⟨he.1.degree_multiple_eq ▸ he.2.1.trans hb.2.1, he.2.2.trans hb.2.2⟩
   window := rfl
 
-/-- When the bounding builder accepts an AIR, every symbolic constraint has degree multiple at most 3 and at most one transition selector along a product. -/
+/-- Suppose the bounding builder accepts an AIR.
+
+Then every symbolic constraint has degree multiple at most 3.
+
+It also has at most one transition selector along a product. -/
 theorem bounded_of_top (air : Air F) (h : air.eval (topBuilder (AirLayout.from_air air)) true = true) :
     ∀ e ∈ air.eval (symbolicBuilder (AirLayout.from_air air)) [],
       e.degree_multiple ≤ 3 ∧ transitionCount e ≤ 1 :=
@@ -156,7 +166,9 @@ section bounds
 variable (htop : TopOk F)
 include htop
 
-/-- Every symbolic constraint of the Keccak-f AIR has degree multiple at most 3 and at most one transition selector along a product. -/
+/-- Every symbolic constraint of the Keccak-f AIR has degree multiple at most 3.
+
+It also has at most one transition selector along a product. -/
 theorem keccak_constraints_bounded :
     ∀ e ∈ (keccakAir (F := F)).eval (symbolicBuilder (AirLayout.from_air (keccakAir (F := F)))) [],
       e.degree_multiple ≤ 3 ∧ transitionCount e ≤ 1 :=

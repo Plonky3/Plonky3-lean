@@ -28,7 +28,9 @@ open p3_fri.hiding_pcs.mirror Polynomial Finset
 
 variable {K : Type} [Field K]
 
-/-- The randomized commitment keeps the trace on the even rows: entry c of row 2 i, at width w + r, is entry c of row i of the trace. -/
+/-- The randomized commitment keeps the trace on the even rows.
+
+At width w + r, entry c of row 2 i is entry c of row i of the trace. -/
 theorem randomize_even_row (v : List K) {w r h : ℕ} (hw : 0 < w) (hv : v.length = h * w) (rnd : List K)
     (hrnd : h * (w + 2 * r) ≤ rnd.length) {i c : ℕ} (hi : i < h) (hc : c < w) :
     (randomize v w r rnd).1.getD (2 * i * (w + r) + c) 0 = v.getD (i * w + c) 0 := by
@@ -61,7 +63,9 @@ def maskDelta (g p : K) (h w : ℕ) (rv : List K) (k : ℕ) (e : ℕ × ℕ) : K
   (if e.1 * w + e.2 = k then -(g ^ e.1 * rv.getD (e.1 * w + e.2) 0) else 0) +
     (if (h + e.1) * w + e.2 = k then p * (g ^ e.1 * rv.getD (e.1 * w + e.2) 0) else 0)
 
-/-- The mask's effect, pair by pair: each pair (i, j) moves its two positions by -g^i r_(i,j) and p g^i r_(i,j). -/
+/-- The mask's effect, pair by pair.
+
+Each pair (i, j) moves its two positions by -g^i r_(i,j) and p g^i r_(i,j). -/
 theorem maskCoeffs_foldl (g p : K) (h w : ℕ) (rv : List K) :
     ∀ (l : List (ℕ × ℕ)) (c : List K), (∀ e ∈ l, (h + e.1) * w + e.2 < c.length ∧ e.1 * w + e.2 < c.length) →
       ∀ k, (l.foldl (fun c e =>
@@ -107,7 +111,10 @@ theorem div_mod_unique {w i j i' j' : ℕ} (hj : j < w) (hj' : j' < w) (h : i' *
   have hi : i' = i := by rw [← h1, h, h2]
   subst hi; exact ⟨rfl, by omega⟩
 
-/-- The quotient mask on coefficients: in column j, coefficient i < h loses g^i r_(i,j), and coefficient h + i gains p g^i r_(i,j). -/
+/-- The quotient mask on coefficients, in column j:
+
+- coefficient i < h loses g^i r_(i,j)
+- coefficient h + i gains p g^i r_(i,j). -/
 theorem maskCoeffs_getD (g p : K) {h w : ℕ} (rv coeffs : List K) (hlen : 2 * h * w ≤ coeffs.length)
     {i j : ℕ} (hi : i < 2 * h) (hj : j < w) :
     (maskCoeffs g p h w rv coeffs).getD (i * w + j) 0 = coeffs.getD (i * w + j) 0 +
@@ -156,7 +163,9 @@ theorem maskCoeffs_getD (g p : K) {h w : ℕ} (rv coeffs : List K) (hlen : 2 * h
         have := Nat.mul_le_mul_right w (show i' + 1 ≤ 2 * h by omega); rw [Nat.succ_mul] at this; omega
       omega
 
-/-- Column j of the masked chunk, as a polynomial on coefficients, gains r(X) (p X^h - 1), for r with coefficients g^i r_(i,j). -/
+/-- Column j of the masked chunk, as a polynomial on coefficients, gains r(X) (p X^h - 1).
+
+Here r has coefficients g^i r_(i,j). -/
 theorem maskCoeffs_column (g p x : K) {h w : ℕ} (rv coeffs : List K) (hlen : 2 * h * w ≤ coeffs.length)
     {j : ℕ} (hj : j < w) :
     ∑ i ∈ range (2 * h), (maskCoeffs g p h w rv coeffs).getD (i * w + j) 0 * x ^ i =
@@ -187,7 +196,13 @@ theorem maskCoeffs_column (g p x : K) {h w : ℕ} (rv coeffs : List K) (hlen : 2
   simp only [add_mul, Finset.sum_add_distrib, hA, hB]
   ring
 
-/-- The masks cancel in the recombination: with weights c_i prod_(j != i) v_j, the chunk masks v_i R_i sum to zero when the last chunk's mask is minus the sum of the others scaled by c_i / c_last. -/
+/-- The masks cancel in the recombination.
+
+The weights are c_i prod_(j != i) v_j.
+
+The chunk masks v_i R_i sum to zero when the last mask balances the others.
+
+That last mask is minus the sum of the others, each scaled by c_i / c_last. -/
 theorem masks_cancel {d : ℕ} (c v : Fin (d + 1) → K) (R : Fin d → K) (hc : c (Fin.last d) ≠ 0) :
     ∑ i : Fin (d + 1), (c i * ∏ j ∈ univ.erase i, v j) *
       (v i * Fin.lastCases (-∑ i : Fin d, c i.castSucc / c (Fin.last d) * R i) R i) = 0 := by
@@ -207,7 +222,9 @@ theorem masks_cancel {d : ℕ} (c v : Fin (d + 1) → K) (R : Fin d → K) (hc :
         rw [mul_neg, Finset.mul_sum, Finset.sum_congr rfl fun i _ => e i, add_neg_cancel, mul_zero]
 
 omit [Field K] in
-/-- The verifier's merge undoes the prover's split: hidden values of the configured count rejoin the public ones. -/
+/-- The verifier's merge undoes the prover's split.
+
+Hidden values of the configured count rejoin the public ones. -/
 theorem merge_split {k : ℕ} (z : K) (vals : List K) (hk : k ≤ vals.length) :
     mergePoint k ⟨z, (splitPoint k vals).1⟩ (splitPoint k vals).2 = some ⟨z, vals⟩ := by
   simp [mergePoint, splitPoint, show vals.length - (vals.length - k) = k by omega]
@@ -218,7 +235,11 @@ theorem mergePoint_eq_none (k : ℕ) (pt : p3_commit.pcs.univariate.mirror.Point
     mergePoint k pt rand = none ↔ rand.length ≠ k := by
   unfold mergePoint; split_ifs with h <;> simp [h]
 
-/-- The three hiding budgets read the same mask height: the trace height N at commit, the LDE height 2 N 2^b without its blowup at opening, and half the doubled domain at verification. -/
+/-- The three hiding budgets read the same mask height:
+
+- the trace height N at commit
+- the LDE height 2 N 2^b without its blowup at opening
+- half the doubled domain at verification. -/
 theorem mask_heights_agree (N b : ℕ) (hb : b < 64) :
     lde_mask_height b (2 * N * 2 ^ b) = N ∧ (2 * N) / 2 = N := by
   simp [lde_mask_height, hb, Nat.mul_div_cancel _ (by positivity : 0 < 2 ^ b)]

@@ -13,7 +13,9 @@ The default methods meet their contract on any scheme that meets the scheme cont
 
 A scheme that commits the matrices themselves meets the contract, so the contract is satisfiable.
 
-The extension-field adapter turns a scheme over the base field that meets the contract into one over the extension that meets it, with the same failure event.
+The extension-field adapter lifts a scheme over the base field to the extension.
+
+If the base scheme meets the contract, so does the lifted one, with the same failure event.
 -/
 
 open p3_commit.pcs.univariate.mirror p3_commit.mmcs.mirror Plonky3Lean.Spec.Commit
