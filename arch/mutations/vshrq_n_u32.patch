@@ -1,0 +1,14 @@
+# Mutation of: vshrq_n_u32
+# Breaks:      a shift by 32 leaves the lane unchanged instead of giving 0.
+#
+--- a/src/aarch64/neon.rs
++++ b/src/aarch64/neon.rs
+@@ -343,7 +343,7 @@
+     let mut e = 0;
+     while e < 4 {
+         dst[e] = if N as u32 >= 32 {
+-            0
++            a.0[e]
+         } else {
+             a.0[e] >> N as u32
+         };

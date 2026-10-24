@@ -160,3 +160,28 @@ opaque = [
   "p3_monty_31::monty_31",
   "p3_monty_31::utils",
 ]
+
+# `PackedMontyField31Neon`'s arithmetic, extracted for AArch64 against the
+# intrinsic models (pre-patch 030, under which `confuse_compiler`, an `asm!`
+# optimisation barrier, is the identity). As for x86_64-avx2: the scalar
+# modules are opaque, and bound to P3Monty31 by
+# variants/aarch64-neon/extraction/P3Monty31Neon/Assumptions/. Its own
+# namespace, since on AArch64 `PackedMontyParameters` has the supertrait
+# `MontyParametersNeon`.
+[[variant]]
+name = "aarch64-neon"
+target = "aarch64-unknown-linux-gnu"
+target_features = ["neon"]
+lean_lib = "P3Monty31Neon"
+namespace = "p3_monty_31_neon"
+start_from = [
+  "{impl core::ops::arith::Add for p3_monty_31::aarch64_neon::packing::PackedMontyField31Neon<_>}::add",
+  "{impl core::ops::arith::Sub for p3_monty_31::aarch64_neon::packing::PackedMontyField31Neon<_>}::sub",
+  "{impl core::ops::arith::Neg for p3_monty_31::aarch64_neon::packing::PackedMontyField31Neon<_>}::neg",
+  "{impl core::ops::arith::Mul for p3_monty_31::aarch64_neon::packing::PackedMontyField31Neon<_>}::mul",
+  "p3_monty_31::aarch64_neon::utils::halve_neon",
+]
+opaque = [
+  "p3_monty_31::monty_31",
+  "p3_monty_31::utils",
+]

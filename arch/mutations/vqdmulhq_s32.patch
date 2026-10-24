@@ -1,0 +1,14 @@
+# Mutation of: vqdmulhq_s32
+# Breaks:      it wraps instead of saturating, at `i32::MIN * i32::MIN`.
+#
+--- a/src/aarch64/neon.rs
++++ b/src/aarch64/neon.rs
+@@ -326,7 +326,7 @@
+     let mut e = 0;
+     while e < 4 {
+         let product = (a.0[e] as i64) * (b.0[e] as i64);
+-        dst[e] = signed_sat_q32(product >> 31);
++        dst[e] = (product >> 31) as i32;
+         e += 1;
+     }
+     int32x4_t(dst)

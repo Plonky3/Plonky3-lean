@@ -4,11 +4,13 @@ public import Plonky3Lean.Spec.Monty31
 public import Plonky3Lean.Spec.BabyBear
 public import P3Monty31Avx2
 public import P3BabyBearAvx2
+public import P3Monty31Neon
+public import P3BabyBearNeon
 
 @[expose] public section
 
 /-!
-# Packed Monty31: what a `PackedMontyField31AVX2` means
+# Packed Monty31: what a `PackedMontyField31AVX2` or `PackedMontyField31Neon` means
 
 p3-monty-31's AVX2 backend packs eight `MontyField31` into one `__m256i`. Its model is
 the `P3Monty31Avx2` variant (`crates/monty-31/variants/x86_64-avx2`), in the namespace
@@ -29,6 +31,8 @@ the `P3Monty31Avx2` variant (`crates/monty-31/variants/x86_64-avx2`), in the nam
   `BabyBearPackedParams` and `BabyBearMontyParamsAvx2` the dictionaries the baby-bear variant
   (`P3BabyBearAvx2`, `crates/baby-bear/variants/x86_64-avx2`) extracts for
   `BabyBearParameters`. Each is an alias of a generated name and adds nothing to it.
+
+The NEON backend's readings, at width 4, are in `Neon` (below).
 -/
 
 open Aeneas Aeneas.Std CoreModels
@@ -98,5 +102,89 @@ noncomputable abbrev BabyBearPackedParams :=
 /-- Its `MontyParameters` dictionary, in the monty-31 variant's record. -/
 noncomputable abbrev BabyBearMontyParamsAvx2 :=
   p3_baby_bear_avx2.baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsMontyParameters
+
+/-! ## NEON
+
+p3-monty-31's NEON backend packs four `MontyField31` into one `uint32x4_t`, and its
+multiplication reads them as an `int32x4_t`. Its model is the `P3Monty31Neon` variant
+(`crates/monty-31/variants/aarch64-neon`), in the namespace `p3_monty_31_neon`; its
+`MontyField31` is P3Monty31's. The readings are those above at width 4, in the namespace
+`Plonky3Lean.Spec.Packed.Neon`. `Valid` differs in `PACKED_MU`, which is an `int32x4_t`
+holding `MONTY_MU`'s bits: its lanes, read as `u32`, are `MONTY_MU`. -/
+
+namespace Neon
+
+/-- Rust's `PackedMontyField31Neon<MP>`: four `MontyField31<MP>`. -/
+abbrev PackedNeon (MP : Type) := p3_monty_31_neon.aarch64_neon.packing.PackedMontyField31Neon MP
+
+/-- A `uint32x4_t`, as p3-arch-shims models it: four `u32` lanes. -/
+abbrev U32x4 := p3_arch_shims.aarch64.types.U32x4
+
+/-- An `int32x4_t`, as p3-arch-shims models it: four `i32` lanes. -/
+abbrev I32x4 := p3_arch_shims.aarch64.types.I32x4
+
+/-- A packed value as the vector of its lanes. -/
+def toVector {MP : Type} (x : PackedNeon MP) : Vector (Monty31.Element MP) 4 :=
+  ⟨x.val.toArray, by simp⟩
+
+/-- Every lane of a packed value is canonical, `< p`. -/
+def Canonical {MP : Type} (p : ℕ) (x : PackedNeon MP) : Prop :=
+  ∀ i : Fin 4, Monty31.Canonical p (toVector x)[i]
+
+/-- Lane `i` of a `uint32x4_t`. -/
+def lane (v : U32x4) (i : Fin 4) : Std.U32 :=
+  v.val[i.val]!
+
+/-- Lane `i` of an `int32x4_t`. -/
+def slane (v : I32x4) (i : Fin 4) : Std.I32 :=
+  v.val[i.val]!
+
+/-- The safety condition of `PackedMontyField31Neon::from_vector`: "each element of vector
+must be in `0..P` (canonical form)". -/
+def FromVectorSafe (p : ℕ) (v : U32x4) : Prop :=
+  ∀ i : Fin 4, (lane v i).val < p
+
+/-- The variant's `MontyParameters` dictionary, read as P3Monty31's: the same members. -/
+def toPortable {MP : Type} (inst : p3_monty_31_neon.data_traits.MontyParameters MP) :
+    p3_monty_31.data_traits.MontyParameters MP where
+  PRIME := inst.PRIME
+  MONTY_BITS := inst.MONTY_BITS
+  MONTY_MU := inst.MONTY_MU
+  MONTY_MASK := inst.MONTY_MASK
+  coremarkerCopyInst := inst.coremarkerCopyInst
+  coredefaultDefaultInst := inst.coredefaultDefaultInst
+  corefmtDebugInst := inst.corefmtDebugInst
+  corecmpEqInst := inst.corecmpEqInst
+  corecmpPartialEqInst := inst.corecmpPartialEqInst
+  corehashHashInst := inst.corehashHashInst
+
+/-- The parameters of a `PackedMontyParameters` impl on AArch64: valid `MontyParameters`
+(`Monty31.Valid`, through `toPortable`), `PACKED_P` holding `p = PRIME` in every lane, and
+`PACKED_MU` holding `mu = MONTY_MU` in every lane, read as a `u32`, which `MontyParametersNeon`
+documents and nothing checks. -/
+structure Valid {MP : Type} (inst : p3_monty_31_neon.data_traits.PackedMontyParameters MP)
+    (p mu : Std.U32) : Prop where
+  monty : Monty31.Valid (toPortable inst.MontyParametersInst) p mu
+  packed_p : ∃ v, inst.aarch64_neonpackingMontyParametersNeonInst.PACKED_P = .ok v ∧
+    ∀ i, lane v i = p
+  packed_mu : ∃ v, inst.aarch64_neonpackingMontyParametersNeonInst.PACKED_MU = .ok v ∧
+    ∀ i, IScalar.hcast .U32 (slane v i) = mu
+
+/-! ### BabyBear -/
+
+/-- Rust's `PackedBabyBearNeon = PackedMontyField31Neon<BabyBearParameters>`. -/
+abbrev PackedBabyBearNeon := PackedNeon p3_baby_bear.baby_bear.BabyBearParameters
+
+/-- The `PackedMontyParameters` dictionary the baby-bear variant extracts for
+`BabyBearParameters` on AArch64: its `MontyParameters` and its `MontyParametersNeon`
+(`PACKED_P`, `PACKED_MU`, `baby-bear/src/aarch64_neon/packing.rs`). -/
+noncomputable abbrev BabyBearPackedParams :=
+  p3_baby_bear_neon.baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsPackedMontyParameters
+
+/-- Its `MontyParameters` dictionary, in the monty-31 variant's record. -/
+noncomputable abbrev BabyBearMontyParamsNeon :=
+  p3_baby_bear_neon.baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsMontyParameters
+
+end Neon
 
 end Plonky3Lean.Spec.Packed

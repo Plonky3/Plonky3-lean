@@ -1,0 +1,14 @@
+# Mutation of: vhsubq_s32
+# Breaks:      it rounds toward zero instead of down.
+#
+--- a/src/aarch64/neon.rs
++++ b/src/aarch64/neon.rs
+@@ -246,7 +246,7 @@
+     let mut e = 0;
+     while e < 4 {
+         let diff = (a.0[e] as i64) - (b.0[e] as i64);
+-        dst[e] = (diff >> 1) as i32;
++        dst[e] = (diff / 2) as i32;
+         e += 1;
+     }
+     int32x4_t(dst)

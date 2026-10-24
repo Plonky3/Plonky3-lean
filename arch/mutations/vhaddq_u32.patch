@@ -1,0 +1,14 @@
+# Mutation of: vhaddq_u32
+# Breaks:      it loses the carry out of the 32-bit sum.
+#
+--- a/src/aarch64/neon.rs
++++ b/src/aarch64/neon.rs
+@@ -228,7 +228,7 @@
+     let mut dst = [0u32; 4];
+     let mut e = 0;
+     while e < 4 {
+-        let sum = (a.0[e] as u64) + (b.0[e] as u64);
++        let sum = a.0[e].wrapping_add(b.0[e]) as u64;
+         dst[e] = (sum >> 1) as u32;
+         e += 1;
+     }

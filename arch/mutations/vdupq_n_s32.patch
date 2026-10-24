@@ -1,0 +1,14 @@
+# Mutation of: vdupq_n_s32
+# Breaks:      it leaves lane 3 zero.
+#
+--- a/src/aarch64/neon.rs
++++ b/src/aarch64/neon.rs
+@@ -45,7 +45,7 @@
+ pub unsafe fn vdupq_n_s32(value: i32) -> int32x4_t {
+     let mut dst = [0i32; 4];
+     let mut e = 0;
+-    while e < 4 {
++    while e < 3 {
+         dst[e] = value;
+         e += 1;
+     }
