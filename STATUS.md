@@ -42,7 +42,7 @@ target `thumbv7em-none-eabi`
 | `merkle-tree` | scoped | 1306 | 43 | 0 | 0 | 0 | 2 / 0 | pre `010`, pre `020` |
 | `mersenne-31` | scoped | 1444 | 259 | 0 | 12 | 30 | 1 / 1 | pre `010` |
 | `monty-31` | scoped | 1581 | 327 | 0 | 13 | 29 | 1 / 1 | pre `010` |
-| `multi-stark` | stub |  | 581 | 0 | 45 |  | 0 / 0 |  |
+| `multi-stark` | stub |  | 1004 | 0 | 77 |  | 0 / 0 |  |
 | `multilinear-util` | stub |  | 1077 | 0 | 75 |  | 1 / 0 | pre `010` |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 68 | 2 | 4 |  | 0 / 0 |  |
@@ -498,7 +498,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1711) whose dependencies include it; reaching one is not using it.
+(of 1738) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -540,7 +540,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1711) whose dependencies include the declaration.
+counts the claims (of 1738) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -1461,9 +1461,9 @@ counts the claims (of 1711) whose dependencies include the declaration.
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_coset_with_precomputation` | `p3_matrix::interpolation::Interpolate::interpolate_coset_with_precomputation` | not translated | 13 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_coset` | `p3_matrix::interpolation::Interpolate::interpolate_coset` | not translated | 12 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_subgroup` | `p3_matrix::interpolation::Interpolate::interpolate_subgroup` | not translated | 0 |
-| `matrix` | `p3_matrix.interpolation.mirror.barycentric_weights` | `p3_matrix::interpolation::barycentric_weights` | not translated | 6 |
-| `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_with_precomputation` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_with_precomputation` | not translated | 4 |
-| `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_point` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_point` | not translated | 4 |
+| `matrix` | `p3_matrix.interpolation.mirror.barycentric_weights` | `p3_matrix::interpolation::barycentric_weights` | not translated | 9 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_with_precomputation` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_with_precomputation` | not translated | 7 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_point` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_point` | not translated | 7 |
 | `matrix` | `p3_matrix.interpolation.mirror.recover_coefficients` | `p3_matrix::interpolation::InterpolateArbitrary::recover_coefficients` | not translated | 2 |
 | `matrix` | `p3_matrix.interpolation.mirror.interpolate_lagrange` | `p3_matrix::interpolation::interpolate_lagrange` | not translated | 1 |
 | `matrix` | `p3_matrix.util.mirror.reverse_matrix_index_bits` | `p3_matrix::util::reverse_matrix_index_bits` | not translated | 17 |
@@ -1539,6 +1539,38 @@ counts the claims (of 1711) whose dependencies include the declaration.
 | `multi-stark` | `p3_multi_stark.zerocheck.mirror.Entry` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | stub | 7 |
 | `multi-stark` | `p3_multi_stark.security.mirror.Term` | `p3_security::SecurityTerm` | stub | 1 |
 | `multi-stark` | `p3_multi_stark.security.mirror.Denominator` | `p3_security::multilinear::reduction_terms` | stub | 1 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.SplitFraction` | `p3_multi_stark::fractional_gkr::SplitFraction` | stub | 7 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.SplitFraction.gate` | `p3_multi_stark::fractional_gkr::SplitFraction::gate` | stub | 6 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.FractionGkrError` | `p3_multi_stark::fractional_gkr::FractionGkrError` | stub | 2 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.ROUND_POLY_LEN` | `p3_multi_stark::fractional_gkr::transcript::ROUND_POLY_LEN` | stub | 0 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.FractionGkrLayerProof` | `p3_multi_stark::fractional_gkr::FractionGkrLayerProof` | stub | 4 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.FractionGkrProof` | `p3_multi_stark::fractional_gkr::FractionGkrProof` | stub | 2 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.FractionGkrOutput` | `p3_multi_stark::fractional_gkr::FractionGkrOutput` | stub | 2 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.VerifierTranscript` | `p3_multi_stark::fractional_gkr::transcript::FractionGkrVerifierTranscript` | stub | 3 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.VerifyState` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | stub | 3 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.firstBadRound` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | stub | 3 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.roundStep` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | stub | 3 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.verify_layer` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | stub | 3 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.verify_fractional_gkr` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | stub | 2 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.LookupInstancePlan` | `p3_multi_stark::lookup::LookupInstancePlan` | stub | 3 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.log2_ceil_usize` | `p3_util::log2_ceil_usize` | stub | 2 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.place` | `p3_multi_stark::lookup::LookupPlan::build` | stub | 2 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.bus_capacity_ok` | `p3_multi_stark::lookup::LookupPlan::build` | stub | 1 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.tupleWeights` | `p3_multi_stark::lookup::AirLinkClaim::new` | stub | 1 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.blockWeights` | `p3_multi_stark::lookup::AirLinkClaim::new` | stub | 1 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.claimed_sum` | `p3_multi_stark::lookup::AirLinkClaim::new` | stub | 1 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.theta_bus_offset` | `p3_multi_stark::lookup::AirLinkClaim::new` | stub | 0 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.bus_prefixes` | `p3_lookup::Challenges::new` | stub | 0 |
+| `multi-stark` | `p3_multi_stark.logup_star.mirror.embed` | `p3_multi_stark::logup_star::position::embed` | stub | 2 |
+| `multi-stark` | `p3_multi_stark.logup_star.mirror.fits` | `p3_multi_stark::logup_star::position::fits` | stub | 1 |
+| `multi-stark` | `p3_multi_stark.logup_star.mirror.eval` | `p3_multi_stark::logup_star::position::eval` | stub | 1 |
+| `multi-stark` | `p3_multi_stark.logup_star.mirror.claimed_sum` | `p3_multi_stark::logup_star::product::claimed_sum` | stub | 0 |
+| `multi-stark` | `p3_multi_stark.bus.mirror.TerminalShare` | `p3_bus::BusTerminalShare` | stub | 2 |
+| `multi-stark` | `p3_multi_stark.bus.mirror.BusBindingError` | `p3_multi_stark::bus::BusBindingError` | stub | 2 |
+| `multi-stark` | `p3_multi_stark.bus.mirror.shareTerm` | `p3_multi_stark::bus::BusContext::terminal_composition` | stub | 2 |
+| `multi-stark` | `p3_multi_stark.bus.mirror.terminal_composition` | `p3_multi_stark::bus::BusContext::terminal_composition` | stub | 1 |
+| `multi-stark` | `p3_multi_stark.security.mirror.LookupParams` | `p3_security::multilinear::MultilinearLookupParams` | stub | 0 |
+| `multi-stark` | `p3_multi_stark.security.mirror.lookup_terms` | `p3_security::multilinear::reduction_terms` | stub | 0 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.split_at` | `p3_multilinear_util::point::Point::split_at` | stub | 0 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.reversed` | `p3_multilinear_util::point::Point::reversed` | stub | 0 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.split_by_coordinate` | `p3_multilinear_util::point::split_by_coordinate` | stub | 3 |
@@ -1548,10 +1580,10 @@ counts the claims (of 1711) whose dependencies include the declaration.
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_table` | `p3_multilinear_util::point::Point::equality_table` | stub | 3 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_weights_msb` | `p3_multilinear_util::point::Point::equality_weights_msb` | stub | 2 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_weights_lsb` | `p3_multilinear_util::point::Point::equality_weights_lsb` | stub | 2 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_at_vertex` | `p3_multilinear_util::point::Point::equality_at_vertex` | stub | 1 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.hypercube` | `p3_multilinear_util::point::Point::hypercube` | stub | 2 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_at_vertex` | `p3_multilinear_util::point::Point::equality_at_vertex` | stub | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.hypercube` | `p3_multilinear_util::point::Point::hypercube` | stub | 3 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.expand_from_univariate` | `p3_multilinear_util::point::Point::expand_from_univariate` | stub | 9 |
-| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_eq` | `p3_multilinear_util::point::Point::eval_eq` | stub | 13 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_eq` | `p3_multilinear_util::point::Point::eval_eq` | stub | 19 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_select` | `p3_multilinear_util::point::Point::eval_select` | stub | 7 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_next` | `p3_multilinear_util::point::Point::eval_next` | stub | 3 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.transpose` | `p3_multilinear_util::point::Point::transpose` | stub | 0 |
@@ -1759,8 +1791,8 @@ counts the claims (of 1711) whose dependencies include the declaration.
 | `sumcheck` | `p3_sumcheck.mirror.VerifierTranscript.round` | `p3_sumcheck::transcript::VerifierTranscript::round` | not translated | 12 |
 | `sumcheck` | `p3_sumcheck.mirror.verify_rounds` | `p3_sumcheck::data::SumcheckData::verify_rounds` | not translated | 12 |
 | `sumcheck` | `p3_sumcheck.mirror.verify_final_sumcheck_rounds` | `p3_sumcheck::data::verify_final_sumcheck_rounds` | not translated | 7 |
-| `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.new` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::new` | not translated | 4 |
-| `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.eval` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::eval` | not translated | 3 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.new` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::new` | not translated | 7 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.eval` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::eval` | not translated | 6 |
 | `sumcheck` | `p3_sumcheck.generic_degree.mirror.GenericDegreeShape.seed` | `p3_sumcheck::generic_degree::transcript::GenericDegreeShape::domain_separator` | not translated | 1 |
 | `sumcheck` | `p3_sumcheck.generic_degree.mirror.VerifierTranscript.round` | `p3_sumcheck::generic_degree::transcript::VerifierTranscript::round` | not translated | 1 |
 | `sumcheck` | `p3_sumcheck.generic_degree.mirror.verify` | `p3_sumcheck::generic_degree::proof::GenericDegreeProof::verify` | not translated | 1 |
@@ -2505,16 +2537,43 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Monty31.utils.to_monty_64.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.utils.to_monty_64_signed.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.utils.to_monty_signed.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.bus_capacity` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.bus_closing` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.bus_family` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.bus_share_term` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.claim_check` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.closing_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.closing_complete` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.closing_loop` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.closing_never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.closing_wrong_count` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.fraction_root` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_branch_bad` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_charge` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_lambda_bad` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_layer` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_layer_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_layer_sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_round_counts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_rounds_bad` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_verifier` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.instCharPExt4FieldSize_plonky3Lean` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.instance_term` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.instance_wrong_width` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.logup_fingerprint` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.logup_star_claim` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_leaf_denominators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_leaf_sum` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_link` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_placed` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_weights` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.next_row_opening` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.padded_denominator` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.position_closed_form` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.position_fits` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.prover_selectors` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.pushforward_identity` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.round_degree_charged` | `Quot.sound`, `propext` |
 | `MultiStark.selectors_are_extensions` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.selectors_on_rows` | `Classical.choice`, `Quot.sound`, `propext` |
