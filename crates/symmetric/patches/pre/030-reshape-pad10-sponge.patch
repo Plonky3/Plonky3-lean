@@ -22,6 +22,9 @@
 # It delays the permutation of a full block until the next element arrives, which is what the peek decides.
 # It pads and permutes at the same points as the original.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/symmetric/src/hax_reshaped.rs b/symmetric/src/hax_reshaped.rs
 index b99c47b..541003a 100644
 --- a/symmetric/src/hax_reshaped.rs

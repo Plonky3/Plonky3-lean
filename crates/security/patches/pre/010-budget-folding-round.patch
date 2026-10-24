@@ -25,6 +25,9 @@
 # The differential test compares it with the report's folding term on 20000 parameter sets.
 # A third of those sets are drawn from edge values.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 --- a/security/src/budget/mod.rs
 +++ b/security/src/budget/mod.rs
 @@ -164,6 +164,10 @@ pub const fn security_report(

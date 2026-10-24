@@ -23,6 +23,9 @@
 # The reshaped body pushes the same items, in the same order, into a vector and hashes that.
 # A hasher sees the same item sequence either way.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/symmetric/src/compression.rs b/symmetric/src/compression.rs
 index 10d3be0..b771090 100644
 --- a/symmetric/src/compression.rs

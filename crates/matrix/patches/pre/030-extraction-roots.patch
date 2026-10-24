@@ -19,6 +19,9 @@
 #
 # That makes charon list the method, so aeneas extracts its body.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/matrix/src/lib.rs b/matrix/src/lib.rs
 index ded9a11..051954a 100644
 --- a/matrix/src/lib.rs

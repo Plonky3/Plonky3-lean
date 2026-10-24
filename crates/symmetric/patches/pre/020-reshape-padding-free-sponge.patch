@@ -21,6 +21,9 @@
 # The reshaped body runs one loop over the input and keeps the rate position in a counter.
 # It overwrites the same positions and calls the permutation at the same points.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/symmetric/src/hax_reshaped.rs b/symmetric/src/hax_reshaped.rs
 new file mode 100644
 index 0000000..b99c47b

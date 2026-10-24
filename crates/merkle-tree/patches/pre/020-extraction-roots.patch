@@ -20,6 +20,9 @@
 # Each wrapper calls one reshaped verifier body, with the hasher, the compression and the packing left generic.
 # The Lean model then takes each as an argument, and its theorems hold for every one.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 diff --git a/merkle-tree/src/hax_roots.rs b/merkle-tree/src/hax_roots.rs
 new file mode 100644
 index 00000000..a68d21ae

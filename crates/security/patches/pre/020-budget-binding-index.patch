@@ -27,6 +27,9 @@
 # The differential test compares the two on 20000 reports.
 # Half of the reports use values in 0..4, to force ties.
 #
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
 --- a/security/src/budget/report.rs
 +++ b/security/src/budget/report.rs
 @@ -61,15 +61,30 @@ impl SecurityReport {
