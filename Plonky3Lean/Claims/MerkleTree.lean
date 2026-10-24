@@ -15,9 +15,15 @@ public import Plonky3Lean.Proofs.MerkleTree.Bugs
 
 These claims hold at the Plonky3 commit pinned in `plonky3/`.
 
-The model is the scoped extraction in `crates/merkle-tree`: the single-index verifier, its schedule, and the hiding verifier.
+The model is the scoped extraction in `crates/merkle-tree`:
 
-Their bodies are those of pre-patch `merkle-tree/010`, which a differential test equates with the shipped ones.
+- the single-index verifier
+- its schedule
+- the hiding verifier.
+
+Their bodies are those of pre-patch `merkle-tree/010`.
+
+A differential test equates them with the shipped ones.
 
 The hasher and the compression stay abstract, so each claim holds for every hash.
 
@@ -27,11 +33,11 @@ The extracted model checks arithmetic, as a debug build does, so an overflow pan
 
 # What the claims find
 
-- Two accepting openings at one index agree on every row the verifier reads, or the hasher or the compression collides.
+- Two accepting openings at one index agree on every row read, or the hasher or the compression collides.
 - An honest opening of the tree verifies.
-- No index, rows, siblings or cap make the verifier panic, once the dimensions pass its own checks.
+- Once the dimensions pass the verifier's own checks, no index, rows, siblings or cap make it panic.
 - With arity 8, heights 4 and 2 make the pinned schedule loop forever.
-- With arity 2 and a cap two layers down, the pinned verifier never reads a height-1 matrix next to a height-8 one.
+- With arity 2 and a cap two layers down, a height-1 matrix next to a height-8 one is never read.
 
 Plonky3/Plonky3#2471 removes both defects, after the pinned commit.
 -/
@@ -48,9 +54,12 @@ variable {P PW F W H C : Type} {N DIGEST_ELEMS : Std.Usize} {D : Type _}
 
 /-- Merkle's binding argument on the extracted verifier.
 
-Two openings at one index, under one cap and one set of dimensions, that both verify agree on every row the verifier reads.
+Take two openings at one index, under one cap and one set of dimensions, that both verify.
 
-Otherwise the hasher maps two different row lists of equal row lengths to one digest, or the compression maps two different children lists to one digest.
+Either they agree on every row the verifier reads, or one of these collides:
+
+- the hasher maps two different row lists of equal row lengths to one digest
+- the compression maps two different children lists to one digest.
 
 The hasher and the compression are any functions.
 
@@ -79,9 +88,13 @@ theorem mmcs.hax_reshaped.verify_batch.binding {P PW F W H C : Type} {N DIGEST_E
 
 /-- Completeness: an honest opening of the tree verifies.
 
-The tree is the one its documentation describes, its layers follow the verifier's schedule, and its padding digest is the default digest.
+The tree is the one its documentation describes:
 
-The leaf is the hash of the leaf rows, the siblings are the path's, and the cap holds the top layer.
+- its layers follow the verifier's schedule
+- its padding digest is the default digest
+- the leaf is the hash of the leaf rows
+- the siblings are the path's
+- the cap holds the top layer.
 
 The verifier must read each injected matrix at the row the tree takes in, below the matrix's height. -/
 theorem mmcs.hax_reshaped.verify_batch.complete {P PW F W H C : Type} {N DIGEST_ELEMS : Std.Usize}
@@ -134,7 +147,13 @@ theorem mmcs.hax_reshaped.verify_batch.complete {P PW F W H C : Type} {N DIGEST_
       proof = RustM.ok (core.result.Result.Ok ()) :=
   Plonky3Lean.Proofs.MerkleTree.verify_complete cl cp dfInst eqInst hInst cInst mt h c hH hC hcl hrefl hN dims val sched pl expected sched1 epl order curr lnpt pos hval hsched hexp hsched1 hepl horder hcurr hlnpt hpos hheights commit index opened proof hlen0 hw hproof hidx hcapl t dflt padA ht hdflt hpad ls L0 hmatch hleaf hpath hcap
 
-/-- The verifier accepts when the rows have their widths, the siblings number as the walked levels take, the index is below the tallest height, the cap holds as many roots as the top layers produce, and the fold of the opening reaches the cap entry at its index. -/
+/-- The verifier accepts when all of these hold:
+
+- the rows have their widths
+- the siblings number as many as the walked levels take
+- the index is below the tallest height
+- the cap holds as many roots as the top layers produce
+- the fold of the opening reaches the cap entry at its index. -/
 theorem mmcs.hax_reshaped.verify_batch.accepts_of_walk {P PW F W H C : Type} {N DIGEST_ELEMS : Std.Usize}
     (cl : core.clone.Clone F) (cp : core.marker.Copy W)
     (dfInst : core.default.Default W) (eqInst : core.cmp.PartialEq W W)
@@ -180,7 +199,12 @@ theorem mmcs.hax_reshaped.verify_batch.accepts_of_walk {P PW F W H C : Type} {N 
       proof = RustM.ok (core.result.Result.Ok ()) :=
   Plonky3Lean.Proofs.MerkleTree.verify_ok_of cl cp dfInst eqInst hInst cInst mt h c hH hC hcl hdf hrefl hN dims val sched pl expected sched1 epl order curr lnpt pos hval hsched hexp hsched1 hepl horder hcurr hlnpt hpos hheights commit index opened proof hlen0 hw hproof hidx hcapl hroot
 
-/-- An accepting run computed every step to a value, checked the widths and the sibling count, hashed the leaf rows, folded its plan and found the result in the cap. -/
+/-- An accepting run did all of these:
+
+- computed every step to a value
+- checked the widths and the sibling count
+- hashed the leaf rows
+- folded its plan and found the result in the cap. -/
 theorem mmcs.hax_reshaped.verify_batch.accepts_inv (cl : core.clone.Clone F) (cp : core.marker.Copy W)
     (dfInst : core.default.Default W) (eqInst : core.cmp.PartialEq W W)
     (hInst : p3_symmetric.hasher.CryptographicHasher H F (Std.Array W DIGEST_ELEMS))
@@ -220,9 +244,18 @@ theorem mmcs.hax_reshaped.verify_batch.accepts_inv (cl : core.clone.Clone F) (cp
         proof.val.length = epl.val :=
   Plonky3Lean.Proofs.MerkleTree.verify_accepts cl cp dfInst eqInst hInst cInst mt commit dims index opened proof h
 
-/-- An accepting run had a positive tallest height, an index below it, one row per matrix at its width, and exactly the siblings the walked levels take.
+/-- An accepting run had all of these:
 
-So an empty batch, a batch of zero-height matrices, an index at or past the tallest height, a missing row, a row of the wrong width and a wrong number of siblings are all rejected. -/
+- a positive tallest height, and an index below it
+- one row per matrix, at its width
+- exactly the siblings the walked levels take.
+
+So each of these is rejected:
+
+- an empty batch, or a batch of zero-height matrices
+- an index at or past the tallest height
+- a missing row, or a row of the wrong width
+- a wrong number of siblings. -/
 theorem mmcs.hax_reshaped.verify_batch.accepts_shape {P PW F W H C : Type} {N DIGEST_ELEMS : Std.Usize}
     (cl : core.clone.Clone F) (cp : core.marker.Copy W)
     (dfInst : core.default.Default W) (eqInst : core.cmp.PartialEq W W)
@@ -248,7 +281,12 @@ theorem mmcs.hax_reshaped.verify_batch.accepts_shape {P PW F W H C : Type} {N DI
 
 The prover controls all four, so no proof makes the verifier panic or loop.
 
-The checks on the dimensions are the height ladder, the schedule, the cap size, the sibling count, the matrix order and the leaf group, all computed from the dimensions alone, and every height at most half the word range. -/
+The checks on the dimensions are computed from the dimensions alone:
+
+- the height ladder and the schedule
+- the cap size and the sibling count
+- the matrix order and the leaf group
+- every height is at most half the word range. -/
 theorem mmcs.hax_reshaped.verify_batch.never_panics {P PW F W H C : Type} {N DIGEST_ELEMS : Std.Usize}
     (cl : core.clone.Clone F) (cp : core.marker.Copy W)
     (dfInst : core.default.Default W) (eqInst : core.cmp.PartialEq W W)
@@ -268,7 +306,12 @@ theorem mmcs.hax_reshaped.verify_batch.never_panics {P PW F W H C : Type} {N DIG
       proof = RustM.ok r :=
   Plonky3Lean.Proofs.MerkleTree.verify_total cl cp dfInst eqInst hInst cInst mt h c hH hC hcl hdf heqt hN dims hdims commit index opened proof
 
-/-- The hiding verifier checks the unsalted widths and the number of salts, appends each salt to its row, widens each width by the salt length, and runs the plain verifier. -/
+/-- The hiding verifier runs these steps:
+
+- check the unsalted widths and the number of salts
+- append each salt to its row
+- widen each width by the salt length
+- run the plain verifier. -/
 theorem mmcs.hax_reshaped.hiding_verify_batch.salted {P PW W H C : Type} {N DIGEST_ELEMS : Std.Usize} (SALT : Std.Usize)
     (cl : core.clone.Clone F) (cp : core.marker.Copy W)
     (dfInst : core.default.Default W) (eqInst : core.cmp.PartialEq W W)
@@ -292,7 +335,9 @@ theorem mmcs.hax_reshaped.hiding_verify_batch.salted {P PW W H C : Type} {N DIGE
         siblings = RustM.ok (core.result.Result.Ok ()) :=
   Plonky3Lean.Proofs.MerkleTree.hiding_accepts SALT cl cp dfInst eqInst hInst cInst hcl mt commit dims index opened salts siblings h
 
-/-- Two hiding openings at one index that both verify agree on every row and every salt the verifier reads, or the hasher or the compression has a collision. -/
+/-- Take two hiding openings at one index that both verify.
+
+Either they agree on every row and every salt the verifier reads, or the hasher or the compression collides. -/
 theorem mmcs.hax_reshaped.hiding_verify_batch.binding {P PW W H C : Type} {N DIGEST_ELEMS : Std.Usize} (SALT : Std.Usize)
     (cl : core.clone.Clone F) (cp : core.marker.Copy W)
     (dfInst : core.default.Default W) (eqInst : core.cmp.PartialEq W W)
@@ -320,14 +365,18 @@ theorem mmcs.hax_reshaped.hiding_verify_batch.binding {P PW W H C : Type} {N DIG
           (rowsL o1).getD m [] = (rowsL o2).getD m [] ∧ (rowsL s1).getD m [] = (rowsL s2).getD m [] :=
   Plonky3Lean.Proofs.MerkleTree.hiding_binding SALT cl cp dfInst eqInst hInst cInst mt h c hH hC hclF hcl heq hN commit dims index o1 s1 o2 s2 p1 p2 h1 h2
 
-/-- A uniform salt of k elements lands a salted row in a fixed set Q of hash inputs for at most |Q| of the |F|^k salts.
+/-- Fix a set Q of hash inputs.
 
-In the random-oracle model this bounds the advantage of a distinguisher that makes |Q| queries by |Q| / |F|^k. -/
+At most |Q| of the |F|^k salts of k elements land a salted row in Q.
+
+In the random-oracle model, a distinguisher making |Q| queries has advantage at most |Q| / |F|^k. -/
 theorem salt_hits_le [Fintype F] [DecidableEq F] (m : List F) (k : ℕ) (Q : Finset (List F)) :
     (Finset.univ.filter fun s : Fin k → F => m ++ List.ofFn s ∈ Q).card ≤ Q.card :=
   Plonky3Lean.Proofs.MerkleTree.salt_hits_le m k Q
 
-/-- Every arity of a schedule the verifier computes is 2 or the full arity, and its proof levels are at most its length. -/
+/-- Every arity of a schedule the verifier computes is 2 or the full arity.
+
+Its proof levels are at most its length. -/
 theorem mmcs.hax_reshaped.arity_schedule_and_proof_levels.arities {N cap pl : Std.Usize} {dims : Slice p3_matrix.Dimensions}
     {sched : alloc.vec.Vec Std.Usize}
     (h : mmcs.hax_reshaped.arity_schedule_and_proof_levels N cap dims =
@@ -349,7 +398,9 @@ theorem mmcs.hax_reshaped.tallest_first.eq {dims : Slice p3_matrix.Dimensions} {
 
 /-- With arity 8, the pinned schedule for heights 4 and 2 never returns.
 
-A binary step at padded width 8 pads back to width 8 without taking in the height-2 matrix, and the loop repeats that state.
+A binary step at padded width 8 pads back to width 8 without taking in the height-2 matrix.
+
+The loop then repeats that state.
 
 Plonky3/Plonky3#2471 rejects this shape, after the pinned commit. -/
 theorem mmcs.hax_reshaped.arity_schedule_and_proof_levels.never_returns_8_4_2 (w0 w1 cap : Std.Usize) (x : alloc.vec.Vec Std.Usize × Std.Usize) :
@@ -357,7 +408,9 @@ theorem mmcs.hax_reshaped.arity_schedule_and_proof_levels.never_returns_8_4_2 (w
       RustM.ok (core.result.Result.Ok x) :=
   Plonky3Lean.Proofs.MerkleTree.schedule_never_returns w0 w1 cap x
 
-/-- With arity 2 and the cap two layers below the root, the pinned verifier never reads a matrix of height 1 committed next to one of height 8.
+/-- Take arity 2 and the cap two layers below the root.
+
+The pinned verifier never reads a matrix of height 1 committed next to one of height 8.
 
 The matrix enters at the root, above the cap, so its row is bound by nothing but its width.
 
@@ -376,7 +429,9 @@ theorem walk.honest (h : List (List F) → D) (c : List D → D) (pad : List D) 
       walk h c pad z order opened proof pl i pp (L0 i) = (capIndex pl i, top c pad z L0 ls (capIndex pl i)) :=
   Plonky3Lean.Proofs.MerkleTree.walk_honest h c pad z order opened proof
 
-/-- Two folds of one plan that reach one digest started from one digest and read the same injected rows, or the hasher or the compression has a collision. -/
+/-- Take two folds of one plan that reach one digest.
+
+Either they share their starting digest and injected rows, or the hasher or the compression collides. -/
 theorem walk.binding (h : List (List F) → D) (c : List D → D) (pad : List D) (z : D)
     (order : List ℕ) (o1 o2 : List (List F)) (p1 p2 : List D)
     (hlen : ∀ m, (o1.getD m []).length = (o2.getD m []).length) (hpad : 2 ≤ pad.length) :

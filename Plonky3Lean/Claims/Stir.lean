@@ -26,9 +26,15 @@ The specification is STIR, eprint 2024/390, Sections 4 and 5:
     DegCor(d*, r, f, d)(x)    = f(x) sum_{l <= d* - d} (x r)^l
 ```
 
-A domain is a coset s <g> of size 2^n, g = G_n from a table G of two-adic generators.
+A domain is a coset s <g> of size 2^n.
 
-The table is primitive and nested, 2 is invertible, and the field's generator w satisfies w^(2^adicity) != 1.
+Its generator is g = G_n, from a table G of two-adic generators.
+
+The claims assume three facts:
+
+- the table is primitive and nested
+- 2 is invertible
+- the field's generator w satisfies w^(2^adicity) != 1.
 
 BabyBear's table and generator satisfy all three.
 -/
@@ -61,7 +67,9 @@ theorem eval_poly_at_base (poly : List EF) (x : F) :
     eval_poly_at_base poly x = (coeffPoly poly).eval (ι x) :=
   eval_poly_at_base_eq poly x
 
-/-- The vanishing polynomial of a list of roots is prod (X - y), with one more coefficient than roots. -/
+/-- The vanishing polynomial of a list of roots is prod (X - y).
+
+It has one more coefficient than roots. -/
 theorem vanishing_poly_from_roots (roots : List EF) :
     coeffPoly (vanishing_poly_from_roots roots) = (roots.map fun r => X - C r).prod ∧
       (vanishing_poly_from_roots roots).length = roots.length + 1 :=
@@ -107,7 +115,9 @@ theorem add_polys (a b : List EF) : coeffPoly (p3_stir.utils.mirror.add_polys a 
 
 /-! ## Folding (Section 4.4) -/
 
-/-- The codeword fold at gamma / s by 2^a on s <g> is Fold(f, 2^a, gamma) at every point (s g^j)^(2^a) of L^k. -/
+/-- The codeword fold by 2^a on s <g>, at challenge gamma / s, is Fold(f, 2^a, gamma).
+
+This holds at every point (s g^j)^(2^a) of L^k. -/
 theorem fold_codeword (G : Gen F) (hG : GenValid G) (hN : GenNested G) {a n : ℕ} (ha : a ≤ n)
     (hn : n ≤ G.adicity) (c : List EF) (hc : c.length = 2 ^ n) {s : F} (hs : s ≠ 0) (f : EF → EF)
     (hf : ∀ i < 2 ^ n, f (ι s * ι (G.gen n) ^ i) = c.getD i 0) (γ : EF) :
@@ -145,7 +155,9 @@ theorem geometric_sum (q : EF) (e : ℕ) :
     ∑ l ∈ range (e + 1), q ^ l = if q = 1 then ((e + 1 : ℕ) : EF) else (1 - q ^ (e + 1)) / (1 - q) :=
   geom_sum_closed q e
 
-/-- The degree-correction factor is DegCor(d*, r, f, d) at x, the case x r = 1 included.
+/-- The degree-correction factor is DegCor(d*, r, f, d) at x.
+
+This includes the case x r = 1.
 
 It never panics. -/
 theorem eval_degree_correction (f : EF → EF) (x r : EF) (dstar d : ℕ) :
@@ -157,7 +169,11 @@ theorem degCor_degree {dstar d : ℕ} (hd : d ≤ dstar) (r : EF) {f : EF[X]} (h
     (polyDegCor dstar d r f).degree < dstar :=
   degree_polyDegCor_lt hd r hf
 
-/-- At every point x_p = s g^p, the batched sweep is sum_i r_i v_i[p] sum_{t <= gap_i} (x_p r)^t, for every chunk size, the lane x_p r = 1 included. -/
+/-- The batched sweep at every point x_p = s g^p is
+
+sum_i r_i v_i[p] sum_{t <= gap_i} (x_p r)^t.
+
+This holds for every chunk size, and includes the lane x_p r = 1. -/
 theorem combine_on_coset {c : ℕ} (hc : 0 < c) (G : Gen F) (hG : GenValid G) {n : ℕ}
     (hn : n ≤ G.adicity) (groups : List (EF × ℕ × List EF)) (r : EF) (s : F)
     (hgroups : ∀ grp ∈ groups, grp.2.2.length = 2 ^ n) :
@@ -167,7 +183,9 @@ theorem combine_on_coset {c : ℕ} (hc : 0 < c) (G : Gen F) (hG : GenValid G) {n
           ∑ t ∈ range (grp.2.1 + 1), ((ι s * ι (G.gen n) ^ p) * r) ^ t).sum) :=
   combine_on_coset_eq hc G hG hn groups r s hgroups
 
-/-- The Combine coefficients are Definition 4.11's r_i, with gaps d* - d_i, for class degrees at most d*. -/
+/-- The Combine coefficients are the r_i of Definition 4.11, with gaps d* - d_i.
+
+This holds for class degrees at most d*. -/
 theorem combine_coefficients (r : EF) (L : ℕ) (logs : List ℕ) (h : ∀ l ∈ logs, l ≤ L) :
     p3_stir.pcs.plan.mirror.combine_coefficients r L logs = some ((List.range logs.length).map fun i =>
       (ri (2 ^ L) (logs.map (2 ^ ·)) r i, 2 ^ L - 2 ^ logs.getD i 0)) :=
@@ -180,14 +198,19 @@ theorem combine_coefficients.panics (r : EF) (L : ℕ) (logs : List ℕ) (h : �
 
 /-! ## Quotients and one round (Sections 4.2 and 5.1) -/
 
-/-- The answer check accepts exactly when ans(rho) is the interpolant at rho, for distinct nodes and rho off them. -/
+/-- The answer check accepts exactly when ans(rho) is the interpolant at rho.
+
+This holds for distinct nodes, and rho off them. -/
 theorem check_ans_interpolates (ans pts vals : List EF) (ρ : EF) (hlen : pts.length = vals.length)
     (hne : pts ≠ []) (hnodup : pts.Nodup) (hρ : ρ ∉ pts) :
     p3_stir.utils.mirror.check_ans_interpolates ans pts vals ρ = some (decide ((coeffPoly ans).eval ρ =
       (Lagrange.interpolate (range pts.length) (fun i => pts.getD i 0) (fun i => vals.getD i 0)).eval ρ)) :=
   check_ans_interpolates_eq ans pts vals ρ hlen hne hnodup hρ
 
-/-- The virtual oracle read on a fiber: rejected when a fiber point is an interpolation point, else (v - Ans(x)) / Z(x) sum_{t <= |G|} (x r)^t at every point. -/
+/-- The virtual oracle read on a fiber.
+
+- it is rejected when a fiber point is an interpolation point
+- otherwise each point x reads (v - Ans(x)) / Z(x) sum_{t <= |G|} (x r)^t. -/
 theorem materialize_virtual_fiber {ζ u0 s : F} {arity : ℕ} (hζ : IsPrimitiveRoot ζ arity)
     (harity : 0 < arity) (row : List EF) (hrow : row.length = arity) (r : EF) (ans pts : List EF) :
     p3_stir.verifier.mirror.materialize_virtual_fiber row (shiftedPowersList ζ u0 arity) s
@@ -197,7 +220,9 @@ theorem materialize_virtual_fiber {ζ u0 s : F} {arity : ℕ} (hζ : IsPrimitive
         virtualVal r ans pts (ι (s * (u0 * ζ ^ l))) (row.getD l 0))) :=
   by convert materialize_virtual_fiber_eq hζ harity row hrow r ans pts
 
-/-- Off the points, the virtual oracle of an honest round is the next polynomial DegCor(d, r, PolyQuotient(PolyFold(f), G), d - |G|). -/
+/-- Off the points, the virtual oracle of an honest round is the next polynomial:
+
+DegCor(d, r, PolyQuotient(PolyFold(f), G), d - |G|). -/
 theorem virtual_oracle (f : EF[X]) (k : ℕ) (rFold rComb : EF) (pts ans : List EF) {d : ℕ}
     (hnd : pts.Nodup) (hd : pts.length ≤ d)
     (hans : coeffPoly ans = ansPoly pts.toFinset fun y => (polyFold f k rFold).eval y)
@@ -206,7 +231,9 @@ theorem virtual_oracle (f : EF[X]) (k : ℕ) (rFold rComb : EF) (pts ans : List 
       (nextPoly f k rFold rComb pts.toFinset d).eval x :=
   virtualVal_eq_nextPoly f k rFold rComb pts ans hnd hd hans hx
 
-/-- Off G, the next polynomial is DegCor of Quotient, as Construction 5.2 defines the next oracle. -/
+/-- Off G, the next polynomial is DegCor of Quotient.
+
+This is how Construction 5.2 defines the next oracle. -/
 theorem next_polynomial (f : EF[X]) (k : ℕ) (rFold rComb : EF) (G : Finset EF) (d : ℕ) (fill : EF → EF)
     {x : EF} (hx : x ∉ G) :
     (nextPoly f k rFold rComb G d).eval x =
@@ -214,7 +241,9 @@ theorem next_polynomial (f : EF[X]) (k : ℕ) (rFold rComb : EF) (G : Finset EF)
         (quotient (fun y => (polyFold f k rFold).eval y) G (fun y => (polyFold f k rFold).eval y) fill) x :=
   eval_nextPoly f k rFold rComb G d fill hx
 
-/-- Round completeness: an honest input of degree below k d gives a next polynomial of degree below d. -/
+/-- Round completeness.
+
+An honest input of degree below k d gives a next polynomial of degree below d. -/
 theorem round_completeness (f : EF[X]) {k d : ℕ} (hk : 0 < k) (hf : f.degree < (k * d : ℕ))
     (rFold rComb : EF) (G : Finset EF) (hG : G.card ≤ d) :
     (nextPoly f k rFold rComb G d).degree < d :=
@@ -222,7 +251,9 @@ theorem round_completeness (f : EF[X]) {k d : ℕ} (hk : 0 < k) (hf : f.degree <
 
 /-! ## The verifier's queries (Construction 5.2) -/
 
-/-- A round-0 query j folds its fiber at gamma / s into Fold(f, 2^a, gamma) at (s g^j)^(2^a). -/
+/-- A round-0 query j folds its fiber at gamma / s.
+
+The result is Fold(f, 2^a, gamma) at (s g^j)^(2^a). -/
 theorem query_fold_value.initial (G : Gen F) (hG : GenValid G) {a n : ℕ} (ha : a ≤ n)
     (hn : n ≤ G.adicity) {s : F} (hs : s ≠ 0) {j : ℕ} (hj : j < 2 ^ (n - a)) (row : List EF)
     (hrow : row.length = 2 ^ a) (f : EF → EF)
@@ -232,7 +263,9 @@ theorem query_fold_value.initial (G : Gen F) (hG : GenValid G) {a n : ℕ} (ha :
       pure (fold (cosetSet (ι s) (ι (G.gen n)) n) f (2 ^ a) γ ((ι s * ι (G.gen n) ^ j) ^ 2 ^ a)) :=
   query_fold_value_initial G hG ha hn (by decide) hs hj row hrow f hf γ round q
 
-/-- A later query is rejected when its fiber meets the interpolation points, and otherwise folds the virtual oracle. -/
+/-- A later query is rejected when its fiber meets the interpolation points.
+
+Otherwise it folds the virtual oracle. -/
 theorem query_fold_value.virtual (G : Gen F) (hG : GenValid G) {a n : ℕ} (ha : a ≤ n)
     (hn : n ≤ G.adicity) {s : F} (hs : s ≠ 0) {j : ℕ} (hj : j < 2 ^ (n - a)) (row : List EF)
     (hrow : row.length = 2 ^ a) (r : EF) (ans pts : List EF) (f : EF → EF)
@@ -246,12 +279,16 @@ theorem query_fold_value.virtual (G : Gen F) (hG : GenValid G) {a n : ℕ} (ha :
       else pure (fold (cosetSet (ι s) (ι (G.gen n)) n) f (2 ^ a) γ ((ι s * ι (G.gen n) ^ j) ^ 2 ^ a)) :=
   by convert query_fold_value_virtual G hG ha hn (by decide) hs hj row hrow r ans pts f hf γ round q
 
-/-- The fold challenge is gamma / s, and a zero shift panics. -/
+/-- The fold challenge is gamma / s.
+
+A zero shift panics. -/
 theorem set_gamma (γ : EF) (s : F) :
     p3_stir.verifier.mirror.set_gamma γ s = if s = 0 then none else some (γ / ι s) :=
   set_gamma_eq γ s
 
-/-- One fiber folded at gamma / s is Fold(f, 2^a, gamma) at (s g^j)^(2^a), on L = s <g> of size 2^(m + a). -/
+/-- One fiber folded at gamma / s is Fold(f, 2^a, gamma) at (s g^j)^(2^a).
+
+The domain is L = s <g>, of size 2^(m + a). -/
 theorem fold_fiber (G : Gen F) (hG : GenValid G) {a m : ℕ} (hn : m + a ≤ G.adicity) {s : F}
     (hs : s ≠ 0) {j : ℕ} (hj : j < 2 ^ m) (fiber : List EF) (hfib : fiber.length = 2 ^ a) (f : EF → EF)
     (hf : ∀ l < 2 ^ a, f (ι s * ι (G.gen (m + a)) ^ (j + l * 2 ^ m)) = fiber.getD l 0) (γ : EF) :
@@ -260,13 +297,15 @@ theorem fold_fiber (G : Gen F) (hG : GenValid G) {a m : ℕ} (hn : m + a ≤ G.a
         ((ι s * ι (G.gen (m + a)) ^ j) ^ 2 ^ a)) :=
   fold_fiber_eq G hG hn (by decide) hs hj fiber hfib f hf γ
 
-/-- Laying an external source's fibers out in draw order never panics when the source does not. -/
+/-- Laying out an external source's fibers in draw order never panics, if the source never panics. -/
 theorem external_fibers_in_draw_order.no_panic (indices : List ℕ) (arity : ℕ) (round : Option ℕ)
     (source : List ℕ → VM (List (List EF))) (hsrc : ∀ l, (source l).run.isSome) :
     (p3_stir.verifier.mirror.external_fibers_in_draw_order indices arity round source).run.isSome :=
   external_fibers_no_panic indices arity round source hsrc
 
-/-- The query loop records each distinct index once, at its point s^k g_k^j, with one answer per point. -/
+/-- The query loop records each distinct index once.
+
+Index j sits at its point s^k g_k^j, with one answer per point. -/
 theorem fold_queries (G : Gen F) (round : ℕ) (fold_shift : F) (fold_log current_log arity : ℕ)
     (current_shift : F) (fold_beta : EF) (prev_ctx : Option (VirtualRoundContext EF))
     (query_indices : List ℕ) (rows : List (List EF)) (st : QueryState F EF)
@@ -282,7 +321,11 @@ theorem fold_point (G : Gen F) (hN : GenNested G) {a n : ℕ} (ha : a ≤ n) (hn
     (s : F) (j : ℕ) : s ^ 2 ^ a * G.gen (n - a) ^ j = (s * G.gen n ^ j) ^ 2 ^ a :=
   fold_point_eq G hN ha hn s j
 
-/-- A round's geometry: arity 2^a, fold domain s^(2^a) <g^(2^a)>, next domain of half the size shifted by w.
+/-- A round's geometry:
+
+- the arity is 2^a
+- the fold domain is s^(2^a) <g^(2^a)>
+- the next domain has half the size, shifted by w.
 
 It panics for a > n or n = 0. -/
 theorem round_geometry (w s : F) (n a : ℕ) :
@@ -290,7 +333,10 @@ theorem round_geometry (w s : F) (n a : ℕ) :
       if a ≤ n ∧ 1 ≤ n then some (2 ^ a, s ^ 2 ^ a, n - a, n - 1, s ^ 2 ^ a * w) else none :=
   round_geometry_eq w s n a
 
-/-- A candidate is kept exactly when, for every excluded coset with l > 0, z^(2^l) != s^(2^l), and it is new.
+/-- A candidate z is kept exactly when both hold:
+
+- z^(2^l) != s^(2^l) for every excluded coset with l > 0
+- z is new.
 
 A coset with l = 0 is never excluded. -/
 theorem ood_filter (doms : List (F × ℕ)) (h : ∀ d ∈ doms, d.1 ≠ 0) (z : EF) (kept : List EF) :
@@ -305,7 +351,9 @@ theorem coset_membership {ω s : F} {l : ℕ} (hω : IsPrimitiveRoot ω (2 ^ l))
     z ^ 2 ^ l = ι s ^ 2 ^ l ↔ ∃ i < 2 ^ l, z = ι (s * ω ^ i) :=
   pow_eq_iff_mem_coset hω hs z
 
-/-- A point of the next domain is neither an accepted out-of-domain point nor a query point, so the next round never reads the virtual oracle at an interpolation point. -/
+/-- A point of the next domain is neither an accepted out-of-domain point nor a query point.
+
+So the next round never reads the virtual oracle at an interpolation point. -/
 theorem next_domain_avoids_points (G : Gen F) (hG : GenValid G) {w s : F} (hw : w ^ 2 ^ G.adicity ≠ 1)
     (hs : s ≠ 0) {a n : ℕ} (ha : a ≤ n) (hn : n ≤ G.adicity) (ood qs : List EF)
     (hood : ∀ z ∈ ood, z ^ 2 ^ (n - 1) ≠ ι (s ^ 2 ^ a * w) ^ 2 ^ (n - 1))
@@ -315,7 +363,10 @@ theorem next_domain_avoids_points (G : Gen F) (hG : GenValid G) {w s : F} (hw : 
 
 /-! ## The verifier never panics on a malformed answer polynomial -/
 
-/-- The sent answer polynomial is accepted with at most max coefficients, and empty only when max = 0. -/
+/-- The sent answer polynomial is accepted exactly when both hold:
+
+- it has at most the maximum number of coefficients
+- it is empty only when that maximum is 0. -/
 theorem check_ans_length (round : ℕ) (ans : List EF) (max : ℕ) :
     p3_stir.verifier.mirror.check_ans_length round ans max = pure () ↔
       ans.length ≤ max ∧ (ans ≠ [] ∨ max = 0) :=
@@ -336,7 +387,9 @@ theorem resolve_ans_polynomial.no_panic (round : ℕ) (compact : Bool) (sent poi
 
 /-! ## BabyBear -/
 
-/-- BabyBear's generator table is primitive and nested up to 27, and its generator lies outside the subgroup of order 2^27. -/
+/-- BabyBear's generator table is primitive and nested up to 27.
+
+Its generator lies outside the subgroup of order 2^27. -/
 theorem babyBear.facts :
     ∃ t g, Plonky3Lean.Spec.BabyBear.TwoAdicParams.TWO_ADIC_GENERATORS = .ok t ∧
       Plonky3Lean.Spec.BabyBear.FieldParams.MONTY_GEN = .ok g ∧

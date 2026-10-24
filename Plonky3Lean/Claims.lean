@@ -41,11 +41,11 @@ public import Plonky3Lean.Claims.MultiStark
 /-!
 # Claims
 
-Every statement this repository asserts about Plonky3, and nothing else. This
-module is what a reader audits.
+Every statement this repository asserts about Plonky3, and nothing else.
 
-Each claim restates its theorem in full and takes its proof from
-`Plonky3Lean.Proofs`:
+This module is what a reader audits.
+
+Each claim restates its theorem in full and takes its proof from the proofs tree:
 
 ```
 theorem baby_bear.BabyBearParameters.PRIME.is_prime :
@@ -53,11 +53,13 @@ theorem baby_bear.BabyBearParameters.PRIME.is_prime :
   Proofs.P3BabyBear.baby_bear.BabyBearParameters.PRIME.is_prime
 ```
 
-A proof whose statement drifts no longer typechecks against its claim, so a
-claim changes only through a change to this module. CODEOWNERS assigns this
-module to the Plonky3 maintainers. CI checks the axioms of every claim against
-`claims.toml`.
+A proof whose statement drifts no longer typechecks against its claim.
 
-Group claims by subject in submodules (`Claims/BabyBear.lean`) and import each
-one here.
+So a claim changes only through a change to this module.
+
+CODEOWNERS assigns this module to the Plonky3 maintainers.
+
+CI checks the axioms of every claim against claims.toml.
+
+Claims are grouped by subject in submodules, such as Claims/BabyBear.lean, each imported here.
 -/

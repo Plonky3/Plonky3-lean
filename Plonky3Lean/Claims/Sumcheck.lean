@@ -10,22 +10,33 @@ public import Plonky3Lean.Proofs.Sumcheck.Prover
 
 The crate is transcribed over a field, not extracted.
 
-The specification is the sumcheck protocol of Lund, Fortnow, Karloff and Nisan, as Thaler states it in Section 4.1:
+The specification is the sumcheck protocol of Lund, Fortnow, Karloff and Nisan.
+
+Thaler states it in Section 4.1:
 
 ```text
     claim:     H = sum_{b in {0,1}^n} g(b),   g of degree at most d in each variable
     round i:   the prover sends g_i of degree at most d
-               the verifier checks g_i(0) + g_i(1) = c_i, samples r_i, sets c_{i+1} = g_i(r_i)
+               the verifier checks g_i(0) + g_i(1) = c_i
+               the verifier samples r_i and sets c_{i+1} = g_i(r_i)
     end:       the verifier checks g(r) = c_n
 ```
 
-Soundness counts the challenge vectors that accept a false claim: at most n d |F|^(n-1) of |F|^n, an error of n d / |F|.
+Soundness counts the challenge vectors that accept a false claim.
 
-The shipped verifier sends h(0) and the X^2 coefficient of a quadratic round, and rebuilds h(1) = c - h(0).
+There are at most n d |F|^(n-1) of the |F|^n vectors, an error of n d / |F|.
 
-The generic-degree verifier sends h(x_0), h(x_2), ..., h(x_d) at the interpolation nodes, and rebuilds h(x_1) the same way.
+The shipped verifier receives h(0) and the X^2 coefficient of a quadratic round.
 
-The sponge is modelled by its history: each challenge is a function of everything absorbed before it.
+It rebuilds h(1) = c - h(0).
+
+The generic-degree verifier receives h(x_0), h(x_2), ..., h(x_d) at the interpolation nodes.
+
+It rebuilds h(x_1) the same way.
+
+The sponge is modelled by its history.
+
+Each challenge is a function of everything absorbed before it.
 -/
 
 open MvPolynomial Finset Plonky3Lean.Spec.Sumcheck Plonky3Lean.Proofs.Sumcheck
@@ -39,13 +50,17 @@ variable {F : Type _} [Field F] [DecidableEq F]
 
 /-! ## The protocol -/
 
-/-- Completeness: the honest prover makes the verifier accept the true sum, on every challenge vector. -/
+/-- Completeness.
+
+The honest prover makes the verifier accept the true sum, on every challenge vector. -/
 theorem protocol.completeness {n d : ℕ} (g : MvPolynomial (Fin n) F) (hg : IndividualDegreeLE g d)
     (r : Fin n → F) : Accepts d g (cubeSum g) (honestProver g) r :=
   Proofs.Sumcheck.completeness g hg r
 
 open scoped Classical in
-/-- Soundness: against a false claim and any causal prover, at most n d |F|^(n-1) challenge vectors accept. -/
+/-- Soundness.
+
+Against a false claim and any causal prover, at most n d |F|^(n-1) challenge vectors accept. -/
 theorem protocol.soundness [Fintype F] {n d : ℕ} (g : MvPolynomial (Fin n) F)
     (hg : IndividualDegreeLE g d) (H : F) (hH : H ≠ cubeSum g) (P : Fin n → (Fin n → F) → Polynomial F)
     (hP : Causal P) :
@@ -54,24 +69,32 @@ theorem protocol.soundness [Fintype F] {n d : ℕ} (g : MvPolynomial (Fin n) F)
 
 /-! ## The quadratic round -/
 
-/-- Interpolation through 0, 1 and infinity: a polynomial of degree at most 2 is recovered at r from h(0), h(1) and its X^2 coefficient. -/
+/-- Interpolation through 0, 1 and infinity.
+
+A polynomial h of degree at most 2 is recovered at r from h(0), h(1) and its X^2 coefficient. -/
 theorem extrapolate_01inf.spec {p : Polynomial F} (hp : p.natDegree ≤ 2) (r : F) :
     extrapolate_01inf (p.eval 0) (p.eval 1) (p.coeff 2) r = p.eval r := by
   rw [← eval_quad, ← eq_quad hp]
 
-/-- The evaluation basis: from h(0), h(inf) and the claim h(0) + h(1) = c, the round identity gives h(r). -/
+/-- The evaluation basis.
+
+From h(0), h(inf) and the claim h(0) + h(1) = c, the round identity gives h(r). -/
 theorem reduce_claim.evaluation {p : Polynomial F} (hp : p.natDegree ≤ 2) {c : F}
     (hc : p.eval 0 + p.eval 1 = c) (r : F) :
     Basis.Evaluation.reduce_claim (p.eval 0) (p.coeff 2) r c = p.eval r := by
   rw [reduce_claim_evaluation, ← encEval, decEval_encEval hp hc]
 
-/-- The projective basis: from s(1), s(inf) and the claim s(0) + s(inf) = c, the round identity gives s(r). -/
+/-- The projective basis.
+
+From s(1), s(inf) and the claim s(0) + s(inf) = c, the round identity gives s(r). -/
 theorem reduce_claim.projective {p : Polynomial F} (hp : p.natDegree ≤ 2) {c : F}
     (hc : p.eval 0 + p.coeff 2 = c) (r : F) :
     Basis.Projective.reduce_claim (p.eval 1) (p.coeff 2) r c = p.eval r := by
   rw [← hc, Basis.reduce_claim, add_sub_cancel_right, extrapolate_01inf.spec hp]
 
-/-- Every pair of values decodes to a quadratic whose sum over {0, 1} is the claim, so the sum check of Section 4.1 always passes. -/
+/-- Every pair of values decodes to a quadratic whose sum over {0, 1} is the claim.
+
+So the sum check of Section 4.1 always passes. -/
 theorem reduce_claim.sum_check (c c_a c_inf : F) :
     (decEval c (c_a, c_inf)).natDegree ≤ 2 ∧
       (decEval c (c_a, c_inf)).eval 0 + (decEval c (c_a, c_inf)).eval 1 = c ∧
@@ -90,7 +113,9 @@ theorem verify_rounds.round_count (S : Sponge G F) (evals : List (F × F)) (wits
     verify_rounds S evals wits h c N pow_bits basis = .error (.RoundCountMismatch N evals.length) := by
   rw [verify_rounds_eq]; simp [hN]
 
-/-- A proof with the wrong number of grinding witnesses is rejected: none without grinding, one per round with it. -/
+/-- A proof with the wrong number of grinding witnesses is rejected.
+
+The right number is none without grinding, and one per round with it. -/
 theorem verify_rounds.witness_count (S : Sponge G F) (evals : List (F × F)) (wits : List G)
     (h : List (Step G F)) (c : F) (N pow_bits : ℕ) (basis : Basis) (hN : evals.length = N)
     (hw : wits.length ≠ if 0 < pow_bits then N else 0) :
@@ -116,7 +141,10 @@ theorem verify_rounds.invalid_witness (S : Sponge G F) (evals : List (F × F)) (
 
 /-- On a well-shaped proof whose witnesses pass, the verifier returns the challenges and the replayed claim.
 
-Challenge i is the sponge sampled after the history at the start of round i and the steps of round i.
+Challenge i is the sponge sampled after two parts:
+
+- the history at the start of round i
+- the steps of round i.
 
 The claimed sum is not absorbed. -/
 theorem verify_rounds.accept (S : Sponge G F) (evals : List (F × F)) (wits : List G)
@@ -133,20 +161,26 @@ theorem verify_rounds.accept (S : Sponge G F) (evals : List (F × F)) (wits : Li
   simp only [hN, hw, ne_eq, not_true_eq_false, ↓reduceIte, hi]
   rfl
 
-/-- The history at the start of round i is the given history, then every earlier round with its challenge. -/
+/-- The history at the start of round i is the given history.
+
+Every earlier round follows, with its challenge. -/
 theorem verify_rounds.history (h : List (Step G F)) (evals : List (F × F)) (wits : List G)
     (pow_bits i : ℕ) :
     before h evals wits pow_bits i =
       h ++ (List.range i).flatMap fun j => roundSteps evals wits pow_bits j ++ [.challenge] :=
   before_eq h evals wits pow_bits i
 
-/-- A round's steps start with its pair, so each challenge is drawn after the message it is evaluated against. -/
+/-- A round's steps start with its pair.
+
+So each challenge is drawn after the message it is evaluated against. -/
 theorem verify_rounds.message_before_challenge (evals : List (F × F)) (wits : List G) (pow_bits i : ℕ) :
     (roundSteps evals wits pow_bits i).head? =
       some (.message [(evals.getD i (0, 0)).1, (evals.getD i (0, 0)).2]) := rfl
 
 open scoped Classical in
-/-- Soundness of the shipped quadratic verifier: against a false claim and any causal prover, at most 2 n |F|^(n-1) challenge vectors replay to g(r). -/
+/-- Soundness of the shipped quadratic verifier.
+
+Against a false claim and any causal prover, at most 2 n |F|^(n-1) challenge vectors replay to g(r). -/
 theorem verify_rounds.soundness [Fintype F] {n : ℕ} (g : MvPolynomial (Fin n) F)
     (hg : IndividualDegreeLE g 2) (H : F) (hH : H ≠ cubeSum g) (M : Fin n → (Fin n → F) → F × F)
     (hM : Causal M) :
@@ -155,7 +189,9 @@ theorem verify_rounds.soundness [Fintype F] {n : ℕ} (g : MvPolynomial (Fin n) 
   simpa only [replay_evaluation] using
     soundness_decoded decEval natDegree_decEval decEval_sum g hg H hH M hM
 
-/-- Completeness of the shipped prover on a product of two multilinears: its messages replay to g(r) from the true sum. -/
+/-- Completeness of the shipped prover on a product of two multilinears.
+
+Its messages replay to g(r) from the true sum. -/
 theorem verify_rounds.completeness {n : ℕ} (f w : List F) (hf : f.length = 2 ^ n)
     (hw : w.length = 2 ^ n) (r : Fin n → F) :
     ∃ ms, proveProduct f w (List.ofFn r) = some ms ∧
@@ -164,7 +200,9 @@ theorem verify_rounds.completeness {n : ℕ} (f w : List F) (hf : f.length = 2 ^
           ms (List.ofFn r) :=
   proveProduct_complete f w hf hw r
 
-/-- With no rounds, the final rounds return the empty point and leave the claim, whatever data the proof carries. -/
+/-- With no rounds, the final rounds return the empty point and leave the claim.
+
+This holds whatever data the proof carries. -/
 theorem verify_final_sumcheck_rounds.zero (S : Sponge G F) (data : Option (List (F × F) × List G))
     (h : List (Step G F)) (c : F) (pow_bits : ℕ) (basis : Basis) :
     verify_final_sumcheck_rounds S data h c 0 pow_bits basis = .ok ([], c, h) := rfl
@@ -179,7 +217,9 @@ end Verifier
 
 /-! ## The prover kernel -/
 
-/-- The prefix kernel on two tables of 2^(n+1) entries sends h(0) and the X^2 coefficient of the honest round polynomial of their product. -/
+/-- The prefix kernel takes two tables of 2^(n+1) entries.
+
+It sends h(0) and the X^2 coefficient, for the honest round polynomial h of their product. -/
 theorem sumcheck_coefficients_prefix.honest (f w : List F) {n : ℕ} (hf : f.length = 2 ^ (n + 1))
     (hw : w.length = 2 ^ (n + 1)) :
     let s := honestMessage (Spec.MultilinearUtil.mlePoly f (n + 1) * Spec.MultilinearUtil.mlePoly w (n + 1))
@@ -201,7 +241,11 @@ open generic_degree.mirror
 
 variable {G : Type _} (node : ℕ → F) {d : ℕ}
 
-/-- The interpolator evaluates at r the polynomial of degree at most d with the transmitted values and the claim h(x_0) + h(x_1) = c, when x_0 = 0, x_1 = 1 and the nodes are distinct. -/
+/-- The interpolator recovers the round polynomial at r.
+
+That is the h of degree at most d with the transmitted values and h(x_0) + h(x_1) = c.
+
+This holds when x_0 = 0, x_1 = 1 and the nodes are distinct. -/
 theorem RoundPolyInterpolator.eval.spec (hd : 0 < d) (h0 : node 0 = 0) (h1 : node 1 = 1)
     (hinj : Function.Injective fun i : Fin (d + 1) => node i) {wt : Fin (d + 1) → F}
     (hwt : RoundPolyInterpolator.new node d = some wt) {p : Polynomial F} (hp : p.natDegree ≤ d) {c : F}
@@ -215,7 +259,12 @@ theorem RoundPolyInterpolator.new.panics :
   rw [RoundPolyInterpolator.new, Proofs.Matrix.Interp.barycentric_weights_eq]
   split_ifs <;> simp_all
 
-/-- The verifier: the configuration checks, a panic on equal nodes, then the first rejected round, else the challenges and the replayed claim.
+/-- The generic-degree verifier runs in this order:
+
+- the configuration checks
+- a panic on equal nodes
+- the first rejected round, if any
+- otherwise, the challenges and the replayed claim.
 
 The claimed sum is absorbed after the seed, before the first challenge. -/
 theorem verify.spec (S : Sponge G F) (c : F) (polys : List (List F)) (wits : List G)
@@ -237,7 +286,9 @@ theorem verify.spec (S : Sponge G F) (c : F) (polys : List (List F)) (wits : Lis
   verify_eq S node c polys wits h N d pow_bits
 
 open scoped Classical in
-/-- Soundness of the generic-degree verifier: against a false claim and any causal prover, at most n d |F|^(n-1) challenge vectors replay to g(r). -/
+/-- Soundness of the generic-degree verifier.
+
+Against a false claim and any causal prover, at most n d |F|^(n-1) challenge vectors replay to g(r). -/
 theorem verify.soundness [Fintype F] (hd : 0 < d) (h0 : node 0 = 0) (h1 : node 1 = 1)
     (hinj : Function.Injective fun i : Fin (d + 1) => node i) {n : ℕ} (g : MvPolynomial (Fin n) F)
     (hg : IndividualDegreeLE g d) (H : F) (hH : H ≠ cubeSum g) (M : Fin n → (Fin n → F) → Fin d → F)
@@ -247,7 +298,9 @@ theorem verify.soundness [Fintype F] (hd : 0 < d) (h0 : node 0 = 0) (h1 : node 1
   soundness_decoded (decGen node d) (natDegree_decGen node hinj) (decGen_sum node hinj hd h0 h1) g hg H
     hH M hM
 
-/-- Completeness of the generic-degree verifier: the honest values replay to g(r) from the true sum. -/
+/-- Completeness of the generic-degree verifier.
+
+The honest values replay to g(r) from the true sum. -/
 theorem verify.completeness (hd : 0 < d) (h0 : node 0 = 0) (h1 : node 1 = 1)
     (hinj : Function.Injective fun i : Fin (d + 1) => node i) {n : ℕ} (g : MvPolynomial (Fin n) F)
     (hg : IndividualDegreeLE g d) (r : Fin n → F) :

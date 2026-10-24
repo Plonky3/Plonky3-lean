@@ -13,9 +13,13 @@ The count record, the indexed column check and the gadget's constructor are extr
 
 The gadget, the lookup list, the prover and the checks are transcribed over a field.
 
-The claims are stated at BabyBear F and its quartic extension K = F[X] / (X^4 - 11), where the challenges live.
+The claims are stated at BabyBear F and its quartic extension K = F[X] / (X^4 - 11).
 
-The specification is LogUp, after Haböck (eprint 2022/1530) and its AIR encoding (eprint 2023/1284):
+The challenges live in K.
+
+The specification is LogUp, after Haböck (eprint 2022/1530).
+
+Its AIR encoding follows eprint 2023/1284:
 
 ```text
     sum_k m_k / (X - v_k) = 0 in K(X)   <->   every key has net multiplicity 0
@@ -23,7 +27,8 @@ The specification is LogUp, after Haböck (eprint 2022/1530) and its AIR encodin
     denominator(bus, e) = alpha + (bus + 1) beta^W - fingerprint(e)
     fingerprint(e)      = sum_i e_i beta^(k - 1 - i)
 
-    acc_0 = 0,   acc_(r+1) = acc_r + sum_c f_(r,c),   terminal = acc_(n-1) + sum_c f_(n-1,c)
+    acc_0 = 0,   acc_(r+1) = acc_r + sum_c f_(r,c)
+    terminal = acc_(n-1) + sum_c f_(n-1,c)
     U f = V on every row,   sum of terminals = 0
 ```
 -/
@@ -44,17 +49,27 @@ instance : CharP K p :=
 
 /-! ## The log-derivative identity -/
 
-/-- **LogUp.** A sum of m / (X - v) vanishes in K(X) exactly when every key has net multiplicity zero. -/
+/-- **LogUp.**
+
+A sum of m / (X - v) vanishes in K(X) exactly when every key has net multiplicity zero. -/
 theorem logDeriv_eq_zero_iff (l : List (K × K)) : logDerivSum l = 0 ↔ Balanced l :=
   logDerivSum_eq_zero_iff l
 
-/-- **Set inclusion (Lemma 5).** With fewer than p queries, the queries lie in the table exactly when sum_j 1 / (X - f_j) = sum_i m_i / (X - t_i) for some multiplicities. -/
+/-- **Set inclusion (Lemma 5).**
+
+Take fewer than p queries.
+
+They lie in the table exactly when some multiplicities satisfy
+
+sum_j 1 / (X - f_j) = sum_i m_i / (X - t_i). -/
 theorem set_inclusion (f t : List K) (hf : f.length < p) :
     LookupRelation f t ↔
       ∃ m : List K, m.length = t.length ∧ logDerivSum (f.map (·, 1)) = logDerivSum (t.zip m) :=
   lookupRelation_iff_logDeriv f t (cast_ne_zero_of_lt p hf)
 
-/-- **Permutations (Lemma 3).** Lists shorter than p are permutations of each other exactly when their sums of 1 / (X - x) agree. -/
+/-- **Permutations (Lemma 3).**
+
+Two lists shorter than p are permutations of each other exactly when their sums of 1 / (X - x) agree. -/
 theorem permutation (a b : List K) (ha : a.length < p) (hb : b.length < p) :
     a.Perm b ↔ logDerivSum (a.map (·, 1)) = logDerivSum (b.map (·, 1)) :=
   perm_iff_logDeriv a b (L := max a.length b.length) (le_max_left _ _) (le_max_right _ _)
@@ -65,13 +80,21 @@ theorem overflow (v : K) :
     logDerivSum ((List.replicate p v).map (·, (1 : K))) = logDerivSum [] :=
   logDeriv_overflow p v
 
-/-- **Multiplicity bound.** Integer counts whose absolute values sum below p balance in K exactly when they balance over the integers. -/
+/-- **Multiplicity bound.**
+
+Take integer counts whose absolute values sum below p.
+
+They balance in K exactly when they balance over the integers. -/
 theorem integer_balance {κ : Type} [DecidableEq κ] (l : List (κ × ℤ))
     (hl : (l.map fun q => q.2.natAbs).sum < p) :
     Balanced (l.map fun q => (q.1, (q.2 : K))) ↔ Balanced l :=
   balanced_cast_iff p l hl
 
-/-- **Lookup soundness.** With query counts whose absolute values sum below p, and provided entries of any multiplicity, a key no entry provides has integer net query count zero. -/
+/-- **Lookup soundness.**
+
+Take query counts whose absolute values sum below p, and provided entries of any multiplicity.
+
+A key that no entry provides has integer net query count zero. -/
 theorem query_without_entry {κ : Type} [DecidableEq κ] (queries : List (κ × ℤ))
     (provided : List (κ × K)) (hq : (queries.map fun q => q.2.natAbs).sum < p)
     (hbal : Balanced (queries.map (fun q => (q.1, (q.2 : K))) ++ provided))
@@ -80,14 +103,20 @@ theorem query_without_entry {κ : Type} [DecidableEq κ] (queries : List (κ × 
 
 /-! ## The height bound -/
 
-/-- **The height bound** accepts exactly when sum_i w_i h_i < p, and panics on unequal lengths. -/
+/-- **The height bound.**
+
+It accepts exactly when sum_i w_i h_i < p.
+
+It panics on unequal lengths. -/
 theorem height_bound (lookups : List (List (Lookup F))) (heights : List ℕ)
     (h : lookups.length = heights.length) :
     check_multiplicity_height_bound p lookups heights = some (.ok ()) ↔
       ((lookups.zip heights).map fun x => total_count_weight x.1 * x.2).sum < p :=
   check_multiplicity_height_bound_iff p lookups heights h
 
-/-- An accepted height bound makes every bounded query count exact: when the AIRs keep each count within its weight, no key without an entry can be queried. -/
+/-- An accepted height bound makes every bounded query count exact.
+
+When the AIRs keep each count within its weight, no key without an entry can be queried. -/
 theorem height_bound_soundness {κ : Type} [DecidableEq κ] (lookups : List (List (Lookup F)))
     (heights : List ℕ) (h : lookups.length = heights.length)
     (hok : check_multiplicity_height_bound p lookups heights = some (.ok ()))
@@ -99,7 +128,9 @@ theorem height_bound_soundness {κ : Type} [DecidableEq κ] (lookups : List (Lis
   query_net_zero_of_not_provided p queries provided
     (hweights.trans_lt ((height_bound lookups heights h).1 hok)) hbal k hk
 
-/-- A local lookup's weight is the exact sum of its tuples' weights, and a sum above u32::MAX panics. -/
+/-- A local lookup's weight is the exact sum of its tuples' weights.
+
+A sum above 2^32 - 1 panics. -/
 theorem local_weight_exact (i : SymbolicLocalInteraction F) :
     i.tuples.foldlM (fun acc t => checked_add_u32 acc t.2.2) 0 =
       if (i.tuples.map (·.2.2)).sum ≤ U32_MAX then some (i.tuples.map (·.2.2)).sum else none :=
@@ -116,18 +147,27 @@ theorem fingerprint_injective {e e' : List K} (hl : e.length = e'.length)
     (h : fingerprintPoly e = fingerprintPoly e') : e = e' :=
   fingerprintPoly_inj hl h
 
-/-- A shorter tuple aliases a longer one padded with zeros: [x] and [0, x] share every fingerprint. -/
+/-- A shorter tuple aliases a longer one padded with zeros.
+
+For example, [x] and [0, x] share every fingerprint. -/
 theorem fingerprint_width_alias (β x : K) : fingerprint β [x] = fingerprint β [0, x] :=
   fingerprint_pad β x
 
-/-- The challenge table: a width of 0 panics; otherwise bus i is offset by (i + 1) beta^W. -/
+/-- The challenge table.
+
+- a width of 0 panics
+- otherwise bus i is offset by (i + 1) beta^W. -/
 theorem challenge_table (α β : K) (W n : ℕ) :
     Challenges.new α β W n =
       if W = 0 then none else
         some (α, β, (List.range n).map fun i : ℕ => α + ((i : K) + 1) * β ^ W) :=
   challenges_new α β W n
 
-/-- **Soundness of the bus sum.** An unbalanced list of N messages, of widths at most W and one width per bus, passes on at most N (W + 1) |K| of the |K|^2 challenge pairs. -/
+/-- **Soundness of the bus sum.**
+
+Take an unbalanced list of N messages, of widths at most W, with one width per bus.
+
+It passes on at most N (W + 1) |K| of the |K|^2 challenge pairs. -/
 theorem bus_soundness (msgs : List (Key K × K)) {W : ℕ} (hW : 1 ≤ W)
     (hlen : ∀ q ∈ msgs, q.1.2.length ≤ W)
     (hbus : ∀ q ∈ msgs, ∀ q' ∈ msgs, (q.1.1 : K) = q'.1.1 → q.1.1 = q'.1.1)
@@ -154,13 +194,17 @@ theorem pin_iff (terms : List (K × K)) (h : ∀ i < terms.length, den terms i �
     Pinned terms f ↔ f = fracSum terms :=
   pinned_iff h f
 
-/-- **A pole frees the fraction.** Two vanishing denominators on a row satisfy the pin for every value. -/
+/-- **A pole frees the fraction.**
+
+Two vanishing denominators on a row satisfy the pin for every value. -/
 theorem pole_pair_frees (terms : List (K × K)) {i j : ℕ} (hij : i ≠ j) (hi : i < terms.length)
     (hj : j < terms.length) (hdi : den terms i = 0) (hdj : den terms j = 0) (f : K) :
     Pinned terms f :=
   pinned_of_two_zero hij hi hj hdi hdj f
 
-/-- **A pole frees the fraction.** A vanishing denominator with a zero count satisfies the pin for every value. -/
+/-- **A pole frees the fraction.**
+
+A vanishing denominator with a zero count satisfies the pin for every value. -/
 theorem pole_zero_count_frees (terms : List (K × K)) {i : ℕ} (hi : i < terms.length)
     (hdi : den terms i = 0) (hmi : mul terms i = 0) (f : K) : Pinned terms f :=
   pinned_of_zero_mul hi hdi hmi f
@@ -191,7 +235,11 @@ theorem honest_running_sum (frac : ℕ → ℕ → K) {n : ℕ} (hn : 0 < n) (w 
     (honest frac n w).Constrained n w :=
   honest_constrained frac hn w
 
-/-- **Satisfied constraints imply the bus relation.** When the verifier accepts and no denominator vanishes, the sum of m / d over every message of every AIR is zero. -/
+/-- **Satisfied constraints imply the bus relation.**
+
+Suppose the verifier accepts and no denominator vanishes.
+
+Then the sum of m / d over every message of every AIR is zero. -/
 theorem accepts_bus_relation {α β : K} {W : ℕ} {airs : List (AirMessages K)}
     {cols : ℕ → RunningSum K} (h : Accepts α β W airs cols)
     (hD : ∀ q ∈ allMessages airs, busDenom α β W q.1.1 q.1.2 ≠ 0) :
@@ -199,7 +247,13 @@ theorem accepts_bus_relation {α β : K} {W : ℕ} {airs : List (AirMessages K)}
   busSum_eq_zero_of_accepts h hD
 
 open Classical in
-/-- **Soundness of the AIR encoding.** For unbalanced messages, at most N (W + 1) |K| challenge pairs admit permutation columns the verifier accepts, the columns chosen after the challenges. -/
+/-- **Soundness of the AIR encoding.**
+
+Take unbalanced messages.
+
+At most N (W + 1) |K| challenge pairs admit permutation columns the verifier accepts.
+
+This holds even when the columns are chosen after the challenges. -/
 theorem air_soundness (airs : List (AirMessages K)) {W : ℕ} (hW : 1 ≤ W)
     (hlen : ∀ q ∈ allMessages airs, q.1.2.length ≤ W)
     (hbus : ∀ q ∈ allMessages airs, ∀ q' ∈ allMessages airs, (q.1.1 : K) = q'.1.1 → q.1.1 = q'.1.1)
@@ -246,7 +300,9 @@ theorem exclusive_idle (xs : List ((K × K) × K)) (hflag : ∀ x ∈ xs, x.1.1 
       (xs.map fun x => x.1.1 * x.1.2).sum + (1 - (xs.map fun x => x.1.1).sum) = 1 :=
   exclusive_none xs hflag
 
-/-- **The fraction pin on a row** asserts U f - V for the resolved tuples and counts and the lookup's challenges. -/
+/-- **The fraction pin on a row.**
+
+It asserts U f - V for the resolved tuples, the resolved counts and the lookup's challenges. -/
 theorem fraction_pin_row (main preprocessed : RowWindow F) (pv : List F) (first last trans : F)
     (periodic : List F) (perm : RowWindow K) (randomness values : List K) (s : DebugState)
     (lookup : Lookup F) (hflags : lookup.flags = none)
@@ -265,7 +321,11 @@ theorem fraction_pin_row (main preprocessed : RowWindow F) (pv : List F) (first 
   eval_fraction_additive main preprocessed pv first last trans periodic perm randomness values s
     lookup hflags hlen hev hmv hα hβ hf
 
-/-- **The accumulator over a trace.** On n >= 1 rows, the accumulator constraints pass on every row exactly when the columns form a constrained running sum. -/
+/-- **The accumulator over a trace.**
+
+Take n >= 1 rows.
+
+The accumulator constraints pass on every row exactly when the columns form a constrained running sum. -/
 theorem accumulator_trace (main preprocessed : ℕ → RowWindow F) (pv : List F)
     (periodic : ℕ → List F) (randomness values : List K) (s : ℕ → DebugState)
     (P : ℕ → ℕ → K) {n : ℕ} (hn : 0 < n) (lookups : List (Lookup F))
@@ -284,7 +344,15 @@ theorem terminal_sum (t : List (Option K)) :
 
 /-! ## The degree -/
 
-/-- **The pin's degree.** With denominators of degree at most D_i n, counts at most M_i n, and a fraction at most n, U f - V has degree at most d n, for the degree d the gadget reports. -/
+/-- **The pin's degree.**
+
+Suppose these degree bounds hold:
+
+- each denominator has degree at most D_i n
+- each count has degree at most M_i n
+- the fraction has degree at most n.
+
+Then U f - V has degree at most d n, for the degree d the gadget reports. -/
 theorem pin_degree (terms : List (K[X] × K[X])) (f : K[X]) (N : ℕ) (D M : ℕ → ℕ)
     (hd : ∀ i < terms.length, (den terms i).natDegree ≤ D i * N)
     (hm : ∀ i < terms.length, (mul terms i).natDegree ≤ M i * N) (hf : f.natDegree ≤ N) :
@@ -298,7 +366,9 @@ theorem denominator_degree (α β : K) (e : List K[X]) (D N : ℕ)
     (he : ∀ x ∈ e, x.natDegree ≤ D * N) : (C α - fingerprint (C β) e).natDegree ≤ D * N :=
   natDegree_denom_le α β e D N he
 
-/-- The gadget reports max(1 + sum_i D_i, max_i (deg m_i + sum_(j != i) D_j)) for an additive column. -/
+/-- For an additive column, the gadget reports this degree:
+
+max(1 + sum_i D_i, max_i (deg m_i + sum_(j != i) D_j)). -/
 theorem reported_degree (lookup : Lookup F) (hflags : lookup.flags = none)
     (hlen : lookup.multiplicities.length = lookup.elements.length) (t : ℕ) :
     constraint_degree_with_transition lookup t =
@@ -332,7 +402,13 @@ theorem prover_fraction_honest (α β : K) (ev : List (List F)) (mv : List F)
       fracSum (rowTerms (ev.map (·.map (algebraMap F K))) (mv.map (algebraMap F K)) α β) :=
   prover_fraction α β ev mv hlen
 
-/-- **A periodic count stops the prover.** On every trace with a row, the generator fails for a lookup whose first count reads a periodic column, though keygen accepts it. -/
+/-- **A periodic count stops the prover.**
+
+Take a lookup whose first count reads a periodic column.
+
+Keygen accepts it.
+
+Yet on every trace with a row, the generator fails. -/
 theorem prover_rejects_periodic (main : Mat F) (preprocessed : Option (Mat F)) (pv : List F)
     (lookups : List (Lookup F)) (challenges : List K) (num_threads min_task_len : ℕ)
     (hh : 0 < main.height) {lookup : Lookup F} (hl : lookup ∈ lookups) (hflags : lookup.flags = none)

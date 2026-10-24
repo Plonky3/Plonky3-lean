@@ -16,7 +16,9 @@ The integer helpers are extracted.
 
 The folders, the quotient, the recombination, the verifier's checks and the transcript are transcribed.
 
-The trace lives on a subgroup s H of order n = 2^k with generator omega, and the quotient on a disjoint coset of order 2^L n.
+The trace lives on a subgroup s H of order n = 2^k, with generator omega.
+
+The quotient lives on a disjoint coset of order 2^L n.
 
 ```text
     C_alpha(X) = sum_i alpha^(m - 1 - i) C_i(X)     m constraints, in emission order
@@ -158,7 +160,9 @@ section quotientPolyK
 
 variable {F : Type _} [Field F] {K : Type _} [Field K]
 
-/-- On point s omega^i of the coset, the STARK's assignment takes the STARK's values on row i of a trace it interpolates. -/
+/-- Take a trace and its interpolant.
+
+At the point s omega^i, the STARK's assignment takes the STARK's values on row i. -/
 theorem eval_starkAssign {s ω : F} {k : ℕ} (hω : IsPrimitiveRoot ω (2 ^ k)) (hs : s ≠ 0)
     {T : Instance F} (hT : T.height = 2 ^ k) {main prep : ℕ → F[X]} {pub : ℕ → F}
     {periodic : ℕ → F[X]}
@@ -227,7 +231,7 @@ section prover
 
 variable {F K : Type} [Field F] [DecidableEq F] [Field K] [Algebra F K] (G : Gen F)
 
-/-- The selector vectors on the quotient coset hold the STARK's selector polynomials at each point, and 1 / Z. -/
+/-- The selector vectors on the quotient coset hold, at each point, the STARK's selector polynomials and 1 / Z. -/
 theorem selector_entries (hV : GenValid G) (hN : GenNested G) (h2 : (2 : F) ≠ 0)
     {td qd : Coset G} (h1 : td.shift = 1) (hle : td.log_size ≤ qd.log_size)
     (hdisj : qd.shift ^ 2 ^ qd.log_size ≠ 1) {sel : LagrangeSelectors (List F)}
@@ -244,7 +248,10 @@ theorem selector_entries (hV : GenValid G) (hN : GenNested G) (h2 : (2 : F) ≠ 
 
 /-- The quotient's values on the quotient coset.
 
-Take the extended trace and preprocessed trace at the points x_i of the quotient coset, and a periodic table that reads each periodic polynomial at x_i.
+Take these inputs at the points x_i of the quotient coset:
+
+- the extended trace and the extended preprocessed trace
+- a periodic table that reads each periodic polynomial at x_i.
 
 Then the value at x_i is C_alpha(x_i) s^n / Z(x_i), for the trace subgroup's selectors. -/
 theorem quotient_values_eq {D : ℕ} (B : Module.Basis (Fin D) F K) (hV : GenValid G)
@@ -292,7 +299,10 @@ theorem verify_constraints_none_iff (hV : GenValid G) (air : Air F)
       InCoset c.shift c.subgroup_generator c.log_size ζ :=
   Plonky3Lean.Proofs.UniStark.verify_constraints_none_iff G hV air hb trace_local trace_next pl pn periodic pv c ζ α q
 
-/-- When the check returns, it accepts exactly when both preprocessed rows have one width and the fold times the inverse vanishing value is the quotient. -/
+/-- When the check returns, it accepts exactly when both hold:
+
+- both preprocessed rows have one width
+- the fold times the inverse vanishing value is the quotient. -/
 theorem verify_constraints_ok_iff (air : Air F) (trace_local trace_next : List K)
     (pl pn : Option (List K)) (periodic : List K) (pv : List F) (c : Coset G) (ζ α q : K)
     (r : Except VerificationError Unit)
@@ -323,7 +333,9 @@ theorem check_ood_point_ok (hV : GenValid G) (c : Coset G) (ζ : K)
 
 Take a trace that satisfies the STARK's relation on the subgroup s H, interpolated by the trace polynomials.
 
-On the honest openings of the trace at zeta, with zeta off s H, the check accepts the quotient s^n C_alpha / Z at zeta. -/
+Open the trace honestly at a point zeta off s H.
+
+The check then accepts the quotient s^n C_alpha / Z at zeta. -/
 theorem verify_constraints_complete (hV : GenValid G) (h2 : (2 : K) ≠ 0) {air : Air F}
     (hb : air.public_boundary_io = []) (c : Coset G) {s ω : F}
     (hcs : c.shift = algebraMap F K s) (hcg : c.subgroup_generator = algebraMap F K ω)
@@ -394,11 +406,13 @@ variable [DecidableEq K]
 
 /-- Completeness of the identity at zeta.
 
-* The trace satisfies the STARK's relation on the trace subgroup s H of order n.
-* Every constraint fits the 2^L chunks of n that p3-air's sizing gives.
-* The quotient coset has order 2^L n.
-* Each chunk's opening rebuilds to its interpolant of the quotient at zeta, as an honest scheme opens it.
-* zeta lies off s H.
+Assume these hold:
+
+- the trace satisfies the STARK's relation on the trace subgroup s H of order n
+- every constraint fits the 2^L chunks of n that p3-air's sizing gives
+- the quotient coset has order 2^L n
+- each chunk's opening rebuilds to its interpolant of the quotient at zeta, as an honest scheme opens it
+- zeta lies off s H.
 
 Then the recombined quotient is Q(zeta), and the check at zeta accepts it. -/
 theorem honest_ood_check (GK : Gen K) (hV : GenValid GK) (hN : GenNested GK) (h2 : (2 : K) ≠ 0)
@@ -441,7 +455,13 @@ end completeness
 
 /-! ## The Fiat-Shamir order -/
 
-/-- The pattern puts alpha after the trace, preprocessed and public steps, and zeta after the quotient, randomization and grind steps, with the opening argument last. -/
+/-- The transcript pattern runs in this order:
+
+- the trace, preprocessed and public steps
+- alpha
+- the quotient, randomization and grind steps
+- zeta
+- the opening argument. -/
 theorem pattern_order (s : StarkShape) :
     ∃ a b, s.pattern = a ++ [.alpha] ++ b ++ [.zeta, .begin_opening_argument, .end_opening_argument] ∧
       .trace_commitment ∈ a ∧ .public_values s.num_public_values ∈ a ∧
@@ -455,7 +475,13 @@ section transcript
 
 variable {C F E : Type}
 
-/-- The first phase accepts exactly when a preprocessed commitment is present for a positive preprocessed width, and alpha is the oracle at the trace commitment, that commitment, and the public values. -/
+/-- The first phase accepts exactly when a preprocessed commitment is present for a positive preprocessed width.
+
+Alpha is then the oracle at three inputs, in order:
+
+- the trace commitment
+- the preprocessed commitment, when present
+- the public values. -/
 theorem constraint_phase_eq (shape : StarkShape) (H : List (Msg C F) → E) (st : List (Msg C F))
     (trace : C) (prep : Option C) (pv : List F) :
     constraint_phase shape H st trace prep pv =
@@ -470,7 +496,11 @@ theorem constraint_phase_eq (shape : StarkShape) (H : List (Msg C F) → E) (st 
       | false, some _ => .error .UnexpectedPreprocessedCommitment :=
   Plonky3Lean.Proofs.UniStark.constraint_phase_eq shape H st trace prep pv
 
-/-- When the second phase accepts, zeta is the oracle at the input state extended by the quotient commitment, the randomization commitment when present, and the grind witness when there is a grind. -/
+/-- When the second phase accepts, zeta is the oracle at the input state extended by these, in order:
+
+- the quotient commitment
+- the randomization commitment, when present
+- the grind witness, when there is a grind. -/
 theorem ood_phase_ok {shape : StarkShape} {H : List (Msg C F) → E}
     {powOk : List (Msg C F) → ℕ → F → Bool} {st st' : List (Msg C F)} {quotient : C}
     {random : Option C} {w : F} {ζ : E}
@@ -480,7 +510,11 @@ theorem ood_phase_ok {shape : StarkShape} {H : List (Msg C F) → E}
         (if shape.ood_pow_bits > 0 then [.scalar w] else [])) :=
   Plonky3Lean.Proofs.UniStark.ood_phase_ok h
 
-/-- After both phases accept, zeta is the oracle at a state that holds every commitment of the proof, every public value and alpha's draw. -/
+/-- After both phases accept, zeta is the oracle at a state that holds these:
+
+- every commitment of the proof
+- every public value
+- alpha's draw. -/
 theorem zeta_binds {shape : StarkShape} {H : List (Msg C F) → E}
     {powOk : List (Msg C F) → ℕ → F → Bool} {st st₁ st₂ : List (Msg C F)} {trace quotient : C}
     {prep random : Option C} {pv : List F} {w : F} {α ζ : E}
@@ -508,10 +542,12 @@ theorem checked_pow2_spec (n : Std.Usize) :
 
 /-- The degree-bits validation, when the minimum fits the word.
 
-* Below is_zk + min, it reports the bits too small, with that minimum.
-* Above max, it reports them too large, with that maximum.
-* At the word size or above, it reports them too large, with the word size minus one.
-* Otherwise it returns the base domain's bits, degree_bits - is_zk, and the extended domain's size 2^degree_bits. -/
+Write b for the degree bits, z for the zero-knowledge bit, and [lo, hi] for the allowed range.
+
+- below z + lo, it reports the bits too small, with that minimum
+- above hi, it reports them too large, with that maximum
+- at the word size or above, it reports them too large, with the word size minus one
+- otherwise it returns the base domain's bits b - z, and the extended domain's size 2^b. -/
 theorem validate_degree_bits_spec (air : core.option.Option Std.Usize) (db zk lo hi : Std.Usize)
     (h : zk.val + lo.val ≤ Usize.max) :
     p3_uni_stark.verifier.validate_degree_bits air db zk lo hi ⦃ r =>
@@ -524,7 +560,12 @@ theorem validate_degree_bits_spec (air : core.option.Option Std.Usize) (db zk lo
       else ∃ a b : Std.Usize, a.val = db.val - zk.val ∧ b.val = 2 ^ db.val ∧ r = .Ok (a, b) ⦄ :=
   Plonky3Lean.Proofs.UniStark.Extracted.validate_degree_bits_spec air db zk lo hi h
 
-/-- The opening rounds are the randomization round when hiding, then the trace, the quotient and the preprocessed trace. -/
+/-- The opening rounds come in this order:
+
+- the randomization round, when hiding
+- the trace
+- the quotient
+- the preprocessed trace. -/
 theorem StarkOpeningLayout_new_spec (zk : Bool) :
     p3_uni_stark.config.StarkOpeningLayout.new zk ⦃ l =>
       l.trace.val = zk.toNat ∧ l.quotient.val = zk.toNat + 1 ∧ l.preprocessed.val = zk.toNat + 2 ⦄ :=
@@ -534,7 +575,9 @@ end extracted
 
 /-! ## The zero-knowledge variant -/
 
-/-- With the zero-knowledge bit, a degree d (2n - 1) + 1 fits 2^(L + 1) chunks of n plus one, for L the sizing of d + 1. -/
+/-- With the zero-knowledge bit, a degree d (2n - 1) + 1 fits 2^(L + 1) chunks of n plus one.
+
+Here L is the sizing of d + 1. -/
 theorem zk_fits (d : ℕ) {n : ℕ} (hn : 1 ≤ n) {D : ℕ} (hD : D ≤ d * (2 * n - 1) + 1) :
     D < (2 ^ (log2_ceil_usize (max (d + 1) 2 - 1) + 1) + 1) * n :=
   Plonky3Lean.Proofs.UniStark.zk_fits d hn hD
@@ -561,7 +604,9 @@ end zk
 
 section babyBear
 
-/-- At BabyBear and its quartic extension, the two folders weight the constraints with the same powers of alpha, for any basis of the extension. -/
+/-- At BabyBear and its quartic extension, the two folders weight the constraints with the same powers of alpha.
+
+This holds for any basis of the extension. -/
 theorem babyBear.prover_eq_verifier {D : ℕ} (B : Module.Basis (Fin D) BabyBear.Field BabyBear.Ext4)
     {air : Air BabyBear.Field} {env : Var → BabyBear.Field} {main preprocessed : RowWindow BabyBear.Field}
     {pv periodic : List BabyBear.Field} {first last trans : BabyBear.Field}
@@ -577,7 +622,9 @@ theorem babyBear.prover_eq_verifier {D : ℕ} (B : Module.Basis (Fin D) BabyBear
       some (air.eval (verifierFolder mainK preprocessedK pv periodicK firstK lastK transK α) 0) :=
   Plonky3Lean.Proofs.UniStark.prover_eq_verifier B hp hv α
 
-/-- On a 4-row BabyBear trace, the constraint is_first_row a + is_transition b separates the two semantics in both directions. -/
+/-- Take a 4-row BabyBear trace and the constraint (first-row selector) a + (transition selector) b.
+
+It separates the two semantics in both directions. -/
 theorem babyBear.selectors_disagree {ω : BabyBear.Field} (hω : IsPrimitiveRoot ω 4) :
     (Satisfies [firstPlusTransition] (rowZeroTrace (F := BabyBear.Field) 4 1 (-1)) ∧
       ¬ SatisfiesStark [firstPlusTransition] (rowZeroTrace (F := BabyBear.Field) 4 1 (-1)) ω) ∧
@@ -585,7 +632,9 @@ theorem babyBear.selectors_disagree {ω : BabyBear.Field} (hω : IsPrimitiveRoot
       ¬ Satisfies [firstPlusTransition] (rowZeroTrace 4 ((1 - ω ^ (4 - 1)) / 4) (-1))) :=
   firstPlusTransition_disagree (by norm_num) hω (by decide) (by decide)
 
-/-- BabyBear's generator table, read in the quartic extension, is primitive and nested up to 27, and 2 is invertible there.
+/-- BabyBear's generator table, read in the quartic extension, is primitive and nested up to 27.
+
+Also, 2 is invertible there.
 
 So the recombination and completeness claims above hold for the extension's cosets. -/
 theorem babyBear.ext4_table :

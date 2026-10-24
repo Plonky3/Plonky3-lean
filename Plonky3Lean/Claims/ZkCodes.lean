@@ -13,7 +13,9 @@ The encoding is transcribed over a field K, not extracted.
 
 The definitions follow Chiesa, Fenzi and Weissenberg, eprint 2026/391, Section 3.2.1.
 
-The code puts the message in the low coefficients and t masks in the next ones, and evaluates on the subgroup of order m = 2^k:
+The code puts the message in the low coefficients and t masks in the next ones.
+
+It evaluates on the subgroup of order m = 2^k:
 
 ```text
     p_{f,rho}(X) = sum_{j < l} f_j X^j + sum_{j < t} rho_j X^(l+j)
@@ -41,12 +43,16 @@ section spec
 
 variable {K : Type _} [Field K] [Fintype K] [DecidableEq K] {m : ℕ}
 
-/-- At distinct nonzero points, the encoding with t masks is t-query zero knowledge with error zero, and the simulator samples each queried symbol uniformly. -/
+/-- At distinct nonzero points, the encoding with t masks is t-query zero knowledge with error zero.
+
+The simulator samples each queried symbol uniformly. -/
 theorem rs_isZk {l t : ℕ} (L : Fin m → K) (hL : Function.Injective L) (h0 : ∀ i, L i ≠ 0) :
     IsZkEncoding (rsZkEnc (l := l) (t := t) L) t 0 uniformSim :=
   rsZkEnc_isZk L hL h0
 
-/-- For every message, the view at a set S of at most t distinct nonzero points is reached by exactly |K|^(t - |S|) randomness vectors per value. -/
+/-- Fix a message and a set S of at most t distinct nonzero points.
+
+Each value of the view at S is reached by exactly |K|^(t - |S|) randomness vectors. -/
 theorem rs_view_balanced {l t : ℕ} (L : Fin m → K) {S : Finset (Fin m)} (hL : Set.InjOn L S)
     (h0 : ∀ i ∈ S, L i ≠ 0) (hS : S.card ≤ t) (f : Fin l → K) (y : S → K) :
     (Finset.univ.filter fun ρ : Fin t → K => restrict (rsZkEnc L f ρ) S = y).card *
@@ -54,20 +60,26 @@ theorem rs_view_balanced {l t : ℕ} (L : Fin m → K) {S : Finset (Fin m)} (hL 
   have := card_view_fiber L hL h0 hS f y
   simpa [Fintype.card_fun] using this
 
-/-- At exactly t distinct nonzero points the view is a bijection of the randomness, for every message. -/
+/-- At exactly t distinct nonzero points, the view is a bijection of the randomness, for every message. -/
 theorem rs_view_bijective {l t : ℕ} (L : Fin m → K) {S : Finset (Fin m)} (hL : Set.InjOn L S)
     (h0 : ∀ i ∈ S, L i ≠ 0) (hS : S.card = t) (f : Fin l → K) :
     Function.Bijective fun ρ : Fin t → K => restrict (rsZkEnc L f ρ) S :=
   view_bijective L hL h0 hS f
 
-/-- The bound t is tight: with l >= 1 and at least t + 1 distinct nonzero points, no simulator achieves (t + 1)-query zero knowledge with error below 1/2. -/
+/-- The bound t is tight.
+
+Take l >= 1 and at least t + 1 distinct nonzero points.
+
+No simulator achieves (t + 1)-query zero knowledge with error below 1/2. -/
 theorem rs_not_isZk_succ {l t : ℕ} (hl : 1 ≤ l) (L : Fin m → K) (hL : Function.Injective L)
     (h0 : ∀ i, L i ≠ 0) (hm : t + 1 ≤ m) {ζ : ℚ} (hζ : ζ < 1 / 2)
     (sim : (S : Finset (Fin m)) → (S → K) → ℚ) :
     ¬ IsZkEncoding (rsZkEnc (l := l) (t := t) L) (t + 1) ζ sim :=
   not_isZk_succ hl L hL h0 hm hζ sim
 
-/-- With the message in the low coefficients, a zero point reveals the constant coefficient: with l, t >= 1 the encoding is then not t-query zero knowledge. -/
+/-- With the message in the low coefficients, a zero point reveals the constant coefficient.
+
+So with l, t >= 1 and a zero point, the encoding is not t-query zero knowledge. -/
 theorem rs_not_isZk_of_zero {l t : ℕ} (hl : 1 ≤ l) (ht : 1 ≤ t) (L : Fin m → K) {i : Fin m}
     (hi : L i = 0) {ζ : ℚ} (hζ : ζ < 1 / 2) (sim : (S : Finset (Fin m)) → (S → K) → ℚ) :
     ¬ IsZkEncoding (rsZkEnc (l := l) (t := t) L) t ζ sim :=
@@ -78,12 +90,16 @@ theorem rs_mem_code {l t : ℕ} (L : Fin m → K) (f : Fin l → K) (ρ : Fin t 
     rsZkEnc L f ρ ∈ rsCode L (l + t) :=
   rsZkEnc_mem L f ρ
 
-/-- Definition 3.17: the generating matrix has rows L_i^j for the message and L_i^(l+j) for the randomness. -/
+/-- Definition 3.17: the generating matrix.
+
+Its rows are L_i^j for the message and L_i^(l+j) for the randomness. -/
 theorem rs_generating {l t : ℕ} (L : Fin m → K) :
     IsGeneratingMatrix (rsZkEnc (l := l) (t := t) L) (rsMsgMatrix L) (rsRandMatrix (l := l) L) :=
   rsZkEnc_generating L
 
-/-- The subgroup of order 2^k is a domain of distinct nonzero points, so the code's encoding is t-query zero knowledge on it. -/
+/-- The subgroup of order 2^k is a domain of distinct nonzero points.
+
+So the code's encoding is t-query zero knowledge on it. -/
 theorem rs_isZk_subgroup {l t k : ℕ} {ω : K} (hω : IsPrimitiveRoot ω (2 ^ k)) :
     IsZkEncoding (rsZkEnc (l := l) (t := t) fun j : Fin (2 ^ k) => ω ^ (j : ℕ)) t 0 uniformSim :=
   rsZkEnc_isZk _ (fun a b h => Fin.ext (hω.pow_inj a.isLt b.isLt h))
@@ -102,13 +118,17 @@ theorem new (t l : ℕ) {k : ℕ} (hle : l + t ≤ 2 ^ k) (hk : k < 64) :
     ReedSolomonZkEncoding.new t l (2 ^ k) = some ⟨t, l, 2 ^ k⟩ :=
   new_eq_some hle hk
 
-/-- The constructor returns exactly when m is a power of two, l + t <= m, and l + t fits in a word. -/
+/-- The constructor returns exactly when all of these hold:
+
+- m is a power of two
+- l + t <= m
+- l + t fits in a word. -/
 theorem new.some_iff {t l m : ℕ} {rs : ReedSolomonZkEncoding} :
     ReedSolomonZkEncoding.new t l m = some rs ↔
       (∃ k, m = 2 ^ k) ∧ l + t ≤ m ∧ l + t < 2 ^ 64 ∧ rs = ⟨t, l, m⟩ :=
   new_eq_some_iff
 
-/-- The accessors: the query bound and the randomness length are t, and the error is zero. -/
+/-- The query bound and the randomness length are t, and the error is zero. -/
 theorem accessors (rs : ReedSolomonZkEncoding) :
     rs.query_bound = rs.t ∧ rs.randomness_len = rs.t ∧ rs.message_len = rs.msg_len ∧
       rs.codeword_len = rs.m ∧ rs.error = 0 :=
@@ -130,13 +150,17 @@ theorem message_row (G : Gen K) {t l k : ℕ} (hk : k ≤ G.adicity) (p : ℕ) :
       some ((List.range l).map fun j => (G.gen k ^ p) ^ j) :=
   message_row_eq G hk p
 
-/-- The randomness row at position p is x^l, ..., x^(l+t-1), for x = G_k^p, and empty for t = 0. -/
+/-- The randomness row at position p is x^l, ..., x^(l+t-1), for x = G_k^p.
+
+It is empty for t = 0. -/
 theorem randomness_row (G : Gen K) {t l k : ℕ} (hk : k ≤ G.adicity) (p : ℕ) :
     (ReedSolomonZkEncoding.mk t l (2 ^ k)).randomness_row G p =
       some ((List.range t).map fun j => (G.gen k ^ p) ^ (l + j)) :=
   randomness_row_eq G hk p
 
-/-- With a backend that computes the transform, the codeword at position i is the polynomial of Proposition 3.19 at G_k^i. -/
+/-- Take a backend that computes the transform.
+
+The codeword at position i is the polynomial of Proposition 3.19 at G_k^i. -/
 theorem encode_with_randomness (G : Gen K) {t l k : ℕ} {dft_batch : ℕ → (ℕ → K) → Option (ℕ → K)}
     (hd : ∀ x, Computes (dft_batch (2 ^ k) x) (2 ^ k) (dft (G.gen k) (2 ^ k) x))
     (hle : l + t ≤ 2 ^ k) (f : Fin l → K) (ρ : Fin t → K) :
@@ -145,7 +169,9 @@ theorem encode_with_randomness (G : Gen K) {t l k : ℕ} {dft_batch : ℕ → (�
       ∀ i : Fin (2 ^ k), y i = rsZkEnc (fun j : Fin (2 ^ k) => G.gen k ^ (j : ℕ)) f ρ i :=
   encode_eq_rsZkEnc G hd hle f ρ
 
-/-- The radix-2 decimation-in-time backend computes the transform, so its codeword is the polynomial at G_k^i. -/
+/-- The radix-2 decimation-in-time backend computes the transform.
+
+So its codeword is the polynomial at G_k^i. -/
 theorem encode_with_randomness.radix2Dit (G : Gen K) (hG : GenValid G) {t l k : ℕ}
     (hk : k ≤ G.adicity) (hle : l + t ≤ 2 ^ k) (f : Fin l → K) (ρ : Fin t → K) :
     ∃ y, (ReedSolomonZkEncoding.mk t l (2 ^ k)).encode_with_randomness (Radix2Dit.dft_batch G)
@@ -153,7 +179,9 @@ theorem encode_with_randomness.radix2Dit (G : Gen K) (hG : GenValid G) {t l k : 
       ∀ i : Fin (2 ^ k), y i = rsZkEnc (fun j : Fin (2 ^ k) => G.gen k ^ (j : ℕ)) f ρ i :=
   encode_eq_rsZkEnc G (fun x => Proofs.Dft.radix2Dit_dft_batch G hG hk x) hle f ρ
 
-/-- The small-batch backend computes the transform, so its codeword is the polynomial at G_k^i. -/
+/-- The small-batch backend computes the transform.
+
+So its codeword is the polynomial at G_k^i. -/
 theorem encode_with_randomness.smallBatch (G : Gen K) (hG : GenValid G) (hN : GenNested G)
     {t l k L : ℕ} (hkL : k ≤ L) (hL : L ≤ G.adicity) (c : ℕ) (hle : l + t ≤ 2 ^ k) (f : Fin l → K)
     (ρ : Fin t → K) :
@@ -174,7 +202,11 @@ theorem encode_with_randomness.panics_rand_len (dft_batch : ℕ → (ℕ → K) 
     rs.encode_with_randomness dft_batch msg r = none :=
   encode_with_randomness_rand_len dft_batch rs msg h
 
-/-- The constructor accepts m = 2^k beyond the two-adicity; every evaluation point then panics, and so does every encoding with a backend that panics there. -/
+/-- The constructor accepts m = 2^k beyond the two-adicity.
+
+Every evaluation point then panics.
+
+So does every encoding with a backend that panics there. -/
 theorem beyond_adicity (G : Gen K) {t l k : ℕ} (hk : G.adicity < k) (hk64 : k < 64)
     (hle : l + t ≤ 2 ^ k) {dft_batch : ℕ → (ℕ → K) → Option (ℕ → K)}
     (hd : ∀ x, dft_batch (2 ^ k) x = none) (p : ℕ) (msg r : List K) :
@@ -183,7 +215,10 @@ theorem beyond_adicity (G : Gen K) {t l k : ℕ} (hk : G.adicity < k) (hk64 : k 
       (ReedSolomonZkEncoding.mk t l (2 ^ k)).encode_with_randomness dft_batch msg r = none :=
   Proofs.ZkCodes.beyond_adicity G hk hk64 hle hd p msg r
 
-/-- The codeword at position p is the message row times the message plus the randomness row times the randomness. -/
+/-- The codeword at position p is a sum of two dot products:
+
+- the message row times the message
+- the randomness row times the randomness. -/
 theorem encode_rows (G : Gen K) {t l k : ℕ} (hk : k ≤ G.adicity)
     {dft_batch : ℕ → (ℕ → K) → Option (ℕ → K)}
     (hd : ∀ x, Computes (dft_batch (2 ^ k) x) (2 ^ k) (dft (G.gen k) (2 ^ k) x))
@@ -195,7 +230,9 @@ theorem encode_rows (G : Gen K) {t l k : ℕ} (hk : k ≤ G.adicity)
         y p = (List.zipWith (· * ·) mrow msg).sum + (List.zipWith (· * ·) rrow r).sum :=
   Proofs.ZkCodes.encode_rows G hk hd hle hmsg hr
 
-/-- Linearity: the encoding of a f_1 + f_2 with a rho_1 + rho_2 is a times the first codeword plus the second. -/
+/-- Linearity.
+
+The encoding of a f_1 + f_2 with a rho_1 + rho_2 is a times the first codeword plus the second. -/
 theorem encode_linear {dft_batch : ℕ → (ℕ → K) → Option (ℕ → K)} {ω : K}
     {rs : ReedSolomonZkEncoding} (hd : ∀ x, Computes (dft_batch rs.m x) rs.m (dft ω rs.m x))
     (hle : rs.msg_len + rs.t ≤ rs.m) (a : K) (f₁ f₂ : Fin rs.msg_len → K) (ρ₁ ρ₂ : Fin rs.t → K) :
@@ -203,7 +240,7 @@ theorem encode_linear {dft_batch : ℕ → (ℕ → K) → Option (ℕ → K)} {
       rs.m (fun i => a * (rsZkPoly f₁ ρ₁).eval (ω ^ i) + (rsZkPoly f₂ ρ₂).eval (ω ^ i)) :=
   Proofs.ZkCodes.encode_linear hd hle a f₁ f₂ ρ₁ ρ₂
 
-/-- The packed batch encoding: column c is the encoding of message c with randomness c. -/
+/-- In the packed batch encoding, column c is the encoding of message c with randomness c. -/
 theorem encode_batch_with_randomness {w : ℕ}
     {dft_batch : ℕ → (ℕ → Fin w → K) → Option (ℕ → Fin w → K)} {ω : K}
     {rs : ReedSolomonZkEncoding} (hd : ∀ x, Computes (dft_batch rs.m x) rs.m (dft ω rs.m x))
@@ -214,7 +251,9 @@ theorem encode_batch_with_randomness {w : ℕ}
       (fun r c => encValue (ms.getD c []) (rss.getD c []) (ω ^ r)) :=
   encode_batch_computes hd hle hw hw0 hrw hlen
 
-/-- The trait's default batch encoding interleaves the single encodings: entry (r, c) is the same as in the packed encoding. -/
+/-- The default batch encoding interleaves the single encodings.
+
+Its entry (r, c) is the same as in the packed encoding. -/
 theorem default_encode_batch_with_randomness {dft_batch : ℕ → (ℕ → K) → Option (ℕ → K)} {ω : K}
     {rs : ReedSolomonZkEncoding} (hd : ∀ x, Computes (dft_batch rs.m x) rs.m (dft ω rs.m x))
     (hle : rs.msg_len + rs.t ≤ rs.m) {ms rss : List (List K)} (hne : ms ≠ [])
@@ -227,7 +266,9 @@ theorem default_encode_batch_with_randomness {dft_batch : ℕ → (ℕ → K) �
       ∀ r < rs.m, ∀ c < ms.length, M.get r c = encValue (ms.getD c []) (rss.getD c []) (ω ^ r) :=
   default_batch_computes hd hle hne hrw hlen
 
-/-- The sampled message and randomness are the first msg_len and t draws, in order; encoding with a generator uses the sampled randomness. -/
+/-- The sampled message and randomness are the first l and t draws, in order.
+
+Encoding with a generator uses the sampled randomness. -/
 theorem sampling (dft_batch : ℕ → (ℕ → K) → Option (ℕ → K)) (rs : ReedSolomonZkEncoding)
     (msg : List K) (draw : ℕ → K) :
     rs.sample_message draw = List.ofFn (fun i : Fin rs.msg_len => draw i) ∧
@@ -235,7 +276,9 @@ theorem sampling (dft_batch : ℕ → (ℕ → K) → Option (ℕ → K)) (rs : 
       rs.encode dft_batch msg draw = rs.encode_with_randomness dft_batch msg (rs.sample_randomness draw) :=
   ⟨sample_message_eq rs draw, sample_randomness_eq rs draw, encode_eq dft_batch rs msg draw⟩
 
-/-- The simulator gives each distinct position, in order of first appearance, the next draw; it panics exactly when there are more than t distinct positions. -/
+/-- The simulator gives each distinct position the next draw, in order of first appearance.
+
+It panics exactly when there are more than t distinct positions. -/
 theorem simulate (rs : ReedSolomonZkEncoding) (Q : List ℕ) (draw : ℕ → K) :
     rs.simulate Q draw =
       if (keys Q).length ≤ rs.t then some (Q.map fun p => draw ((keys Q).idxOf p)) else none :=
@@ -243,7 +286,11 @@ theorem simulate (rs : ReedSolomonZkEncoding) (Q : List ℕ) (draw : ℕ → K) 
 
 /-- The simulator's output has the distribution of the real codeword at the queried positions.
 
-This holds for every message of length l, every list of positions below 2^k with at most t distinct ones, and every backend that computes the transform. -/
+This holds for all of these:
+
+- every message of length l
+- every list of positions below 2^k with at most t distinct ones
+- every backend that computes the transform. -/
 theorem simulate_matches_encode [Fintype K] (G : Gen K) (hG : GenValid G)
     {t l k : ℕ} (hk : k ≤ G.adicity) (hle : l + t ≤ 2 ^ k)
     {dft_batch : ℕ → (ℕ → K) → Option (ℕ → K)}
@@ -262,7 +309,9 @@ theorem simulate.t_zero (l m : ℕ) (draw : ℕ → K) (p : ℕ) (Q : List ℕ) 
       (ReedSolomonZkEncoding.mk 0 l m).simulate (p :: Q) draw = none :=
   simulate_t_zero l m draw p Q
 
-/-- The simulator accepts positions at or above m, and gives p and p + m two independent draws, although their evaluation points coincide. -/
+/-- The simulator accepts positions at or above m.
+
+It gives p and p + m two independent draws, although their evaluation points coincide. -/
 theorem simulate.wraps (G : Gen K) (hG : GenValid G) {t l k : ℕ} (hk : k ≤ G.adicity) (ht : 2 ≤ t)
     (p : ℕ) (draw : ℕ → K) :
     (ReedSolomonZkEncoding.mk t l (2 ^ k)).simulate [p, p + 2 ^ k] draw = some [draw 0, draw 1] ∧
