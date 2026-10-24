@@ -30,6 +30,7 @@ public import Plonky3Lean.Proofs.Commit.Mmcs
 public import Plonky3Lean.Proofs.Commit.Pcs
 public import Plonky3Lean.Proofs.Commit.PeriodicTable
 public import Plonky3Lean.Proofs.MultilinearUtil.Packing
+public import Plonky3Lean.Proofs.Sumcheck.Extracted
 public import Plonky3Lean.Proofs.Sumcheck.GenericDegree
 public import Plonky3Lean.Proofs.Sumcheck.Prover
 public import Plonky3Lean.Proofs.Whir.Iteration

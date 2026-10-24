@@ -5245,6 +5245,38 @@ name   = "Plonky3Lean.Claims.Sumcheck.reduce_claim.sum_check"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.Sumcheck.lagrange.lagrange_weights_01inf.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Sumcheck.lagrange.extrapolate_01inf.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Sumcheck.strategy.Basis.reduce_claim.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Sumcheck.strategy.Basis.reduce_claim.evaluation"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Sumcheck.strategy.Basis.reduce_claim.projective"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Sumcheck.strategy.Basis.reduce_claim.sum_check"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Sumcheck.lagrange.lagrange_weights_01inf_multi.eq_spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Sumcheck.lagrange.lagrange_weights_01inf_multi.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.Sumcheck.verify_rounds.round_count"
 axioms = ["Quot.sound", "propext"]
 

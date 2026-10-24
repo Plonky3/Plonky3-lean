@@ -1,5 +1,6 @@
 module
 
+public import Plonky3Lean.Proofs.Sumcheck.Extracted
 public import Plonky3Lean.Proofs.Sumcheck.GenericDegree
 public import Plonky3Lean.Proofs.Sumcheck.Prover
 
@@ -8,7 +9,9 @@ public import Plonky3Lean.Proofs.Sumcheck.Prover
 /-!
 # p3-sumcheck: claims
 
-The crate is transcribed over a field, not extracted.
+The round arithmetic is extracted, generic over the field trait.
+
+The round loop and the rest of the verifier core are transcribed over a field.
 
 The specification is the sumcheck protocol of Lund, Fortnow, Karloff and Nisan.
 
@@ -100,6 +103,110 @@ theorem reduce_claim.sum_check (c c_a c_inf : F) :
       (decEval c (c_a, c_inf)).eval 0 + (decEval c (c_a, c_inf)).eval 1 = c ∧
       ∀ r, Basis.Evaluation.reduce_claim c_a c_inf r c = (decEval c (c_a, c_inf)).eval r :=
   ⟨natDegree_decEval c _, decEval_sum c _, fun r => reduce_claim_evaluation c_a c_inf r c⟩
+
+/-! ## The extracted round arithmetic
+
+Each claim assumes one thing of the field instance: its one, sum, difference and product are the field's.
+-/
+
+section Extracted
+
+open CoreModels Aeneas Aeneas.Std
+
+variable {K : Type} [Field K] {inst : p3_field.field.Field K}
+
+/-- The weights of interpolation through 0, 1 and infinity at r are 1 - r, r and r (r - 1).
+
+They never panic. -/
+theorem lagrange.lagrange_weights_01inf.eq_spec (h : FieldComputes inst) (r : K) :
+    p3_sumcheck.lagrange.lagrange_weights_01inf inst r =
+      .ok (Std.Array.make 3#usize [1 - r, r, r * (r - 1)]) :=
+  lagrange_weights_01inf_eq h r
+
+/-- The shipped extrapolation recovers a polynomial h of degree at most 2 at r.
+
+Its inputs are h(0), h(1) and the X^2 coefficient of h.
+
+It never panics. -/
+theorem lagrange.extrapolate_01inf.eq_spec (h : FieldComputes inst) {p : Polynomial K}
+    (hp : p.natDegree ≤ 2) (r : K) :
+    p3_sumcheck.lagrange.extrapolate_01inf inst (p.eval 0) (p.eval 1) (p.coeff 2) r = .ok (p.eval r) := by
+  rw [extrapolate_01inf_eq h, ← eval_quad, ← eq_quad hp]
+
+/-- The shipped claim reduction computes what its transcription computes, in both bases.
+
+It never panics. -/
+theorem strategy.Basis.reduce_claim.eq_spec (h : FieldComputes inst) (b : p3_sumcheck.strategy.Basis)
+    (c_a c_inf r c : K) :
+    p3_sumcheck.strategy.Basis.reduce_claim inst b c_a c_inf r c =
+      .ok ((toMirror b).reduce_claim c_a c_inf r c) :=
+  reduce_claim_eq h b c_a c_inf r c
+
+/-- The evaluation basis of the shipped verifier.
+
+The round sends h(0) and the X^2 coefficient of a quadratic h with h(0) + h(1) = c.
+
+The reduced claim is h(r). -/
+theorem strategy.Basis.reduce_claim.evaluation (h : FieldComputes inst) {p : Polynomial K}
+    (hp : p.natDegree ≤ 2) {c : K} (hc : p.eval 0 + p.eval 1 = c) (r : K) :
+    p3_sumcheck.strategy.Basis.reduce_claim inst .Evaluation (p.eval 0) (p.coeff 2) r c = .ok (p.eval r) := by
+  rw [reduce_claim_eq h, toMirror, reduce_claim_evaluation, ← encEval, decEval_encEval hp hc]
+
+/-- The projective basis of the shipped verifier.
+
+The round sends s(1) and the X^2 coefficient of a quadratic s with s(0) + s(inf) = c.
+
+The reduced claim is s(r). -/
+theorem strategy.Basis.reduce_claim.projective (h : FieldComputes inst) {p : Polynomial K}
+    (hp : p.natDegree ≤ 2) {c : K} (hc : p.eval 0 + p.coeff 2 = c) (r : K) :
+    p3_sumcheck.strategy.Basis.reduce_claim inst .Projective (p.eval 1) (p.coeff 2) r c = .ok (p.eval r) := by
+  rw [reduce_claim_eq h, toMirror, ← hc, Basis.reduce_claim, add_sub_cancel_right, ← eval_quad, ← eq_quad hp]
+
+/-- Every round message passes the sum check of the shipped verifier.
+
+The two values decode to a quadratic h with h(0) + h(1) = c, and the reduced claim is h(r). -/
+theorem strategy.Basis.reduce_claim.sum_check (h : FieldComputes inst) (c c_a c_inf : K) :
+    (decEval c (c_a, c_inf)).natDegree ≤ 2 ∧
+      (decEval c (c_a, c_inf)).eval 0 + (decEval c (c_a, c_inf)).eval 1 = c ∧
+      ∀ r, p3_sumcheck.strategy.Basis.reduce_claim inst .Evaluation c_a c_inf r c =
+        .ok ((decEval c (c_a, c_inf)).eval r) := by
+  refine ⟨natDegree_decEval c _, decEval_sum c _, fun r => ?_⟩
+  rw [reduce_claim_eq h, toMirror, reduce_claim_evaluation]
+
+/-- The tensor product of the weights at n points has 3^n entries.
+
+Entry j is a product over the points.
+
+Point k contributes its weight at the node named by digit k of j, in base 3.
+
+```text
+    digit 0 -> 1 - r_k,   digit 1 -> r_k,   digit 2 -> r_k (r_k - 1)
+```
+
+The shipped code returns it whenever 3^n fits in a vector's length. -/
+theorem lagrange.lagrange_weights_01inf_multi.eq_spec (h : FieldComputes inst) (rs : Slice K)
+    (hn : 3 ^ rs.val.length ≤ Usize.max) :
+    ∃ v, p3_sumcheck.lagrange.lagrange_weights_01inf_multi inst rs = .ok v ∧
+      (Slice.val v).length = 3 ^ rs.val.length ∧
+      ∀ j < 3 ^ rs.val.length,
+        (Slice.val v).getD j 0 = ∏ k ∈ range rs.val.length, wt (rs.val.getD k 0) (j / 3 ^ k % 3) := by
+  have hl := mirror_multi_length rs.val
+  refine ⟨mkVec (p3_sumcheck.lagrange.mirror.lagrange_weights_01inf_multi rs.val) (hl ▸ hn), ?_,
+    by simpa [mkVec] using hl, fun j hj => ?_⟩
+  · rw [lagrange_weights_01inf_multi_eq h, pushAll, dite_eq_left (by simpa [vlist_emptyVec, hl] using hn)]
+    simp [vlist_emptyVec]
+  · simpa [mkVec] using mirror_multi_getD rs.val hj
+
+/-- The shipped tensor product panics exactly when its 3^n entries exceed a vector's maximal length.
+
+Rust then overflows `3usize.pow(n)`, or a push overflows the length. -/
+theorem lagrange.lagrange_weights_01inf_multi.panics (h : FieldComputes inst) (rs : Slice K) :
+    p3_sumcheck.lagrange.lagrange_weights_01inf_multi inst rs = .fail .panic ↔
+      Usize.max < 3 ^ rs.val.length := by
+  rw [lagrange_weights_01inf_multi_eq h, pushAll]
+  simp [vlist_emptyVec, mirror_multi_length]
+
+end Extracted
 
 /-! ## The quadratic verifier -/
 
