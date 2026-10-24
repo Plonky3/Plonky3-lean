@@ -7,6 +7,9 @@ public import Plonky3Lean.Proofs.Fri.Transcript
 public import Plonky3Lean.Proofs.Fri.Hiding
 public import Plonky3Lean.Proofs.Fri.Packed
 public import Plonky3Lean.Proofs.Commit.BabyBear
+public import Plonky3Lean.Proofs.Fri.Deep
+public import Plonky3Lean.Proofs.Fri.Complete
+public import Plonky3Lean.Proofs.Fri.Edge
 
 @[expose] public section
 
@@ -309,15 +312,185 @@ end reduce
 
 /-! ## The verifier never panics -/
 
-/-- The verifier never panics.
+/-- The verifier never panics on a transcript whose phases never panic at a height within the adicity.
 
-On every proof, transcript, commitment schemes and claims, it accepts or rejects. -/
+This holds on every proof, commitment schemes and claims. -/
 theorem verify_fri.never_panics {K : Type} [Field K] [DecidableEq K] (G : Gen K) (hV : GenValid G)
-    (h2 : (2 : K) ≠ 0) (g : K) {C S : Type} (fmmcs immcs : MmcsOps K) (tx : VerifierTx K fmmcs.Commitment S)
-    (params : FriParameters) (proof : FriProof K fmmcs.Commitment fmmcs.MultiProof immcs.MultiProof) (s : S)
+    (h2 : (2 : K) ≠ 0) (g : K) {C S : Type} (fmmcs immcs : MmcsOps K)
+    (mkTx : FriShape → VerifierTx K fmmcs.Commitment S)
+    (params : FriParameters)
+    (htx : ∀ L H, H ≤ G.adicity → (∀ s c w, ((mkTx (FriShape.with_schedule params L H)).commit_rounds s c w).run.isSome) ∧
+      ∀ s f w, ((mkTx (FriShape.with_schedule params L H)).query_phase s f w).run.isSome)
+    (proof : FriProof K fmmcs.Commitment fmmcs.MultiProof immcs.MultiProof) (s : S)
     (claims : List (Claim G C)) (commit_of : C → immcs.Commitment) (alpha : K) :
-    (show Option _ from verify_fri G g fmmcs immcs tx params proof s claims commit_of alpha).isSome :=
-  verify_fri_total G hV h2 g fmmcs immcs tx params proof s claims commit_of alpha
+    (show Option _ from verify_fri G g fmmcs immcs mkTx params proof s claims commit_of alpha).isSome :=
+  verify_fri_total G hV h2 g fmmcs immcs mkTx params htx proof s claims commit_of alpha
+
+/-! ## The DEEP quotients -/
+
+section deep
+
+variable {K : Type} [Field K]
+
+/-- Off z, the quotient (f - f(z)) / (X - z) takes the value (f(x) - f(z)) / (x - z). -/
+theorem deep.eval (f : K[X]) {z x : K} (hx : x ≠ z) :
+    (deepQuot f z).eval x = (f.eval x - f.eval z) / (x - z) :=
+  eval_deepQuot f hx
+
+/-- The quotient of a non-constant f has degree below that of f. -/
+theorem deep.degree {f : K[X]} (hf : 0 < f.degree) (z : K) : (deepQuot f z).degree < f.degree :=
+  degree_deepQuot_lt hf z
+
+/-- A constant column has quotient zero, so a one-row matrix contributes nothing. -/
+theorem deep.constant (c z : K) : deepQuot (C c) z = 0 := deepQuot_C c z
+
+/-- On honest claims, the reduced opening at x is the batched DEEP polynomial at x:
+
+```text
+    R(x) = Q(x),   Q = sum_k sum_i alpha^(off_k + i) (f_(k,i) - f_(k,i)(z_k)) / (X - z_k)
+```
+
+This holds when no point z_k equals x. -/
+theorem deep.reduced_opening (α x : K) (off : ℕ) (L : List (K × List K[X])) (hz : ∀ e ∈ L, e.1 ≠ x) :
+    reducedOpening α x off (L.map fun e => (e.1, e.2.map (·.eval e.1), e.2.map (·.eval x))) =
+      (deepPoly α off L).eval x :=
+  reducedOpening_eq_deepPoly α x off L hz
+
+/-- The batched DEEP polynomial has degree below d when every column has. -/
+theorem deep.batched_degree (α : K) {d : WithBot ℕ} (hd : ⊥ < d) (off : ℕ) (L : List (K × List K[X]))
+    (hL : ∀ e ∈ L, ∀ f ∈ e.2, f.degree < d) : (deepPoly α off L).degree < d :=
+  degree_deepPoly_lt α hd off L hL
+
+/-- The verifier's reduction of one query is the batched DEEP polynomial at each height, at its query point.
+
+This needs opened rows that are the columns at the query point.
+
+It also needs claimed values that are the columns at each opening point. -/
+theorem deep.verifier : type_of% @reduceQuery_deep := @reduceQuery_deep
+
+end deep
+
+/-! ## The fold chain, round by round -/
+
+/-- Row t of the codeword of P folds by 2^a to fold(P, 2^a, beta) at point t of the folded subgroup. -/
+theorem fold_chain.row : type_of% @fold_row_rowList := @fold_row_rowList
+
+/-- One round of the verifier's fold chain on an honest codeword.
+
+It returns fold(P, 2^a, beta) at the folded point, for any arity 2^a.
+
+When the next opening sits at the folded height, it adds beta^(2^a) times that opening. -/
+theorem fold_chain.step : type_of% @foldStep_codeword := @foldStep_codeword
+
+/-- A chain of codewords, each the fold of the previous one plus beta^(2^a) times any rolled-in codeword,
+satisfies every check of the fold chain. -/
+theorem fold_chain.honest : type_of% @HonestChain.chainOK := @HonestChain.chainOK
+
+/-- An accepted fold chain has every opening at or above the final height.
+
+So an input below the final height is never rolled in, and its query is rejected. -/
+theorem fold_chain.final_le : type_of% @fold_query_final_le := @fold_query_final_le
+
+/-! ## The PCS verifier: panics -/
+
+/-- The grinding check panics exactly when the difficulty b is positive and not both b < 64 and 2^b < p. -/
+theorem pcs.check_witness.panics {K Com S : Type} (sp : Sponge K Com S) (s : S) (b : ℕ) (w : K) :
+    check_witness sp s b w = none ↔ ¬ (b = 0 ∨ (b < 64 ∧ 2 ^ b < sp.order)) :=
+  check_witness_eq_none sp s b w
+
+/-- The commit rounds panic exactly when:
+
+- the commitment and witness counts match the schedule
+- some round exists
+- the commit difficulty is unsafe. -/
+theorem pcs.commit_rounds.panics : type_of% @commit_rounds_run_eq_none := @commit_rounds_run_eq_none
+
+/-- With a safe index width, the query phase panics exactly when:
+
+- the final polynomial has its length
+- a witness is given
+- the query difficulty is unsafe. -/
+theorem pcs.query_phase.panics : type_of% @query_phase_run_eq_none := @query_phase_run_eq_none
+
+/-- The batching phase panics exactly when a witness is given and the batching difficulty is unsafe. -/
+theorem pcs.batch_phase.panics : type_of% @batch_phase_run_eq_none := @batch_phase_run_eq_none
+
+/-- The claims replay never rejects and never panics, since its description comes from the same claims. -/
+theorem pcs.claims_replay : type_of% @claimed_openings_from_claims := @claimed_openings_from_claims
+
+/-- The FRI verifier panics exactly when its checks pass up to the transcript, and then:
+
+- the commit rounds panic, or
+- they return, and the query phase panics. -/
+theorem pcs.fri_panics_iff : type_of% @verify_fri_panics_iff := @verify_fri_panics_iff
+
+/-- The PCS verifier never panics when:
+
+- the three difficulties are safe for the field order p
+- 2^h < p for the adicity h, with h < 64. -/
+theorem pcs.never_panics : type_of% @Plonky3Lean.Proofs.Fri.verify_total := @Plonky3Lean.Proofs.Fri.verify_total
+
+/-- The PCS verifier panics exactly when the zero-difficulty witnesses are zero, and one of these holds:
+
+- the batching difficulty is unsafe, or
+- the batching grind passes, the FRI checks before its transcript pass, and either
+  - some round exists, the counts match, and the commit difficulty is unsafe, or
+  - the commit rounds return and the query difficulty is unsafe. -/
+theorem pcs.panics_iff : type_of% @Plonky3Lean.Proofs.Fri.verify_panics_iff :=
+  @Plonky3Lean.Proofs.Fri.verify_panics_iff
+
+/-- For BabyBear, a grinding difficulty is safe exactly up to 30 bits. -/
+theorem pcs.babyBear_difficulty (b : ℕ) : (b = 0 ∨ (b < 64 ∧ 2 ^ b < 2013265921)) ↔ b ≤ 30 :=
+  powSafe_babyBear b
+
+/-! ## The PCS verifier: completeness -/
+
+/-- The FRI verifier accepts when:
+
+- the checks before the transcript pass, and the transcript accepts
+- the input checks return each query's first value and rolled-in inputs
+- each query sees an honest chain of codewords
+- the final polynomial agrees with the final word
+- the commit-phase scheme accepts the honest rows. -/
+theorem pcs.fri_complete : type_of% @verify_fri_complete := @verify_fri_complete
+
+/-- The PCS verifier accepts when:
+
+- the zero-difficulty witnesses are zero
+- the batching grind passes
+- the FRI verifier accepts. -/
+theorem pcs.complete : type_of% @pcs_verify_complete := @pcs_verify_complete
+
+/-- The input checks pass on honest openings, and leave each query's reduction. -/
+theorem pcs.inputs_honest : type_of% @open_inputs_honest := @open_inputs_honest
+
+/-- One batch's checks pass on rows of the right shape that the scheme accepts. -/
+theorem pcs.batch_honest : type_of% @checkBatch_honest := @checkBatch_honest
+
+/-- The denominator checks pass when no opening point is a query point. -/
+theorem pcs.denominators_honest : type_of% @checkDenominators_honest := @checkDenominators_honest
+
+/-! ## Edge cases -/
+
+/-- Zero queries are rejected. -/
+theorem edge.zero_queries : type_of% @verify_fri_zero_queries := @verify_fri_zero_queries
+
+/-- A blowup of 1 is rejected. -/
+theorem edge.zero_blowup : type_of% @verify_fri_zero_blowup := @verify_fri_zero_blowup
+
+/-- A tallest claimed height past the adicity is rejected. -/
+theorem edge.too_tall : type_of% @verify_fri_too_tall := @verify_fri_too_tall
+
+/-- The prover panics exactly when an opening point is one of the domain points it divides by. -/
+theorem edge.point_in_domain : type_of% @compute_inverse_denominators_eq_none :=
+  @compute_inverse_denominators_eq_none
+
+/-- A domain shorter than one full arity still folds.
+
+With height 2, final height 1 and arity cap 2^3, the schedule folds once by 2.
+
+The security model's layer count for it is (2 - 0) / 3 = 0. -/
+theorem edge.short_round : fold_schedule [2] 1 3 = some [1] ∧ (2 - 0) / 3 = 0 := by decide
 
 /-! ## The transcripts -/
 
