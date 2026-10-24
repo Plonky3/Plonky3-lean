@@ -19,6 +19,7 @@ target `thumbv7em-none-eabi`
 | `batch-stark` | scoped | 116 | 664 | 0 | 52 | 0 | 0 / 0 |  |
 | `binary-dft` | stub |  | 528 | 0 | 50 |  | 0 / 0 |  |
 | `binary-field` | scoped | 21777 | 66 | 0 | 0 | 139 | 7 / 2 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050`, pre `060`, pre `070` |
+| `binary-pcs` | stub |  | 759 | 0 | 10 |  | 0 / 0 |  |
 | `blake2s` | scoped | 148 | 51 | 1 | 0 | 0 | 1 / 0 | pre `010` |
 | `blake3` | scoped | 2609 | 40 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
 | `blake3-crate` | stub |  | 26 | 0 | 3 |  | 0 / 0 |  |
@@ -466,7 +467,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1498) whose dependencies include it; reaching one is not using it.
+(of 1514) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -505,7 +506,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1498) whose dependencies include the declaration.
+counts the claims (of 1514) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -628,11 +629,11 @@ counts the claims (of 1498) whose dependencies include the declaration.
 | `batch-stark` | `p3_batch_stark.checker.mirror.rowBuilder` | `p3_air::DebugConstraintBuilder::new_with_permutation` | not translated | 1 |
 | `batch-stark` | `p3_batch_stark.checker.mirror.eval_air_and_lookups` | `p3_lookup::LookupProtocol::eval_air_and_lookups` | not translated | 1 |
 | `batch-stark` | `p3_batch_stark.checker.mirror.check_constraints` | `p3_batch_stark::check_constraints::check_constraints` | not translated | 1 |
-| `binary-dft` | `p3_binary_dft.mirror.Level.cantorBasis` | `p3_binary_field::tower::TowerLevel::cantor_basis` | stub | 17 |
-| `binary-dft` | `p3_binary_dft.mirror.trailingZeros` | `core::num::usize::trailing_zeros` | stub | 11 |
-| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point.loop` | `p3_binary_dft::domain::domain_point` | stub | 15 |
-| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point` | `p3_binary_dft::domain::domain_point` | stub | 15 |
-| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point_steps` | `p3_binary_dft::domain::domain_point_steps` | stub | 10 |
+| `binary-dft` | `p3_binary_dft.mirror.Level.cantorBasis` | `p3_binary_field::tower::TowerLevel::cantor_basis` | stub | 24 |
+| `binary-dft` | `p3_binary_dft.mirror.trailingZeros` | `core::num::usize::trailing_zeros` | stub | 12 |
+| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point.loop` | `p3_binary_dft::domain::domain_point` | stub | 22 |
+| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point` | `p3_binary_dft::domain::domain_point` | stub | 22 |
+| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point_steps` | `p3_binary_dft::domain::domain_point_steps` | stub | 11 |
 | `binary-dft` | `p3_binary_dft.domain.mirror.subspace_polynomial` | `p3_binary_dft::domain::subspace_polynomial` | stub | 1 |
 | `binary-dft` | `p3_binary_dft.naive.mirror.vanishing` | `p3_binary_dft::naive::normalised_subspace_poly` | stub | 4 |
 | `binary-dft` | `p3_binary_dft.naive.mirror.normalised_subspace_poly` | `p3_binary_dft::naive::normalised_subspace_poly` | stub | 4 |
@@ -678,6 +679,16 @@ counts the claims (of 1498) whose dependencies include the declaration.
 | `binary-dft` | `p3_binary_dft.traits.mirror.shifted_lde_batch` | `p3_binary_dft::traits::AdditiveNtt::shifted_lde_batch` | stub | 1 |
 | `binary-dft` | `p3_binary_dft.encoder.mirror.encode_batch` | `{impl p3_commit::Encoder<BinaryField128> for p3_binary_dft::encoder::AdditiveRsEncoder<BinaryField128, Ntt>}::encode_batch` | stub | 1 |
 | `binary-dft` | `p3_binary_dft.encoder.mirror.encode_batch_padded` | `{impl p3_commit::Encoder<BinaryField128> for p3_binary_dft::encoder::AdditiveRsEncoder<BinaryField128, Ntt>}::encode_batch_padded` | stub | 0 |
+| `binary-pcs` | `p3_binary_pcs.params.mirror.try_new_with_folding` | `p3_binary_pcs::params::BinaryPcsConfig::try_new_with_folding` | stub | 2 |
+| `binary-pcs` | `p3_binary_pcs.params.mirror.BinaryPcsConfig.try_with_folding` | `p3_binary_pcs::params::BinaryPcsConfig::try_with_folding` | stub | 1 |
+| `binary-pcs` | `p3_binary_pcs.params.mirror.BinaryPcsConfig.fold_batches` | `p3_binary_pcs::params::BinaryPcsConfig::fold_batches` | stub | 3 |
+| `binary-pcs` | `p3_binary_pcs.params.mirror.BinaryPcsRegime.max_security_bits` | `p3_security::binary::BinaryPcsRegime::max_security_bits` | stub | 4 |
+| `binary-pcs` | `p3_binary_pcs.transcript.mirror.BinaryPcsShape.new` | `p3_binary_pcs::transcript::BinaryPcsShape::new` | stub | 3 |
+| `binary-pcs` | `p3_binary_pcs.fold.mirror.fold_pair` | `p3_binary_pcs::fold::fold_pair` | stub | 7 |
+| `binary-pcs` | `p3_binary_pcs.fold.mirror.fold_round` | `p3_binary_pcs::fold::fold_round` | stub | 1 |
+| `binary-pcs` | `p3_binary_pcs.fold.mirror.fold_coset` | `p3_binary_pcs::fold::fold_coset` | stub | 3 |
+| `binary-pcs` | `p3_binary_pcs.verifier.mirror.verify_query_paths` | `p3_binary_pcs::verifier::verify_query_paths` | stub | 2 |
+| `binary-pcs` | `p3_binary_pcs.verifier.mirror.verify_opening` | `{impl p3_binary_pcs::pcs::BinaryPcs<F, EF, MT, MX, E>}::verify_opening` | stub | 0 |
 | `blake3-crate` | `blake3.BLOCK_LEN` | `blake3::BLOCK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.CHUNK_LEN` | `blake3::CHUNK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.OUT_LEN` | `blake3::OUT_LEN` | stub | 0 |
@@ -1648,6 +1659,22 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BinaryDft.vanishing.add` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.vanishing.point_eq_zero` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.vanishing.succ` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.bindAll.mle` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.field_error` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.final.uniform` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.fold_batches` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.fold_coset.ntt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.fold_pair.ntt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.fold_pair.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.fold_round.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.security_regime` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.shape` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.towerLevel.fold_pair` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.try_new_with_folding.ok` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.try_new_with_folding.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.try_with_folding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.verify_query_paths.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.verify_query_paths.no_panic` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.blocks_aligned` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.bus_soundness` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.clock_orbit_fields` | `Classical.choice`, `Quot.sound`, `propext` |

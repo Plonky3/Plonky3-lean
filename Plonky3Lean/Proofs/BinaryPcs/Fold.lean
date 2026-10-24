@@ -204,6 +204,11 @@ def bind1 (beta : EF) (e : ℕ → EF) : ℕ → EF := fun k => (1 - beta) * e (
 def bindAll (bs : List EF) (e : ℕ → EF) : ℕ → EF := bs.foldl (fun e b => bind1 b e) e
 
 omit [CharP F 2] in
+/-- Binding two runs of challenges in turn binds their concatenation. -/
+theorem bindAll_append (bs cs : List EF) (e : ℕ → EF) : bindAll cs (bindAll bs e) = bindAll (bs ++ cs) e := by
+  simp [bindAll, List.foldl_append]
+
+omit [CharP F 2] in
 theorem vanishing_congr {β β' : ℕ → F} {j : ℕ} (h : ∀ r < j, β r = β' r) (x : F) :
     vanishing β j x = vanishing β' j x :=
   prod_congr rfl fun m hm => by rw [point_congr (mem_range.mp hm) h]
