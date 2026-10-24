@@ -1,0 +1,14 @@
+# Mutation of: vbicq_u32
+# Breaks:      it clears `a`'s bits from `b`, the operands swapped.
+#
+--- a/src/aarch64/neon.rs
++++ b/src/aarch64/neon.rs
+@@ -116,7 +116,7 @@
+     let mut dst = [0u32; 4];
+     let mut e = 0;
+     while e < 4 {
+-        dst[e] = a.0[e] & !b.0[e];
++        dst[e] = !a.0[e] & b.0[e];
+         e += 1;
+     }
+     uint32x4_t(dst)
