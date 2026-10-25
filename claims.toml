@@ -421,6 +421,22 @@ name   = "Plonky3Lean.Claims.Blake2sAir.generate_binary_trace_packed.panics"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.Blake2sAir.binary.generation.transpose_bits.bit"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Blake2sAir.binary.generation.transpose_bits.eq_mirror"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Blake2sAir.binary.generation.add_planes.eq_mirror"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Blake2sAir.binary.generation.xor_rotate_right.eq_mirror"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.BinaryDft.domain_point.eq"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 

@@ -96,6 +96,7 @@ public import Plonky3Lean.Proofs.Blake2sAir.Degree
 public import Plonky3Lean.Proofs.Blake2sAir.Extracted
 public import Plonky3Lean.Proofs.Blake2sAir.Packed
 public import Plonky3Lean.Proofs.Blake2sAir.Transpose
+public import Plonky3Lean.Proofs.Blake2sAir.TransposeExtracted
 public import Plonky3Lean.Proofs.Blake2sAir.PackedGen
 public import Plonky3Lean.Proofs.Symmetric.Roots
 public import Plonky3Lean.Proofs.Field.BabyBear

@@ -62,6 +62,7 @@ The packed generator fills 64 rows at once, one per bit lane, with every word he
 - It returns exactly the packing of the trace generator's trace.
 - It panics on exactly the same inputs.
 - Its bit-matrix transpose moves bit `c` of row `r` to bit `r` of row `c`.
+- The extracted transpose, adder and rotation on planes compute what the transcription computes.
 - The lanes past the last input stay zero, as the packing needs.
 -/
 
@@ -321,5 +322,33 @@ theorem generate_binary_trace_packed.panics {inputs : List Blake2sCompressionInp
     (h : ¬ ((2 : F) = 0 ∧ inputs.length ≠ 0 ∧ 2 ^ Nat.log 2 inputs.length = inputs.length)) :
     generate_binary_trace_packed (F := F) inputs = none := by
   rw [packed_eq (F := F) inputs 0, generate_binary_trace_rows.panics h, Option.map_none]
+
+/-- The extracted transpose never panics, and moves bit `r` of row `c` to bit `c` of row `r`, for `r, c < 64`. -/
+theorem binary.generation.transpose_bits.bit (rows : Std.Array Std.U64 64#usize) :
+    ∃ out, p3_blake2s_air.binary.generation.transpose_bits rows = .ok out ∧
+      ∀ r < 64, ∀ c < 64, (out.val[r]!).bv.getLsbD c = (rows.val[c]!).bv.getLsbD r :=
+  transpose_bits_extracted_bit rows
+
+/-- The extracted transpose returns the rows of the transcribed transpose. -/
+theorem binary.generation.transpose_bits.eq_mirror (rows : Std.Array Std.U64 64#usize) :
+    ∃ out, p3_blake2s_air.binary.generation.transpose_bits rows = .ok out ∧
+      ∀ i < 64, (out.val[i]!).bv = transpose_bits (fun j => (rows.val[j]!).bv) i :=
+  transpose_bits_extracted rows
+
+/-- The extracted adder on planes returns the planes of the transcribed adder. -/
+theorem binary.generation.add_planes.eq_mirror (x y : Std.Array Std.U64 32#usize) (c : Std.Array Std.U64 31#usize) :
+    ∃ s c', p3_blake2s_air.binary.generation.add_planes x y c = .ok (s, c') ∧
+      (∀ i < 32, (s.val[i]!).bv =
+        (add_planes (fun i => (x.val[i]!).bv) (fun i => (y.val[i]!).bv) (fun i => (c.val[i]!).bv)).1 i) ∧
+      ∀ i < 31, (c'.val[i]!).bv =
+        (add_planes (fun i => (x.val[i]!).bv) (fun i => (y.val[i]!).bv) (fun i => (c.val[i]!).bv)).2 i :=
+  add_planes_extracted x y c
+
+/-- The extracted rotation on planes returns the planes of the transcribed rotation, for an amount below 32. -/
+theorem binary.generation.xor_rotate_right.eq_mirror (x y : Std.Array Std.U64 32#usize) (amount : Std.Usize)
+    (ha : amount.val < 32) :
+    ∃ out, p3_blake2s_air.binary.generation.xor_rotate_right x y amount = .ok out ∧
+      ∀ i < 32, (out.val[i]!).bv = xor_rotate_right (fun i => (x.val[i]!).bv) (fun i => (y.val[i]!).bv) amount.val i :=
+  xor_rotate_right_extracted x y amount ha
 
 end Plonky3Lean.Claims.Blake2sAir

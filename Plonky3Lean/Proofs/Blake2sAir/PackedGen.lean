@@ -1,6 +1,6 @@
 module
 
-public import Plonky3Lean.Proofs.Blake2sAir.Transpose
+public import Plonky3Lean.Proofs.Blake2sAir.TransposeExtracted
 public import Plonky3Lean.Proofs.Blake2sAir.Step
 public import Plonky3Lean.Proofs.Blake2sAir.Trace
 public import Plonky3Lean.Proofs.Air.Pack
@@ -714,5 +714,32 @@ theorem packed_eq (inputs : List Blake2sCompressionInput) (e : ℕ) :
       · have hp : ¬ 2 ^ Nat.log 2 inputs.length = inputs.length := fun hp => hc ⟨h2, hl, hp⟩
         simp [h2, hl, hp]
     · simp [h2]
+
+/-! ## The extracted helpers are the transcribed ones -/
+
+theorem laneWord_eq (p : Aeneas.Std.Array Aeneas.Std.U64 32#usize) (k : ℕ) :
+    laneWord p k = laneW (fun i => (p.val[i]!).bv) k := rfl
+
+/-- The extracted adder on planes returns the transcribed adder's sum and carry planes. -/
+theorem add_planes_extracted (x y : Aeneas.Std.Array Aeneas.Std.U64 32#usize) (c : Aeneas.Std.Array Aeneas.Std.U64 31#usize) :
+    ∃ s c', p3_blake2s_air.binary.generation.add_planes x y c = .ok (s, c') ∧
+      (∀ i < 32, (s.val[i]!).bv =
+        (add_planes (fun i => (x.val[i]!).bv) (fun i => (y.val[i]!).bv) (fun i => (c.val[i]!).bv)).1 i) ∧
+      ∀ i < 31, (c'.val[i]!).bv =
+        (add_planes (fun i => (x.val[i]!).bv) (fun i => (y.val[i]!).bv) (fun i => (c.val[i]!).bv)).2 i := by
+  obtain ⟨s, c', h, hs, hc⟩ := add_planes_spec x y c
+  refine ⟨s, c', h, fun i hi => BitVec.eq_of_getLsbD_eq fun k _ => ?_, fun i hi => BitVec.eq_of_getLsbD_eq fun k _ => ?_⟩
+  · rw [← laneW_bit _ k hi, add_planes_sum, ← laneWord_eq, ← laneWord_eq, ← hs k, laneWord_eq, laneW_bit _ k hi]
+  · rw [hc k i hi, add_planes_carries _ _ _ _ hi, laneWord_eq, laneWord_eq]
+
+/-- The extracted rotation on planes returns the transcribed rotation's planes. -/
+theorem xor_rotate_right_extracted (x y : Aeneas.Std.Array Aeneas.Std.U64 32#usize) (amount : Aeneas.Std.Usize) (ha : amount.val < 32) :
+    ∃ out, p3_blake2s_air.binary.generation.xor_rotate_right x y amount = .ok out ∧
+      ∀ i < 32, (out.val[i]!).bv =
+        xor_rotate_right (fun i => (x.val[i]!).bv) (fun i => (y.val[i]!).bv) amount.val i := by
+  obtain ⟨out, h, ho⟩ := xor_rotate_right_spec x y amount ha
+  refine ⟨out, h, fun i hi => BitVec.eq_of_getLsbD_eq fun k _ => ?_⟩
+  rw [← laneW_bit _ k hi, xor_rotate_right_lane _ _ ha, ← laneWord_eq, ← laneWord_eq, ← ho k, laneWord_eq,
+    laneW_bit _ k hi]
 
 end Plonky3Lean.Proofs.Blake2sAir
