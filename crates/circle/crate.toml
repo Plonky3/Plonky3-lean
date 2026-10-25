@@ -355,6 +355,14 @@ lean = "p3_circle.prover.mirror.pairsOf"
 rust = "p3_circle::folding::fold_y"
 
 [[mirror]]
+lean = "p3_circle.prover.mirror.compute_lagrange_den_on_domain"
+rust = "p3_circle::point::compute_lagrange_den_on_domain"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.evaluate_at_point_with_den"
+rust = "p3_circle::cfft::CircleEvaluations::evaluate_at_point_with_den"
+
+[[mirror]]
 lean = "p3_circle.prover.mirror.openMatrix"
 rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open"
 

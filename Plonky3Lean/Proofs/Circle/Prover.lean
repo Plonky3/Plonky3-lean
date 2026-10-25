@@ -2,6 +2,7 @@ module
 
 public import P3Circle.Prover
 public import Plonky3Lean.Proofs.Circle.Honest
+public import Plonky3Lean.Proofs.Circle.Bary
 
 @[expose] public section
 
@@ -1067,11 +1068,83 @@ theorem claimHeights_claimsOf (immcs : MmcsOps K) (lb : ℕ) (hb : List (List (H
   simp only [claimHeights, claimsOf, List.flatMap_map, List.map_flatten, List.map_map]
   rfl
 
-theorem openedValues_honest {lb : ℕ} (eval_at : ℕ → List (List K) → Point K → List K) (hb : List (List (HMat K)))
+/-! ## The opened values: the circle Lagrange evaluation -/
+
+/-- The first 2^s points of the LDE domain of height h, in circle FFT order, are a twin coset of size 2^s.
+
+Its shift is the LDE's shift, the generator of order 2^(h + 1). -/
+theorem twinList_prefix (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {h s : ℕ} (hs : 1 ≤ s) (hsh : s ≤ h)
+    (hG : h + 1 ≤ G.adicity) : TwinList s (genPt G (h + 1)) fun r => ptD G h (cfft_permute_index r h) := by
+  have hsh' : 2 ^ s ≤ 2 ^ h := Nat.pow_le_pow_right two_pos hsh
+  refine ⟨fun i hi j hj hij => ?_, fun r hr => ?_⟩
+  · have hk := List.inj_on_of_nodup_map (standard_nodup hV h2 hG)
+      (List.mem_range.mpr (cfft_permute_index_lt h i)) (List.mem_range.mpr (cfft_permute_index_lt h j)) hij
+    rw [← cfft_permute_index_involutive (show i < 2 ^ h by omega), hk,
+      cfft_permute_index_involutive (show j < 2 ^ h by omega)]
+  obtain ⟨n, rfl⟩ : ∃ n, h = n + 1 := ⟨h - 1, by omega⟩
+  have hj : r / 2 < 2 ^ (s - 1) := by
+    rw [show 2 ^ s = 2 ^ (s - 1) * 2 by rw [← pow_succ]; congr 1; omega] at hr; omega
+  have hjn : r / 2 < 2 ^ n := lt_of_lt_of_le hj (Nat.pow_le_pow_right two_pos (by omega))
+  obtain ⟨he, ho⟩ := ptD_pair hV (show n + 2 ≤ G.adicity by omega) hjn
+  have hz : 2 ^ (s - 1) • rev n (r / 2) • genPt G n = 0 := by
+    have hrev : rev n (r / 2) = rev (s - 1) (r / 2) * 2 ^ (n - (s - 1)) := by
+      have := Plonky3Lean.Proofs.Matrix.bitRev_add_of_lt (k := n - (s - 1)) hj
+      rwa [show s - 1 + (n - (s - 1)) = n by omega] at this
+    rw [hrev, smul_smul, show 2 ^ (s - 1) * (rev (s - 1) (r / 2) * 2 ^ (n - (s - 1))) = 2 ^ n * rev (s - 1) (r / 2) by
+      rw [mul_left_comm, ← pow_add, show s - 1 + (n - (s - 1)) = n by omega, mul_comm], mul_nsmul,
+      genPt_order_zero hV (by omega), smul_zero]
+  rcases Nat.even_or_odd' r with ⟨j, rfl | rfl⟩
+  · rw [show 2 * j / 2 = j by omega] at he hz
+    simp [he, smul_add, hz]
+  · rw [show (2 * j + 1) / 2 = j by omega] at ho hz
+    simp [ho, smul_add, hz, show (2 * j + 1) % 2 = 1 by omega]
+
+/-- The prover opens an honest matrix at its points to the columns' values there.
+
+Take a matrix whose columns lie in the FFT space of the trace size 2^n, n >= 2.
+
+Take opening points on the circle and off the LDE domain. -/
+theorem openMatrix_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {lb : ℕ} (m : HMat K)
+    (hn : 2 ≤ m.1.domain.log_n) (hG : hgt lb m + 1 ≤ G.adicity)
+    (hfft : ∀ f ∈ m.2, IsFftPoly (2 ^ (m.1.domain.log_n - 1)) f)
+    (hvals : ∀ p ∈ m.1.points, p.values = m.2.map (· (ptOf p.point)))
+    (hcirc : ∀ p ∈ m.1.points, 1 + p.point * p.point ≠ 0)
+    (hoff : ∀ p ∈ m.1.points, ∀ k < 2 ^ hgt lb m, ptOf p.point ≠ ptD G (hgt lb m) k) :
+    openMatrix G lb (ldeMat G lb m) (m.1.points.map (·.point)) = some (m.1.points.map (·.values)) := by
+  unfold openMatrix
+  simp only [ldeMat, log2Strict_pow, Option.bind_eq_bind, Option.bind_some]
+  set s := m.1.domain.log_n
+  set h := hgt lb m
+  have hsh : s ≤ h := by unfold h hgt; omega
+  have hP := twinList_prefix hV h2 (show 1 ≤ s by omega) hsh hG
+  have htake : ((List.range (2 ^ h)).map fun i => ofC (ptD G h (cfft_permute_index i h))).take (2 ^ s) =
+      (List.range (2 ^ s)).map fun i => ofC (ptD G h (cfft_permute_index i h)) := by
+    rw [← List.map_take, List.take_range, min_eq_left (Nat.pow_le_pow_right two_pos hsh)]
+  simp only [permutedPoints_eq hV (show 1 ≤ h by omega) hG, standard_eq hV h hG, show ¬ h < lb by unfold h hgt; omega,
+    ↓reduceIte, show h - lb = s by unfold h hgt; omega, CircleDomain.new, Option.bind_some, htake]
+  rw [List.mapM_map]
+  refine mapM_eq_some_map _ _ _ fun p hp => ?_
+  have hs1 : s - 1 + 1 = s := by omega
+  have hZ : ∀ i < 2 ^ s, (ptOf p.point - ptD G h (cfft_permute_index i h)).y ≠ 0 := fun i hi => by
+    refine sub_y_ne_zero (m := s - 1) (c := vn s (genPt G (h + 1))) h2 (by omega) (by rw [hP.card, hs1]) (fun Q hQ => ?_) (fun hZ => ?_)
+      (TwinList.mem.mpr ⟨i, hi, rfl⟩)
+    · obtain ⟨j, hj, rfl⟩ := TwinList.mem.mp hQ; rw [hs1]; exact hP.vn_eq hj
+    · obtain ⟨j, -, hj⟩ := TwinList.mem.mp hZ
+      exact hoff p hp _ (cfft_permute_index_lt h j) hj.symm
+  simp only [Function.comp_apply, ofC_ptOf (hcirc p hp), Option.bind_some,
+    compute_lagrange_den_eq h2 (show 1 ≤ s by omega) hP _ hZ]
+  rw [evaluate_at_point_with_den_eq h2 (show 1 ≤ s by omega) hP ⟨2 ^ s, m.2.length, _⟩ rfl (fun c => m.2.get c)
+    (fun c => hfft _ (List.get_mem _ _)) (fun r _ c => rfl) _ hZ, hvals p hp]
+  exact congrArg some (finRange_map_get_apply m.2 _)
+
+/-- The prover's opened values of honest batches are the claimed values. -/
+theorem openedValues_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {lb H : ℕ} (hb : List (List (HMat K)))
+    (hc : ∀ m ∈ hb.flatten, 2 ≤ m.1.domain.log_n ∧ hgt lb m ≤ H) (hG : H + 1 ≤ G.adicity)
+    (hfft : ∀ m ∈ hb.flatten, ∀ f ∈ m.2, IsFftPoly (2 ^ (m.1.domain.log_n - 1)) f)
+    (hvals : ∀ m ∈ hb.flatten, ∀ p ∈ m.1.points, p.values = m.2.map (· (ptOf p.point)))
     (hcirc : ∀ m ∈ hb.flatten, ∀ p ∈ m.1.points, 1 + p.point * p.point ≠ 0)
-    (heval : ∀ m ∈ hb.flatten, ∀ p ∈ m.1.points, eval_at m.1.domain.log_n
-      ((rowsOf (ldeMat G lb m)).take (2 ^ m.1.domain.log_n)) (ofC (ptOf p.point)) = p.values) :
-    openedValues lb eval_at (hb.map fun ms => (ms.map (ldeMat G lb), ms.map fun m => m.1.points.map (·.point))) =
+    (hoff : ∀ m ∈ hb.flatten, ∀ p ∈ m.1.points, ∀ k < 2 ^ hgt lb m, ptOf p.point ≠ ptD G (hgt lb m) k) :
+    openedValues G lb (hb.map fun ms => (ms.map (ldeMat G lb), ms.map fun m => m.1.points.map (·.point))) =
       some (valuesOf hb) := by
   unfold openedValues valuesOf
   rw [List.mapM_map]
@@ -1080,12 +1153,9 @@ theorem openedValues_honest {lb : ℕ} (eval_at : ℕ → List (List K) → Poin
   simp only [Function.comp_apply, List.length_map, ne_eq, not_true_eq_false, ↓reduceIte]
   rw [zip_map_map, List.mapM_map]
   refine mapM_eq_some_map _ _ _ fun m hm => ?_
-  simp only [Function.comp_apply, openMatrix, ldeMat, log2Strict_pow, Option.bind_eq_bind, Option.bind_some,
-    show ¬ hgt lb m < lb by unfold hgt; omega, ↓reduceIte, show hgt lb m - lb = m.1.domain.log_n by unfold hgt; omega]
-  rw [List.mapM_map]
-  refine mapM_eq_some_map _ _ _ fun p hp => ?_
-  rw [Function.comp_apply, ofC_ptOf (hcirc m (hms' m hm) p hp), Option.map_some]
-  exact congrArg some (heval m (hms' m hm) p hp)
+  have hm' := hms' m hm
+  exact openMatrix_honest hV h2 m (hc m hm').1 (by have := (hc m hm').2; omega) (hfft m hm') (hvals m hm')
+    (hcirc m hm') (hoff m hm')
 
 theorem max?_eq_foldl {l : List ℕ} {H : ℕ} (h : l.max? = some H) : l.foldl max 0 = H := by
   obtain ⟨hmem, hle⟩ := List.max?_eq_some_iff.mp h
@@ -1240,11 +1310,9 @@ theorem Xg_eq_Xp {H k : ℕ} (hk : k + 2 ≤ H) (j : ℕ) : Xg G (H - 1) k j = X
 
 /-- Completeness of the circle PCS, prover to verifier.
 
-Take honest batches: columns of degree below the trace size, committed as their LDEs in circle FFT order.
+Take honest batches: columns of the FFT space of the trace size, committed as their LDEs in circle FFT order.
 
 Take opening points on the circle and off the LDE domain.
-
-Take an evaluation that returns the columns' values there.
 
 Take commitment schemes that open and accept honestly, and prover and verifier transcripts that agree.
 
@@ -1254,13 +1322,12 @@ theorem open_verify_complete (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) (immcs
     (tp : CircleProverTx K fmmcs.Commitment Sp) (tv : CircleVerifierTx K fmmcs.Commitment Sv)
     {Rel : Sp → Sv → Prop} (params : FriParameters) {H : ℕ} (agree : TxAgree params H tp tv Rel) (sp : Sp) (sv : Sv)
     (hrel : Rel sp sv) (harity : params.max_log_arity = 1) (hq : params.num_queries ≠ 0)
-    (hlb : 1 ≤ params.log_blowup) (eval_at : ℕ → List (List K) → Point K → List K) {hb : List (List (HMat K))}
+    (hlb : 1 ≤ params.log_blowup) {hb : List (List (HMat K))}
     (hc : HonestClaims G params.log_blowup H (claimsOf G immcs params.log_blowup hb) hb)
     (hne : ∀ ms ∈ hb, ms ≠ []) (hmax : (hb.flatten.map (hgt params.log_blowup)).max? = some H)
     (hG : H + 1 ≤ G.adicity)
-    (heval : ∀ m ∈ hb.flatten, ∀ p ∈ m.1.points, eval_at m.1.domain.log_n
-      ((rowsOf (ldeMat G params.log_blowup m)).take (2 ^ m.1.domain.log_n)) (ofC (ptOf p.point)) = p.values) :
-    ∃ proof, open_ G immcs fmmcs tp params eval_at (requestsOf G immcs params.log_blowup hb) sp =
+    (hfft : ∀ m ∈ hb.flatten, ∀ f ∈ m.2, IsFftPoly (2 ^ (m.1.domain.log_n - 1)) f) :
+    ∃ proof, open_ G immcs fmmcs tp params (requestsOf G immcs params.log_blowup hb) sp =
         some (valuesOf hb, proof) ∧
       verify G immcs fmmcs tv params (claimsOf G immcs params.log_blowup hb) proof sv = pure () := by
   set lb := params.log_blowup
@@ -1283,7 +1350,8 @@ theorem open_verify_complete (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) (immcs
     simp [log2Strict_pow]
   unfold open_
   simp only [hmr]
-  rw [openedValues_honest eval_at hb hcirc heval]
+  rw [openedValues_honest hV h2 hb (fun m hm => ⟨hc.log_n m hm, hc.height m hm⟩) hG hfft hc.values hcirc
+    hc.off_domain]
   simp only [Option.bind_eq_bind, Option.bind_some]
   rw [hlogmax, Option.bind_some, proverClaims_honest hb hcirc, Option.bind_some]
   set α := (tp.batch_phase sp (claimsZOf hb)).1

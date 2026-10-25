@@ -5,7 +5,9 @@ What a transcription abstracts, beyond the models of the verifier:
 
 - the base field and its extension are one mathlib field K, base values read through their embedding
 - the commitment schemes' methods are fields of records, as in p3-fri's model
-- the opened values come from a parameter: the Lagrange interpolation on the trace-size prefix of the LDE
+- the Lagrange denominators, cached per height and point, are recomputed, which gives the cached values
+- a matrix opened at two points is read once for both, which gives the two single-point evaluations
+- the first rows of a matrix are the matrix cut to that height
 - a wide matrix's reduction through the lifted transform is the plain row reduction, which the crate tests it equals
 - the domain's points through the parallel chain are its points, in natural order
 - a map keyed by height is a function of the height and its list of keys, read in increasing order
@@ -58,33 +60,81 @@ def pairsOf (m : Mat K) : List (K × K) :=
   (List.range m.height).map fun r => (if h : 0 < m.width then m.entry r ⟨0, h⟩ else 0,
     if h : 1 < m.width then m.entry r ⟨1, h⟩ else 0)
 
+/-- The Lagrange denominators of the points toward a point: ((at - p).x + 1) / ((at - p).y s_i).
+
+Here s_i is the selector normalizer of the shift at an even index i, and its negation at an odd one.
+
+It debug-asserts:
+
+- 2^log_n points
+- that the normalizer of the point is s_i at the indices 0, 1, n - 2 and n - 1.
+
+A zero denominator panics in the batch inversion. -/
+def compute_lagrange_den_on_domain (points : List (Point K)) (at_ : Point K) (domain : CircleDomain K) :
+    Option (List K) := do
+  let n := points.length
+  if n ≠ 2 ^ domain.log_n then none
+  let s_p_at_shift ← Point.s_p_at_p domain.shift domain.log_n
+  let s_p_at_index := fun (i : ℕ) => if i % 2 = 0 then s_p_at_shift else -s_p_at_shift
+  if n < 2 then none
+  let ok ← [0, 1, n - 2, n - 1].allM fun i => do
+    let p ← points[i]?
+    let s ← Point.s_p_at_p p domain.log_n
+    pure (decide (s = s_p_at_index i))
+  if !ok then none
+  let diffs := points.zipIdx.map fun (pt, i) =>
+    let diff := Point.sub at_ pt
+    (diff.x + 1, diff.y * s_p_at_index i)
+  let inv_d ← batchInv (diffs.map (·.2))
+  pure (List.zipWith (· * ·) (diffs.map (·.1)) inv_d)
+
+/-- The columns at a point, from the Lagrange denominators: v_D(point) times sum_r den_r row_r.
+
+It asserts one denominator per row. -/
+def evaluate_at_point_with_den (domain : CircleDomain K) (m : Mat K) (point : Point K) (den : List K) :
+    Option (List K) := do
+  let num ← CircleDomain.vanishing_poly domain point
+  if den.length ≠ m.height then none
+  pure ((List.finRange m.width).map fun c =>
+    ((List.range m.height).map fun r => den.getD r 0 * m.entry r c).sum * num)
+
 variable (G : Gen (K × K))
-
-/-- The opened values of one matrix at its points.
-
-The evaluation reads the first 2^(log_height - log_blowup) rows, the LDE on the trace-size twin coset. -/
-def openMatrix (log_blowup : ℕ) (eval_at : ℕ → List (List K) → Point K → List K) (mat : Mat K)
-    (points : List K) : Option (List (List K)) := do
-  let log_height ← log2Strict mat.height
-  if log_height < log_blowup then none
-  let log_sub := log_height - log_blowup
-  points.mapM fun t => (Point.from_projective_line t).map fun zeta =>
-    eval_at log_sub ((rowsOf mat).take (2 ^ log_sub)) zeta
-
-/-- The opened values of every matrix of every round.
-
-It asserts one point list per matrix. -/
-def openedValues (log_blowup : ℕ) (eval_at : ℕ → List (List K) → Point K → List K)
-    (rounds : List (List (Mat K) × List (List K))) : Option (List (List (List (List K)))) :=
-  rounds.mapM fun r => do
-    if r.1.length ≠ r.2.length then none
-    (r.1.zip r.2).mapM fun mp => openMatrix log_blowup eval_at mp.1 mp.2
 
 /-- The domain points of height h, in circle FFT order. -/
 def permutedPoints (h : ℕ) : Option (List (Point K)) := do
   let d ← CircleDomain.standard G h
   let pts ← CircleDomain.points G d
   cfft_permute_slice pts
+
+/-- The opened values of one matrix at its points.
+
+The evaluation reads the first 2^(log_height - log_blowup) rows.
+
+They hold the LDE on the twin coset of the trace size with the LDE's shift.
+
+Its points are the first points of the LDE domain in circle FFT order. -/
+def openMatrix (log_blowup : ℕ) (mat : Mat K) (points : List K) : Option (List (List K)) := do
+  let log_height ← log2Strict mat.height
+  let pts ← permutedPoints G log_height
+  if log_height < log_blowup then none
+  let log_sub := log_height - log_blowup
+  let sub_height := 2 ^ log_sub
+  let std ← CircleDomain.standard G log_height
+  let sub_domain := CircleDomain.new log_sub std.shift
+  let evals : Mat K := ⟨sub_height, mat.width, mat.entry⟩
+  points.mapM fun t => do
+    let zeta ← Point.from_projective_line t
+    let den ← compute_lagrange_den_on_domain (pts.take sub_height) zeta sub_domain
+    evaluate_at_point_with_den sub_domain evals zeta den
+
+/-- The opened values of every matrix of every round.
+
+It asserts one point list per matrix. -/
+def openedValues (log_blowup : ℕ) (rounds : List (List (Mat K) × List (List K))) :
+    Option (List (List (List (List K)))) :=
+  rounds.mapM fun r => do
+    if r.1.length ≠ r.2.length then none
+    (r.1.zip r.2).mapM fun mp => openMatrix G log_blowup mp.1 mp.2
 
 /-- Add one matrix's DEEP quotients to the reduced openings of its height.
 
@@ -195,12 +245,12 @@ commits and folds the first layer, runs circle FRI, and answers the queries.
 
 Circle FRI asserts arity 2, at least one query and a positive blowup, and inputs of non-increasing lengths. -/
 def open_ (immcs fmmcs : MmcsOps K) {S : Type _} (tx : CircleProverTx K fmmcs.Commitment S) (params : FriParameters)
-    (eval_at : ℕ → List (List K) → Point K → List K) (rounds : List (immcs.ProverData × List (List K)))
+    (rounds : List (immcs.ProverData × List (List K)))
     (s : S) :
     Option (List (List (List (List K))) × CirclePcsProof K fmmcs.Commitment immcs.MultiProof fmmcs.MultiProof) := do
   let log_blowup := params.log_blowup
   let mrounds := rounds.map fun r => (immcs.get_matrices r.1, r.2)
-  let values ← openedValues log_blowup eval_at mrounds
+  let values ← openedValues G log_blowup mrounds
   let log_max_height ← (mrounds.flatMap fun r => r.1.map Mat.height).max? >>= log2Strict
   let claims ← (mrounds.zip values).flatMap (fun rv => (rv.1.2.zip rv.2).flatMap fun pv =>
       pv.1.zip pv.2) |>.mapM fun tv => (Point.from_projective_line tv.1).map fun z => (z, tv.2)

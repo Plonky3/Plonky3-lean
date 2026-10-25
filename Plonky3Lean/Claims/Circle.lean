@@ -163,14 +163,76 @@ theorem pcs.complete : type_of% @Plonky3Lean.Proofs.Circle.verify_complete_hones
 
 /-- The verifier accepts what the honest prover opens.
 
-- the batches hold columns of degree below the trace size, committed as their LDEs in circle FFT order
-- the opening points lie on the circle and off the LDE domain, and the evaluation returns the columns there
+- the batches hold columns of the FFT space of the trace size, committed as their LDEs in circle FFT order
+- the opening points lie on the circle and off the LDE domain
 - both commitment schemes open and accept honestly
 - the prover's and the verifier's transcripts agree.
 
-Then the prover returns the claimed values and a proof, and the verifier accepts the proof. -/
+Then the prover returns the claimed values and a proof, and the verifier accepts the proof.
+
+The opened values come from the crate's Lagrange evaluation, which is proven, not assumed. -/
 theorem pcs.open_complete : type_of% @Plonky3Lean.Proofs.Circle.open_verify_complete :=
   @Plonky3Lean.Proofs.Circle.open_verify_complete
+
+/-- The prover opens an honest matrix to its columns' values.
+
+- the columns lie in the FFT space of the trace size 2^n, with n >= 2
+- the opening points lie on the circle and off the LDE domain.
+
+The evaluation reads the first 2^n rows of the LDE, a twin coset of size 2^n. -/
+theorem pcs.open_matrix : type_of% @Plonky3Lean.Proofs.Circle.openMatrix_honest :=
+  @Plonky3Lean.Proofs.Circle.openMatrix_honest
+
+/-! ## The Lagrange evaluation on a twin coset, Section 3.3 -/
+
+/-- The circle barycentric formula.
+
+Take 2^(m+1) distinct points on which v_(m+1) is a constant c, and f in the FFT space of order m + 1.
+
+Take Z with (Z - P).y nonzero for every point P.
+
+Then f(Z) is (v_(m+1)(Z) - c) times the sum over P of f(P) ((Z - P).x + 1) / ((Z - P).y s_P).
+
+Here s_P = -2 P.y v_(m+1)'(P.x). -/
+theorem bary.formula : type_of% @Plonky3Lean.Proofs.Circle.bary := @Plonky3Lean.Proofs.Circle.bary
+
+/-- An FFT-space function of order m + 1 that vanishes on such 2^(m+1) points vanishes everywhere. -/
+theorem bary.unique : type_of% @Plonky3Lean.Proofs.Circle.IsFftPoly.eq_zero :=
+  @Plonky3Lean.Proofs.Circle.IsFftPoly.eq_zero
+
+/-- Outside the FFT space the formula is wrong by the v_(m+1) component.
+
+For f of degree 2^m with v_(m+1) component mu, it returns f(Z) - mu (v_(m+1)(Z) - c). -/
+theorem bary.v_component : type_of% @Plonky3Lean.Proofs.Circle.bary_circlePoly :=
+  @Plonky3Lean.Proofs.Circle.bary_circlePoly
+
+/-- On a twin coset of size at least 4, a point off the coset is off every pole of the formula. -/
+theorem bary.off_poles : type_of% @Plonky3Lean.Proofs.Circle.sub_y_ne_zero :=
+  @Plonky3Lean.Proofs.Circle.sub_y_ne_zero
+
+/-- The crate's Lagrange denominators pass their debug assertions.
+
+At a point off every pole they are ((Z - P_i).x + 1) / ((Z - P_i).y s_(P_i)). -/
+theorem bary.denominators : type_of% @Plonky3Lean.Proofs.Circle.compute_lagrange_den_eq :=
+  @Plonky3Lean.Proofs.Circle.compute_lagrange_den_eq
+
+/-- From those denominators, the crate's evaluation returns the columns' values at the point. -/
+theorem bary.evaluate : type_of% @Plonky3Lean.Proofs.Circle.evaluate_at_point_with_den_eq :=
+  @Plonky3Lean.Proofs.Circle.evaluate_at_point_with_den_eq
+
+/-- On a twin coset of size at least 4, the denominators panic exactly on the coset. -/
+theorem bary.panics_iff : type_of% @Plonky3Lean.Proofs.Circle.compute_lagrange_den_none_iff :=
+  @Plonky3Lean.Proofs.Circle.compute_lagrange_den_none_iff
+
+/-- On a twin coset of size 2 with nonzero x-coordinates, the denominators panic off the coset.
+
+The antipode of the first point is off the coset, and it is the pole of that point's term. -/
+theorem bary.size_two_panics : type_of% @Plonky3Lean.Proofs.Circle.compute_lagrange_den_size_two :=
+  @Plonky3Lean.Proofs.Circle.compute_lagrange_den_size_two
+
+/-- On a domain of one point, the denominators panic. -/
+theorem bary.size_one_panics : type_of% @Plonky3Lean.Proofs.Circle.compute_lagrange_den_log_zero :=
+  @Plonky3Lean.Proofs.Circle.compute_lagrange_den_log_zero
 
 /-! ## The DEEP quotient lemma, Section 3 -/
 
