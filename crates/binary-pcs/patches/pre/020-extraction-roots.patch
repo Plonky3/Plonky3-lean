@@ -1,0 +1,80 @@
+# Patch:        020-extraction-roots
+# Phase:        pre
+# Target:       binary-pcs/src/hax_roots.rs, binary-pcs/src/lib.rs
+# Hunks:        2
+# Class:        bound
+# Gap:          docs/extractor-issues.md 4 (aeneas drops a method that no free
+#               function calls).
+# Cost:         none in a normal build: the module exists only under
+#               cfg(hax_backend_lean). In the extracted variant it adds free
+#               functions, each of which calls one item of the crate.
+#               No existing body changes.
+# Upstreamable: no: the module exists only for the extractor.
+# Drop when:    charon orders `--start-from` methods, so that the methods
+#               themselves can be roots.
+# Test:         lint p3-binary-pcs unexpected_cfgs
+# Mutation:     the module is gated on a misspelled cfg, so a normal
+#               `cargo check` reports `unexpected_cfgs`.
+#
+# The roots are the schedule's methods:
+#
+# - the constructor, which reads the query count and the security ceiling of p3-security;
+# - the change of folding factor, which reads the security ceiling;
+# - the batch count;
+# - the transcript shape's constructor.
+#
+# The fold of a pair is a free function, and crate.toml roots it directly.
+#
+diff --git a/binary-pcs/src/hax_roots.rs b/binary-pcs/src/hax_roots.rs
+new file mode 100644
+index 00000000..08d0e207
+--- /dev/null
++++ b/binary-pcs/src/hax_roots.rs
+@@ -0,0 +1,33 @@
++//! PATCHED: extraction roots for hax's Lean backend, compiled only under `cfg(hax_backend_lean)`.
++//!
++//! Aeneas drops a method that no free function calls (Plonky3-lean, docs/extractor-issues.md, 4).
++//! Each function here calls one item and does nothing else, so that the item's own body is extracted.
++
++use p3_binary_dft::EncodableLevel;
++use p3_binary_field::TowerLevel;
++
++use crate::params::{BinaryPcsConfig, BinaryPcsConfigError, BinaryPcsParams};
++use crate::transcript::BinaryPcsShape;
++
++pub fn try_new_with_folding<F: EncodableLevel, EF: TowerLevel>(
++    num_variables: usize,
++    params: BinaryPcsParams,
++    log_folding_factor: usize,
++) -> Result<BinaryPcsConfig, BinaryPcsConfigError> {
++    BinaryPcsConfig::try_new_with_folding::<F, EF>(num_variables, params, log_folding_factor)
++}
++
++pub fn try_with_folding(
++    config: BinaryPcsConfig,
++    log_folding_factor: usize,
++) -> Result<BinaryPcsConfig, BinaryPcsConfigError> {
++    config.try_with_folding(log_folding_factor)
++}
++
++pub fn num_fold_batches(config: &BinaryPcsConfig) -> usize {
++    config.num_fold_batches()
++}
++
++pub fn shape_new(config: &BinaryPcsConfig) -> BinaryPcsShape {
++    BinaryPcsShape::new(config)
++}
+diff --git a/binary-pcs/src/lib.rs b/binary-pcs/src/lib.rs
+index 83ca4a39..4c5b2bf9 100644
+--- a/binary-pcs/src/lib.rs
++++ b/binary-pcs/src/lib.rs
+@@ -11,6 +11,9 @@ mod boolean_trace_transcript;
+ mod error;
+ mod fold;
+ mod grouped_mmcs;
++// PATCHED: extraction roots, only under hax's Lean backend.
++#[cfg(hax_backend_lean)]
++pub mod hax_roots;
+ mod mixed_trace;
+ mod packing;
+ mod params;

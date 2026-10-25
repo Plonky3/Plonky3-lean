@@ -13,8 +13,8 @@ The opening protocol is its claim capacity check, its table counts and its batch
 -/
 module
 
-public import P3BinaryPcs.Fold
-public import P3BinaryPcs.Transcript
+public import P3BinaryPcs.Mirror.Fold
+public import P3BinaryPcs.Mirror.Transcript
 
 @[expose] public section
 

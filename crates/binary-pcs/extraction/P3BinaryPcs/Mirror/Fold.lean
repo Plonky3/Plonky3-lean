@@ -9,7 +9,7 @@ The packed route is not transcribed.
 -/
 module
 
-public import P3BinaryPcs.Model
+public import P3BinaryPcs.Mirror.Model
 
 @[expose] public section
 

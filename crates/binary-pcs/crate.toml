@@ -2,12 +2,27 @@
 
 lean_lib = "P3BinaryPcs"
 
-# Nothing is extracted.
+# Extracted, generic over the tower-level and encodable-level traits:
 #
-# The crate is generic over the tower-level, challenger and Merkle traits, which aeneas rejects (docs/extractor-issues.md 9).
+# - the fold of one pair;
+# - the schedule's constructor, its change of folding factor and its batch count;
+# - the transcript shape.
 #
-# The schedule, the transcript shape, the fold and the verifier are transcribed over fields in stub/P3BinaryPcs/.
-state = "stub"
+# Pre-patch 020 roots the methods through free functions.
+#
+# Not extracted:
+#
+# - the coset fold: aeneas stops on its in-place layer loop with an internal error;
+# - the query-coset fold: aeneas stops on its slice pattern (an inconsistent projection);
+# - the challenger, Merkle and transcript code, which hold mutable borrows of the challenger.
+#
+# Those are transcribed over fields in extraction/P3BinaryPcs/Mirror/ (docs/extractor-issues.md 244).
+state = "scoped"
+
+start_from = [
+  "p3_binary_pcs::fold::fold_pair",
+  "p3_binary_pcs::hax_roots",
+]
 
 features = []
 

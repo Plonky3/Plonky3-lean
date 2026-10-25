@@ -5,8 +5,8 @@ The draw of distinct pairs is the challenger's rejection loop, which keeps a can
 -/
 module
 
-public import P3BinaryPcs.Model
-public import P3BinaryPcs.Params
+public import P3BinaryPcs.Mirror.Model
+public import P3BinaryPcs.Mirror.Params
 
 @[expose] public section
 

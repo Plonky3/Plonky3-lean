@@ -332,11 +332,12 @@ keeps its number and says so.
     - p3-multi-stark needed the same import as p3-sumcheck, and the same bound at 15 sites (pre-patches `multi-stark/010` and `020`);
     - rustc panicked on p3-binary-pcs ("escaping bound vars") while reporting the same unmet bound on a serde derive, at 13 sites (pre-patch `binary-pcs/010`).
 
-    p3-binary-pcs still extracts nothing that can be proved:
+    p3-binary-pcs now extracts, generic over the tower-level trait:
 
-    - its configuration constructor reads the query count, which p3-security computes in floating point (19);
-    - the fold of a pair calls p3-binary-dft's domain, which is a stub;
-    - the change of folding factor extracts, but p3-security's security ceiling uses saturating operations without an exposed body (22).
+    - p3-binary-dft is scoped at its domain points and subspace polynomials;
+    - P3BinaryField and P3BinaryDft declare the tower-level and encodable-level traits by hand, as aeneas would emit them;
+    - `P3Security/Mirror/Queries.lean` assumes the floating-point query count as an opaque function (19);
+    - post-patches `security/020` and `binary-pcs/010` expose the saturating operations (22).
 
     p3-bus's name check, RAM validation and RAM layout do not extract either; pre-patch `bus/010` says why for each.
 
@@ -381,6 +382,18 @@ keeps its number and says so.
     Its call site passes a pair literal, so the term is not type-correct at reducible transparency, and `simp` rejects every goal that contains it.
 
     Post-patch `word/030` marks the three such states of p3-word reducible.
+
+244. **aeneas stops on three binary-field items.**
+
+    p3-binary-dft's domain steps accumulate into a captured variable, and their closure gets a back function, as in 60.
+
+    The generated `call_once` then does not elaborate against CoreModels' `FnOnce`.
+
+    p3-binary-pcs's coset fold rewrites its scratch buffer in place across layers, and aeneas reports an internal error on that loop.
+
+    The verifier's query-coset fold matches its challenges against a one-element slice pattern, and aeneas reports an inconsistent projection.
+
+    All three stay transcribed, and their callers' claims read the transcriptions.
 
 200. **charon's `--start-from` does not accept trait generics.** A pattern such
     as `{impl p3_field::integers::QuotientMap<u32> for …}::from_int` fails with

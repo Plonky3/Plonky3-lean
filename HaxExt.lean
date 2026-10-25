@@ -348,6 +348,10 @@ def core.num.U64.saturating_sub_exposed (x y : Std.U64) : RustM Std.U64 :=
 def core.num.U128.saturating_sub_exposed (x y : Std.U128) : RustM Std.U128 :=
   ok ⟨BitVec.ofNat _ (x.val - y.val)⟩
 
+/-- Word addition clamped at the largest word, exposed as for the subtraction. -/
+def core.num.Usize.saturating_add_exposed (x y : Std.Usize) : RustM Std.Usize :=
+  ok ⟨BitVec.ofNat _ (min (x.val + y.val) (2 ^ System.Platform.numBits - 1))⟩
+
 /-- 32-bit addition clamped at 2^32 - 1, exposed as for the word. -/
 def core.num.U32.saturating_add_exposed (x y : Std.U32) : RustM Std.U32 :=
   ok ⟨BitVec.ofNat _ (min (x.val + y.val) (2 ^ 32 - 1))⟩
