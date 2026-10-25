@@ -52,6 +52,9 @@ theorem ite_of_pos {c : Prop} [Decidable c] (h : c) {α : Sort _} (a b : α) :
 theorem ite_of_neg {c : Prop} [Decidable c] (h : ¬c) {α : Sort _} (a b : α) :
     (if c then a else b) = b := by simp [h]
 
+theorem uz_one : (1#usize : Std.Usize) = uz 1 :=
+  UScalar.eq_of_val_eq (by rw [uz_val (by scalar_tac)]; rfl)
+
 theorem uz_add_one {a : ℕ} (h : a + 1 ≤ Usize.max) :
     (uz a + 1#usize : RustM Std.Usize) = .ok (uz (a + 1)) := by
   obtain ⟨z, hz, hv⟩ := usize_add_ok (uz a) 1#usize (by
@@ -931,5 +934,160 @@ theorem flat_writeBack {w n o len : ℕ} (x y : ℕ → ℕ → F) (h : o + len 
   · rw [List.setSlice!_getElem?_suffix _ _ _ _ (by rw [length_flat]; have := Nat.mul_le_mul_right w (show o + len ≤ r by omega); rw [add_mul] at this; omega),
       flat_getElem?, div_row hc, mod_row hc]
     simp [writeBack, h2]
+
+/-! ## One stage pass -/
+
+open p3_binary_dft.lch.mirror in
+variable [DecidableEq F] in
+/-- The extracted stage pass over n rows, whole blocks of stage j, is the transcribed pass. -/
+theorem stage_pass_eq_mirror {inst : p3_binary_dft.butterfly.ButterflyField F R} (hb : ButterflyComputes inst L)
+    (tw : Twiddles F) (hbl : tw.bases.length ≤ Usize.max) (hsl : tw.steps.length ≤ Usize.max)
+    (inverse : Bool) {w n j : ℕ} (hw : 0 < w) (x : ℕ → ℕ → F) (values : Slice F)
+    (hv : flat w n x = values.val) (hdiv : 2 ^ (j + 1) ∣ n) (hn : 0 < n)
+    (hbound : n * w + 1024 ≤ Usize.max) :
+    p3_binary_dft.lch.schedule.stage_pass inverse inst values (uz w) (uz j) (toTw tw) =
+      ofOption ((stage_pass L tw inverse w n j x).map fun y => mkSlice (flat w n y)) := by
+  have hjn : 2 ^ (j + 1) ≤ n := Nat.le_of_dvd hn hdiv
+  have hj2 : 2 * 2 ^ j = 2 ^ (j + 1) := by rw [pow_succ]; ring
+  have hjb : j < UScalarTy.Usize.numBits := by
+    have h1 : 2 ^ (j + 1) ≤ Usize.max := by nlinarith
+    have : Usize.max = 2 ^ UScalarTy.Usize.numBits - 1 := by rw [Usize.max_def]; simp [Usize.numBits]
+    by_contra hc
+    have : 2 ^ UScalarTy.Usize.numBits ≤ 2 ^ (j + 1) := Nat.pow_le_pow_right two_pos (by omega)
+    omega
+  have hnw := values.property
+  rw [← hv, length_flat] at hnw
+  set H := 2 ^ j * w with hH
+  have hHpos : 0 < H := Nat.mul_pos (Nat.two_pow_pos j) hw
+  have h2H : 2 * H ≤ n * w := by rw [hH, ← mul_assoc, hj2]; exact Nat.mul_le_mul_right _ hjn
+  set per := max (1024 / H) 1 with hper
+  have hperpos : 0 < per := by omega
+  set TR := per * (2 * 2 ^ j) with hTR
+  set TL := per * (H * 2) with hTL
+  have hTLR : TL = TR * w := by rw [hTL, hTR, hH]; ring
+  have hTLb : TL ≤ Usize.max := by
+    -- A task is at most the grain, or one block when a block exceeds the grain.
+    by_cases hg : H ≤ 1024
+    · have : per * H ≤ 1024 := by
+        rw [hper, max_eq_left (Nat.div_pos hg hHpos)]
+        exact Nat.div_mul_le_self 1024 H
+      have hbig : 2 ^ 32 - 1 ≤ Usize.max := by
+        rcases Usize.bounds_eq with e | e <;> rw [e] <;> simp [U32.max_def, U64.max_def, U32.numBits, U64.numBits]
+      rw [hTL, show per * (H * 2) = per * H * 2 by ring]
+      norm_num at hbig; omega
+    · have : per = 1 := by rw [hper]; simp [Nat.div_eq_of_lt (show 1024 < H by omega)]
+      rw [hTL, this]; omega
+  set K := (n + TR - 1) / TR with hK
+  have hTRpos : 0 < TR := by positivity
+  have hKTR : n ≤ K * TR := by
+    rw [hK, mul_comm]; have := Nat.div_add_mod (n + TR - 1) TR; have := Nat.mod_lt (n + TR - 1) hTRpos
+    omega
+  have hKlt : ∀ k < K, k * TR < n := fun k hk => by
+    by_contra hc; push Not at hc
+    have : K < k + 1 := by
+      rw [hK]; apply (Nat.div_lt_iff_lt_mul hTRpos).mpr; rw [add_mul, one_mul]; omega
+    omega
+  have hdivTR : 2 ^ (j + 1) ∣ TR := ⟨per, by rw [hTR, hj2, mul_comm]⟩
+  -- The pass, as a loop over the tasks.
+  have hloop := loop_foldlM_inv
+    (fun st => p3_binary_dft.lch.schedule.hax_reshaped.stage_pass_loop.body inverse inst (uz j) (toTw tw)
+      (uz H) (uz per) (uz TL) (uz (n * w)) st.1 st.2.1 st.2.2)
+    (fun (x : ℕ → ℕ → F) k => (mkSlice (flat w n x), uz (min (k * TL) (n * w)), uz k))
+    (fun x => mkSlice (flat w n x)) K
+    (fun x task => do
+      let y ← walkBlocks L tw inverse j (task * per) (min TR (n - task * TR)) (2 ^ j) (slice x (task * TR))
+      pure (writeBack x (task * TR) (min TR (n - task * TR)) y))
+    (fun _ _ => True) (fun k hk c _ => ?_) (fun c _ => ?_) x trivial
+  · simp only [zero_mul, Nat.zero_min] at hloop
+    rw [hv, mkSlice_self] at hloop
+    have hl : p3_binary_dft.lch.schedule.hax_reshaped.stage_pass_loop inverse inst values (uz j) (toTw tw)
+        (uz H) (uz per) (uz TL) (uz (n * w)) 0#usize 0#usize = _ := hloop
+    have hHm : H ≤ Usize.max := by omega
+    have hdl : 1024 / H ≤ 1024 := Nat.div_le_self _ _
+    have hwn : w ≤ n * w := Nat.le_mul_of_pos_left w hn
+    have hperle : per ≤ 1024 := by rw [hper]; omega
+    unfold p3_binary_dft.lch.schedule.stage_pass p3_binary_dft.lch.schedule.hax_reshaped.stage_pass stage_pass
+    rw [uz_one, shl_uz hjb (by rw [one_mul]; nlinarith), bind_ok, one_mul,
+      uz_mul (by rw [← hH]; omega) (by nlinarith) (by omega), bind_ok, ← hH, grain_eq, bind_ok,
+      uz_div (by omega) hHm (by omega), bind_ok, max_uz (by omega) (by omega), bind_ok, ← hper,
+      shl_one_eq (uz H) (by rw [uz_val hHm]; omega), bind_ok, uz_val hHm,
+      uz_mul (by rw [← hTL]; exact hTLb) (by omega) (by omega), bind_ok, ← hTL]
+    simp only [massert, bne_uz_zero hTLb]
+    rw [ite_of_pos (by simp only [ne_eq, decide_eq_true_eq]; positivity), bind_ok, slice_len_eq, bind_ok, ← hv,
+      length_flat, hl, ite_of_neg (by positivity)]
+    simp only [BUTTERFLY_GRAIN, ← hper, ← hTR, ← hK]
+  · -- One task.
+    set o := k * TR with ho
+    set lk := min TR (n - o) with hlk
+    have hon : o < n := hKlt k hk
+    have holk : o + lk ≤ n := by omega
+    have hlkpos : 0 < lk := by omega
+    have hdo : 2 ^ (j + 1) ∣ o := Dvd.dvd.mul_left hdivTR k
+    have hdlk : 2 ^ (j + 1) ∣ lk := by
+      rw [hlk]; rcases le_total TR (n - o) with h | h
+      · rw [min_eq_left h]; exact hdivTR
+      · rw [min_eq_right h]; exact Nat.dvd_sub hdiv hdo
+    obtain ⟨cnt, hcnt⟩ := hdlk
+    have hlkc : lk = cnt * (2 * 2 ^ j) := by rw [hcnt, hj2, mul_comm]
+    have hkTL : k * TL = o * w := by rw [hTLR, ho]; ring
+    have hmin1 : min (k * TL) (n * w) = o * w := by
+      rw [hkTL, min_eq_left (Nat.mul_le_mul_right _ hon.le)]
+    have hmin2 : min (o * w + TL) (n * w) = (o + lk) * w := by
+      rw [hTLR, ← add_mul, hlk]
+      rcases le_total TR (n - o) with h | h
+      · rw [min_eq_left h, min_eq_left (Nat.mul_le_mul_right _ (by omega))]
+      · rw [min_eq_right h, min_eq_right (Nat.mul_le_mul_right _ (by omega)), show o + (n - o) = n by omega]
+    have hmin3 : min ((k + 1) * TL) (n * w) = (o + lk) * w := by rw [add_mul, one_mul, hkTL, hmin2]
+    have hgl : (flat w n c).length = n * w := length_flat _ _ _
+    have hgv : (mkSlice (flat w n c)).val = flat w n c := mkSlice_val (by omega)
+    have holw : (o + lk) * w ≤ n * w := Nat.mul_le_mul_right _ holk
+    have hidx := index_mut_range_eq (mkSlice (flat w n c)) (a := o * w) (b := (o + lk) * w)
+      (Nat.mul_le_mul_right _ (by omega)) (by rw [hgv, hgl]; exact holw)
+    rw [hgv, show (o + lk) * w - o * w = lk * w by rw [add_mul]; omega, ← flat_slice c holk] at hidx
+    have hsub : (mkSlice (flat w lk (slice c o))).val = flat w lk (slice c o) := mkSlice_val (by
+      rw [length_flat]; have := Nat.mul_le_mul_right w (show lk ≤ n by omega); omega)
+    have hkper : k * per * 2 ^ (j + 1) = o := by rw [ho, hTR, hj2]; ring
+    have hfirst : (k * per + cnt) * 2 ≤ Usize.max := by
+      have h1 : (k * per + cnt) * 2 ^ (j + 1) ≤ n := by rw [add_mul, hkper, mul_comm cnt, ← hcnt]; exact holk
+      have h2 : (k * per + cnt) * 2 ≤ (k * per + cnt) * 2 ^ (j + 1) :=
+        Nat.mul_le_mul_left _ (by have := Nat.one_lt_two_pow_iff.mpr (Nat.succ_ne_zero j); omega)
+      have h3 : n ≤ n * w := Nat.le_mul_of_pos_right n hw
+      calc (k * per + cnt) * 2 ≤ (k * per + cnt) * 2 ^ (j + 1) := h2
+        _ ≤ n := h1
+        _ ≤ n * w := h3
+        _ ≤ Usize.max := by omega
+    have hwalk := walk_blocks_eq hb tw hbl hsl inverse true hw (Nat.two_pow_pos j)
+      (mkSlice (flat w lk (slice c o))) (slice c o) (by rw [hsub, hlkc]) (uz j) (uz (k * per))
+      (by rw [uz_val (by omega)]; exact hfirst) (by omega)
+    have hkp : k * per ≤ Usize.max := le_trans (Nat.le_mul_of_pos_right _ two_pos) (le_trans (Nat.mul_le_mul_right _ (Nat.le_add_right _ cnt)) hfirst)
+    have hkm : k ≤ Usize.max := le_trans (Nat.le_mul_of_pos_right k hperpos) hkp
+    have hk1 : k + 1 ≤ Usize.max := by
+      have : k * TR + 1 ≤ n := hon
+      have : k ≤ k * TR := Nat.le_mul_of_pos_right k hTRpos
+      have : n ≤ n * w := Nat.le_mul_of_pos_right n hw
+      omega
+    have hperm : per ≤ Usize.max := by
+      have : 1024 / H ≤ 1024 := Nat.div_le_self _ _
+      have : per ≤ 1024 := by rw [hper]; omega
+      omega
+    have hjm : j ≤ Usize.max := by
+      have := Nat.lt_two_pow_self (n := j + 1); have : n ≤ n * w := Nat.le_mul_of_pos_right n hw; omega
+    simp only [uz_val hkp, uz_val hjm, ← hlkc, ← hH] at hwalk
+    simp only [p3_binary_dft.lch.schedule.hax_reshaped.stage_pass_loop.body, hmin1]
+    rw [ite_of_pos ((uz_lt (by omega) (by omega)).mpr (Nat.mul_lt_mul_of_pos_right hon hw)),
+      chunk_end_eq (Nat.mul_le_mul_right _ hon.le) (by omega) hTLb, hmin2, bind_ok, hidx, bind_ok]
+    simp only [Aeneas.Std.uncurry]
+    rw [uz_mul hkp hkm hperm, bind_ok, hwalk, uz_add_one hk1]
+    cases walkBlocks L tw inverse j (k * per) lk (2 ^ j) (slice c o) with
+    | none => simp [ofOption]
+    | some y =>
+      simp only [ofOption, bind_ok, Option.bind_eq_bind, Option.bind_some, Option.pure_def,
+        Option.map]
+      refine ⟨trivial, ?_⟩
+      rw [mkSlice_val (by rw [length_flat]; have := Nat.mul_le_mul_right w (show lk ≤ n by omega); omega),
+        ← flat_writeBack c y holk, hmin3]
+  · simp only [p3_binary_dft.lch.schedule.hax_reshaped.stage_pass_loop.body]
+    rw [min_eq_right (by rw [hTLR, ← mul_assoc]; exact Nat.mul_le_mul_right _ hKTR),
+      ite_of_neg (lt_irrefl _)]
 
 end Plonky3Lean.Proofs.BinaryDft
