@@ -1,6 +1,7 @@
 module
 
 public import Plonky3Lean.Proofs.BinaryDft.ExtractedLch
+public import Plonky3Lean.Lib.Scalar.Signed
 
 @[expose] public section
 
@@ -134,5 +135,104 @@ theorem log2_ceil_eq (n : Std.Usize) : p3_util.log2_ceil_usize n = .ok (uz (Nat.
     rw [hv, bind_ok, hy, bind_ok, cast_u32_usize y (by rw [hyv, hvv, bits_val]; omega), hyv, hvv, bits_val,
       clog_eq_log_pred (by omega)]
     congr 2; omega
+
+/-! ## Division rounding up -/
+
+theorem uz_rem {a b : ℕ} (ha : a ≤ Usize.max) (hb : b ≤ Usize.max) (h0 : b ≠ 0) :
+    (uz a % uz b : RustM Std.Usize) = .ok (uz (a % b)) := by
+  obtain ⟨z, hz, hv⟩ := spec_imp_exists (UScalar.rem_spec (uz a) (y := uz b) (by rw [uz_val hb]; exact h0))
+  rw [hz, eq_uz z, hv, uz_val ha, uz_val hb]
+
+theorem ceil_div_eq (a b : ℕ) (hb : 0 < b) :
+    (a + b - 1) / b = a / b + if 0 < a % b then 1 else 0 := by
+  have e := Nat.div_add_mod a b
+  have hr : a % b < b := Nat.mod_lt a hb
+  generalize a / b = d at e ⊢
+  generalize a % b = r at e hr ⊢
+  rw [show a + b - 1 = (r + b - 1) + b * d by omega, Nat.add_mul_div_left _ _ hb]
+  split_ifs with h
+  · rw [Nat.div_eq_of_lt_le (k := 1) (by omega) (by omega)]; omega
+  · rw [Nat.div_eq_of_lt (by omega)]; omega
+
+theorem div_ceil_eq {a b : ℕ} (ha : a ≤ Usize.max) (hb : b ≤ Usize.max) (h0 : 0 < b) :
+    core.num.Usize.div_ceil (uz a) (uz b) = .ok (uz ((a + b - 1) / b)) := by
+  unfold core.num.Usize.div_ceil
+  rw [uz_div ha hb (by omega), bind_ok, uz_rem ha hb (by omega), bind_ok, ceil_div_eq a b h0]
+  have hr : (0#usize : Std.Usize) = uz 0 := UScalar.eq_of_val_eq (by rw [uz_val (by scalar_tac)]; rfl)
+  rw [hr]
+  split_ifs with h1 h2 h2
+  · have hd : a / b + 1 ≤ a := by
+      have := Nat.div_add_mod a b; have := Nat.div_le_self a b
+      nlinarith [Nat.mul_le_mul_right (a / b) (show 1 ≤ b from h0)]
+    exact uz_add_one (by omega)
+  · exact absurd ((uz_lt (by scalar_tac) (le_trans (Nat.mod_le a b) ha)).mp h1) (by omega)
+  · exact absurd ((uz_lt (by scalar_tac) (le_trans (Nat.mod_le a b) ha)).mpr h2) h1
+  · rfl
+
+/-! ## The schedule -/
+
+theorem min_uz {a b : ℕ} (ha : a ≤ Usize.max) (hb : b ≤ Usize.max) :
+    core.Usize.Insts.CoreCmpOrd.min (uz a) (uz b) = .ok (uz (min a b)) := by
+  obtain ⟨z, hz, hv⟩ := spec_imp_exists (Plonky3Lean.Lib.core.Usize.Insts.CoreCmpOrd.min.spec (uz a) (uz b))
+  rw [hz, eq_uz z, hv, uz_val ha, uz_val hb]
+
+open p3_binary_dft.lch.mirror in
+/-- A transcribed schedule as the extracted structure. -/
+def toSched (s : Schedule) : p3_binary_dft.lch.schedule.Schedule :=
+  ⟨uz s.log_tile_rows, uz s.log_staged_rows, uz s.log_slab_rows⟩
+
+open p3_binary_dft.lch.mirror in
+/-- The extracted schedule of the serial pool is the transcribed one, at the element size the layout gives. -/
+theorem schedule_new_eq {b w : ℕ} (hsz : core.mem.size_of F = .ok (uz b)) (hb : 0 < b) (hw : 0 < w)
+    (hbw : b * w ≤ Usize.max) (log_n : Std.Usize) (hl : log_n.val < UScalarTy.Usize.numBits) :
+    p3_binary_dft.lch.schedule.Schedule.new F (uz w) log_n =
+      .ok (toSched (Schedule.new b w log_n.val)) := by
+  have h64 := numBits_le64
+  have hbig : 2 ^ 32 - 1 ≤ Usize.max := by
+    rcases Usize.bounds_eq with e | e <;> rw [e] <;> simp [U32.max_def, U64.max_def, U32.numBits, U64.numBits]
+  norm_num at hbig
+  have hbwpos : 0 < b * w := Nat.mul_pos hb hw
+  have hdeep : p3_binary_dft.lch.schedule.DEEP_TILE_BYTES = .ok (uz 131072) := by
+    unfold p3_binary_dft.lch.schedule.DEEP_TILE_BYTES
+    rw [show (128#usize : Std.Usize) = uz 128 from UScalar.eq_of_val_eq (by rw [uz_val (by omega)]; rfl),
+      show (1024#usize : Std.Usize) = uz 1024 from UScalar.eq_of_val_eq (by rw [uz_val (by omega)]; rfl),
+      uz_mul (by omega) (by omega) (by omega)]
+  have hcache : p3_binary_dft.lch.schedule.CACHE_LINE_BYTES = uz 64 := by
+    unfold p3_binary_dft.lch.schedule.CACHE_LINE_BYTES
+    exact UScalar.eq_of_val_eq (by rw [uz_val (by omega)]; rfl)
+  have hstaged : p3_binary_dft.lch.schedule.STAGED_WORKERS = uz 16 := by
+    unfold p3_binary_dft.lch.schedule.STAGED_WORKERS
+    exact UScalar.eq_of_val_eq (by rw [uz_val (by omega)]; rfl)
+  have hlm : log_n.val ≤ Usize.max := by omega
+  have hbm : b ≤ Usize.max := le_trans (Nat.le_mul_of_pos_right b hw) hbw
+  have hwm : w ≤ Usize.max := le_trans (Nat.le_mul_of_pos_left w hb) hbw
+  unfold p3_binary_dft.lch.schedule.Schedule.new p3_binary_dft.lch.schedule.Schedule.for_workers
+    Schedule.new Schedule.for_workers
+  simp only [p3_maybe_rayon.serial.current_num_threads, bind_ok, uz_one, hsz, uz_mul hbw hbm hwm,
+    hdeep, uz_div (show 131072 ≤ Usize.max by omega) hbw (by omega)]
+  have hq : 131072 / (b * w) ≤ 131072 := Nat.div_le_self _ _
+  set m1 := max (131072 / (b * w)) 1 with hm1
+  have hm1b : m1 ≤ 131072 := by omega
+  have hlog1 : Nat.log 2 m1 ≤ m1 := Nat.log_le_self 2 m1
+  set m2 := (64 + b * w - 1) / (b * w) with hm2
+  have hm2b : m2 ≤ 64 := by
+    rw [hm2]; apply Nat.div_le_of_le_mul; omega
+  have hclog2 : Nat.clog 2 m2 ≤ m2 := Nat.clog_le_of_le_pow (Nat.lt_two_pow_self).le
+  rw [max_uz (by omega) (by omega), bind_ok, ← hm1, log2_floor_eq, bind_ok, uz_val (by omega),
+    log2_ceil_eq, bind_ok, uz_val (show 1 ≤ Usize.max by omega), saturating_sub_exposed_eq, bind_ok,
+    uz_val (show Nat.clog 2 1 ≤ Usize.max by simp), min_uz (by omega) (by omega), bind_ok, hcache,
+    div_ceil_eq (by omega) hbw hbwpos, bind_ok, ← hm2, log2_ceil_eq, bind_ok, uz_val (by omega),
+    min_uz (by omega) (by omega), bind_ok]
+  have hshl : ∀ (x : Std.Usize) (s : ℕ), s < UScalarTy.Usize.numBits →
+      (x <<< uz s : RustM Std.Usize) = .ok ⟨x.bv.shiftLeft s⟩ := by
+    intro x s hs
+    show UScalar.shiftLeft_UScalar x (uz s) = _
+    unfold UScalar.shiftLeft_UScalar UScalar.shiftLeft
+    rw [uz_val (by omega), ite_of_pos hs]
+  rw [hshl _ _ (by have := Nat.min_le_right (Nat.clog 2 m2) (min (Nat.log 2 m1) (log_n.val - Nat.clog 2 1)); omega),
+    bind_ok, hstaged, ite_of_neg (fun h => absurd ((uz_le (by omega) (by omega)).mp h) (by omega))]
+  simp only [toSched, log2Floor, log2Ceil, DEEP_TILE_BYTES, hm1, show (16 ≤ 1) = False by decide, ite_false]
+  rw [show (128 * 1024 : ℕ) = 131072 by norm_num,
+    show (0#usize : Std.Usize) = uz 0 from UScalar.eq_of_val_eq (by rw [uz_val (by omega)]; rfl)]
 
 end Plonky3Lean.Proofs.BinaryDft
