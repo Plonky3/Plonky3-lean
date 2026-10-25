@@ -8,7 +8,7 @@ lean_lib = "P3Circle"
 #
 # A wrapper at Mersenne31 does not help: the generic impl it calls still needs the trait dictionary.
 #
-# The points, the domains, the order, the circle FFT, the folding, the DEEP quotient and the PCS verifier are transcribed over a field in stub/P3Circle/, with the abstractions each file lists.
+# The points, the domains, the order, the circle FFT, the folding, the DEEP quotient, the PCS verifier and the PCS prover's open path are transcribed over a field in stub/P3Circle/, with the abstractions each file lists.
 state = "stub"
 
 features = []
@@ -337,3 +337,67 @@ rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circ
 [[mirror]]
 lean = "p3_circle.pcs.mirror.verify"
 rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.CircleProverTx"
+rust = "p3_circle::transcript::CircleProverTranscript"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.rowsOf"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.matOfPairs"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.pairsOf"
+rust = "p3_circle::folding::fold_y"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.openMatrix"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.openedValues"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.permutedPoints"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.accumulateMatrix"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.reducedOpenings"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.extractLambdas"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.commitRound"
+rust = "p3_circle::prover::commit_phase"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.commitPhase"
+rust = "p3_circle::prover::commit_phase"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.answerQueries"
+rust = "p3_circle::prover::answer_queries"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.openInputs"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.firstLayerSiblings"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.open_"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open"

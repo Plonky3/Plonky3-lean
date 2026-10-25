@@ -454,7 +454,9 @@ theorem extract_lambda_split (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {L lb 
   ring
 
 open p3_circle.ordering.mirror p3_circle.deep_quotient.mirror in
-/-- The lambda extraction on a function of degree 2^(n - 1), n = L - lb, read in circle FFT order on the LDE domain.
+/-- The lambda extraction on a function of degree 2^(n - 1), with n = L - lb.
+
+The function is read in circle FFT order on the LDE domain.
 
 The function splits as an FFT-basis function of order n plus mu v_n.
 

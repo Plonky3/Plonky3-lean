@@ -404,7 +404,9 @@ theorem heightsOf_bounds {lb H : ℕ} {L : List (HMat K)} (hlog : ∀ m ∈ L, 2
 
 /-- One query on honest openings.
 
-Every height of the honest matrices gives one input to circle FRI: the folded DEEP function at the round's point.
+Every height of the honest matrices gives one input to circle FRI.
+
+It is the folded DEEP function at the round's point.
 
 The first-layer leaves are the corrected DEEP function at the query point and at its conjugate. -/
 theorem reduceQuery_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) (immcs : MmcsOps K) {FME : Type}

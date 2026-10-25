@@ -3,6 +3,7 @@ module
 public import Plonky3Lean.Proofs.Circle.Deep
 public import Plonky3Lean.Proofs.Circle.Selectors
 public import Plonky3Lean.Proofs.Circle.Query
+public import Plonky3Lean.Proofs.Circle.Prover
 
 @[expose] public section
 
@@ -147,14 +148,83 @@ theorem pcs.panics_iff : type_of% @Plonky3Lean.Proofs.Circle.verify_panics_iff :
 theorem pcs.one_row_panics : type_of% @Plonky3Lean.Proofs.Circle.firstLayerLeaf_one_row :=
   @Plonky3Lean.Proofs.Circle.firstLayerLeaf_one_row
 
-/-- The verifier accepts when:
+/-- The verifier accepts honest openings.
 
 - the claims pass the checks before the transcript, and the transcript accepts
-- the input checks return the honest inputs at the points each query reads
-- the commit-phase siblings hold the honest layers, and the final value is the folded constant
-- the commit-phase scheme accepts the honest codewords. -/
-theorem pcs.complete : type_of% @Plonky3Lean.Proofs.Circle.verify_complete :=
-  @Plonky3Lean.Proofs.Circle.verify_complete
+- the claimed columns have degree below the trace size, opened on the circle and off the LDE domain
+- the input openings hold the columns at the query points, and the input scheme accepts them
+- the first-layer siblings and the lambdas are the prover's, and the first-layer scheme accepts the rows
+- the commit-phase siblings hold the folded layers, and the final value is the folded constant
+- the commit-phase scheme accepts the honest codewords.
+
+Nothing is assumed about the DEEP quotient: its degree follows from the DEEP quotient lemma. -/
+theorem pcs.complete : type_of% @Plonky3Lean.Proofs.Circle.verify_complete_honest :=
+  @Plonky3Lean.Proofs.Circle.verify_complete_honest
+
+/-- The verifier accepts what the honest prover opens.
+
+- the batches hold columns of degree below the trace size, committed as their LDEs in circle FFT order
+- the opening points lie on the circle and off the LDE domain, and the evaluation returns the columns there
+- both commitment schemes open and accept honestly
+- the prover's and the verifier's transcripts agree.
+
+Then the prover returns the claimed values and a proof, and the verifier accepts the proof. -/
+theorem pcs.open_complete : type_of% @Plonky3Lean.Proofs.Circle.open_verify_complete :=
+  @Plonky3Lean.Proofs.Circle.open_verify_complete
+
+/-! ## The DEEP quotient lemma, Section 3 -/
+
+/-- Take f of degree at most D on the circle and a point Z.
+
+The quotient of (f - f(Z)) (P - Z)_y by the tangent 1 - (P - Z)_x at Z has degree at most D. -/
+theorem deep.quotient_degree : type_of% @Plonky3Lean.Proofs.Circle.IsCirclePoly.deep :=
+  @Plonky3Lean.Proofs.Circle.IsCirclePoly.deep
+
+/-- The DEEP term of honest values at one opening point has the degree of the columns, off that point. -/
+theorem deep.term_degree : type_of% @Plonky3Lean.Proofs.Circle.deepTerm_circlePoly :=
+  @Plonky3Lean.Proofs.Circle.deepTerm_circlePoly
+
+/-- An FFT-basis function of order m + 1 has degree at most 2^m. -/
+theorem deep.fft_degree : type_of% @Plonky3Lean.Proofs.Circle.isCirclePoly_fftEval :=
+  @Plonky3Lean.Proofs.Circle.isCirclePoly_fftEval
+
+/-- Every p(x) + y q(x) with p and q of degree below 2^m is an FFT-basis function of order m + 1. -/
+theorem deep.fft_span : type_of% @Plonky3Lean.Proofs.Circle.exists_fftEval :=
+  @Plonky3Lean.Proofs.Circle.exists_fftEval
+
+/-- A function of degree 2^m is an FFT-basis function of order m + 1 plus a multiple of v_(m+1). -/
+theorem deep.split_vn : type_of% @Plonky3Lean.Proofs.Circle.IsCirclePoly.split_vn :=
+  @Plonky3Lean.Proofs.Circle.IsCirclePoly.split_vn
+
+/-- On a standard domain of size 2^L, an FFT-basis function of order n < L is orthogonal to v_n. -/
+theorem deep.orthogonal : type_of% @Plonky3Lean.Proofs.Circle.sum_fftEval_mul_vn :=
+  @Plonky3Lean.Proofs.Circle.sum_fftEval_mul_vn
+
+/-- On a function of degree 2^(n-1), the lambda extraction returns its v_n component and the FFT-basis rest. -/
+theorem deep.extract_lambda_split : type_of% @Plonky3Lean.Proofs.Circle.extract_lambda_circlePoly :=
+  @Plonky3Lean.Proofs.Circle.extract_lambda_circlePoly
+
+/-! ## The honest prover -/
+
+/-- The prover's reduced column of each height is the DEEP function of that height on its LDE domain. -/
+theorem prover.reduced_openings : type_of% @Plonky3Lean.Proofs.Circle.reducedOpenings_honest :=
+  @Plonky3Lean.Proofs.Circle.reducedOpenings_honest
+
+/-- The prover's lambdas and corrected columns are the honest ones, by increasing height. -/
+theorem prover.lambdas : type_of% @Plonky3Lean.Proofs.Circle.extractLambdas_honest :=
+  @Plonky3Lean.Proofs.Circle.extractLambdas_honest
+
+/-- The first-layer fold of an honest corrected column is the codeword circle FRI starts from. -/
+theorem prover.first_layer : type_of% @Plonky3Lean.Proofs.Circle.fold_y_honest :=
+  @Plonky3Lean.Proofs.Circle.fold_y_honest
+
+/-- The circle FRI commit phase folds the honest codewords, rolls in each input, and ends at the folded constant. -/
+theorem prover.commit_phase : type_of% @Plonky3Lean.Proofs.Circle.commitPhase_honest :=
+  @Plonky3Lean.Proofs.Circle.commitPhase_honest
+
+/-- The query answers hold, at each round and query, the other member of the pair. -/
+theorem prover.answers : type_of% @Plonky3Lean.Proofs.Circle.foldlM_aqStep_honest :=
+  @Plonky3Lean.Proofs.Circle.foldlM_aqStep_honest
 
 /-! ## One query, against Sections 3 and 4 -/
 
