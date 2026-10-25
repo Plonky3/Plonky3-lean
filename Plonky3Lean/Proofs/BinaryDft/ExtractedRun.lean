@@ -377,4 +377,87 @@ theorem tile_stages_eq_mirror {inst : p3_binary_dft.butterfly.ButterflyField F R
         core.Usize.Insts.CoreIterRangeStep { start := uz k, «end» := uz k } = _ from range_next_none _ _ le_rfl]
     simp
 
+/-! ## The deep tiles -/
+
+open p3_binary_dft.lch.mirror in
+variable [DecidableEq F] {R : Type} {L : Level F} in
+/-- The extracted pass over the tiles of 2^k rows is the transcribed one. -/
+theorem deep_tiles_eq_mirror {inst : p3_binary_dft.butterfly.ButterflyField F R} (hb : ButterflyComputes inst L)
+    (tw : Twiddles F) (hbl : tw.bases.length ≤ Usize.max) (hsl : tw.steps.length ≤ Usize.max)
+    (inverse : Bool) {w n k : ℕ} (hw : 0 < w) (x : ℕ → ℕ → F) (values : Slice F)
+    (hv : flat w n x = values.val) (hdiv : 2 ^ k ∣ n) (hn : 0 < n) (hbound : n * w + 1024 ≤ Usize.max) :
+    p3_binary_dft.lch.schedule.deep_tiles inverse inst values (uz w) (uz k) (toTw tw) =
+      ofOption ((deep_tiles L tw inverse n k x).map fun y => mkSlice (flat w n y)) := by
+  obtain ⟨K, hK⟩ := hdiv
+  have hkn : 2 ^ k ≤ n := Nat.le_of_dvd hn ⟨K, hK⟩
+  have hKpos : 0 < K := by rcases Nat.eq_zero_or_pos K with h | h <;> simp_all
+  have hnle : n ≤ n * w := Nat.le_mul_of_pos_right n hw
+  have hkb : k < UScalarTy.Usize.numBits := by
+    by_contra hc
+    have : 2 ^ UScalarTy.Usize.numBits ≤ 2 ^ k := Nat.pow_le_pow_right two_pos (by omega)
+    have : Usize.max = 2 ^ UScalarTy.Usize.numBits - 1 := by rw [Usize.max_def]; simp [Usize.numBits]
+    omega
+  set T := 2 ^ k with hT
+  have hTpos : 0 < T := Nat.two_pow_pos k
+  set TL := T * w with hTL
+  have hTLm : TL ≤ Usize.max := by have := Nat.mul_le_mul_right w hkn; omega
+  have hcount : (n + T - 1) / T = K := by
+    rw [hK, show T * K + T - 1 = (T - 1) + K * T by rw [mul_comm]; omega, Nat.add_mul_div_right _ _ hTpos,
+      Nat.div_eq_of_lt (by omega), zero_add]
+  have hloop := loop_foldlM_inv
+    (fun st => p3_binary_dft.lch.schedule.hax_reshaped.deep_tiles_loop.body inverse inst (uz w) (uz k) (toTw tw)
+      (uz TL) (uz (n * w)) st.1 st.2.1 st.2.2)
+    (fun (x : ℕ → ℕ → F) i => (mkSlice (flat w n x), uz (i * TL), uz i))
+    (fun x => mkSlice (flat w n x)) K
+    (fun x index => do
+      let y ← tile_stages L tw inverse (min T (n - index * T)) k 0 index (slice x (index * T))
+      pure (writeBack x (index * T) (min T (n - index * T)) y))
+    (fun _ _ => True) (fun i hi c _ => ?_) (fun c _ => ?_) x trivial
+  · simp only [zero_mul] at hloop
+    rw [hv, mkSlice_self] at hloop
+    have hl : p3_binary_dft.lch.schedule.hax_reshaped.deep_tiles_loop inverse inst values (uz w) (uz k) (toTw tw)
+        (uz TL) (uz (n * w)) 0#usize 0#usize = _ := hloop
+    unfold p3_binary_dft.lch.schedule.deep_tiles p3_binary_dft.lch.schedule.hax_reshaped.deep_tiles deep_tiles
+    have hwm : w ≤ Usize.max := le_trans (Nat.le_mul_of_pos_left w hn) (by omega)
+    rw [uz_one, shl_uz hkb (by rw [one_mul]; omega), bind_ok, one_mul, ← hT,
+      uz_mul hTLm (by omega) hwm, bind_ok, ← hTL]
+    simp only [massert, bne_uz_zero hTLm]
+    rw [ite_of_pos (by simp only [ne_eq, decide_eq_true_eq]; positivity), bind_ok, slice_len_eq, bind_ok, ← hv,
+      length_flat, hl, hcount]
+  · -- One tile.
+    have hi1 : (i + 1) * T ≤ n := by rw [hK, mul_comm T K]; exact Nat.mul_le_mul_right _ hi
+    have hmin : min T (n - i * T) = T := min_eq_left (by rw [add_mul, one_mul] at hi1; omega)
+    have hiTL : i * T * w + T * w ≤ n * w := by
+      have h := Nat.mul_le_mul_right w hi1; rw [add_mul, one_mul, add_mul] at h; exact h
+    have hTLe : ∀ m, m * TL = m * T * w := fun m => by rw [hTL]; ring
+    have hgl : (flat w n c).length = n * w := length_flat _ _ _
+    have hgv : (mkSlice (flat w n c)).val = flat w n c := mkSlice_val (by omega)
+    have hidx := index_mut_range_eq (mkSlice (flat w n c)) (a := i * T * w) (b := i * T * w + T * w) (by omega)
+      (by rw [hgv, hgl]; exact hiTL)
+    rw [hgv, show i * T * w + T * w - i * T * w = T * w by omega,
+      ← flat_slice c (by omega : i * T + T ≤ n)] at hidx
+    have hsub : (mkSlice (flat w T (slice c (i * T)))).val = flat w T (slice c (i * T)) := mkSlice_val (by
+      rw [length_flat]; have := Nat.mul_le_mul_right w hkn; omega)
+    have hts := tile_stages_eq_mirror hb tw hbl hsl inverse hw (base := 0) (slice c (i * T)) _ hsub.symm hi1
+      hbound (by have := Nat.lt_two_pow_self (n := k); omega)
+    have hzero : (0#usize : Std.Usize) = uz 0 := UScalar.eq_of_val_eq (by rw [uz_val (by scalar_tac)]; rfl)
+    simp only [p3_binary_dft.lch.schedule.hax_reshaped.deep_tiles_loop.body, hTLe]
+    rw [ite_of_pos ((uz_lt (by omega) (by omega)).mpr (by
+        have := Nat.mul_le_mul_right w (show i * T + 1 ≤ n by rw [add_mul, one_mul] at hi1; omega)
+        rw [add_mul, one_mul] at this; omega)),
+      ← hTLe, chunk_end_eq (by rw [hTLe]; omega) (by omega) hTLm, hTLe, hTL, min_eq_left hiTL, bind_ok, hidx,
+      bind_ok]
+    simp only [Aeneas.Std.uncurry]
+    have hi1n : i + 1 ≤ n := le_trans (Nat.le_mul_of_pos_right (i + 1) hTpos) hi1
+    rw [hzero, hts, uz_add_one (by omega), add_mul, add_mul, one_mul, hmin]
+    cases tile_stages L tw inverse T k 0 i (slice c (i * T)) with
+    | none => simp [ofOption]
+    | some y =>
+      simp only [ofOption, bind_ok, Option.bind_eq_bind, Option.bind_some, Option.pure_def, Option.map]
+      refine ⟨trivial, ?_⟩
+      rw [mkSlice_val (by rw [length_flat]; have := Nat.mul_le_mul_right w hkn; omega),
+        show i * T * w = (i * T) * w from rfl, ← flat_writeBack c y (by omega : i * T + T ≤ n)]
+  · simp only [p3_binary_dft.lch.schedule.hax_reshaped.deep_tiles_loop.body]
+    rw [show K * TL = n * w by rw [hTL, hK]; ring, ite_of_neg (lt_irrefl _)]
+
 end Plonky3Lean.Proofs.BinaryDft
