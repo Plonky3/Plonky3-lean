@@ -1289,6 +1289,26 @@ theorem openMatrix_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {lb : ℕ
     (fun c => hfft _ (List.get_mem _ _)) (fun r _ c => rfl) _ hZ, hvals p hp]
   exact congrArg some (finRange_map_get_apply m.2 _)
 
+theorem mapM_eq_none_of_mem {α β : Type _} (f : α → Option β) {a : α} (hf : f a = none) :
+    ∀ {l : List α}, a ∈ l → l.mapM f = none
+  | b :: l, hm => by
+    rw [List.mapM_cons]
+    rcases List.mem_cons.mp hm with rfl | hm
+    · simp [hf]
+    · cases f b <;> simp [mapM_eq_none_of_mem f hf hm]
+
+/-- The prover panics on an opening point t of the line with t^2 = -1, a point at infinity of the circle. -/
+theorem openMatrix_none_of_sq (lb : ℕ) (mat : Mat K) {points : List K} {t : K} (ht : t ∈ points)
+    (h0 : 1 + t * t = 0) : openMatrix G lb mat points = none := by
+  have hnone : Point.from_projective_line t = none := by simp [from_projective_line_eq, h0]
+  unfold openMatrix
+  cases log2Strict mat.height <;> simp only [Option.bind_eq_bind, Option.bind_none, Option.bind_some]
+  cases permutedPoints G _ <;> simp only [Option.bind_none, Option.bind_some]
+  split_ifs
+  · rfl
+  · cases CircleDomain.standard G _ <;> simp only [Option.bind_none, Option.bind_some]
+    exact mapM_eq_none_of_mem _ (by simp [hnone]) ht
+
 /-- The prover's opened values of honest batches are the claimed values. -/
 theorem openedValues_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {lb H : ℕ} (hb : List (List (HMat K)))
     (hc : ∀ m ∈ hb.flatten, 2 ≤ m.1.domain.log_n ∧ hgt lb m ≤ H) (hG : H + 1 ≤ G.adicity)

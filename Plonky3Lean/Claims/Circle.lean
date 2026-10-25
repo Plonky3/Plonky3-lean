@@ -199,6 +199,10 @@ theorem prover.lifted_reduction : type_of% @Plonky3Lean.Proofs.Circle.rowwise_al
 theorem cfft.prefix_twiddles : type_of% @Plonky3Lean.Proofs.Circle.twC_prefix_ne_zero :=
   @Plonky3Lean.Proofs.Circle.twC_prefix_ne_zero
 
+/-- The prover panics on an opening point t of the line with t^2 = -1, a point at infinity of the circle. -/
+theorem pcs.open_panics_at_infinity : type_of% @Plonky3Lean.Proofs.Circle.openMatrix_none_of_sq :=
+  @Plonky3Lean.Proofs.Circle.openMatrix_none_of_sq
+
 /-! ## The Lagrange evaluation on a twin coset, Section 3.3 -/
 
 /-- The circle barycentric formula.
