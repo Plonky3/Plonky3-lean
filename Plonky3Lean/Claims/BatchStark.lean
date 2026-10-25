@@ -7,6 +7,7 @@ public import Plonky3Lean.Proofs.BatchStark.Extracted
 public import Plonky3Lean.Proofs.BatchStark.Zeta
 public import Plonky3Lean.Proofs.BatchStark.BusWidths
 public import Plonky3Lean.Proofs.BatchStark.LogUpCount
+public import Plonky3Lean.Proofs.BatchStark.NoPanic
 public import CompPoly.Fields.BabyBear.Ext4
 
 @[expose] public section
@@ -560,5 +561,131 @@ theorem p_sends_balance (k : Key K) : Balanced (List.replicate p (k, (1 : K))) :
 theorem one_sender_unbalanced (msgs : List (Key K × K)) (hne : msgs ≠ []) (hone : ∀ q ∈ msgs, q.2 = 1)
     (hlen : msgs.length < p) : ¬ Balanced msgs :=
   one_sided_unbalanced msgs hne hone hlen
+
+/-! ## The full verifier -/
+
+/-
+The batch verifier is transcribed end to end, over the FRI transcription's sponge.
+
+Write b_i for instance i's degree bits, z for the zero-knowledge bit and L_i for its quotient sizing.
+
+```text
+    base trace domain       subgroup of order 2^(b_i - z)
+    extended trace domain   subgroup of order 2^b_i
+    quotient coset          shift g, order 2^(b_i + L_i), split into 2^(L_i + z) chunks
+    chunk domains           each committed over the extended trace domain
+```
+
+The claims at zeta come in round order: randomization, trace, quotient chunks, preprocessed, permutation.
+-/
+
+section full
+
+/-- When every step accepts, the verifier accepts.
+
+The steps are the shape checks, the transcript, the claims at zeta and the opening argument.
+
+The last two are each instance's check at zeta and the cross-table sum. -/
+theorem full_verify_accepts : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.verify_accepts :=
+  @Plonky3Lean.Proofs.BatchStark.EndToEnd.verify_accepts
+
+/-- Once the shape checks accept, the claims at zeta have their closed form.
+
+Each instance's chunk domains are the 2^(L + z) chunks of its quotient coset.
+
+The preprocessed round's index is z + 2, when the common data has one. -/
+theorem full_claims : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.commitments_eq :=
+  @Plonky3Lean.Proofs.BatchStark.EndToEnd.commitments_eq
+
+/-- An honest instance passes its check at zeta.
+
+Its openings are its polynomials at zeta, off its base trace domain.
+
+Its chunks recombine to s^n C / Z at zeta, and Z divides its constraint polynomial C. -/
+theorem full_check_at_zeta : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.Honest.check :=
+  @Plonky3Lean.Proofs.BatchStark.EndToEnd.Honest.check
+
+/-- Completeness of the batch verifier, given each instance's chunk recombination.
+
+The shape checks and both grinds accept, and every instance is honest at the drawn zeta.
+
+The terminals sum to zero, and the opening argument accepts the claims. -/
+theorem full_verify_complete : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.verify_complete :=
+  @Plonky3Lean.Proofs.BatchStark.EndToEnd.verify_complete
+
+/-- Completeness over Merkle commitments and two-adic FRI.
+
+The FRI prover is honest on the verifier's claims at zeta. -/
+theorem full_verify_complete_merkle : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.verify_complete_merkle :=
+  @Plonky3Lean.Proofs.BatchStark.EndToEnd.verify_complete_merkle
+
+/-- Completeness of the zero-knowledge path, over the hiding FRI scheme and Merkle commitments.
+
+- The verifier's claims are the public part of a randomized batch.
+- The proof's hidden values are the rest of it.
+- The FRI prover is honest on the randomized batch. -/
+theorem full_verify_complete_hiding : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.verify_complete_hiding :=
+  @Plonky3Lean.Proofs.BatchStark.EndToEnd.verify_complete_hiding
+
+/-- An instance's chunks, opened at their interpolants of Q, recombine to Q at zeta.
+
+Here Q has degree below its quotient coset's order. -/
+theorem full_recombine_chunks : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.recombine_chunks :=
+  @Plonky3Lean.Proofs.BatchStark.EndToEnd.recombine_chunks
+
+/-- An instance's masked chunks recombine to Q at zeta, as the unmasked ones do.
+
+Chunk j opens to its interpolant plus Z_j times its mask, the last mask balancing the others. -/
+theorem full_recombine_chunks_masked : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.recombine_chunks_masked :=
+  @Plonky3Lean.Proofs.BatchStark.EndToEnd.recombine_chunks_masked
+
+/-- The batch verifier never panics on any proof, under these conditions:
+
+- every AIR binds its public values by constraints, and declares as many periodic columns as it lists
+- the largest trace height lies within the generator table
+- the quotient sizing returns
+- the common data matches the AIRs: preprocessed widths, lookup slots and widths, matrix instances
+- the lookups pass the challenge layout's width checks
+- both grinding difficulties are zero, or b < 64 with 2^b < p
+- the opening argument never panics
+- the configured extension degree is the basis's. -/
+theorem full_verify_ne_none : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.verify_ne_none :=
+  @Plonky3Lean.Proofs.BatchStark.EndToEnd.verify_ne_none
+
+/-- At the pin, the out-of-domain grind panics exactly at an unsafe difficulty.
+
+The difficulty b is unsafe when b > 0 and either b >= 64 or 2^b >= p. -/
+theorem full_ood_grind_panics : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.ood_phase_run_eq_none :=
+  @Plonky3Lean.Proofs.BatchStark.EndToEnd.ood_phase_run_eq_none
+
+/-- At the pin, the lookup grind panics exactly when it is reached at an unsafe difficulty.
+
+It is reached when the batch has lookups and the proof carries a witness. -/
+theorem full_lookup_grind_panics : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.lookup_phase_run_eq_none :=
+  @Plonky3Lean.Proofs.BatchStark.EndToEnd.lookup_phase_run_eq_none
+
+/-- At the pin, a proof that reaches the out-of-domain grind at an unsafe difficulty panics the verifier. -/
+theorem full_verify_ood_panics : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.verify_ood_none :=
+  @Plonky3Lean.Proofs.BatchStark.EndToEnd.verify_ood_none
+
+/-- At the pin, a proof that reaches the lookup grind at an unsafe difficulty panics the verifier. -/
+theorem full_verify_lookup_panics : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.verify_lookup_none :=
+  @Plonky3Lean.Proofs.BatchStark.EndToEnd.verify_lookup_none
+
+/-- An AIR with boundary cells panics the verifier on every proof. -/
+theorem full_verify_boundary_panics : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.verify_boundary_none :=
+  @Plonky3Lean.Proofs.BatchStark.EndToEnd.verify_boundary_none
+
+/-- With no instance and no preprocessed commitment, no claim names a matrix.
+
+The two-adic opening argument then rejects the claims as vacuous. -/
+theorem full_no_instances_vacuous : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.batchClaims_no_instances :=
+  @Plonky3Lean.Proofs.BatchStark.EndToEnd.batchClaims_no_instances
+
+/-- An instance's permutation matrix is claimed exactly when it declares a lookup. -/
+theorem full_permutation_round_exact : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.permMat_isSome_iff :=
+  @Plonky3Lean.Proofs.BatchStark.EndToEnd.permMat_isSome_iff
+
+end full
 
 end Plonky3Lean.Claims.BatchStark
