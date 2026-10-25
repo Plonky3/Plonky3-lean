@@ -2,13 +2,18 @@ module
 
 public import Plonky3Lean.Proofs.BinaryDft.Concrete
 public import Plonky3Lean.Proofs.BinaryDft.CompPoly
+public import Plonky3Lean.Proofs.BinaryDft.Extracted
 
 @[expose] public section
 
 /-!
 # p3-binary-dft: claims
 
-The crate is transcribed over a field of characteristic 2, not extracted.
+The domain points and the subspace polynomials are extracted, generic over the tower-level trait.
+
+Their claims assume that the instance's members compute the field operations and the level's Cantor basis.
+
+The transforms are transcribed over a field of characteristic 2.
 
 A tower level is the field with its bit width 2^b and its Cantor basis beta.
 
@@ -160,6 +165,24 @@ theorem domain_point_steps.eq (L : Level F) (count : ℕ) :
 /-- The subspace polynomial is the j-th iterate of x^2 + x. -/
 theorem subspace_polynomial.eq (j : ℕ) (x : F) : subspace_polynomial j x = sqAddIter j x :=
   Proofs.BinaryDft.subspace_polynomial_eq j x
+
+/-- The shipped domain point of an index is point(index), and panics past the level's 2^(2^b) points.
+
+It assumes that the instance's members compute zero, the sum and the Cantor basis of the level. -/
+theorem extracted.domain_point {R : Type} {inst : p3_binary_field.tower.TowerLevel F R}
+    {L : Level F} (h : TowerComputes inst L) (index : Aeneas.Std.Usize) :
+    p3_binary_dft.domain.domain_point inst index =
+      if index.val < 2 ^ 2 ^ L.logBits then .ok (point L.cantor index.val) else .fail .panic := by
+  rw [domain_point_eq_mirror h, Proofs.BinaryDft.domain_point_eq]
+  split_ifs <;> rfl
+
+/-- The shipped subspace polynomial is the j-th iterate of x^2 + x, and never panics.
+
+It assumes that the instance's members compute the sum and the square. -/
+theorem extracted.subspace_polynomial {R : Type} {inst : p3_binary_field.tower.TowerLevel F R}
+    {L : Level F} (h : TowerComputes inst L) (j : Aeneas.Std.Usize) (x : F) :
+    p3_binary_dft.domain.subspace_polynomial inst j x = .ok (sqAddIter j.val x) := by
+  rw [subspace_polynomial_eq_mirror h, Proofs.BinaryDft.subspace_polynomial_eq]
 
 /-- The twiddle state of 2^l rows: the bases W_j(shift) and the steps table. -/
 theorem Twiddles.new.eq (L : Level F) {l : ℕ} (hl : l ≤ 2 ^ L.logBits) (shift : F) :

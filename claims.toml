@@ -265,6 +265,14 @@ name   = "Plonky3Lean.Claims.BinaryDft.compPoly_W_eval"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.extracted.domain_point"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.extracted.subspace_polynomial"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.Blake2sAir.binary.G_SCHEDULE.eq"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
