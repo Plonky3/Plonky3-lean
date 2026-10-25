@@ -229,6 +229,14 @@ name   = "Plonky3Lean.Claims.Air.next_row_unread"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.Air.packMat.bit"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Air.packMat.length"
+axioms = ["Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.BinaryDft.IsCantor.independent'"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -395,6 +403,22 @@ axioms = ["Quot.sound", "propext"]
 [[claim]]
 name   = "Plonky3Lean.Claims.Blake2sAir.state_after_round.panics"
 axioms = ["Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Blake2sAir.transpose_bits.bit"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Blake2sAir.generate_binary_trace_packed.eq_pack"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Blake2sAir.generate_binary_trace_packed.complete"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Blake2sAir.generate_binary_trace_packed.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.BinaryDft.domain_point.eq"
@@ -5405,6 +5429,18 @@ name   = "Plonky3Lean.Claims.KeccakAir.sound"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.KeccakAir.binary.generate_binary_trace_packed.eq_pack"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KeccakAir.binary.generate_binary_trace_packed.complete"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.KeccakAir.binary.generate_binary_trace_packed.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.Sumcheck.protocol.completeness"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -7350,6 +7386,22 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.Sha256Air.sound"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Sha256Air.binary.generate_binary_trace_packed.eq_pack"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Sha256Air.binary.generate_binary_trace_packed.complete"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Sha256Air.binary.generate_binary_trace_packed.panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Sha256Air.binary.generate_trace_row.cells_scratch"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]

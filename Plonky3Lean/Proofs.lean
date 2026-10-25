@@ -11,6 +11,7 @@ public import Plonky3Lean.Proofs.Air.Examples
 public import Plonky3Lean.Proofs.Air.Extracted
 public import Plonky3Lean.Proofs.Air.SymbolicExt
 public import Plonky3Lean.Proofs.Air.VirtualColumn
+public import Plonky3Lean.Proofs.Air.Pack
 public import Plonky3Lean.Proofs.Dft.SmallBatch
 public import Plonky3Lean.Proofs.Dft.Lde
 public import Plonky3Lean.Proofs.Dft.Rows
@@ -83,15 +84,19 @@ public import Plonky3Lean.Proofs.KeccakAir.Extracted
 public import Plonky3Lean.Proofs.KeccakAir.Binary.Complete
 public import Plonky3Lean.Proofs.KeccakAir.Binary.Degree
 public import Plonky3Lean.Proofs.KeccakAir.Binary.Extracted
+public import Plonky3Lean.Proofs.KeccakAir.Binary.Packed
 public import Plonky3Lean.Proofs.Sha256Air.Complete
 public import Plonky3Lean.Proofs.Sha256Air.Degree
 public import Plonky3Lean.Proofs.Sha256Air.Extracted
 public import Plonky3Lean.Proofs.Sha256Air.Binary.Sound
 public import Plonky3Lean.Proofs.Sha256Air.Binary.Complete
+public import Plonky3Lean.Proofs.Sha256Air.Binary.Packed
 public import Plonky3Lean.Proofs.Blake2sAir.Trace
 public import Plonky3Lean.Proofs.Blake2sAir.Degree
 public import Plonky3Lean.Proofs.Blake2sAir.Extracted
 public import Plonky3Lean.Proofs.Blake2sAir.Packed
+public import Plonky3Lean.Proofs.Blake2sAir.Transpose
+public import Plonky3Lean.Proofs.Blake2sAir.PackedGen
 public import Plonky3Lean.Proofs.Symmetric.Roots
 public import Plonky3Lean.Proofs.Field.BabyBear
 public import Plonky3Lean.Proofs.Field.BabyBear.Arith
