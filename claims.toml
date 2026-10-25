@@ -6445,7 +6445,15 @@ name   = "Plonky3Lean.Claims.Bus.planner_layout"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
-name   = "Plonky3Lean.Claims.Bus.blocks_aligned"
+name   = "Plonky3Lean.Claims.Bus.planner_domains"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.planner_blocks"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Bus.planner_block_unique"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]

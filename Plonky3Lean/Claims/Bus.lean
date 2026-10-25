@@ -6,6 +6,7 @@ public import Plonky3Lean.Proofs.Bus.Evaluation
 public import Plonky3Lean.Proofs.Bus.Timestamped
 public import Plonky3Lean.Proofs.Bus.Security
 public import Plonky3Lean.Proofs.Bus.Extracted
+public import Plonky3Lean.Proofs.Bus.PlanBuild
 public import CompPoly.Fields.BabyBear.Ext4
 public import CompPoly.Fields.KoalaBear.Basic
 
@@ -90,57 +91,100 @@ theorem planner_layout {inputs : List (BusPlanInput F)} {p : BusPlan}
     (h : BusPlan.build inputs = .ok (some p)) : LayoutWF p :=
   build_wf h
 
-/-- **Every block is aligned.**
+/-- **Every declaration's domain.**
 
-Sorted by side and decreasing height, each block starts at a multiple of its height.
+In a plan the planner returns, each declared bus name is a domain of the plan.
 
-So the planner's debug assertion never fails. -/
-theorem blocks_aligned (pending : List PendingBlock) {out : List BusBlock × List BusBlock × ℕ × ℕ}
-    (h : layoutBlocks (pending.mergeSort pendingLe) = .ok out) :
-    ∀ blk ∈ out.1 ++ out.2.1, 2 ^ blk.log_height ∣ blk.offset :=
-  layoutBlocks_aligned pending h
+That domain has the declaration's payload width, and the payload is nonempty. -/
+theorem planner_domains {inputs : List (BusPlanInput F)} {p : BusPlan}
+    (h : BusPlan.build inputs = .ok (some p)) {input : BusPlanInput F} (hin : input ∈ inputs)
+    {i : SymbolicBusInteraction F} (hi : i ∈ input.interactions) :
+    ∃ hb : busIndex p i.bus_name < p.domains.length,
+      p.domains[busIndex p i.bus_name].«name» = i.bus_name ∧
+      p.domains[busIndex p i.bus_name].payload_width = i.fields.length ∧ i.fields ≠ [] :=
+  build_domain h hin hi
+
+/-- **The blocks of a plan.**
+
+In a plan the planner returns:
+
+- the pushes lie on the push side and the pulls on the pull side
+- forgetting offsets, the blocks are the declarations' requests, rearranged
+- each side's blocks are laid end to end and end by the logical leaf count
+- each block starts at a multiple of its own height, so the debug assertion never fails -/
+theorem planner_blocks {inputs : List (BusPlanInput F)} {p : BusPlan}
+    (h : BusPlan.build inputs = .ok (some p)) :
+    (∀ b ∈ p.pushes, b.direction = .Push) ∧ (∀ b ∈ p.pulls, b.direction = .Pull) ∧
+      ((p.pushes ++ p.pulls).map BusBlock.request).Perm (pendingOf p inputs) ∧
+      Separated p.pushes p.geometry.logical_leaf_count ∧
+      Separated p.pulls p.geometry.logical_leaf_count ∧
+      ∀ b ∈ p.pushes ++ p.pulls, 2 ^ b.log_height ∣ b.offset :=
+  build_blocks h
+
+/-- **Every declaration owns exactly one block.**
+
+Take the declaration j of AIR a.
+
+The plan has exactly one block owned by it.
+
+That block carries the declaration's bus and direction, and the AIR's height. -/
+theorem planner_block_unique {inputs : List (BusPlanInput F)} {p : BusPlan}
+    (h : BusPlan.build inputs = .ok (some p)) {a j : ℕ} {input : BusPlanInput F}
+    {i : SymbolicBusInteraction F} (ha : inputs[a]? = some input) (hj : input.interactions[j]? = some i) :
+    ((p.pushes ++ p.pulls).filter (·.owner = ⟨a, j⟩)).map BusBlock.request =
+      [⟨busIndex p i.bus_name, i.direction, ⟨a, j⟩, input.log_height⟩] :=
+  build_block_unique h ha hj
 
 /-- **The layout is injective.**
 
-On such a plan, a padded tuple determines its bus and its payload. -/
-theorem layout_injective {p : BusPlan} (hp : LayoutWF p) {b b' : ℕ} (hb : b < p.domains.length)
+On a plan the planner returns, a padded tuple determines its bus and its payload. -/
+theorem layout_injective {inputs : List (BusPlanInput F)} {p : BusPlan}
+    (h : BusPlan.build inputs = .ok (some p)) {b b' : ℕ} (hb : b < p.domains.length)
     (hb' : b' < p.domains.length) {x y : List K} (hx : x.length = p.domains[b].payload_width)
-    (hy : y.length = p.domains[b'].payload_width) (h : tupleOf p b x = tupleOf p b' y) :
+    (hy : y.length = p.domains[b'].payload_width) (he : tupleOf p b x = tupleOf p b' y) :
     b = b' ∧ x = y :=
-  tupleOf_injective hp hb hb' hx hy h
+  tupleOf_injective (build_wf h) hb hb' hx hy he
 
 /-- **Soundness of the bus.**
 
-Take a plan the planner returns, and pushed declarations that are not a permutation of the pulled ones.
+Take the plan the planner returns for some declarations.
+
+Take pushed and pulled named payloads those declarations allow, not a permutation of each other.
 
 Their padded tuples have equal grand products on at most max(1, m) N |K|^m of the |K|^(m + 1) challenges. -/
-theorem bus_soundness {p : BusPlan} (hp : LayoutWF p) {push pull : List (ℕ × List K)}
-    (hpush : ∀ d ∈ push, Fits p d) (hpull : ∀ d ∈ pull, Fits p d) (hperm : ¬ push.Perm pull)
-    {N : ℕ} (hN : push.length ≤ N) (hN' : pull.length ≤ N) :
+theorem bus_soundness {inputs : List (BusPlanInput F)} {p : BusPlan}
+    (h : BusPlan.build inputs = .ok (some p)) {push pull : List (String × List K)}
+    (hpush : ∀ d ∈ push, Declared inputs d) (hpull : ∀ d ∈ pull, Declared inputs d)
+    (hperm : ¬ push.Perm pull) {N : ℕ} (hN : push.length ≤ N) (hN' : pull.length ≤ N) :
     #{x : K × (Fin p.geometry.tuple_variables → K) |
-      grandProduct x.1 (List.ofFn x.2) (push.map fun d => tupleOf p d.1 d.2) =
-        grandProduct x.1 (List.ofFn x.2) (pull.map fun d => tupleOf p d.1 d.2)}
+      grandProduct x.1 (List.ofFn x.2) (push.map fun d => tupleOf p (busIndex p d.1) d.2) =
+        grandProduct x.1 (List.ofFn x.2) (pull.map fun d => tupleOf p (busIndex p d.1) d.2)}
       ≤ max 1 p.geometry.tuple_variables * N * Fintype.card K ^ p.geometry.tuple_variables :=
-  Plonky3Lean.Proofs.Bus.bus_soundness hp hpush hpull hperm hN hN'
+  bus_soundness_of_build h hpush hpull hperm hN hN'
 
 /-! ## The leaf factor -/
 
 /-- **The factor is the specified leaf.**
+
+Take a declaration of the inputs, compiled against the plan the planner returns.
 
 The weights are the equality table of the fingerprint point.
 
 A compiled declaration evaluates to gamma minus the multilinear extension of its padded tuple.
 
 Its activation is then applied to that value. -/
-theorem factor_is_leaf {p : BusPlan} (hp : LayoutWF p) {b : ℕ} (hb : b < p.domains.length)
-    {interaction : SymbolicBusInteraction F} (hw : interaction.fields.length = p.domains[b].payload_width)
+theorem factor_is_leaf {inputs : List (BusPlanInput F)} {p : BusPlan}
+    (h : BusPlan.build inputs = .ok (some p)) {input : BusPlanInput F} (hin : input ∈ inputs)
+    {interaction : SymbolicBusInteraction F} (hi : interaction ∈ input.interactions)
     {r : List K} (hr : r.length = p.geometry.tuple_variables) (γ : K) (values : BusEvaluation F K)
     {vals : List K} (hvals : interaction.fields.mapM (exprValue values) = some vals)
     {sOpt : Option K} (hact : actValue values interaction.activation = some sOpt)
     {f : BusFactorPlan F K}
-    (hf : p3_bus.evaluation.mirror.BusPlan.compile_factor p b interaction (eqTable r) γ = .ok f) :
-    f.evaluate values = .ok (gateOpt sOpt (leaf γ r (tupleOf p b vals))) :=
-  factor_eq_leaf hp hb hw hr γ values hvals hact hf
+    (hf : p3_bus.evaluation.mirror.BusPlan.compile_factor p (busIndex p interaction.bus_name) interaction
+      (eqTable r) γ = .ok f) :
+    f.evaluate values = .ok (gateOpt sOpt (leaf γ r (tupleOf p (busIndex p interaction.bus_name) vals))) := by
+  obtain ⟨hb, -, hw, -⟩ := build_domain h hin hi
+  exact factor_eq_leaf (build_wf h) hb hw.symm hr γ values hvals hact hf
 
 /-- Flattening a declaration is faithful.
 
