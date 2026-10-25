@@ -14,5 +14,6 @@ public import P3BatchStark.Assumptions.Mirror.Transcript
 public import P3BatchStark.Assumptions.Mirror.Verifier
 public import P3BatchStark.Assumptions.Mirror.Check
 public import P3BatchStark.Assumptions.Mirror.Constraints
+public import P3BatchStark.Assumptions.Mirror.Verify
 
 @[expose] public section
