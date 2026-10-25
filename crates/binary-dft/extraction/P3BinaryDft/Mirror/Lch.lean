@@ -15,8 +15,8 @@ Its branch is a panic here too.
 -/
 module
 
-public import P3BinaryDft.Domain
-public import P3BinaryDft.Butterfly
+public import P3BinaryDft.Mirror.Domain
+public import P3BinaryDft.Mirror.Butterfly
 
 @[expose] public section
 

@@ -5,7 +5,7 @@ The matrix is its height and its rows, in a vector space V over the field.
 -/
 module
 
-public import P3BinaryDft.Domain
+public import P3BinaryDft.Mirror.Domain
 public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 
 @[expose] public section

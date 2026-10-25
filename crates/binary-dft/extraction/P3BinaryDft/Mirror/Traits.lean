@@ -7,7 +7,7 @@ Rows past the height read as zero, which is how a zero-padded copy looks.
 -/
 module
 
-public import P3BinaryDft.Model
+public import P3BinaryDft.Mirror.Model
 
 @[expose] public section
 

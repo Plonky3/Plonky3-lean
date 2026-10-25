@@ -1,18 +1,23 @@
 /-
 The Lean model of p3-binary-dft.
 
-Nothing is extracted: every transform is generic over the tower-level trait, which aeneas rejects.
+`P3BinaryDft/Extraction/` is hax's scoped extraction, rooted at `start_from` in crate.toml.
 
-The transforms are transcribed over a field, one definition per Rust item.
+It holds the domain points and the subspace polynomials, generic over the tower-level trait.
+
+`P3BinaryDft/Mirror/` transcribes the transforms over a field.
+
+Each transcription has a `[[mirror]]` entry in crate.toml.
 -/
 module
 
-public import P3BinaryDft.Model
-public import P3BinaryDft.Domain
-public import P3BinaryDft.Naive
-public import P3BinaryDft.Butterfly
-public import P3BinaryDft.Lch
-public import P3BinaryDft.Traits
-public import P3BinaryDft.Encoder
+public import P3BinaryDft.Extraction
+public import P3BinaryDft.Mirror.Model
+public import P3BinaryDft.Mirror.Domain
+public import P3BinaryDft.Mirror.Naive
+public import P3BinaryDft.Mirror.Butterfly
+public import P3BinaryDft.Mirror.Lch
+public import P3BinaryDft.Mirror.Traits
+public import P3BinaryDft.Mirror.Encoder
 
 @[expose] public section

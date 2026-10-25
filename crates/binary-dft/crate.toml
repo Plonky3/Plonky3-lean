@@ -2,16 +2,23 @@
 
 lean_lib = "P3BinaryDft"
 
-# Nothing is extracted.
+# The domain points and the subspace polynomials are extracted.
 #
-# Every transform is generic over the tower-level trait of p3-binary-field, whose p3-field supertraits aeneas rejects (docs/extractor-issues.md 9).
+# They stay generic over the tower-level trait, whose Lean structure P3BinaryField declares by hand.
 #
-# The transforms also use rayon iterators, raw pointers, SIMD intrinsics and a `const` generic `bool` that picks a kernel (items 12, 14 and 61).
+# The transforms use rayon iterators, raw pointers, SIMD intrinsics and a `const` generic `bool` that picks a kernel (docs/extractor-issues.md 12, 14 and 61).
 #
-# Each item is transcribed over a field in stub/P3BinaryDft/, with the abstractions its file header lists.
+# The domain steps accumulate in a closure over a mutable capture, whose back function CoreModels cannot take (60).
+#
+# Each of them is transcribed over a field in extraction/P3BinaryDft/Mirror/, with the abstractions its file header lists.
 #
 # Not transcribed: the staged coset pass and the staging buffers (lch/schedule.rs `run_cosets`, staging.rs), the polynomial-basis transform (poly/), and the SIMD kernels.
-state = "stub"
+state = "scoped"
+
+start_from = [
+  "p3_binary_dft::domain::domain_point",
+  "p3_binary_dft::domain::subspace_polynomial",
+]
 
 features = []
 

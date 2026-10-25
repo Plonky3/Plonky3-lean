@@ -3,7 +3,7 @@ Transcriptions of the Reed-Solomon encoder of p3-binary-dft.
 -/
 module
 
-public import P3BinaryDft.Traits
+public import P3BinaryDft.Mirror.Traits
 
 @[expose] public section
 

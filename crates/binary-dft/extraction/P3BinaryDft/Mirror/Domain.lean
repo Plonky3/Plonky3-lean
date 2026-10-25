@@ -3,7 +3,7 @@ Transcriptions of the domain of p3-binary-dft: its points, their steps, and the 
 -/
 module
 
-public import P3BinaryDft.Model
+public import P3BinaryDft.Mirror.Model
 
 @[expose] public section
 
