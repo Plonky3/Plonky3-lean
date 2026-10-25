@@ -5,6 +5,7 @@ public import Plonky3Lean.Proofs.Air.Extracted
 public import Plonky3Lean.Proofs.Air.SymbolicExt
 public import Plonky3Lean.Proofs.Air.VirtualColumn
 public import Plonky3Lean.Proofs.Air.NextRow
+public import Plonky3Lean.Proofs.Air.Pack
 
 @[expose] public section
 
@@ -499,5 +500,26 @@ theorem next_row_unread : type_of% @Plonky3Lean.Proofs.Air.constraints_congr :=
   @Plonky3Lean.Proofs.Air.constraints_congr
 
 end nextRow
+
+/-! ## Traces of bits packed 64 rows to a word -/
+
+section pack
+
+/-- The packing of a matrix keeps its width, and stores 64 rows per row, one per bit:
+
+- bit `k` of word `(w, j)` says whether cell `(64 w + k, j)` is 1
+- the bits past the height are zero -/
+theorem packMat.bit (M : Mat F) {w j k : ℕ} (hw : w < (M.height + 63) / 64) (hj : j < M.width) :
+    (packMat M).width = M.width ∧
+      ((packMat M).values.getD (w * M.width + j) 0).getLsbD k =
+        (decide (k < 64) && decide (64 * w + k < M.height) && decide (M.get (64 * w + k) j = some 1)) := by
+  refine ⟨rfl, ?_⟩
+  rw [packMat, packRows_getD _ _ _ hw hj, wordOf_getLsbD, Bool.and_assoc]
+
+/-- A packed matrix has `ceil(h / 64)` rows of words. -/
+theorem packMat.length (M : Mat F) : (packMat M).values.length = M.width * ((M.height + 63) / 64) := by
+  rw [packMat, length_packRows]
+
+end pack
 
 end Plonky3Lean.Claims.Air
