@@ -27,7 +27,7 @@ target `thumbv7em-none-eabi`
 | `blake3-crate` | stub |  | 26 | 0 | 3 |  | 0 / 0 |  |
 | `bus` | scoped | 163 | 1431 | 0 | 122 | 0 | 1 / 0 | pre `010` |
 | `challenger` | scoped | 1552 | 223 | 0 | 12 | 6 | 1 / 1 | pre `010` |
-| `circle` | stub |  | 1283 | 0 | 80 |  | 0 / 0 |  |
+| `circle` | stub |  | 1510 | 0 | 96 |  | 0 / 0 |  |
 | `commit` | stub |  | 836 | 0 | 59 |  | 0 / 0 |  |
 | `dft` | stub |  | 992 | 0 | 67 |  | 0 / 0 |  |
 | `field` | stub |  | 382 | 7 | 25 |  | 0 / 0 |  |
@@ -521,7 +521,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1868) whose dependencies include it; reaching one is not using it.
+(of 1881) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -564,7 +564,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1868) whose dependencies include the declaration.
+counts the claims (of 1881) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -1067,42 +1067,42 @@ counts the claims (of 1868) whose dependencies include the declaration.
 | `challenger` | `p3_challenger.mirror.refill` | `p3_challenger::multi_field_challenger::MultiField32Challenger::refill_f_squeeze_from_inner` | not translated | 1 |
 | `challenger` | `p3_challenger.mirror.sampleFromQueue` | `{impl p3_challenger::CanSample<EF> for p3_challenger::multi_field_challenger::MultiField32Challenger<F, PF, P, WIDTH, RATE>}::sample` | not translated | 1 |
 | `challenger` | `p3_challenger.mirror.grindState` | `{impl p3_challenger::grinding_challenger::GrindingChallenger for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::grind` | not translated | 1 |
-| `circle` | `p3_circle.point.mirror.Point` | `p3_circle::point::Point` | stub | 30 |
-| `circle` | `p3_circle.point.mirror.tryInverse` | `p3_field::Field::try_inverse` | stub | 8 |
-| `circle` | `p3_circle.point.mirror.Point.new` | `p3_circle::point::Point::new` | stub | 26 |
-| `circle` | `p3_circle.point.mirror.Point.ZERO` | `p3_circle::point::Point::ZERO` | stub | 14 |
-| `circle` | `p3_circle.point.mirror.Point.from_projective_line` | `p3_circle::point::Point::from_projective_line` | stub | 7 |
+| `circle` | `p3_circle.point.mirror.Point` | `p3_circle::point::Point` | stub | 37 |
+| `circle` | `p3_circle.point.mirror.tryInverse` | `p3_field::Field::try_inverse` | stub | 10 |
+| `circle` | `p3_circle.point.mirror.Point.new` | `p3_circle::point::Point::new` | stub | 33 |
+| `circle` | `p3_circle.point.mirror.Point.ZERO` | `p3_circle::point::Point::ZERO` | stub | 16 |
+| `circle` | `p3_circle.point.mirror.Point.from_projective_line` | `p3_circle::point::Point::from_projective_line` | stub | 9 |
 | `circle` | `p3_circle.point.mirror.Point.to_projective_line` | `p3_circle::point::Point::to_projective_line` | stub | 1 |
-| `circle` | `p3_circle.point.mirror.Point.double` | `p3_circle::point::Point::double` | stub | 11 |
+| `circle` | `p3_circle.point.mirror.Point.double` | `p3_circle::point::Point::double` | stub | 13 |
 | `circle` | `p3_circle.point.mirror.Point.repeated_double` | `p3_circle::point::Point::repeated_double` | stub | 0 |
-| `circle` | `p3_circle.point.mirror.Point.vnStep` | `p3_circle::point::Point::v_n` | stub | 19 |
-| `circle` | `p3_circle.point.mirror.Point.v_n` | `p3_circle::point::Point::v_n` | stub | 10 |
+| `circle` | `p3_circle.point.mirror.Point.vnStep` | `p3_circle::point::Point::v_n` | stub | 23 |
+| `circle` | `p3_circle.point.mirror.Point.v_n` | `p3_circle::point::Point::v_n` | stub | 14 |
 | `circle` | `p3_circle.point.mirror.Point.vnProdLoop` | `p3_circle::point::Point::v_n_prod` | stub | 4 |
 | `circle` | `p3_circle.point.mirror.Point.v_n_prod` | `p3_circle::point::Point::v_n_prod` | stub | 4 |
-| `circle` | `p3_circle.point.mirror.Point.neg` | `{impl core::ops::Neg for p3_circle::point::Point<F>}::neg` | stub | 13 |
-| `circle` | `p3_circle.point.mirror.Point.add` | `{impl core::ops::Add<p3_circle::point::Point<F>> for p3_circle::point::Point<EF>}::add` | stub | 21 |
-| `circle` | `p3_circle.point.mirror.Point.sub` | `{impl core::ops::Sub<p3_circle::point::Point<F>> for p3_circle::point::Point<EF>}::sub` | stub | 5 |
+| `circle` | `p3_circle.point.mirror.Point.neg` | `{impl core::ops::Neg for p3_circle::point::Point<F>}::neg` | stub | 19 |
+| `circle` | `p3_circle.point.mirror.Point.add` | `{impl core::ops::Add<p3_circle::point::Point<F>> for p3_circle::point::Point<EF>}::add` | stub | 28 |
+| `circle` | `p3_circle.point.mirror.Point.sub` | `{impl core::ops::Sub<p3_circle::point::Point<F>> for p3_circle::point::Point<EF>}::sub` | stub | 11 |
 | `circle` | `p3_circle.point.mirror.Point.v_tilde_p` | `p3_circle::point::Point::v_tilde_p` | stub | 0 |
 | `circle` | `p3_circle.point.mirror.Point.recip_v_tilde_p_num_den` | `p3_circle::point::Point::recip_v_tilde_p_num_den` | stub | 3 |
 | `circle` | `p3_circle.point.mirror.Point.s_p_at_p` | `p3_circle::point::Point::s_p_at_p` | stub | 4 |
-| `circle` | `p3_circle.point.mirror.Point.v_p` | `p3_circle::point::Point::v_p` | stub | 8 |
-| `circle` | `p3_circle.point.mirror.Point.mulLoop` | `{impl core::ops::Mul<usize> for p3_circle::point::Point<F>}::mul` | stub | 10 |
-| `circle` | `p3_circle.point.mirror.Point.mul` | `{impl core::ops::Mul<usize> for p3_circle::point::Point<F>}::mul` | stub | 10 |
-| `circle` | `p3_circle.point.mirror.Point.generator` | `p3_circle::point::Point::generator` | stub | 17 |
-| `circle` | `p3_circle.domain.mirror.CircleDomain` | `p3_circle::domain::CircleDomain` | stub | 19 |
-| `circle` | `p3_circle.domain.mirror.interleave` | `itertools::Itertools::interleave` | stub | 3 |
-| `circle` | `p3_circle.domain.mirror.chain` | `itertools::iterate` | stub | 8 |
+| `circle` | `p3_circle.point.mirror.Point.v_p` | `p3_circle::point::Point::v_p` | stub | 14 |
+| `circle` | `p3_circle.point.mirror.Point.mulLoop` | `{impl core::ops::Mul<usize> for p3_circle::point::Point<F>}::mul` | stub | 12 |
+| `circle` | `p3_circle.point.mirror.Point.mul` | `{impl core::ops::Mul<usize> for p3_circle::point::Point<F>}::mul` | stub | 12 |
+| `circle` | `p3_circle.point.mirror.Point.generator` | `p3_circle::point::Point::generator` | stub | 23 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain` | `p3_circle::domain::CircleDomain` | stub | 25 |
+| `circle` | `p3_circle.domain.mirror.interleave` | `itertools::Itertools::interleave` | stub | 9 |
+| `circle` | `p3_circle.domain.mirror.chain` | `itertools::iterate` | stub | 15 |
 | `circle` | `p3_circle.domain.mirror.parallel_point_chain` | `p3_circle::domain::parallel_point_chain` | stub | 0 |
 | `circle` | `p3_circle.domain.mirror.forward_backward_index` | `p3_circle::domain::forward_backward_index` | stub | 0 |
 | `circle` | `p3_circle.domain.mirror.CircleDomain.new` | `p3_circle::domain::CircleDomain::new` | stub | 0 |
-| `circle` | `p3_circle.domain.mirror.CircleDomain.standard` | `p3_circle::domain::CircleDomain::standard` | stub | 12 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.standard` | `p3_circle::domain::CircleDomain::standard` | stub | 18 |
 | `circle` | `p3_circle.domain.mirror.CircleDomain.is_standard` | `p3_circle::domain::CircleDomain::is_standard` | stub | 1 |
-| `circle` | `p3_circle.domain.mirror.CircleDomain.subgroup_generator` | `p3_circle::domain::CircleDomain::subgroup_generator` | stub | 16 |
-| `circle` | `p3_circle.domain.mirror.CircleDomain.coset0` | `p3_circle::domain::CircleDomain::coset0` | stub | 7 |
-| `circle` | `p3_circle.domain.mirror.CircleDomain.coset1` | `p3_circle::domain::CircleDomain::coset1` | stub | 3 |
-| `circle` | `p3_circle.domain.mirror.CircleDomain.points` | `p3_circle::domain::CircleDomain::points` | stub | 3 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.subgroup_generator` | `p3_circle::domain::CircleDomain::subgroup_generator` | stub | 22 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.coset0` | `p3_circle::domain::CircleDomain::coset0` | stub | 13 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.coset1` | `p3_circle::domain::CircleDomain::coset1` | stub | 9 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.points` | `p3_circle::domain::CircleDomain::points` | stub | 9 |
 | `circle` | `p3_circle.domain.mirror.CircleDomain.points_vec` | `p3_circle::domain::CircleDomain::points_vec` | stub | 0 |
-| `circle` | `p3_circle.domain.mirror.CircleDomain.nth_point` | `p3_circle::domain::CircleDomain::nth_point` | stub | 6 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.nth_point` | `p3_circle::domain::CircleDomain::nth_point` | stub | 7 |
 | `circle` | `p3_circle.domain.mirror.CircleDomain.vanishing_poly` | `p3_circle::domain::CircleDomain::vanishing_poly` | stub | 2 |
 | `circle` | `p3_circle.domain.mirror.CircleDomain.size` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::size` | stub | 0 |
 | `circle` | `p3_circle.domain.mirror.CircleDomain.first_point` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::first_point` | stub | 0 |
@@ -1113,40 +1113,56 @@ counts the claims (of 1868) whose dependencies include the declaration.
 | `circle` | `p3_circle.domain.mirror.CircleDomain.vanishing_poly_at_point` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::vanishing_poly_at_point` | stub | 0 |
 | `circle` | `p3_circle.domain.mirror.CircleDomain.selectors_at_point` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::selectors_at_point` | stub | 2 |
 | `circle` | `p3_circle.domain.mirror.CircleDomain.selectors_on_coset` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::selectors_on_coset` | stub | 1 |
-| `circle` | `p3_circle.ordering.mirror.cfft_permute_index` | `p3_circle::ordering::cfft_permute_index` | stub | 13 |
-| `circle` | `p3_circle.ordering.mirror.cfft_permute_slice` | `p3_circle::ordering::cfft_permute_slice` | stub | 0 |
+| `circle` | `p3_circle.ordering.mirror.cfft_permute_index` | `p3_circle::ordering::cfft_permute_index` | stub | 18 |
+| `circle` | `p3_circle.ordering.mirror.cfft_permute_slice` | `p3_circle::ordering::cfft_permute_slice` | stub | 2 |
 | `circle` | `p3_circle.ordering.mirror.cfft_permute_slice_chunked_in_place` | `p3_circle::ordering::cfft_permute_slice_chunked_in_place` | stub | 1 |
-| `circle` | `p3_circle.verifier.mirror.FriError` | `p3_fri::verifier::FriError` | stub | 5 |
-| `circle` | `p3_circle.verifier.mirror.Res` | `p3_circle::verifier::verify_queries` | stub | 5 |
-| `circle` | `p3_circle.verifier.mirror.crash` | `p3_circle::verifier::verify_queries` | stub | 4 |
-| `circle` | `p3_circle.verifier.mirror.lift` | `p3_circle::verifier::verify_queries` | stub | 5 |
-| `circle` | `p3_circle.verifier.mirror.CircleFriProof` | `p3_circle::proof::CircleFriProof` | stub | 4 |
-| `circle` | `p3_circle.verifier.mirror.validate_proof_shape` | `p3_circle::verifier::validate_proof_shape` | stub | 3 |
-| `circle` | `p3_circle.verifier.mirror.rebuildRow` | `p3_circle::verifier::fold_query` | stub | 6 |
-| `circle` | `p3_circle.verifier.mirror.ChainState` | `p3_circle::verifier::fold_query` | stub | 6 |
-| `circle` | `p3_circle.verifier.mirror.foldStep` | `p3_circle::verifier::fold_query` | stub | 6 |
-| `circle` | `p3_circle.verifier.mirror.fold_query` | `p3_circle::verifier::fold_query` | stub | 5 |
-| `circle` | `p3_circle.verifier.mirror.mapInputError` | `p3_circle::verifier::verify_queries` | stub | 4 |
-| `circle` | `p3_circle.verifier.mirror.checkRound` | `p3_circle::verifier::verify_queries` | stub | 4 |
-| `circle` | `p3_circle.verifier.mirror.checkQuery` | `p3_circle::verifier::verify_queries` | stub | 4 |
-| `circle` | `p3_circle.verifier.mirror.verify_queries` | `p3_circle::verifier::verify_queries` | stub | 4 |
-| `circle` | `p3_circle.pcs.mirror.InputError` | `p3_circle::pcs::InputError` | stub | 4 |
-| `circle` | `p3_circle.pcs.mirror.CircleInputProof` | `p3_circle::pcs::CircleInputProof` | stub | 3 |
-| `circle` | `p3_circle.pcs.mirror.CirclePcsProof` | `p3_circle::pcs::CirclePcsProof` | stub | 3 |
-| `circle` | `p3_circle.pcs.mirror.CircleVerifierTx` | `p3_circle::transcript::CircleVerifierTranscript` | stub | 3 |
-| `circle` | `p3_circle.pcs.mirror.Claim` | `p3_circle::pcs::CommitmentWithClaims` | stub | 3 |
-| `circle` | `p3_circle.pcs.mirror.IRes` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 4 |
-| `circle` | `p3_circle.pcs.mirror.Replayed` | `p3_circle::pcs::ReplayedChallenges` | stub | 3 |
-| `circle` | `p3_circle.pcs.mirror.txResult` | `p3_circle::pcs::replay_transcript` | stub | 3 |
-| `circle` | `p3_circle.pcs.mirror.replay_transcript` | `p3_circle::pcs::replay_transcript` | stub | 3 |
-| `circle` | `p3_circle.pcs.mirror.checkBatch` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 3 |
-| `circle` | `p3_circle.pcs.mirror.reduceMatrix` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 4 |
-| `circle` | `p3_circle.pcs.mirror.firstLayerLeaf` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 5 |
-| `circle` | `p3_circle.pcs.mirror.reduceBatch` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 3 |
-| `circle` | `p3_circle.pcs.mirror.reduceQuery` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 3 |
-| `circle` | `p3_circle.pcs.mirror.open_inputs` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 3 |
-| `circle` | `p3_circle.pcs.mirror.claimedWidth` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 3 |
-| `circle` | `p3_circle.pcs.mirror.verify` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 3 |
+| `circle` | `p3_circle.verifier.mirror.FriError` | `p3_fri::verifier::FriError` | stub | 6 |
+| `circle` | `p3_circle.verifier.mirror.Res` | `p3_circle::verifier::verify_queries` | stub | 6 |
+| `circle` | `p3_circle.verifier.mirror.crash` | `p3_circle::verifier::verify_queries` | stub | 5 |
+| `circle` | `p3_circle.verifier.mirror.lift` | `p3_circle::verifier::verify_queries` | stub | 6 |
+| `circle` | `p3_circle.verifier.mirror.CircleFriProof` | `p3_circle::proof::CircleFriProof` | stub | 5 |
+| `circle` | `p3_circle.verifier.mirror.validate_proof_shape` | `p3_circle::verifier::validate_proof_shape` | stub | 4 |
+| `circle` | `p3_circle.verifier.mirror.rebuildRow` | `p3_circle::verifier::fold_query` | stub | 7 |
+| `circle` | `p3_circle.verifier.mirror.ChainState` | `p3_circle::verifier::fold_query` | stub | 7 |
+| `circle` | `p3_circle.verifier.mirror.foldStep` | `p3_circle::verifier::fold_query` | stub | 7 |
+| `circle` | `p3_circle.verifier.mirror.fold_query` | `p3_circle::verifier::fold_query` | stub | 6 |
+| `circle` | `p3_circle.verifier.mirror.mapInputError` | `p3_circle::verifier::verify_queries` | stub | 5 |
+| `circle` | `p3_circle.verifier.mirror.checkRound` | `p3_circle::verifier::verify_queries` | stub | 5 |
+| `circle` | `p3_circle.verifier.mirror.checkQuery` | `p3_circle::verifier::verify_queries` | stub | 5 |
+| `circle` | `p3_circle.verifier.mirror.verify_queries` | `p3_circle::verifier::verify_queries` | stub | 5 |
+| `circle` | `p3_circle.pcs.mirror.InputError` | `p3_circle::pcs::InputError` | stub | 5 |
+| `circle` | `p3_circle.pcs.mirror.CircleInputProof` | `p3_circle::pcs::CircleInputProof` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.CirclePcsProof` | `p3_circle::pcs::CirclePcsProof` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.CircleVerifierTx` | `p3_circle::transcript::CircleVerifierTranscript` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.Claim` | `p3_circle::pcs::CommitmentWithClaims` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.IRes` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 5 |
+| `circle` | `p3_circle.pcs.mirror.Replayed` | `p3_circle::pcs::ReplayedChallenges` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.txResult` | `p3_circle::pcs::replay_transcript` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.replay_transcript` | `p3_circle::pcs::replay_transcript` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.checkBatch` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.reduceMatrix` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 5 |
+| `circle` | `p3_circle.pcs.mirror.firstLayerLeaf` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 6 |
+| `circle` | `p3_circle.pcs.mirror.reduceBatch` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.reduceQuery` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.open_inputs` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.claimedWidth` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.verify` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 4 |
+| `circle` | `p3_circle.prover.mirror.CircleProverTx` | `p3_circle::transcript::CircleProverTranscript` | stub | 2 |
+| `circle` | `p3_circle.prover.mirror.rowsOf` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 3 |
+| `circle` | `p3_circle.prover.mirror.matOfPairs` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 4 |
+| `circle` | `p3_circle.prover.mirror.pairsOf` | `p3_circle::folding::fold_y` | stub | 3 |
+| `circle` | `p3_circle.prover.mirror.openMatrix` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 1 |
+| `circle` | `p3_circle.prover.mirror.openedValues` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 1 |
+| `circle` | `p3_circle.prover.mirror.permutedPoints` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 2 |
+| `circle` | `p3_circle.prover.mirror.accumulateMatrix` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 2 |
+| `circle` | `p3_circle.prover.mirror.reducedOpenings` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 2 |
+| `circle` | `p3_circle.prover.mirror.extractLambdas` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 2 |
+| `circle` | `p3_circle.prover.mirror.commitRound` | `p3_circle::prover::commit_phase` | stub | 2 |
+| `circle` | `p3_circle.prover.mirror.commitPhase` | `p3_circle::prover::commit_phase` | stub | 2 |
+| `circle` | `p3_circle.prover.mirror.answerQueries` | `p3_circle::prover::answer_queries` | stub | 1 |
+| `circle` | `p3_circle.prover.mirror.openInputs` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 1 |
+| `circle` | `p3_circle.prover.mirror.firstLayerSiblings` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 1 |
+| `circle` | `p3_circle.prover.mirror.open_` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 1 |
 | `commit` | `p3_commit.domain.mirror.LagrangeSelectors` | `p3_commit::domain::LagrangeSelectors` | stub | 39 |
 | `commit` | `p3_commit.domain.mirror.Coset.size` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::size` | stub | 37 |
 | `commit` | `p3_commit.domain.mirror.Coset.first_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::first_point` | stub | 27 |
@@ -1176,9 +1192,9 @@ counts the claims (of 1868) whose dependencies include the declaration.
 | `commit` | `p3_commit.periodic.mirror.unitEvalOnLde` | `{impl p3_commit::periodic::PeriodicEvaluator<F, D> for ()}::eval_on_lde` | stub | 1 |
 | `commit` | `p3_commit.periodic.mirror.unitEvalAtPoint` | `{impl p3_commit::periodic::PeriodicEvaluator<F, D> for ()}::eval_at_point` | stub | 1 |
 | `commit` | `p3_commit.periodic.mirror.build_periodic_lde_table` | `p3_commit::pcs::univariate::UnivariateStarkPcs::build_periodic_lde_table` | stub | 4 |
-| `commit` | `p3_commit.pcs.univariate.mirror.PointOpening` | `p3_commit::pcs::univariate::PointOpening` | stub | 57 |
-| `commit` | `p3_commit.pcs.univariate.mirror.MatrixOpening` | `p3_commit::pcs::univariate::MatrixOpening` | stub | 56 |
-| `commit` | `p3_commit.pcs.univariate.mirror.CommitmentOpening` | `p3_commit::pcs::univariate::CommitmentOpening` | stub | 53 |
+| `commit` | `p3_commit.pcs.univariate.mirror.PointOpening` | `p3_commit::pcs::univariate::PointOpening` | stub | 62 |
+| `commit` | `p3_commit.pcs.univariate.mirror.MatrixOpening` | `p3_commit::pcs::univariate::MatrixOpening` | stub | 61 |
+| `commit` | `p3_commit.pcs.univariate.mirror.CommitmentOpening` | `p3_commit::pcs::univariate::CommitmentOpening` | stub | 54 |
 | `commit` | `p3_commit.pcs.univariate.mirror.commit_preprocessing` | `p3_commit::pcs::univariate::UnivariateStarkPcs::commit_preprocessing` | stub | 1 |
 | `commit` | `p3_commit.pcs.univariate.mirror.commit_quotient` | `p3_commit::pcs::univariate::UnivariateStarkPcs::commit_quotient` | stub | 2 |
 | `commit` | `p3_commit.pcs.univariate.mirror.get_evaluations_on_domain_no_random` | `p3_commit::pcs::univariate::UnivariateStarkPcs::get_evaluations_on_domain_no_random` | stub | 1 |
@@ -1216,7 +1232,7 @@ counts the claims (of 1868) whose dependencies include the declaration.
 | `dft` | `p3_dft.butterflies.mirror.DifButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterfly<F>}::apply_to_rows` | stub | 1 |
 | `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::ScaledDitButterfly<F>}::apply_to_rows` | stub | 1 |
 | `dft` | `p3_dft.butterflies.mirror.DifButterflyZeros.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterflyZeros<F>}::apply_to_rows` | stub | 0 |
-| `dft` | `p3_dft.mirror.bitRev` | `p3_util::reverse_bits_len` | stub | 91 |
+| `dft` | `p3_dft.mirror.bitRev` | `p3_util::reverse_bits_len` | stub | 97 |
 | `dft` | `p3_dft.mirror.revIndex` | `p3_util::reverse_slice_index_bits` | stub | 53 |
 | `dft` | `p3_dft.util.mirror.divide_by_height` | `p3_dft::util::divide_by_height` | stub | 4 |
 | `dft` | `p3_dft.util.mirror.coset_shift_cols` | `p3_dft::util::coset_shift_cols` | stub | 5 |
@@ -1298,7 +1314,7 @@ counts the claims (of 1868) whose dependencies include the declaration.
 | `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.generator_exp` | `p3_field::coset::TwoAdicMultiplicativeCoset::generator_exp` | stub | 1 |
 | `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.element` | `p3_field::coset::TwoAdicMultiplicativeCoset::element` | stub | 1 |
 | `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.iter` | `p3_field::coset::TwoAdicMultiplicativeCoset::iter` | stub | 8 |
-| `fri` | `p3_fri.config.mirror.FriParameters` | `p3_fri::config::FriParameters` | stub | 28 |
+| `fri` | `p3_fri.config.mirror.FriParameters` | `p3_fri::config::FriParameters` | stub | 29 |
 | `fri` | `p3_fri.config.mirror.FriProverError` | `p3_fri::config::FriProverError` | stub | 3 |
 | `fri` | `p3_fri.config.mirror.FriParameters.final_poly_len` | `p3_fri::config::FriParameters::final_poly_len` | stub | 20 |
 | `fri` | `p3_fri.config.mirror.FriParameters.blowup` | `p3_fri::config::FriParameters::blowup` | stub | 0 |
@@ -1328,9 +1344,9 @@ counts the claims (of 1868) whose dependencies include the declaration.
 | `fri` | `p3_fri.two_adic_pcs.mirror.reducePoint` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 3 |
 | `fri` | `p3_fri.two_adic_pcs.mirror.reduceMat` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 3 |
 | `fri` | `p3_fri.two_adic_pcs.mirror.reduced_openings` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 3 |
-| `fri` | `p3_fri.mirror.MmcsOps` | `p3_commit::Mmcs` | stub | 29 |
-| `fri` | `p3_fri.mirror.CommitPhaseMultiStep` | `p3_fri::proof::CommitPhaseMultiStep` | stub | 24 |
-| `fri` | `p3_fri.mirror.BatchMultiOpening` | `p3_fri::proof::BatchMultiOpening` | stub | 26 |
+| `fri` | `p3_fri.mirror.MmcsOps` | `p3_commit::Mmcs` | stub | 32 |
+| `fri` | `p3_fri.mirror.CommitPhaseMultiStep` | `p3_fri::proof::CommitPhaseMultiStep` | stub | 26 |
+| `fri` | `p3_fri.mirror.BatchMultiOpening` | `p3_fri::proof::BatchMultiOpening` | stub | 27 |
 | `fri` | `p3_fri.mirror.FriProof` | `p3_fri::proof::FriProof` | stub | 20 |
 | `fri` | `p3_fri.mirror.TranscriptFailure` | `p3_fri::transcript::TranscriptFailure` | stub | 24 |
 | `fri` | `p3_fri.mirror.ProverTx` | `p3_fri::transcript::ProverTranscript` | stub | 0 |
@@ -2342,9 +2358,16 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Circle.cfft.twiddles` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Circle.deep.extract_lambda` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Circle.deep.extract_lambda_orthogonal` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.extract_lambda_split` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.fft_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.fft_span` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.orthogonal` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Circle.deep.prover_verifier` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.quotient_degree` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Circle.deep.re_im` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Circle.deep.reduce_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.split_vn` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.term_degree` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Circle.domain.disjoint_domain` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Circle.domain.standard_disjoint` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Circle.domain.standard_nodup` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -2362,6 +2385,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Circle.pcs.complete` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Circle.pcs.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Circle.pcs.one_row_panics` | `Quot.sound`, `propext` |
+| `Circle.pcs.open_complete` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Circle.pcs.panics_iff` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Circle.point.double` | `Quot.sound`, `propext` |
 | `Circle.point.from_projective_line` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -2370,6 +2394,11 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Circle.point.s_p_at_p` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Circle.point.v_n` | `Quot.sound`, `propext` |
 | `Circle.point.v_p` | `Quot.sound`, `propext` |
+| `Circle.prover.answers` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.prover.commit_phase` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.prover.first_layer` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.prover.lambdas` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.prover.reduced_openings` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Circle.query.complete` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Circle.query.deep` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Circle.query.first_layer` | `Classical.choice`, `Quot.sound`, `propext` |
