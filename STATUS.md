@@ -17,9 +17,9 @@ target `thumbv7em-none-eabi`
 | `air` | scoped | 364 | 931 | 0 | 67 | 0 | 0 / 1 | post `010` |
 | `baby-bear` | extracted | 2953 | 121 | 4 | 0 | 0 | 5 / 3 | pre `020`, pre `030`, pre `040`, pre `050` |
 | `batch-stark` | scoped | 116 | 788 | 0 | 54 | 0 | 0 / 0 |  |
-| `binary-dft` | stub |  | 552 | 0 | 50 |  | 0 / 0 |  |
-| `binary-field` | scoped | 21777 | 66 | 0 | 0 | 137 | 7 / 2 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050`, pre `060`, pre `070` |
-| `binary-pcs` | stub |  | 828 | 0 | 10 |  | 1 / 0 | pre `010` |
+| `binary-dft` | scoped | 165 | 623 | 0 | 50 | 0 | 0 / 0 |  |
+| `binary-field` | scoped | 21777 | 102 | 0 | 0 | 137 | 7 / 2 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050`, pre `060`, pre `070` |
+| `binary-pcs` | scoped | 506 | 874 | 0 | 10 | 0 | 2 / 1 | pre `010`, pre `020`, post `010` |
 | `blake2s` | scoped | 148 | 51 | 1 | 0 | 0 | 1 / 0 | pre `010` |
 | `blake2s-air` | scoped | 499 | 515 | 0 | 37 | 0 | 0 / 0 |  |
 | `blake3` | scoped | 2609 | 40 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
@@ -30,7 +30,7 @@ target `thumbv7em-none-eabi`
 | `circle` | stub |  | 1283 | 0 | 80 |  | 0 / 0 |  |
 | `commit` | stub |  | 836 | 0 | 59 |  | 0 / 0 |  |
 | `dft` | stub |  | 992 | 0 | 67 |  | 0 / 0 |  |
-| `field` | stub |  | 375 | 7 | 25 |  | 0 / 0 |  |
+| `field` | stub |  | 382 | 7 | 25 |  | 0 / 0 |  |
 | `fri` | stub |  | 1598 | 0 | 114 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
 | `keccak` | scoped | 1109 | 39 | 0 | 0 | 6 | 2 / 2 | pre `010`, pre `020` |
@@ -46,7 +46,7 @@ target `thumbv7em-none-eabi`
 | `multilinear-util` | scoped | 222 | 1113 | 0 | 75 | 0 | 2 / 0 | pre `010`, pre `020` |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 68 | 2 | 4 |  | 0 / 0 |  |
-| `security` | scoped | 1414 | 130 | 6 | 13 | 0 | 2 / 1 | pre `010`, pre `020` |
+| `security` | scoped | 1426 | 165 | 7 | 14 | 0 | 2 / 2 | pre `010`, pre `020`, post `020` |
 | `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
 | `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
 | `sha256-air` | scoped | 150 | 925 | 0 | 76 | 0 | 0 / 0 |  |
@@ -84,6 +84,11 @@ charon errors: 0.
 Nothing translated is dropped.
 
 ### `batch-stark`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `binary-dft`
 
 charon errors: 0.
 Nothing translated is dropped.
@@ -232,6 +237,11 @@ charon errors: 0.
 | `p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::halve` | `` |  |
 | `p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::mul_2exp_u64` | `` |  |
 | `p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::xor` | `` |  |
+
+### `binary-pcs`
+
+charon errors: 0.
+Nothing translated is dropped.
 
 ### `blake2s`
 
@@ -511,7 +521,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1805) whose dependencies include it; reaching one is not using it.
+(of 1815) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -542,6 +552,7 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 | `security` | `budget.shape.InstanceShape.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `security` | `budget.shape.LookupShape.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `security` | `budget.shape.ProtocolParams.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `security` | `p3_security.binary.BinaryPcsRegime.queriesForTargetCount` | p3-security derives it from a floating-point bound, which aeneas cannot translate | 1 |
 | `symmetric` | `p3_symmetric.hasher.CryptographicHasher.hash_iter_slices.default` | aeneas stops on its iterator adapters, so crate.toml makes it opaque (docs/extractor-issues.md 30) | 0 |
 | `word` | `index.IndexError.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 6 |
 | `word` | `word.Word32.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 7 |
@@ -553,7 +564,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1805) whose dependencies include the declaration.
+counts the claims (of 1815) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -678,66 +689,66 @@ counts the claims (of 1805) whose dependencies include the declaration.
 | `batch-stark` | `p3_batch_stark.checker.mirror.rowBuilder` | `p3_air::DebugConstraintBuilder::new_with_permutation` | not translated | 1 |
 | `batch-stark` | `p3_batch_stark.checker.mirror.eval_air_and_lookups` | `p3_lookup::LookupProtocol::eval_air_and_lookups` | not translated | 5 |
 | `batch-stark` | `p3_batch_stark.checker.mirror.check_constraints` | `p3_batch_stark::check_constraints::check_constraints` | not translated | 1 |
-| `binary-dft` | `p3_binary_dft.mirror.Level.cantorBasis` | `p3_binary_field::tower::TowerLevel::cantor_basis` | stub | 24 |
-| `binary-dft` | `p3_binary_dft.mirror.trailingZeros` | `core::num::usize::trailing_zeros` | stub | 12 |
-| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point.loop` | `p3_binary_dft::domain::domain_point` | stub | 22 |
-| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point` | `p3_binary_dft::domain::domain_point` | stub | 22 |
-| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point_steps` | `p3_binary_dft::domain::domain_point_steps` | stub | 11 |
-| `binary-dft` | `p3_binary_dft.domain.mirror.subspace_polynomial` | `p3_binary_dft::domain::subspace_polynomial` | stub | 1 |
-| `binary-dft` | `p3_binary_dft.naive.mirror.vanishing` | `p3_binary_dft::naive::normalised_subspace_poly` | stub | 4 |
-| `binary-dft` | `p3_binary_dft.naive.mirror.normalised_subspace_poly` | `p3_binary_dft::naive::normalised_subspace_poly` | stub | 4 |
-| `binary-dft` | `p3_binary_dft.naive.mirror.basisAt` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_ntt_batch` | stub | 3 |
-| `binary-dft` | `p3_binary_dft.naive.mirror.NaiveAdditiveNtt.shifted_ntt_batch` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_ntt_batch` | stub | 3 |
-| `binary-dft` | `p3_binary_dft.naive.mirror.blockLoop` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_intt_batch` | stub | 2 |
-| `binary-dft` | `p3_binary_dft.naive.mirror.NaiveAdditiveNtt.shifted_intt_batch` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_intt_batch` | stub | 2 |
-| `binary-dft` | `p3_binary_dft.butterfly.mirror.pairOp` | `p3_binary_dft::butterfly::butterfly_values` | stub | 11 |
-| `binary-dft` | `p3_binary_dft.butterfly.mirror.butterfly_values` | `p3_binary_dft::butterfly::butterfly_values` | stub | 10 |
-| `binary-dft` | `p3_binary_dft.butterfly.mirror.packed_butterfly` | `p3_binary_dft::butterfly::packed_butterfly` | stub | 10 |
-| `binary-dft` | `p3_binary_dft.butterfly.mirror.plain_butterfly` | `p3_binary_dft::butterfly::plain_butterfly` | stub | 10 |
-| `binary-dft` | `p3_binary_dft.butterfly.mirror.typed_butterfly` | `p3_binary_dft::butterfly::subfield::typed_butterfly` | stub | 1 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.Twiddles` | `p3_binary_dft::lch::twiddles::Twiddles` | stub | 11 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.Twiddles.new` | `p3_binary_dft::lch::twiddles::Twiddles::new` | stub | 9 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.Twiddles.at` | `p3_binary_dft::lch::twiddles::Twiddles::at` | stub | 10 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.Twiddles.step` | `p3_binary_dft::lch::twiddles::Twiddles::step` | stub | 10 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.BUTTERFLY_GRAIN` | `p3_binary_dft::lch::schedule::BUTTERFLY_GRAIN` | stub | 10 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.DEEP_TILE_BYTES` | `p3_binary_dft::lch::schedule::DEEP_TILE_BYTES` | stub | 9 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.blockButterfly` | `p3_binary_dft::lch::schedule::stage_pass` | stub | 10 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.walkBlocks` | `p3_binary_dft::lch::schedule::stage_pass` | stub | 10 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.stage_pass` | `p3_binary_dft::lch::schedule::stage_pass` | stub | 10 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.tile_stages` | `p3_binary_dft::lch::schedule::tile_stages` | stub | 9 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.deep_tiles` | `p3_binary_dft::lch::schedule::deep_tiles` | stub | 9 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.Schedule` | `p3_binary_dft::lch::schedule::Schedule` | stub | 9 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.Schedule.for_workers` | `p3_binary_dft::lch::schedule::Schedule::for_workers` | stub | 9 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.Schedule.new` | `p3_binary_dft::lch::schedule::Schedule::new` | stub | 9 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.Cut` | `p3_binary_dft::lch::schedule::Cut` | stub | 9 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.Cut.new` | `p3_binary_dft::lch::schedule::Cut::new` | stub | 9 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.Cut.bounds` | `p3_binary_dft::lch::schedule::Cut::bounds` | stub | 9 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.group_pass` | `p3_binary_dft::lch::schedule::group_pass` | stub | 9 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.forward_below` | `p3_binary_dft::lch::schedule::forward_below` | stub | 9 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.run` | `p3_binary_dft::lch::schedule::run` | stub | 9 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.log2Floor` | `p3_util::log2_floor_usize` | stub | 9 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.log2Ceil` | `p3_util::log2_ceil_usize` | stub | 9 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.transform` | `p3_binary_dft::lch::transform` | stub | 8 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.transform_cosets` | `p3_binary_dft::lch::transform_cosets` | stub | 4 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.LchNtt.shifted_ntt_batch` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::lch::LchNtt<F>}::shifted_ntt_batch` | stub | 2 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.LchNtt.shifted_intt_batch` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::lch::LchNtt<F>}::shifted_intt_batch` | stub | 2 |
-| `binary-dft` | `p3_binary_dft.lch.mirror.LchNtt.ntt_batch_padded` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::lch::LchNtt<F>}::ntt_batch_padded` | stub | 4 |
-| `binary-dft` | `p3_binary_dft.traits.mirror.ntt_batch_padded` | `p3_binary_dft::traits::AdditiveNtt::ntt_batch_padded` | stub | 0 |
-| `binary-dft` | `p3_binary_dft.traits.mirror.padded_len` | `p3_binary_dft::traits::padded_len` | stub | 2 |
-| `binary-dft` | `p3_binary_dft.traits.mirror.ntt_batch_borrowed` | `p3_binary_dft::traits::AdditiveNtt::ntt_batch_borrowed` | stub | 0 |
-| `binary-dft` | `p3_binary_dft.traits.mirror.shifted_lde_batch` | `p3_binary_dft::traits::AdditiveNtt::shifted_lde_batch` | stub | 1 |
-| `binary-dft` | `p3_binary_dft.encoder.mirror.encode_batch` | `{impl p3_commit::Encoder<BinaryField128> for p3_binary_dft::encoder::AdditiveRsEncoder<BinaryField128, Ntt>}::encode_batch` | stub | 1 |
-| `binary-dft` | `p3_binary_dft.encoder.mirror.encode_batch_padded` | `{impl p3_commit::Encoder<BinaryField128> for p3_binary_dft::encoder::AdditiveRsEncoder<BinaryField128, Ntt>}::encode_batch_padded` | stub | 0 |
-| `binary-pcs` | `p3_binary_pcs.params.mirror.try_new_with_folding` | `p3_binary_pcs::params::BinaryPcsConfig::try_new_with_folding` | stub | 2 |
-| `binary-pcs` | `p3_binary_pcs.params.mirror.BinaryPcsConfig.try_with_folding` | `p3_binary_pcs::params::BinaryPcsConfig::try_with_folding` | stub | 1 |
-| `binary-pcs` | `p3_binary_pcs.params.mirror.BinaryPcsConfig.fold_batches` | `p3_binary_pcs::params::BinaryPcsConfig::fold_batches` | stub | 3 |
-| `binary-pcs` | `p3_binary_pcs.params.mirror.BinaryPcsRegime.max_security_bits` | `p3_security::binary::BinaryPcsRegime::max_security_bits` | stub | 4 |
-| `binary-pcs` | `p3_binary_pcs.transcript.mirror.BinaryPcsShape.new` | `p3_binary_pcs::transcript::BinaryPcsShape::new` | stub | 3 |
-| `binary-pcs` | `p3_binary_pcs.fold.mirror.fold_pair` | `p3_binary_pcs::fold::fold_pair` | stub | 7 |
-| `binary-pcs` | `p3_binary_pcs.fold.mirror.fold_round` | `p3_binary_pcs::fold::fold_round` | stub | 1 |
-| `binary-pcs` | `p3_binary_pcs.fold.mirror.fold_coset` | `p3_binary_pcs::fold::fold_coset` | stub | 3 |
-| `binary-pcs` | `p3_binary_pcs.verifier.mirror.verify_query_paths` | `p3_binary_pcs::verifier::verify_query_paths` | stub | 2 |
-| `binary-pcs` | `p3_binary_pcs.verifier.mirror.verify_opening` | `{impl p3_binary_pcs::pcs::BinaryPcs<F, EF, MT, MX, E>}::verify_opening` | stub | 0 |
+| `binary-dft` | `p3_binary_dft.mirror.Level.cantorBasis` | `p3_binary_field::tower::TowerLevel::cantor_basis` | not translated | 27 |
+| `binary-dft` | `p3_binary_dft.mirror.trailingZeros` | `core::num::usize::trailing_zeros` | not translated | 12 |
+| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point.loop` | `p3_binary_dft::domain::domain_point` | not translated | 25 |
+| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point` | `p3_binary_dft::domain::domain_point` | not translated | 25 |
+| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point_steps` | `p3_binary_dft::domain::domain_point_steps` | not translated | 11 |
+| `binary-dft` | `p3_binary_dft.domain.mirror.subspace_polynomial` | `p3_binary_dft::domain::subspace_polynomial` | not translated | 2 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.vanishing` | `p3_binary_dft::naive::normalised_subspace_poly` | not translated | 4 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.normalised_subspace_poly` | `p3_binary_dft::naive::normalised_subspace_poly` | not translated | 4 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.basisAt` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_ntt_batch` | not translated | 3 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.NaiveAdditiveNtt.shifted_ntt_batch` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_ntt_batch` | not translated | 3 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.blockLoop` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_intt_batch` | not translated | 2 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.NaiveAdditiveNtt.shifted_intt_batch` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_intt_batch` | not translated | 2 |
+| `binary-dft` | `p3_binary_dft.butterfly.mirror.pairOp` | `p3_binary_dft::butterfly::butterfly_values` | not translated | 11 |
+| `binary-dft` | `p3_binary_dft.butterfly.mirror.butterfly_values` | `p3_binary_dft::butterfly::butterfly_values` | not translated | 10 |
+| `binary-dft` | `p3_binary_dft.butterfly.mirror.packed_butterfly` | `p3_binary_dft::butterfly::packed_butterfly` | not translated | 10 |
+| `binary-dft` | `p3_binary_dft.butterfly.mirror.plain_butterfly` | `p3_binary_dft::butterfly::plain_butterfly` | not translated | 10 |
+| `binary-dft` | `p3_binary_dft.butterfly.mirror.typed_butterfly` | `p3_binary_dft::butterfly::subfield::typed_butterfly` | not translated | 1 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Twiddles` | `p3_binary_dft::lch::twiddles::Twiddles` | not translated | 11 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Twiddles.new` | `p3_binary_dft::lch::twiddles::Twiddles::new` | not translated | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Twiddles.at` | `p3_binary_dft::lch::twiddles::Twiddles::at` | not translated | 10 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Twiddles.step` | `p3_binary_dft::lch::twiddles::Twiddles::step` | not translated | 10 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.BUTTERFLY_GRAIN` | `p3_binary_dft::lch::schedule::BUTTERFLY_GRAIN` | not translated | 10 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.DEEP_TILE_BYTES` | `p3_binary_dft::lch::schedule::DEEP_TILE_BYTES` | not translated | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.blockButterfly` | `p3_binary_dft::lch::schedule::stage_pass` | not translated | 10 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.walkBlocks` | `p3_binary_dft::lch::schedule::stage_pass` | not translated | 10 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.stage_pass` | `p3_binary_dft::lch::schedule::stage_pass` | not translated | 10 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.tile_stages` | `p3_binary_dft::lch::schedule::tile_stages` | not translated | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.deep_tiles` | `p3_binary_dft::lch::schedule::deep_tiles` | not translated | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Schedule` | `p3_binary_dft::lch::schedule::Schedule` | not translated | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Schedule.for_workers` | `p3_binary_dft::lch::schedule::Schedule::for_workers` | not translated | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Schedule.new` | `p3_binary_dft::lch::schedule::Schedule::new` | not translated | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Cut` | `p3_binary_dft::lch::schedule::Cut` | not translated | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Cut.new` | `p3_binary_dft::lch::schedule::Cut::new` | not translated | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Cut.bounds` | `p3_binary_dft::lch::schedule::Cut::bounds` | not translated | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.group_pass` | `p3_binary_dft::lch::schedule::group_pass` | not translated | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.forward_below` | `p3_binary_dft::lch::schedule::forward_below` | not translated | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.run` | `p3_binary_dft::lch::schedule::run` | not translated | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.log2Floor` | `p3_util::log2_floor_usize` | not translated | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.log2Ceil` | `p3_util::log2_ceil_usize` | not translated | 9 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.transform` | `p3_binary_dft::lch::transform` | not translated | 8 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.transform_cosets` | `p3_binary_dft::lch::transform_cosets` | not translated | 4 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.LchNtt.shifted_ntt_batch` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::lch::LchNtt<F>}::shifted_ntt_batch` | not translated | 2 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.LchNtt.shifted_intt_batch` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::lch::LchNtt<F>}::shifted_intt_batch` | not translated | 2 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.LchNtt.ntt_batch_padded` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::lch::LchNtt<F>}::ntt_batch_padded` | not translated | 4 |
+| `binary-dft` | `p3_binary_dft.traits.mirror.ntt_batch_padded` | `p3_binary_dft::traits::AdditiveNtt::ntt_batch_padded` | not translated | 0 |
+| `binary-dft` | `p3_binary_dft.traits.mirror.padded_len` | `p3_binary_dft::traits::padded_len` | not translated | 2 |
+| `binary-dft` | `p3_binary_dft.traits.mirror.ntt_batch_borrowed` | `p3_binary_dft::traits::AdditiveNtt::ntt_batch_borrowed` | not translated | 0 |
+| `binary-dft` | `p3_binary_dft.traits.mirror.shifted_lde_batch` | `p3_binary_dft::traits::AdditiveNtt::shifted_lde_batch` | not translated | 1 |
+| `binary-dft` | `p3_binary_dft.encoder.mirror.encode_batch` | `{impl p3_commit::Encoder<BinaryField128> for p3_binary_dft::encoder::AdditiveRsEncoder<BinaryField128, Ntt>}::encode_batch` | not translated | 1 |
+| `binary-dft` | `p3_binary_dft.encoder.mirror.encode_batch_padded` | `{impl p3_commit::Encoder<BinaryField128> for p3_binary_dft::encoder::AdditiveRsEncoder<BinaryField128, Ntt>}::encode_batch_padded` | not translated | 0 |
+| `binary-pcs` | `p3_binary_pcs.params.mirror.try_new_with_folding` | `p3_binary_pcs::params::BinaryPcsConfig::try_new_with_folding` | not translated | 3 |
+| `binary-pcs` | `p3_binary_pcs.params.mirror.BinaryPcsConfig.try_with_folding` | `p3_binary_pcs::params::BinaryPcsConfig::try_with_folding` | not translated | 3 |
+| `binary-pcs` | `p3_binary_pcs.params.mirror.BinaryPcsConfig.fold_batches` | `p3_binary_pcs::params::BinaryPcsConfig::fold_batches` | not translated | 3 |
+| `binary-pcs` | `p3_binary_pcs.params.mirror.BinaryPcsRegime.max_security_bits` | `p3_security::binary::BinaryPcsRegime::max_security_bits` | not translated | 7 |
+| `binary-pcs` | `p3_binary_pcs.transcript.mirror.BinaryPcsShape.new` | `p3_binary_pcs::transcript::BinaryPcsShape::new` | not translated | 4 |
+| `binary-pcs` | `p3_binary_pcs.fold.mirror.fold_pair` | `p3_binary_pcs::fold::fold_pair` | not translated | 9 |
+| `binary-pcs` | `p3_binary_pcs.fold.mirror.fold_round` | `p3_binary_pcs::fold::fold_round` | not translated | 1 |
+| `binary-pcs` | `p3_binary_pcs.fold.mirror.fold_coset` | `p3_binary_pcs::fold::fold_coset` | not translated | 3 |
+| `binary-pcs` | `p3_binary_pcs.verifier.mirror.verify_query_paths` | `p3_binary_pcs::verifier::verify_query_paths` | not translated | 2 |
+| `binary-pcs` | `p3_binary_pcs.verifier.mirror.verify_opening` | `{impl p3_binary_pcs::pcs::BinaryPcs<F, EF, MT, MX, E>}::verify_opening` | not translated | 0 |
 | `blake2s-air` | `p3_blake2s_air.mirror.IV` | `p3_blake2s_air::constants::IV` | not translated | 9 |
 | `blake2s-air` | `p3_blake2s_air.mirror.SIGMA` | `p3_blake2s_air::constants::SIGMA` | not translated | 10 |
 | `blake2s-air` | `p3_blake2s_air.mirror.NUM_ROUNDS` | `p3_blake2s_air::binary::NUM_ROUNDS` | not translated | 9 |
@@ -1236,10 +1247,10 @@ counts the claims (of 1805) whose dependencies include the declaration.
 | `dft` | `p3_dft.radix_2_small_batch.mirror.Radix2DFTSmallBatch.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_small_batch::Radix2DFTSmallBatch<F>}::dft_batch` | stub | 2 |
 | `dft` | `p3_dft.radix_2_small_batch.mirror.Radix2DFTSmallBatch.idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_small_batch::Radix2DFTSmallBatch<F>}::idft_batch` | stub | 1 |
 | `field` | `p3_field.dup.Dup` | `p3_field::dup::Dup` | stub | 0 |
-| `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 23 |
-| `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 17 |
+| `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 27 |
+| `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 22 |
 | `field` | `p3_field.field.PrimeField` | `p3_field::field::PrimeField` | stub | 0 |
-| `field` | `p3_field.field.Algebra` | `p3_field::field::Algebra` | stub | 17 |
+| `field` | `p3_field.field.Algebra` | `p3_field::field::Algebra` | stub | 21 |
 | `field` | `p3_field.integers.QuotientMap` | `p3_field::integers::QuotientMap` | stub | 0 |
 | `field` | `p3_field.field.PrimeField64` | `p3_field::field::PrimeField64` | stub | 0 |
 | `field` | `p3_field.field.PrimeField32` | `p3_field::field::PrimeField32` | stub | 0 |
@@ -1687,6 +1698,7 @@ counts the claims (of 1805) whose dependencies include the declaration.
 | `poseidon2` | `p3_poseidon2.external.ExternalLayerConstructor` | `p3_poseidon2::external::ExternalLayerConstructor` | stub | 0 |
 | `poseidon2` | `p3_poseidon2.internal.InternalLayerConstructor` | `p3_poseidon2::internal::InternalLayerConstructor` | stub | 0 |
 | `poseidon2` | `p3_poseidon2.Poseidon2` | `p3_poseidon2::Poseidon2` | stub | 0 |
+| `security` | `p3_security.binary.BinaryPcsRegime.queries_for_target` | `p3_security::binary::BinaryPcsRegime::queries_for_target` | not translated | 1 |
 | `security` | `Plonky3Lean.Proofs.Security.Real.deepBitsR` | `p3_security::deep::deep_ali_error` | not translated | 2 |
 | `security` | `Plonky3Lean.Proofs.Security.Real.deepFactorR` | `p3_security::deep::deep_ali_error` | not translated | 1 |
 | `security` | `Plonky3Lean.Proofs.Security.Real.aliBitsR` | `p3_security::air::composition_error` | not translated | 1 |
@@ -1974,6 +1986,8 @@ counts the claims (of 1805) whose dependencies include the declaration.
 | `binary-field/pre/060-field-default-shims` | none in a normal build: the copies are compiled but unused there. In the extracted variant, inherent `inverse`, `is_zero` and `is_one` shadow the `Field` defaults at every call site on a concrete field type of this crate, and call copies of the default bodies. |
 | `binary-field/pre/070-field-api-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of a field type. No existing body changes. |
 | `binary-pcs/pre/010-raw-data-bounds` | none: each added bound is implied by `TowerLevel: Field` in a normal build. |
+| `binary-pcs/pre/020-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. No existing body changes. |
+| `binary-pcs/post/010-exposed-saturating-add` | `core.num.Usize.saturating_add_exposed` in HaxExt.lean, a model of `usize::saturating_add`, trusted as the rest of HaxExt is. |
 | `blake2s/pre/010-reshape-hash-many` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the scalar `hash_many` calls the reshaped body, which a differential test equates with the original. |
 | `blake3/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds one free function, which calls `Blake3::hash_many`. No existing body changes. |
 | `blake3/pre/020-reshape-batch` | none in a normal build: the reshaped driver is compiled only under cfg(hax_backend_lean), as the crate's `batch` module, and under cfg(test), beside the shipped one. The extracted variant hashes on the one-lane backend, which is what the extraction target compiles. |
@@ -1997,6 +2011,7 @@ counts the claims (of 1805) whose dependencies include the declaration.
 | `multilinear-util/pre/020-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. No existing body changes. |
 | `security/pre/010-budget-folding-round` | None in a normal build, where the new function is compiled but unused. In the extracted variant, the report computes its folding term with it. Its body is the original match, verbatim. |
 | `security/pre/020-budget-binding-index` | None in a normal build, where the two new functions are compiled but unused. In the extracted variant, the binding term is read at the first minimum. That minimum is taken over the seven bit counts. |
+| `security/post/020-exposed-saturating-ops` | the exposed models of `saturating_sub` on usize, u64 and u128, `saturating_add` on u32 and u64, and `saturating_mul` on u64, in HaxExt.lean, trusted as the rest of HaxExt is. |
 | `sha256/pre/010-reshape-compress` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `Sha256Compress::compress` calls the reshaped body, which a differential test equates with the original. |
 | `sumcheck/pre/010-import-packed-extension-iter` | none: the added lines are behind cfg(hax_backend_lean), so a normal build is token for token as shipped. |
 | `sumcheck/pre/020-ring-switch-raw-data-bounds` | none: each added bound is implied by `TowerLevel: Field` in a normal build. |
@@ -2123,6 +2138,8 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BinaryDft.domain_point.eq` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.domain_point_steps.eq` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.encode_batch.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.extracted.domain_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.extracted.subspace_polynomial` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.inetwork_network` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.inetwork_ntt` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.network_inetwork` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -2147,6 +2164,13 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BinaryDft.vanishing.point_eq_zero` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryDft.vanishing.succ` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryPcs.bindAll.mle` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.extracted.fold_pair` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.extracted.fold_pair.ntt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.extracted.num_fold_batches` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.extracted.shape` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.extracted.try_new_with_folding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.extracted.try_with_folding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.extracted.try_with_folding.eq` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryPcs.field_error` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryPcs.final.uniform` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BinaryPcs.fold_batches` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -3527,6 +3551,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Mersenne31.mersenne_31.reduce_64.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.binary.field_error_numerator.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.binary.field_security_bits.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.binary.max_security_bits.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.budget.report.SecurityReport.security_level.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.budget.security_report.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Security.budget.security_report.overstates_composition` | `Classical.choice`, `Quot.sound`, `propext` |
