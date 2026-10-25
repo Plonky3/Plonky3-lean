@@ -14,5 +14,6 @@ public import P3UniStark.Assumptions.Mirror.Folder
 public import P3UniStark.Assumptions.Mirror.Prover
 public import P3UniStark.Assumptions.Mirror.Verifier
 public import P3UniStark.Assumptions.Mirror.Transcript
+public import P3UniStark.Assumptions.Mirror.Verify
 
 @[expose] public section

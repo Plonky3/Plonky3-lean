@@ -17,7 +17,7 @@ start_from = [
   "p3_uni_stark::config::StarkOpeningLayout::new",
 ]
 
-watch = ["uni-stark/src", "uni-stark/Cargo.toml", "air/src/symbolic/builder.rs", "field/src/field.rs", "matrix/src/lib.rs"]
+watch = ["uni-stark/src", "uni-stark/Cargo.toml", "air/src/symbolic/builder.rs", "field/src/field.rs", "matrix/src/lib.rs", "util/src/lib.rs", "util/src/zip_eq.rs"]
 
 # The transcriptions in extraction/P3UniStark/Assumptions/Mirror/.
 # Hashes are pending tools/mirror.
@@ -141,3 +141,51 @@ rust = "p3_uni_stark::transcript::StarkVerifierTranscript::constraint_phase"
 [[mirror]]
 lean = "p3_uni_stark.transcript.mirror.ood_phase"
 rust = "p3_uni_stark::transcript::StarkVerifierTranscript::ood_phase"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.PreprocessedVerifierKey"
+rust = "p3_uni_stark::preprocessed::PreprocessedVerifierKey"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.Proof"
+rust = "p3_uni_stark::proof::Proof"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.validate_degree_bits"
+rust = "p3_uni_stark::verifier::validate_degree_bits"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.checked_log_size_sum"
+rust = "p3_util::checked_log_size_sum"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.natural_domain_for_degree"
+rust = "{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::natural_domain_for_degree"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.process_preprocessed_trace"
+rust = "p3_uni_stark::verifier::process_preprocessed_trace"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.ofTranscriptFailure"
+rust = "{impl core::convert::From<p3_uni_stark::transcript::StarkTranscriptFailure> for p3_uni_stark::error::VerificationError<PcsErr>}::from"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.constraint_phase"
+rust = "p3_uni_stark::transcript::StarkVerifierTranscript::constraint_phase"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.ood_phase"
+rust = "p3_uni_stark::transcript::StarkVerifierTranscript::ood_phase"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.opening_claims"
+rust = "p3_uni_stark::verifier::prepare_opening_claims"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.prepare_opening_claims"
+rust = "p3_uni_stark::verifier::prepare_opening_claims"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.verify_with_preprocessed"
+rust = "p3_uni_stark::verifier::verify_with_preprocessed"
