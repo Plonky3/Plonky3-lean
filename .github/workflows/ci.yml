@@ -30,7 +30,7 @@ jobs:
       - name: Check the runner has AVX2
         run: grep -qw avx2 /proc/cpuinfo
       - name: Check the differential tests are compiled in
-        run: cargo test --locked --release --manifest-path arch/Cargo.toml --test avx2 -- --list | grep -q ': test$'
+        run: cargo test --locked --release --manifest-path arch/Cargo.toml --test avx2 -- --list | grep -q -- ' test$'
       - name: Test the arch shims against the intrinsics
         run: cargo test --locked --release --manifest-path arch/Cargo.toml
       - name: Check that each shim's recorded mutation fails the tests
