@@ -413,7 +413,9 @@ keeps its number and says so.
      cfg, in every file on BabyBear's AVX2 path: models with the same names and
      signatures, over lane arrays, each transcribing Intel's pseudocode and
      tested against the hardware. Pre-patch `monty-31/030` does the same for
-     BabyBear's NEON path, with `p3_arch_shims::aarch64` and Arm's pseudocode.
+     BabyBear's NEON path, with `p3_arch_shims::aarch64` and Arm's pseudocode,
+     and `monty-31/040` for its AVX-512 path, whose models are reviewed against
+     Intel's pseudocode but not yet tested against the hardware.
 211. **`--exclude` on a type that an extracted type refers to makes aeneas fail**
      with "Internal error". `--opaque` on the same item works: the type becomes
      an external declaration. The AVX2 variants make the scalar modules opaque
@@ -428,4 +430,9 @@ keeps its number and says so.
 213. **aeneas rejects `asm!`.** monty-31's NEON backend has one block, the
      optimisation barrier `confuse_compiler`, whose value is its input. Pre-patch
      `monty-31/030` replaces it with the identity under the cfg, a stand-in that
-     TRUST.md lists.
+     TRUST.md lists. Its AVX-512 backend has four: two such barriers
+     (`confuse_compiler`, `confuse_compiler_256`), and two masked `vmovshdup`
+     instructions (`mask_movehdup_epi32`, `mask_movehdup_epi32_256`). Pre-patch
+     `monty-31/040` makes the barriers the identity, and each `vmovshdup` a call
+     of the intrinsic for that instruction (`_mm512_mask_movehdup_ps`,
+     `_mm256_mask_movehdup_ps`), stand-ins that TRUST.md lists.
