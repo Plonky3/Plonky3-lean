@@ -21,7 +21,7 @@ target `thumbv7em-none-eabi`
 | `binary-field` | scoped | 21777 | 103 | 0 | 0 | 137 | 7 / 2 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050`, pre `060`, pre `070` |
 | `binary-pcs` | scoped | 506 | 874 | 0 | 10 | 0 | 2 / 1 | pre `010`, pre `020`, post `010` |
 | `blake2s` | scoped | 148 | 51 | 1 | 0 | 0 | 1 / 0 | pre `010` |
-| `blake2s-air` | scoped | 499 | 515 | 0 | 37 | 0 | 0 / 0 |  |
+| `blake2s-air` | scoped | 499 | 654 | 0 | 47 | 0 | 0 / 0 |  |
 | `blake3` | scoped | 2609 | 40 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
 | `blake3-air` | scoped | 240 | 953 | 0 | 117 | 0 | 0 / 0 |  |
 | `blake3-crate` | stub |  | 26 | 0 | 3 |  | 0 / 0 |  |
@@ -34,7 +34,7 @@ target `thumbv7em-none-eabi`
 | `fri` | stub |  | 1598 | 0 | 114 |  | 0 / 0 |  |
 | `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
 | `keccak` | scoped | 1109 | 39 | 0 | 0 | 6 | 2 / 2 | pre `010`, pre `020` |
-| `keccak-air` | scoped | 624 | 676 | 0 | 39 | 0 | 0 / 0 |  |
+| `keccak-air` | scoped | 624 | 771 | 0 | 48 | 0 | 0 / 0 |  |
 | `koala-bear` | extracted | 3024 | 121 | 4 | 0 | 0 | 0 / 3 |  |
 | `lookup` | scoped | 275 | 894 | 0 | 58 | 0 | 0 / 0 |  |
 | `matrix` | scoped | 1625 | 259 | 0 | 12 | 0 | 3 / 3 | pre `020`, pre `030`, post `020`, post `030` |
@@ -49,7 +49,7 @@ target `thumbv7em-none-eabi`
 | `security` | scoped | 1426 | 165 | 7 | 14 | 0 | 2 / 2 | pre `010`, pre `020`, post `020` |
 | `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
 | `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
-| `sha256-air` | scoped | 150 | 925 | 0 | 76 | 0 | 0 / 0 |  |
+| `sha256-air` | scoped | 150 | 957 | 0 | 77 | 0 | 0 / 0 |  |
 | `stir` | stub |  | 695 | 0 | 40 |  | 0 / 0 |  |
 | `sumcheck` | scoped | 299 | 558 | 0 | 29 | 0 | 3 / 0 | pre `010`, pre `020`, pre `030` |
 | `symmetric` | scoped | 1078 | 62 | 1 | 0 | 4 | 4 / 2 | pre `010`, pre `020`, pre `030`, pre `040` |
@@ -521,7 +521,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1887) whose dependencies include it; reaching one is not using it.
+(of 1904) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -566,7 +566,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1887) whose dependencies include the declaration.
+counts the claims (of 1904) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -588,19 +588,19 @@ counts the claims (of 1887) whose dependencies include the declaration.
 | `air` | `p3_air.symbolic.mirror.instSymLeafExtLeaf` | `{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression_ext::ExtLeaf<F, EF>}::degree_multiple` | not translated | 4 |
 | `air` | `p3_air.symbolic.mirror.SymbolicExpressionExt.to_base` | `p3_air::symbolic::expression_ext::SymbolicExpressionExt::to_base` | not translated | 1 |
 | `air` | `p3_air.builder.mirror.AirBuilder.is_transition_window` | `p3_air::builder::AirBuilder::is_transition_window` | not translated | 21 |
-| `air` | `p3_air.builder.mirror.AirBuilder.when` | `p3_air::builder::AirBuilder::when` | not translated | 41 |
+| `air` | `p3_air.builder.mirror.AirBuilder.when` | `p3_air::builder::AirBuilder::when` | not translated | 42 |
 | `air` | `p3_air.builder.mirror.AirBuilder.when_ne` | `p3_air::builder::AirBuilder::when_ne` | not translated | 3 |
-| `air` | `p3_air.builder.mirror.AirBuilder.when_first_row` | `p3_air::builder::AirBuilder::when_first_row` | not translated | 18 |
+| `air` | `p3_air.builder.mirror.AirBuilder.when_first_row` | `p3_air::builder::AirBuilder::when_first_row` | not translated | 19 |
 | `air` | `p3_air.builder.mirror.AirBuilder.when_last_row` | `p3_air::builder::AirBuilder::when_last_row` | not translated | 3 |
 | `air` | `p3_air.builder.mirror.AirBuilder.when_transition` | `p3_air::builder::AirBuilder::when_transition` | not translated | 13 |
 | `air` | `p3_air.builder.mirror.AirBuilder.when_transition_window` | `p3_air::builder::AirBuilder::when_transition_window` | not translated | 0 |
-| `air` | `p3_air.builder.mirror.AirBuilder.assert_zeros` | `p3_air::builder::AirBuilder::assert_zeros` | not translated | 50 |
-| `air` | `p3_air.builder.mirror.AirBuilder.bool_check` | `p3_field::PrimeCharacteristicRing::bool_check` | not translated | 52 |
-| `air` | `p3_air.builder.mirror.AirBuilder.assert_bools` | `p3_air::builder::AirBuilder::assert_bools` | not translated | 49 |
-| `air` | `p3_air.builder.mirror.AirBuilder.assert_one` | `p3_air::builder::AirBuilder::assert_one` | not translated | 18 |
+| `air` | `p3_air.builder.mirror.AirBuilder.assert_zeros` | `p3_air::builder::AirBuilder::assert_zeros` | not translated | 53 |
+| `air` | `p3_air.builder.mirror.AirBuilder.bool_check` | `p3_field::PrimeCharacteristicRing::bool_check` | not translated | 55 |
+| `air` | `p3_air.builder.mirror.AirBuilder.assert_bools` | `p3_air::builder::AirBuilder::assert_bools` | not translated | 52 |
+| `air` | `p3_air.builder.mirror.AirBuilder.assert_one` | `p3_air::builder::AirBuilder::assert_one` | not translated | 19 |
 | `air` | `p3_air.builder.mirror.AirBuilder.assert_eq` | `p3_air::builder::AirBuilder::assert_eq` | not translated | 13 |
 | `air` | `p3_air.builder.mirror.AirBuilder.assert_eq_arrays` | `p3_air::builder::AirBuilder::assert_eq_arrays` | not translated | 0 |
-| `air` | `p3_air.builder.mirror.AirBuilder.assert_bool` | `p3_air::builder::AirBuilder::assert_bool` | not translated | 28 |
+| `air` | `p3_air.builder.mirror.AirBuilder.assert_bool` | `p3_air::builder::AirBuilder::assert_bool` | not translated | 29 |
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_zeros_ext` | `p3_air::builder::ExtensionBuilder::assert_zeros_ext` | not translated | 0 |
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_eq_ext` | `p3_air::builder::ExtensionBuilder::assert_eq_ext` | not translated | 2 |
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_one_ext` | `p3_air::builder::ExtensionBuilder::assert_one_ext` | not translated | 1 |
@@ -620,9 +620,9 @@ counts the claims (of 1887) whose dependencies include the declaration.
 | `air` | `p3_air.builder.mirror.VirtualPairCol.apply` | `p3_air::virtual_column::VirtualPairCol::apply` | not translated | 2 |
 | `air` | `p3_air.air.mirror.BoundaryPublic.row` | `p3_air::boundary::BoundaryPublic::row` | not translated | 6 |
 | `air` | `p3_air.air.mirror.validate` | `p3_air::boundary::validate` | not translated | 6 |
-| `air` | `p3_air.air.mirror.Air.periodic_values` | `p3_air::air::BaseAir::periodic_values` | not translated | 19 |
+| `air` | `p3_air.air.mirror.Air.periodic_values` | `p3_air::air::BaseAir::periodic_values` | not translated | 22 |
 | `air` | `p3_air.air.mirror.resolve` | `p3_air::symbolic::expression::SymbolicExpression::resolve` | not translated | 20 |
-| `air` | `p3_air.air.mirror.AirLayout.from_air` | `p3_air::symbolic::builder::AirLayout::from_air` | not translated | 78 |
+| `air` | `p3_air.air.mirror.AirLayout.from_air` | `p3_air::symbolic::builder::AirLayout::from_air` | not translated | 81 |
 | `air` | `p3_air.air.mirror.AirLayout.validate_against_air` | `p3_air::symbolic::builder::AirLayout::validate_against_air` | not translated | 19 |
 | `air` | `p3_air.air.mirror.symbolicBuilder` | `p3_air::symbolic::builder::SymbolicAirBuilder::new` | not translated | 49 |
 | `air` | `p3_air.air.mirror.get_symbolic_constraints` | `p3_air::symbolic::builder::get_symbolic_constraints` | not translated | 15 |
@@ -780,43 +780,53 @@ counts the claims (of 1887) whose dependencies include the declaration.
 | `binary-pcs` | `p3_binary_pcs.fold.mirror.fold_coset` | `p3_binary_pcs::fold::fold_coset` | not translated | 3 |
 | `binary-pcs` | `p3_binary_pcs.verifier.mirror.verify_query_paths` | `p3_binary_pcs::verifier::verify_query_paths` | not translated | 2 |
 | `binary-pcs` | `p3_binary_pcs.verifier.mirror.verify_opening` | `{impl p3_binary_pcs::pcs::BinaryPcs<F, EF, MT, MX, E>}::verify_opening` | not translated | 0 |
-| `blake2s-air` | `p3_blake2s_air.mirror.IV` | `p3_blake2s_air::constants::IV` | not translated | 9 |
-| `blake2s-air` | `p3_blake2s_air.mirror.SIGMA` | `p3_blake2s_air::constants::SIGMA` | not translated | 10 |
-| `blake2s-air` | `p3_blake2s_air.mirror.NUM_ROUNDS` | `p3_blake2s_air::binary::NUM_ROUNDS` | not translated | 9 |
-| `blake2s-air` | `p3_blake2s_air.mirror.G_PER_ROUND` | `p3_blake2s_air::binary::G_PER_ROUND` | not translated | 9 |
-| `blake2s-air` | `p3_blake2s_air.mirror.G_SCHEDULE` | `p3_blake2s_air::binary::G_SCHEDULE` | not translated | 11 |
+| `blake2s-air` | `p3_blake2s_air.mirror.IV` | `p3_blake2s_air::constants::IV` | not translated | 12 |
+| `blake2s-air` | `p3_blake2s_air.mirror.SIGMA` | `p3_blake2s_air::constants::SIGMA` | not translated | 13 |
+| `blake2s-air` | `p3_blake2s_air.mirror.NUM_ROUNDS` | `p3_blake2s_air::binary::NUM_ROUNDS` | not translated | 12 |
+| `blake2s-air` | `p3_blake2s_air.mirror.G_PER_ROUND` | `p3_blake2s_air::binary::G_PER_ROUND` | not translated | 12 |
+| `blake2s-air` | `p3_blake2s_air.mirror.G_SCHEDULE` | `p3_blake2s_air::binary::G_SCHEDULE` | not translated | 14 |
 | `blake2s-air` | `p3_blake2s_air.mirror.NUM_INPUT_WORDS` | `p3_blake2s_air::binary::generation::NUM_INPUT_WORDS` | not translated | 1 |
 | `blake2s-air` | `p3_blake2s_air.mirror.NUM_INPUT_BITS` | `p3_blake2s_air::binary::air::NUM_INPUT_BITS` | not translated | 1 |
 | `blake2s-air` | `p3_blake2s_air.mirror.CONSTRAINTS_PER_G` | `p3_blake2s_air::binary::air::CONSTRAINTS_PER_G` | not translated | 1 |
 | `blake2s-air` | `p3_blake2s_air.mirror.NUM_G_CONSTRAINTS` | `p3_blake2s_air::binary::air::NUM_G_CONSTRAINTS` | not translated | 1 |
 | `blake2s-air` | `p3_blake2s_air.mirror.num_constraints` | `{impl p3_air::air::BaseAir<F> for p3_blake2s_air::binary::air::Blake2sBinaryAir}::num_constraints` | not translated | 1 |
-| `blake2s-air` | `p3_blake2s_air.mirror.col.chaining_value` | `p3_blake2s_air::binary::columns::Blake2sBinaryCols` | not translated | 8 |
-| `blake2s-air` | `p3_blake2s_air.mirror.NUM_BLAKE2S_BINARY_COLS` | `p3_blake2s_air::binary::columns::NUM_BLAKE2S_BINARY_COLS` | not translated | 7 |
-| `blake2s-air` | `p3_blake2s_air.mirror.u32_to_bits_le` | `p3_air::utils::u32_to_bits_le` | not translated | 8 |
-| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sBinaryGCols` | `p3_blake2s_air::binary::columns::Blake2sBinaryGCols` | not translated | 9 |
-| `blake2s-air` | `p3_blake2s_air.mirror.State` | `p3_blake2s_air::binary::air::State` | not translated | 7 |
-| `blake2s-air` | `p3_blake2s_air.mirror.xor_rotl` | `p3_blake2s_air::binary::air::xor_rotl` | not translated | 7 |
-| `blake2s-air` | `p3_blake2s_air.mirror.xor_rotl_var` | `p3_blake2s_air::binary::air::xor_rotl_var` | not translated | 7 |
-| `blake2s-air` | `p3_blake2s_air.mirror.maj` | `p3_blake2s_air::binary::air::maj` | not translated | 7 |
-| `blake2s-air` | `p3_blake2s_air.mirror.add2` | `p3_blake2s_air::binary::air::add2` | not translated | 7 |
-| `blake2s-air` | `p3_blake2s_air.mirror.add3` | `p3_blake2s_air::binary::air::add3` | not translated | 7 |
-| `blake2s-air` | `p3_blake2s_air.mirror.eval_g` | `p3_blake2s_air::binary::air::eval_g` | not translated | 7 |
-| `blake2s-air` | `p3_blake2s_air.mirror.eval` | `{impl p3_air::air::Air<AB> for p3_blake2s_air::binary::air::Blake2sBinaryAir}::eval` | not translated | 7 |
-| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sCompressionInput` | `p3_blake2s_air::binary::generation::Blake2sCompressionInput` | not translated | 4 |
-| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sCompressionInput.flag_word` | `p3_blake2s_air::binary::generation::Blake2sCompressionInput::flag_word` | not translated | 4 |
-| `blake2s-air` | `p3_blake2s_air.mirror.GWords` | `p3_blake2s_air::binary::generation::GWords` | not translated | 6 |
-| `blake2s-air` | `p3_blake2s_air.mirror.carries_word` | `p3_blake2s_air::binary::generation::carries_word` | not translated | 7 |
-| `blake2s-air` | `p3_blake2s_air.mirror.g_words` | `p3_blake2s_air::binary::generation::g_words` | not translated | 6 |
-| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sBinaryCols` | `p3_blake2s_air::binary::columns::Blake2sBinaryCols` | not translated | 6 |
-| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sBinaryCols.cells` | `p3_blake2s_air::binary::columns::Blake2sBinaryCols` | not translated | 4 |
+| `blake2s-air` | `p3_blake2s_air.mirror.col.chaining_value` | `p3_blake2s_air::binary::columns::Blake2sBinaryCols` | not translated | 9 |
+| `blake2s-air` | `p3_blake2s_air.mirror.NUM_BLAKE2S_BINARY_COLS` | `p3_blake2s_air::binary::columns::NUM_BLAKE2S_BINARY_COLS` | not translated | 10 |
+| `blake2s-air` | `p3_blake2s_air.mirror.u32_to_bits_le` | `p3_air::utils::u32_to_bits_le` | not translated | 11 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sBinaryGCols` | `p3_blake2s_air::binary::columns::Blake2sBinaryGCols` | not translated | 12 |
+| `blake2s-air` | `p3_blake2s_air.mirror.State` | `p3_blake2s_air::binary::air::State` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.xor_rotl` | `p3_blake2s_air::binary::air::xor_rotl` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.xor_rotl_var` | `p3_blake2s_air::binary::air::xor_rotl_var` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.maj` | `p3_blake2s_air::binary::air::maj` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.add2` | `p3_blake2s_air::binary::air::add2` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.add3` | `p3_blake2s_air::binary::air::add3` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.eval_g` | `p3_blake2s_air::binary::air::eval_g` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.eval` | `{impl p3_air::air::Air<AB> for p3_blake2s_air::binary::air::Blake2sBinaryAir}::eval` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sCompressionInput` | `p3_blake2s_air::binary::generation::Blake2sCompressionInput` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sCompressionInput.flag_word` | `p3_blake2s_air::binary::generation::Blake2sCompressionInput::flag_word` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.GWords` | `p3_blake2s_air::binary::generation::GWords` | not translated | 9 |
+| `blake2s-air` | `p3_blake2s_air.mirror.carries_word` | `p3_blake2s_air::binary::generation::carries_word` | not translated | 10 |
+| `blake2s-air` | `p3_blake2s_air.mirror.g_words` | `p3_blake2s_air::binary::generation::g_words` | not translated | 9 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sBinaryCols` | `p3_blake2s_air::binary::columns::Blake2sBinaryCols` | not translated | 9 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sBinaryCols.cells` | `p3_blake2s_air::binary::columns::Blake2sBinaryCols` | not translated | 7 |
 | `blake2s-air` | `p3_blake2s_air.mirror.Blake2sBinaryCols.ofCells` | `{impl core::borrow::Borrow<p3_blake2s_air::binary::columns::Blake2sBinaryCols<T>> for [T]}::borrow` | not translated | 2 |
-| `blake2s-air` | `p3_blake2s_air.mirror.word_to_bits_le` | `p3_blake2s_air::binary::generation::word_to_bits_le` | not translated | 4 |
-| `blake2s-air` | `p3_blake2s_air.mirror.generate_g` | `p3_blake2s_air::binary::generation::generate_g` | not translated | 4 |
-| `blake2s-air` | `p3_blake2s_air.mirror.generate_trace_row` | `p3_blake2s_air::binary::generation::generate_trace_row` | not translated | 4 |
-| `blake2s-air` | `p3_blake2s_air.mirror.generate_binary_trace_rows` | `p3_blake2s_air::binary::generation::generate_binary_trace_rows` | not translated | 3 |
+| `blake2s-air` | `p3_blake2s_air.mirror.word_to_bits_le` | `p3_blake2s_air::binary::generation::word_to_bits_le` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.generate_g` | `p3_blake2s_air::binary::generation::generate_g` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.generate_trace_row` | `p3_blake2s_air::binary::generation::generate_trace_row` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.generate_binary_trace_rows` | `p3_blake2s_air::binary::generation::generate_binary_trace_rows` | not translated | 6 |
 | `blake2s-air` | `p3_blake2s_air.mirror.read_word` | `p3_blake2s_air::binary::generation::read_word` | not translated | 4 |
 | `blake2s-air` | `p3_blake2s_air.mirror.state_after_round` | `p3_blake2s_air::binary::generation::Blake2sBinaryCols::state_after_round` | not translated | 3 |
 | `blake2s-air` | `p3_blake2s_air.mirror.compression_output` | `p3_blake2s_air::binary::generation::Blake2sBinaryCols::compression_output` | not translated | 2 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Planes` | `p3_blake2s_air::binary::generation::generate_block` | not translated | 5 |
+| `blake2s-air` | `p3_blake2s_air.mirror.add_planes` | `p3_blake2s_air::binary::generation::add_planes` | not translated | 4 |
+| `blake2s-air` | `p3_blake2s_air.mirror.xor_rotate_right` | `p3_blake2s_air::binary::generation::xor_rotate_right` | not translated | 4 |
+| `blake2s-air` | `p3_blake2s_air.mirror.transpose_step` | `p3_blake2s_air::binary::generation::transpose_bits` | not translated | 6 |
+| `blake2s-air` | `p3_blake2s_air.mirror.transpose_bits` | `p3_blake2s_air::binary::generation::transpose_bits` | not translated | 6 |
+| `blake2s-air` | `p3_blake2s_air.mirror.lane_mask` | `p3_blake2s_air::binary::generation::lane_mask` | not translated | 3 |
+| `blake2s-air` | `p3_blake2s_air.mirror.input_words` | `p3_blake2s_air::binary::generation::input_words` | not translated | 3 |
+| `blake2s-air` | `p3_blake2s_air.mirror.g_planes` | `p3_blake2s_air::binary::generation::g_planes` | not translated | 3 |
+| `blake2s-air` | `p3_blake2s_air.mirror.generate_block` | `p3_blake2s_air::binary::generation::generate_block` | not translated | 3 |
+| `blake2s-air` | `p3_blake2s_air.mirror.generate_binary_trace_packed` | `p3_blake2s_air::binary::generation::generate_binary_trace_packed` | not translated | 3 |
 | `blake3-air` | `p3_blake3_air.mirror.BITS_PER_LIMB` | `p3_blake3_air::constants::BITS_PER_LIMB` | not translated | 9 |
 | `blake3-air` | `p3_blake3_air.mirror.U32_LIMBS` | `p3_blake3_air::constants::U32_LIMBS` | not translated | 0 |
 | `blake3-air` | `p3_blake3_air.mirror.IV` | `p3_blake3_air::constants::IV` | not translated | 18 |
@@ -1451,12 +1461,12 @@ counts the claims (of 1887) whose dependencies include the declaration.
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_unchecked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked` | dropped | 2 |
-| `keccak-air` | `p3_keccak_air.mirror.NUM_ROUNDS` | `p3_keccak_air::NUM_ROUNDS` | not translated | 15 |
+| `keccak-air` | `p3_keccak_air.mirror.NUM_ROUNDS` | `p3_keccak_air::NUM_ROUNDS` | not translated | 18 |
 | `keccak-air` | `p3_keccak_air.mirror.BITS_PER_LIMB` | `p3_keccak_air::BITS_PER_LIMB` | not translated | 9 |
 | `keccak-air` | `p3_keccak_air.mirror.U64_LIMBS` | `p3_keccak_air::U64_LIMBS` | not translated | 9 |
-| `keccak-air` | `p3_keccak_air.mirror.R` | `p3_keccak_air::constants::R` | not translated | 20 |
-| `keccak-air` | `p3_keccak_air.mirror.RC` | `p3_keccak_air::constants::RC` | not translated | 7 |
-| `keccak-air` | `p3_keccak_air.mirror.RC_BITS` | `p3_keccak_air::constants::RC_BITS` | not translated | 20 |
+| `keccak-air` | `p3_keccak_air.mirror.R` | `p3_keccak_air::constants::R` | not translated | 23 |
+| `keccak-air` | `p3_keccak_air.mirror.RC` | `p3_keccak_air::constants::RC` | not translated | 10 |
+| `keccak-air` | `p3_keccak_air.mirror.RC_BITS` | `p3_keccak_air::constants::RC_BITS` | not translated | 21 |
 | `keccak-air` | `p3_keccak_air.mirror.NUM_KECCAK_COLS` | `p3_keccak_air::columns::NUM_KECCAK_COLS` | not translated | 9 |
 | `keccak-air` | `p3_keccak_air.mirror.KeccakCols` | `p3_keccak_air::columns::KeccakCols` | not translated | 2 |
 | `keccak-air` | `p3_keccak_air.mirror.KeccakCols.cells` | `p3_keccak_air::columns::KeccakCols` | not translated | 2 |
@@ -1468,28 +1478,37 @@ counts the claims (of 1887) whose dependencies include the declaration.
 | `keccak-air` | `p3_keccak_air.mirror.xor` | `p3_field::PrimeCharacteristicRing::xor` | not translated | 18 |
 | `keccak-air` | `p3_keccak_air.mirror.xor3` | `p3_field::PrimeCharacteristicRing::xor3` | not translated | 9 |
 | `keccak-air` | `p3_keccak_air.mirror.andn` | `p3_field::PrimeCharacteristicRing::andn` | not translated | 9 |
-| `keccak-air` | `p3_keccak_air.mirror.sum` | `{impl core::iter::Sum<T> for p3_air::symbolic::SymbolicExpr<A>}::sum` | not translated | 15 |
+| `keccak-air` | `p3_keccak_air.mirror.sum` | `{impl core::iter::Sum<T> for p3_air::symbolic::SymbolicExpr<A>}::sum` | not translated | 16 |
 | `keccak-air` | `p3_keccak_air.mirror.eval_round_flags` | `p3_keccak_air::round_flags::eval_round_flags` | not translated | 9 |
 | `keccak-air` | `p3_keccak_air.mirror.eval` | `{impl p3_air::air::Air<AB> for p3_keccak_air::air::KeccakAir}::eval` | not translated | 9 |
-| `keccak-air` | `p3_keccak_air.mirror.u64_to_bits_le` | `p3_air::utils::u64_to_bits_le` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.u64_to_bits_le` | `p3_air::utils::u64_to_bits_le` | not translated | 6 |
 | `keccak-air` | `p3_keccak_air.mirror.u64_to_16_bit_limbs` | `p3_air::utils::u64_to_16_bit_limbs` | not translated | 2 |
 | `keccak-air` | `p3_keccak_air.mirror.generate_trace_row_for_round` | `p3_keccak_air::generation::generate_trace_row_for_round` | not translated | 2 |
 | `keccak-air` | `p3_keccak_air.mirror.generate_trace_rows_for_perm` | `p3_keccak_air::generation::generate_trace_rows_for_perm` | not translated | 2 |
 | `keccak-air` | `p3_keccak_air.mirror.generate_trace_rows` | `p3_keccak_air::generation::generate_trace_rows` | not translated | 2 |
-| `keccak-air` | `p3_keccak_air.mirror.binary.KECCAK_BINARY_ROWS_PER_PERM` | `p3_keccak_air::binary::columns::KECCAK_BINARY_ROWS_PER_PERM` | not translated | 2 |
-| `keccak-air` | `p3_keccak_air.mirror.binary.NUM_KECCAK_BINARY_COLS` | `p3_keccak_air::binary::columns::NUM_KECCAK_BINARY_COLS` | not translated | 6 |
-| `keccak-air` | `p3_keccak_air.mirror.binary.KeccakBinaryCols` | `p3_keccak_air::binary::columns::KeccakBinaryCols` | not translated | 1 |
-| `keccak-air` | `p3_keccak_air.mirror.binary.KeccakBinaryCols.cells` | `p3_keccak_air::binary::columns::KeccakBinaryCols` | not translated | 1 |
-| `keccak-air` | `p3_keccak_air.mirror.binary.col.a` | `p3_keccak_air::binary::columns::KeccakBinaryCols` | not translated | 6 |
-| `keccak-air` | `p3_keccak_air.mirror.binary.rho_pi_source` | `p3_keccak_air::binary::rho_pi_source` | not translated | 8 |
-| `keccak-air` | `p3_keccak_air.mirror.binary.eval` | `{impl p3_air::air::Air<AB> for p3_keccak_air::binary::air::KeccakBinaryAir}::eval` | not translated | 6 |
-| `keccak-air` | `p3_keccak_air.mirror.binary.keccak_round` | `p3_keccak_air::binary::generation::keccak_round` | not translated | 3 |
-| `keccak-air` | `p3_keccak_air.mirror.binary.write_state` | `p3_keccak_air::binary::generation::write_state` | not translated | 1 |
-| `keccak-air` | `p3_keccak_air.mirror.binary.generate_perm_rows` | `p3_keccak_air::binary::generation::generate_perm_rows` | not translated | 1 |
-| `keccak-air` | `p3_keccak_air.mirror.binary.generate_binary_trace_rows` | `p3_keccak_air::binary::generation::generate_binary_trace_rows` | not translated | 1 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.KECCAK_BINARY_ROWS_PER_PERM` | `p3_keccak_air::binary::columns::KECCAK_BINARY_ROWS_PER_PERM` | not translated | 5 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.NUM_KECCAK_BINARY_COLS` | `p3_keccak_air::binary::columns::NUM_KECCAK_BINARY_COLS` | not translated | 9 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.KeccakBinaryCols` | `p3_keccak_air::binary::columns::KeccakBinaryCols` | not translated | 4 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.KeccakBinaryCols.cells` | `p3_keccak_air::binary::columns::KeccakBinaryCols` | not translated | 4 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.col.a` | `p3_keccak_air::binary::columns::KeccakBinaryCols` | not translated | 9 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.rho_pi_source` | `p3_keccak_air::binary::rho_pi_source` | not translated | 11 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.eval` | `{impl p3_air::air::Air<AB> for p3_keccak_air::binary::air::KeccakBinaryAir}::eval` | not translated | 7 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.keccak_round` | `p3_keccak_air::binary::generation::keccak_round` | not translated | 6 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.write_state` | `p3_keccak_air::binary::generation::write_state` | not translated | 4 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.generate_perm_rows` | `p3_keccak_air::binary::generation::generate_perm_rows` | not translated | 4 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.generate_binary_trace_rows` | `p3_keccak_air::binary::generation::generate_binary_trace_rows` | not translated | 4 |
 | `keccak-air` | `p3_keccak_air.mirror.binary.num_constraints` | `{impl p3_air::air::BaseAir<F> for p3_keccak_air::binary::air::KeccakBinaryAir}::num_constraints` | not translated | 1 |
 | `keccak-air` | `p3_keccak_air.mirror.binary.NUM_FLAG_CONSTRAINTS` | `p3_keccak_air::binary::air::NUM_FLAG_CONSTRAINTS` | not translated | 1 |
 | `keccak-air` | `p3_keccak_air.mirror.binary.NUM_STATE_BITS` | `p3_keccak_air::binary::air::NUM_STATE_BITS` | not translated | 1 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.BITS_PER_WORD` | `p3_keccak_air::binary::generation::BITS_PER_WORD` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.OUTPUT_FLAG_COLUMN` | `p3_keccak_air::binary::generation::OUTPUT_FLAG_COLUMN` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.trailing_zeros` | `core::num::{u32}::trailing_zeros` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.RowWords` | `p3_keccak_air::binary::generation::RowWords` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.RowWords.default` | `{impl core::default::Default for p3_keccak_air::binary::generation::RowWords}::default` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.generate_perm_words` | `p3_keccak_air::binary::generation::generate_perm_words` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.pack_row` | `p3_keccak_air::binary::generation::pack_block` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.pack_block` | `p3_keccak_air::binary::generation::pack_block` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.generate_binary_trace_packed` | `p3_keccak_air::binary::generation::generate_binary_trace_packed` | not translated | 3 |
 | `lookup` | `p3_lookup.mirror.Kind` | `p3_lookup::types::Kind` | not translated | 29 |
 | `lookup` | `p3_lookup.mirror.Lookup` | `p3_lookup::types::Lookup` | not translated | 44 |
 | `lookup` | `p3_lookup.mirror.Lookup.num_denoms` | `p3_lookup::types::Lookup::num_denoms` | not translated | 0 |
@@ -1785,18 +1804,18 @@ counts the claims (of 1887) whose dependencies include the declaration.
 | `security` | `Plonky3Lean.Proofs.Security.Real.foldingPowBitsR` | `p3_security::assumption::SecurityAssumption::folding_pow_bits` | not translated | 1 |
 | `security` | `Plonky3Lean.Proofs.Security.Real.upperX` | `p3_security::proximity::compute_upper_m` | not translated | 2 |
 | `security` | `Plonky3Lean.Proofs.Security.Real.sumBitsR` | `p3_security::error::ErrorBits::sum` | not translated | 1 |
-| `sha256-air` | `p3_sha256_air.mirror.BLOCK_WORDS` | `p3_sha256_air::constants::BLOCK_WORDS` | not translated | 15 |
-| `sha256-air` | `p3_sha256_air.mirror.NUM_COMPRESSION_ROUNDS` | `p3_sha256_air::constants::NUM_COMPRESSION_ROUNDS` | not translated | 15 |
-| `sha256-air` | `p3_sha256_air.mirror.SCHEDULE_EXTENSIONS` | `p3_sha256_air::constants::SCHEDULE_EXTENSIONS` | not translated | 15 |
-| `sha256-air` | `p3_sha256_air.mirror.STATE_WORDS` | `p3_sha256_air::constants::STATE_WORDS` | not translated | 15 |
+| `sha256-air` | `p3_sha256_air.mirror.BLOCK_WORDS` | `p3_sha256_air::constants::BLOCK_WORDS` | not translated | 19 |
+| `sha256-air` | `p3_sha256_air.mirror.NUM_COMPRESSION_ROUNDS` | `p3_sha256_air::constants::NUM_COMPRESSION_ROUNDS` | not translated | 19 |
+| `sha256-air` | `p3_sha256_air.mirror.SCHEDULE_EXTENSIONS` | `p3_sha256_air::constants::SCHEDULE_EXTENSIONS` | not translated | 19 |
+| `sha256-air` | `p3_sha256_air.mirror.STATE_WORDS` | `p3_sha256_air::constants::STATE_WORDS` | not translated | 19 |
 | `sha256-air` | `p3_sha256_air.mirror.WORD_BITS` | `p3_sha256_air::constants::WORD_BITS` | not translated | 10 |
 | `sha256-air` | `p3_sha256_air.mirror.BITS_PER_LIMB` | `p3_sha256_air::constants::BITS_PER_LIMB` | not translated | 10 |
 | `sha256-air` | `p3_sha256_air.mirror.U32_LIMBS` | `p3_sha256_air::constants::U32_LIMBS` | not translated | 3 |
-| `sha256-air` | `p3_sha256_air.mirror.CHAIN_LEN` | `p3_sha256_air::columns::CHAIN_LEN` | not translated | 12 |
+| `sha256-air` | `p3_sha256_air.mirror.CHAIN_LEN` | `p3_sha256_air::columns::CHAIN_LEN` | not translated | 16 |
 | `sha256-air` | `p3_sha256_air.mirror.INPUT_WORDS` | `p3_sha256_air::generation::INPUT_WORDS` | not translated | 0 |
-| `sha256-air` | `p3_sha256_air.mirror.SHA256_K` | `p3_sha256_air::constants::SHA256_K` | not translated | 17 |
+| `sha256-air` | `p3_sha256_air.mirror.SHA256_K` | `p3_sha256_air::constants::SHA256_K` | not translated | 21 |
 | `sha256-air` | `p3_sha256_air.mirror.SHA256_IV` | `p3_sha256_air::constants::SHA256_IV` | not translated | 1 |
-| `sha256-air` | `p3_sha256_air.mirror.kOf` | `p3_sha256_air::constants::SHA256_K` | not translated | 16 |
+| `sha256-air` | `p3_sha256_air.mirror.kOf` | `p3_sha256_air::constants::SHA256_K` | not translated | 20 |
 | `sha256-air` | `p3_sha256_air.mirror.col.h_in` | `p3_sha256_air::columns::Sha256Cols` | not translated | 9 |
 | `sha256-air` | `p3_sha256_air.mirror.NUM_SHA256_COLS` | `p3_sha256_air::columns::NUM_SHA256_COLS` | not translated | 10 |
 | `sha256-air` | `p3_sha256_air.mirror.double` | `p3_field::PrimeCharacteristicRing::double` | not translated | 9 |
@@ -1826,16 +1845,16 @@ counts the claims (of 1887) whose dependencies include the declaration.
 | `sha256-air` | `p3_sha256_air.mirror.Sha256RoundCols` | `p3_sha256_air::columns::Sha256RoundCols` | not translated | 3 |
 | `sha256-air` | `p3_sha256_air.mirror.Sha256Cols` | `p3_sha256_air::columns::Sha256Cols` | not translated | 3 |
 | `sha256-air` | `p3_sha256_air.mirror.Sha256Cols.cells` | `p3_sha256_air::columns::Sha256Cols` | not translated | 3 |
-| `sha256-air` | `p3_sha256_air.mirror.u32_to_bits_le` | `p3_air::utils::u32_to_bits_le` | not translated | 13 |
+| `sha256-air` | `p3_sha256_air.mirror.u32_to_bits_le` | `p3_air::utils::u32_to_bits_le` | not translated | 20 |
 | `sha256-air` | `p3_sha256_air.mirror.u32_to_limbs` | `p3_sha256_air::constants::u32_to_limbs` | not translated | 3 |
 | `sha256-air` | `p3_sha256_air.mirror.WorkVars` | `p3_sha256_air::generation::generate_trace_row_for_compression` | not translated | 3 |
 | `sha256-air` | `p3_sha256_air.mirror.generate_trace_row_for_compression` | `p3_sha256_air::generation::generate_trace_row_for_compression` | not translated | 3 |
 | `sha256-air` | `p3_sha256_air.mirror.generate_trace_rows` | `p3_sha256_air::generation::generate_trace_rows` | not translated | 3 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.T1_CARRIES` | `p3_sha256_air::binary::T1_CARRIES` | not translated | 5 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.SCHEDULE_CARRIES` | `p3_sha256_air::binary::SCHEDULE_CARRIES` | not translated | 5 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.rotr_index` | `p3_sha256_air::binary::rotr_index` | not translated | 4 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.col.a_chain` | `p3_sha256_air::binary::columns::Sha256BinaryCols` | not translated | 4 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.NUM_SHA256_BINARY_COLS` | `p3_sha256_air::binary::columns::NUM_SHA256_BINARY_COLS` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.T1_CARRIES` | `p3_sha256_air::binary::T1_CARRIES` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.SCHEDULE_CARRIES` | `p3_sha256_air::binary::SCHEDULE_CARRIES` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.rotr_index` | `p3_sha256_air::binary::rotr_index` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.col.a_chain` | `p3_sha256_air::binary::columns::Sha256BinaryCols` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.NUM_SHA256_BINARY_COLS` | `p3_sha256_air::binary::columns::NUM_SHA256_BINARY_COLS` | not translated | 8 |
 | `sha256-air` | `p3_sha256_air.mirror.binary.NUM_INPUT_BITS` | `p3_sha256_air::binary::air::NUM_INPUT_BITS` | not translated | 1 |
 | `sha256-air` | `p3_sha256_air.mirror.binary.STORED_CARRY_ADD` | `p3_sha256_air::binary::air::STORED_CARRY_ADD` | not translated | 1 |
 | `sha256-air` | `p3_sha256_air.mirror.binary.SUM_CARRY_ADD` | `p3_sha256_air::binary::air::SUM_CARRY_ADD` | not translated | 1 |
@@ -1843,24 +1862,25 @@ counts the claims (of 1887) whose dependencies include the declaration.
 | `sha256-air` | `p3_sha256_air.mirror.binary.CONSTRAINTS_PER_ROUND` | `p3_sha256_air::binary::air::CONSTRAINTS_PER_ROUND` | not translated | 1 |
 | `sha256-air` | `p3_sha256_air.mirror.binary.NUM_HASH_CONSTRAINTS` | `p3_sha256_air::binary::air::NUM_HASH_CONSTRAINTS` | not translated | 1 |
 | `sha256-air` | `p3_sha256_air.mirror.binary.num_constraints` | `{impl p3_air::air::BaseAir<F> for p3_sha256_air::binary::air::Sha256BinaryAir}::num_constraints` | not translated | 1 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.xor3_rot` | `p3_sha256_air::binary::air::xor3_rot` | not translated | 4 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.xor3_shift` | `p3_sha256_air::binary::air::xor3_shift` | not translated | 4 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.maj` | `p3_sha256_air::binary::air::maj` | not translated | 9 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.add_many_step` | `p3_sha256_air::binary::air::add_many` | not translated | 4 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.add_many` | `p3_sha256_air::binary::air::add_many` | not translated | 4 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.eval` | `{impl p3_air::air::Air<AB> for p3_sha256_air::binary::air::Sha256BinaryAir}::eval` | not translated | 4 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.big_sigma0` | `p3_sha256_air::binary::generation::big_sigma0` | not translated | 2 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.big_sigma1` | `p3_sha256_air::binary::generation::big_sigma1` | not translated | 2 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.small_sigma0` | `p3_sha256_air::binary::generation::small_sigma0` | not translated | 2 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.small_sigma1` | `p3_sha256_air::binary::generation::small_sigma1` | not translated | 2 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.Sha256BinaryScheduleCols` | `p3_sha256_air::binary::columns::Sha256BinaryScheduleCols` | not translated | 2 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.Sha256BinaryRoundCols` | `p3_sha256_air::binary::columns::Sha256BinaryRoundCols` | not translated | 2 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.Sha256BinaryCols` | `p3_sha256_air::binary::columns::Sha256BinaryCols` | not translated | 2 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.Sha256BinaryCols.cells` | `p3_sha256_air::binary::columns::Sha256BinaryCols` | not translated | 2 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.carry_bits` | `p3_sha256_air::binary::generation::carry_bits` | not translated | 2 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.add_with_carries` | `p3_sha256_air::binary::generation::add_with_carries` | not translated | 2 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.generate_trace_row` | `p3_sha256_air::binary::generation::generate_trace_row` | not translated | 2 |
-| `sha256-air` | `p3_sha256_air.mirror.binary.generate_binary_trace_rows` | `p3_sha256_air::binary::generation::generate_binary_trace_rows` | not translated | 2 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.xor3_rot` | `p3_sha256_air::binary::air::xor3_rot` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.xor3_shift` | `p3_sha256_air::binary::air::xor3_shift` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.maj` | `p3_sha256_air::binary::air::maj` | not translated | 11 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.add_many_step` | `p3_sha256_air::binary::air::add_many` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.add_many` | `p3_sha256_air::binary::air::add_many` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.eval` | `{impl p3_air::air::Air<AB> for p3_sha256_air::binary::air::Sha256BinaryAir}::eval` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.big_sigma0` | `p3_sha256_air::binary::generation::big_sigma0` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.big_sigma1` | `p3_sha256_air::binary::generation::big_sigma1` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.small_sigma0` | `p3_sha256_air::binary::generation::small_sigma0` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.small_sigma1` | `p3_sha256_air::binary::generation::small_sigma1` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.Sha256BinaryScheduleCols` | `p3_sha256_air::binary::columns::Sha256BinaryScheduleCols` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.Sha256BinaryRoundCols` | `p3_sha256_air::binary::columns::Sha256BinaryRoundCols` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.Sha256BinaryCols` | `p3_sha256_air::binary::columns::Sha256BinaryCols` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.Sha256BinaryCols.cells` | `p3_sha256_air::binary::columns::Sha256BinaryCols` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.carry_bits` | `p3_sha256_air::binary::generation::carry_bits` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.add_with_carries` | `p3_sha256_air::binary::generation::add_with_carries` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.generate_trace_row` | `p3_sha256_air::binary::generation::generate_trace_row` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.generate_binary_trace_rows` | `p3_sha256_air::binary::generation::generate_binary_trace_rows` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.generate_binary_trace_packed` | `p3_sha256_air::binary::generation::generate_binary_trace_packed` | not translated | 3 |
 | `stir` | `p3_stir.utils.mirror.eval_poly` | `p3_stir::utils::eval_poly` | stub | 7 |
 | `stir` | `p3_stir.utils.mirror.eval_poly_parallel` | `p3_stir::utils::eval_poly_parallel` | stub | 1 |
 | `stir` | `p3_stir.utils.mirror.divide_by_linear` | `p3_stir::utils::divide_by_linear` | stub | 0 |
@@ -2138,6 +2158,8 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Air.next_row_of_last_row` | `Quot.sound`, `propext` |
 | `Air.next_row_unread` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Air.num_quotient_chunks` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.packMat.bit` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.packMat.length` | `Quot.sound`, `propext` |
 | `Air.periodic_degree` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Air.poly_degree_bound` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Air.quotient_fits_one_transition` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -2288,17 +2310,24 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BinaryPcs.verify_query_paths.no_panic` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake2sAir.binary.G_SCHEDULE.eq` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake2sAir.binary.G_SCHEDULE.eq_rfc` | `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.add_planes.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake2sAir.binary.generation.add_planes.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake2sAir.binary.generation.carries_word.eq` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake2sAir.binary.generation.g_words.eq_rfc` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake2sAir.binary.generation.g_words.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake2sAir.binary.generation.g_words.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.transpose_bits.bit` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.transpose_bits.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.xor_rotate_right.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake2sAir.binary.generation.xor_rotate_right.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake2sAir.check_complete` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake2sAir.complete` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake2sAir.constants.IV.eq_rfc` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake2sAir.constants.SIGMA.eq_rfc` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake2sAir.degree_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.generate_binary_trace_packed.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.generate_binary_trace_packed.eq_pack` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.generate_binary_trace_packed.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake2sAir.generate_binary_trace_rows.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake2sAir.generate_trace_row.output` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake2sAir.num_constraints_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -2310,6 +2339,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Blake2sAir.spec.rounds_abc` | `Quot.sound`, `propext` |
 | `Blake2sAir.spec.selftest` | `Quot.sound`, `propext` |
 | `Blake2sAir.state_after_round.panics` | `Quot.sound`, `propext` |
+| `Blake2sAir.transpose_bits.bit` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake3Air.add2_small_field` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake3Air.add3_small_field` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake3Air.binary.complete` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -2643,6 +2673,9 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `KeccakAir.RC_BITS.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
 | `KeccakAir.binary.complete` | `Classical.choice`, `Quot.sound`, `propext` |
 | `KeccakAir.binary.degree_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.binary.generate_binary_trace_packed.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.binary.generate_binary_trace_packed.eq_pack` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.binary.generate_binary_trace_packed.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `KeccakAir.binary.generation.keccak_round.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
 | `KeccakAir.binary.generation.keccak_round.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `KeccakAir.binary.keccak_round.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -3785,7 +3818,11 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Sha256Air.SHA256_K.eq_fips` | `propext` |
 | `Sha256Air.binary.complete` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sha256Air.binary.degree_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.binary.generate_binary_trace_packed.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.binary.generate_binary_trace_packed.eq_pack` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.binary.generate_binary_trace_packed.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sha256Air.binary.generate_binary_trace_rows.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.binary.generate_trace_row.cells_scratch` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sha256Air.binary.generation.sigma.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sha256Air.binary.num_constraints_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Sha256Air.binary.sound` | `Classical.choice`, `Quot.sound`, `propext` |
