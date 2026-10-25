@@ -731,12 +731,13 @@ variable [DecidableEq F] in
 theorem walk_blocks_eq {inst : p3_binary_dft.butterfly.ButterflyField F R} (hb : ButterflyComputes inst L)
     (tw : Twiddles F) (hbl : tw.bases.length ≤ Usize.max) (hsl : tw.steps.length ≤ Usize.max)
     (inverse split : Bool) {w cnt half : ℕ} (hw : 0 < w) (hh : 0 < half) (s : Slice F)
-    (hs : s.val.length = cnt * (2 * half) * w) (stage first : Std.Usize)
+    (y : ℕ → ℕ → F) (hy : flat w (cnt * (2 * half)) y = s.val) (stage first : Std.Usize)
     (hfirst : (first.val + cnt) * 2 ≤ Usize.max) (hHG : 2 * (half * w) + 1024 ≤ Usize.max) :
     p3_binary_dft.lch.schedule.hax_reshaped.walk_blocks inverse inst s (uz (half * w)) stage first split
         (toTw tw) =
-      ofOption ((walkBlocks L tw inverse stage.val first.val (cnt * (2 * half)) half (rowsOf w s.val)).map
+      ofOption ((walkBlocks L tw inverse stage.val first.val (cnt * (2 * half)) half y).map
         fun y => mkSlice (flat w (cnt * (2 * half)) y)) := by
+  have hs : s.val.length = cnt * (2 * half) * w := by rw [← hy, length_flat]
   set H := half * w with hH
   set len := cnt * (2 * half) with hlen
   have hsmax := s.property
@@ -753,7 +754,7 @@ theorem walk_blocks_eq {inst : p3_binary_dft.butterfly.ButterflyField F R} (hb :
       ofOption (((List.range cnt).foldlM (fun (acc : (ℕ → ℕ → F) × F) i => do
         let t ← if i = 0 then pure acc.2 else (do pure (acc.2 + (← tw.step (first.val + i))))
         let y ← blockButterfly inverse len half i t acc.1
-        pure (y, t)) (rowsOf w s.val, t0)).map fun (c : (ℕ → ℕ → F) × F) => mkSlice (flat w len c.1)) := by
+        pure (y, t)) (y, t0)).map fun (c : (ℕ → ℕ → F) × F) => mkSlice (flat w len c.1)) := by
     intro t0
     have := loop_foldlM_inv
       (fun st => p3_binary_dft.lch.schedule.hax_reshaped.walk_blocks_loop.body inverse inst (uz H) first
@@ -764,8 +765,8 @@ theorem walk_blocks_eq {inst : p3_binary_dft.butterfly.ButterflyField F R} (hb :
         let t ← if i = 0 then pure acc.2 else (do pure (acc.2 + (← tw.step (first.val + i))))
         let y ← blockButterfly inverse len half i t acc.1
         pure (y, t)) (fun _ _ => True) (fun k hk c _ => ?_) (fun c _ => ?_)
-      (rowsOf w s.val, t0) trivial
-    · rw [show (rowsOf w s.val, t0).1 = rowsOf w s.val from rfl, flat_rowsOf _ hs, mkSlice_self] at this
+      (y, t0) trivial
+    · rw [show (y, t0).1 = y from rfl, hy, mkSlice_self] at this
       simp only [zero_mul] at this
       unfold p3_binary_dft.lch.schedule.hax_reshaped.walk_blocks_loop
       exact this
@@ -852,5 +853,83 @@ theorem walk_blocks_eq {inst : p3_binary_dft.butterfly.ButterflyField F R} (hb :
       uz_val (show H ≤ Usize.max by omega), slice_len_eq, hs, massert, bne_uz_zero hH2]
     rw [ite_of_pos (by simp only [ne_eq, decide_eq_true_eq]; positivity), bind_ok, hloop t0]
     exact (ofOption_map_bind _ (fun y => mkSlice (flat w len y))).trans rfl
+
+/-! ## Helpers for a stage pass -/
+
+theorem uz_div {a b : ℕ} (ha : a ≤ Usize.max) (hb : b ≤ Usize.max) (h0 : b ≠ 0) :
+    (uz a / uz b : RustM Std.Usize) = .ok (uz (a / b)) := by
+  obtain ⟨z, hz, hv, -⟩ := UScalar.div_bv_spec (uz a) (y := uz b) (by rw [uz_val hb]; exact h0)
+  rw [hz, eq_uz z, hv, uz_val ha, uz_val hb]
+
+theorem max_uz {a b : ℕ} (ha : a ≤ Usize.max) (hb : b ≤ Usize.max) :
+    core.Usize.Insts.CoreCmpOrd.max (uz a) (uz b) = .ok (uz (max a b)) := by
+  unfold core.Usize.Insts.CoreCmpOrd.max
+  congr 1
+  by_cases h : b < a
+  · rw [ite_of_pos ((uz_lt hb ha).mpr h), max_eq_left (by omega)]
+  · rw [ite_of_neg (fun h' => h ((uz_lt hb ha).mp h')), max_eq_right (by omega)]
+
+theorem shl_uz {a j : ℕ} (hj : j < UScalarTy.Usize.numBits) (h : a * 2 ^ j ≤ Usize.max) :
+    (uz a <<< uz j : RustM Std.Usize) = .ok (uz (a * 2 ^ j)) := by
+  have hjm : j ≤ Usize.max := by
+    have : Usize.max = 2 ^ UScalarTy.Usize.numBits - 1 := by rw [Usize.max_def]; simp [Usize.numBits]
+    have := Nat.lt_two_pow_self (n := UScalarTy.Usize.numBits); omega
+  show UScalar.shiftLeft_UScalar (uz a) (uz j) = _
+  unfold UScalar.shiftLeft_UScalar UScalar.shiftLeft
+  rw [uz_val hjm, ite_of_pos hj]
+  congr 1
+  apply UScalar.eq_of_val_eq
+  rw [uz_val h]
+  have ha : a ≤ Usize.max := le_trans (Nat.le_mul_of_pos_right _ (Nat.two_pow_pos j)) h
+  show ((uz a).bv <<< j).toNat = _
+  rw [BitVec.toNat_shiftLeft, Nat.shiftLeft_eq]
+  change ((uz a).val * 2 ^ j) % _ = _
+  rw [uz_val ha, Nat.mod_eq_of_lt]
+  have : Usize.max = 2 ^ UScalarTy.Usize.numBits - 1 := by rw [Usize.max_def]; simp [Usize.numBits]
+  have := Nat.two_pow_pos UScalarTy.Usize.numBits
+  simp only [UScalarTy.Usize_numBits_eq] at *
+  omega
+
+open p3_binary_dft.lch.mirror in
+theorem flat_slice {w n o len : ℕ} (x : ℕ → ℕ → F) (h : o + len ≤ n) :
+    flat w len (slice x o) = ((flat w n x).drop (o * w)).take (len * w) := by
+  apply List.ext_getElem?
+  intro p
+  rw [flat_getElem?, List.getElem?_take, List.getElem?_drop, flat_getElem?]
+  by_cases hp : p < len * w
+  · have hw : 0 < w := by rcases Nat.eq_zero_or_pos w with h0 | h0 <;> simp_all
+    rw [ite_of_pos hp, ite_of_pos hp, ite_of_pos (by nlinarith)]
+    obtain ⟨r, c, hc, rfl⟩ : ∃ r c, c < w ∧ p = r * w + c :=
+      ⟨p / w, p % w, Nat.mod_lt _ hw, by rw [Nat.mul_comm]; exact (Nat.div_add_mod p w).symm⟩
+    rw [div_row hc, mod_row hc, show o * w + (r * w + c) = (o + r) * w + c by ring, div_row hc, mod_row hc]
+    rfl
+  · rw [ite_of_neg hp, ite_of_neg hp]
+
+open p3_binary_dft.lch.mirror in
+theorem flat_writeBack {w n o len : ℕ} (x y : ℕ → ℕ → F) (h : o + len ≤ n) :
+    flat w n (writeBack x o len y) = (flat w n x).setSlice! (o * w) (flat w len y) := by
+  apply List.ext_getElem?
+  intro p
+  rcases Nat.eq_zero_or_pos w with hw | hw
+  · subst hw; simp [flat]
+  rw [flat_getElem?]
+  obtain ⟨r, c, hc, rfl⟩ : ∃ r c, c < w ∧ p = r * w + c :=
+    ⟨p / w, p % w, Nat.mod_lt _ hw, by rw [Nat.mul_comm]; exact (Nat.div_add_mod p w).symm⟩
+  rw [div_row hc, mod_row hc]
+  by_cases h1 : r < o
+  · rw [List.setSlice!_getElem?_prefix _ _ _ _ ((row_lt_iff hc).mpr h1), flat_getElem?, div_row hc,
+      mod_row hc]
+    simp [writeBack, show ¬ o ≤ r by omega]
+  by_cases h2 : r < o + len
+  · rw [List.setSlice!_getElem?_middle _ _ _ _ ⟨(row_le_iff hc).mpr (by omega), by
+        rw [length_flat, show r * w + c - o * w = (r - o) * w + c by rw [Nat.sub_mul]; have := Nat.mul_le_mul_right w (show o ≤ r by omega); omega]
+        exact (row_lt_iff hc).mpr (by omega), by rw [length_flat]; exact (row_lt_iff hc).mpr (by omega)⟩,
+      flat_getElem?, show r * w + c - o * w = (r - o) * w + c by rw [Nat.sub_mul]; have := Nat.mul_le_mul_right w (show o ≤ r by omega); omega,
+      div_row hc, mod_row hc]
+    simp only [writeBack, show o ≤ r by omega, h2, and_self, ite_true]
+    rw [ite_of_pos ((row_lt_iff hc).mpr (by omega)), ite_of_pos ((row_lt_iff hc).mpr (by omega))]
+  · rw [List.setSlice!_getElem?_suffix _ _ _ _ (by rw [length_flat]; have := Nat.mul_le_mul_right w (show o + len ≤ r by omega); rw [add_mul] at this; omega),
+      flat_getElem?, div_row hc, mod_row hc]
+    simp [writeBack, h2]
 
 end Plonky3Lean.Proofs.BinaryDft
