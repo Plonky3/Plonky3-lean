@@ -521,7 +521,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1864) whose dependencies include it; reaching one is not using it.
+(of 1868) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -564,29 +564,29 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1864) whose dependencies include the declaration.
+counts the claims (of 1868) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
-| `air` | `p3_air.symbolic.mirror.SymbolicVariable.degree_multiple` | `p3_air::symbolic::variable::SymbolicVariable::degree_multiple` | not translated | 53 |
-| `air` | `p3_air.symbolic.mirror.SymbolicVariable.poly_degree` | `p3_air::symbolic::variable::SymbolicVariable::poly_degree` | not translated | 53 |
+| `air` | `p3_air.symbolic.mirror.SymbolicVariable.degree_multiple` | `p3_air::symbolic::variable::SymbolicVariable::degree_multiple` | not translated | 61 |
+| `air` | `p3_air.symbolic.mirror.SymbolicVariable.poly_degree` | `p3_air::symbolic::variable::SymbolicVariable::poly_degree` | not translated | 61 |
 | `air` | `p3_air.symbolic.mirror.SymbolicVariableExt.degree_multiple` | `p3_air::symbolic::variable::SymbolicVariableExt::degree_multiple` | not translated | 5 |
 | `air` | `p3_air.symbolic.mirror.SymbolicVariableExt.poly_degree` | `p3_air::symbolic::variable::SymbolicVariableExt::poly_degree` | not translated | 5 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_multiple` | `p3_air::symbolic::SymbolicExpr::degree_multiple` | not translated | 51 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_multiple` | `p3_air::symbolic::SymbolicExpr::degree_multiple` | not translated | 59 |
 | `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_with` | `p3_air::symbolic::SymbolicExpr::degree_memo` | not translated | 38 |
 | `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_multiple_with_transition` | `p3_air::symbolic::SymbolicExpr::degree_multiple_with_transition` | not translated | 5 |
 | `air` | `p3_air.symbolic.mirror.SymbolicExpr.poly_degree` | `p3_air::symbolic::SymbolicExpr::poly_degree` | not translated | 20 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.as_const` | `p3_air::symbolic::SymbolicExpr::as_const` | not translated | 48 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_add` | `p3_air::symbolic::SymbolicExpr::sym_add` | not translated | 43 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_neg` | `p3_air::symbolic::SymbolicExpr::sym_neg` | not translated | 44 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_sub` | `p3_air::symbolic::SymbolicExpr::sym_sub` | not translated | 43 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_mul` | `p3_air::symbolic::SymbolicExpr::sym_mul` | not translated | 43 |
-| `air` | `p3_air.symbolic.mirror.SymbolicExpr.const` | `{impl p3_field::PrimeCharacteristicRing for p3_air::symbolic::SymbolicExpr<A>}::from_prime_subfield` | not translated | 41 |
-| `air` | `p3_air.symbolic.mirror.instSymLeafBaseLeaf` | `{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression::BaseLeaf<F>}::degree_multiple` | not translated | 52 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.as_const` | `p3_air::symbolic::SymbolicExpr::as_const` | not translated | 56 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_add` | `p3_air::symbolic::SymbolicExpr::sym_add` | not translated | 51 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_neg` | `p3_air::symbolic::SymbolicExpr::sym_neg` | not translated | 52 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_sub` | `p3_air::symbolic::SymbolicExpr::sym_sub` | not translated | 51 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_mul` | `p3_air::symbolic::SymbolicExpr::sym_mul` | not translated | 51 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.const` | `{impl p3_field::PrimeCharacteristicRing for p3_air::symbolic::SymbolicExpr<A>}::from_prime_subfield` | not translated | 49 |
+| `air` | `p3_air.symbolic.mirror.instSymLeafBaseLeaf` | `{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression::BaseLeaf<F>}::degree_multiple` | not translated | 60 |
 | `air` | `p3_air.symbolic.mirror.instSymLeafExtLeaf` | `{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression_ext::ExtLeaf<F, EF>}::degree_multiple` | not translated | 4 |
 | `air` | `p3_air.symbolic.mirror.SymbolicExpressionExt.to_base` | `p3_air::symbolic::expression_ext::SymbolicExpressionExt::to_base` | not translated | 1 |
-| `air` | `p3_air.builder.mirror.AirBuilder.is_transition_window` | `p3_air::builder::AirBuilder::is_transition_window` | not translated | 20 |
-| `air` | `p3_air.builder.mirror.AirBuilder.when` | `p3_air::builder::AirBuilder::when` | not translated | 40 |
+| `air` | `p3_air.builder.mirror.AirBuilder.is_transition_window` | `p3_air::builder::AirBuilder::is_transition_window` | not translated | 21 |
+| `air` | `p3_air.builder.mirror.AirBuilder.when` | `p3_air::builder::AirBuilder::when` | not translated | 41 |
 | `air` | `p3_air.builder.mirror.AirBuilder.when_ne` | `p3_air::builder::AirBuilder::when_ne` | not translated | 3 |
 | `air` | `p3_air.builder.mirror.AirBuilder.when_first_row` | `p3_air::builder::AirBuilder::when_first_row` | not translated | 18 |
 | `air` | `p3_air.builder.mirror.AirBuilder.when_last_row` | `p3_air::builder::AirBuilder::when_last_row` | not translated | 3 |
@@ -602,7 +602,7 @@ counts the claims (of 1864) whose dependencies include the declaration.
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_zeros_ext` | `p3_air::builder::ExtensionBuilder::assert_zeros_ext` | not translated | 0 |
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_eq_ext` | `p3_air::builder::ExtensionBuilder::assert_eq_ext` | not translated | 2 |
 | `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_one_ext` | `p3_air::builder::ExtensionBuilder::assert_one_ext` | not translated | 1 |
-| `air` | `p3_air.builder.mirror.ExtensionBuilder.when` | `{impl p3_air::builder::ExtensionBuilder for p3_air::filtered::FilteredAirBuilder<'_, AB>}::assert_zero_ext` | not translated | 16 |
+| `air` | `p3_air.builder.mirror.ExtensionBuilder.when` | `{impl p3_air::builder::ExtensionBuilder for p3_air::filtered::FilteredAirBuilder<'_, AB>}::assert_zero_ext` | not translated | 17 |
 | `air` | `p3_air.builder.mirror.PairCol.get` | `p3_air::virtual_column::PairCol::get` | not translated | 2 |
 | `air` | `p3_air.builder.mirror.VirtualPairCol.new` | `p3_air::virtual_column::VirtualPairCol::new` | not translated | 0 |
 | `air` | `p3_air.builder.mirror.VirtualPairCol.new_preprocessed` | `p3_air::virtual_column::VirtualPairCol::new_preprocessed` | not translated | 0 |
@@ -619,10 +619,10 @@ counts the claims (of 1864) whose dependencies include the declaration.
 | `air` | `p3_air.air.mirror.BoundaryPublic.row` | `p3_air::boundary::BoundaryPublic::row` | not translated | 6 |
 | `air` | `p3_air.air.mirror.validate` | `p3_air::boundary::validate` | not translated | 6 |
 | `air` | `p3_air.air.mirror.Air.periodic_values` | `p3_air::air::BaseAir::periodic_values` | not translated | 19 |
-| `air` | `p3_air.air.mirror.resolve` | `p3_air::symbolic::expression::SymbolicExpression::resolve` | not translated | 19 |
-| `air` | `p3_air.air.mirror.AirLayout.from_air` | `p3_air::symbolic::builder::AirLayout::from_air` | not translated | 74 |
+| `air` | `p3_air.air.mirror.resolve` | `p3_air::symbolic::expression::SymbolicExpression::resolve` | not translated | 20 |
+| `air` | `p3_air.air.mirror.AirLayout.from_air` | `p3_air::symbolic::builder::AirLayout::from_air` | not translated | 78 |
 | `air` | `p3_air.air.mirror.AirLayout.validate_against_air` | `p3_air::symbolic::builder::AirLayout::validate_against_air` | not translated | 19 |
-| `air` | `p3_air.air.mirror.symbolicBuilder` | `p3_air::symbolic::builder::SymbolicAirBuilder::new` | not translated | 41 |
+| `air` | `p3_air.air.mirror.symbolicBuilder` | `p3_air::symbolic::builder::SymbolicAirBuilder::new` | not translated | 49 |
 | `air` | `p3_air.air.mirror.get_symbolic_constraints` | `p3_air::symbolic::builder::get_symbolic_constraints` | not translated | 15 |
 | `air` | `p3_air.air.mirror.constraint_degree_from_poly_degree` | `p3_air::symbolic::builder::constraint_degree_from_poly_degree` | not translated | 16 |
 | `air` | `p3_air.air.mirror.get_max_constraint_degree` | `p3_air::symbolic::builder::get_max_constraint_degree_extension` | not translated | 14 |
@@ -684,10 +684,10 @@ counts the claims (of 1864) whose dependencies include the declaration.
 | `batch-stark` | `p3_batch_stark.verifier.mirror.replay` | `p3_batch_stark::verifier::verify_batch` | not translated | 4 |
 | `batch-stark` | `p3_batch_stark.verifier.mirror.opening_reads` | `p3_batch_stark::verifier::commitments_with_opening_points` | not translated | 2 |
 | `batch-stark` | `p3_batch_stark.verifier.mirror.verify_batch` | `p3_batch_stark::verifier::verify_batch` | not translated | 2 |
-| `batch-stark` | `p3_batch_stark.constraints.mirror.verifierPermFolder` | `p3_batch_stark::folder::VerifierConstraintFolderWithLookups` | not translated | 13 |
-| `batch-stark` | `p3_batch_stark.constraints.mirror.verify_constraints_with_lookups` | `p3_batch_stark::verifier::VerifierData::verify_constraints_with_lookups` | not translated | 13 |
+| `batch-stark` | `p3_batch_stark.constraints.mirror.verifierPermFolder` | `p3_batch_stark::folder::VerifierConstraintFolderWithLookups` | not translated | 14 |
+| `batch-stark` | `p3_batch_stark.constraints.mirror.verify_constraints_with_lookups` | `p3_batch_stark::verifier::VerifierData::verify_constraints_with_lookups` | not translated | 14 |
 | `batch-stark` | `p3_batch_stark.checker.mirror.rowBuilder` | `p3_air::DebugConstraintBuilder::new_with_permutation` | not translated | 1 |
-| `batch-stark` | `p3_batch_stark.checker.mirror.eval_air_and_lookups` | `p3_lookup::LookupProtocol::eval_air_and_lookups` | not translated | 14 |
+| `batch-stark` | `p3_batch_stark.checker.mirror.eval_air_and_lookups` | `p3_lookup::LookupProtocol::eval_air_and_lookups` | not translated | 15 |
 | `batch-stark` | `p3_batch_stark.checker.mirror.check_constraints` | `p3_batch_stark::check_constraints::check_constraints` | not translated | 1 |
 | `batch-stark` | `p3_batch_stark.verify.mirror.BatchProof` | `p3_batch_stark::proof::BatchProof` | not translated | 12 |
 | `batch-stark` | `p3_batch_stark.verify.mirror.Opened` | `p3_batch_stark::proof::OpenedValuesWithLookups` | not translated | 12 |
@@ -1147,7 +1147,7 @@ counts the claims (of 1864) whose dependencies include the declaration.
 | `circle` | `p3_circle.pcs.mirror.open_inputs` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 3 |
 | `circle` | `p3_circle.pcs.mirror.claimedWidth` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 3 |
 | `circle` | `p3_circle.pcs.mirror.verify` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 3 |
-| `commit` | `p3_commit.domain.mirror.LagrangeSelectors` | `p3_commit::domain::LagrangeSelectors` | stub | 37 |
+| `commit` | `p3_commit.domain.mirror.LagrangeSelectors` | `p3_commit::domain::LagrangeSelectors` | stub | 39 |
 | `commit` | `p3_commit.domain.mirror.Coset.size` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::size` | stub | 37 |
 | `commit` | `p3_commit.domain.mirror.Coset.first_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::first_point` | stub | 27 |
 | `commit` | `p3_commit.domain.mirror.Coset.next_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::next_point` | stub | 20 |
@@ -1155,8 +1155,8 @@ counts the claims (of 1864) whose dependencies include the declaration.
 | `commit` | `p3_commit.domain.mirror.Coset.create_disjoint_domain` | `p3_commit::domain::PolynomialSpace::create_disjoint_domain` | stub | 1 |
 | `commit` | `p3_commit.domain.mirror.Coset.split_domains` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::split_domains` | stub | 19 |
 | `commit` | `p3_commit.domain.mirror.Coset.split_evals` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::split_evals` | stub | 4 |
-| `commit` | `p3_commit.domain.mirror.Coset.vanishing_poly_at_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::vanishing_poly_at_point` | stub | 32 |
-| `commit` | `p3_commit.domain.mirror.Coset.selectors_at_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::selectors_at_point` | stub | 30 |
+| `commit` | `p3_commit.domain.mirror.Coset.vanishing_poly_at_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::vanishing_poly_at_point` | stub | 33 |
+| `commit` | `p3_commit.domain.mirror.Coset.selectors_at_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::selectors_at_point` | stub | 32 |
 | `commit` | `p3_commit.domain.mirror.Coset.selectors_on_coset` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::selectors_on_coset` | stub | 7 |
 | `commit` | `p3_commit.domain.mirror.Coset.evaluate_polynomial_at` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::evaluate_polynomial_at` | stub | 19 |
 | `commit` | `p3_commit.domain.mirror.Coset.default_evaluate_periodic_column_at` | `p3_commit::domain::PolynomialSpace::evaluate_periodic_column_at` | stub | 1 |
@@ -1285,10 +1285,10 @@ counts the claims (of 1864) whose dependencies include the declaration.
 | `field` | `p3_field.field.BasedVectorSpace.Blanket` | `{impl p3_field::field::BasedVectorSpace<F> for F}` | stub | 0 |
 | `field` | `p3_field.field.UniformSamplingField` | `p3_field::field::UniformSamplingField` | stub | 0 |
 | `field` | `p3_field.helpers.halve_u32` | `p3_field::helpers::halve_u32` | stub | 1 |
-| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset` | `p3_field::coset::TwoAdicMultiplicativeCoset` | stub | 112 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset` | `p3_field::coset::TwoAdicMultiplicativeCoset` | stub | 114 |
 | `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.new` | `p3_field::coset::TwoAdicMultiplicativeCoset::new` | stub | 36 |
-| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.subgroup_generator` | `p3_field::coset::TwoAdicMultiplicativeCoset::subgroup_generator` | stub | 67 |
-| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.shift_inverse` | `p3_field::coset::TwoAdicMultiplicativeCoset::shift_inverse` | stub | 41 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.subgroup_generator` | `p3_field::coset::TwoAdicMultiplicativeCoset::subgroup_generator` | stub | 69 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.shift_inverse` | `p3_field::coset::TwoAdicMultiplicativeCoset::shift_inverse` | stub | 43 |
 | `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.size` | `p3_field::coset::TwoAdicMultiplicativeCoset::size` | stub | 46 |
 | `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.shrink_coset` | `p3_field::coset::TwoAdicMultiplicativeCoset::shrink_coset` | stub | 1 |
 | `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.exp_power_of_2` | `p3_field::coset::TwoAdicMultiplicativeCoset::exp_power_of_2` | stub | 1 |
@@ -1470,8 +1470,8 @@ counts the claims (of 1864) whose dependencies include the declaration.
 | `keccak-air` | `p3_keccak_air.mirror.binary.num_constraints` | `{impl p3_air::air::BaseAir<F> for p3_keccak_air::binary::air::KeccakBinaryAir}::num_constraints` | not translated | 1 |
 | `keccak-air` | `p3_keccak_air.mirror.binary.NUM_FLAG_CONSTRAINTS` | `p3_keccak_air::binary::air::NUM_FLAG_CONSTRAINTS` | not translated | 1 |
 | `keccak-air` | `p3_keccak_air.mirror.binary.NUM_STATE_BITS` | `p3_keccak_air::binary::air::NUM_STATE_BITS` | not translated | 1 |
-| `lookup` | `p3_lookup.mirror.Kind` | `p3_lookup::types::Kind` | not translated | 28 |
-| `lookup` | `p3_lookup.mirror.Lookup` | `p3_lookup::types::Lookup` | not translated | 43 |
+| `lookup` | `p3_lookup.mirror.Kind` | `p3_lookup::types::Kind` | not translated | 29 |
+| `lookup` | `p3_lookup.mirror.Lookup` | `p3_lookup::types::Lookup` | not translated | 44 |
 | `lookup` | `p3_lookup.mirror.Lookup.num_denoms` | `p3_lookup::types::Lookup::num_denoms` | not translated | 0 |
 | `lookup` | `p3_lookup.mirror.checked_add_u32` | `core::num::u32::checked_add` | not translated | 1 |
 | `lookup` | `p3_lookup.mirror.SymbolicInteraction` | `p3_lookup::builder::SymbolicInteraction` | not translated | 0 |
@@ -1488,14 +1488,14 @@ counts the claims (of 1864) whose dependencies include the declaration.
 | `lookup` | `p3_lookup.mirror.total_count_weight` | `p3_lookup::types::Lookups::total_count_weight` | not translated | 15 |
 | `lookup` | `p3_lookup.mirror.check_bus_widths` | `p3_lookup::types::check_bus_widths` | not translated | 4 |
 | `lookup` | `p3_lookup.mirror.check_multiplicity_height_bound` | `p3_lookup::types::check_multiplicity_height_bound` | not translated | 15 |
-| `lookup` | `p3_lookup.mirror.PermBuilder` | `p3_air::air::PermutationAirBuilder` | not translated | 16 |
-| `lookup` | `p3_lookup.mirror.zip_eq` | `itertools::Itertools::zip_eq` | not translated | 17 |
-| `lookup` | `p3_lookup.mirror.combine_elements` | `p3_lookup::logup::LogUpGadget::combine_elements` | not translated | 18 |
-| `lookup` | `p3_lookup.mirror.compute_combined_sum_terms` | `p3_lookup::logup::LogUpGadget::compute_combined_sum_terms` | not translated | 16 |
-| `lookup` | `p3_lookup.mirror.compute_exclusive_terms` | `p3_lookup::logup::LogUpGadget::compute_exclusive_terms` | not translated | 16 |
-| `lookup` | `p3_lookup.mirror.eval_fraction` | `p3_lookup::logup::LogUpGadget::eval_fraction` | not translated | 15 |
-| `lookup` | `p3_lookup.mirror.eval_accumulator` | `p3_lookup::logup::LogUpGadget::eval_accumulator` | not translated | 15 |
-| `lookup` | `p3_lookup.mirror.eval_all` | `p3_lookup::protocol::LookupProtocol::eval_all` | not translated | 14 |
+| `lookup` | `p3_lookup.mirror.PermBuilder` | `p3_air::air::PermutationAirBuilder` | not translated | 17 |
+| `lookup` | `p3_lookup.mirror.zip_eq` | `itertools::Itertools::zip_eq` | not translated | 18 |
+| `lookup` | `p3_lookup.mirror.combine_elements` | `p3_lookup::logup::LogUpGadget::combine_elements` | not translated | 19 |
+| `lookup` | `p3_lookup.mirror.compute_combined_sum_terms` | `p3_lookup::logup::LogUpGadget::compute_combined_sum_terms` | not translated | 17 |
+| `lookup` | `p3_lookup.mirror.compute_exclusive_terms` | `p3_lookup::logup::LogUpGadget::compute_exclusive_terms` | not translated | 17 |
+| `lookup` | `p3_lookup.mirror.eval_fraction` | `p3_lookup::logup::LogUpGadget::eval_fraction` | not translated | 16 |
+| `lookup` | `p3_lookup.mirror.eval_accumulator` | `p3_lookup::logup::LogUpGadget::eval_accumulator` | not translated | 16 |
+| `lookup` | `p3_lookup.mirror.eval_all` | `p3_lookup::protocol::LookupProtocol::eval_all` | not translated | 15 |
 | `lookup` | `p3_lookup.mirror.verify_terminal_sum` | `p3_lookup::logup::LogUpGadget::verify_terminal_sum` | not translated | 11 |
 | `lookup` | `p3_lookup.mirror.constraint_degree_with_transition` | `p3_lookup::logup::LogUpGadget::constraint_degree_with_transition` | not translated | 1 |
 | `lookup` | `p3_lookup.mirror.LookupTraceBuilder` | `p3_lookup::traits::LookupTraceBuilder` | not translated | 1 |
@@ -1920,19 +1920,19 @@ counts the claims (of 1864) whose dependencies include the declaration.
 | `uni-stark` | `p3_uni_stark.folder.mirror.batched_linear_combination` | `p3_field::field::chunked_linear_combination` | not translated | 4 |
 | `uni-stark` | `p3_uni_stark.folder.mirror.proverFolder` | `{impl p3_air::AirBuilder for p3_uni_stark::folder::ProverConstraintFolder<'a, SC>}` | not translated | 4 |
 | `uni-stark` | `p3_uni_stark.folder.mirror.finalize_constraints` | `p3_uni_stark::folder::ProverConstraintFolder::finalize_constraints` | not translated | 4 |
-| `uni-stark` | `p3_uni_stark.folder.mirror.verifierFolder` | `{impl p3_air::AirBuilder for p3_uni_stark::folder::VerifierConstraintFolder<'a, SC>}` | not translated | 27 |
+| `uni-stark` | `p3_uni_stark.folder.mirror.verifierFolder` | `{impl p3_air::AirBuilder for p3_uni_stark::folder::VerifierConstraintFolder<'a, SC>}` | not translated | 30 |
 | `uni-stark` | `p3_uni_stark.prover.mirror.get_log_quotient_degree_extension` | `p3_uni_stark::symbolic::get_log_quotient_degree_extension` | not translated | 7 |
 | `uni-stark` | `p3_uni_stark.prover.mirror.get_log_num_quotient_chunks_for_domain` | `p3_uni_stark::symbolic::get_log_num_quotient_chunks_for_domain` | not translated | 7 |
 | `uni-stark` | `p3_uni_stark.prover.mirror.num_quotient_chunks` | `p3_uni_stark::prover::prove_with_preprocessed` | not translated | 0 |
 | `uni-stark` | `p3_uni_stark.prover.mirror.wrappingRow` | `p3_matrix::Matrix::vertically_packed_row` | not translated | 1 |
 | `uni-stark` | `p3_uni_stark.prover.mirror.quotient_values` | `p3_uni_stark::prover::quotient_values_inner` | not translated | 1 |
-| `uni-stark` | `p3_uni_stark.verifier.mirror.InvalidProofShapeError` | `p3_uni_stark::error::InvalidProofShapeError` | not translated | 23 |
-| `uni-stark` | `p3_uni_stark.verifier.mirror.VerificationError` | `p3_uni_stark::error::VerificationError` | not translated | 28 |
+| `uni-stark` | `p3_uni_stark.verifier.mirror.InvalidProofShapeError` | `p3_uni_stark::error::InvalidProofShapeError` | not translated | 24 |
+| `uni-stark` | `p3_uni_stark.verifier.mirror.VerificationError` | `p3_uni_stark::error::VerificationError` | not translated | 30 |
 | `uni-stark` | `p3_uni_stark.verifier.mirror.from_ext_basis_coefficients` | `p3_field::field::ExtensionField::from_ext_basis_coefficients` | not translated | 22 |
 | `uni-stark` | `p3_uni_stark.verifier.mirror.chunkFactor` | `p3_uni_stark::verifier::recompose_quotient_from_chunks` | not translated | 22 |
 | `uni-stark` | `p3_uni_stark.verifier.mirror.recompose_quotient_from_chunks` | `p3_uni_stark::verifier::recompose_quotient_from_chunks` | not translated | 22 |
-| `uni-stark` | `p3_uni_stark.verifier.mirror.preprocessedWindow` | `p3_uni_stark::verifier::verify_constraints` | not translated | 11 |
-| `uni-stark` | `p3_uni_stark.verifier.mirror.verify_constraints` | `p3_uni_stark::verifier::verify_constraints` | not translated | 11 |
+| `uni-stark` | `p3_uni_stark.verifier.mirror.preprocessedWindow` | `p3_uni_stark::verifier::verify_constraints` | not translated | 12 |
+| `uni-stark` | `p3_uni_stark.verifier.mirror.verify_constraints` | `p3_uni_stark::verifier::verify_constraints` | not translated | 12 |
 | `uni-stark` | `p3_uni_stark.verifier.mirror.check_shape` | `p3_uni_stark::verifier::verify_with_preprocessed` | not translated | 7 |
 | `uni-stark` | `p3_uni_stark.verifier.mirror.check_ood_point` | `p3_uni_stark::verifier::prepare_opening_claims` | not translated | 7 |
 | `uni-stark` | `p3_uni_stark.transcript.mirror.StarkShape` | `p3_uni_stark::transcript::StarkShape` | not translated | 4 |
@@ -2113,6 +2113,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Air.ext_variable_degree_multiple` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Air.ext_variable_poly_degree` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Air.next_row_of_last_row` | `Quot.sound`, `propext` |
+| `Air.next_row_unread` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Air.num_quotient_chunks` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Air.periodic_degree` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Air.poly_degree_bound` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -2151,6 +2152,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `BatchStark.check_at_zeta` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BatchStark.check_at_zeta_complete` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BatchStark.check_at_zeta_in_domain` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.check_at_zeta_unread` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BatchStark.checker_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BatchStark.checks_at_zeta` | `Classical.choice`, `Quot.sound`, `propext` |
 | `BatchStark.combiner_is_bus_denominator` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -3846,6 +3848,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `UniStark.eval_starkAssign` | `Classical.choice`, `Quot.sound`, `propext` |
 | `UniStark.finalize_decompose` | `Classical.choice`, `Quot.sound`, `propext` |
 | `UniStark.firstPlusTransition_disagree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.fold_unread` | `Classical.choice`, `Quot.sound`, `propext` |
 | `UniStark.foldl_horner` | `Classical.choice`, `Quot.sound`, `propext` |
 | `UniStark.get_constraint_layout.from_air` | `Classical.choice`, `Quot.sound`, `propext` |
 | `UniStark.get_log_num_quotient_chunks_for_domain_eq` | `Quot.sound`, `propext` |
@@ -3878,6 +3881,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `UniStark.verify_complete_hiding` | `Classical.choice`, `Quot.sound`, `propext` |
 | `UniStark.verify_complete_merkle` | `Classical.choice`, `Quot.sound`, `propext` |
 | `UniStark.verify_constraints_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.verify_constraints_complete_unread` | `Classical.choice`, `Quot.sound`, `propext` |
 | `UniStark.verify_constraints_none_iff` | `Classical.choice`, `Quot.sound`, `propext` |
 | `UniStark.verify_constraints_ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
 | `UniStark.verify_ne_none` | `Classical.choice`, `Quot.sound`, `propext` |
