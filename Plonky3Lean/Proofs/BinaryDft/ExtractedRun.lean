@@ -23,6 +23,8 @@ set_option linter.unusedSectionVars false
 
 namespace Plonky3Lean.Proofs.BinaryDft
 
+variable {F : Type} [Field F]
+
 /-! ## Iterating a range backwards -/
 
 theorem range_next_back_lt (i : Std.Usize) {K : ℕ} (hK : K ≤ Usize.max) (h : i.val < K) :
@@ -287,5 +289,92 @@ theorem cut_bounds_eq (c : Cut) (hg1 : c.group = 1) (g : ℕ) (h : c.tile + g + 
   by_cases hc : c.tile + g + 1 < c.log_n
   · rw [ite_of_pos ((uz_lt (by omega) hl).mpr hc), min_eq_left hc.le]
   · rw [ite_of_neg (fun h' => hc ((uz_lt (by omega) hl).mp h')), min_eq_right (by omega)]
+
+/-! ## The stages of one tile -/
+
+open p3_binary_dft.lch.mirror in
+variable [DecidableEq F] {R : Type} {L : Level F} in
+/-- The extracted stages of a tile of 2^k rows are the transcribed ones. -/
+theorem tile_stages_eq_mirror {inst : p3_binary_dft.butterfly.ButterflyField F R} (hb : ButterflyComputes inst L)
+    (tw : Twiddles F) (hbl : tw.bases.length ≤ Usize.max) (hsl : tw.steps.length ≤ Usize.max)
+    (inverse : Bool) {w k base index N : ℕ} (hw : 0 < w) (y : ℕ → ℕ → F) (s : Slice F)
+    (hy : flat w (2 ^ k) y = s.val) (hN : (index + 1) * 2 ^ k ≤ N) (hNw : N * w + 1024 ≤ Usize.max)
+    (hbase : base + k ≤ Usize.max) :
+    p3_binary_dft.lch.schedule.hax_reshaped.tile_stages inverse inst s (uz w) (uz k) (uz base) (uz index)
+        (toTw tw) =
+      ofOption ((tile_stages L tw inverse (2 ^ k) k base index y).map fun y => mkSlice (flat w (2 ^ k) y)) := by
+  have hNle : N ≤ N * w := Nat.le_mul_of_pos_right N hw
+  have hkN : 2 ^ k ≤ N := le_trans (Nat.le_mul_of_pos_left _ (by omega)) hN
+  have hkb : k < UScalarTy.Usize.numBits := by
+    by_contra hc
+    have : 2 ^ UScalarTy.Usize.numBits ≤ 2 ^ k := Nat.pow_le_pow_right two_pos (by omega)
+    have : Usize.max = 2 ^ UScalarTy.Usize.numBits - 1 := by rw [Usize.max_def]; simp [Usize.numBits]
+    omega
+  have hkm : k ≤ Usize.max := by have := Nat.lt_two_pow_self (n := k); omega
+  have := loop_foldlM_inv
+    (fun st => p3_binary_dft.lch.schedule.hax_reshaped.tile_stages_loop.body inverse inst (uz w) (uz k) (uz base)
+      (uz index) (toTw tw) st.1 st.2)
+    (fun (y : ℕ → ℕ → F) step => (({ start := uz step, «end» := uz k } : core.ops.range.Range Std.Usize),
+      mkSlice (flat w (2 ^ k) y)))
+    (fun y => mkSlice (flat w (2 ^ k) y)) k
+    (fun y step =>
+      let jj := if inverse then step else k - 1 - step
+      walkBlocks L tw inverse (base + jj) (index * 2 ^ (k - 1 - jj)) (2 ^ k) (2 ^ jj) y)
+    (fun _ _ => True) (fun st hst c _ => ?_) (fun c _ => ?_) y trivial
+  · rw [hy, mkSlice_self] at this
+    exact this
+  · -- One stage of the tile.
+    set jj := if inverse then st else k - 1 - st with hjj
+    have hjjk : jj < k := by rw [hjj]; split_ifs <;> omega
+    have hjjm : jj ≤ Usize.max := by omega
+    have hpow : 2 ^ k = 2 ^ (k - 1 - jj) * (2 * 2 ^ jj) := by
+      rw [← pow_succ', ← pow_add]; congr 1; omega
+    have hidx : index * 2 ^ (k - 1 - jj) ≤ Usize.max := by
+      have : index * 2 ^ (k - 1 - jj) ≤ index * 2 ^ k := Nat.mul_le_mul_left _ (Nat.pow_le_pow_right two_pos (by omega))
+      have : index * 2 ^ k ≤ N := by rw [add_mul, one_mul] at hN; omega
+      omega
+    have hwalk := walk_blocks_eq hb tw hbl hsl inverse false hw (Nat.two_pow_pos jj)
+      (mkSlice (flat w (2 ^ k) c)) c (by rw [mkSlice_val (by rw [length_flat]; have := Nat.mul_le_mul_right w hkN; omega), ← hpow])
+      (uz (base + jj)) (uz (index * 2 ^ (k - 1 - jj)))
+      (by
+        rw [uz_val hidx]
+        have h1 : (index * 2 ^ (k - 1 - jj) + 2 ^ (k - 1 - jj)) * 2 ≤ (index + 1) * 2 ^ k := by
+          rw [show index * 2 ^ (k - 1 - jj) + 2 ^ (k - 1 - jj) = (index + 1) * 2 ^ (k - 1 - jj) by ring,
+            mul_assoc]
+          exact Nat.mul_le_mul_left _ (by rw [← pow_succ]; exact Nat.pow_le_pow_right two_pos (by omega))
+        omega)
+      (by
+        have : 2 ^ jj * 2 ≤ 2 ^ k := by rw [← pow_succ]; exact Nat.pow_le_pow_right two_pos (by omega)
+        have : 2 * (2 ^ jj * w) ≤ N * w := by
+          rw [← mul_assoc, mul_comm 2]; exact Nat.mul_le_mul_right _ (by omega)
+        omega)
+    rw [← hpow, uz_val (show base + jj ≤ Usize.max by omega), uz_val hidx] at hwalk
+    simp only [p3_binary_dft.lch.schedule.hax_reshaped.tile_stages_loop.body]
+    rw [show core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next
+        core.Usize.Insts.CoreIterRangeStep { start := uz st, «end» := uz k } = _ from range_step st (uz k)
+          (by rw [uz_val hkm]; exact hst)]
+    have hk1 : (uz k - 1#usize : RustM Std.Usize) = .ok (uz (k - 1)) := by
+      rw [uz_one, uz_sub (by omega) hkm]
+    have hjv : (if inverse = true then RustM.ok (uz st) else do
+        let i ← uz k - 1#usize
+        i - uz st) = RustM.ok (uz jj) := by
+      rw [hjj]; cases inverse
+      · rw [ite_of_neg (by simp), hk1, bind_ok, uz_sub (by omega) (by omega)]; rfl
+      · rfl
+    simp only [usz_eq_uz, bind_ok, Aeneas.Std.uncurry]
+    have hjw : 2 ^ jj * w ≤ Usize.max := by
+      have : 2 ^ jj ≤ 2 ^ k := Nat.pow_le_pow_right two_pos hjjk.le
+      have := Nat.mul_le_mul_right w (le_trans this hkN); omega
+    rw [hjv, bind_ok, uz_one, shl_uz (by omega) (by rw [one_mul]; have := Nat.le_mul_of_pos_right (2 ^ jj) hw; omega),
+      bind_ok, one_mul, uz_mul hjw (by have := Nat.le_mul_of_pos_right (2 ^ jj) hw; omega)
+        (by have := Nat.le_mul_of_pos_left w (Nat.two_pow_pos jj); omega), bind_ok,
+      uz_sub (show 1 ≤ k by omega) hkm, bind_ok, uz_sub (by omega) (by omega), bind_ok, shl_uz (by omega) hidx, bind_ok,
+      uz_add (by omega), bind_ok, hwalk]
+    cases walkBlocks L tw inverse (base + jj) (index * 2 ^ (k - 1 - jj)) (2 ^ k) (2 ^ jj) c <;>
+      simp [ofOption]
+  · simp only [p3_binary_dft.lch.schedule.hax_reshaped.tile_stages_loop.body]
+    rw [show core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next
+        core.Usize.Insts.CoreIterRangeStep { start := uz k, «end» := uz k } = _ from range_next_none _ _ le_rfl]
+    simp
 
 end Plonky3Lean.Proofs.BinaryDft
