@@ -2,6 +2,7 @@ module
 
 public import Plonky3Lean.Proofs.BinaryDft.ExtractedLch
 public import Plonky3Lean.Lib.Scalar.Signed
+public import Plonky3Lean.Proofs.Matrix.Log2
 
 @[expose] public section
 
@@ -627,5 +628,128 @@ theorem run_eq_mirror {inst : p3_binary_dft.butterfly.ButterflyField F R} (hb : 
         exact hinv z _ (hfl z)
     · rw [ite_of_neg (fun h' => h (htilepos.mp h')), ite_of_neg h, bind_ok]
       exact hinv x values hv
+
+/-! ## The transform -/
+
+theorem div_uz_zero (x : Std.Usize) : (x / uz 0 : RustM Std.Usize) = .fail .panic := by
+  show UScalar.div x (uz 0) = _
+  unfold UScalar.div
+  simp
+
+open p3_binary_dft.lch.mirror p3_dft.mirror in
+variable [DecidableEq F] {R : Type} {L : Level F} in
+/-- The extracted transform is the transcribed one on the rows of a buffer of n rows.
+
+It assumes that the element size is the level's, and that the buffer's bytes fit a word. -/
+theorem transform_eq_mirror {inst : p3_binary_dft.butterfly.ButterflyField F R} (hb : ButterflyComputes inst L)
+    (hlb : L.logBits ≤ 31) (hsz : core.mem.size_of F = .ok (uz L.bytes)) (hbytes : 0 < L.bytes)
+    (inverse : Bool) {w n : ℕ} (hwm : w ≤ Usize.max) (x : ℕ → ℕ → F) (values : Slice F)
+    (hv : flat w n x = values.val) (hfit : n * w * L.bytes + 1024 ≤ Usize.max) (shift : F) :
+    p3_binary_dft.lch.transform inverse inst values (uz w) shift =
+      ofOption ((transform L inverse w n shift x).map fun y => mkSlice (flat w n y)) := by
+  have hlen : values.val.length = n * w := by rw [← hv, length_flat]
+  have hnw : n * w ≤ n * w * L.bytes := Nat.le_mul_of_pos_right _ hbytes
+  unfold p3_binary_dft.lch.transform transform
+  rw [slice_len_eq, bind_ok, hlen]
+  rcases Nat.eq_zero_or_pos w with hw0 | hw
+  · subst hw0
+    rw [div_uz_zero]; simp [ofOption]
+  have hnn : n ≤ n * w := Nat.le_mul_of_pos_right n hw
+  rw [uz_div (by omega) hwm (by omega), bind_ok, Nat.mul_div_cancel n hw, ite_of_neg (by omega)]
+  by_cases hpow : ∃ l, n = 2 ^ l
+  case neg =>
+    push Not at hpow
+    rw [Plonky3Lean.Proofs.Matrix.log2_strict_usize_panics (uz n) (by rw [uz_val (by omega)]; exact hpow)]
+    have : log2Strict n = none := by
+      unfold log2Strict
+      rw [ite_of_neg (fun h => hpow _ h.2.symm)]
+    simp [this, ofOption]
+  obtain ⟨l, rfl⟩ := hpow
+  have hl2 : l < 2 ^ l := Nat.lt_two_pow_self
+  have hn1 : 2 ^ l ≤ 2 ^ l * w := Nat.le_mul_of_pos_right _ hw
+  have hlnb : l < UScalarTy.Usize.numBits := by
+    by_contra hc
+    have : 2 ^ UScalarTy.Usize.numBits ≤ 2 ^ l := Nat.pow_le_pow_right two_pos (by omega)
+    have : Usize.max = 2 ^ UScalarTy.Usize.numBits - 1 := by rw [Usize.max_def]; simp [Usize.numBits]
+    omega
+  obtain ⟨r, hr, hrv⟩ := spec_imp_exists (Plonky3Lean.Proofs.Matrix.log2_strict_usize_two_pow hlnb (uz (2 ^ l)) (uz_val (by omega)))
+  rw [hr, bind_ok, eq_uz r, hrv]
+  have hls : log2Strict (2 ^ l) = some l := by
+    unfold log2Strict; rw [ite_of_pos ⟨by positivity, by rw [Nat.log_pow one_lt_two]⟩, Nat.log_pow one_lt_two]
+  simp only [hls, Option.bind_eq_bind, Option.bind_some]
+  have h32 : 32 ≤ UScalarTy.Usize.numBits := Plonky3Lean.Proofs.Matrix.numBits_ge
+  have hbig : 2 ^ 32 - 1 ≤ Usize.max := by
+    rcases Usize.bounds_eq with e | e <;> rw [e] <;> simp [U32.max_def, U64.max_def, U32.numBits, U64.numBits]
+  have hpb : 2 ^ L.logBits ≤ 2 ^ 31 := Nat.pow_le_pow_right two_pos hlb
+  rw [hb.logBits, bind_ok, uz_one, shl_uz (by omega) (by rw [one_mul]; omega), bind_ok, one_mul]
+  simp only [massert]
+  by_cases hlb2 : l ≤ 2 ^ L.logBits
+  case neg =>
+    rw [ite_of_neg (fun h => hlb2 ((uz_le (by omega) (by omega)).mp h)), ite_of_pos (by omega)]
+    simp [ofOption]
+  rw [ite_of_pos ((uz_le (by omega) (by omega)).mpr hlb2), ite_of_neg (by omega), bind_ok,
+    twiddles_new_eq_mirror hb.tower, uz_val (by omega), Twiddles.new_eq L hlb2 shift]
+  simp only [ofOption, Option.map_some, bind_ok, Option.bind_some]
+  set tw : Twiddles F := ⟨(List.range l).map fun j => sqAddIter j shift,
+    (List.range (l - 1)).map fun r => ∑ q ∈ Finset.range (r + 1), L.cantor (q + 1)⟩ with htw
+  have hbl : tw.bases.length ≤ Usize.max := by simp [htw]; omega
+  have hsl : tw.steps.length ≤ Usize.max := by simp [htw]; omega
+  have hbound : 2 ^ l * w + 1024 ≤ Usize.max := by omega
+  have hsv : core.mem.size_of_val values = .ok (uz (2 ^ l * w * L.bytes)) := by
+    unfold core.mem.size_of_val
+    have := Nat.le_mul_of_pos_left L.bytes (show 0 < 2 ^ l * w by positivity)
+    rw [hsz, bind_ok, uz_val (show L.bytes ≤ Usize.max by omega)]
+    show RustM.ok (uz (values.val.length * L.bytes)) = _
+    rw [hlen]
+  have hdeep : p3_binary_dft.lch.schedule.DEEP_TILE_BYTES = .ok (uz 131072) := by
+    unfold p3_binary_dft.lch.schedule.DEEP_TILE_BYTES
+    rw [show (128#usize : Std.Usize) = uz 128 from UScalar.eq_of_val_eq (by rw [uz_val (by omega)]; rfl),
+      show (1024#usize : Std.Usize) = uz 1024 from UScalar.eq_of_val_eq (by rw [uz_val (by omega)]; rfl),
+      uz_mul (by omega) (by omega) (by omega)]
+  rw [hsv, bind_ok, hdeep, bind_ok]
+  simp only [DEEP_TILE_BYTES, show (128 * 1024 : ℕ) = 131072 by norm_num]
+  by_cases hsmall : 2 ^ l * w * L.bytes ≤ 131072
+  · rw [ite_of_pos ((uz_le (by omega) (by omega)).mpr hsmall), ite_of_pos hsmall]
+    -- The stages one pass each.
+    have := loop_foldlM_inv
+      (fun st => p3_binary_dft.lch.transform_loop.body inverse inst (uz w) (uz l) (toTw tw) st.1 st.2)
+      (fun (y : ℕ → ℕ → F) k => (({ start := uz k, «end» := uz l } : core.ops.range.Range Std.Usize),
+        mkSlice (flat w (2 ^ l) y)))
+      (fun y => mkSlice (flat w (2 ^ l) y)) l
+      (fun x step => stage_pass L tw inverse w (2 ^ l) (if inverse = true then step else l - 1 - step) x)
+      (fun _ _ => True) (fun k hk c _ => ?_) (fun c _ => ?_) x trivial
+    · rw [hv, mkSlice_self] at this
+      have hl : p3_binary_dft.lch.transform_loop inverse inst { start := 0#usize, «end» := uz l } values (uz w)
+          (uz l) (toTw tw) = _ := this
+      rw [hl]; rfl
+    · simp only [p3_binary_dft.lch.transform_loop.body]
+      rw [show core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next
+          core.Usize.Insts.CoreIterRangeStep { start := uz k, «end» := uz l } = _ from range_step k _
+            (by rw [uz_val (by omega)]; exact hk)]
+      simp only [usz_eq_uz, bind_ok, Aeneas.Std.uncurry]
+      set j := if inverse = true then k else l - 1 - k with hj
+      have hjl : j < l := by rw [hj]; split_ifs <;> omega
+      have hjv : (if inverse = true then RustM.ok (uz k) else do
+          let i ← uz l - 1#usize
+          i - uz k) = RustM.ok (uz j) := by
+        rw [hj]; cases inverse
+        · rw [ite_of_neg (by simp), uz_one, uz_sub (by omega) (by omega), bind_ok, uz_sub (by omega) (by omega)]
+          rfl
+        · rfl
+      rw [hjv, bind_ok, stage_pass_eq_mirror hb tw hbl hsl inverse hw c _ (mkSlice_val (by
+          rw [length_flat]; omega)).symm (Nat.pow_dvd_pow 2 (by omega)) (Nat.two_pow_pos l) hbound]
+      cases stage_pass L tw inverse w (2 ^ l) j c <;> simp [ofOption]
+    · simp only [p3_binary_dft.lch.transform_loop.body]
+      rw [show core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next
+          core.Usize.Insts.CoreIterRangeStep { start := uz l, «end» := uz l } = _ from range_next_none _ _ le_rfl]
+      simp
+  · have hbw : L.bytes * w ≤ Usize.max := by
+      have h := Nat.le_mul_of_pos_left (L.bytes * w) (Nat.two_pow_pos l)
+      rw [show 2 ^ l * (L.bytes * w) = 2 ^ l * w * L.bytes by ring] at h; omega
+    have hul : (uz l).val < UScalarTy.Usize.numBits := by rw [uz_val (by omega)]; exact hlnb
+    rw [ite_of_neg (fun h => hsmall ((uz_le (by omega) (by omega)).mp h)), ite_of_neg hsmall,
+      schedule_new_eq hsz hbytes hw hbw (uz l) hul, bind_ok, uz_val (by omega),
+      run_eq_mirror hb tw hbl hsl inverse hw x values hv hbound]
+    rfl
 
 end Plonky3Lean.Proofs.BinaryDft
