@@ -5,6 +5,8 @@ The Lean model of p3-binary-dft.
 
 It holds the domain points and the subspace polynomials, generic over the tower-level trait.
 
+`P3BinaryDft/Encodable.lean` declares the encodable-level trait for code generic over it.
+
 `P3BinaryDft/Mirror/` transcribes the transforms over a field.
 
 Each transcription has a `[[mirror]]` entry in crate.toml.
@@ -12,6 +14,7 @@ Each transcription has a `[[mirror]]` entry in crate.toml.
 module
 
 public import P3BinaryDft.Extraction
+public import P3BinaryDft.Encodable
 public import P3BinaryDft.Mirror.Model
 public import P3BinaryDft.Mirror.Domain
 public import P3BinaryDft.Mirror.Naive
