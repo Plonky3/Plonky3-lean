@@ -21,5 +21,6 @@ public import P3MultiStark.Mirror.FractionalGkr
 public import P3MultiStark.Mirror.Lookup
 public import P3MultiStark.Mirror.LogupStar
 public import P3MultiStark.Mirror.Bus
+public import P3MultiStark.Mirror.Indexed
 
 @[expose] public section
