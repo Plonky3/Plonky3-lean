@@ -86,16 +86,28 @@ def lenOf (comp : component.Composition W) : index.Segment → ℕ
   | .Public => comp.public_len.val
   | .Witness => comp.witness_len.val
 
+/-- The relations one instance of a call owns in a family. -/
+def relsOf (c : component.ComponentCall W) : system.ConstraintKind → ℕ
+  | .Zero => (vecSlice c.component.body.zero_constraints).val.length
+  | .And => (vecSlice c.component.body.and_constraints).val.length
+  | .IntegerMul => (vecSlice c.component.body.integer_mul_constraints).val.length
+
+/-- The relations each call owns in a family, over all its instances. -/
+def famSizes (comp : component.Composition W) (kind : system.ConstraintKind) : List ℕ :=
+  List.zipWith (· * ·) (counts comp) ((callsOf comp).map (relsOf · kind))
+
 /-- A composition is laid out when its blocks are packed one after the other.
 
 - There is one block start per call.
 - In each segment, call `k`'s block starts after the blocks of the calls before it.
-- The recorded segment lengths are the totals. -/
+- The recorded segment lengths are the totals.
+- Each relation family holds fewer than $2^{32}$ relations in total. -/
 structure LaidOut (comp : component.Composition W) : Prop where
   len : (basesOf comp).length = (callsOf comp).length
   base : ∀ k (h : k < (basesOf comp).length) seg,
     (baseOf (basesOf comp)[k] seg).val = pref (List.zipWith (· * ·) (counts comp) (widths comp seg)) k
   total : ∀ seg, (List.zipWith (· * ·) (counts comp) (widths comp seg)).sum = lenOf comp seg
+  fam : ∀ kind, (famSizes comp kind).sum < 2 ^ 32
 
 /-- What readdressing returns.
 

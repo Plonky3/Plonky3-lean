@@ -140,13 +140,20 @@ theorem local_slots_eq (inst : word.Word W) (c : component.ComponentCall W) :
 def zs (calls : List (component.ComponentCall W)) (seg : index.Segment) : List ℕ :=
   List.zipWith (· * ·) (calls.map (·.instances.val)) (calls.map (slotsOf · seg))
 
+/-- The family sizes of a list of calls. -/
+def fz (calls : List (component.ComponentCall W)) (kind : system.ConstraintKind) : List ℕ :=
+  List.zipWith (· * ·) (calls.map (·.instances.val)) (calls.map (relsOf · kind))
+
 /-- The layout loop's state after `j` calls. -/
-structure Inv (calls : List (component.ComponentCall W)) (j : ℕ) (P Wt : Std.Usize)
+structure Inv (calls : List (component.ComponentCall W)) (j : ℕ) (P Wt Z A Pr : Std.Usize)
     (bases : CoreModels.alloc.vec.Vec component.CallBase) (idx : Std.Usize) : Prop where
   idx : idx.val = j
   le : j ≤ calls.length
   pub : P.val = pref (zs calls .Public) j
   wit : Wt.val = pref (zs calls .Witness) j
+  zero : Z.val = pref (fz calls .Zero) j
+  and : A.val = pref (fz calls .And) j
+  prod : Pr.val = pref (fz calls .IntegerMul) j
   blen : (vecSlice bases).val.length = j
   base : ∀ k (h : k < (vecSlice bases).val.length) seg,
     (baseOf (vecSlice bases).val[k] seg).val = pref (zs calls seg) k
@@ -169,13 +176,13 @@ def StepOk (calls : List (component.ComponentCall W)) (j : ℕ)
       CoreModels.alloc.vec.Vec component.CallBase × Std.Usize)
       (CoreModels.core.result.Result (component.Composition W) component.CompositionError)) : Prop :=
   match x with
-  | .cont (P, Wt, _, _, _, bases, idx) => Inv calls (j + 1) P Wt bases idx
+  | .cont (P, Wt, Z, A, Pr, bases, idx) => Inv calls (j + 1) P Wt Z A Pr bases idx
   | .done r => ∀ comp, r ≠ .Ok comp
 
 theorem new_body_step (inst : word.Word W) (callsV : CoreModels.alloc.vec.Vec (component.ComponentCall W))
     (hwf : ∀ c ∈ (vecSlice callsV).val, slotsP c < 2 ^ 32) {j : ℕ}
     {P Wt Z A Pr idx : Std.Usize} {bases : CoreModels.alloc.vec.Vec component.CallBase}
-    (hinv : Inv (vecSlice callsV).val j P Wt bases idx) (hj : j < (vecSlice callsV).val.length) :
+    (hinv : Inv (vecSlice callsV).val j P Wt Z A Pr bases idx) (hj : j < (vecSlice callsV).val.length) :
     ∃ x, component.reshaped.Composition.reshaped_new_loop.body inst callsV P Wt Z A Pr bases idx =
       .ok x ∧ StepOk (vecSlice callsV).val j x := by
   have hlt : idx < (vecSlice callsV).len := by rw [UScalar.lt_equiv]; simp [hinv.idx, hj]
@@ -215,9 +222,15 @@ theorem new_body_step (inst : word.Word W) (callsV : CoreModels.alloc.vec.Vec (c
     have hzlen : ∀ seg, j < (zs (vecSlice callsV).val seg).length := by intro seg; simp [zs, hj]
     have hzj : ∀ seg, (zs (vecSlice callsV).val seg)[j]'(hzlen seg) = c.instances.val * slotsOf c seg := by
       intro seg; simp [zs, hc]
-    refine ⟨by rw [uOf_val hn, hinv.idx], hj, ?_, ?_, ?_, ?_⟩
+    have hflen : ∀ kind, j < (fz (vecSlice callsV).val kind).length := by intro kind; simp [fz, hj]
+    have hfj : ∀ kind, (fz (vecSlice callsV).val kind)[j]'(hflen kind) = c.instances.val * relsOf c kind := by
+      intro kind; simp [fz, hc]
+    refine ⟨by rw [uOf_val hn, hinv.idx], hj, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · rw [uOf_val (by omega), pref_succ _ _ (hzlen _), hzj, ← hinv.pub]; simp only [slotsOf]; ring
     · rw [uOf_val (by omega), pref_succ _ _ (hzlen _), hzj, ← hinv.wit]; simp only [slotsOf]; ring
+    · rw [uOf_val (by omega), pref_succ _ _ (hflen _), hfj, ← hinv.zero]; simp [relsOf]; ring
+    · rw [uOf_val (by omega), pref_succ _ _ (hflen _), hfj, ← hinv.and]; simp [relsOf]; ring
+    · rw [uOf_val (by omega), pref_succ _ _ (hflen _), hfj, ← hinv.prod]; simp [relsOf]; ring
     · rw [vecPush_val]; simp [hinv.blen]
     · intro k hk seg
       simp only [vecPush_val] at hk ⊢
@@ -246,13 +259,13 @@ theorem pref_length (sizes : List ℕ) : pref sizes sizes.length = sizes.sum := 
 
 theorem new_body_last (inst : word.Word W) (callsV : CoreModels.alloc.vec.Vec (component.ComponentCall W))
     {P Wt Z A Pr idx : Std.Usize} {bases : CoreModels.alloc.vec.Vec component.CallBase}
-    (hinv : Inv (vecSlice callsV).val (vecSlice callsV).val.length P Wt bases idx) :
+    (hinv : Inv (vecSlice callsV).val (vecSlice callsV).val.length P Wt Z A Pr bases idx) :
     ∃ r, component.reshaped.Composition.reshaped_new_loop.body inst callsV P Wt Z A Pr bases idx =
       .ok (.done r) ∧ NewOk callsV r := by
   have hnlt : ¬ idx < (vecSlice callsV).len := by rw [UScalar.lt_equiv]; simp [hinv.idx]
   simp only [component.reshaped.Composition.reshaped_new_loop.body, vec_len_eq, bind_ok, hnlt,
     ite_false, bound_segment_eq, bound_family_eq]
-  split_ifs with h1 h2
+  split_ifs with h1 h2 h3 h4 h5
   all_goals simp (config := { failIfUnchanged := false }) only [
     CoreModels.core.result.Result.Insts.CoreOpsTry_traitTryTResultInfallibleE.branch,
     CoreModels.core.result.Result.Insts.CoreOpsTry_traitFromResidualResultInfallibleE.from_residual,
@@ -260,7 +273,7 @@ theorem new_body_last (inst : word.Word W) (callsV : CoreModels.alloc.vec.Vec (c
     exists_eq_left', NewOk, reduceCtorEq, false_imp_iff, implies_true]
   intro comp hcomp
   cases hcomp
-  refine ⟨⟨?_, ?_, ?_⟩, rfl⟩
+  refine ⟨⟨?_, ?_, ?_, ?_⟩, rfl⟩
   · exact hinv.blen
   · intro k hk seg
     exact hinv.base k hk seg
@@ -271,6 +284,14 @@ theorem new_body_last (inst : word.Word W) (callsV : CoreModels.alloc.vec.Vec (c
     cases seg
     · rw [← hinv.pub]; exact (cast_u32_val P (by omega)).symm
     · rw [← hinv.wit]; exact (cast_u32_val Wt (by omega)).symm
+  · intro kind
+    change (fz (vecSlice callsV).val kind).sum < _
+    rw [← pref_length, show (fz (vecSlice callsV).val kind).length = (vecSlice callsV).val.length by
+      simp [fz]]
+    cases kind
+    · rw [← hinv.zero]; exact h3
+    · rw [← hinv.and]; exact h4
+    · rw [← hinv.prod]; exact h5
 
 /-- The empty vector. -/
 def emptyVec (T : Type) : CoreModels.alloc.vec.Vec T := Slice.new T
@@ -278,7 +299,7 @@ def emptyVec (T : Type) : CoreModels.alloc.vec.Vec T := Slice.new T
 theorem new_loop (inst : word.Word W) (callsV : CoreModels.alloc.vec.Vec (component.ComponentCall W))
     (hwf : ∀ c ∈ (vecSlice callsV).val, slotsP c < 2 ^ 32) :
     ∀ m j (P Wt Z A Pr idx : Std.Usize) (bases : CoreModels.alloc.vec.Vec component.CallBase),
-      (vecSlice callsV).val.length - j = m → Inv (vecSlice callsV).val j P Wt bases idx →
+      (vecSlice callsV).val.length - j = m → Inv (vecSlice callsV).val j P Wt Z A Pr bases idx →
       ∃ r, component.reshaped.Composition.reshaped_new_loop inst callsV P Wt Z A Pr bases idx =
         .ok r ∧ NewOk callsV r := by
   intro m
@@ -311,8 +332,9 @@ theorem composition_new_laid_out (inst : word.Word W)
       ∀ comp, r = .Ok comp → LaidOut comp ∧ comp.calls = callsV := by
   simp only [component.Composition.new, component.reshaped.Composition.reshaped_new, vec_len_eq,
     bind_ok, CoreModels.alloc.vec.Vec.with_capacity, CoreModels.alloc.vec.Vec.new]
-  have hinv : Inv (vecSlice callsV).val 0 0#usize 0#usize (emptyVec component.CallBase) 0#usize :=
-    ⟨rfl, Nat.zero_le _, rfl, rfl, rfl, fun k hk => absurd hk (by simp [emptyVec])⟩
+  have hinv : Inv (vecSlice callsV).val 0 0#usize 0#usize 0#usize 0#usize 0#usize
+      (emptyVec component.CallBase) 0#usize :=
+    ⟨rfl, Nat.zero_le _, rfl, rfl, rfl, rfl, rfl, rfl, fun k hk => absurd hk (by simp [emptyVec])⟩
   obtain ⟨r, hr, hn⟩ := new_loop inst callsV hwf _ 0 0#usize 0#usize 0#usize 0#usize 0#usize 0#usize
     (emptyVec component.CallBase) rfl hinv
   refine ⟨r, ?_, hn⟩
