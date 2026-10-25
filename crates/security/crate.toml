@@ -29,6 +29,10 @@ watch = ["security/src", "security/Cargo.toml"]
 # Each entry below pairs a Rust function with its transcription over the reals.
 # The transcriptions live in Plonky3Lean/Proofs/Security/Real.lean.
 [[mirror]]
+lean = "p3_security.binary.BinaryPcsRegime.queries_for_target"
+rust = "p3_security::binary::BinaryPcsRegime::queries_for_target"
+
+[[mirror]]
 lean = "Plonky3Lean.Proofs.Security.Real.deepBitsR"
 rust = "p3_security::deep::deep_ali_error"
 
