@@ -423,6 +423,37 @@ theorem sum_cfft_permute {M : Type _} [AddCommMonoid M] (L : ℕ) (f : ℕ → M
     (fun i hi => cfft_permute_index_involutive (by simpa using hi)) (fun i _ => rfl)
 
 open p3_circle.ordering.mirror p3_circle.deep_quotient.mirror in
+/-- The lambda extraction on an LDE whose values are an FFT-basis function of order n = L - lb plus mu v_n.
+
+It returns that mu, and the values of the FFT-basis function. -/
+theorem extract_lambda_split (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {L lb : ℕ} (hlb : 1 ≤ lb)
+    (hn : lb + 1 ≤ L) (hG : L + 1 ≤ G.adicity) (v : ℕ → K) (c : ℕ → K) (μ : K)
+    (hv : ∀ k < 2 ^ L, v k = fftEval (L - lb) c ((2 * k + 1) • genPt G (L + 1)) +
+      μ * vn (L - lb) ((2 * k + 1) • genPt G (L + 1))) :
+    extract_lambda G ((List.range (2 ^ L)).map fun i => v (cfft_permute_index i L)) lb =
+      some (μ, (List.range (2 ^ L)).map fun i =>
+        fftEval (L - lb) c ((2 * cfft_permute_index i L + 1) • genPt G (L + 1))) := by
+  set pt : ℕ → C K := fun k => (2 * k + 1) • genPt G (L + 1)
+  have hσ : ∀ i, cfft_permute_index i L < 2 ^ L := fun i => cfft_permute_index_lt L i
+  have hlen : ((List.range (2 ^ L)).map fun i => v (cfft_permute_index i L)).length = 2 ^ L := by simp
+  have hget : ∀ i ∈ range (2 ^ L), ((List.range (2 ^ L)).map fun i => v (cfft_permute_index i L)).getD i 0 =
+      v (cfft_permute_index i L) := fun i hi => by
+    rw [List.getD_eq_getElem _ _ (by simpa using hi)]; simp
+  have hlam : (∑ i ∈ range (2 ^ L), ((List.range (2 ^ L)).map fun i => v (cfft_permute_index i L)).getD i 0 *
+      vdAt G L lb i) * ((2 : K) ^ (L - 1))⁻¹ = μ := by
+    rw [sum_congr rfl fun i hi => by rw [hget i hi, hv _ (hσ i)]]
+    simp only [vdAt]
+    rw [sum_cfft_permute L fun k => (fftEval (L - lb) c (pt k) + μ * vn (L - lb) (pt k)) * vn (L - lb) (pt k)]
+    simp only [add_mul, sum_add_distrib, pt, sum_fftEval_mul_vn hV h2 (by omega : 1 ≤ L - lb)
+      (by omega : L - lb < L) hG, zero_add, mul_assoc, ← mul_sum, ← pow_two, sum_vn_sq hV h2 hlb hn hG]
+    field_simp
+  rw [extract_lambda_eq hV hlb hn hG h2 _ hlen, hlam]
+  congr 2
+  refine List.map_congr_left fun i hi => ?_
+  rw [hget i (by simpa using hi), vdAt, hv _ (hσ i)]
+  ring
+
+open p3_circle.ordering.mirror p3_circle.deep_quotient.mirror in
 /-- The lambda extraction on a function of degree 2^(n - 1), n = L - lb, read in circle FFT order on the LDE domain.
 
 The function splits as an FFT-basis function of order n plus mu v_n.
@@ -436,25 +467,8 @@ theorem extract_lambda_circlePoly (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {
           fftEval (L - lb) c ((2 * cfft_permute_index i L + 1) • genPt G (L + 1))) := by
   obtain ⟨c, μ, hc⟩ := hF.split_vn h2
   rw [show L - lb - 1 + 1 = L - lb by omega] at hc
-  refine ⟨c, μ, hc, ?_⟩
-  set pt : ℕ → C K := fun k => (2 * k + 1) • genPt G (L + 1)
-  have hlen : ((List.range (2 ^ L)).map fun i => F (pt (cfft_permute_index i L))).length = 2 ^ L := by simp
-  have hget : ∀ i ∈ range (2 ^ L), ((List.range (2 ^ L)).map fun i => F (pt (cfft_permute_index i L))).getD i 0 =
-      F (pt (cfft_permute_index i L)) := fun i hi => by
-    rw [List.getD_eq_getElem _ _ (by simpa using hi)]; simp
-  have hlam : (∑ i ∈ range (2 ^ L), ((List.range (2 ^ L)).map fun i => F (pt (cfft_permute_index i L))).getD i 0 *
-      vdAt G L lb i) * ((2 : K) ^ (L - 1))⁻¹ = μ := by
-    rw [sum_congr rfl fun i hi => by rw [hget i hi]]
-    simp only [vdAt]
-    rw [sum_cfft_permute L fun k => F (pt k) * vn (L - lb) (pt k)]
-    simp only [hc, add_mul, sum_add_distrib, pt, sum_fftEval_mul_vn hV h2 (by omega : 1 ≤ L - lb)
-      (by omega : L - lb < L) hG, zero_add, mul_assoc, ← mul_sum, ← pow_two, sum_vn_sq hV h2 hlb hn hG]
-    field_simp
-  rw [extract_lambda_eq hV hlb hn hG h2 _ hlen, hlam]
-  congr 2
-  refine List.map_congr_left fun i hi => ?_
-  rw [hget i (by simpa using hi), vdAt, hc]
-  ring
+  exact ⟨c, μ, hc, extract_lambda_split hV h2 hlb hn hG (fun k => F ((2 * k + 1) • genPt G (L + 1))) c μ
+    fun k _ => hc _⟩
 
 end domain
 
