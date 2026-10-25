@@ -5,9 +5,11 @@ public import Aeneas
 @[expose] public section
 
 /-!
-# Checked usize addition
+# Checked usize addition and subtraction
 
 A usize sum returns the sum when it fits, and panics when it does not.
+
+A usize difference returns the difference when it is not negative, and panics when it is.
 -/
 
 open Aeneas Aeneas.Std
@@ -29,6 +31,30 @@ theorem usize_add_fail (x y : Std.Usize) (h : Usize.max < x.val + y.val) :
     (x + y : RustM Std.Usize) = .fail .panic := by
   have hs := @Usize.add_spec x y
   generalize (x + y : RustM Std.Usize) = m at hs ⊢
+  cases m with
+  | ret r => simp at hs; scalar_tac
+  | vis i k =>
+    cases i with
+    | fail e =>
+      cases e <;> simp [WP.partialSpec] at hs
+      exact congrArg _ (funext fun x => nomatch x)
+  | div => simp at hs
+
+/-- A usize difference that is not negative returns the difference. -/
+theorem usize_sub_ok (x y : Std.Usize) (h : y.val ≤ x.val) :
+    ∃ z : Std.Usize, (x - y : RustM Std.Usize) = .ok z ∧ z.val = x.val - y.val := by
+  have hs := @Usize.sub_spec x y
+  generalize (x - y : RustM Std.Usize) = m at hs ⊢
+  cases m with
+  | ret r => exact ⟨r, rfl, by simp at hs; exact hs.1⟩
+  | vis i k => cases i with | fail e => (cases e <;> simp [WP.partialSpec] at hs; omega)
+  | div => simp at hs
+
+/-- A usize difference below zero panics. -/
+theorem usize_sub_fail (x y : Std.Usize) (h : x.val < y.val) :
+    (x - y : RustM Std.Usize) = .fail .panic := by
+  have hs := @Usize.sub_spec x y
+  generalize (x - y : RustM Std.Usize) = m at hs ⊢
   cases m with
   | ret r => simp at hs; scalar_tac
   | vis i k =>

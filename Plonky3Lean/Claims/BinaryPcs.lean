@@ -2,15 +2,27 @@ module
 
 public import Plonky3Lean.Proofs.BinaryPcs.Complete
 public import Plonky3Lean.Proofs.BinaryPcs.Walk
+public import Plonky3Lean.Proofs.BinaryPcs.Extracted
 
 @[expose] public section
 
 /-!
 # p3-binary-pcs: claims
 
-The schedule, the fold and the verifier's query phase are transcribed, not extracted.
+Four items are extracted:
 
-They work over fields of characteristic 2.
+- the fold of a pair
+- the schedule's constructor
+- its change of folding factor
+- its batch count
+
+Their claims assume a 64-bit word, and that the field instances compute the operations they name.
+
+Each one returns what its transcription computes, so the transcription's claims cover the shipped code.
+
+The query count comes from a floating-point bound of p3-security, and is assumed.
+
+The coset fold and the verifier's query phase are transcribed over fields of characteristic 2.
 
 The specification is the folding of FRI-Binius (Diamond and Posen, eprint 2024/504, section 4).
 
@@ -218,6 +230,78 @@ theorem verify_query_paths.complete [CharP F 2] [CharP EF 2] {c : BinaryPcsConfi
     hpow hbase hrl hround hmb hmr
 
 end Verifier
+
+/-! ## The shipped code -/
+
+section Shipped
+
+variable {F EF R : Type} [Field F] [Field EF] [Algebra F EF]
+
+/-- The shipped fold of a pair computes the transcription's fold. -/
+theorem extracted.fold_pair (h64 : System.Platform.numBits = 64)
+    {inst : p3_binary_field.tower.TowerLevel F R} {einst : p3_field.field.ExtensionField EF F}
+    {L : Level F} (h : FoldComputes inst einst L) (index : Aeneas.Std.Usize) (beta : EF) (lo hi : F) :
+    p3_binary_pcs.fold.fold_pair inst einst index beta lo hi =
+      Proofs.BinaryDft.ofOption (fold_pair L index.val beta lo hi) :=
+  fold_pair_eq_mirror h64 h index beta lo hi
+
+/-- The FRI-Binius folding lemma, for the shipped fold.
+
+Folding the pair above point(j) of an honest codeword gives the codeword of the bound coefficients. -/
+theorem extracted.fold_pair.ntt [CharP F 2] (h64 : System.Platform.numBits = 64)
+    {inst : p3_binary_field.tower.TowerLevel F R} {einst : p3_field.field.ExtensionField EF F}
+    {L : Level F} (h : FoldComputes inst einst L) (hL : Cantor L) {l : ℕ}
+    (hl : l + 1 ≤ 2 ^ L.logBits) (hw : l < 64) (d : ℕ → F) {j : Aeneas.Std.Usize} (hj : j.val < 2 ^ l)
+    (beta : EF) :
+    p3_binary_pcs.fold.fold_pair inst einst j beta (ntt L.cantor (l + 1) 0 d (2 * j.val))
+        (ntt L.cantor (l + 1) 0 d (2 * j.val + 1)) =
+      .ok (ntt (algebraMap F EF ∘ L.cantor) l 0
+        (fun k => (1 - beta) * algebraMap F EF (d (2 * k)) + beta * algebraMap F EF (d (2 * k + 1))) j.val) := by
+  rw [fold_pair_eq_mirror h64 h, fold_pair_ntt hL hl hw d hj beta]
+  rfl
+
+/-- The shipped constructor computes the transcription's, with p3-security's query count.
+
+It reads the two levels' bit widths from their instances. -/
+theorem extracted.try_new_with_folding (h64 : System.Platform.numBits = 64) {Enc R0 R1 : Type}
+    (encInst : p3_binary_dft.encoder.EncodableLevel F Enc R0)
+    (tInst : p3_binary_field.tower.TowerLevel EF R1) (fb eb : Aeneas.Std.Usize)
+    (hfb : encInst.p3_binary_fieldtowerTowerLevelInst.p3_fieldfieldFieldInst.bits = .ok fb)
+    (heb : tInst.p3_fieldfieldFieldInst.bits = .ok eb)
+    (n : Aeneas.Std.Usize) (params : p3_binary_pcs.params.BinaryPcsParams) (lff : Aeneas.Std.Usize) :
+    liftR (resM configM)
+        (p3_binary_pcs.params.BinaryPcsConfig.try_new_with_folding encInst tInst n params lff) =
+      Proofs.BinaryDft.ofOption (try_new_with_folding queriesNat fb.val eb.val n.val (paramsM params) lff.val) :=
+  try_new_with_folding_eq h64 encInst tInst fb eb hfb heb n params lff
+
+/-- The shipped change of folding factor computes the transcription's. -/
+theorem extracted.try_with_folding.eq (h64 : System.Platform.numBits = 64)
+    (c : p3_binary_pcs.params.BinaryPcsConfig) (lff : Aeneas.Std.Usize) :
+    liftR (resM configM) (p3_binary_pcs.params.BinaryPcsConfig.try_with_folding c lff) =
+      Proofs.BinaryDft.ofOption ((configM c).try_with_folding lff.val) :=
+  try_with_folding_eq h64 c lff
+
+/-- On an accepted schedule, the shipped change of folding factor never panics.
+
+It accepts exactly the factors that keep the invariants. -/
+theorem extracted.try_with_folding (h64 : System.Platform.numBits = 64)
+    {c : p3_binary_pcs.params.BinaryPcsConfig} (h : Inv (configM c)) (lff : Aeneas.Std.Usize) :
+    ∃ r, p3_binary_pcs.params.BinaryPcsConfig.try_with_folding c lff = .ok r ∧
+      ∀ c', resM configM r = .ok c' ↔
+        c' = { configM c with log_folding_factor := lff.val } ∧ Inv c' := by
+  obtain ⟨⟨x, hx⟩, hiff⟩ := h.try_with_folding lff.val
+  have e := try_with_folding_eq h64 c lff
+  rw [hx] at e
+  obtain ⟨r, hr, hrx⟩ := liftR_ok e
+  exact ⟨r, hr, fun c' => by rw [hrx, ← hiff c', hx, Option.some.injEq]⟩
+
+/-- The shipped batch count is ceil(n / lff), and panics at a zero factor. -/
+theorem extracted.num_fold_batches (c : p3_binary_pcs.params.BinaryPcsConfig) :
+    liftR Aeneas.Std.UScalar.val (p3_binary_pcs.params.BinaryPcsConfig.num_fold_batches c) =
+      Proofs.BinaryDft.ofOption (configM c).num_fold_batches :=
+  num_fold_batches_eq c
+
+end Shipped
 
 /-! ## The tower levels -/
 
