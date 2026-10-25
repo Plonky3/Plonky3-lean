@@ -4289,6 +4289,14 @@ name   = "Plonky3Lean.Claims.P3MerkleTree.mmcs.hax_reshaped.verify_batch.reads_b
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3MerkleTree.mmcs.hax_reshaped.arity_schedule_and_proof_levels.panics_tall"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3MerkleTree.mmcs.hax_reshaped.verify_batch.panics_tall"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3MerkleTree.salt_hits_le"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
