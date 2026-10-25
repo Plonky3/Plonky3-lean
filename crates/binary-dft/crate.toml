@@ -8,7 +8,7 @@ lean_lib = "P3BinaryDft"
 #
 # The transforms use rayon iterators, raw pointers, SIMD intrinsics and a `const` generic `bool` that picks a kernel (docs/extractor-issues.md 12, 14 and 61).
 #
-# The domain steps accumulate in a closure over a mutable capture, whose back function CoreModels cannot take (60).
+# The domain steps accumulate in a closure over a mutable capture, whose back function CoreModels cannot take (docs/extractor-issues.md 60 and 244).
 #
 # Each of them is transcribed over a field in extraction/P3BinaryDft/Mirror/, with the abstractions its file header lists.
 #
