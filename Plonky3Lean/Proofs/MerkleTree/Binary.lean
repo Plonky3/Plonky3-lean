@@ -14,9 +14,10 @@ The tallest height is then 2^n.
 
 Every value the verifier reads from the dimensions is the binary tree's:
 
-- the schedule is n binary steps, and the proof walks n - min(c, n) of them for a cap height c;
-- the matrix order groups the matrices by height, tallest first;
-- the leaf group is the tallest matrices;
+- the schedule is n binary steps
+- the proof walks n - min(c, n) of them, for a cap height c
+- the matrix order groups the matrices by height, tallest first
+- the leaf group is the tallest matrices
 - the plan injects the matrices of height 2^e after the fold to width 2^e.
 -/
 
@@ -318,7 +319,11 @@ Take two openings at one index, under one cap and one set of dimensions, that bo
 
 The tallest height is 2^n, and c is the cap height.
 
-Either the hasher or the compression collides, or the two openings agree on every matrix of height 2^e with e at least min(c, n). -/
+Then one of these holds:
+
+- the hasher collides
+- the compression collides
+- the two openings agree on every matrix of height 2^e with e at least min(c, n). -/
 theorem verify_binding_binary (cl : core.clone.Clone F) (cp : core.marker.Copy W)
     (dfInst : core.default.Default W) (eqInst : core.cmp.PartialEq W W)
     (hInst : p3_symmetric.hasher.CryptographicHasher H F (Std.Array W DIGEST_ELEMS))
@@ -356,9 +361,9 @@ The tallest height is 2^n, c is the cap height, and L = n - min(c, n) is the num
 
 An accepting run had all of these:
 
-- an index below 2^n;
-- one row per matrix, at its width;
-- L siblings;
+- an index below 2^n
+- one row per matrix, at its width
+- L siblings
 - a walk of the binary plan from the hash of the tallest rows that reaches the cap entry at its index.
 
 The walk pads with the default digest z, and binary levels never read the padding. -/
@@ -463,130 +468,5 @@ theorem cap_loop_ok {sched : alloc.vec.Vec Std.Usize} {pl e : Std.Usize}
     cases ok_inj hr
     rw [← hinv, List.drop_of_length_le (by omega)]
     simp
-
-/-- When the verifier accepts on the binary tree over power-of-two heights.
-
-The tallest height is 2^n, c is the cap height, and L = n - min(c, n) is the number of walked levels.
-
-Once the dimensions pass the verifier's own checks, it accepts when all of these hold:
-
-- one row per matrix, at its width;
-- an index below 2^n;
-- L siblings;
-- a cap of 2^min(c, n) digests;
-- a walk of the binary plan from the hash of the tallest rows that reaches the cap entry at its index. -/
-theorem verify_ok_binary (cl : core.clone.Clone F) (cp : core.marker.Copy W)
-    (dfInst : core.default.Default W) (eqInst : core.cmp.PartialEq W W)
-    (hInst : p3_symmetric.hasher.CryptographicHasher H F (Std.Array W DIGEST_ELEMS))
-    (cInst : p3_symmetric.compression.PseudoCompressionFunction C (Std.Array W DIGEST_ELEMS) 2#usize)
-    (mt : mmcs.MerkleTreeMmcs P PW H C 2#usize DIGEST_ELEMS)
-    (h : List (List F) → Std.Array W DIGEST_ELEMS)
-    (c : List (Std.Array W DIGEST_ELEMS) → Std.Array W DIGEST_ELEMS)
-    (hH : HashOn hInst mt.hash h) (hC : CompressOn cInst mt.compress c)
-    (hcl : ∀ x, ∃ v, cp.cloneCloneInst.clone x = RustM.ok v)
-    (hrefl : ∀ x, eqInst.eq x x = RustM.ok true)
-    (t : W) (z : Std.Array W DIGEST_ELEMS) (ht : dfInst.default = RustM.ok t)
-    (hz : core.array.repeat DIGEST_ELEMS cp.cloneCloneInst t = RustM.ok z)
-    (dims : Slice p3_matrix.Dimensions) (hpow : PowHeights dims)
-    (hdims : DimsPass 2#usize mt.cap_height dims)
-    (commit : p3_symmetric.hash.MerkleCap F (Std.Array W DIGEST_ELEMS)) (index : Std.Usize)
-    (opened : Slice (alloc.vec.Vec F)) (proof : Slice (Std.Array W DIGEST_ELEMS)) :
-    let n := Nat.log 2 (maxHeight dims)
-    let lh := logsOf dims
-    let w := walk h c [z, z] z (tallOrder lh n) (openedL opened) proof.val
-      (bplan lh n n (n - min mt.cap_height.val n)) index.val 0
-      (h (group (tallOrder lh n) (openedL opened) 0 (blockEnd lh n n)))
-    opened.val.length = dims.val.length →
-    (∀ m (hm : m < dims.val.length) (hm' : m < opened.val.length),
-      (opened.val[m]).val.length = (dims.val[m]).width.val) →
-    index.val < 2 ^ n →
-    proof.val.length = n - min mt.cap_height.val n →
-    commit.cap.val.length = 2 ^ min mt.cap_height.val n →
-    commit.cap.val[w.1]? = some w.2 →
-    mmcs.hax_reshaped.verify_batch cl cp dfInst eqInst hInst cInst mt commit dims index opened proof =
-      RustM.ok (core.result.Result.Ok ()) := by
-  intro n lh w hlen0 hw hidx hproof hcapl hcap
-  obtain ⟨val, sched, pl, expected, sched1, epl, order, curr, lnpt, pos, hval, hsched, hexp, hsched1,
-    hepl, horder, hcurr, hlnpt, hpos, hheights⟩ := hdims
-  have hvm := (validate_ok_val hval).1
-  obtain ⟨hv2, -, hs, hpl, hord, hpv⟩ := layout_binary hpow hval hsched horder hcurr hlnpt hpos
-  have hplan := plan_eq_bplan hpow hval hsched hsched1 horder hcurr hlnpt hpos
-  rw [hvm] at hv2 hs hpl hord hpv hplan
-  refine verify_ok_of cl cp dfInst eqInst hInst cInst mt h c hH hC hcl ⟨t, ht⟩ hrefl (by decide) dims
-    val sched pl expected sched1 epl order curr lnpt pos hval hsched hexp hsched1 hepl horder hcurr
-    hlnpt hpos hheights commit index opened proof hlen0 hw ?_ (by rw [hvm, hv2]; exact hidx) ?_ ?_
-  · -- One sibling per walked level.
-    rw [hproof, sibSum, List.drop_zero, vec_truncate_ok hsched1,
-      show (fun s : Std.Usize => s.val - 1) = (fun x => x - 1) ∘ (fun s : Std.Usize => s.val) from rfl,
-      ← List.map_map, List.map_take, hs, hpl, List.take_replicate]
-    simp only [List.map_replicate, List.sum_replicate, smul_eq_mul]
-    simp only [n]
-    omega
-  · -- The cap holds as many digests as the top min(c, n) binary levels produce.
-    rw [hcapl, cap_loop_ok hexp, List.map_drop, hs, hpl, List.drop_replicate, List.prod_replicate]
-    congr 1
-    simp only [n]
-    omega
-  · -- The run folds the binary plan, whatever the padding array holds.
-    intro t' dflt padA ht' hdflt hpad
-    rw [ht] at ht'; cases ok_inj ht'
-    rw [hz] at hdflt; cases ok_inj hdflt
-    simp only [show (2#usize : Std.Usize).val = 2 from rfl]
-    rw [hplan, hord, hpv, walk_pad_two h c z _ _ _ padA.val (by simp) _ (bplan_steps _ _ _ _)]
-    exact hcap
-
-open Plonky3Lean.Spec.MerkleTree in
-/-- Completeness on the binary tree over power-of-two heights.
-
-The tallest height is 2^n, c is the cap height, and L = n - min(c, n).
-
-Take the honest binary tree over matrices whose row j of matrix m is given.
-
-An honest opening of leaf I verifies once the dimensions pass the verifier's own checks:
-
-- for each matrix of height 2^e, its row I / 2^(n - e), at its width;
-- the siblings of the path of leaf I;
-- a cap holding the 2^min(c, n) top nodes. -/
-theorem verify_complete_binary (cl : core.clone.Clone F) (cp : core.marker.Copy W)
-    (dfInst : core.default.Default W) (eqInst : core.cmp.PartialEq W W)
-    (hInst : p3_symmetric.hasher.CryptographicHasher H F (Std.Array W DIGEST_ELEMS))
-    (cInst : p3_symmetric.compression.PseudoCompressionFunction C (Std.Array W DIGEST_ELEMS) 2#usize)
-    (mt : mmcs.MerkleTreeMmcs P PW H C 2#usize DIGEST_ELEMS)
-    (h : List (List F) → Std.Array W DIGEST_ELEMS)
-    (c : List (Std.Array W DIGEST_ELEMS) → Std.Array W DIGEST_ELEMS)
-    (hH : HashOn hInst mt.hash h) (hC : CompressOn cInst mt.compress c)
-    (hcl : ∀ x, ∃ v, cp.cloneCloneInst.clone x = RustM.ok v)
-    (hrefl : ∀ x, eqInst.eq x x = RustM.ok true)
-    (t : W) (z : Std.Array W DIGEST_ELEMS) (ht : dfInst.default = RustM.ok t)
-    (hz : core.array.repeat DIGEST_ELEMS cp.cloneCloneInst t = RustM.ok z)
-    (dims : Slice p3_matrix.Dimensions) (hpow : PowHeights dims)
-    (hdims : DimsPass 2#usize mt.cap_height dims) (rowsOf : ℕ → ℕ → List F)
-    (commit : p3_symmetric.hash.MerkleCap F (Std.Array W DIGEST_ELEMS)) (index : Std.Usize)
-    (opened : Slice (alloc.vec.Vec F)) (proof : Slice (Std.Array W DIGEST_ELEMS)) :
-    let n := Nat.log 2 (maxHeight dims)
-    let L := n - min mt.cap_height.val n
-    let lh := logsOf dims
-    opened.val.length = dims.val.length →
-    (∀ m (hm : m < dims.val.length) (hm' : m < opened.val.length),
-      (opened.val[m]).val.length = (dims.val[m]).width.val) →
-    index.val < 2 ^ n →
-    (∀ m < dims.val.length, (openedL opened).getD m [] = rowsOf m (index.val / 2 ^ (n - lh.getD m 0))) →
-    proof.val = path c [z, z] z (bleaf h lh n rowsOf) (bspecs h lh n rowsOf n L) index.val →
-    commit.cap.val = (List.range (2 ^ min mt.cap_height.val n)).map
-      (top c [z, z] z (bleaf h lh n rowsOf) (bspecs h lh n rowsOf n L)) →
-    mmcs.hax_reshaped.verify_batch cl cp dfInst eqInst hInst cInst mt commit dims index opened proof =
-      RustM.ok (core.result.Result.Ok ()) := by
-  intro n L lh hlen0 hw hidx hop hpath hcap
-  have hlh : lh.length = dims.val.length := logsOf_length dims
-  refine verify_ok_binary cl cp dfInst eqInst hInst cInst mt h c hH hC hcl hrefl t z ht hz dims hpow
-    hdims commit index opened proof hlen0 hw hidx (by rw [hpath, length_path_bspecs])
-    (by rw [hcap]; simp; rfl) ?_
-  rw [hpath, bwalk_honest h c z lh n L rowsOf (openedL opened) index.val (by omega) hidx
-    (fun m hm => hop m (hlh ▸ hm)), hcap]
-  have hlt : index.val / 2 ^ L < 2 ^ min mt.cap_height.val n := by
-    rw [Nat.div_lt_iff_lt_mul (by positivity), ← pow_add,
-      show min mt.cap_height.val n + L = n by omega]
-    exact hidx
-  simp [hlt]
 
 end Plonky3Lean.Proofs.MerkleTree

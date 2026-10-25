@@ -22,6 +22,8 @@ A multi-opening holds, for each query index, every matrix's row and the path's s
 
 The verifier walks each query from its leaf to the cap, as the extracted single-index verifier does.
 
+At arity 2, the extracted verifier accepts exactly these queries, with a cap of the right size.
+
 Plonky3 prunes the siblings that queries share.
 
 Its pruned proof expands back to these per-query paths, so pruning is not modelled.

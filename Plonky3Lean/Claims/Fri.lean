@@ -14,6 +14,7 @@ public import Plonky3Lean.Proofs.Fri.Honest
 public import Plonky3Lean.Proofs.Fri.HidingPcs
 public import Plonky3Lean.Proofs.Fri.Pow
 public import Plonky3Lean.Proofs.Fri.MerklePcs
+public import Plonky3Lean.Proofs.Fri.MerkleExtracted
 public import Plonky3Lean.Proofs.Fri.HidingMasks
 
 @[expose] public section
@@ -701,6 +702,15 @@ Then one of these holds:
 - the hasher collides
 - the two agree on the row of every matrix at least as tall as the cap. -/
 theorem merkle.binding : type_of% @merkle_verify_binding := @merkle_verify_binding
+
+/-- The scheme's query check is the extracted single-index verifier at arity 2.
+
+On a batch of power-of-two heights that is not empty, the verifier accepts a query exactly when:
+
+- the scheme accepts it, at cap height min(c, n) for the verifier's cap height c
+- the cap holds 2^min(c, n) digests. -/
+theorem merkle.extracted : type_of% @Plonky3Lean.Proofs.Fri.verify_iff_queryAccepts :=
+  @Plonky3Lean.Proofs.Fri.verify_iff_queryAccepts
 
 end merkle
 
