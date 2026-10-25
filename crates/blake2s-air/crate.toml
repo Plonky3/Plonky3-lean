@@ -28,6 +28,10 @@ watch = ["blake2s-air/src", "blake2s-air/Cargo.toml"]
 # The transcriptions in extraction/P3Blake2sAir/Assumptions/Mirror/.
 # Hashes are pending tools/mirror.
 #
+# The packed generator is transcribed as well.
+#
+# Plonky3Lean/Proofs/Blake2sAir/PackedGen.lean proves that it returns the packing of the trace.
+#
 # Plonky3Lean/Proofs/Blake2sAir/Extracted.lean proves the transcribed constants and G step on words equal to the extracted ones.
 
 [[mirror]]
@@ -177,3 +181,43 @@ rust = "p3_blake2s_air::binary::generation::Blake2sBinaryCols::state_after_round
 [[mirror]]
 lean = "p3_blake2s_air.mirror.compression_output"
 rust = "p3_blake2s_air::binary::generation::Blake2sBinaryCols::compression_output"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.Planes"
+rust = "p3_blake2s_air::binary::generation::generate_block"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.add_planes"
+rust = "p3_blake2s_air::binary::generation::add_planes"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.xor_rotate_right"
+rust = "p3_blake2s_air::binary::generation::xor_rotate_right"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.transpose_step"
+rust = "p3_blake2s_air::binary::generation::transpose_bits"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.transpose_bits"
+rust = "p3_blake2s_air::binary::generation::transpose_bits"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.lane_mask"
+rust = "p3_blake2s_air::binary::generation::lane_mask"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.input_words"
+rust = "p3_blake2s_air::binary::generation::input_words"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.g_planes"
+rust = "p3_blake2s_air::binary::generation::g_planes"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.generate_block"
+rust = "p3_blake2s_air::binary::generation::generate_block"
+
+[[mirror]]
+lean = "p3_blake2s_air.mirror.generate_binary_trace_packed"
+rust = "p3_blake2s_air::binary::generation::generate_binary_trace_packed"

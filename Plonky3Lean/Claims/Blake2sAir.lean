@@ -4,6 +4,7 @@ public import Plonky3Lean.Proofs.Blake2sAir.Trace
 public import Plonky3Lean.Proofs.Blake2sAir.Degree
 public import Plonky3Lean.Proofs.Blake2sAir.Extracted
 public import Plonky3Lean.Proofs.Blake2sAir.Packed
+public import Plonky3Lean.Proofs.Blake2sAir.PackedGen
 public import Plonky3Lean.Proofs.Hash.Blake2s.Vectors
 
 @[expose] public section
@@ -53,6 +54,15 @@ The additions are ripple-carry adders whose sums are XORs, valid in characterist
 - On a positive power-of-two number of inputs, the generator's trace satisfies the AIR in characteristic 2.
 - The generator panics otherwise.
 - Every constraint has degree multiple at most 2, the declared bound.
+
+# The packed generator
+
+The packed generator fills 64 rows at once, one per bit lane, with every word held as 32 bit planes.
+
+- It returns exactly the packing of the trace generator's trace.
+- It panics on exactly the same inputs.
+- Its bit-matrix transpose moves bit `c` of row `r` to bit `r` of row `c`.
+- The lanes past the last input stay zero, as the packing needs.
 -/
 
 open Aeneas Aeneas.Std
@@ -280,5 +290,36 @@ theorem num_constraints_gf2 (cb : Bool) :
         (symbolicBuilder (AirLayout.from_air (blake2sAir (F := ZMod 2) cb))) []).length =
       num_constraints cb :=
   num_constraints_eq cb
+
+/-! ## The packed generator -/
+
+/-- The packed generator's transpose moves bit `r` of row `c` to bit `c` of row `r`, for `r, c < 64`. -/
+theorem transpose_bits.bit (rows : ℕ → BitVec 64) {r c : ℕ} (hr : r < 64) (hc : c < 64) :
+    (transpose_bits rows r).getLsbD c = (rows c).getLsbD r :=
+  transpose_bit rows hr hc
+
+/-- The packed generator returns the trace packed 64 rows to a word.
+
+It panics exactly when the trace generator does.
+
+Bit `k` of word `(w, j)` says whether cell `(64 w + k, j)` is 1, and the bits past the height are zero. -/
+theorem generate_binary_trace_packed.eq_pack (inputs : List Blake2sCompressionInput) (e : ℕ) :
+    generate_binary_trace_packed (F := F) inputs = (generate_binary_trace_rows (F := F) inputs e).map packMat :=
+  packed_eq inputs e
+
+/-- In characteristic 2, on a positive power-of-two number of inputs, the packed trace is a packed valid trace. -/
+theorem generate_binary_trace_packed.complete [Inhabited F] (h2 : (2 : F) = 0) (cb : Bool)
+    {inputs : List Blake2sCompressionInput}
+    (h : inputs.length ≠ 0 ∧ 2 ^ Nat.log 2 inputs.length = inputs.length) (e : ℕ) :
+    ∃ M : Mat F, generate_binary_trace_packed (F := F) inputs = some (packMat M) ∧
+      Satisfies (constraints (blake2sAir cb)) (instOf (blake2sAir cb) M []) := by
+  obtain ⟨M, hM, hs⟩ := Proofs.Blake2sAir.complete h2 cb h e
+  exact ⟨M, by rw [packed_eq (F := F) inputs e, hM, Option.map_some], hs⟩
+
+/-- The packed generator panics unless 2 is 0 in the field and the number of inputs is a positive power of two. -/
+theorem generate_binary_trace_packed.panics {inputs : List Blake2sCompressionInput}
+    (h : ¬ ((2 : F) = 0 ∧ inputs.length ≠ 0 ∧ 2 ^ Nat.log 2 inputs.length = inputs.length)) :
+    generate_binary_trace_packed (F := F) inputs = none := by
+  rw [packed_eq (F := F) inputs 0, generate_binary_trace_rows.panics h, Option.map_none]
 
 end Plonky3Lean.Claims.Blake2sAir
