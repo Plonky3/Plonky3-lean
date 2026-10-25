@@ -13,10 +13,10 @@ Take arity 2, and matrices of heights 2^e.
 
 Then the verifier computes, from the dimensions alone:
 
-- the matrix order: the matrices grouped by height, tallest first, in input order within a height;
-- the leaf group: the tallest matrices;
-- the schedule: one binary step per level, n of them for a tallest height 2^n;
-- the plan: the binary plan, which injects the matrices of height 2^e after the fold to width 2^e.
+- the matrix order groups the matrices by height, tallest first, in input order within a height
+- the leaf group is the tallest matrices
+- the schedule is one binary step per level, n of them for a tallest height 2^n
+- the plan injects the matrices of height 2^e after the fold to width 2^e.
 -/
 
 namespace Plonky3Lean.Proofs.MerkleTree
@@ -167,7 +167,9 @@ theorem logsDown_around {n e : ℕ} (he : e ≤ n) :
   · conv_lhs => rw [← List.take_append_drop (n - e) (logsDown n)]
     rw [drop_logsDown he, logsDown_eq_cons e]
 
-/-- The insertion sort of the verifier groups the matrices by height, tallest first, in input order within a height. -/
+/-- The verifier's insertion sort groups the matrices by height, tallest first.
+
+Within a height, the matrices keep their input order. -/
 theorem sortTallest_eq (lh : List ℕ) (height : ℕ → ℕ) (n : ℕ)
     (hh : ∀ m < lh.length, height m = 2 ^ lh.getD m 0) (hn : ∀ m < lh.length, lh.getD m 0 ≤ n) :
     ∀ k ≤ lh.length, sortTallest height k =

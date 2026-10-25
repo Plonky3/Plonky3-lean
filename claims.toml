@@ -4253,6 +4253,42 @@ name   = "Plonky3Lean.Claims.P3MerkleTree.mmcs.hax_reshaped.verify_batch.unread_
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3MerkleTree.mmcs.hax_reshaped.arity_schedule_and_proof_levels.binary"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3MerkleTree.mmcs.hax_reshaped.validate_heights.panics_max"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3MerkleTree.mmcs.hax_reshaped.verify_batch.binding_binary"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3MerkleTree.mmcs.hax_reshaped.verify_batch.complete_binary"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3MerkleTree.mmcs.hax_reshaped.verify_batch.iff_binary"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3MerkleTree.mmcs.hax_reshaped.verify_batch.never_panics_binary"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3MerkleTree.mmcs.hax_reshaped.verify_batch.panics_max"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3MerkleTree.mmcs.hax_reshaped.verify_batch.plan_binary"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3MerkleTree.mmcs.hax_reshaped.verify_batch.reads_binary"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3MerkleTree.salt_hits_le"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -5778,6 +5814,10 @@ axioms = ["propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.Fri.merkle.binding"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Fri.merkle.extracted"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
