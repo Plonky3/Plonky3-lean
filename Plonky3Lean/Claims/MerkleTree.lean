@@ -6,6 +6,7 @@ public import Plonky3Lean.Proofs.MerkleTree.Edge
 public import Plonky3Lean.Proofs.MerkleTree.Hiding
 public import Plonky3Lean.Proofs.MerkleTree.Bugs
 public import Plonky3Lean.Proofs.MerkleTree.Batch
+public import Plonky3Lean.Proofs.MerkleTree.BinaryAccept
 
 @[expose] public section
 
@@ -39,6 +40,11 @@ The extracted model checks arithmetic, as a debug build does, so an overflow pan
 - On the binary tree over power-of-two heights, the walk is complete and binding.
 
   That is the layout the FRI PCS commits.
+- At arity 2 on power-of-two heights, the verifier runs exactly that binary plan.
+
+  It accepts exactly the openings that walk the plan to the cap, and it never panics.
+- It reads exactly the matrices at least as tall as the cap.
+- A tallest height of the largest word next to a height 0 or 1 makes the height check panic.
 - Once the dimensions pass the verifier's own checks, no index, rows, siblings or cap make it panic.
 - With arity 8, heights 4 and 2 make the pinned schedule loop forever.
 - With arity 2 and a cap two layers down, a height-1 matrix next to a height-8 one is never read.
@@ -458,5 +464,76 @@ Then one of these holds:
 - the hasher collides
 - the two openings agree on every matrix of height at least 2^(n - L). -/
 theorem walk.binary_binding : type_of% @bwalk_binding := @bwalk_binding
+
+/-! ## Arity 2 on power-of-two heights -/
+
+/-- With arity 2 and power-of-two heights, the verifier reads from the dimensions what the binary tree prescribes.
+
+The tallest height is 2^n, and c is the cap height.
+
+- The tallest height and the padded leaf width are 2^n.
+- The schedule is n binary steps, and the proof walks n - min(c, n) of them.
+- The matrices are grouped by height, tallest first, in input order within a height.
+- The leaf group is the tallest matrices. -/
+theorem mmcs.hax_reshaped.arity_schedule_and_proof_levels.binary : type_of% @Plonky3Lean.Proofs.MerkleTree.layout_binary :=
+  @Plonky3Lean.Proofs.MerkleTree.layout_binary
+
+/-- With arity 2 and power-of-two heights, the verifier's plan is the binary plan.
+
+After the fold to width 2^e, it injects the matrices of height 2^e, in input order. -/
+theorem mmcs.hax_reshaped.verify_batch.plan_binary : type_of% @Plonky3Lean.Proofs.MerkleTree.plan_eq_bplan :=
+  @Plonky3Lean.Proofs.MerkleTree.plan_eq_bplan
+
+/-- With arity 2 and power-of-two heights, the verifier reads exactly the matrices at least as tall as the cap.
+
+It reads a matrix of height 2^e exactly when e is at least min(c, n).
+
+The tallest height is 2^n, and c is the cap height. -/
+theorem mmcs.hax_reshaped.verify_batch.reads_binary : type_of% @Plonky3Lean.Proofs.MerkleTree.reads_binary :=
+  @Plonky3Lean.Proofs.MerkleTree.reads_binary
+
+/-- Take two openings at one index that both verify, at arity 2 on power-of-two heights.
+
+Then one of these holds:
+
+- the compression collides
+- the hasher collides
+- the two agree on every matrix of height 2^e with e at least min(c, n). -/
+theorem mmcs.hax_reshaped.verify_batch.binding_binary : type_of% @Plonky3Lean.Proofs.MerkleTree.verify_binding_binary :=
+  @Plonky3Lean.Proofs.MerkleTree.verify_binding_binary
+
+/-- Take arity 2 and a batch of power-of-two heights that is not empty.
+
+The verifier accepts exactly when all of these hold:
+
+- one row per matrix, at its width
+- an index below 2^n
+- n - min(c, n) siblings
+- a cap of 2^min(c, n) digests
+- a walk of the binary plan from the hash of the tallest rows that reaches the cap entry at its index. -/
+theorem mmcs.hax_reshaped.verify_batch.iff_binary : type_of% @Plonky3Lean.Proofs.MerkleTree.verify_iff_binary :=
+  @Plonky3Lean.Proofs.MerkleTree.verify_iff_binary
+
+/-- At arity 2, the verifier accepts an honest opening of the binary tree over a batch of power-of-two heights. -/
+theorem mmcs.hax_reshaped.verify_batch.complete_binary : type_of% @Plonky3Lean.Proofs.MerkleTree.verify_complete_binary :=
+  @Plonky3Lean.Proofs.MerkleTree.verify_complete_binary
+
+/-- At arity 2, the verifier returns on every opening of a batch of power-of-two heights that is not empty. -/
+theorem mmcs.hax_reshaped.verify_batch.never_panics_binary : type_of% @Plonky3Lean.Proofs.MerkleTree.verify_total_binary :=
+  @Plonky3Lean.Proofs.MerkleTree.verify_total_binary
+
+/-- The height check panics on a tallest height of the largest word next to a height 0 or 1.
+
+Such a height sits a full word of halvings below the leaves.
+
+The shift by the word size overflows, so a debug build panics. -/
+theorem mmcs.hax_reshaped.validate_heights.panics_max : type_of% @Plonky3Lean.Proofs.MerkleTree.validate_panics_max :=
+  @Plonky3Lean.Proofs.MerkleTree.validate_panics_max
+
+/-- The verifier panics on a tallest height of the largest word next to a height 0 or 1.
+
+It does so once it holds one row per matrix, whatever the index, siblings and cap. -/
+theorem mmcs.hax_reshaped.verify_batch.panics_max : type_of% @Plonky3Lean.Proofs.MerkleTree.verify_panics_max :=
+  @Plonky3Lean.Proofs.MerkleTree.verify_panics_max
 
 end Plonky3Lean.Claims.P3MerkleTree
