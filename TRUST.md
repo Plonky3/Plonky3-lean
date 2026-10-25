@@ -39,9 +39,13 @@ The charon flags in `toolchain.toml`'s `charon_args` restrict what is extracted
 for every crate: `Debug` bodies become `opaque`, and serde is excluded.
 
 Extraction is target-scoped to `thumbv7em-none-eabi`. That target has no SIMD,
-so **nothing here describes the AVX2, AVX-512 or NEON code paths**, which are what
-production runs on x86-64 and aarch64. The models are of the portable scalar
-paths.
+so the models are of the portable scalar paths. The exception is AVX2: the
+`x86_64-avx2` variants of p3-field, p3-monty-31 and p3-baby-bear are extracted
+for x86_64 against models of the `core::arch` intrinsics (`arch/`), which are
+trusted, and checked against the hardware by `arch/tests/`. Of that code, only
+BabyBear's packed `Add`, `Sub`, `Mul`, `Neg` and `halve_avx2` are claimed
+(`Plonky3Lean/Claims/BabyBear/Avx2.lean`). **Nothing here describes the AVX-512
+or NEON code paths**, or the rest of the AVX2 one.
 
 ## 4. Specification libraries
 

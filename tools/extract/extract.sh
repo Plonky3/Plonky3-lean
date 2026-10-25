@@ -392,9 +392,23 @@ echo "==> 6/8 checking each Assumptions/ against the regenerated templates; inst
 # `Assumptions/<X>External.lean` must declare exactly the names the template
 # does. The signatures may differ on purpose; `lake build` checks those. A file
 # that states an `axiom` is refused: assumptions here are `opaque` constants.
+# aeneas puts a long name on the line after its keyword (`axiom` alone, then
+# the name indented), so a keyword alone on its line takes the next line's name.
 decl_names() {
     [ -f "$1" ] || return 0
-    sed -nE 's/^(noncomputable )?(axiom|opaque|def|abbrev|structure|inductive|class) ([^ :({]+).*/\3/p' "$1" | sort -u
+    awk '
+        pending {
+            pending = 0
+            if (match($0, /^[ \t]+[^ \t:({]+/)) {
+                n = substr($0, RSTART, RLENGTH); sub(/^[ \t]+/, "", n); print n
+            }
+            next
+        }
+        /^(noncomputable )?(axiom|opaque|def|abbrev|structure|inductive|class)[ \t]*$/ { pending = 1; next }
+        match($0, /^(noncomputable )?(axiom|opaque|def|abbrev|structure|inductive|class) [^ :({]+/) {
+            s = substr($0, RSTART, RLENGTH); sub(/^(noncomputable )?[a-z]+ /, "", s); print s
+        }
+    ' "$1" | sort -u
 }
 stub_fail=0
 while IFS='|' read -r unit lib state home; do
