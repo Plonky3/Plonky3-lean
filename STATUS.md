@@ -14,50 +14,50 @@ target `thumbv7em-none-eabi`
 
 | Crate | State | Generated lines | Hand-written lines | `opaque` | Mirrored | Dropped by the extractor | Patches (pre / post) | Patches with a cost |
 |---|---|---:|---:|---:|---:|---:|---|---|
-| `air` | scoped | 364 | 931 | 0 | 67 | 0 | 0 / 1 | post `010` |
-| `baby-bear` | extracted | 2953 | 121 | 4 | 0 | 0 | 5 / 3 | pre `020`, pre `030`, pre `040`, pre `050` |
-| `batch-stark` | scoped | 116 | 1408 | 0 | 81 | 0 | 0 / 0 |  |
-| `binary-dft` | scoped | 1073 | 691 | 2 | 52 | 0 | 2 / 1 | pre `010`, pre `020`, post `010` |
-| `binary-field` | scoped | 21777 | 103 | 0 | 0 | 137 | 7 / 2 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050`, pre `060`, pre `070` |
-| `binary-pcs` | scoped | 506 | 874 | 0 | 10 | 0 | 2 / 1 | pre `010`, pre `020`, post `010` |
-| `blake2s` | scoped | 148 | 51 | 1 | 0 | 0 | 1 / 0 | pre `010` |
-| `blake2s-air` | scoped | 499 | 654 | 0 | 47 | 0 | 0 / 0 |  |
-| `blake3` | scoped | 2609 | 40 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
-| `blake3-air` | scoped | 240 | 953 | 0 | 117 | 0 | 0 / 0 |  |
+| `air` | scoped | 364 | 935 | 0 | 67 | 0 | 0 / 1 | post `010` |
+| `baby-bear` | extracted | 2953 | 126 | 4 | 0 | 0 | 5 / 3 | pre `020`, pre `030`, pre `040`, pre `050` |
+| `batch-stark` | scoped | 116 | 1413 | 0 | 81 | 0 | 0 / 0 |  |
+| `binary-dft` | scoped | 1073 | 694 | 2 | 52 | 0 | 2 / 1 | pre `010`, pre `020`, post `010` |
+| `binary-field` | scoped | 21777 | 106 | 0 | 0 | 137 | 7 / 2 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050`, pre `060`, pre `070` |
+| `binary-pcs` | scoped | 506 | 878 | 0 | 10 | 0 | 2 / 1 | pre `010`, pre `020`, post `010` |
+| `blake2s` | scoped | 148 | 55 | 1 | 0 | 0 | 1 / 0 | pre `010` |
+| `blake2s-air` | scoped | 499 | 658 | 0 | 47 | 0 | 0 / 0 |  |
+| `blake3` | scoped | 2609 | 44 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
+| `blake3-air` | scoped | 240 | 955 | 0 | 117 | 0 | 0 / 0 |  |
 | `blake3-crate` | stub |  | 26 | 0 | 3 |  | 0 / 0 |  |
-| `bus` | scoped | 163 | 1431 | 0 | 122 | 0 | 1 / 0 | pre `010` |
-| `challenger` | scoped | 1552 | 223 | 0 | 12 | 6 | 1 / 1 | pre `010` |
+| `bus` | scoped | 163 | 1435 | 0 | 122 | 0 | 1 / 0 | pre `010` |
+| `challenger` | scoped | 1552 | 227 | 0 | 12 | 6 | 1 / 1 | pre `010` |
 | `circle` | stub |  | 1591 | 0 | 100 |  | 0 / 0 |  |
 | `commit` | stub |  | 836 | 0 | 59 |  | 0 / 0 |  |
 | `dft` | stub |  | 992 | 0 | 67 |  | 0 / 0 |  |
 | `field` | stub |  | 382 | 7 | 25 |  | 0 / 0 |  |
 | `fri` | stub |  | 1598 | 0 | 114 |  | 0 / 0 |  |
-| `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
-| `keccak` | scoped | 1109 | 39 | 0 | 0 | 6 | 2 / 2 | pre `010`, pre `020` |
-| `keccak-air` | scoped | 624 | 771 | 0 | 48 | 0 | 0 / 0 |  |
-| `koala-bear` | extracted | 3024 | 121 | 4 | 0 | 0 | 0 / 3 |  |
-| `lookup` | scoped | 275 | 894 | 0 | 58 | 0 | 0 / 0 |  |
-| `matrix` | scoped | 1625 | 259 | 0 | 12 | 0 | 3 / 3 | pre `020`, pre `030`, post `020`, post `030` |
-| `mds` | scoped | 101 | 43 | 0 | 0 | 0 | 0 / 0 |  |
-| `merkle-tree` | scoped | 1306 | 43 | 0 | 0 | 0 | 2 / 0 | pre `010`, pre `020` |
-| `mersenne-31` | scoped | 1444 | 259 | 0 | 12 | 30 | 1 / 1 | pre `010` |
-| `monty-31` | scoped | 1581 | 327 | 0 | 13 | 29 | 1 / 1 | pre `010` |
-| `multi-stark` | scoped | 338 | 1319 | 0 | 103 | 0 | 3 / 1 | pre `010`, pre `020`, pre `030`, post `010` |
-| `multilinear-util` | scoped | 222 | 1113 | 0 | 75 | 0 | 2 / 0 | pre `010`, pre `020` |
+| `goldilocks` | scoped | 574 | 428 | 0 | 19 | 27 | 1 / 1 |  |
+| `keccak` | scoped | 1109 | 43 | 0 | 0 | 6 | 2 / 2 | pre `010`, pre `020` |
+| `keccak-air` | scoped | 624 | 773 | 0 | 48 | 0 | 0 / 0 |  |
+| `koala-bear` | extracted | 3024 | 126 | 4 | 0 | 0 | 0 / 3 |  |
+| `lookup` | scoped | 275 | 898 | 0 | 58 | 0 | 0 / 0 |  |
+| `matrix` | scoped | 1625 | 263 | 0 | 12 | 0 | 3 / 3 | pre `020`, pre `030`, post `020`, post `030` |
+| `mds` | scoped | 101 | 46 | 0 | 0 | 0 | 0 / 0 |  |
+| `merkle-tree` | scoped | 1306 | 47 | 0 | 0 | 0 | 2 / 0 | pre `010`, pre `020` |
+| `mersenne-31` | scoped | 1444 | 261 | 0 | 12 | 30 | 1 / 1 | pre `010` |
+| `monty-31` | scoped | 1581 | 329 | 0 | 13 | 29 | 1 / 1 | pre `010` |
+| `multi-stark` | scoped | 338 | 1323 | 0 | 103 | 0 | 3 / 1 | pre `010`, pre `020`, pre `030`, post `010` |
+| `multilinear-util` | scoped | 222 | 1117 | 0 | 75 | 0 | 2 / 0 | pre `010`, pre `020` |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 68 | 2 | 4 |  | 0 / 0 |  |
-| `security` | scoped | 1426 | 165 | 7 | 14 | 0 | 2 / 2 | pre `010`, pre `020`, post `020` |
-| `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
-| `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
-| `sha256-air` | scoped | 150 | 957 | 0 | 77 | 0 | 0 / 0 |  |
+| `security` | scoped | 1426 | 170 | 7 | 14 | 0 | 2 / 2 | pre `010`, pre `020`, post `020` |
+| `sha2` | scoped | 371 | 41 | 0 | 0 | 0 | 0 / 0 |  |
+| `sha256` | scoped | 208 | 42 | 0 | 0 | 1 | 1 / 0 | pre `010` |
+| `sha256-air` | scoped | 150 | 959 | 0 | 77 | 0 | 0 / 0 |  |
 | `stir` | stub |  | 695 | 0 | 40 |  | 0 / 0 |  |
-| `sumcheck` | scoped | 299 | 558 | 0 | 29 | 0 | 3 / 0 | pre `010`, pre `020`, pre `030` |
-| `symmetric` | scoped | 1078 | 62 | 1 | 0 | 4 | 4 / 2 | pre `010`, pre `020`, pre `030`, pre `040` |
+| `sumcheck` | scoped | 299 | 562 | 0 | 29 | 0 | 3 / 0 | pre `010`, pre `020`, pre `030` |
+| `symmetric` | scoped | 1078 | 66 | 1 | 0 | 4 | 4 / 2 | pre `010`, pre `020`, pre `030`, pre `040` |
 | `tiny-keccak` | scoped | 98 | 101 | 0 | 3 | 0 | 0 / 0 |  |
-| `uni-stark` | scoped | 252 | 900 | 0 | 42 | 0 | 0 / 0 |  |
-| `util` | scoped | 240 | 70 | 0 | 1 | 0 | 0 / 1 | post `010` |
+| `uni-stark` | scoped | 252 | 903 | 0 | 42 | 0 | 0 / 0 |  |
+| `util` | scoped | 240 | 74 | 0 | 1 | 0 | 0 / 1 | post `010` |
 | `whir` | stub |  | 605 | 0 | 20 |  | 0 / 0 |  |
-| `word` | scoped | 4507 | 101 | 3 | 0 | 0 | 3 / 3 | pre `010`, pre `020`, pre `030` |
+| `word` | scoped | 4507 | 106 | 3 | 0 | 0 | 3 / 3 | pre `010`, pre `020`, pre `030` |
 | `word-backend` | stub |  | 419 | 0 | 26 |  | 0 / 0 |  |
 | `zk-codes` | stub |  | 248 | 0 | 19 |  | 0 / 0 |  |
 
