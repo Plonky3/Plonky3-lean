@@ -44,7 +44,7 @@ The extracted model checks arithmetic, as a debug build does, so an overflow pan
 
   It accepts exactly the openings that walk the plan to the cap, and it never panics.
 - It reads exactly the matrices at least as tall as the cap.
-- A tallest height of the largest word next to a height 0 or 1 makes the height check panic.
+- Heights above half the word range make the verifier panic instead of returning an error.
 - Once the dimensions pass the verifier's own checks, no index, rows, siblings or cap make it panic.
 - With arity 8, heights 4 and 2 make the pinned schedule loop forever.
 - With arity 2 and a cap two layers down, a height-1 matrix next to a height-8 one is never read.
@@ -535,5 +535,19 @@ theorem mmcs.hax_reshaped.validate_heights.panics_max : type_of% @Plonky3Lean.Pr
 It does so once it holds one row per matrix, whatever the index, siblings and cap. -/
 theorem mmcs.hax_reshaped.verify_batch.panics_max : type_of% @Plonky3Lean.Proofs.MerkleTree.verify_panics_max :=
   @Plonky3Lean.Proofs.MerkleTree.verify_panics_max
+
+/-- At arity 2, the schedule panics on one matrix taller than 2^(w-1) on a w-bit word.
+
+The height check passes, but the leaf width rounds up to 2^w, which overflows the word. -/
+theorem mmcs.hax_reshaped.arity_schedule_and_proof_levels.panics_tall :
+    type_of% @Plonky3Lean.Proofs.MerkleTree.arity_panics_tall :=
+  @Plonky3Lean.Proofs.MerkleTree.arity_panics_tall
+
+/-- At arity 2, the verifier panics on one matrix taller than 2^(w-1) on a w-bit word.
+
+It does so once it holds one row, whatever the index, siblings and cap. -/
+theorem mmcs.hax_reshaped.verify_batch.panics_tall :
+    type_of% @Plonky3Lean.Proofs.MerkleTree.verify_panics_tall :=
+  @Plonky3Lean.Proofs.MerkleTree.verify_panics_tall
 
 end Plonky3Lean.Claims.P3MerkleTree

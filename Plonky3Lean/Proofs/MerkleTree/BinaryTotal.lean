@@ -2,11 +2,19 @@ module
 
 public import Plonky3Lean.Proofs.MerkleTree.Binary
 public import Plonky3Lean.Proofs.MerkleTree.Panics
+import all Init.Data.Nat.Power2.Basic
 
 @[expose] public section
 
 /-!
-# The height check, read forwards
+# The checks on the dimensions, read forwards
+
+At arity 2, every batch of power-of-two heights passes the checks on the dimensions.
+
+Above half the word range, the pinned checks panic instead of returning an error:
+
+- a tallest height of the largest word next to a height 0 or 1 overflows the ladder shift
+- one matrix taller than 2^(w-1) on a w-bit word overflows the rounding to a power of two.
 -/
 
 open CoreModels Aeneas
@@ -767,5 +775,130 @@ theorem dims_pass_binary {cap : Std.Usize} {dims : Slice p3_matrix.Dimensions}
   obtain ⟨epl, hepl⟩ := sum_loop_total h2 hlen1
   exact ⟨val, sched, pl, expected, sched1, epl, order, curr, lnpt, pos, hval, hsched, hexp, hsched1,
     hepl, horder, hcurr, hlnpt, hpos, hh⟩
+
+/-- One matrix of the given width and height. -/
+def dims1 (w h : Std.Usize) : Slice p3_matrix.Dimensions :=
+  Slice.from [{ width := w, height := h }] (by simp; scalar_tac)
+
+theorem npt_fail {x : Std.Usize} (h : 2 ^ (UScalarTy.Usize.numBits - 1) < x.val) :
+    core.num.Usize.next_power_of_two x = RustM.fail .panic := by
+  unfold core.num.Usize.next_power_of_two
+  have hw := numBits_pos
+  have hle : 2 ^ UScalarTy.Usize.numBits ≤ x.val.nextPowerOfTwo := by
+    obtain ⟨j, hj⟩ := Nat.isPowerOfTwo_nextPowerOfTwo x.val
+    have h1 := Nat.le_nextPowerOfTwo (n := x.val)
+    rw [hj] at h1 ⊢
+    have : UScalarTy.Usize.numBits - 1 < j :=
+      (Nat.pow_lt_pow_iff_right (a := 2) (by norm_num)).1 (lt_of_lt_of_le h h1)
+    exact Nat.pow_le_pow_right (by omega) (by omega)
+  rw [ite_eq_right (by omega)]
+
+/-- A single matrix of positive height passes the height check: it sits at depth 0. -/
+theorem validate_one (w h : Std.Usize) (hpos : 0 < h.val) :
+    mmcs.hax_reshaped.validate_heights (dims1 w h) = RustM.ok (core.result.Result.Ok h) := by
+  have hv : (dims1 w h).val = [{ width := w, height := h }] := by simp [dims1]
+  have h1 : (1#usize : Std.Usize).val = 1 := rfl
+  have hb : h.val ≤ Usize.max := by scalar_tac
+  have hmax : 1 ≤ Usize.max := by scalar_tac
+  obtain ⟨m, hm⟩ := max_loop_total (dims1 w h)
+  have hmh : m = h := by
+    apply UScalar.eq_of_val_eq
+    rw [max_loop_ok hm]; simp [maxHeight, dims1]
+  subst hmh
+  unfold mmcs.hax_reshaped.validate_heights
+  rw [hm, bind_ok, ite_eq_right (fun h0 => by rw [h0] at hpos; simp at hpos)]
+  obtain ⟨lg, hlg, -⟩ := log2_ceil_ok m
+  rw [hlg, bind_ok]
+  have hlen : Slice.len (dims1 w m) = 1#usize := by
+    apply UScalar.eq_of_val_eq; simp [hv]
+  obtain ⟨m1, hm1, hm1v⟩ := usize_sub_eq (x := m) (y := 1#usize) (by rw [h1]; omega)
+  obtain ⟨b0, hb0, hb0v⟩ := usize_sub_eq (x := lg) (y := lg) le_rfl
+  obtain ⟨s0, hs0, hs0v⟩ := usize_shr_eq (x := m1) (y := b0) (by rw [hb0v]; simp)
+  obtain ⟨e0, he0, he0v⟩ := usize_add_eq (x := s0) (y := 1#usize) (by
+    rw [hs0v, hb0v, hm1v, h1]; simp; omega)
+  have he0m : e0 = m := by
+    apply UScalar.eq_of_val_eq; rw [he0v, hs0v, hb0v, hm1v, h1]; simp; omega
+  obtain ⟨one, hone, honev⟩ := usize_add_eq (x := 0#usize) (y := 1#usize) (by
+    rw [h1, show (0#usize : Std.Usize).val = 0 from rfl]; omega)
+  unfold mmcs.hax_reshaped.validate_heights_loop1
+  rw [loop]
+  unfold mmcs.hax_reshaped.validate_heights_loop1.body
+  simp only [core.slice.Slice.len, rust_primitives.slice.slice_length, bind_ok]
+  rw [hlen, ite_eq_left (by decide), Lib.slice_index_eq _ _ (by simp [hv]), bind_ok]
+  simp only [hv, List.getElem_cons_zero, show (0#usize : Std.Usize).val = 0 from rfl]
+  rw [hlg, bind_ok, hb0, bind_ok, hm1, bind_ok, hs0, bind_ok, he0, bind_ok, he0m]
+  simp only [bne_self_eq_false, Bool.false_eq_true, ↓reduceIte, bind_ok]
+  rw [hone, bind_ok, bind_ok]
+  dsimp only
+  rw [loop]
+  rw [ite_eq_right (show ¬ one < 1#usize by
+    show ¬ one.val < (1#usize : Std.Usize).val; rw [honev, h1]; simp), bind_ok]
+
+/-- With arity 2, the schedule panics on one matrix taller than 2^(w-1) on a w-bit word.
+
+The height check passes, but the leaf width rounds up to 2^w, which overflows the word.
+
+```text
+    height h, 2^(w-1) < h < 2^w - 1
+    rounded up:  2^w
+``` -/
+theorem arity_panics_tall (cap w h : Std.Usize) (hlo : 2 ^ (UScalarTy.Usize.numBits - 1) < h.val)
+    (hhi : h.val < Usize.max) :
+    mmcs.hax_reshaped.arity_schedule_and_proof_levels 2#usize cap (dims1 w h) = RustM.fail .panic := by
+  have h1 : (1#usize : Std.Usize).val = 1 := rfl
+  have hp : 1 ≤ 2 ^ (UScalarTy.Usize.numBits - 1) := Nat.one_le_two_pow
+  have hval := validate_one w h (lt_of_le_of_lt (Nat.zero_le _) hlo)
+  obtain ⟨order, horder⟩ := tallest_first_total (dims1 w h)
+  -- The padded leaf width fits, since the height is below the largest word.
+  obtain ⟨curr, hcurr⟩ : ∃ curr, p3_merkle_tree.merkle_tree.padded_len h 2#usize = RustM.ok curr := by
+    unfold p3_merkle_tree.merkle_tree.padded_len
+    rw [ite_eq_right (show ¬ h ≤ 1#usize by show ¬ h.val ≤ (1#usize : Std.Usize).val; rw [h1]; omega),
+      ite_eq_left (show 2#usize ≤ h by show (2#usize : Std.Usize).val ≤ h.val; simp; omega)]
+    unfold core.num.Usize.div_ceil
+    obtain ⟨d, hd, hdv⟩ := usize_div_eq (x := h) (y := 2#usize) (by simp)
+    obtain ⟨r, hr, hrv⟩ := usize_rem_eq (x := h) (y := 2#usize) (by simp)
+    rw [hd, bind_ok, hr, bind_ok]
+    have hdv' : d.val = h.val / 2 := by rw [hdv]; simp
+    have hrv' : r.val = h.val % 2 := by rw [hrv]; simp
+    split
+    · rename_i hodd
+      have hodd' : 0 < r.val := hodd
+      obtain ⟨d1, hd1, hd1v⟩ := usize_succ_eq (i := d) (by omega)
+      rw [hd1, bind_ok]
+      obtain ⟨p, hp, -⟩ := usize_mul_eq (x := d1) (y := 2#usize) (by rw [hd1v, hdv']; simp; omega)
+      exact ⟨p, hp⟩
+    · obtain ⟨p, hp, -⟩ := usize_mul_eq (x := d) (y := 2#usize) (by rw [hdv']; simp; omega)
+      exact ⟨p, by rw [bind_ok]; exact hp⟩
+  -- The leaf width rounds up to the full word size.
+  unfold mmcs.hax_reshaped.arity_schedule_and_proof_levels
+  rw [hval, bind_ok, branch_ok_eq, bind_ok]
+  simp only
+  rw [horder, bind_ok, hcurr, bind_ok, npt_fail hlo, bind_fail]
+
+
+variable {P PW F W H C : Type} {DIGEST_ELEMS : Std.Usize} in
+/-- At arity 2, the verifier panics on one matrix taller than 2^(w-1) on a w-bit word.
+
+It does so once it holds one row, whatever the index, siblings and cap. -/
+theorem verify_panics_tall (cl : core.clone.Clone F) (cp : core.marker.Copy W)
+    (dfInst : core.default.Default W) (eqInst : core.cmp.PartialEq W W)
+    (hInst : p3_symmetric.hasher.CryptographicHasher H F (Std.Array W DIGEST_ELEMS))
+    (cInst : p3_symmetric.compression.PseudoCompressionFunction C (Std.Array W DIGEST_ELEMS) 2#usize)
+    (mt : mmcs.MerkleTreeMmcs P PW H C 2#usize DIGEST_ELEMS)
+    (commit : p3_symmetric.hash.MerkleCap F (Std.Array W DIGEST_ELEMS))
+    (w h : Std.Usize) (hlo : 2 ^ (UScalarTy.Usize.numBits - 1) < h.val) (hhi : h.val < Usize.max)
+    (index : Std.Usize) (opened : Slice (alloc.vec.Vec F)) (hlen : opened.val.length = 1)
+    (proof : Slice (Std.Array W DIGEST_ELEMS)) :
+    mmcs.hax_reshaped.verify_batch cl cp dfInst eqInst hInst cInst mt commit (dims1 w h) index
+      opened proof = RustM.fail .panic := by
+  unfold mmcs.hax_reshaped.verify_batch
+  have hl : Slice.len (dims1 w h) = Slice.len opened := by
+    apply UScalar.eq_of_val_eq; simp [dims1, hlen]
+  simp only [core.slice.Slice.len, rust_primitives.slice.slice_length, bind_ok, hl,
+    bne_self_eq_false, Bool.false_eq_true, ↓reduceIte]
+  rw [validate_one w h (lt_of_le_of_lt (Nat.zero_le _) hlo), bind_ok, branch_ok_eq, bind_ok]
+  simp only
+  unfold mmcs.hax_reshaped.check_cap_size
+  rw [arity_panics_tall mt.cap_height w h hlo hhi, bind_fail, bind_fail]
 
 end Plonky3Lean.Proofs.MerkleTree
