@@ -1,6 +1,6 @@
 module
 
-public import Plonky3Lean.Proofs.Word.Validate
+public import Plonky3Lean.Proofs.Word.Lower
 
 @[expose] public section
 
@@ -204,5 +204,71 @@ theorem Composition.interface.panics {W : Type} (inst : word.Word W) (comp : com
     (hlen : pub.val.length < en.val) :
     component.Composition.interface inst comp pub k i = .fail .panic :=
   interface_panics inst comp pub k i st en hr hlen
+
+/-- Lowering a laid-out composition of well-formed gadgets never fails and never panics.
+
+Each gadget must satisfy two conditions:
+
+- Its interface covers its public segment.
+- Every term of its body addresses a word inside its segment.
+
+The lowered system has the composed segment lengths.
+
+Each family lists the relations of call 0, instance 0, then instance 1, and so on, then call 1.
+
+Each copied relation reads slot $s$ of instance $i$ of call $k$ at address $b_k + i w_k + s$:
+
+- $b_k$ is the start of call $k$'s block.
+- $w_k$ is the width of one instance. -/
+theorem Composition.lower.eq {W : Type} (inst : word.Word W) (comp : component.Composition W)
+    (hl : LaidOut comp) (hwf : CallsWF comp) :
+    ∃ s, component.Composition.lower inst comp = .ok (.Ok s) ∧ LowerOf comp s :=
+  lower_eq inst comp hl (fun _ hk => bodyFits_of_wf hwf hk)
+
+/-- A 32-bit composition built from gadgets the constructors accepted lowers without failing or panicking.
+
+The gadgets' shifts must not panic, which every shift the shift constructor builds satisfies.
+
+The flat verifier then accepts exactly when two conditions hold:
+
+- Both segments have the composed lengths.
+- Every instance of every call satisfies its gadget on its own block of words. -/
+theorem Composition.lower.sound32 (callsV : CoreModels.alloc.vec.Vec (component.ComponentCall word.Word32))
+    {comp : component.Composition word.Word32}
+    (hnew : component.Composition.new I32w callsV = .ok (.Ok comp))
+    (hwf : ∀ c ∈ (vecSlice callsV).val,
+      slotsP c = c.component.body.public_len.val ∧ validateSpec c.component.body = .Ok ())
+    (hv : ∀ c ∈ (vecSlice callsV).val, SysValid M32 c.component.body) :
+    ∃ s, component.Composition.lower I32w comp = .ok (.Ok s) ∧
+      ∀ pub wit : Slice word.Word32,
+        (system.ConstraintSystem.verify I32w s pub wit = .ok (.Ok ()) ↔
+          pub.val.length = comp.public_len.val ∧ wit.val.length = comp.witness_len.val ∧
+          ∀ k (hk : k < (callsOf comp).length), ∀ i < ((callsOf comp)[k]).instances.val,
+            system.ConstraintSystem.verify I32w ((callsOf comp)[k]).component.body
+              (block comp k i .Public pub) (block comp k i .Witness wit) = .ok (.Ok ())) :=
+  lower_sound_of_new indexFree32 callsV hnew hwf hv
+
+/-- A 64-bit composition built from gadgets the constructors accepted lowers without failing or panicking.
+
+The gadgets' shifts must not panic, which every shift the shift constructor builds satisfies.
+
+The flat verifier then accepts exactly when two conditions hold:
+
+- Both segments have the composed lengths.
+- Every instance of every call satisfies its gadget on its own block of words. -/
+theorem Composition.lower.sound64 (callsV : CoreModels.alloc.vec.Vec (component.ComponentCall word.Word64))
+    {comp : component.Composition word.Word64}
+    (hnew : component.Composition.new I64w callsV = .ok (.Ok comp))
+    (hwf : ∀ c ∈ (vecSlice callsV).val,
+      slotsP c = c.component.body.public_len.val ∧ validateSpec c.component.body = .Ok ())
+    (hv : ∀ c ∈ (vecSlice callsV).val, SysValid M64 c.component.body) :
+    ∃ s, component.Composition.lower I64w comp = .ok (.Ok s) ∧
+      ∀ pub wit : Slice word.Word64,
+        (system.ConstraintSystem.verify I64w s pub wit = .ok (.Ok ()) ↔
+          pub.val.length = comp.public_len.val ∧ wit.val.length = comp.witness_len.val ∧
+          ∀ k (hk : k < (callsOf comp).length), ∀ i < ((callsOf comp)[k]).instances.val,
+            system.ConstraintSystem.verify I64w ((callsOf comp)[k]).component.body
+              (block comp k i .Public pub) (block comp k i .Witness wit) = .ok (.Ok ())) :=
+  lower_sound_of_new indexFree64 callsV hnew hwf hv
 
 end Plonky3Lean.Claims.P3Word

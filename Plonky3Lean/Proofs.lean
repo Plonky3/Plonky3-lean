@@ -56,10 +56,12 @@ public import Plonky3Lean.Proofs.WordBackend.Transpose
 public import Plonky3Lean.Proofs.WordBackend.Columns
 public import Plonky3Lean.Proofs.WordBackend.Accept
 public import Plonky3Lean.Proofs.WordBackend.Code
+public import Plonky3Lean.Proofs.WordBackend.Tree
 public import Plonky3Lean.Proofs.Word.Layout
 public import Plonky3Lean.Proofs.Word.Composition
 public import Plonky3Lean.Proofs.Word.Layout2
 public import Plonky3Lean.Proofs.Word.Validate
+public import Plonky3Lean.Proofs.Word.Lower
 public import Plonky3Lean.Proofs.Hash.Blake2s
 public import Plonky3Lean.Proofs.Hash.Blake3.Spec
 public import Plonky3Lean.Proofs.Hash.Blake3.Vectors

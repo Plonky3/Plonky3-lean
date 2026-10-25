@@ -3,6 +3,7 @@ module
 public import Plonky3Lean.Proofs.WordBackend.Accept
 public import Plonky3Lean.Proofs.WordBackend.Transpose
 public import Plonky3Lean.Proofs.WordBackend.Code
+public import Plonky3Lean.Proofs.WordBackend.Tree
 
 @[expose] public section
 
@@ -244,5 +245,63 @@ theorem KeyCode.injective {W : Type} (inst : word.Word W) {op₁ op₂ : system.
   subst hc₁ hc₂
   exact ⟨by simpa [RustM.ok.injEq] using op1.symm.trans op2,
     by simpa [RustM.ok.injEq] using sh1.symm.trans sh2⟩
+
+/-! ## The product trees -/
+
+/-- A product tree of depth $d$ has $d + 1$ layers, so it is never empty. -/
+theorem product_layers.length {F : Type _} [Field F] (leaves : List F) (d : ℕ) :
+    (product_layers leaves d).length = d + 1 :=
+  product_layers_length leaves d
+
+/-- Each layer above the leaves multiplies the adjacent pairs of the layer below it.
+
+An unpaired last entry is dropped. -/
+theorem product_layers.children {F : Type _} [Field F] (leaves : List F) (d : ℕ) {t : ℕ} (h : t < d)
+    (ht : t < (product_layers leaves d).length) (ht' : t + 1 < (product_layers leaves d).length) :
+    ((product_layers leaves d)[t]).length = ((product_layers leaves d)[t + 1]).length / 2 ∧
+      ∀ r < ((product_layers leaves d)[t]).length,
+        ((product_layers leaves d)[t]).getD r 0 =
+          ((product_layers leaves d)[t + 1]).getD (2 * r) 0 *
+            ((product_layers leaves d)[t + 1]).getD (2 * r + 1) 0 := by
+  rw [product_layers_children leaves d h]
+  exact ⟨layer_above_length _, fun r hr => layer_above_getD _ (by rwa [layer_above_length] at hr)⟩
+
+/-- The layer at position $t$ of a tree of depth $d$ multiplies blocks of $2^e$ leaves, with $e = d - t$.
+
+- It has $\lfloor n / 2^e \rfloor$ entries for $n$ leaves.
+- Entry $r$ is the product of leaves $r 2^e$ to $r 2^e + 2^e - 1$.
+
+So the root multiplies blocks of $2^d$ leaves, and leaves past the last full block are ignored. -/
+theorem product_layers.blocks {F : Type _} [Field F] (leaves : List F) (d t : ℕ)
+    (ht : t < (product_layers leaves d).length) :
+    ((product_layers leaves d)[t]).length = leaves.length / 2 ^ (d - t) ∧
+      ∀ r < leaves.length / 2 ^ (d - t), ((product_layers leaves d)[t]).getD r 0 =
+        ∏ s ∈ range (2 ^ (d - t)), leaves.getD (r * 2 ^ (d - t) + s) 0 := by
+  rw [product_layers_getElem]
+  exact ⟨up_length _ _, fun r hr => up_getD _ _ hr⟩
+
+/-- The factor tree over words of $2^k$ bits has one root entry per row, and entry $r$ is $g^{a_r b_r}$. -/
+theorem product_layers.factor_root {F : Type _} [Field F] (g : F) (k : ℕ) {left right : List ℕ}
+    (hlen : left.length = right.length) (hl : ∀ a ∈ left, a < 2 ^ 2 ^ k)
+    (hr : ∀ b ∈ right, b < 2 ^ 2 ^ k) :
+    let root := (product_layers (factor_leaves left right (2 ^ k) (generator_squarings g (2 * 2 ^ k)))
+      (Tree.depth k .Factor))[0]'(by rw [product_layers_length]; omega)
+    root.length = left.length ∧
+      ∀ r (h : r < left.length), root.getD r 0 = g ^ (left[r] * right[r]'(hlen ▸ h)) := by
+  simp only [product_layers_root]
+  exact Plonky3Lean.Proofs.WordBackend.factor_root g k hlen hl hr
+
+/-- The result tree over words of $2^k$ bits has one root entry per row.
+
+Entry $r$ is $g^{lo_r + 2^w hi_r}$, with $w = 2^k$. -/
+theorem product_layers.result_root {F : Type _} [Field F] (g : F) (k : ℕ) {low high : List ℕ}
+    (hlen : low.length = high.length) (hl : ∀ a ∈ low, a < 2 ^ 2 ^ k)
+    (hh : ∀ b ∈ high, b < 2 ^ 2 ^ k) :
+    let root := (product_layers (result_leaves low high (2 ^ k) (generator_squarings g (2 * 2 ^ k)))
+      (Tree.depth k .Result))[0]'(by rw [product_layers_length]; omega)
+    root.length = low.length ∧
+      ∀ r (h : r < low.length), root.getD r 0 = g ^ (low[r] + 2 ^ 2 ^ k * high[r]'(hlen ▸ h)) := by
+  simp only [product_layers_root]
+  exact Plonky3Lean.Proofs.WordBackend.result_root g k hlen hl hh
 
 end Plonky3Lean.Claims.P3WordBackend
