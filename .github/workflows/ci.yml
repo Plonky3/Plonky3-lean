@@ -60,7 +60,7 @@ jobs:
           echo "avx512=true" >> "$GITHUB_OUTPUT"
       - name: Check the differential tests are compiled in
         if: steps.cpu.outputs.avx512 == 'true'
-        run: cargo test --locked --release --manifest-path arch/Cargo.toml --test avx512 -- --list | grep -q ': test$'
+        run: cargo test --locked --release --manifest-path arch/Cargo.toml --test avx512 -- --list | grep -q -- ' test$'
       - name: Test the AVX-512 shims against the intrinsics
         if: steps.cpu.outputs.avx512 == 'true'
         run: |
