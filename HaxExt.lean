@@ -340,6 +340,26 @@ Generated code that needs the value calls this exposed copy instead. -/
 def core.num.Usize.saturating_sub_exposed (x y : Std.Usize) : RustM Std.Usize :=
   ok ⟨BitVec.ofNat _ (x.val - y.val)⟩
 
+/-- 64-bit subtraction clamped at 0, exposed as for the word. -/
+def core.num.U64.saturating_sub_exposed (x y : Std.U64) : RustM Std.U64 :=
+  ok ⟨BitVec.ofNat _ (x.val - y.val)⟩
+
+/-- 128-bit subtraction clamped at 0, exposed as for the word. -/
+def core.num.U128.saturating_sub_exposed (x y : Std.U128) : RustM Std.U128 :=
+  ok ⟨BitVec.ofNat _ (x.val - y.val)⟩
+
+/-- 32-bit addition clamped at 2^32 - 1, exposed as for the word. -/
+def core.num.U32.saturating_add_exposed (x y : Std.U32) : RustM Std.U32 :=
+  ok ⟨BitVec.ofNat _ (min (x.val + y.val) (2 ^ 32 - 1))⟩
+
+/-- 64-bit addition clamped at 2^64 - 1, exposed as for the word. -/
+def core.num.U64.saturating_add_exposed (x y : Std.U64) : RustM Std.U64 :=
+  ok ⟨BitVec.ofNat _ (min (x.val + y.val) (2 ^ 64 - 1))⟩
+
+/-- 64-bit multiplication clamped at 2^64 - 1, exposed as for the word. -/
+def core.num.U64.saturating_mul_exposed (x y : Std.U64) : RustM Std.U64 :=
+  ok ⟨BitVec.ofNat _ (min (x.val * y.val) (2 ^ 64 - 1))⟩
+
 /-- Whether some item of a slice iterator satisfies a predicate.
 
 It stops at the first item that does, and returns the iterator past it. -/

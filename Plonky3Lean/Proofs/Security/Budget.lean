@@ -1,7 +1,6 @@
 module
 
 public import Plonky3Lean.Proofs.Security.Fixed
-import all Aeneas.Std.Scalar.SaturatingOps
 
 @[expose] public section
 
@@ -75,34 +74,24 @@ def queryM (fb lb q pow cap : ℕ) : ℕ := min (satAdd64 (satMul64 q (bpq lb fb
 
 @[step]
 theorem sat_add32_spec (x y : Std.U32) :
-    CoreModels.core.num.U32.saturating_add x y ⦃ z => z.val = satAdd32 x.val y.val ⦄ := by
-  simp only [CoreModels.core.num.U32.saturating_add,
-    CoreModels.rust_primitives.arithmetic.saturating_add_u32, WP.spec_ok, UScalar.saturating_add]
-  show (BitVec.ofNat 32 (min (UScalar.max .U32) (x.val + y.val))).toNat = _
-  rw [BitVec.toNat_ofNat]
-  simp only [UScalar.max, UScalarTy.U32_numBits_eq, satAdd32]
-  rw [Nat.mod_eq_of_lt (by omega)]; omega
+    core.num.U32.saturating_add_exposed x y ⦃ z => z.val = satAdd32 x.val y.val ⦄ := by
+  simp only [core.num.U32.saturating_add_exposed, WP.spec_ok]
+  show (BitVec.ofNat 32 (min (x.val + y.val) (2 ^ 32 - 1))).toNat = _
+  rw [BitVec.toNat_ofNat, satAdd32, Nat.mod_eq_of_lt (by omega)]
 
 @[step]
 theorem sat_add64_spec (x y : Std.U64) :
-    CoreModels.core.num.U64.saturating_add x y ⦃ z => z.val = satAdd64 x.val y.val ⦄ := by
-  simp only [CoreModels.core.num.U64.saturating_add,
-    CoreModels.rust_primitives.arithmetic.saturating_add_u64, WP.spec_ok, UScalar.saturating_add]
-  show (BitVec.ofNat 64 (min (UScalar.max .U64) (x.val + y.val))).toNat = _
-  rw [BitVec.toNat_ofNat]
-  simp only [UScalar.max, UScalarTy.U64_numBits_eq, satAdd64]
-  rw [Nat.mod_eq_of_lt (by omega)]; omega
+    core.num.U64.saturating_add_exposed x y ⦃ z => z.val = satAdd64 x.val y.val ⦄ := by
+  simp only [core.num.U64.saturating_add_exposed, WP.spec_ok]
+  show (BitVec.ofNat 64 (min (x.val + y.val) (2 ^ 64 - 1))).toNat = _
+  rw [BitVec.toNat_ofNat, satAdd64, Nat.mod_eq_of_lt (by omega)]
 
 @[step]
 theorem sat_mul64_spec (x y : Std.U64) :
-    CoreModels.core.num.U64.saturating_mul x y ⦃ z => z.val = satMul64 x.val y.val ⦄ := by
-  simp only [CoreModels.core.num.U64.saturating_mul,
-    CoreModels.rust_primitives.arithmetic.saturating_mul_u64, WP.spec_ok,
-    CoreModels.usaturating_mul]
-  show (BitVec.ofNat 64 (min (UScalar.max .U64) (x.val * y.val))).toNat = _
-  rw [BitVec.toNat_ofNat]
-  simp only [UScalar.max, UScalarTy.U64_numBits_eq, satMul64]
-  rw [Nat.mod_eq_of_lt (by omega)]; omega
+    core.num.U64.saturating_mul_exposed x y ⦃ z => z.val = satMul64 x.val y.val ⦄ := by
+  simp only [core.num.U64.saturating_mul_exposed, WP.spec_ok]
+  show (BitVec.ofNat 64 (min (x.val * y.val) (2 ^ 64 - 1))).toNat = _
+  rw [BitVec.toNat_ofNat, satMul64, Nat.mod_eq_of_lt (by omega)]
 
 @[step]
 theorem min_spec (a b : Std.U64) : budget.min a b ⦃ y => y.val = min a.val b.val ⦄ := by

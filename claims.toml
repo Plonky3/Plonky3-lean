@@ -3977,6 +3977,10 @@ name   = "Plonky3Lean.Claims.P3Security.binary.field_security_bits.spec"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.P3Security.binary.max_security_bits.spec"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.P3Security.budget.report.SecurityReport.security_level.spec"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 

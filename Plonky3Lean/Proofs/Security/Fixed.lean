@@ -3,7 +3,6 @@ module
 public import P3Security
 public import Plonky3Lean.Lib.RustM
 public import Plonky3Lean.Proofs.Security.FixedLog
-import all Aeneas.Std.Scalar.SaturatingOps
 
 @[expose] public section
 
@@ -284,12 +283,11 @@ theorem ceil_log2_14917 :
 /-- Saturating subtraction on 64 bits is truncated subtraction. -/
 @[step]
 theorem u64_saturating_sub_spec (x y : Std.U64) :
-    CoreModels.core.num.U64.saturating_sub x y ⦃ z => z.val = x.val - y.val ⦄ := by
-  simp only [CoreModels.core.num.U64.saturating_sub,
-    CoreModels.rust_primitives.arithmetic.saturating_sub_u64, WP.spec_ok, UScalar.saturating_sub]
-  show (BitVec.ofNat 64 (max 0 (x.val - y.val))).toNat = _
+    core.num.U64.saturating_sub_exposed x y ⦃ z => z.val = x.val - y.val ⦄ := by
+  simp only [core.num.U64.saturating_sub_exposed, WP.spec_ok]
+  show (BitVec.ofNat 64 (x.val - y.val)).toNat = _
   have := x.hBounds
-  rw [BitVec.toNat_ofNat]; simp only [Nat.zero_max]
+  rw [BitVec.toNat_ofNat]
   exact Nat.mod_eq_of_lt (by simp at this ⊢; omega)
 
 /-- The bits per query never panic, and equal the model on the naturals. -/

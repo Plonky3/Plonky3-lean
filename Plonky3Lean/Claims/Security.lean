@@ -185,6 +185,24 @@ theorem binary.field_security_bits.spec (reg : binary.BinaryPcsRegime)
         2 ^ reg.challenge_field_bits.val) ⦄ :=
   Binary.field_security_bits_spec reg h hr hn
 
+/-- The binary PCS's security ceiling never panics on an accepted schedule.
+
+It needs n + r - f below the word width, which an accepted schedule gives on a 64-bit target.
+
+It keeps one bit for the queries, unless the queries cover all 2^(n + r - f) cosets of the first batch. -/
+theorem binary.max_security_bits.spec (reg : binary.BinaryPcsRegime)
+    (h : reg.num_variables.val + reg.log_inv_rate.val < 64) (hr : reg.log_inv_rate.val ≠ 0)
+    (hn : reg.num_variables.val ≠ 0)
+    (hf : reg.log_folding_factor.val ≤ reg.num_variables.val + reg.log_inv_rate.val)
+    (hw : reg.num_variables.val + reg.log_inv_rate.val - reg.log_folding_factor.val <
+      UScalarTy.Usize.numBits) :
+    binary.BinaryPcsRegime.max_security_bits reg ⦃ y =>
+      y.val = reg.challenge_field_bits.val - (Nat.log2 (Binary.numeratorSpec reg.num_variables.val
+        reg.log_inv_rate.val - 1) + 1) -
+        if 2 ^ (reg.num_variables.val + reg.log_inv_rate.val - reg.log_folding_factor.val) ≤
+          reg.num_queries.val then 0 else 1 ⦄ :=
+  Binary.max_security_bits_accepted reg h hr hn hf hw
+
 /-! ## The floating-point bounds, over the reals -/
 
 /-- **The DEEP round charges the list size once.**

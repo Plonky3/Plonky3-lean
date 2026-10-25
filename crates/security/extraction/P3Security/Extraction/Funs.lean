@@ -120,7 +120,8 @@ def binary.BinaryPcsRegime.field_security_bits
   let i1 ← core.num.U128.leading_zeros i
   let i2 ← core.num.U128.BITS - i1
   let i3 ← lift (UScalar.cast .Usize i2)
-  core.num.Usize.saturating_sub self.challenge_field_bits i3
+  -- PATCHED: the exposed model of `saturating_sub` (was `core.num.Usize.saturating_sub`)
+  core.num.Usize.saturating_sub_exposed self.challenge_field_bits i3
 
 /-- [p3_security::binary::{p3_security::binary::BinaryPcsRegime}::max_security_bits]:
     Source: 'security/src/binary.rs', lines 129:4-132:5
@@ -132,7 +133,8 @@ def binary.BinaryPcsRegime.max_security_bits
   let i1 ← if b
              then ok 0#usize
              else ok 1#usize
-  core.num.Usize.saturating_sub i i1
+  -- PATCHED: the exposed model of `saturating_sub` (was `core.num.Usize.saturating_sub`)
+  core.num.Usize.saturating_sub_exposed i i1
 
 /-- [p3_security::fixed::FRACTIONAL_BITS]
     Source: 'security/src/fixed.rs', lines 16:0-16:36
@@ -247,7 +249,8 @@ def fixed.bits_per_query
         let i2 ← fixed.ceil_log2 numerator
         let i3 ← fixed.floor_log2 field_bits
         let correction ← i2 - i3
-        core.num.U64.saturating_sub uncorrected correction
+        -- PATCHED: the exposed model of `saturating_sub` (was `core.num.U64.saturating_sub`)
+        core.num.U64.saturating_sub_exposed uncorrected correction
 
 /-- [p3_security::budget::shape::{p3_security::budget::shape::InstanceShape}::cap]:
     Source: 'security/src/budget/shape.rs', lines 62:4-72:5
@@ -374,7 +377,8 @@ def budget.out_of_domain_round
       else
         let i8 ← lift (UScalar.cast .U64 size)
         let error ← fixed.ceil_log2 i8
-        let i9 ← core.num.U64.saturating_sub «instance».field_bits error
+        -- PATCHED: the exposed model of `saturating_sub` (was `core.num.U64.saturating_sub`)
+        let i9 ← core.num.U64.saturating_sub_exposed «instance».field_bits error
         let i10 ← fixed.from_bits pow_bits
         let bits ← i9 + i10
         let i11 ← budget.min bits cap
@@ -443,7 +447,8 @@ def budget.folding_round
     budget.report.SecurityTerm.new budget.report.FOLDING_LABEL 0#u64
   | core.option.Option.Some _ =>
     let i ←
-      core.num.U32.saturating_add «instance».log_max_height params.log_blowup
+      -- PATCHED: the exposed model of `saturating_add` (was `core.num.U32.saturating_add`)
+      core.num.U32.saturating_add_exposed «instance».log_max_height params.log_blowup
     budget.round budget.report.FOLDING_LABEL «instance» o i
       params.folding_pow_bits cap
 
@@ -496,7 +501,8 @@ def budget.security_report
     match air.num_deep_terms with
     | core.option.Option.None =>
       let i1 ←
-        core.num.U32.saturating_add «instance».log_max_height
+        -- PATCHED: the exposed model of `saturating_add` (was `core.num.U32.saturating_add`)
+        core.num.U32.saturating_add_exposed «instance».log_max_height
           params.log_blowup
       let deep_composition ←
         budget.round budget.report.DEEP_COMPOSITION_LABEL «instance»
@@ -504,9 +510,11 @@ def budget.security_report
       let folding ← budget.folding_round params «instance» cap
       let i2 ← lift (UScalar.cast .U64 params.num_queries)
       let i3 ← fixed.bits_per_query params.log_blowup «instance».field_bits
-      let i4 ← core.num.U64.saturating_mul i2 i3
+      -- PATCHED: the exposed model of `saturating_mul` (was `core.num.U64.saturating_mul`)
+      let i4 ← core.num.U64.saturating_mul_exposed i2 i3
       let i5 ← fixed.from_bits params.query_pow_bits
-      let query_bits ← core.num.U64.saturating_add i4 i5
+      -- PATCHED: the exposed model of `saturating_add` (was `core.num.U64.saturating_add`)
+      let query_bits ← core.num.U64.saturating_add_exposed i4 i5
       let i6 ← budget.min query_bits cap
       let query ← budget.report.SecurityTerm.new budget.report.QUERY_LABEL i6
       let st ←
@@ -519,7 +527,8 @@ def budget.security_report
     | core.option.Option.Some n =>
       let i1 ← lift (UScalar.cast .U64 n)
       let i2 ←
-        core.num.U32.saturating_add «instance».log_max_height
+        -- PATCHED: the exposed model of `saturating_add` (was `core.num.U32.saturating_add`)
+        core.num.U32.saturating_add_exposed «instance».log_max_height
           params.log_blowup
       let deep_composition ←
         budget.round budget.report.DEEP_COMPOSITION_LABEL «instance»
@@ -527,9 +536,11 @@ def budget.security_report
       let folding ← budget.folding_round params «instance» cap
       let i3 ← lift (UScalar.cast .U64 params.num_queries)
       let i4 ← fixed.bits_per_query params.log_blowup «instance».field_bits
-      let i5 ← core.num.U64.saturating_mul i3 i4
+      -- PATCHED: the exposed model of `saturating_mul` (was `core.num.U64.saturating_mul`)
+      let i5 ← core.num.U64.saturating_mul_exposed i3 i4
       let i6 ← fixed.from_bits params.query_pow_bits
-      let query_bits ← core.num.U64.saturating_add i5 i6
+      -- PATCHED: the exposed model of `saturating_add` (was `core.num.U64.saturating_add`)
+      let query_bits ← core.num.U64.saturating_add_exposed i5 i6
       let i7 ← budget.min query_bits cap
       let query ← budget.report.SecurityTerm.new budget.report.QUERY_LABEL i7
       let st ←
@@ -1247,7 +1258,8 @@ def word.WordIntegerMulSecurityModel.tree_numerator
   let rows ← lift (UScalar.cast .U128 self.row_variables)
   let depth1 ← lift (UScalar.cast .U128 depth)
   let i ← rows * depth1
-  let i1 ← core.num.U128.saturating_sub depth1 1#u128
+  -- PATCHED: the exposed model of `saturating_sub` (was `core.num.U128.saturating_sub`)
+  let i1 ← core.num.U128.saturating_sub_exposed depth1 1#u128
   let i2 ← depth1 * i1
   let i3 ← i2 / 2#u128
   let i4 ← i + i3

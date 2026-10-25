@@ -1,7 +1,7 @@
 module
 
 public import Plonky3Lean.Proofs.Security.Budget
-import all Aeneas.Std.Scalar.SaturatingOps
+public import Plonky3Lean.Lib.Range
 
 @[expose] public section
 
@@ -88,13 +88,11 @@ theorem leading_zeros128_spec (x : Std.U128) (hx : x.val ≠ 0) :
 
 @[step]
 theorem usize_saturating_sub_spec (x y : Std.Usize) :
-    CoreModels.core.num.Usize.saturating_sub x y ⦃ z => z.val = x.val - y.val ⦄ := by
-  simp only [CoreModels.core.num.Usize.saturating_sub,
-    CoreModels.rust_primitives.arithmetic.saturating_sub_usize, WP.spec_ok,
-    UScalar.saturating_sub]
-  show (BitVec.ofNat _ (max 0 (x.val - y.val))).toNat = _
+    core.num.Usize.saturating_sub_exposed x y ⦃ z => z.val = x.val - y.val ⦄ := by
+  simp only [core.num.Usize.saturating_sub_exposed, WP.spec_ok]
+  show (BitVec.ofNat _ (x.val - y.val)).toNat = _
   have := x.hBounds
-  rw [BitVec.toNat_ofNat]; simp only [Nat.zero_max]
+  rw [BitVec.toNat_ofNat]
   exact Nat.mod_eq_of_lt (by omega)
 
 theorem numeratorSpec_ge (n r : ℕ) (hn : n ≠ 0) (hr : r ≠ 0) : 7 ≤ numeratorSpec n r := by
@@ -145,5 +143,63 @@ theorem field_security_bits_spec (reg : binary.BinaryPcsRegime)
     calc N * 2 ^ y.val ≤ 2 ^ (Nat.log2 (N - 1) + 1) * 2 ^ y.val :=
           Nat.mul_le_mul_right _ (by omega)
       _ = 2 ^ reg.challenge_field_bits.val := by rw [← pow_add]; congr 1; omega
+
+/-- Whether the queries are exhaustive never panics once the folding factor fits and the shift fits a word.
+
+It says whether 2^(n + r - f) queries are asked, the cosets of the first batch. -/
+theorem queries_are_exhaustive_spec (reg : binary.BinaryPcsRegime)
+    (hnr : reg.num_variables.val + reg.log_inv_rate.val ≤ Usize.max)
+    (hf : reg.log_folding_factor.val ≤ reg.num_variables.val + reg.log_inv_rate.val)
+    (hw : reg.num_variables.val + reg.log_inv_rate.val - reg.log_folding_factor.val <
+      UScalarTy.Usize.numBits) :
+    binary.BinaryPcsRegime.queries_are_exhaustive reg ⦃ b =>
+      b = decide (2 ^ (reg.num_variables.val + reg.log_inv_rate.val - reg.log_folding_factor.val) ≤
+        reg.num_queries.val) ⦄ := by
+  unfold binary.BinaryPcsRegime.queries_are_exhaustive
+  step*
+  have hv : i2.val = 2 ^ (reg.num_variables.val + reg.log_inv_rate.val -
+      reg.log_folding_factor.val) := by
+    rw [i2_post, Nat.one_shiftLeft, i1_post, i_post]
+    exact Nat.mod_eq_of_lt (by
+      rw [Usize.size, Usize.numBits_def]
+      exact Nat.pow_lt_pow_right (by norm_num) hw)
+  simp only [ge_iff_le, UScalar.le_equiv, hv]
+
+/-- The security ceiling keeps one bit for the queries, unless they are exhaustive.
+
+It never panics once the field security bits and the exhaustiveness check return. -/
+theorem max_security_bits_spec (reg : binary.BinaryPcsRegime) (fsb : Std.Usize) (b : Bool)
+    (hf : binary.BinaryPcsRegime.field_security_bits reg = .ok fsb)
+    (hb : binary.BinaryPcsRegime.queries_are_exhaustive reg = .ok b) :
+    binary.BinaryPcsRegime.max_security_bits reg ⦃ y =>
+      y.val = fsb.val - if b then 0 else 1 ⦄ := by
+  unfold binary.BinaryPcsRegime.max_security_bits
+  rw [hf, hb]
+  cases b <;> simp only [bind_ok, Bool.false_eq_true, ↓reduceIte] <;>
+    exact usize_saturating_sub_spec fsb _
+
+/-- On an accepted schedule whose first-batch exponent fits a word, the ceiling never panics.
+
+It is the field security bits less one, unless the queries are exhaustive. -/
+theorem max_security_bits_accepted (reg : binary.BinaryPcsRegime)
+    (h : reg.num_variables.val + reg.log_inv_rate.val < 64) (hr : reg.log_inv_rate.val ≠ 0)
+    (hn : reg.num_variables.val ≠ 0)
+    (hf : reg.log_folding_factor.val ≤ reg.num_variables.val + reg.log_inv_rate.val)
+    (hw : reg.num_variables.val + reg.log_inv_rate.val - reg.log_folding_factor.val <
+      UScalarTy.Usize.numBits) :
+    binary.BinaryPcsRegime.max_security_bits reg ⦃ y =>
+      y.val = reg.challenge_field_bits.val - (Nat.log2 (numeratorSpec reg.num_variables.val
+        reg.log_inv_rate.val - 1) + 1) -
+        if 2 ^ (reg.num_variables.val + reg.log_inv_rate.val - reg.log_folding_factor.val) ≤
+          reg.num_queries.val then 0 else 1 ⦄ := by
+  obtain ⟨fsb, hfsb, hfv, -⟩ := spec_imp_exists (field_security_bits_spec reg h hr hn)
+  have hmax : reg.num_variables.val + reg.log_inv_rate.val ≤ Usize.max := by
+    have := usize_max_ge (n := 64) (by norm_num)
+    simp only [Usize.max, UScalar.max, Usize.numBits_def] at *
+    omega
+  obtain ⟨b, hb, rfl⟩ := spec_imp_exists (queries_are_exhaustive_spec reg hmax hf hw)
+  have := max_security_bits_spec reg fsb _ hfsb hb
+  rw [← hfv]
+  simpa using this
 
 end Plonky3Lean.Proofs.Security.Binary
