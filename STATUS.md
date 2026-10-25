@@ -521,7 +521,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1856) whose dependencies include it; reaching one is not using it.
+(of 1864) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -554,9 +554,9 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 | `security` | `budget.shape.ProtocolParams.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `security` | `p3_security.binary.BinaryPcsRegime.queriesForTargetCount` | p3-security derives it from a floating-point bound, which aeneas cannot translate | 1 |
 | `symmetric` | `p3_symmetric.hasher.CryptographicHasher.hash_iter_slices.default` | aeneas stops on its iterator adapters, so crate.toml makes it opaque (docs/extractor-issues.md 30) | 0 |
-| `word` | `index.IndexError.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 6 |
-| `word` | `word.Word32.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 7 |
-| `word` | `word.Word64.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 7 |
+| `word` | `index.IndexError.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 9 |
+| `word` | `word.Word32.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 8 |
+| `word` | `word.Word64.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 8 |
 
 ## Transcriptions
 
@@ -564,7 +564,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1856) whose dependencies include the declaration.
+counts the claims (of 1864) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -1993,15 +1993,15 @@ counts the claims (of 1856) whose dependencies include the declaration.
 | `word-backend` | `p3_word_backend.shift.wiring.mirror.evaluate_word` | `p3_word_backend::shift::wiring::evaluate_word` | stub | 0 |
 | `word-backend` | `p3_word_backend.shift.wiring.mirror.shift_transpose` | `p3_word_backend::shift::wiring::shift_transpose` | stub | 4 |
 | `word-backend` | `p3_word_backend.shift.wiring.mirror.shift_weights` | `p3_word_backend::shift::wiring::shift_weights` | stub | 2 |
-| `word-backend` | `p3_word_backend.integer_mul.mirror.Tree.depth` | `p3_word_backend::integer_mul::Tree::depth` | stub | 0 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.Tree.depth` | `p3_word_backend::integer_mul::Tree::depth` | stub | 2 |
 | `word-backend` | `p3_word_backend.integer_mul.mirror.IntegerMulReduction.new` | `p3_word_backend::integer_mul::IntegerMulReduction::new` | stub | 1 |
 | `word-backend` | `p3_word_backend.integer_mul.mirror.check_field` | `p3_word_backend::integer_mul::IntegerMulReduction::check_field` | stub | 5 |
-| `word-backend` | `p3_word_backend.integer_mul.mirror.generator_squarings` | `p3_word_backend::integer_mul::exponent::generator_squarings` | stub | 6 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.generator_squarings` | `p3_word_backend::integer_mul::exponent::generator_squarings` | stub | 8 |
 | `word-backend` | `p3_word_backend.integer_mul.mirror.factor_weights` | `p3_word_backend::integer_mul::exponent::factor_weights` | stub | 0 |
 | `word-backend` | `p3_word_backend.integer_mul.mirror.result_weights` | `p3_word_backend::integer_mul::exponent::result_weights` | stub | 0 |
-| `word-backend` | `p3_word_backend.integer_mul.mirror.factor_leaves` | `p3_word_backend::integer_mul::factor_leaves` | stub | 5 |
-| `word-backend` | `p3_word_backend.integer_mul.mirror.result_leaves` | `p3_word_backend::integer_mul::result_leaves` | stub | 5 |
-| `word-backend` | `p3_word_backend.integer_mul.mirror.product_layers` | `p3_word_backend::integer_mul::product_layers` | stub | 0 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.factor_leaves` | `p3_word_backend::integer_mul::factor_leaves` | stub | 6 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.result_leaves` | `p3_word_backend::integer_mul::result_leaves` | stub | 6 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.product_layers` | `p3_word_backend::integer_mul::product_layers` | stub | 5 |
 | `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.new` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::new` | stub | 3 |
 | `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.evaluation_point` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::evaluation_point` | stub | 7 |
 | `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.message_row_iter` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::message_row_iter` | stub | 2 |
@@ -3689,6 +3689,9 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Symmetric.truncated.collision_of_inverse` | `Quot.sound`, `propext` |
 | `P3Word.Component.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Word.Composition.interface.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Composition.lower.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Composition.lower.sound32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Composition.lower.sound64` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Word.Composition.new.laid_out` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Word.Composition.resolve.eq` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Word.Composition.resolve.injective` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -3721,6 +3724,11 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3WordBackend.check_field.two_pow` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3WordBackend.evaluate.eq` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3WordBackend.factor_leaves.prod` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.product_layers.blocks` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.product_layers.children` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.product_layers.factor_root` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.product_layers.length` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.product_layers.result_root` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3WordBackend.result_leaves.prod` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3WordBackend.row.collision` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3WordBackend.row.sound` | `Classical.choice`, `Quot.sound`, `propext` |
