@@ -8,6 +8,8 @@ public import Plonky3Lean.Proofs.MultiStark.Transcript
 public import Plonky3Lean.Proofs.MultiStark.Security
 public import Plonky3Lean.Proofs.MultiStark.FractionalGkr
 public import Plonky3Lean.Proofs.MultiStark.LookupPlan
+public import Plonky3Lean.Proofs.MultiStark.LookupBuild
+public import Plonky3Lean.Proofs.MultiStark.IndexedPlan
 public import Plonky3Lean.Proofs.MultiStark.LogupStar
 public import Plonky3Lean.Proofs.MultiStark.BusComposition
 public import Plonky3Lean.Proofs.MultiStark.LookupSecurity
@@ -21,8 +23,8 @@ public import CompPoly.Fields.BabyBear.Ext4
 
 The verifier's arithmetic that needs no transcript and no AIR is extracted, generic over the field trait:
 
-- the boundary selectors at a point and at a row;
-- the successor row rebuilt from the opened columns;
+- the boundary selectors at a point and at a row
+- the successor row rebuilt from the opened columns
 - the zerocheck's free coordinates.
 
 These parts are transcribed:
@@ -30,7 +32,8 @@ These parts are transcribed:
 - the selectors and the next-row scatter
 - the zerocheck's claim and closing checks
 - the two transcript shapes
-- the AIR security terms.
+- the AIR security terms
+- the lookup planner and the indexed-lookup planner.
 
 The transcription claims are stated at the quartic extension K of BabyBear, where the challenges live.
 
@@ -516,13 +519,13 @@ theorem bus_capacity (B : ℕ) :
 
 /-- **Placement.**
 
-Instances sorted by decreasing height, placed from zero, own aligned blocks.
+A plan the planner returns owns aligned blocks, one per tuple.
 
-The blocks never overlap and fit the next power of two. -/
-theorem lookup_placed (insts : List LookupInstancePlan)
-    (hs : insts.Pairwise fun a b => b.num_variables ≤ a.num_variables) (m d : ℕ → ℕ → ℕ → K) :
-    Placed (planFracBlocks (place 0 insts).1 m d) (log2_ceil_usize (place 0 insts).2) :=
-  plan_placed insts hs m d
+The blocks never overlap and fit the padded table of 2^M leaves, for the plan's M. -/
+theorem lookup_placed {p : ℕ} {airs : List (List Lookup)} {nv : List ℕ} {plan : LookupPlan}
+    (h : LookupPlan.build p airs nv = some (.ok (some plan))) (m d : ℕ → ℕ → ℕ → K) :
+    Placed (planFracBlocks plan.instances m d) plan.num_variables :=
+  build_placed h m d
 
 /-- **The verifier's weights.**
 
@@ -541,21 +544,23 @@ theorem lookup_weights {M : ℕ} {point : List K} {inst : LookupInstancePlan}
 
 /-- **The link.**
 
+Take a plan the planner returns, and a point q with one coordinate per table variable.
+
 The folded claim N(q) + theta (D(q) - 1) is the sum, over the blocks, of each block's share.
 
 A block's share is its weight times m~ + theta (d~ - 1), read at the point's suffix.
 
 The padding drops out. -/
-theorem lookup_link (insts : List LookupInstancePlan)
-    (hs : insts.Pairwise fun a b => b.num_variables ≤ a.num_variables) (m d : ℕ → ℕ → ℕ → K)
-    (q : List K) (hq : q.length = log2_ceil_usize (place 0 insts).2) (θ : K) :
-    claimed_sum (rowExt (numTable (planFracBlocks (place 0 insts).1 m d)) q)
-        (rowExt (denTable (planFracBlocks (place 0 insts).1 m d)) q) θ =
-      ((planBlocks (place 0 insts).1).map fun nc =>
+theorem lookup_link {p : ℕ} {airs : List (List Lookup)} {nv : List ℕ} {plan : LookupPlan}
+    (h : LookupPlan.build p airs nv = some (.ok (some plan))) (m d : ℕ → ℕ → ℕ → K)
+    (q : List K) (hq : q.length = plan.num_variables) (θ : K) :
+    claimed_sum (rowExt (numTable (planFracBlocks plan.instances m d)) q)
+        (rowExt (denTable (planFracBlocks plan.instances m d)) q) θ =
+      ((planBlocks plan.instances).map fun nc =>
         eq (vertex (q.length - nc.1) nc.2) (q.take (q.length - nc.1)) *
           (rowExt (m nc.1 nc.2) (q.drop (q.length - nc.1)) +
             θ * (rowExt (d nc.1 nc.2) (q.drop (q.length - nc.1)) - 1))).sum :=
-  plan_link insts hs m d q hq θ
+  build_link h m d q hq θ
 
 /-- **The leaf sum.**
 
@@ -799,5 +804,171 @@ theorem zerocheck.transcript.ZerocheckShape.free_coordinates.eq_spec
   free_coordinates_eq s
 
 end Extracted
+
+/-! ## The lookup planner -/
+
+section LookupPlanner
+
+open p3_multi_stark.lookup.mirror
+
+/-- **The lookup planner's outcome.**
+
+It runs its checks in this order, over the characteristic p:
+
+- slices of different lengths panic
+- characteristic two with a tuple is an error
+- an exclusive or periodic declaration panics
+- a height of 64 or more overflows its shift and panics
+- a worst-case multiplicity sum of at least p is an error
+- a batch without tuples has no plan
+- leaves past a word, or a named bus of two widths, panic
+- more buses than p is an error
+- payloads that are all empty panic
+- otherwise the planner returns its plan. -/
+theorem lookup_plan_outcome (p : ℕ) (airs : List (List Lookup)) (nv : List ℕ) :
+    LookupPlan.build p airs nv =
+      if airs.length ≠ nv.length then none
+      else if p = 2 ∧ anyActive airs then some (.error .UnsupportedCharacteristic)
+      else if unsupported airs then none
+      else if ∃ n ∈ nv, 64 ≤ n then none
+      else if p ≤ weightedSum airs nv then
+        some (.error (.MultiplicityHeightBoundExceeded (weightedSum airs nv)))
+      else if anyActive airs = false then some (.ok none)
+      else if ¬ (leaves airs nv < 2 ^ 64 ∧ WidthsAgree airs) then none
+      else if p < numBuses airs then some (.error .BusIdentifierCapacityExceeded)
+      else if maxWidth airs = 0 then none
+      else some (.ok (some (thePlan airs nv))) :=
+  build_spec p airs nv
+
+/-- **A returned lookup plan is well formed.**
+
+- its offsets are the running heights from zero, ending at the leaf count, below 2^64
+- its AIRs are the active ones, each once, by decreasing height
+- each keeps its height and its tuple counts, with one identifier per declaration
+- its identifiers number its buses, which are those of the active declarations, at most p
+- its buses each have one width, the widest being nonzero
+- its table has ceil(log_2) of the leaf count variables. -/
+theorem lookup_plan_wf {p : ℕ} {airs : List (List Lookup)} {nv : List ℕ} {plan : LookupPlan}
+    (h : LookupPlan.build p airs nv = some (.ok (some plan))) :
+    plan = thePlan airs nv ∧ PlanWF airs nv plan.instances plan.num_buses ∧
+      0 < plan.max_width ∧ plan.num_buses ≤ p ∧ WidthsAgree airs ∧ leaves airs nv < 2 ^ 64 ∧
+      plan.num_variables = log2_ceil_usize (leaves airs nv) :=
+  build_wf h
+
+/-- **Identifiers name buses.**
+
+Take two active declarations of AIRs in a returned plan.
+
+Their identifiers are equal exactly when their buses are, and both lie below the bus count. -/
+theorem lookup_plan_ids {p : ℕ} {airs : List (List Lookup)} {nv : List ℕ} {plan : LookupPlan}
+    (h : LookupPlan.build p airs nv = some (.ok (some plan))) {i i' : LookupInstancePlan}
+    (hi : i ∈ plan.instances) (hi' : i' ∈ plan.instances) {ls ls' : List Lookup}
+    (hls : airs[i.air_index]? = some ls) (hls' : airs[i'.air_index]? = some ls') {j j' : ℕ}
+    (hj : j < ls.length) (hj' : j' < ls'.length) (ha : ls[j].active) (ha' : ls'[j'].active) :
+    ∃ (hb : j < i.bus_ids.length) (hb' : j' < i'.bus_ids.length),
+      (i.bus_ids[j] = i'.bus_ids[j'] ↔ busOf i.air_index j ls[j] = busOf i'.air_index j' ls'[j']) ∧
+        i.bus_ids[j] < plan.num_buses :=
+  build_ids h hi hi' hls hls' hj hj' ha ha'
+
+/-- **One width per bus.**
+
+In a returned plan, two active declarations on one bus have first tuples of one width.
+
+Every active declaration's width is at most the widest, which is nonzero. -/
+theorem lookup_plan_widths {p : ℕ} {airs : List (List Lookup)} {nv : List ℕ} {plan : LookupPlan}
+    (h : LookupPlan.build p airs nv = some (.ok (some plan))) {a a' j j' : ℕ} {ls ls' : List Lookup}
+    {l l' : Lookup} (ha : airs[a]? = some ls) (ha' : airs[a']? = some ls') (hj : ls[j]? = some l)
+    (hj' : ls'[j']? = some l') (hl : l.active) (hl' : l'.active) :
+    (busOf a j l = busOf a' j' l' → l.widths.headD 0 = l'.widths.headD 0) ∧
+      l.widths.headD 0 ≤ plan.max_width ∧ 0 < plan.max_width :=
+  build_widths h ha ha' hj hj' hl hl'
+
+/-- **A table without a variable.**
+
+A returned plan's table has no variable exactly when the batch has at most one leaf.
+
+That is one tuple on a one-row trace, which the fractional reduction then rejects. -/
+theorem lookup_plan_no_variable {p : ℕ} {airs : List (List Lookup)} {nv : List ℕ}
+    {plan : LookupPlan} (h : LookupPlan.build p airs nv = some (.ok (some plan))) :
+    plan.num_variables = 0 ↔ leaves airs nv ≤ 1 :=
+  build_num_variables_eq_zero h
+
+end LookupPlanner
+
+/-! ## The indexed-lookup planner -/
+
+section IndexedPlanner
+
+open p3_multi_stark.indexed.mirror Plonky3Lean.Proofs.MultiStark.Indexed
+
+/-- **The trivial outcomes.**
+
+The indexed planner panics exactly when the slices disagree on length.
+
+With agreeing slices, it has no plan exactly when nothing is declared. -/
+theorem indexed_plan_trivial (bits : ℕ) (declared : List IndexedLookups) (nv : List ℕ) :
+    (IndexedPlan.from_declared bits declared nv = none ↔ declared.length ≠ nv.length) ∧
+      (declared.length = nv.length →
+        (IndexedPlan.from_declared bits declared nv = some (.ok none) ↔
+          declared.all IndexedLookups.isEmpty)) :=
+  from_declared_trivial bits declared nv
+
+/-- **The indexed planner.**
+
+Take agreeing slices that declare something, over a field of the given bits.
+
+The planner returns a plan exactly when the batch is accepted, and the plan is the accepted plan.
+
+Any error names a real offence:
+
+- a table without a variable, too large for the field, or provided twice
+- a read of a missing table, or of the wrong width
+- a table nobody reads. -/
+theorem indexed_plan (bits : ℕ) (declared : List IndexedLookups) (nv : List ℕ)
+    (hlen : declared.length = nv.length) (hne : declared.all IndexedLookups.isEmpty = false) :
+    (∀ plans, IndexedPlan.from_declared bits declared nv = some (.ok (some plans)) ↔
+      Accepted bits declared nv ∧ plans = acceptedPlan declared nv) ∧
+    ∀ e, IndexedPlan.from_declared bits declared nv = some (.error e) →
+      TableOffence bits nv (providers declared) e ∨ ReadOffence (providers declared) (readsOf declared) e ∨
+        NotRead declared e :=
+  from_declared_spec bits declared nv hlen hne
+
+/-- **The tables come once each, in strict name order.** -/
+theorem indexed_plan_sorted {bits : ℕ} {declared : List IndexedLookups} {nv : List ℕ}
+    (h : Accepted bits declared nv) :
+    (acceptedPlan declared nv).Pairwise fun a b => a.name < b.name :=
+  acceptedPlan_sorted h
+
+/-- **Every table of an accepted plan.**
+
+Each comes from one provided table, with the reads naming it, in caller then emission order.
+
+It has a reader, a variable and fewer variables than the field's bits.
+
+Every reader pulls as many columns as it carries. -/
+theorem indexed_plan_tables {bits : ℕ} {declared : List IndexedLookups} {nv : List ℕ}
+    (h : Accepted bits declared nv) : ∀ q ∈ acceptedPlan declared nv, ∃ x ∈ providers declared,
+      q = tablePlan nv x (readersOf nv (readsOf declared) x.2.name) ∧ q.readers ≠ [] ∧
+      0 < q.table.num_variables ∧ q.table.num_variables < bits ∧
+      ∀ r ∈ q.readers, r.payload.length = q.table.columns.length :=
+  acceptedPlan_tables h
+
+/-- **Every provided table appears.** -/
+theorem indexed_plan_complete {declared : List IndexedLookups} {nv : List ℕ}
+    (x : ℕ × IndexedTable) (hx : x ∈ providers declared) :
+    tablePlan nv x (readersOf nv (readsOf declared) x.2.name) ∈ acceptedPlan declared nv :=
+  acceptedPlan_complete x hx
+
+/-- **Every read lands in exactly one table.**
+
+An accepted plan has exactly one table of the read's name, and the read is among its readers. -/
+theorem indexed_plan_reads {bits : ℕ} {declared : List IndexedLookups} {nv : List ℕ}
+    (h : Accepted bits declared nv) (y : ℕ × IndexedRead) (hy : y ∈ readsOf declared) :
+    ((acceptedPlan declared nv).filter (·.name = y.2.table)).length = 1 ∧
+      ∃ q ∈ acceptedPlan declared nv, q.name = y.2.table ∧
+        (⟨y.1, y.2.position, y.2.payload, nv.getD y.1 0⟩ : ReaderPlacement) ∈ q.readers :=
+  acceptedPlan_reads h y hy
+
+end IndexedPlanner
 
 end Plonky3Lean.Claims.MultiStark

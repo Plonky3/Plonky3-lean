@@ -15,7 +15,7 @@ features = []
 # Each of its functions calls one item, with the field left generic.
 start_from = ["p3_multi_stark::hax_roots"]
 
-watch = ["multi-stark/src", "multi-stark/Cargo.toml", "security/src/multilinear.rs", "multilinear-util/src/point.rs", "sumcheck/src/generic_degree/util.rs", "lookup/src/challenges.rs", "bus/src/plan/mod.rs"]
+watch = ["multi-stark/src", "lookup/src/types.rs", "lookup/src/indexed.rs", "multi-stark/Cargo.toml", "security/src/multilinear.rs", "multilinear-util/src/point.rs", "sumcheck/src/generic_degree/util.rs", "lookup/src/challenges.rs", "bus/src/plan/mod.rs"]
 
 # The transcriptions. Hashes are pending tools/mirror.
 
@@ -326,3 +326,107 @@ rust = "p3_security::multilinear::MultilinearLookupParams"
 [[mirror]]
 lean = "p3_multi_stark.security.mirror.lookup_terms"
 rust = "p3_security::multilinear::reduction_terms"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.Kind"
+rust = "p3_lookup::Kind"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.Lookup"
+rust = "p3_lookup::Lookup"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.Lookup.active"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.LookupBus"
+rust = "p3_multi_stark::lookup::LookupBus"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.busOf"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.LookupError"
+rust = "p3_multi_stark::lookup::LookupError"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.LookupPlan"
+rust = "p3_multi_stark::lookup::LookupPlan"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.shl_one"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.word"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.BusTable"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.assignBus"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.ActiveAir"
+rust = "p3_multi_stark::lookup::LookupInstancePlan"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.planStep"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.LookupPlan.build"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.TraceWindow"
+rust = "p3_lookup::indexed::TraceWindow"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.IndexedRead"
+rust = "p3_lookup::indexed::IndexedRead"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.IndexedTable"
+rust = "p3_lookup::indexed::IndexedTable"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.IndexedLookups"
+rust = "p3_lookup::indexed::IndexedLookups"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.IndexedLookups.isEmpty"
+rust = "p3_lookup::indexed::IndexedLookups::is_empty"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.TablePlacement"
+rust = "p3_multi_stark::indexed::TablePlacement"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.ReaderPlacement"
+rust = "p3_multi_stark::indexed::ReaderPlacement"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.IndexedTablePlan"
+rust = "p3_multi_stark::indexed::IndexedTablePlan"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.IndexedPlanError"
+rust = "p3_lookup::indexed::IndexedLookupError"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.addTable"
+rust = "p3_multi_stark::indexed::IndexedPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.addRead"
+rust = "p3_multi_stark::indexed::IndexedPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.IndexedPlan.from_declared"
+rust = "p3_multi_stark::indexed::IndexedPlan::build"
