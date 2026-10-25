@@ -35,7 +35,7 @@ set_option maxRecDepth 2048
 open p3_arch_shims
 
 /-- [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M256i}::fmt]:
-    Source: 'src/x86_64/types.rs', lines 29:12-31:13
+    Source: 'src/x86_64/types.rs', lines 58:12-60:13
     Visibility: public
     Assumed: `Debug` bodies are opaque by `charon_args` (toolchain.toml). -/
 opaque x86_64.types.M256i.Insts.CoreFmtDebug.fmt
@@ -44,7 +44,7 @@ opaque x86_64.types.M256i.Insts.CoreFmtDebug.fmt
     Unit core.fmt.Error) × core.fmt.Formatter)
 
 /-- [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M128i}::fmt]:
-    Source: 'src/x86_64/types.rs', lines 29:12-31:13
+    Source: 'src/x86_64/types.rs', lines 58:12-60:13
     Visibility: public
     Assumed: `Debug` bodies are opaque by `charon_args` (toolchain.toml). -/
 opaque x86_64.types.M128i.Insts.CoreFmtDebug.fmt
@@ -53,12 +53,39 @@ opaque x86_64.types.M128i.Insts.CoreFmtDebug.fmt
     Unit core.fmt.Error) × core.fmt.Formatter)
 
 /-- [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M256}::fmt]:
-    Source: 'src/x86_64/types.rs', lines 29:12-31:13
+    Source: 'src/x86_64/types.rs', lines 58:12-60:13
     Visibility: public
     Assumed: `Debug` bodies are opaque by `charon_args` (toolchain.toml). -/
 opaque x86_64.types.M256.Insts.CoreFmtDebug.fmt
   :
   x86_64.types.M256 → core.fmt.Formatter → RustM ((core.result.Result
+    Unit core.fmt.Error) × core.fmt.Formatter)
+
+/-- [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M512i}::fmt]:
+    Source: 'src/x86_64/types.rs', lines 58:12-60:13
+    Visibility: public
+    Assumed: `Debug` bodies are opaque by `charon_args` (toolchain.toml). -/
+opaque x86_64.types.M512i.Insts.CoreFmtDebug.fmt
+  :
+  x86_64.types.M512i → core.fmt.Formatter → RustM ((core.result.Result
+    Unit core.fmt.Error) × core.fmt.Formatter)
+
+/-- [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M512}::fmt]:
+    Source: 'src/x86_64/types.rs', lines 58:12-60:13
+    Visibility: public
+    Assumed: `Debug` bodies are opaque by `charon_args` (toolchain.toml). -/
+opaque x86_64.types.M512.Insts.CoreFmtDebug.fmt
+  :
+  x86_64.types.M512 → core.fmt.Formatter → RustM ((core.result.Result
+    Unit core.fmt.Error) × core.fmt.Formatter)
+
+/-- [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M512d}::fmt]:
+    Source: 'src/x86_64/types.rs', lines 72:4-74:5
+    Visibility: public
+    Assumed: `Debug` bodies are opaque by `charon_args` (toolchain.toml). -/
+opaque x86_64.types.M512d.Insts.CoreFmtDebug.fmt
+  :
+  x86_64.types.M512d → core.fmt.Formatter → RustM ((core.result.Result
     Unit core.fmt.Error) × core.fmt.Formatter)
 
 /-- [p3_arch_shims::aarch64::types::{impl core::fmt::Debug for p3_arch_shims::aarch64::types::U32x4}::fmt]:

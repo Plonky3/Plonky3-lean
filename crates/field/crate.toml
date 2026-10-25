@@ -144,3 +144,18 @@ start_from = [
   "p3_field::packed::aarch64_neon::uint32x4_mod_add",
   "p3_field::packed::aarch64_neon::uint32x4_mod_sub",
 ]
+
+# The AVX-512 helpers BabyBear's AVX-512 path calls, extracted for x86_64 with
+# AVX-512F against the intrinsic models (pre-patch monty-31/040), as for
+# x86_64-avx2.
+[[variant]]
+name = "x86_64-avx512"
+target = "x86_64-unknown-linux-gnu"
+target_features = ["avx512f"]
+lean_lib = "P3FieldAvx512"
+# The stub's namespace: the monty-31 variant refers to these by their absolute names.
+namespace = "p3_field"
+start_from = [
+  "p3_field::packed::x86_64_avx::mm512_mod_add",
+  "p3_field::packed::x86_64_avx::mm512_mod_sub",
+]
