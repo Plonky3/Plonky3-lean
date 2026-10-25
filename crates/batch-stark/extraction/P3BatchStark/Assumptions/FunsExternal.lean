@@ -1,8 +1,11 @@
 -- [p3_batch_stark]: external functions.
--- HAND-WRITTEN, from hax's seed of Extraction/FunsExternal_Template.lean.
--- The generated code imports it by this module name.
--- extract.sh fails if the regenerated template declares other names than this file.
--- The template declares nothing: the opening count of one instance comes from p3-uni-stark's extraction.
+--
+-- Hand-written from hax's seed, `Extraction/FunsExternal_Template.lean`.
+-- The generated code imports this module by name.
+-- extract.sh fails if the regenerated template declares different names.
+--
+-- The template declares nothing.
+-- The opening count of one instance comes from p3-uni-stark's extraction.
 module
 
 public import Aeneas

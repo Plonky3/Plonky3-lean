@@ -1,13 +1,16 @@
 -- [p3_word]: external functions.
--- HAND-WRITTEN, from hax's seed of Extraction/FunsExternal_Template.lean.
--- The generated code imports it by this module name.
--- extract.sh fails if the regenerated template declares other names than this file.
 --
--- EDITED: aeneas's template returns a `&mut Formatter` back-function from `fmt`.
+-- Hand-written from hax's seed, `Extraction/FunsExternal_Template.lean`.
+-- The generated code imports this module by name.
+-- extract.sh fails if the regenerated template declares different names.
+--
+-- EDITED: the `fmt` signatures below follow CoreModels' shape.
+-- aeneas's template gives `fmt` a `&mut Formatter` back-function in its result.
 -- CoreModels' `core.fmt.Debug.fmt` returns only the updated `Formatter`.
--- The signatures below follow CoreModels' shape.
--- `axiom` -> `opaque`: these are the bodies of derived `Debug` impls.
--- extract.sh makes those opaque on purpose.
+--
+-- EDITED: `axiom` -> `opaque`.
+-- These are the bodies of derived `Debug` impls.
+-- extract.sh makes them opaque on purpose.
 module
 
 public import Aeneas

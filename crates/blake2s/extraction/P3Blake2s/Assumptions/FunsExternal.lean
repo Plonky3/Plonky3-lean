@@ -1,9 +1,11 @@
 -- [p3_blake2s]: external functions.
--- HAND-WRITTEN, from hax's seed of Extraction/FunsExternal_Template.lean.
--- The generated code imports it by this module name. extract.sh fails if the
--- regenerated template declares different names than this file does.
--- `axiom` -> `opaque`: an opaque constant asserts only that some inhabitant
--- exists, so it adds nothing to a theorem's axiom footprint.
+--
+-- Hand-written from hax's seed, `Extraction/FunsExternal_Template.lean`.
+-- The generated code imports this module by name.
+-- extract.sh fails if the regenerated template declares different names.
+--
+-- `axiom` -> `opaque`: an opaque constant asserts only that some inhabitant exists.
+-- It adds nothing to a theorem's axiom footprint.
 module
 
 public import Aeneas

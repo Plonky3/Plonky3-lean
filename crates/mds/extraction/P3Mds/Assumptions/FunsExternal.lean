@@ -1,8 +1,11 @@
 -- [p3_mds]: external functions.
--- HAND-WRITTEN, from hax's seed of Extraction/FunsExternal_Template.lean.
--- The generated code imports it by this module name. extract.sh fails if the
--- regenerated template declares different names than this file does. The
--- template declares none: p3-mds needs no external function.
+--
+-- Hand-written from hax's seed, `Extraction/FunsExternal_Template.lean`.
+-- The generated code imports this module by name.
+-- extract.sh fails if the regenerated template declares different names.
+--
+-- The template declares nothing.
+-- p3-mds needs no external function.
 module
 public import Aeneas
 public import CoreModels
