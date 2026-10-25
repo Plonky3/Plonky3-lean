@@ -752,4 +752,85 @@ theorem transform_eq_mirror {inst : p3_binary_dft.butterfly.ButterflyField F R} 
       run_eq_mirror hb tw hbl hsl inverse hw x values hv hbound]
     rfl
 
+/-! ## The extracted transform computes the additive NTT -/
+
+theorem flat_congr {w n : ℕ} {x y : ℕ → ℕ → F} (h : ∀ r < n, x r = y r) : flat w n x = flat w n y := by
+  apply List.ext_getElem?; intro p
+  rw [flat_getElem?, flat_getElem?]
+  split_ifs with hp
+  · rcases Nat.eq_zero_or_pos w with hw | hw
+    · subst hw; simp at hp
+    · rw [h _ (by rw [Nat.div_lt_iff_lt_mul hw]; exact hp)]
+  · rfl
+
+section Ntt
+
+open p3_binary_dft.lch.mirror
+
+variable [DecidableEq F] [CharP F 2] {R : Type} {L : Level F} {inst : p3_binary_dft.butterfly.ButterflyField F R}
+  (hL : Cantor L) (hb : ButterflyComputes inst L) (hlb : L.logBits ≤ 31)
+  (hsz : core.mem.size_of F = .ok (uz L.bytes)) (hbytes : 0 < L.bytes)
+include hL hb hlb hsz hbytes
+
+/-- The extracted forward transform of 2^l rows lists the additive NTT of the rows over the coset. -/
+theorem extracted_transform_ntt {l w : ℕ} (hl : l ≤ 2 ^ L.logBits) (hw : 0 < w) (hwm : w ≤ Usize.max)
+    (values : Slice F) (hlen : values.val.length = 2 ^ l * w)
+    (hfit : 2 ^ l * w * L.bytes + 1024 ≤ Usize.max) (shift : F) :
+    p3_binary_dft.lch.transform false inst values (uz w) shift =
+      .ok (mkSlice (flat w (2 ^ l) (ntt L.cantor l shift (rowsOf w values.val)))) := by
+  rw [transform_eq_mirror hb hlb hsz hbytes false hwm (rowsOf w values.val) values (flat_rowsOf _ hlen) hfit,
+    transform_ntt hL hl shift hw]
+  simp only [ofOption, Option.map_some]
+  congr 2
+  exact flat_congr fun r hr => by simp [mask, hr]
+
+/-- The extracted inverse transform recovers the rows of coefficients whose additive NTT it is given. -/
+theorem extracted_transform_intt {l w : ℕ} (hl : l ≤ 2 ^ L.logBits) (hw : 0 < w) (hwm : w ≤ Usize.max)
+    (shift : F) (d : ℕ → ℕ → F) (values : Slice F) (hv : values.val = flat w (2 ^ l) (ntt L.cantor l shift d))
+    (hfit : 2 ^ l * w * L.bytes + 1024 ≤ Usize.max) :
+    p3_binary_dft.lch.transform true inst values (uz w) shift = .ok (mkSlice (flat w (2 ^ l) d)) := by
+  rw [transform_eq_mirror hb hlb hsz hbytes true hwm (ntt L.cantor l shift d) values hv.symm hfit,
+    transform_eq hL hl shift true hw]
+  simp only [ofOption, Option.map_some]
+  congr 2
+  refine flat_congr fun r hr => ?_
+  have hi := transform_intt hL hl shift hw d (ntt L.cantor l shift d) (fun _ _ => rfl) hr
+  rw [transform_eq hL hl shift true hw] at hi
+  simpa using hi
+
+/-- The extracted inverse transform undoes the extracted forward transform. -/
+theorem extracted_transform_round_trip {l w : ℕ} (hl : l ≤ 2 ^ L.logBits) (hw : 0 < w) (hwm : w ≤ Usize.max)
+    (values : Slice F) (hlen : values.val.length = 2 ^ l * w)
+    (hfit : 2 ^ l * w * L.bytes + 1024 ≤ Usize.max) (shift : F) :
+    (do
+      let out ← p3_binary_dft.lch.transform false inst values (uz w) shift
+      p3_binary_dft.lch.transform true inst out (uz w) shift) = .ok values := by
+  rw [extracted_transform_ntt hL hb hlb hsz hbytes hl hw hwm values hlen hfit shift,
+    bind_tc_ok (α := Slice F), extracted_transform_intt hL hb hlb hsz hbytes hl hw hwm shift (rowsOf w values.val) _
+      (mkSlice_val (by rw [length_flat]; have := Nat.le_mul_of_pos_right (2 ^ l * w) hbytes; omega)) hfit,
+    flat_rowsOf _ hlen, mkSlice_self]
+
+/-- The extracted transform panics on a height that is not a power of two, or wider than the level. -/
+theorem extracted_transform_panics (inverse : Bool) {n w : ℕ} (hwm : w ≤ Usize.max) (values : Slice F)
+    (hlen : values.val.length = n * w) (hfit : n * w * L.bytes + 1024 ≤ Usize.max) (shift : F)
+    (h : (∀ k, n ≠ 2 ^ k) ∨ (∃ l, n = 2 ^ l ∧ 2 ^ L.logBits < l)) :
+    p3_binary_dft.lch.transform inverse inst values (uz w) shift = .fail .panic := by
+  rcases Nat.eq_zero_or_pos w with hw | hw
+  · subst hw
+    unfold p3_binary_dft.lch.transform
+    rw [slice_len_eq, bind_ok, div_uz_zero]; simp
+  rw [transform_eq_mirror hb hlb hsz hbytes inverse hwm (rowsOf w values.val) values (flat_rowsOf _ hlen) hfit,
+    transform_panics inverse shift (h.elim Or.inl (fun h => Or.inr (Or.inl h)))]
+  rfl
+
+end Ntt
+
+variable {R : Type} in
+/-- The extracted transform panics at width zero, whatever the buffer. -/
+theorem extracted_transform_panics_width {inst : p3_binary_dft.butterfly.ButterflyField F R} (inverse : Bool)
+    (values : Slice F) (shift : F) :
+    p3_binary_dft.lch.transform inverse inst values (uz 0) shift = .fail .panic := by
+  unfold p3_binary_dft.lch.transform
+  rw [slice_len_eq, bind_ok, div_uz_zero]; simp
+
 end Plonky3Lean.Proofs.BinaryDft
