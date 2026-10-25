@@ -5,6 +5,7 @@ public import Plonky3Lean.Proofs.BinaryDft.Extracted
 public import Plonky3Lean.Proofs.BinaryPcs.Params
 public import Plonky3Lean.Proofs.Matrix.Views
 public import Plonky3Lean.Lib.Scalar.Signed
+public import Plonky3Lean.Proofs.Matrix.Log2
 
 @[expose] public section
 
@@ -425,5 +426,58 @@ theorem try_new_with_folding_eq (h64 : System.Platform.numBits = 64) {F EF Enc R
       simp [this, hw, liftR, ofOption, resM, errM, hval, hbits]
     · rw [hn (by omega)]
       simp [hw, liftR, ofOption, resM, errM, hval, hbits]
+
+/-! ## The transcript shape -/
+
+/-- A transcript shape, read as naturals. -/
+def shapeM (s : p3_binary_pcs.transcript.BinaryPcsShape) : p3_binary_pcs.transcript.mirror.BinaryPcsShape :=
+  ⟨s.num_variables.val, s.log_folding_factor.val, s.num_oracles.val, s.final_codeword_len.val,
+    s.pow_bits.val, s.pair_bits.val, s.num_pairs.val⟩
+
+/-- On an accepted schedule, the extracted transcript shape never panics and is the transcription's. -/
+theorem shape_new_spec (h64 : System.Platform.numBits = 64) (c : p3_binary_pcs.params.BinaryPcsConfig)
+    (h : Inv (configM c)) :
+    p3_binary_pcs.transcript.BinaryPcsShape.new c ⦃ s =>
+      some (shapeM s) = p3_binary_pcs.transcript.mirror.BinaryPcsShape.new (configM c) ⦄ := by
+  have hb := h.batches_pos
+  have hl := h.lff_pos
+  have hle := h.lff_le
+  have hr := h.r_pos
+  have hw := h.word
+  rw [h.shape]
+  simp only [configM, paramsM] at hb hl hle hr hw ⊢
+  unfold p3_binary_pcs.transcript.BinaryPcsShape.new p3_binary_pcs.params.BinaryPcsConfig.domain_size
+    p3_binary_pcs.params.BinaryPcsConfig.log_domain_size
+    p3_binary_pcs.params.BinaryPcsConfig.num_fold_batches
+    p3_binary_pcs.params.BinaryPcsConfig.impl.log_folding_factor
+    p3_binary_pcs.params.BinaryPcsConfig.impl.num_variables
+    p3_binary_pcs.params.BinaryPcsConfig.impl.num_queries
+    p3_binary_pcs.params.BinaryPcsConfig.log_final_len
+    p3_binary_pcs.params.BinaryPcsConfig.pow_bits
+    p3_binary_pcs.verifier.num_distinct_queries
+  have hnb : UScalarTy.Usize.numBits = 64 := by simp [h64]
+  step*
+  have hi1 : i1.val = 2 ^ (c.num_variables.val + c.params.log_inv_rate.val) := by
+    rw [i1_post, Nat.one_shiftLeft, x_post, Usize.size, Usize.numBits_def, hnb]
+    exact Nat.mod_eq_of_lt (Nat.pow_lt_pow_right (by norm_num) hw)
+  have hpd : pair_domain.val / 2 =
+      2 ^ (c.num_variables.val + c.params.log_inv_rate.val - c.log_folding_factor.val) := by
+    rw [pair_domain_post, hi1, shift_post, ← shift_post]
+    rw [shift_post]
+    exact pow_shiftRight_div hl (by omega)
+  obtain ⟨d, hd, hdv⟩ := spec_imp_exists (Matrix.div_ceil_eq c.num_variables c.log_folding_factor hl)
+  simp only [hd, bind_ok]
+  step*
+  obtain ⟨lg, hlg, hlgv⟩ := spec_imp_exists (Matrix.log2_strict_usize_two_pow
+    (k := c.num_variables.val + c.params.log_inv_rate.val - c.log_folding_factor.val)
+    (by rw [hnb]; omega) i8 (by rw [i8_post, hpd]))
+  simp only [hlg, bind_ok]
+  step*
+  have hi6 : i6.val = 2 ^ c.params.log_inv_rate.val := by
+    rw [i6_post, Nat.one_shiftLeft, Usize.size, Usize.numBits_def, hnb]
+    exact Nat.mod_eq_of_lt (Nat.pow_lt_pow_right (by norm_num) (by omega))
+  split_ifs with hq <;> simp only [bind_ok, WP.spec_ok, shapeM, Option.some.injEq,
+    p3_binary_pcs.transcript.mirror.BinaryPcsShape.mk.injEq] <;> simp only [UScalar.lt_equiv] at hq <;>
+    refine ⟨trivial, trivial, by omega, hi6, trivial, hlgv, by omega⟩
 
 end Plonky3Lean.Proofs.BinaryPcs

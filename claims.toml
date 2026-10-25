@@ -489,6 +489,10 @@ name   = "Plonky3Lean.Claims.BinaryPcs.extracted.num_fold_batches"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.BinaryPcs.extracted.shape"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.BinaryPcs.extracted.try_new_with_folding"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 

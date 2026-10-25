@@ -9,12 +9,13 @@ public import Plonky3Lean.Proofs.BinaryPcs.Extracted
 /-!
 # p3-binary-pcs: claims
 
-Four items are extracted:
+Five items are extracted:
 
 - the fold of a pair
 - the schedule's constructor
 - its change of folding factor
 - its batch count
+- the transcript shape
 
 Their claims assume a 64-bit word, and that the field instances compute the operations they name.
 
@@ -300,6 +301,22 @@ theorem extracted.num_fold_batches (c : p3_binary_pcs.params.BinaryPcsConfig) :
     liftR Aeneas.Std.UScalar.val (p3_binary_pcs.params.BinaryPcsConfig.num_fold_batches c) =
       Proofs.BinaryDft.ofOption (configM c).num_fold_batches :=
   num_fold_batches_eq c
+
+/-- On an accepted schedule, the shipped transcript shape never panics.
+
+It has n + r - lff index bits and min(q, 2^(n+r-lff)) distinct pairs. -/
+theorem extracted.shape (h64 : System.Platform.numBits = 64) {c : p3_binary_pcs.params.BinaryPcsConfig}
+    (h : Inv (configM c)) :
+    ∃ s, p3_binary_pcs.transcript.BinaryPcsShape.new c = .ok s ∧
+      shapeM s = ⟨c.num_variables.val, c.log_folding_factor.val,
+        (c.num_variables.val + c.log_folding_factor.val - 1) / c.log_folding_factor.val - 1,
+        2 ^ c.params.log_inv_rate.val, c.params.pow_bits.val,
+        c.num_variables.val + c.params.log_inv_rate.val - c.log_folding_factor.val,
+        min c.num_queries.val (2 ^ (c.num_variables.val + c.params.log_inv_rate.val -
+          c.log_folding_factor.val))⟩ := by
+  obtain ⟨s, hs, hv⟩ := Lib.spec_imp_exists (shape_new_spec h64 c h)
+  rw [h.shape] at hv
+  exact ⟨s, hs, Option.some.inj hv⟩
 
 end Shipped
 
