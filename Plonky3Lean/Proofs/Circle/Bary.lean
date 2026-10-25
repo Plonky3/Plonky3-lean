@@ -30,7 +30,7 @@ Here W_P is the quotient of v_(m+1)(X) - v_(m+1)(P.x) by X - P.x.
 
 It lies in the FFT space, it is s_P at P and zero on the rest of D.
 
-Off D it is the crate's term v_D(Q) ((Q - P).x + 1) / (Q - P).y.
+Off the poles of P it is the crate's term v_D(Q) ((Q - P).x + 1) / (Q - P).y.
 
 So the sum is an FFT-space function that agrees with f on D.
 
