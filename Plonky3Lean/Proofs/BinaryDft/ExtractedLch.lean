@@ -46,6 +46,12 @@ theorem usz_eq_uz (k : ℕ) : usz k = uz k := rfl
 
 theorem eq_uz (x : Std.Usize) : x = uz x.val := UScalar.eq_of_val_eq (by rw [uz_val (by scalar_tac)])
 
+theorem ite_of_pos {c : Prop} [Decidable c] (h : c) {α : Sort _} (a b : α) :
+    (if c then a else b) = a := by simp [h]
+
+theorem ite_of_neg {c : Prop} [Decidable c] (h : ¬c) {α : Sort _} (a b : α) :
+    (if c then a else b) = b := by simp [h]
+
 theorem uz_add_one {a : ℕ} (h : a + 1 ≤ Usize.max) :
     (uz a + 1#usize : RustM Std.Usize) = .ok (uz (a + 1)) := by
   obtain ⟨z, hz, hv⟩ := usize_add_ok (uz a) 1#usize (by
@@ -505,5 +511,172 @@ theorem split_at_mut_eq {α : Type} (s : Slice α) {n : ℕ} (hn : n ≤ s.val.l
   · simp only
     rw [dite_eq_left_of_eq_true (eq_true ⟨by simp [uz_val hnm, ha]; omega, by simp [uz_val hnm, hb]⟩)]
     apply Slice.ext; rw [Slice.from_val, mkSlice_val (by simp [ha, hb]; have := s.property; omega)]
+
+/-! ## The butterfly instance -/
+
+/-- The lower outputs of the butterflies of two runs, pair by pair. -/
+def bfly1 (inverse : Bool) (t : F) (lo hi : List F) : List F :=
+  List.zipWith (fun u v => (bop inverse t u v).1) lo hi
+
+/-- The upper outputs of the butterflies of two runs, pair by pair. -/
+def bfly2 (inverse : Bool) (t : F) (lo hi : List F) : List F :=
+  List.zipWith (fun u v => (bop inverse t u v).2) lo hi
+
+/-- The members of a butterfly instance that the transform calls compute:
+
+- the tower level's members, as for the domain;
+- the bit width 2^b of the level, through b;
+- the butterfly of two runs of equal length, pair by pair, which panics on runs of different lengths. -/
+structure ButterflyComputes (inst : p3_binary_dft.butterfly.ButterflyField F R) (L : Level F) :
+    Prop where
+  tower : TowerComputes inst.p3_binary_fieldtowerTowerLevelInst L
+  logBits : inst.p3_binary_fieldtowerTowerLevelInst.LOG_BITS = .ok (uz L.logBits)
+  butterfly : ∀ (inverse : Bool) (lo hi : Slice F) (t : F), inst.butterfly inverse lo hi t =
+    if lo.val.length = hi.val.length then
+      .ok (mkSlice (bfly1 inverse t lo.val hi.val), mkSlice (bfly2 inverse t lo.val hi.val))
+    else .fail .panic
+
+theorem chunk_end_eq {a z n : ℕ} (han : a ≤ n) (hn : n ≤ Usize.max) (hz : z ≤ Usize.max) :
+    p3_binary_dft.lch.schedule.hax_reshaped.chunk_end (uz a) (uz z) (uz n) = .ok (uz (min (a + z) n)) := by
+  unfold p3_binary_dft.lch.schedule.hax_reshaped.chunk_end
+  rw [uz_sub han hn, bind_ok]
+  by_cases h : n - a < z
+  · rw [ite_of_pos ((uz_lt (by omega) hz).mpr h), min_eq_right (by omega)]
+  · rw [ite_of_neg (fun h' => h ((uz_lt (by omega) hz).mp h')), uz_add (by omega), min_eq_left (by omega)]
+
+theorem grain_eq : p3_binary_dft.lch.schedule.BUTTERFLY_GRAIN = .ok (uz 1024) := by
+  unfold p3_binary_dft.lch.schedule.BUTTERFLY_GRAIN
+  rw [shiftLeft_i32_eq _ _ (by decide) (by
+    simp [UScalarTy.Usize_numBits_eq]; rcases System.Platform.numBits_eq with e | e <;> simp [e])]
+  congr 1
+
+/-! ## The butterfly one grain at a time -/
+
+/-- The run base with its first m entries replaced by f of the first m pairs of lo and hi. -/
+def stg (f : F → F → F) (m : ℕ) (lo hi base : List F) : List F :=
+  List.zipWith f (lo.take m) (hi.take m) ++ base.drop m
+
+theorem stg_drop_take (f : F → F → F) {m H : ℕ} (lo hi base : List F) (hlo : lo.length = H)
+    (hhi : hi.length = H) (hm : m ≤ H) (d : ℕ) :
+    ((stg f m lo hi base).drop m).take d = (base.drop m).take d := by
+  unfold stg
+  rw [List.drop_append_of_le_length (by simp; omega)]
+  simp [hlo, hhi, hm]
+
+theorem stg_getElem? (f : F → F → F) {m H : ℕ} (lo hi base : List F) (hlo : lo.length = H)
+    (hhi : hi.length = H) (hm : m ≤ H) (p : ℕ) :
+    (stg f m lo hi base)[p]? = if p < m then Option.map₂ f lo[p]? hi[p]? else base[p]? := by
+  unfold stg
+  split_ifs with hp
+  · rw [List.getElem?_append_left (by simp; omega), List.getElem?_zipWith]
+    simp only [List.getElem?_take, hp, ite_true]
+    cases lo[p]? <;> cases hi[p]? <;> rfl
+  · rw [List.getElem?_append_right (by simp; omega)]
+    simp only [List.length_zipWith, List.length_take, hlo, hhi, min_self, min_eq_left hm,
+      List.getElem?_drop]
+    congr 1; omega
+
+theorem stg_setSlice (f : F → F → F) {m m' H : ℕ} (lo hi base : List F) (hlo : lo.length = H)
+    (hhi : hi.length = H) (hb : base.length = H) (hm : m ≤ m') (hm' : m' ≤ H) :
+    (stg f m lo hi base).setSlice! m
+        (List.zipWith f ((lo.drop m).take (m' - m)) ((hi.drop m).take (m' - m))) =
+      stg f m' lo hi base := by
+  have hx : (List.zipWith f ((lo.drop m).take (m' - m)) ((hi.drop m).take (m' - m))).length = m' - m := by
+    simp; omega
+  have hl : (stg f m lo hi base).length = H := by simp [stg]; omega
+  apply List.ext_getElem?
+  intro p
+  rw [stg_getElem? f lo hi base hlo hhi hm']
+  by_cases h1 : p < m
+  · rw [List.setSlice!_getElem?_prefix _ _ _ _ h1, stg_getElem? f lo hi base hlo hhi (by omega),
+      ite_of_pos h1, ite_of_pos (show p < m' by omega)]
+  by_cases h2 : p < m'
+  · rw [List.setSlice!_getElem?_middle _ _ _ _ ⟨by omega, by omega, by omega⟩, ite_of_pos h2,
+      List.getElem?_zipWith]
+    simp only [List.getElem?_take, List.getElem?_drop, show p - m < m' - m by omega, ite_true,
+      show m + (p - m) = p by omega]
+    cases lo[p]? <;> cases hi[p]? <;> rfl
+  · rw [List.setSlice!_getElem?_suffix _ _ _ _ (by rw [hx]; omega), stg_getElem? f lo hi base hlo hhi (by omega),
+      ite_of_neg h1, ite_of_neg h2]
+
+theorem slice_len_eq {α : Type} (s : Slice α) : core.slice.Slice.len s = .ok (uz s.val.length) := by
+  simp only [core.slice.Slice.len, rust_primitives.slice.slice_length]
+  congr 1
+  apply UScalar.eq_of_val_eq
+  rw [uz_val s.property]; simp
+
+theorem stg_zero (f : F → F → F) (lo hi base : List F) : stg f 0 lo hi base = base := by simp [stg]
+
+theorem stg_full (f : F → F → F) {H : ℕ} (lo hi base : List F) (hlo : lo.length = H)
+    (hhi : hi.length = H) (hb : base.length = H) :
+    stg f H lo hi base = List.zipWith f lo hi := by
+  unfold stg
+  rw [List.take_of_length_le (by omega), List.take_of_length_le (by omega),
+    List.drop_of_length_le (by omega), List.append_nil]
+
+theorem length_stg (f : F → F → F) {m H : ℕ} (lo hi base : List F) (hlo : lo.length = H)
+    (hhi : hi.length = H) (hb : base.length = H) (hm : m ≤ H) : (stg f m lo hi base).length = H := by
+  simp [stg]; omega
+
+/-- The butterfly of two runs of equal length, one grain at a time, is the butterfly of the runs. -/
+theorem grains_eq {inst : p3_binary_dft.butterfly.ButterflyField F R} (hb : ButterflyComputes inst L)
+    (inverse : Bool) (lo hi : Slice F) (t : F) (h : lo.val.length = hi.val.length)
+    (hH : lo.val.length + 1024 ≤ Usize.max) :
+    p3_binary_dft.lch.schedule.hax_reshaped.grains inverse inst lo hi t =
+      .ok (mkSlice (bfly1 inverse t lo.val hi.val), mkSlice (bfly2 inverse t lo.val hi.val)) := by
+  set H := lo.val.length with hHdef
+  set f1 : F → F → F := fun u v => (bop inverse t u v).1
+  set f2 : F → F → F := fun u v => (bop inverse t u v).2
+  let m : ℕ → ℕ := fun k => min (k * 1024) H
+  have := loop_foldlM_inv
+    (fun st => p3_binary_dft.lch.schedule.hax_reshaped.grains_loop.body inverse inst t st.1 st.2.1 st.2.2)
+    (fun (_ : Unit) k => (mkSlice (stg f1 (m k) lo.val hi.val lo.val),
+      mkSlice (stg f2 (m k) lo.val hi.val hi.val), uz (k * 1024)))
+    (fun _ => (mkSlice (stg f1 H lo.val hi.val lo.val), mkSlice (stg f2 H lo.val hi.val hi.val)))
+    ((H + 1023) / 1024) (fun _ _ => some ()) (fun _ _ => True) (fun k hk _ _ => ?_) (fun _ _ => ?_) () trivial
+  · simp only [m, zero_mul, Nat.zero_min, stg_zero, mkSlice_self] at this
+    have hloop : p3_binary_dft.lch.schedule.hax_reshaped.grains inverse inst lo hi t = _ := this
+    rw [hloop, foldlM_some _ (fun _ _ => ()) _ (fun _ _ _ => rfl)]
+    simp only [ofOption, Option.map_some, bfly1, bfly2]
+    rw [stg_full f1 lo.val hi.val lo.val hHdef.symm h.symm hHdef.symm,
+      stg_full f2 lo.val hi.val hi.val hHdef.symm h.symm h.symm]
+  · refine ⟨trivial, ?_⟩
+    have hkH : k * 1024 < H := by omega
+    have hmk : m k = k * 1024 := by simp only [m]; omega
+    set m' := min (k * 1024 + 1024) H with hm'
+    have hmk1 : m (k + 1) = m' := by simp only [m, hm']; ring_nf
+    have hlo : lo.val.length = H := rfl
+    have hhi : hi.val.length = H := h.symm
+    have lL := length_stg f1 lo.val hi.val lo.val hlo hhi hlo (le_of_lt hkH)
+    have lH := length_stg f2 lo.val hi.val hi.val hlo hhi hhi (le_of_lt hkH)
+    have vL : (mkSlice (stg f1 (m k) lo.val hi.val lo.val)).val = stg f1 (k * 1024) lo.val hi.val lo.val := by
+      rw [hmk, mkSlice_val (by rw [lL]; omega)]
+    have vH : (mkSlice (stg f2 (m k) lo.val hi.val hi.val)).val = stg f2 (k * 1024) lo.val hi.val hi.val := by
+      rw [hmk, mkSlice_val (by rw [lH]; omega)]
+    have eL := index_mut_range_eq (mkSlice (stg f1 (m k) lo.val hi.val lo.val)) (a := k * 1024) (b := m')
+      (by omega) (by rw [vL, lL]; omega)
+    have eH := index_mut_range_eq (mkSlice (stg f2 (m k) lo.val hi.val hi.val)) (a := k * 1024) (b := m')
+      (by omega) (by rw [vH, lH]; omega)
+    rw [vL, stg_drop_take f1 lo.val hi.val lo.val hlo hhi (le_of_lt hkH)] at eL
+    rw [vH, stg_drop_take f2 lo.val hi.val hi.val hlo hhi (le_of_lt hkH)] at eH
+    have eB := hb.butterfly inverse (mkSlice ((lo.val.drop (k * 1024)).take (m' - k * 1024)))
+      (mkSlice ((hi.val.drop (k * 1024)).take (m' - k * 1024))) t
+    rw [mkSlice_val (by simp; omega), mkSlice_val (by simp; omega), ite_of_pos (by simp; omega)] at eB
+    simp only [p3_binary_dft.lch.schedule.hax_reshaped.grains_loop.body, slice_len_eq, vL, vH, lL, lH,
+      bind_ok, ite_of_pos ((uz_lt (by omega) (by omega)).mpr hkH), grain_eq,
+      chunk_end_eq (le_of_lt hkH) (show H ≤ Usize.max by omega) (show 1024 ≤ Usize.max by omega),
+      uz_add (show k * 1024 + 1024 ≤ Usize.max by omega)]
+    simp only [← hm', eL, eH, bind_ok, hmk1, Aeneas.Std.uncurry]
+    rw [eB, bind_ok]
+    simp only [Aeneas.Std.uncurry, bfly1, bfly2]
+    rw [mkSlice_val (by simp; omega), mkSlice_val (by simp; omega),
+      stg_setSlice f1 lo.val hi.val lo.val hlo hhi hlo (by omega) (by omega),
+      stg_setSlice f2 lo.val hi.val hi.val hlo hhi hhi (by omega) (by omega), add_mul, one_mul]
+  · have hK : H ≤ (H + 1023) / 1024 * 1024 := by omega
+    have hmK : m ((H + 1023) / 1024) = H := by simp only [m]; omega
+    have lL := length_stg f1 lo.val hi.val lo.val rfl h.symm rfl (le_refl H)
+    simp only [p3_binary_dft.lch.schedule.hax_reshaped.grains_loop.body, slice_len_eq, hmK,
+      mkSlice_val (show (stg f1 H lo.val hi.val lo.val).length ≤ Usize.max by omega), lL, bind_ok]
+    rw [ite_of_neg (fun h' => absurd ((uz_lt (by omega) (by omega)).mp h') (by omega))]
 
 end Plonky3Lean.Proofs.BinaryDft
