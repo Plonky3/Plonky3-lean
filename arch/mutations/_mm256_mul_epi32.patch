@@ -1,0 +1,14 @@
+# Mutation of: _mm256_mul_epi32
+# Breaks:      it zero-extends instead of sign-extending.
+#
+--- a/src/x86_64/avx2.rs
++++ b/src/x86_64/avx2.rs
+@@ -125,7 +125,7 @@
+     let mut dst = [0u32; 8];
+     let mut k = 0;
+     while k < 4 {
+-        let p = (a.0[2 * k] as i32 as i64) * (b.0[2 * k] as i32 as i64);
++        let p = (a.0[2 * k] as i64) * (b.0[2 * k] as i64);
+         let (lo, hi) = split64(p as u64);
+         dst[2 * k] = lo;
+         dst[2 * k + 1] = hi;

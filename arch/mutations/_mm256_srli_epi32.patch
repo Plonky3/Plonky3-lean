@@ -1,0 +1,14 @@
+# Mutation of: _mm256_srli_epi32
+# Breaks:      it masks the count instead of zeroing.
+#
+--- a/src/x86_64/avx2.rs
++++ b/src/x86_64/avx2.rs
+@@ -326,7 +326,7 @@
+     let mut dst = [0u32; 8];
+     let mut j = 0;
+     while j < 8 {
+-        dst[j] = if s > 31 { 0 } else { a.0[j] >> s };
++        dst[j] = a.0[j] >> (s & 31);
+         j += 1;
+     }
+     __m256i(dst)

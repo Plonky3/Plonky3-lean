@@ -1,0 +1,14 @@
+# Mutation of: _mm256_mul_epu32
+# Breaks:      it multiplies the odd lanes.
+#
+--- a/src/x86_64/avx2.rs
++++ b/src/x86_64/avx2.rs
+@@ -109,7 +109,7 @@
+     let mut dst = [0u32; 8];
+     let mut k = 0;
+     while k < 4 {
+-        let (lo, hi) = split64((a.0[2 * k] as u64) * (b.0[2 * k] as u64));
++        let (lo, hi) = split64((a.0[2 * k + 1] as u64) * (b.0[2 * k + 1] as u64));
+         dst[2 * k] = lo;
+         dst[2 * k + 1] = hi;
+         k += 1;

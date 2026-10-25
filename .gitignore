@@ -1,3 +1,6 @@
 # cache and other artifacts produced by Lean's Lake build tool
 .lake/
 __pycache__/
+
+# the arch shim crate's cargo output
+/arch/target/

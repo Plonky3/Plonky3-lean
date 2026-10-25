@@ -1,0 +1,18 @@
+# p3-arch-shims: models of the `core::arch` intrinsics Plonky3's SIMD backends use.
+#
+# Not a Plonky3 crate: it lives in this repository (`arch/`), and pre-patch
+# monty-31/020 makes the AVX2 backends import it in place of `core::arch` under
+# the extraction cfg (docs/extractor-issues.md 210). Each body transcribes
+# Intel's pseudocode, and arch/tests/ checks it against the hardware.
+
+lean_lib = "P3ArchShims"
+
+# This repository's directory, rather than one of plonky3/ or Cargo's registry.
+path = "arch"
+package = "p3-arch-shims"
+
+state = "extracted"
+
+features = []
+
+watch = []

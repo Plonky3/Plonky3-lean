@@ -15,6 +15,7 @@ target `thumbv7em-none-eabi`
 | Crate | State | Generated lines | Hand-written lines | `opaque` | Mirrored | Dropped by the extractor | Patches (pre / post) | Patches with a cost |
 |---|---|---:|---:|---:|---:|---:|---|---|
 | `air` | scoped | 364 | 935 | 0 | 67 | 0 | 0 / 1 | post `010` |
+| `arch-shims` | extracted | 1409 | 91 | 3 | 0 | 0 | 0 / 1 |  |
 | `baby-bear` | extracted | 2953 | 126 | 4 | 0 | 0 | 5 / 3 | pre `020`, pre `030`, pre `040`, pre `050` |
 | `batch-stark` | scoped | 116 | 1413 | 0 | 81 | 0 | 0 / 0 |  |
 | `binary-dft` | scoped | 1073 | 694 | 2 | 52 | 0 | 2 / 1 | pre `010`, pre `020`, post `010` |
@@ -41,7 +42,7 @@ target `thumbv7em-none-eabi`
 | `mds` | scoped | 101 | 46 | 0 | 0 | 0 | 0 / 0 |  |
 | `merkle-tree` | scoped | 1306 | 47 | 0 | 0 | 0 | 2 / 0 | pre `010`, pre `020` |
 | `mersenne-31` | scoped | 1444 | 261 | 0 | 12 | 30 | 1 / 1 | pre `010` |
-| `monty-31` | scoped | 1581 | 329 | 0 | 13 | 29 | 1 / 1 | pre `010` |
+| `monty-31` | scoped | 1581 | 329 | 0 | 13 | 29 | 2 / 1 | pre `010`, pre `020` |
 | `multi-stark` | scoped | 338 | 1323 | 0 | 103 | 0 | 3 / 1 | pre `010`, pre `020`, pre `030`, post `010` |
 | `multilinear-util` | scoped | 222 | 1117 | 0 | 75 | 0 | 2 / 0 | pre `010`, pre `020` |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
@@ -67,6 +68,16 @@ the items of the crate that charon translated with a body and aeneas did not emi
 (`docs/extractor-issues.md`, 4); the extraction gaps below list them. The
 `[[mirror]]` entries have no hashes yet (`tools/mirror` is planned).
 
+## Variants
+
+A crate extracted again for another target (`[[variant]]` in its `crate.toml`), into
+`crates/<crate>/variants/<name>/extraction/`, with its own library and namespace.
+
+| Variant | Target | Library | Namespace | Generated lines | Hand-written lines | `opaque` | Dropped by the extractor | Patches (post) |
+|---|---|---|---|---:|---:|---:|---:|---:|
+| `field@x86_64-avx2` | `x86_64-unknown-linux-gnu +avx2` | `P3FieldAvx2` | `p3_field` | 85 | 33 | 0 | 0 | 0 |
+| `monty-31@x86_64-avx2` | `x86_64-unknown-linux-gnu +avx2` | `P3Monty31Avx2` | `p3_monty_31_avx2` | 426 | 118 | 0 | 0 | 1 |
+
 ## Extraction gaps
 
 From each extracted crate's `extraction/gaps.toml`, which `extract.sh` writes from
@@ -74,6 +85,11 @@ charon's output and `--check` requires to reproduce. An item is *mirrored* when 
 `[[mirror]]` entry transcribes it by hand.
 
 ### `air`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `arch-shims`
 
 charon errors: 0.
 Nothing translated is dropped.
@@ -516,6 +532,16 @@ Nothing translated is dropped.
 charon errors: 0.
 Nothing translated is dropped.
 
+### `field@x86_64-avx2`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `monty-31@x86_64-avx2`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ## Assumptions
 
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
@@ -525,6 +551,9 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
+| `arch-shims` | `x86_64.types.M128i.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `arch-shims` | `x86_64.types.M256.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `arch-shims` | `x86_64.types.M256i.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 72 |
 | `baby-bear` | `mds.MDSBabyBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
@@ -559,6 +588,17 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 | `word` | `index.IndexError.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 9 |
 | `word` | `word.Word32.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 8 |
 | `word` | `word.Word64.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 8 |
+
+## Layout assumptions
+
+Every `transmute` instance outside `HaxExt.lean`: what the generated code's
+`core.intrinsics.transmute` computes at a pair of types, assumed from their Rust
+layouts (`HaxExt.lean`). A pair with no instance does not elaborate.
+
+| Library | Instance | Why |
+|---|---|---|
+| `monty-31@x86_64-avx2` | `p3_monty_31_avx2.Transmute.m256iToMontyArray` | the layout of `montyArrayToM256i`, read the other way |
+| `monty-31@x86_64-avx2` | `p3_monty_31_avx2.Transmute.montyArrayToM256i` | `MontyField31` is `repr(transparent)` over its `value: u32` (its other field is a `PhantomData`), so the array is eight `u32`s, element `i` at byte `4 i`; and `__m256i`'s lane `i` is bytes `4 i` to `4 i + 3`, as in p3-arch-shims' `repr(transparent)` lane array |
 
 ## Transcriptions
 
@@ -2103,6 +2143,7 @@ counts the claims (of 1917) whose dependencies include the declaration.
 | `merkle-tree/pre/020-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one reshaped body. No existing body changes. |
 | `mersenne-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of `Mersenne31`. No existing body changes. |
 | `monty-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method or constant of `MontyField31`. No existing body changes. |
+| `monty-31/pre/020-redirect-avx2-intrinsics` | none in a normal build: p3-arch-shims is a dependency only under cfg(hax_backend_lean). In the extracted AVX2 variants each intrinsic is its model in `arch/` (p3-arch-shims), trusted: reviewed against Intel's pseudocode and tested against the hardware (`arch/tests/`). |
 | `multi-stark/pre/010-import-packed-extension-iter` | none: the added items are behind cfg(hax_backend_lean), so a normal build is token for token as shipped. |
 | `multi-stark/pre/020-raw-data-bounds` | none: each added bound is implied by `Field` in a normal build. |
 | `multi-stark/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. No existing body changes. |

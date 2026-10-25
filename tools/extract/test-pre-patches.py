@@ -46,8 +46,8 @@ so the build stops until a person has judged each divergence.
 
 `--check` does not write: it fails if a header is out of date instead (for CI).
 
-Results are cached on the tree state, the *diff* part of each patch (header
-edits do not invalidate it) and this script, so re-runs are free.
+Results are cached on the tree state, arch/, the *diff* part of each patch
+(header edits do not invalidate it) and this script, so re-runs are free.
 
 Usage: test-pre-patches.py [--no-cache] [--check]      (run from anywhere)
 """
@@ -63,6 +63,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 REPO = ROOT / "plonky3"
+# p3-arch-shims, which pre-patches add as a path dependency (`../../arch`).
+ARCH = ROOT / "arch"
 WORK = Path(os.environ.get("PRETEST_DIR",
                            Path(os.environ.get("EXTRACT_DIR", ROOT / ".lake" / "extract")) / "pretest"))
 CLASSES = {"totality", "observable", "signature", "test-edited", "harness"}
@@ -104,9 +106,20 @@ def cache_key(ps):
         # Only the diff: the header is rewritten by this script and by authors,
         # and neither changes what the patch does.
         h.update(split_header(p.read_text())[1].encode())
+    h.update(arch_digest().encode())
     h.update(Path(__file__).read_bytes())
     h.update(sh(["rustc", "--version"], cwd=REPO).stdout.encode())
     return h.hexdigest()[:16]
+
+
+def arch_digest():
+    """The content of arch/, which the patched trees depend on."""
+    h = hashlib.sha256()
+    for f in sorted(ARCH.rglob("*")):
+        if f.is_file() and "target" not in f.relative_to(ARCH).parts:
+            h.update(str(f.relative_to(ARCH)).encode())
+            h.update(f.read_bytes())
+    return h.hexdigest()
 
 
 def sync(dest):
@@ -126,6 +139,8 @@ def sync(dest):
         f = dest / name
         if f.is_file():
             os.utime(f)
+    # Beside the tree, where the pre-patches' `../../arch` paths find it.
+    sh(["rsync", "-a", "--delete", "--exclude", "target/", f"{ARCH}/", f"{dest.parent / 'arch'}/"])
 
 
 def apply(tree, ps):
@@ -134,6 +149,10 @@ def apply(tree, ps):
                            stdin=open(p), text=True, capture_output=True)
         if r.returncode != 0:
             sys.exit(f"error: {p.name} does not apply to the test tree:\n{r.stdout}{r.stderr}")
+    # Plonky3's Cargo.lock is not tracked, so a patch cannot edit it. Record the
+    # dependencies the patches add (a path dependency only adds its own entry;
+    # no locked version changes), so that `--locked` holds every other one.
+    sh(["cargo", "metadata", "--offline", "--format-version", "1"], cwd=tree)
 
 
 RUNNING = re.compile(r"^\s+Running (\S+(?: \S+)?) \((?:[^)]*/)?([A-Za-z0-9_-]+?)(?:-[0-9a-f]{16})?\)$")

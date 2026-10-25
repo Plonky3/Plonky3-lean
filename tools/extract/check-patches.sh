@@ -5,7 +5,8 @@
 # Patches are meant to be read one at a time, so every patch carries its own
 # rationale in its header. This script is what keeps that promise honest.
 #
-# Checks, per patch (crates/<crate>/patches/{pre,post}/*.patch):
+# Checks, per patch (crates/<crate>/patches/{pre,post}/*.patch, and a
+# variant's crates/<crate>/variants/<name>/patches/post/*.patch):
 #   - filename is NNN-lowercase-slug.patch
 #   - the required header fields are present and non-empty: for every patch
 #     Patch, Phase, Target, Hunks, Class, Gap, Cost, Upstreamable, Drop when;
@@ -20,8 +21,8 @@
 #   - a pre patch has its recorded mutation, `NNN-slug.mutation.patch`
 # and per phase:
 #   - the whole ordered set applies cleanly (zero fuzz): every crate's `pre`
-#     patches together to plonky3/, and each crate's `post` patches to that
-#     crate's pristine hax output, when a run of extract.sh has left one
+#     patches together to plonky3/, and each crate's or variant's `post`
+#     patches to its pristine hax output, when a run of extract.sh has left one
 #   - each mutation applies cleanly on top of the whole `pre` set
 #
 # Usage: tools/extract/check-patches.sh
@@ -192,8 +193,13 @@ done
 
 echo "== post =="
 n=0
-for dir in "$ROOT"/crates/*/patches/post; do
-    crate="$(basename "$(dirname "$(dirname "$dir")")")"
+for dir in "$ROOT"/crates/*/patches/post "$ROOT"/crates/*/variants/*/patches/post; do
+    [ -d "$dir" ] || continue
+    home="$(dirname "$(dirname "$dir")")"
+    case "$home" in
+        */variants/*) crate="$(basename "$(dirname "$(dirname "$home")")")@$(basename "$home")" ;;
+        *) crate="$(basename "$home")" ;;
+    esac
     [ "$crate" != "_template" ] || continue
     post=()
     for pf in "$dir"/[0-9]*.patch; do

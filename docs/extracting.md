@@ -69,6 +69,43 @@ modules, so every hand-written file it imports (`Assumptions/`, the stubs,
 hax also writes a `Verification/ProofObligations.lean` scaffold for hand-written
 proofs. It is not installed: the proofs live in `Plonky3Lean`.
 
+### Variants
+
+The run extracts every crate for `toolchain.toml`'s `target`, which has no SIMD,
+so the models describe the portable code. A `[[variant]]` table in a crate's
+`crate.toml` extracts the crate again for another target, such as a SIMD
+backend:
+
+```toml
+[[variant]]
+name = "x86_64-avx2"                   # crates/<crate>/variants/<name>/
+target = "x86_64-unknown-linux-gnu"    # charon's --targets
+target_features = ["avx2"]             # -Ctarget-feature=+<f>
+lean_lib = "P3Monty31Avx2"             # the variant's library
+namespace = "p3_monty_31_avx2"         # and namespace
+start_from = ["..."]                   # its roots, as for a scoped crate
+opaque = ["p3_monty_31::monty_31"]     # charon --opaque: the crate's portable modules
+```
+
+A variant is a unit of its own (`<crate>@<name>`, `config.py units`): step 3
+checks it for its target, step 4 extracts it and renames hax's library and
+namespace to the variant's (`tools/extract/rename-variant.py`), and steps 6 and 7
+install it into `crates/<crate>/variants/<name>/extraction/`, with its own
+`Assumptions/`, `gaps.toml` and `patches/post/`. The generated code refers to
+its own crate's items by names relative to the namespace and to other crates' by
+absolute names, so only the `namespace`/`open`/`end` lines and the module root
+change. Its `Assumptions/` bind each external from an `opaque` module to the
+crate's own model, rather than assume it. A variant whose items other variants
+call by absolute name keeps the crate's namespace (p3-field's).
+
+The SIMD backends call `core::arch` intrinsics, which have no Rust bodies.
+Pre-patch `monty-31/020` redirects them, under the cfg, to `arch/`
+(p3-arch-shims), lane-array models with the same names and signatures, which
+`crates/arch-shims` extracts as `P3ArchShims` and `arch/tests/` checks against
+the hardware. A `transmute` in the generated code means what its
+`core.intrinsics.Transmute` instance says (`HaxExt.lean`); `STATUS.md` lists the
+instances.
+
 ## Reading the extraction
 
 The extracted surface of p3-baby-bear is four modules, `baby_bear`, `mds`,
