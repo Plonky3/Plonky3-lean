@@ -1,0 +1,14 @@
+# Mutation of: _mm512_castpd_si512
+# Breaks:      it swaps the 32-bit halves of each element.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -797,7 +797,7 @@
+     let mut dst = [0u32; 16];
+     let mut k = 0;
+     while k < 8 {
+-        let (lo, hi) = split64(a.0[k]);
++        let (hi, lo) = split64(a.0[k]);
+         dst[2 * k] = lo;
+         dst[2 * k + 1] = hi;
+         k += 1;

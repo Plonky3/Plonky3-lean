@@ -1,0 +1,14 @@
+# Mutation of: _mm512_mask_slli_epi32
+# Breaks:      it shifts the lanes whose mask bit is clear.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -296,7 +296,7 @@
+     let mut dst = [0u32; 16];
+     let mut j = 0;
+     while j < 16 {
+-        dst[j] = if bit16(k, j) {
++        dst[j] = if !bit16(k, j) {
+             if s > 31 { 0 } else { a.0[j] << s }
+         } else {
+             src.0[j]

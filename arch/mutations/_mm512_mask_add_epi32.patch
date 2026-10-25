@@ -1,0 +1,14 @@
+# Mutation of: _mm512_mask_add_epi32
+# Breaks:      it zeroes the unselected lanes instead of taking them from `src`.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -342,7 +342,7 @@
+         dst[j] = if bit16(k, j) {
+             a.0[j].wrapping_add(b.0[j])
+         } else {
+-            src.0[j]
++            0
+         };
+         j += 1;
+     }

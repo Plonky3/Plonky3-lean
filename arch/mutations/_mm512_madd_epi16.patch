@@ -1,0 +1,14 @@
+# Mutation of: _mm512_madd_epi16
+# Breaks:      it reads `a`'s low 16-bit halves as unsigned.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -191,7 +191,7 @@
+     let mut dst = [0u32; 16];
+     let mut j = 0;
+     while j < 16 {
+-        let a_lo = (a.0[j] & 0xffff) as u16 as i16 as i32;
++        let a_lo = (a.0[j] & 0xffff) as u16 as i32;
+         let a_hi = (a.0[j] >> 16) as u16 as i16 as i32;
+         let b_lo = (b.0[j] & 0xffff) as u16 as i16 as i32;
+         let b_hi = (b.0[j] >> 16) as u16 as i16 as i32;
