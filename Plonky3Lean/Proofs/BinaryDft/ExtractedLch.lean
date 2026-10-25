@@ -134,6 +134,10 @@ theorem loop_foldlM {α β γ : Type} (body : α → RustM (ControlFlow α β)) 
     (fun k hk c _ => by rw [hstep k hk c]; cases g c k <;> simp)
     (fun c _ => hdone c) c trivial
 
+theorem ofOption_map_bind {α β γ : Type} (o : Option (α × γ)) (f : α → β) :
+    ofOption (o.map fun c => f c.1) = ofOption ((o.bind fun r => pure r.1).map f) := by
+  cases o <;> rfl
+
 /-! ## Lists as slices -/
 
 /-- A list as a slice, or the empty slice if it is too long. -/
@@ -262,6 +266,23 @@ theorem twiddles_new_eq_mirror (h : TowerComputes inst L) (log_n : Std.Usize) (s
       range_next_none _ _ (by rw [uz_val (by scalar_tac)])]
     simp
 
+/-- Doubling a word by a shift, while the double fits. -/
+theorem shl_one_eq (x : Std.Usize) (h2 : x.val * 2 ≤ Usize.max) :
+    (x <<< 1#i32 : RustM Std.Usize) = .ok (uz (x.val * 2)) := by
+  rw [shiftLeft_i32_eq _ _ (by decide) (by
+    simp [UScalarTy.Usize_numBits_eq]; rcases System.Platform.numBits_eq with e | e <;> simp [e])]
+  congr 1
+  apply UScalar.eq_of_val_eq
+  rw [uz_val h2]
+  show (x.bv <<< (1#i32 : Std.I32).toNat).toNat = _
+  rw [show (1#i32 : Std.I32).toNat = 1 from rfl, BitVec.toNat_shiftLeft, Nat.shiftLeft_eq,
+    pow_one, Nat.mod_eq_of_lt]
+  · rfl
+  · have : Usize.max = 2 ^ UScalarTy.Usize.numBits - 1 := by rw [Usize.max_def]; simp [Usize.numBits]
+    have := Nat.two_pow_pos UScalarTy.Usize.numBits
+    show x.val * 2 < _
+    simp only [UScalarTy.Usize_numBits_eq] at *; omega
+
 /-- The trailing zeros of a nonzero word are those the transcription counts. -/
 theorem trailing_zeros_eq (n : Std.Usize) (hn : 0 < n.val) :
     core.num.Usize.trailing_zeros n = .ok ⟨BitVec.ofNat 32 (trailingZeros n.val)⟩ := by
@@ -289,20 +310,7 @@ theorem twiddles_at_eq (h : TowerComputes inst L) (tw : Twiddles F) (hb : tw.bas
     p3_binary_dft.lch.twiddles.Twiddles.at inst (toTw tw) stage block =
       ofOption (tw.at L stage.val block.val) := by
   unfold p3_binary_dft.lch.twiddles.Twiddles.at Twiddles.at
-  have hsh : (block <<< 1#i32 : RustM Std.Usize) = .ok (uz (block.val * 2)) := by
-    rw [shiftLeft_i32_eq _ _ (by decide) (by
-      simp [UScalarTy.Usize_numBits_eq]; rcases System.Platform.numBits_eq with e | e <;> simp [e])]
-    congr 1
-    apply UScalar.eq_of_val_eq
-    rw [uz_val h2]
-    show (block.bv <<< (1#i32 : Std.I32).toNat).toNat = _
-    rw [show (1#i32 : Std.I32).toNat = 1 from rfl, BitVec.toNat_shiftLeft, Nat.shiftLeft_eq,
-      pow_one, Nat.mod_eq_of_lt]
-    · rfl
-    · have : Usize.max = 2 ^ UScalarTy.Usize.numBits - 1 := by rw [Usize.max_def]; simp [Usize.numBits]
-      have := Nat.two_pow_pos UScalarTy.Usize.numBits
-      show block.val * 2 < _
-      simp only [UScalarTy.Usize_numBits_eq] at *; omega
+  have hsh := shl_one_eq block h2
   simp only [toTw, vec_index_eq _ hb, hsh, bind_ok, domain_point_eq_mirror h, uz_val h2]
   cases tw.bases[stage.val]? <;> simp [ofOption]
   cases p3_binary_dft.domain.mirror.domain_point L (block.val * 2) <;> simp [h.add]
@@ -678,5 +686,171 @@ theorem grains_eq {inst : p3_binary_dft.butterfly.ButterflyField F R} (hb : Butt
     simp only [p3_binary_dft.lch.schedule.hax_reshaped.grains_loop.body, slice_len_eq, hmK,
       mkSlice_val (show (stg f1 H lo.val hi.val lo.val).length ≤ Usize.max by omega), lL, bind_ok]
     rw [ite_of_neg (fun h' => absurd ((uz_lt (by omega) (by omega)).mp h') (by omega))]
+
+/-! ## The walk over the blocks of a group -/
+
+open p3_binary_dft.lch.mirror p3_binary_dft.butterfly.mirror in
+variable [DecidableEq F] in
+theorem blockButterfly_full' (inverse : Bool) {len half k : ℕ} (h : (k + 1) * (2 * half) ≤ len)
+    (t : F) (y : ℕ → ℕ → F) :
+    blockButterfly inverse len half k t y =
+      some (packed_butterfly inverse (k * (2 * half)) (k * (2 * half) + half) half t y) := by
+  have hb : min (2 * half) (len - k * (2 * half)) = 2 * half := by
+    rw [min_eq_left]; rw [add_mul, one_mul] at h; omega
+  simp only [blockButterfly, hb, show ¬ 2 * half < half by omega, ↓reduceIte, plain_butterfly,
+    show 2 * half - half = half by omega]
+
+theorem bne_uz_zero {k : ℕ} (hk : k ≤ Usize.max) : (uz k != 0#usize) = decide (k ≠ 0) := by
+  by_cases h : k = 0
+  · subst h; rfl
+  · have : uz k ≠ 0#usize := fun e => h (by rw [← uz_val hk, e]; rfl)
+    simp [this, h]
+
+/-- The butterfly a block runs, whole or one grain at a time, on two runs of equal length. -/
+theorem kernel_eq {inst : p3_binary_dft.butterfly.ButterflyField F R} (hb : ButterflyComputes inst L)
+    (inverse split : Bool) (H : ℕ) (lo hi : Slice F) (t : F) (hlo : lo.val.length = H)
+    (hhi : hi.val.length = H) (hH : H + 1024 ≤ Usize.max) :
+    (if split then do
+        let i1 ← p3_binary_dft.lch.schedule.BUTTERFLY_GRAIN
+        if uz H ≤ i1 then inst.butterfly inverse lo hi t
+        else p3_binary_dft.lch.schedule.hax_reshaped.grains inverse inst lo hi t
+      else inst.butterfly inverse lo hi t) =
+      .ok (mkSlice (bfly1 inverse t lo.val hi.val), mkSlice (bfly2 inverse t lo.val hi.val)) := by
+  have hbf : inst.butterfly inverse lo hi t = _ := hb.butterfly inverse lo hi t
+  rw [ite_of_pos (by rw [hlo, hhi])] at hbf
+  cases split
+  · exact hbf
+  · simp only [ite_true, grain_eq, bind_ok]
+    split_ifs
+    · exact hbf
+    · exact grains_eq hb inverse lo hi t (by rw [hlo, hhi]) (by omega)
+
+open p3_binary_dft.lch.mirror p3_binary_dft.butterfly.mirror in
+variable [DecidableEq F] in
+/-- The extracted walk over cnt whole blocks of a group is the transcribed walk, on its rows. -/
+theorem walk_blocks_eq {inst : p3_binary_dft.butterfly.ButterflyField F R} (hb : ButterflyComputes inst L)
+    (tw : Twiddles F) (hbl : tw.bases.length ≤ Usize.max) (hsl : tw.steps.length ≤ Usize.max)
+    (inverse split : Bool) {w cnt half : ℕ} (hw : 0 < w) (hh : 0 < half) (s : Slice F)
+    (hs : s.val.length = cnt * (2 * half) * w) (stage first : Std.Usize)
+    (hfirst : (first.val + cnt) * 2 ≤ Usize.max) (hHG : 2 * (half * w) + 1024 ≤ Usize.max) :
+    p3_binary_dft.lch.schedule.hax_reshaped.walk_blocks inverse inst s (uz (half * w)) stage first split
+        (toTw tw) =
+      ofOption ((walkBlocks L tw inverse stage.val first.val (cnt * (2 * half)) half (rowsOf w s.val)).map
+        fun y => mkSlice (flat w (cnt * (2 * half)) y)) := by
+  set H := half * w with hH
+  set len := cnt * (2 * half) with hlen
+  have hsmax := s.property
+  have hcount : (len + 2 * half - 1) / (2 * half) = cnt := by
+    rw [hlen, show cnt * (2 * half) + 2 * half - 1 = (2 * half - 1) + cnt * (2 * half) by omega,
+      Nat.add_mul_div_right _ _ (by omega), Nat.div_eq_of_lt (by omega), zero_add]
+  unfold p3_binary_dft.lch.schedule.hax_reshaped.walk_blocks walkBlocks
+  rw [twiddles_at_eq hb.tower tw hbl stage first (by omega)]
+  have hH2 : H * 2 ≤ Usize.max := by omega
+  have hlw : len * w ≤ Usize.max := by omega
+  -- The block walk, as a loop over the blocks.
+  have hloop : ∀ t0 : F, p3_binary_dft.lch.schedule.hax_reshaped.walk_blocks_loop inverse inst s (uz H)
+      first split (toTw tw) t0 (uz (H * 2)) (uz (len * w)) 0#usize 0#usize =
+      ofOption (((List.range cnt).foldlM (fun (acc : (ℕ → ℕ → F) × F) i => do
+        let t ← if i = 0 then pure acc.2 else (do pure (acc.2 + (← tw.step (first.val + i))))
+        let y ← blockButterfly inverse len half i t acc.1
+        pure (y, t)) (rowsOf w s.val, t0)).map fun (c : (ℕ → ℕ → F) × F) => mkSlice (flat w len c.1)) := by
+    intro t0
+    have := loop_foldlM_inv
+      (fun st => p3_binary_dft.lch.schedule.hax_reshaped.walk_blocks_loop.body inverse inst (uz H) first
+        split (toTw tw) (uz (H * 2)) (uz (len * w)) st.1 st.2.1 st.2.2.1 st.2.2.2)
+      (fun (c : (ℕ → ℕ → F) × F) k => (mkSlice (flat w len c.1), c.2, uz (k * (H * 2)), uz k))
+      (fun (c : (ℕ → ℕ → F) × F) => mkSlice (flat w len c.1)) cnt
+      (fun (acc : (ℕ → ℕ → F) × F) i => do
+        let t ← if i = 0 then pure acc.2 else (do pure (acc.2 + (← tw.step (first.val + i))))
+        let y ← blockButterfly inverse len half i t acc.1
+        pure (y, t)) (fun _ _ => True) (fun k hk c _ => ?_) (fun c _ => ?_)
+      (rowsOf w s.val, t0) trivial
+    · rw [show (rowsOf w s.val, t0).1 = rowsOf w s.val from rfl, flat_rowsOf _ hs, mkSlice_self] at this
+      simp only [zero_mul] at this
+      unfold p3_binary_dft.lch.schedule.hax_reshaped.walk_blocks_loop
+      exact this
+    · -- One block.
+      have hkc : k + 1 ≤ cnt := hk
+      have hHpos : 0 < H := Nat.mul_pos hh hw
+      have hlenw : len * w = cnt * (H * 2) := by rw [hlen, hH]; ring
+      have hk2 : (k + 1) * (2 * half) ≤ len := by rw [hlen]; exact Nat.mul_le_mul_right _ hkc
+      have hko : k * (H * 2) + H * 2 ≤ len * w := by rw [hlenw, ← add_one_mul]; exact Nat.mul_le_mul_right _ hkc
+      set g := flat w len c.1 with hg
+      have hgl : g.length = len * w := length_flat _ _ _
+      have hgv : (mkSlice g).val = g := mkSlice_val (by omega)
+      -- The twiddle of the block.
+      have ht : ∀ {β : Type} (P : F → RustM β),
+          (do let t1 ← (if (uz k != 0#usize) = true then do
+                  let i1 ← first + uz k
+                  let t2 ← p3_binary_dft.lch.twiddles.Twiddles.step inst.p3_binary_fieldtowerTowerLevelInst (toTw tw) i1
+                  inst.p3_binary_fieldtowerTowerLevelInst.p3_fieldfieldFieldInst.AlgebraInst.coreopsarithAddAssignInst.add_assign c.2 t2
+                else RustM.ok c.2); P t1) =
+            ofOption (if k = 0 then pure c.2 else (do pure (c.2 + (← tw.step (first.val + k))))) >>= P := by
+        intro β P
+        rw [bne_uz_zero (by omega)]
+        by_cases hk0 : k = 0
+        · simp [hk0, ofOption]
+        · simp only [hk0, ne_eq, not_false_eq_true, decide_true, ite_true, ite_false]
+          have e1 : (first + uz k : RustM Std.Usize) = .ok (uz (first.val + k)) := by
+            conv_lhs => rw [eq_uz first]
+            exact uz_add (by omega)
+          rw [e1, bind_ok, twiddles_step_eq tw hsl _ (by rw [uz_val (by omega)]; omega),
+            uz_val (by omega)]
+          cases tw.step (first.val + k) <;> simp [ofOption, hb.tower.add_assign]
+      have hmir : ∀ t : F, blockButterfly inverse len half k t c.1 =
+          some (packed_butterfly inverse (k * (2 * half)) (k * (2 * half) + half) half t c.1) :=
+        fun t => blockButterfly_full' inverse hk2 t c.1
+      simp only [hmir]
+      simp only [p3_binary_dft.lch.schedule.hax_reshaped.walk_blocks_loop.body]
+      rw [ite_of_pos ((uz_lt (by omega) (by omega)).mpr (by omega)),
+        chunk_end_eq (by omega) hlw hH2, min_eq_left hko, bind_ok]
+      set o := k * (H * 2) with ho
+      set sub := (g.drop o).take (H * 2) with hsub
+      have hsubl : sub.length = H * 2 := by simp [hsub, hgl]; omega
+      have hidx := index_mut_range_eq (mkSlice g) (a := o) (b := o + H * 2) (by omega) (by rw [hgv]; omega)
+      rw [hgv, show o + H * 2 - o = H * 2 by omega, ← hsub] at hidx
+      have hsv : (mkSlice sub).val = sub := mkSlice_val (by omega)
+      obtain ⟨back2, hsplit, hback2⟩ := split_at_mut_eq (mkSlice sub) (n := H) (by rw [hsv]; omega)
+      rw [hsv] at hsplit hback2
+      have hlo : (mkSlice (sub.take H)).val = sub.take H := mkSlice_val (by simp; omega)
+      have hhi : (mkSlice (sub.drop H)).val = sub.drop H := mkSlice_val (by simp; omega)
+      have hker := fun t1 => kernel_eq hb inverse split H (mkSlice (sub.take H)) (mkSlice (sub.drop H)) t1
+        (by rw [hlo]; simp; omega) (by rw [hhi]; simp; omega) (by omega)
+      have hb2 : ∀ t1 : F, back2 (mkSlice (bfly1 inverse t1 (mkSlice (sub.take H)).val (mkSlice (sub.drop H)).val),
+          mkSlice (bfly2 inverse t1 (mkSlice (sub.take H)).val (mkSlice (sub.drop H)).val)) =
+          mkSlice (bfly1 inverse t1 (sub.take H) (sub.drop H) ++ bfly2 inverse t1 (sub.take H) (sub.drop H)) := by
+        intro t1
+        rw [hlo, hhi, hback2 _ _ (by rw [mkSlice_val (by simp [bfly1]; omega)]; simp [bfly1]; omega)
+          (by rw [mkSlice_val (by simp [bfly2]; omega)]; simp [bfly2]; omega),
+          mkSlice_val (by simp [bfly1]; omega), mkSlice_val (by simp [bfly2]; omega)]
+      have hfin : ∀ t1 : F, mkSlice (g.setSlice! o (mkSlice (bfly1 inverse t1 (sub.take H) (sub.drop H) ++
+          bfly2 inverse t1 (sub.take H) (sub.drop H))).val) =
+          mkSlice (flat w len (packed_butterfly inverse (k * (2 * half)) (k * (2 * half) + half) half t1 c.1)) := by
+        intro t1
+        rw [mkSlice_val (by simp [bfly1, bfly2]; omega)]
+        have := blockList_flat inverse t1 hw hk2 c.1
+        rw [show k * (2 * half) * w = o by rw [ho, hH]; ring, ← hH] at this
+        rw [← this, ← hg]
+        unfold blockList
+        rw [show 2 * H = H * 2 by ring, ← hsub]
+        rfl
+      simp only [hidx, bind_ok, Aeneas.Std.uncurry, hsplit, hker, uz_add_one (show k + 1 ≤ Usize.max by omega),
+        hb2, hfin]
+      simp only [ht, show o + H * 2 = (k + 1) * (H * 2) by rw [ho]; ring]
+      by_cases hk0 : k = 0
+      · simp [hk0, ofOption]
+      · cases tw.step (first.val + k) <;> simp [hk0, ofOption]
+    · have e : c.1 = c.1 := rfl
+      simp only [p3_binary_dft.lch.schedule.hax_reshaped.walk_blocks_loop.body,
+        show cnt * (H * 2) = len * w by rw [hlen, hH]; ring]
+      rw [ite_of_neg (fun h' => absurd ((uz_lt (by omega) (by omega)).mp h') (lt_irrefl _))]
+  cases hat : Twiddles.at L tw stage.val first.val with
+  | none => simp [ofOption]
+  | some t0 =>
+    rw [hcount]
+    simp only [ofOption, bind_ok, shl_one_eq (uz H) (by rw [uz_val (by omega)]; omega),
+      uz_val (show H ≤ Usize.max by omega), slice_len_eq, hs, massert, bne_uz_zero hH2]
+    rw [ite_of_pos (by simp only [ne_eq, decide_eq_true_eq]; positivity), bind_ok, hloop t0]
+    exact (ofOption_map_bind _ (fun y => mkSlice (flat w len y))).trans rfl
 
 end Plonky3Lean.Proofs.BinaryDft
