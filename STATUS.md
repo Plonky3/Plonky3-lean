@@ -42,7 +42,7 @@ target `thumbv7em-none-eabi`
 | `merkle-tree` | scoped | 1306 | 43 | 0 | 0 | 0 | 2 / 0 | pre `010`, pre `020` |
 | `mersenne-31` | scoped | 1444 | 259 | 0 | 12 | 30 | 1 / 1 | pre `010` |
 | `monty-31` | scoped | 1581 | 327 | 0 | 13 | 29 | 1 / 1 | pre `010` |
-| `multi-stark` | scoped | 338 | 1046 | 0 | 77 | 0 | 3 / 1 | pre `010`, pre `020`, pre `030`, post `010` |
+| `multi-stark` | scoped | 338 | 1319 | 0 | 103 | 0 | 3 / 1 | pre `010`, pre `020`, pre `030`, post `010` |
 | `multilinear-util` | scoped | 222 | 1113 | 0 | 75 | 0 | 2 / 0 | pre `010`, pre `020` |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 68 | 2 | 4 |  | 0 / 0 |  |
@@ -511,7 +511,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1805) whose dependencies include it; reaching one is not using it.
+(of 1818) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -553,7 +553,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1805) whose dependencies include the declaration.
+counts the claims (of 1818) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -895,17 +895,17 @@ counts the claims (of 1805) whose dependencies include the declaration.
 | `blake3-crate` | `blake3.BLOCK_LEN` | `blake3::BLOCK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.CHUNK_LEN` | `blake3::CHUNK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.OUT_LEN` | `blake3::OUT_LEN` | stub | 0 |
-| `bus` | `p3_bus.mirror.BusDirection` | `p3_bus::direction::BusDirection` | not translated | 5 |
-| `bus` | `p3_bus.mirror.BusDirection.index` | `p3_bus::direction::BusDirection::index` | not translated | 3 |
+| `bus` | `p3_bus.mirror.BusDirection` | `p3_bus::direction::BusDirection` | not translated | 10 |
+| `bus` | `p3_bus.mirror.BusDirection.index` | `p3_bus::direction::BusDirection::index` | not translated | 8 |
 | `bus` | `p3_bus.mirror.BusDirection.ALL` | `p3_bus::direction::BusDirection::ALL` | not translated | 0 |
-| `bus` | `p3_bus.mirror.BusNameError` | `p3_bus::name::BusNameError` | not translated | 3 |
-| `bus` | `p3_bus.mirror.BusName.MAX_LEN` | `p3_bus::name::BusName::MAX_LEN` | not translated | 3 |
-| `bus` | `p3_bus.mirror.isAsciiAlphabetic` | `core::num::u8::is_ascii_alphabetic` | not translated | 3 |
-| `bus` | `p3_bus.mirror.isAsciiAlphanumeric` | `core::num::u8::is_ascii_alphanumeric` | not translated | 3 |
-| `bus` | `p3_bus.mirror.BusName.try_new` | `p3_bus::name::BusName::try_new` | not translated | 3 |
-| `bus` | `p3_bus.mirror.BusBoundary` | `p3_bus::builder::BusBoundary` | not translated | 5 |
+| `bus` | `p3_bus.mirror.BusNameError` | `p3_bus::name::BusNameError` | not translated | 9 |
+| `bus` | `p3_bus.mirror.BusName.MAX_LEN` | `p3_bus::name::BusName::MAX_LEN` | not translated | 9 |
+| `bus` | `p3_bus.mirror.isAsciiAlphabetic` | `core::num::u8::is_ascii_alphabetic` | not translated | 9 |
+| `bus` | `p3_bus.mirror.isAsciiAlphanumeric` | `core::num::u8::is_ascii_alphanumeric` | not translated | 9 |
+| `bus` | `p3_bus.mirror.BusName.try_new` | `p3_bus::name::BusName::try_new` | not translated | 9 |
+| `bus` | `p3_bus.mirror.BusBoundary` | `p3_bus::builder::BusBoundary` | not translated | 10 |
 | `bus` | `p3_bus.mirror.BusBoundary.contains_row` | `p3_bus::builder::BusBoundary::contains_row` | not translated | 1 |
-| `bus` | `p3_bus.mirror.BusActivation` | `p3_bus::builder::BusActivation` | not translated | 4 |
+| `bus` | `p3_bus.mirror.BusActivation` | `p3_bus::builder::BusActivation` | not translated | 9 |
 | `bus` | `p3_bus.mirror.BusBuilder` | `p3_bus::builder::BusInteractionRecorder` | not translated | 2 |
 | `bus` | `p3_bus.mirror.BusBuilder.push_bus_interaction` | `p3_bus::builder::BusInteractionBuilder::push_bus_interaction` | not translated | 2 |
 | `bus` | `p3_bus.ram.mirror.MAX_RAM_BIT_WIDTH` | `p3_bus::ram::statement::MAX_RAM_BIT_WIDTH` | not translated | 2 |
@@ -944,15 +944,15 @@ counts the claims (of 1805) whose dependencies include the declaration.
 | `bus` | `p3_bus.product.mirror.interpolate_pair` | `p3_bus::product::math::interpolate_pair` | not translated | 1 |
 | `bus` | `p3_bus.product.mirror.interpolate_quad` | `p3_bus::product::math::interpolate_quad` | not translated | 1 |
 | `bus` | `p3_bus.product.mirror.has_distinct_round_nodes` | `p3_bus::product::math::has_distinct_round_nodes` | not translated | 1 |
-| `bus` | `p3_bus.product.mirror.ProductGkrRootShape` | `p3_bus::product::shape::ProductGkrRootShape` | not translated | 2 |
-| `bus` | `p3_bus.product.mirror.ProductGkrShapeError` | `p3_bus::product::error::ProductGkrShapeError` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrRootShape` | `p3_bus::product::shape::ProductGkrRootShape` | not translated | 8 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShapeError` | `p3_bus::product::error::ProductGkrShapeError` | not translated | 7 |
 | `bus` | `p3_bus.product.mirror.ProductGkrError` | `p3_bus::product::error::ProductGkrError` | not translated | 1 |
-| `bus` | `p3_bus.product.mirror.USIZE_MAX` | `core::num::usize::MAX` | not translated | 1 |
-| `bus` | `p3_bus.product.mirror.ProductGkrShape` | `p3_bus::product::shape::ProductGkrShape` | not translated | 8 |
-| `bus` | `p3_bus.product.mirror.ProductGkrShape.new` | `p3_bus::product::shape::ProductGkrShape::new` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.USIZE_MAX` | `core::num::usize::MAX` | not translated | 7 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape` | `p3_bus::product::shape::ProductGkrShape` | not translated | 14 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape.new` | `p3_bus::product::shape::ProductGkrShape::new` | not translated | 7 |
 | `bus` | `p3_bus.product.mirror.ProductGkrShape.root_message_len` | `p3_bus::product::shape::ProductGkrShape::root_message_len` | not translated | 1 |
-| `bus` | `p3_bus.product.mirror.layersLoop` | `p3_bus::product::shape::ProductGkrShape::layers` | not translated | 6 |
-| `bus` | `p3_bus.product.mirror.ProductGkrShape.layers` | `p3_bus::product::shape::ProductGkrShape::layers` | not translated | 6 |
+| `bus` | `p3_bus.product.mirror.layersLoop` | `p3_bus::product::shape::ProductGkrShape::layers` | not translated | 12 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape.layers` | `p3_bus::product::shape::ProductGkrShape::layers` | not translated | 12 |
 | `bus` | `p3_bus.product.mirror.ProductGkrShape.identity_padding_evaluation` | `p3_bus::product::shape::ProductGkrShape::identity_padding_evaluation` | not translated | 2 |
 | `bus` | `p3_bus.product.mirror.ProductGkrRootShape.encode` | `p3_bus::product::shape::ProductGkrRootShape::encode` | not translated | 0 |
 | `bus` | `p3_bus.product.mirror.ProductGkrRootShape.decode` | `p3_bus::product::shape::ProductGkrRootShape::decode` | not translated | 1 |
@@ -965,32 +965,32 @@ counts the claims (of 1805) whose dependencies include the declaration.
 | `bus` | `p3_bus.product.mirror.VerifyState` | `p3_bus::product::proof::ProductGkrProof::verify` | not translated | 1 |
 | `bus` | `p3_bus.product.mirror.verify_layer` | `p3_bus::product::proof::ProductGkrProof::verify` | not translated | 1 |
 | `bus` | `p3_bus.product.mirror.ProductGkrProof.verify` | `p3_bus::product::proof::ProductGkrProof::verify` | not translated | 1 |
-| `bus` | `p3_bus.plan.mirror.log2_ceil_usize` | `p3_util::log2_ceil_usize` | not translated | 1 |
-| `bus` | `p3_bus.plan.mirror.checked_next_power_of_two` | `core::num::usize::checked_next_power_of_two` | not translated | 1 |
-| `bus` | `p3_bus.plan.mirror.checked_add` | `core::num::usize::checked_add` | not translated | 2 |
-| `bus` | `p3_bus.plan.mirror.BusDomain` | `p3_bus::plan::BusDomain` | not translated | 4 |
+| `bus` | `p3_bus.plan.mirror.log2_ceil_usize` | `p3_util::log2_ceil_usize` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.checked_next_power_of_two` | `core::num::usize::checked_next_power_of_two` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.checked_add` | `core::num::usize::checked_add` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.BusDomain` | `p3_bus::plan::BusDomain` | not translated | 7 |
 | `bus` | `p3_bus.plan.mirror.BusDomain.identity_bit` | `p3_bus::plan::BusDomain::identity_bit` | not translated | 3 |
 | `bus` | `p3_bus.plan.mirror.BusTupleSlot` | `p3_bus::plan::BusTupleSlot` | not translated | 3 |
-| `bus` | `p3_bus.plan.mirror.BusBlockOwner` | `p3_bus::plan::BusBlockOwner` | not translated | 2 |
-| `bus` | `p3_bus.plan.mirror.BusBlock` | `p3_bus::plan::BusBlock` | not translated | 2 |
-| `bus` | `p3_bus.plan.mirror.BusSecurityGeometry` | `p3_bus::plan::BusSecurityGeometry` | not translated | 4 |
-| `bus` | `p3_bus.plan.mirror.BusPlan` | `p3_bus::plan::BusPlan` | not translated | 5 |
+| `bus` | `p3_bus.plan.mirror.BusBlockOwner` | `p3_bus::plan::BusBlockOwner` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.BusBlock` | `p3_bus::plan::BusBlock` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.BusSecurityGeometry` | `p3_bus::plan::BusSecurityGeometry` | not translated | 8 |
+| `bus` | `p3_bus.plan.mirror.BusPlan` | `p3_bus::plan::BusPlan` | not translated | 8 |
 | `bus` | `p3_bus.plan.mirror.BusPlan.tuple_slot` | `p3_bus::plan::BusPlan::tuple_slot` | not translated | 3 |
 | `bus` | `p3_bus.plan.mirror.BusPlan.blocks` | `p3_bus::plan::BusPlan::blocks` | not translated | 0 |
-| `bus` | `p3_bus.plan.mirror.UnsupportedBusAccess` | `p3_bus::plan::UnsupportedBusAccess` | not translated | 1 |
-| `bus` | `p3_bus.plan.mirror.BusExpressionLocation` | `p3_bus::plan::BusExpressionLocation` | not translated | 1 |
-| `bus` | `p3_bus.plan.mirror.BusPlanError` | `p3_bus::plan::error::BusPlanError` | not translated | 2 |
-| `bus` | `p3_bus.plan.mirror.SymbolicBusInteraction` | `p3_bus::builder::SymbolicBusInteraction` | not translated | 2 |
-| `bus` | `p3_bus.plan.mirror.BusPlanInput` | `p3_bus::plan::BusPlanInput` | not translated | 1 |
-| `bus` | `p3_bus.plan.mirror.leafAccess` | `p3_bus::plan::validate_expression` | not translated | 1 |
-| `bus` | `p3_bus.plan.mirror.validateWalk` | `p3_bus::plan::validate_expression` | not translated | 1 |
-| `bus` | `p3_bus.plan.mirror.validate_expression` | `p3_bus::plan::validate_expression` | not translated | 1 |
-| `bus` | `p3_bus.plan.mirror.validate_interaction` | `p3_bus::plan::validate_interaction` | not translated | 1 |
-| `bus` | `p3_bus.plan.mirror.PendingBlock` | `p3_bus::plan::PendingBlock` | not translated | 2 |
-| `bus` | `p3_bus.plan.mirror.pendingLe` | `p3_bus::plan::BusPlan::build` | not translated | 2 |
-| `bus` | `p3_bus.plan.mirror.collectWidths` | `p3_bus::plan::BusPlan::build` | not translated | 1 |
-| `bus` | `p3_bus.plan.mirror.layoutBlocks` | `p3_bus::plan::BusPlan::build` | not translated | 2 |
-| `bus` | `p3_bus.plan.mirror.BusPlan.build` | `p3_bus::plan::BusPlan::build` | not translated | 1 |
+| `bus` | `p3_bus.plan.mirror.UnsupportedBusAccess` | `p3_bus::plan::UnsupportedBusAccess` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.BusExpressionLocation` | `p3_bus::plan::BusExpressionLocation` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.BusPlanError` | `p3_bus::plan::error::BusPlanError` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.SymbolicBusInteraction` | `p3_bus::builder::SymbolicBusInteraction` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.BusPlanInput` | `p3_bus::plan::BusPlanInput` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.leafAccess` | `p3_bus::plan::validate_expression` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.validateWalk` | `p3_bus::plan::validate_expression` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.validate_expression` | `p3_bus::plan::validate_expression` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.validate_interaction` | `p3_bus::plan::validate_interaction` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.PendingBlock` | `p3_bus::plan::PendingBlock` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.pendingLe` | `p3_bus::plan::BusPlan::build` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.collectWidths` | `p3_bus::plan::BusPlan::build` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.layoutBlocks` | `p3_bus::plan::BusPlan::build` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.BusPlan.build` | `p3_bus::plan::BusPlan::build` | not translated | 7 |
 | `bus` | `p3_bus.evaluation.mirror.BusEvaluation` | `p3_bus::evaluation::BusEvaluation` | not translated | 2 |
 | `bus` | `p3_bus.evaluation.mirror.BusNode` | `p3_bus::evaluation::BusNode` | not translated | 2 |
 | `bus` | `p3_bus.evaluation.mirror.BusEvaluationError` | `p3_bus::evaluation::error::BusEvaluationError` | not translated | 2 |
@@ -1016,7 +1016,7 @@ counts the claims (of 1805) whose dependencies include the declaration.
 | `bus` | `p3_bus.security.mirror.BusSecurityDims` | `p3_security::bus::ProductGkrSecurityProfile` | not translated | 1 |
 | `bus` | `p3_bus.security.mirror.BusPlan.security_dims` | `p3_bus::security::BusPlan::security_model` | not translated | 1 |
 | `bus` | `p3_bus.security.mirror.components` | `p3_security::bus::BusSecurityModel::components` | not translated | 1 |
-| `bus` | `p3_bus.plan.mirror.layoutStep` | `p3_bus::plan::BusPlan::build` | not translated | 2 |
+| `bus` | `p3_bus.plan.mirror.layoutStep` | `p3_bus::plan::BusPlan::build` | not translated | 7 |
 | `challenger` | `p3_challenger.duplex_challenger.mirror.sample` | `{impl p3_challenger::CanSample<EF> for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::sample` | not translated | 1 |
 | `challenger` | `p3_challenger.duplex_challenger.mirror.sample_bits` | `{impl p3_challenger::CanSampleBits<usize> for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::sample_bits` | not translated | 0 |
 | `challenger` | `p3_challenger.mirror.squeezeLoop` | `p3_field::helpers::squeeze_field_order_num_limbs` | not translated | 2 |
@@ -1585,9 +1585,9 @@ counts the claims (of 1805) whose dependencies include the declaration.
 | `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.roundStep` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | not translated | 3 |
 | `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.verify_layer` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | not translated | 3 |
 | `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.verify_fractional_gkr` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | not translated | 2 |
-| `multi-stark` | `p3_multi_stark.lookup.mirror.LookupInstancePlan` | `p3_multi_stark::lookup::LookupInstancePlan` | not translated | 3 |
-| `multi-stark` | `p3_multi_stark.lookup.mirror.log2_ceil_usize` | `p3_util::log2_ceil_usize` | not translated | 2 |
-| `multi-stark` | `p3_multi_stark.lookup.mirror.place` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.LookupInstancePlan` | `p3_multi_stark::lookup::LookupInstancePlan` | not translated | 8 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.log2_ceil_usize` | `p3_util::log2_ceil_usize` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.place` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
 | `multi-stark` | `p3_multi_stark.lookup.mirror.bus_capacity_ok` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 1 |
 | `multi-stark` | `p3_multi_stark.lookup.mirror.tupleWeights` | `p3_multi_stark::lookup::AirLinkClaim::new` | not translated | 1 |
 | `multi-stark` | `p3_multi_stark.lookup.mirror.blockWeights` | `p3_multi_stark::lookup::AirLinkClaim::new` | not translated | 1 |
@@ -1604,6 +1604,32 @@ counts the claims (of 1805) whose dependencies include the declaration.
 | `multi-stark` | `p3_multi_stark.bus.mirror.terminal_composition` | `p3_multi_stark::bus::BusContext::terminal_composition` | not translated | 1 |
 | `multi-stark` | `p3_multi_stark.security.mirror.LookupParams` | `p3_security::multilinear::MultilinearLookupParams` | not translated | 0 |
 | `multi-stark` | `p3_multi_stark.security.mirror.lookup_terms` | `p3_security::multilinear::reduction_terms` | not translated | 0 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.Kind` | `p3_lookup::Kind` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.Lookup` | `p3_lookup::Lookup` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.Lookup.active` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.LookupBus` | `p3_multi_stark::lookup::LookupBus` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.busOf` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.LookupError` | `p3_multi_stark::lookup::LookupError` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.LookupPlan` | `p3_multi_stark::lookup::LookupPlan` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.shl_one` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.word` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.BusTable` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.assignBus` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.ActiveAir` | `p3_multi_stark::lookup::LookupInstancePlan` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.planStep` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.LookupPlan.build` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.TraceWindow` | `p3_lookup::indexed::TraceWindow` | not translated | 6 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.IndexedRead` | `p3_lookup::indexed::IndexedRead` | not translated | 6 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.IndexedTable` | `p3_lookup::indexed::IndexedTable` | not translated | 6 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.IndexedLookups` | `p3_lookup::indexed::IndexedLookups` | not translated | 6 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.IndexedLookups.isEmpty` | `p3_lookup::indexed::IndexedLookups::is_empty` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.TablePlacement` | `p3_multi_stark::indexed::TablePlacement` | not translated | 6 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.ReaderPlacement` | `p3_multi_stark::indexed::ReaderPlacement` | not translated | 6 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.IndexedTablePlan` | `p3_multi_stark::indexed::IndexedTablePlan` | not translated | 6 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.IndexedPlanError` | `p3_lookup::indexed::IndexedLookupError` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.addTable` | `p3_multi_stark::indexed::IndexedPlan::build` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.addRead` | `p3_multi_stark::indexed::IndexedPlan::build` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.IndexedPlan.from_declared` | `p3_multi_stark::indexed::IndexedPlan::build` | not translated | 2 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.split_at` | `p3_multilinear_util::point::Point::split_at` | not translated | 0 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.Point.reversed` | `p3_multilinear_util::point::Point::reversed` | not translated | 0 |
 | `multilinear-util` | `p3_multilinear_util.point.mirror.split_by_coordinate` | `p3_multilinear_util::point::split_by_coordinate` | not translated | 3 |
@@ -2209,7 +2235,6 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Blake3Air.quotient_fits_babyBear` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake3Air.ringChar_fields` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Blake3Air.sound` | `Classical.choice`, `Quot.sound`, `propext` |
-| `Bus.blocks_aligned` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.builder.BusBoundary.contains_row.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.builder.BusBoundary.contains_row.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.bus_soundness` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -2225,6 +2250,9 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Bus.identity_padding.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.layout_injective` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.multiset_identity` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.planner_block_unique` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.planner_blocks` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.planner_domains` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.planner_layout` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.ram.statement.RamStatement.access_payload_width.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Bus.ram.statement.RamStatement.access_payload_width.panics` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -2656,6 +2684,12 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `MultiStark.gkr_rounds_bad` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.gkr_sound` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.gkr_verifier` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.indexed_plan` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.indexed_plan_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.indexed_plan_reads` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.indexed_plan_sorted` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.indexed_plan_tables` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.indexed_plan_trivial` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.instCharPExt4FieldSize_plonky3Lean` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.instance_term` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.instance_wrong_width` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -2665,6 +2699,11 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `MultiStark.lookup_leaf_sum` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.lookup_link` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.lookup_placed` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_plan_ids` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_plan_no_variable` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_plan_outcome` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_plan_wf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_plan_widths` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.lookup_weights` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.next_row_opening` | `Classical.choice`, `Quot.sound`, `propext` |
 | `MultiStark.opening.OpeningClaims.next_row.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
