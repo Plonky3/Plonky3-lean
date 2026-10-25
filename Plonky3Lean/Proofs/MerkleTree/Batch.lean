@@ -187,6 +187,19 @@ theorem bwalk_honest (h : List (List F) → D) (c : List D → D) (z : D) (lh : 
   rw [hleaf, walk_honest h c [z, z] z _ opened _ _ _ _ I 0 hm (fun j _ => by simp),
     capIndex_bplan]
 
+/-- The path of the binary tree has one sibling per level. -/
+theorem length_path_bspecs (h : List (List F) → D) (c : List D → D) (z : D) (lh : List ℕ) (n : ℕ)
+    (rowsOf : ℕ → ℕ → List F) :
+    ∀ L e (L0 : ℕ → D) i, (path c [z, z] z L0 (bspecs h lh n rowsOf e L) i).length = L := by
+  intro L
+  induction L with
+  | zero => intro e L0 i; simp [bspecs, path]
+  | succ L ih =>
+    intro e L0 i
+    simp only [bspecs, path, List.length_append, List.length_map, ih, filter_ne_length,
+      Nat.mod_lt i (show 0 < 2 by norm_num), ↓reduceIte]
+    omega
+
 /-! ## Binding -/
 
 theorem mem_injected_bplan (lh : List ℕ) (n : ℕ) :
