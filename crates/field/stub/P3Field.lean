@@ -152,6 +152,13 @@ structure field.ExtensionField (Self Base : Type) where
   FieldInst : field.Field Self
   AlgebraSelfBaseSelf_Clause1_Clause0_PrimeSubfieldInst : field.Algebra Self Base
 
+/-- The extension's algebra over the base.
+
+This is the name aeneas gives it in code that names no other algebra of the extension. -/
+abbrev field.ExtensionField.AlgebraInst {Self Base : Type} (inst : field.ExtensionField Self Base) :
+    field.Algebra Self Base :=
+  inst.AlgebraSelfBaseSelf_Clause1_Clause0_PrimeSubfieldInst
+
 instance {Self : Type} : Inhabited (integers.QuotientMap Self Std.U64) :=
   ⟨⟨fun _ => fail .panic⟩⟩
 
