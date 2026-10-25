@@ -535,8 +535,8 @@ def bfly2 (inverse : Bool) (t : F) (lo hi : List F) : List F :=
 
 /-- The members of a butterfly instance that the transform calls compute:
 
-- the tower level's members, as for the domain;
-- the bit width 2^b of the level, through b;
+- the tower level's members, as for the domain
+- the bit width 2^b of the level, through b
 - the butterfly of two runs of equal length, pair by pair, which panics on runs of different lengths. -/
 structure ButterflyComputes (inst : p3_binary_dft.butterfly.ButterflyField F R) (L : Level F) :
     Prop where

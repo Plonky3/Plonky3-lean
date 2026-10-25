@@ -2,17 +2,22 @@
 
 lean_lib = "P3BinaryDft"
 
-# The domain points and the subspace polynomials are extracted.
+# Extracted, generic over the tower-level and butterfly traits:
 #
-# They stay generic over the tower-level trait, whose Lean structure P3BinaryField declares by hand.
+# - the domain points, the domain steps and the subspace polynomials;
+# - the twiddle state, the stage pass, the tile stages, the schedule, the blocked run and the forward and inverse transform.
 #
-# The transforms use rayon iterators, raw pointers, SIMD intrinsics and a `const` generic `bool` that picks a kernel (docs/extractor-issues.md 12, 14 and 61).
+# P3BinaryField declares the tower-level trait by hand; aeneas emits the butterfly trait.
 #
-# The domain steps accumulate in a closure over a mutable capture, whose back function CoreModels cannot take (docs/extractor-issues.md 60 and 244).
+# Pre-patch 010 reshapes the domain steps, whose closure updates a captured variable (docs/extractor-issues.md 60).
 #
-# Each of them is transcribed over a field in extraction/P3BinaryDft/Mirror/, with the abstractions its file header lists.
+# Pre-patch 020 reshapes the twiddle state and the stage kernels, which drive mutable chunk iterators through closures (docs/extractor-issues.md 14 and 60).
 #
-# Not transcribed: the staged coset pass and the staging buffers (lch/schedule.rs `run_cosets`, staging.rs), the polynomial-basis transform (poly/), and the SIMD kernels.
+# The staged group of a pool of 16 workers or more stays opaque, through `charon_args` below.
+#
+# Not extracted: the butterfly kernels themselves (SIMD intrinsics and raw pointers, docs/extractor-issues.md 12), the staged coset pass and the staging buffers (lch/schedule.rs `run_cosets`, staging.rs), and the polynomial-basis transform (poly/).
+#
+# The transcriptions in extraction/P3BinaryDft/Mirror/ remain the specifications the extracted kernels are proven equal to.
 state = "scoped"
 
 start_from = [

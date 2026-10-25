@@ -16,6 +16,8 @@ Their claims assume that the instance's members compute the field operations and
 
 The transforms are transcribed over a field of characteristic 2.
 
+The forward and inverse transform kernels are also extracted, and proven equal to their transcriptions.
+
 A tower level is the field with its bit width 2^b and its Cantor basis beta.
 
 The tower levels of the binary-field proofs, GF(2^(2^k)) for k up to 7, are such levels.
@@ -354,11 +356,14 @@ A buffer of w columns is read as its rows: entry r w + c is column c of row r.
 
 The claims assume of the instance:
 
-- its tower-level members compute the field operations and the Cantor basis, as for the domain;
-- it reports the level's bit width 2^b, with b at most 31;
-- its butterfly sends each pair (u, v) of two runs of equal length to (u + t v, u + t v + v), or back, and panics on runs of different lengths.
+- its tower-level members compute the field operations and the Cantor basis
+- it reports the level's bit width 2^b, with b at most 31
+- its butterfly maps each pair (u, v) to (u + t v, u + t v + v), or back
+- its butterfly panics on two runs of different lengths
 
-They also assume that the element size is the level's, and that the buffer's bytes fit a word with 1024 to spare.
+They also assume that the element size is the level's.
+
+They assume that the buffer's bytes fit a word, with 1024 to spare.
 -/
 
 section ExtractedLch
@@ -376,7 +381,9 @@ theorem extracted.domain_point_steps (h : TowerComputes inst.p3_binary_fieldtowe
   rw [domain_point_steps_eq_mirror h, Proofs.BinaryDft.domain_point_steps_eq]
   split_ifs <;> rfl
 
-/-- The shipped forward transform of 2^l rows, l at most the bit width, lists the additive NTT of the rows over shift + S_l. -/
+/-- The shipped forward transform of 2^l rows lists the additive NTT of the rows over shift + S_l.
+
+Here l is at most the bit width. -/
 theorem extracted.transform_ntt (hL : Cantor L) (hb : ButterflyComputes inst L) (hlb : L.logBits ≤ 31)
     (hsz : core.mem.size_of F = .ok (uz L.bytes)) (hbytes : 0 < L.bytes) {l w : ℕ}
     (hl : l ≤ 2 ^ L.logBits) (hw : 0 < w) (hwm : w ≤ Aeneas.Std.Usize.max) (values : Aeneas.Std.Slice F)
@@ -408,8 +415,8 @@ theorem extracted.transform_round_trip (hL : Cantor L) (hb : ButterflyComputes i
 
 /-- The shipped transform of n rows panics in two cases:
 
-- n is not a power of two, zero included;
-- n is 2^l with l past the level's bit width 2^b. -/
+- n is not a power of two, zero included
+- n is 2^l with l past the level's bit width 2^b -/
 theorem extracted.transform_panics (hL : Cantor L) (hb : ButterflyComputes inst L) (hlb : L.logBits ≤ 31)
     (hsz : core.mem.size_of F = .ok (uz L.bytes)) (hbytes : 0 < L.bytes) (inverse : Bool) {n w : ℕ}
     (hwm : w ≤ Aeneas.Std.Usize.max) (values : Aeneas.Std.Slice F) (hlen : values.val.length = n * w)

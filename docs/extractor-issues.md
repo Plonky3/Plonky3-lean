@@ -389,11 +389,13 @@ keeps its number and says so.
 
     The generated `call_once` then does not elaborate against CoreModels' `FnOnce`.
 
+    Pre-patch `binary-dft/010` gives the domain steps a plain loop, so they are extracted now.
+
     p3-binary-pcs's coset fold rewrites its scratch buffer in place across layers, and aeneas reports an internal error on that loop.
 
     The verifier's query-coset fold matches its challenges against a one-element slice pattern, and aeneas reports an inconsistent projection.
 
-    All three stay transcribed, and their callers' claims read the transcriptions.
+    The two folds stay transcribed, and their callers' claims read the transcriptions.
 
 200. **charon's `--start-from` does not accept trait generics.** A pattern such
     as `{impl p3_field::integers::QuotientMap<u32> for …}::from_int` fails with
