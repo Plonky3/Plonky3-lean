@@ -235,4 +235,57 @@ theorem schedule_new_eq {b w : ℕ} (hsz : core.mem.size_of F = .ok (uz b)) (hb 
   rw [show (128 * 1024 : ℕ) = 131072 by norm_num,
     show (0#usize : Std.Usize) = uz 0 from UScalar.eq_of_val_eq (by rw [uz_val (by omega)]; rfl)]
 
+/-! ## The cut -/
+
+open p3_binary_dft.lch.mirror in
+/-- A transcribed cut as the extracted structure. -/
+def toCut (c : Cut) : p3_binary_dft.lch.schedule.Cut :=
+  ⟨uz c.tile, uz c.slab, uz c.group, uz c.groups, uz c.log_n⟩
+
+theorem ite_uz {c : Prop} [Decidable c] (a b : ℕ) :
+    (if c then RustM.ok (uz a) else RustM.ok (uz b)) = RustM.ok (uz (if c then a else b)) := by
+  split_ifs <;> rfl
+
+open p3_binary_dft.lch.mirror in
+/-- The extracted cut of a schedule with no staged group: one stage per group above the tile. -/
+theorem cut_new_eq (s : Schedule) (h1 : s.log_tile_rows ≤ Usize.max) (h2 : s.log_staged_rows = 0)
+    (h3 : s.log_slab_rows ≤ Usize.max) {log_n : ℕ} (hl : log_n ≤ Usize.max) :
+    p3_binary_dft.lch.schedule.Cut.new (toSched s) (uz log_n) = .ok (toCut (Cut.new s log_n)) := by
+  have hmin : (p3_binary_dft.lch.schedule.MIN_FUSED_STAGES : Std.Usize) = uz 2 := by
+    unfold p3_binary_dft.lch.schedule.MIN_FUSED_STAGES
+    exact UScalar.eq_of_val_eq (by rw [uz_val (by scalar_tac)]; rfl)
+  have h2m : (2 : ℕ) ≤ Usize.max := by scalar_tac
+  unfold p3_binary_dft.lch.schedule.Cut.new Cut.new
+  simp only [toSched, hmin, h2]
+  have ht : ∃ t, t = min s.log_tile_rows log_n ∧
+      (if uz s.log_tile_rows < uz log_n then RustM.ok (uz s.log_tile_rows) else RustM.ok (uz log_n)) =
+        RustM.ok (uz t) := by
+    refine ⟨_, rfl, ?_⟩
+    by_cases h : s.log_tile_rows < log_n
+    · rw [ite_of_pos ((uz_lt h1 hl).mpr h), min_eq_left h.le]
+    · rw [ite_of_neg (fun h' => h ((uz_lt h1 hl).mp h')), min_eq_right (by omega)]
+  obtain ⟨t, htv, hte⟩ := ht
+  have htm : t ≤ Usize.max := by omega
+  rw [hte, bind_ok]
+  have hs : (if uz s.log_slab_rows < uz t then RustM.ok (uz s.log_slab_rows) else RustM.ok (uz t)) =
+      RustM.ok (uz (min s.log_slab_rows t)) := by
+    by_cases h : s.log_slab_rows < t
+    · rw [ite_of_pos ((uz_lt h3 htm).mpr h), min_eq_left h.le]
+    · rw [ite_of_neg (fun h' => h ((uz_lt h3 htm).mp h')), min_eq_right (by omega)]
+  rw [hs, bind_ok, ite_of_neg (fun h' => absurd ((uz_le h2m (by scalar_tac)).mp h') (by omega)), bind_ok,
+    uz_sub (by omega) hl, bind_ok, uz_one, div_ceil_eq (by omega) (by scalar_tac) one_pos, bind_ok]
+  simp only [toCut, ← htv, show ¬ (2 ≤ 0) from by omega, ite_false]
+
+open p3_binary_dft.lch.mirror in
+theorem cut_bounds_eq (c : Cut) (hg1 : c.group = 1) (g : ℕ) (h : c.tile + g + 1 ≤ Usize.max)
+    (hl : c.log_n ≤ Usize.max) :
+    p3_binary_dft.lch.schedule.Cut.bounds (toCut c) (uz g) = .ok (uz (c.bounds g).1, uz (c.bounds g).2) := by
+  unfold p3_binary_dft.lch.schedule.Cut.bounds Cut.bounds
+  simp only [toCut, hg1, mul_one]
+  rw [uz_mul (by omega) (by omega) (by scalar_tac), bind_ok, mul_one, uz_add (by omega), bind_ok,
+    uz_add (by omega), bind_ok]
+  by_cases hc : c.tile + g + 1 < c.log_n
+  · rw [ite_of_pos ((uz_lt (by omega) hl).mpr hc), min_eq_left hc.le]
+  · rw [ite_of_neg (fun h' => hc ((uz_lt (by omega) hl).mp h')), min_eq_right (by omega)]
+
 end Plonky3Lean.Proofs.BinaryDft
