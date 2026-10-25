@@ -15,5 +15,6 @@ public import P3Circle.Folding
 public import P3Circle.DeepQuotient
 public import P3Circle.Verifier
 public import P3Circle.Pcs
+public import P3Circle.Prover
 
 @[expose] public section
