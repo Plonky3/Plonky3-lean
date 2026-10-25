@@ -17,14 +17,32 @@ state = "scoped"
 
 start_from = [
   "p3_binary_dft::domain::domain_point",
+  "p3_binary_dft::domain::domain_point_steps",
   "p3_binary_dft::domain::subspace_polynomial",
+  "p3_binary_dft::lch::transform",
 ]
 
 features = []
 
+# Passed to charon after toolchain.toml's `charon_args`, for this crate only.
+#   fused_group -> opaque: a staged group of stages runs only on a pool of 16 workers or more.
+#                  The serial pool has one, so the transform never reaches it.
+#                  Its body drives the staging buffers through rayon's `for_each_init`, which aeneas rejects.
+charon_args = [
+  "--opaque", "p3_binary_dft::lch::schedule::fused_group",
+]
+
 watch = ["binary-dft/src", "binary-dft/Cargo.toml", "binary-field/src/tower.rs", "util/src/lib.rs", "commit/src/encoder.rs"]
 
 # The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_maybe_rayon.serial.current_num_threads"
+rust = "p3_maybe_rayon::serial::current_num_threads"
+
+[[mirror]]
+lean = "core.mem.size_of_val"
+rust = "core::mem::size_of_val"
 
 [[mirror]]
 lean = "p3_binary_dft.mirror.Level.cantorBasis"

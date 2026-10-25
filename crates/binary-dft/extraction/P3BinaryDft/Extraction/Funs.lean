@@ -83,8 +83,71 @@ def domain.domain_point
   domain.domain_point_loop p3_binary_fieldtowerTowerLevelInst point index
     0#usize
 
+/-- [p3_binary_dft::hax_reshaped::domain_point_steps]: loop body 0:
+    Source: 'binary-dft/src/hax_reshaped.rs', lines 23:4-26:5 -/
+@[rust_loop_body]
+def hax_reshaped.domain_point_steps_loop.body
+  {F : Type _} {Clause0_Repr : Type _} (p3_binary_fieldtowerTowerLevelInst :
+  p3_binary_field.tower.TowerLevel F Clause0_Repr)
+  (iter : core.ops.range.Range Std.Usize) (steps : alloc.vec.Vec F) (point : F)
+  :
+  RustM (ControlFlow ((core.ops.range.Range Std.Usize) × (alloc.vec.Vec F) ×
+    F) (alloc.vec.Vec F))
+  := do
+  let (o, iter1) ←
+    core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next
+      core.Usize.Insts.CoreIterRangeStep iter
+  match o with
+  | core.option.Option.None => ok (done steps)
+  | core.option.Option.Some r =>
+    let i ← r + 1#usize
+    let t ← p3_binary_fieldtowerTowerLevelInst.cantor_basis i
+    let point1 ←
+      p3_binary_fieldtowerTowerLevelInst.p3_fieldfieldFieldInst.AlgebraInst.coreopsarithAddAssignInst.add_assign
+        point t
+    let steps1 ← alloc.vec.Vec.push steps point1
+    ok (cont (iter1, steps1, point1))
+
+/-- [p3_binary_dft::hax_reshaped::domain_point_steps]: loop 0:
+    Source: 'binary-dft/src/hax_reshaped.rs', lines 23:4-26:5 -/
+@[rust_loop]
+def hax_reshaped.domain_point_steps_loop
+  {F : Type _} {Clause0_Repr : Type _} (p3_binary_fieldtowerTowerLevelInst :
+  p3_binary_field.tower.TowerLevel F Clause0_Repr)
+  (iter : core.ops.range.Range Std.Usize) (steps : alloc.vec.Vec F) (point : F)
+  :
+  RustM (alloc.vec.Vec F)
+  := do
+  loop
+    (fun (iter1, steps1, point1) => hax_reshaped.domain_point_steps_loop.body
+      p3_binary_fieldtowerTowerLevelInst iter1 steps1 point1)
+    (iter, steps, point)
+
+/-- [p3_binary_dft::hax_reshaped::domain_point_steps]:
+    Source: 'binary-dft/src/hax_reshaped.rs', lines 18:0-28:1 -/
+def hax_reshaped.domain_point_steps
+  {F : Type _} {Clause0_Repr : Type _} (p3_binary_fieldtowerTowerLevelInst :
+  p3_binary_field.tower.TowerLevel F Clause0_Repr) (count : Std.Usize) :
+  RustM (alloc.vec.Vec F)
+  := do
+  let steps ← alloc.vec.Vec.new F
+  let point ←
+    p3_binary_fieldtowerTowerLevelInst.p3_fieldfieldFieldInst.AlgebraInst.PrimeCharacteristicRingInst.ZERO
+  hax_reshaped.domain_point_steps_loop p3_binary_fieldtowerTowerLevelInst
+    { start := 0#usize, «end» := count } steps point
+
+/-- [p3_binary_dft::domain::domain_point_steps]:
+    Source: 'binary-dft/src/domain.rs', lines 59:0-61:1
+    Visibility: public -/
+def domain.domain_point_steps
+  {F : Type _} {Clause0_Repr : Type _} (p3_binary_fieldtowerTowerLevelInst :
+  p3_binary_field.tower.TowerLevel F Clause0_Repr) (count : Std.Usize) :
+  RustM (alloc.vec.Vec F)
+  := do
+  hax_reshaped.domain_point_steps p3_binary_fieldtowerTowerLevelInst count
+
 /-- [p3_binary_dft::domain::subspace_polynomial]: loop body 0:
-    Source: 'binary-dft/src/domain.rs', lines 63:4-65:5
+    Source: 'binary-dft/src/domain.rs', lines 71:4-73:5
     Visibility: public -/
 @[rust_loop_body]
 def domain.subspace_polynomial_loop.body
@@ -108,7 +171,7 @@ def domain.subspace_polynomial_loop.body
     ok (cont (iter1, value1))
 
 /-- [p3_binary_dft::domain::subspace_polynomial]: loop 0:
-    Source: 'binary-dft/src/domain.rs', lines 63:4-65:5
+    Source: 'binary-dft/src/domain.rs', lines 71:4-73:5
     Visibility: public -/
 @[rust_loop]
 def domain.subspace_polynomial_loop
@@ -123,7 +186,7 @@ def domain.subspace_polynomial_loop
     (iter, value)
 
 /-- [p3_binary_dft::domain::subspace_polynomial]:
-    Source: 'binary-dft/src/domain.rs', lines 61:0-67:1
+    Source: 'binary-dft/src/domain.rs', lines 69:0-75:1
     Visibility: public -/
 @[reducible]
 def domain.subspace_polynomial
@@ -133,5 +196,818 @@ def domain.subspace_polynomial
   := do
   domain.subspace_polynomial_loop p3_binary_fieldtowerTowerLevelInst
     { start := 0#usize, «end» := j } x
+
+/-- [p3_binary_dft::lch::twiddles::{p3_binary_dft::lch::twiddles::Twiddles<F>}::new_indexed]: loop body 0:
+    Source: 'binary-dft/src/lch/twiddles.rs', lines 59:8-62:9 -/
+@[rust_loop_body]
+def lch.twiddles.Twiddles.new_indexed_loop.body
+  {F : Type _} {Clause0_Repr : Type _} (p3_binary_fieldtowerTowerLevelInst :
+  p3_binary_field.tower.TowerLevel F Clause0_Repr)
+  (iter : core.ops.range.Range Std.Usize) (bases : alloc.vec.Vec F) (base : F)
+  :
+  RustM (ControlFlow ((core.ops.range.Range Std.Usize) × (alloc.vec.Vec F) ×
+    F) (alloc.vec.Vec F))
+  := do
+  let (o, iter1) ←
+    core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next
+      core.Usize.Insts.CoreIterRangeStep iter
+  match o with
+  | core.option.Option.None => ok (done bases)
+  | core.option.Option.Some _ =>
+    let bases1 ← alloc.vec.Vec.push bases base
+    let t ←
+      p3_binary_fieldtowerTowerLevelInst.p3_fieldfieldFieldInst.AlgebraInst.PrimeCharacteristicRingInst.square
+        base
+    let base1 ←
+      p3_binary_fieldtowerTowerLevelInst.p3_fieldfieldFieldInst.AlgebraInst.coreopsarithAddInst.add
+        t base
+    ok (cont (iter1, bases1, base1))
+
+/-- [p3_binary_dft::lch::twiddles::{p3_binary_dft::lch::twiddles::Twiddles<F>}::new_indexed]: loop 0:
+    Source: 'binary-dft/src/lch/twiddles.rs', lines 59:8-62:9 -/
+@[rust_loop]
+def lch.twiddles.Twiddles.new_indexed_loop
+  {F : Type _} {Clause0_Repr : Type _} (p3_binary_fieldtowerTowerLevelInst :
+  p3_binary_field.tower.TowerLevel F Clause0_Repr)
+  (iter : core.ops.range.Range Std.Usize) (bases : alloc.vec.Vec F) (base : F)
+  :
+  RustM (alloc.vec.Vec F)
+  := do
+  loop
+    (fun (iter1, bases1, base1) => lch.twiddles.Twiddles.new_indexed_loop.body
+      p3_binary_fieldtowerTowerLevelInst iter1 bases1 base1)
+    (iter, bases, base)
+
+/-- [p3_binary_dft::lch::twiddles::{p3_binary_dft::lch::twiddles::Twiddles<F>}::new_indexed]:
+    Source: 'binary-dft/src/lch/twiddles.rs', lines 55:4-68:5 -/
+def lch.twiddles.Twiddles.new_indexed
+  {F : Type _} {Clause0_Repr : Type _} (p3_binary_fieldtowerTowerLevelInst :
+  p3_binary_field.tower.TowerLevel F Clause0_Repr) (log_n : Std.Usize)
+  (shift : F) :
+  RustM (lch.twiddles.Twiddles F)
+  := do
+  let bases ← alloc.vec.Vec.new F
+  let bases1 ←
+    lch.twiddles.Twiddles.new_indexed_loop p3_binary_fieldtowerTowerLevelInst
+      { start := 0#usize, «end» := log_n } bases shift
+  -- PATCHED: the exposed model of `saturating_sub` (was `core.num.Usize.saturating_sub`)
+  let i ← core.num.Usize.saturating_sub_exposed log_n 1#usize
+  let steps ← domain.domain_point_steps p3_binary_fieldtowerTowerLevelInst i
+  ok { bases := bases1, steps }
+
+/-- [p3_binary_dft::lch::twiddles::{p3_binary_dft::lch::twiddles::Twiddles<F>}::new]:
+    Source: 'binary-dft/src/lch/twiddles.rs', lines 49:4-51:5 -/
+def lch.twiddles.Twiddles.new
+  {F : Type _} {Clause0_Repr : Type _} (p3_binary_fieldtowerTowerLevelInst :
+  p3_binary_field.tower.TowerLevel F Clause0_Repr) (log_n : Std.Usize)
+  (shift : F) :
+  RustM (lch.twiddles.Twiddles F)
+  := do
+  lch.twiddles.Twiddles.new_indexed p3_binary_fieldtowerTowerLevelInst log_n
+    shift
+
+/-- [p3_binary_dft::lch::schedule::BUTTERFLY_GRAIN]
+    Source: 'binary-dft/src/lch/schedule.rs', lines 29:0-29:50 -/
+@[global_simps, irreducible]
+def lch.schedule.BUTTERFLY_GRAIN : RustM Std.Usize := 1#usize <<< 10#i32
+
+/-- [p3_binary_dft::lch::twiddles::{p3_binary_dft::lch::twiddles::Twiddles<F>}::step]:
+    Source: 'binary-dft/src/lch/twiddles.rs', lines 78:4-80:5 -/
+def lch.twiddles.Twiddles.step
+  {F : Type _} {Clause0_Repr : Type _} (p3_binary_fieldtowerTowerLevelInst :
+  p3_binary_field.tower.TowerLevel F Clause0_Repr)
+  (self : lch.twiddles.Twiddles F) (index : Std.Usize) :
+  RustM F
+  := do
+  let i ← core.num.Usize.trailing_zeros index
+  let i1 ← lift (UScalar.cast .Usize i)
+  alloc.vec.Vec.Insts.CoreOpsIndexIndex.index
+    (core.Usize.Insts.CoreSliceIndexSliceIndexSliceT F) self.steps i1
+
+/-- [p3_binary_dft::lch::twiddles::{p3_binary_dft::lch::twiddles::Twiddles<F>}::at]:
+    Source: 'binary-dft/src/lch/twiddles.rs', lines 72:4-74:5 -/
+def lch.twiddles.Twiddles.at
+  {F : Type _} {Clause0_Repr : Type _} (p3_binary_fieldtowerTowerLevelInst :
+  p3_binary_field.tower.TowerLevel F Clause0_Repr)
+  (self : lch.twiddles.Twiddles F) (stage : Std.Usize) (block : Std.Usize) :
+  RustM F
+  := do
+  let t ←
+    alloc.vec.Vec.Insts.CoreOpsIndexIndex.index
+      (core.Usize.Insts.CoreSliceIndexSliceIndexSliceT F) self.bases stage
+  let i ← block <<< 1#i32
+  let t1 ← domain.domain_point p3_binary_fieldtowerTowerLevelInst i
+  p3_binary_fieldtowerTowerLevelInst.p3_fieldfieldFieldInst.AlgebraInst.coreopsarithAddInst.add
+    t t1
+
+/-- [p3_binary_dft::lch::schedule::hax_reshaped::chunk_end]:
+    Source: 'binary-dft/src/lch/schedule/hax_reshaped.rs', lines 16:0-23:1 -/
+def lch.schedule.hax_reshaped.chunk_end
+  (start : Std.Usize) (size : Std.Usize) (len : Std.Usize) :
+  RustM Std.Usize
+  := do
+  let i ← len - start
+  if i < size
+  then ok len
+  else start + size
+
+/-- [p3_binary_dft::lch::schedule::hax_reshaped::grains]: loop body 0:
+    Source: 'binary-dft/src/lch/schedule/hax_reshaped.rs', lines 78:4-83:5 -/
+@[rust_loop_body]
+def lch.schedule.hax_reshaped.grains_loop.body
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (t : F) (lo : Slice F) (hi : Slice F)
+  (start : Std.Usize) :
+  RustM (ControlFlow ((Slice F) × (Slice F) × Std.Usize) ((Slice F) × (Slice
+    F)))
+  := do
+  let i ← core.slice.Slice.len lo
+  if start < i
+  then
+    let i1 ← core.slice.Slice.len hi
+    if start < i1
+    then
+      let i2 ← lch.schedule.BUTTERFLY_GRAIN
+      let lo_end ← lch.schedule.hax_reshaped.chunk_end start i2 i
+      let hi_end ← lch.schedule.hax_reshaped.chunk_end start i2 i1
+      let (s, index_mut_back) ←
+        core.Slice.Insts.CoreOpsIndexIndexMut.index_mut
+          (core.ops.range.RangeUsize.Insts.CoreSliceIndexSliceIndexSliceSlice
+          F) lo { start, «end» := lo_end }
+      let (s1, index_mut_back1) ←
+        core.Slice.Insts.CoreOpsIndexIndexMut.index_mut
+          (core.ops.range.RangeUsize.Insts.CoreSliceIndexSliceIndexSliceSlice
+          F) hi { start, «end» := hi_end }
+      let (s2, s3) ← butterflyButterflyFieldInst.butterfly INVERSE s s1 t
+      let start1 ← start + i2
+      let hi1 := index_mut_back1 s3
+      let lo1 := index_mut_back s2
+      ok (cont (lo1, hi1, start1))
+    else ok (done (lo, hi))
+  else ok (done (lo, hi))
+
+/-- [p3_binary_dft::lch::schedule::hax_reshaped::grains]: loop 0:
+    Source: 'binary-dft/src/lch/schedule/hax_reshaped.rs', lines 78:4-83:5 -/
+@[rust_loop]
+def lch.schedule.hax_reshaped.grains_loop
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (lo : Slice F) (hi : Slice F) (t : F)
+  (start : Std.Usize) :
+  RustM ((Slice F) × (Slice F))
+  := do
+  loop
+    (fun (lo1, hi1, start1) => lch.schedule.hax_reshaped.grains_loop.body
+      INVERSE butterflyButterflyFieldInst t lo1 hi1 start1)
+    (lo, hi, start)
+
+/-- [p3_binary_dft::lch::schedule::hax_reshaped::grains]:
+    Source: 'binary-dft/src/lch/schedule/hax_reshaped.rs', lines 75:0-84:1 -/
+@[reducible]
+def lch.schedule.hax_reshaped.grains
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (lo : Slice F) (hi : Slice F) (t : F) :
+  RustM ((Slice F) × (Slice F))
+  := do
+  lch.schedule.hax_reshaped.grains_loop INVERSE butterflyButterflyFieldInst lo
+    hi t 0#usize
+
+/-- [p3_binary_dft::lch::schedule::hax_reshaped::walk_blocks]: loop body 0:
+    Source: 'binary-dft/src/lch/schedule/hax_reshaped.rs', lines 55:4-70:5 -/
+@[rust_loop_body]
+def lch.schedule.hax_reshaped.walk_blocks_loop.body
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (half : Std.Usize) (first : Std.Usize) (split : Bool)
+  (twiddles : lch.twiddles.Twiddles F) (block_len : Std.Usize)
+  (len : Std.Usize) (group : Slice F) (t : F) (start : Std.Usize)
+  (i : Std.Usize) :
+  RustM (ControlFlow ((Slice F) × F × Std.Usize × Std.Usize) (Slice F))
+  := do
+  if start < len
+  then
+    let «end» ← lch.schedule.hax_reshaped.chunk_end start block_len len
+    let t1 ←
+      if i != 0#usize
+      then
+        do
+        let i1 ← first + i
+        let t2 ←
+          lch.twiddles.Twiddles.step
+            butterflyButterflyFieldInst.p3_binary_fieldtowerTowerLevelInst
+            twiddles i1
+        butterflyButterflyFieldInst.p3_binary_fieldtowerTowerLevelInst.p3_fieldfieldFieldInst.AlgebraInst.coreopsarithAddAssignInst.add_assign
+          t t2
+      else ok t
+    let (s, index_mut_back) ←
+      core.Slice.Insts.CoreOpsIndexIndexMut.index_mut
+        (core.ops.range.RangeUsize.Insts.CoreSliceIndexSliceIndexSliceSlice F)
+        group { start, «end» }
+    let ((lo, hi), split_at_mut_back) ← core.slice.Slice.split_at_mut s half
+    let (lo1, hi1) ←
+      if split
+      then
+        do
+        let i1 ← lch.schedule.BUTTERFLY_GRAIN
+        if half <= i1
+        then butterflyButterflyFieldInst.butterfly INVERSE lo hi t1
+        else
+          lch.schedule.hax_reshaped.grains INVERSE butterflyButterflyFieldInst
+            lo hi t1
+      else butterflyButterflyFieldInst.butterfly INVERSE lo hi t1
+    let i1 ← i + 1#usize
+    let s1 := split_at_mut_back (lo1, hi1)
+    let group1 := index_mut_back s1
+    ok (cont (group1, t1, «end», i1))
+  else ok (done group)
+
+/-- [p3_binary_dft::lch::schedule::hax_reshaped::walk_blocks]: loop 0:
+    Source: 'binary-dft/src/lch/schedule/hax_reshaped.rs', lines 55:4-70:5 -/
+@[rust_loop]
+def lch.schedule.hax_reshaped.walk_blocks_loop
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (group : Slice F) (half : Std.Usize)
+  (first : Std.Usize) (split : Bool) (twiddles : lch.twiddles.Twiddles F)
+  (t : F) (block_len : Std.Usize) (len : Std.Usize) (start : Std.Usize)
+  (i : Std.Usize) :
+  RustM (Slice F)
+  := do
+  loop
+    (fun (group1, t1, start1, i1) =>
+      lch.schedule.hax_reshaped.walk_blocks_loop.body INVERSE
+      butterflyButterflyFieldInst half first split twiddles block_len len
+      group1 t1 start1 i1)
+    (group, t, start, i)
+
+/-- [p3_binary_dft::lch::schedule::hax_reshaped::walk_blocks]:
+    Source: 'binary-dft/src/lch/schedule/hax_reshaped.rs', lines 36:0-71:1 -/
+def lch.schedule.hax_reshaped.walk_blocks
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (group : Slice F) (half : Std.Usize)
+  (stage : Std.Usize) (first : Std.Usize) (split : Bool)
+  (twiddles : lch.twiddles.Twiddles F) :
+  RustM (Slice F)
+  := do
+  let t ←
+    lch.twiddles.Twiddles.at
+      butterflyButterflyFieldInst.p3_binary_fieldtowerTowerLevelInst twiddles
+      stage first
+  let block_len ← half <<< 1#i32
+  massert (block_len != 0#usize)
+  let len ← core.slice.Slice.len group
+  lch.schedule.hax_reshaped.walk_blocks_loop INVERSE
+    butterflyButterflyFieldInst group half first split twiddles t block_len len
+    0#usize 0#usize
+
+/-- [p3_binary_dft::lch::schedule::hax_reshaped::stage_pass]: loop body 0:
+    Source: 'binary-dft/src/lch/schedule/hax_reshaped.rs', lines 110:4-122:5 -/
+@[rust_loop_body]
+def lch.schedule.hax_reshaped.stage_pass_loop.body
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (j : Std.Usize) (twiddles : lch.twiddles.Twiddles F)
+  (half : Std.Usize) (per_task : Std.Usize) (task_len : Std.Usize)
+  (len : Std.Usize) (values : Slice F) (start : Std.Usize) (task : Std.Usize) :
+  RustM (ControlFlow ((Slice F) × Std.Usize × Std.Usize) (Slice F))
+  := do
+  if start < len
+  then
+    let «end» ← lch.schedule.hax_reshaped.chunk_end start task_len len
+    let (s, index_mut_back) ←
+      core.Slice.Insts.CoreOpsIndexIndexMut.index_mut
+        (core.ops.range.RangeUsize.Insts.CoreSliceIndexSliceIndexSliceSlice F)
+        values { start, «end» }
+    let i ← task * per_task
+    let s1 ←
+      lch.schedule.hax_reshaped.walk_blocks INVERSE butterflyButterflyFieldInst
+        s half j i true twiddles
+    let task1 ← task + 1#usize
+    let values1 := index_mut_back s1
+    ok (cont (values1, «end», task1))
+  else ok (done values)
+
+/-- [p3_binary_dft::lch::schedule::hax_reshaped::stage_pass]: loop 0:
+    Source: 'binary-dft/src/lch/schedule/hax_reshaped.rs', lines 110:4-122:5 -/
+@[rust_loop]
+def lch.schedule.hax_reshaped.stage_pass_loop
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (values : Slice F) (j : Std.Usize)
+  (twiddles : lch.twiddles.Twiddles F) (half : Std.Usize)
+  (per_task : Std.Usize) (task_len : Std.Usize) (len : Std.Usize)
+  (start : Std.Usize) (task : Std.Usize) :
+  RustM (Slice F)
+  := do
+  loop
+    (fun (values1, start1, task1) =>
+      lch.schedule.hax_reshaped.stage_pass_loop.body INVERSE
+      butterflyButterflyFieldInst j twiddles half per_task task_len len values1
+      start1 task1)
+    (values, start, task)
+
+/-- [p3_binary_dft::lch::schedule::hax_reshaped::stage_pass]:
+    Source: 'binary-dft/src/lch/schedule/hax_reshaped.rs', lines 93:0-123:1 -/
+def lch.schedule.hax_reshaped.stage_pass
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (values : Slice F) (width : Std.Usize) (j : Std.Usize)
+  (twiddles : lch.twiddles.Twiddles F) :
+  RustM (Slice F)
+  := do
+  let i ← 1#usize <<< j
+  let half ← i * width
+  let i1 ← lch.schedule.BUTTERFLY_GRAIN
+  let i2 ← i1 / half
+  let per_task ← core.Usize.Insts.CoreCmpOrd.max i2 1#usize
+  let i3 ← half <<< 1#i32
+  let task_len ← per_task * i3
+  massert (task_len != 0#usize)
+  let len ← core.slice.Slice.len values
+  lch.schedule.hax_reshaped.stage_pass_loop INVERSE butterflyButterflyFieldInst
+    values j twiddles half per_task task_len len 0#usize 0#usize
+
+/-- [p3_binary_dft::lch::schedule::stage_pass]:
+    Source: 'binary-dft/src/lch/schedule.rs', lines 266:0-273:1 -/
+def lch.schedule.stage_pass
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (values : Slice F) (width : Std.Usize) (j : Std.Usize)
+  (twiddles : lch.twiddles.Twiddles F) :
+  RustM (Slice F)
+  := do
+  lch.schedule.hax_reshaped.stage_pass INVERSE butterflyButterflyFieldInst
+    values width j twiddles
+
+/-- [p3_binary_dft::lch::schedule::group_pass]:
+    Source: 'binary-dft/src/lch/schedule.rs', lines 366:0-378:1 -/
+def lch.schedule.group_pass
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (values : Slice F) (width : Std.Usize)
+  (p : (Std.Usize × Std.Usize)) (log_slab : Std.Usize)
+  (twiddles : lch.twiddles.Twiddles F) :
+  RustM (Slice F)
+  := do
+  let (low, high) := p
+  let i ← high - low
+  if i = 1#usize
+  then
+    lch.schedule.stage_pass INVERSE butterflyButterflyFieldInst values width
+      low twiddles
+  else
+    let i1 ← high - 1#usize
+    lch.schedule.fused_group INVERSE butterflyButterflyFieldInst values width
+      i1 i log_slab twiddles
+
+/-- [p3_binary_dft::lch::schedule::hax_reshaped::tile_stages]: loop body 0:
+    Source: 'binary-dft/src/lch/schedule/hax_reshaped.rs', lines 137:4-144:5 -/
+@[rust_loop_body]
+def lch.schedule.hax_reshaped.tile_stages_loop.body
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (row_len : Std.Usize) (log_rows : Std.Usize)
+  (stage_base : Std.Usize) (index : Std.Usize)
+  (twiddles : lch.twiddles.Twiddles F) (iter : core.ops.range.Range Std.Usize)
+  (tile : Slice F) :
+  RustM (ControlFlow ((core.ops.range.Range Std.Usize) × (Slice F)) (Slice F))
+  := do
+  let (o, iter1) ←
+    core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next
+      core.Usize.Insts.CoreIterRangeStep iter
+  match o with
+  | core.option.Option.None => ok (done tile)
+  | core.option.Option.Some step =>
+    let jj ←
+      if INVERSE
+      then ok step
+      else do
+           let i ← log_rows - 1#usize
+           i - step
+    let i ← 1#usize <<< jj
+    let half ← i * row_len
+    let i1 ← log_rows - 1#usize
+    let i2 ← i1 - jj
+    let first ← index <<< i2
+    let i3 ← stage_base + jj
+    let tile1 ←
+      lch.schedule.hax_reshaped.walk_blocks INVERSE butterflyButterflyFieldInst
+        tile half i3 first false twiddles
+    ok (cont (iter1, tile1))
+
+/-- [p3_binary_dft::lch::schedule::hax_reshaped::tile_stages]: loop 0:
+    Source: 'binary-dft/src/lch/schedule/hax_reshaped.rs', lines 137:4-144:5 -/
+@[rust_loop]
+def lch.schedule.hax_reshaped.tile_stages_loop
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (iter : core.ops.range.Range Std.Usize)
+  (tile : Slice F) (row_len : Std.Usize) (log_rows : Std.Usize)
+  (stage_base : Std.Usize) (index : Std.Usize)
+  (twiddles : lch.twiddles.Twiddles F) :
+  RustM (Slice F)
+  := do
+  loop
+    (fun (iter1, tile1) => lch.schedule.hax_reshaped.tile_stages_loop.body
+      INVERSE butterflyButterflyFieldInst row_len log_rows stage_base index
+      twiddles iter1 tile1)
+    (iter, tile)
+
+/-- [p3_binary_dft::lch::schedule::hax_reshaped::tile_stages]:
+    Source: 'binary-dft/src/lch/schedule/hax_reshaped.rs', lines 129:0-145:1 -/
+@[reducible]
+def lch.schedule.hax_reshaped.tile_stages
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (tile : Slice F) (row_len : Std.Usize)
+  (log_rows : Std.Usize) (stage_base : Std.Usize) (index : Std.Usize)
+  (twiddles : lch.twiddles.Twiddles F) :
+  RustM (Slice F)
+  := do
+  lch.schedule.hax_reshaped.tile_stages_loop INVERSE
+    butterflyButterflyFieldInst { start := 0#usize, «end» := log_rows } tile
+    row_len log_rows stage_base index twiddles
+
+/-- [p3_binary_dft::lch::schedule::hax_reshaped::deep_tiles]: loop body 0:
+    Source: 'binary-dft/src/lch/schedule/hax_reshaped.rs', lines 167:4-172:5 -/
+@[rust_loop_body]
+def lch.schedule.hax_reshaped.deep_tiles_loop.body
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (width : Std.Usize) (log_rows : Std.Usize)
+  (twiddles : lch.twiddles.Twiddles F) (tile_len : Std.Usize) (len : Std.Usize)
+  (values : Slice F) (start : Std.Usize) (index : Std.Usize) :
+  RustM (ControlFlow ((Slice F) × Std.Usize × Std.Usize) (Slice F))
+  := do
+  if start < len
+  then
+    let «end» ← lch.schedule.hax_reshaped.chunk_end start tile_len len
+    let (s, index_mut_back) ←
+      core.Slice.Insts.CoreOpsIndexIndexMut.index_mut
+        (core.ops.range.RangeUsize.Insts.CoreSliceIndexSliceIndexSliceSlice F)
+        values { start, «end» }
+    let s1 ←
+      lch.schedule.hax_reshaped.tile_stages INVERSE butterflyButterflyFieldInst
+        s width log_rows 0#usize index twiddles
+    let index1 ← index + 1#usize
+    let values1 := index_mut_back s1
+    ok (cont (values1, «end», index1))
+  else ok (done values)
+
+/-- [p3_binary_dft::lch::schedule::hax_reshaped::deep_tiles]: loop 0:
+    Source: 'binary-dft/src/lch/schedule/hax_reshaped.rs', lines 167:4-172:5 -/
+@[rust_loop]
+def lch.schedule.hax_reshaped.deep_tiles_loop
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (values : Slice F) (width : Std.Usize)
+  (log_rows : Std.Usize) (twiddles : lch.twiddles.Twiddles F)
+  (tile_len : Std.Usize) (len : Std.Usize) (start : Std.Usize)
+  (index : Std.Usize) :
+  RustM (Slice F)
+  := do
+  loop
+    (fun (values1, start1, index1) =>
+      lch.schedule.hax_reshaped.deep_tiles_loop.body INVERSE
+      butterflyButterflyFieldInst width log_rows twiddles tile_len len values1
+      start1 index1)
+    (values, start, index)
+
+/-- [p3_binary_dft::lch::schedule::hax_reshaped::deep_tiles]:
+    Source: 'binary-dft/src/lch/schedule/hax_reshaped.rs', lines 153:0-173:1 -/
+def lch.schedule.hax_reshaped.deep_tiles
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (values : Slice F) (width : Std.Usize)
+  (log_rows : Std.Usize) (twiddles : lch.twiddles.Twiddles F) :
+  RustM (Slice F)
+  := do
+  let i ← 1#usize <<< log_rows
+  let tile_len ← i * width
+  massert (tile_len != 0#usize)
+  let len ← core.slice.Slice.len values
+  lch.schedule.hax_reshaped.deep_tiles_loop INVERSE butterflyButterflyFieldInst
+    values width log_rows twiddles tile_len len 0#usize 0#usize
+
+/-- [p3_binary_dft::lch::schedule::deep_tiles]:
+    Source: 'binary-dft/src/lch/schedule.rs', lines 290:0-297:1 -/
+def lch.schedule.deep_tiles
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (values : Slice F) (width : Std.Usize)
+  (log_rows : Std.Usize) (twiddles : lch.twiddles.Twiddles F) :
+  RustM (Slice F)
+  := do
+  lch.schedule.hax_reshaped.deep_tiles INVERSE butterflyButterflyFieldInst
+    values width log_rows twiddles
+
+/-- [p3_binary_dft::lch::schedule::{p3_binary_dft::lch::schedule::Cut}::bounds]:
+    Source: 'binary-dft/src/lch/schedule.rs', lines 158:4-166:5 -/
+def lch.schedule.Cut.bounds
+  (self : lch.schedule.Cut) (g : Std.Usize) :
+  RustM (Std.Usize × Std.Usize)
+  := do
+  let i ← g * self.group
+  let low ← self.tile + i
+  let i1 ← low + self.group
+  if i1 < self.log_n
+  then ok (low, i1)
+  else ok (low, self.log_n)
+
+/-- [p3_binary_dft::lch::schedule::forward_below]: loop body 0:
+    Source: 'binary-dft/src/lch/schedule.rs', lines 411:4-413:5 -/
+@[rust_loop_body]
+def lch.schedule.forward_below_loop.body
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (butterflyButterflyFieldInst :
+  butterfly.ButterflyField F Clause0_Clause0_Repr) (width : Std.Usize)
+  (cut : lch.schedule.Cut) (twiddles : lch.twiddles.Twiddles F)
+  (iter : core.iter.adapters.rev.Rev (core.ops.range.Range Std.Usize))
+  (values : Slice F) :
+  RustM (ControlFlow ((core.iter.adapters.rev.Rev (core.ops.range.Range
+    Std.Usize)) × (Slice F)) ((Slice F) × lch.schedule.Cut))
+  := do
+  let (o, iter1) ←
+    core.iter.adapters.rev.Rev.Insts.CoreIterTraitsIteratorIterator.next
+      (core.ops.range.Range.Insts.CoreIterTraitsDouble_endedDoubleEndedIterator
+      core.Usize.Insts.CoreIterRangeStep) iter
+  match o with
+  | core.option.Option.None => ok (done (values, cut))
+  | core.option.Option.Some g =>
+    let p ← lch.schedule.Cut.bounds cut g
+    let values1 ←
+      lch.schedule.group_pass false butterflyButterflyFieldInst values width p
+        cut.slab twiddles
+    ok (cont (iter1, values1))
+
+/-- [p3_binary_dft::lch::schedule::forward_below]: loop 0:
+    Source: 'binary-dft/src/lch/schedule.rs', lines 411:4-413:5 -/
+@[rust_loop]
+def lch.schedule.forward_below_loop
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (butterflyButterflyFieldInst :
+  butterfly.ButterflyField F Clause0_Clause0_Repr)
+  (iter : core.iter.adapters.rev.Rev (core.ops.range.Range Std.Usize))
+  (values : Slice F) (width : Std.Usize) (cut : lch.schedule.Cut)
+  (twiddles : lch.twiddles.Twiddles F) :
+  RustM ((Slice F) × lch.schedule.Cut)
+  := do
+  loop
+    (fun (iter1, values1) => lch.schedule.forward_below_loop.body
+      butterflyButterflyFieldInst width cut twiddles iter1 values1)
+    (iter, values)
+
+/-- [p3_binary_dft::lch::schedule::forward_below]:
+    Source: 'binary-dft/src/lch/schedule.rs', lines 404:0-417:1 -/
+def lch.schedule.forward_below
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (butterflyButterflyFieldInst :
+  butterfly.ButterflyField F Clause0_Clause0_Repr) (values : Slice F)
+  (width : Std.Usize) (cut : lch.schedule.Cut) (groups : Std.Usize)
+  (twiddles : lch.twiddles.Twiddles F) :
+  RustM (Slice F)
+  := do
+  let iter ←
+    core.iter.traits.iterator.Iterator.rev.default
+      (core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator
+      core.Usize.Insts.CoreIterRangeStep)
+      (core.ops.range.Range.Insts.CoreIterTraitsDouble_endedDoubleEndedIterator
+      core.Usize.Insts.CoreIterRangeStep)
+      { start := 0#usize, «end» := groups }
+  let (values1, cut1) ←
+    lch.schedule.forward_below_loop butterflyButterflyFieldInst iter values
+      width cut twiddles
+  if cut1.tile > 0#usize
+  then
+    lch.schedule.deep_tiles false butterflyButterflyFieldInst values1 width
+      cut1.tile twiddles
+  else ok values1
+
+/-- [p3_binary_dft::lch::schedule::MIN_FUSED_STAGES]
+    Source: 'binary-dft/src/lch/schedule.rs', lines 44:0-44:45 -/
+@[global_simps, irreducible]
+def lch.schedule.MIN_FUSED_STAGES : Std.Usize := 2#usize
+
+/-- [p3_binary_dft::lch::schedule::{p3_binary_dft::lch::schedule::Cut}::new]:
+    Source: 'binary-dft/src/lch/schedule.rs', lines 126:4-155:5 -/
+def lch.schedule.Cut.new
+  (schedule : lch.schedule.Schedule) (log_n : Std.Usize) :
+  RustM lch.schedule.Cut
+  := do
+  let tile ←
+    if schedule.log_tile_rows < log_n
+    then ok schedule.log_tile_rows
+    else ok log_n
+  let slab ←
+    if schedule.log_slab_rows < tile
+    then ok schedule.log_slab_rows
+    else ok tile
+  let group ←
+    if schedule.log_staged_rows >= lch.schedule.MIN_FUSED_STAGES
+    then ok schedule.log_staged_rows
+    else ok 1#usize
+  let i ← log_n - tile
+  let i1 ← core.num.Usize.div_ceil i group
+  ok { tile, slab, group, groups := i1, log_n }
+
+/-- [p3_binary_dft::lch::schedule::run]: loop body 0:
+    Source: 'binary-dft/src/lch/schedule.rs', lines 395:8-397:9 -/
+@[rust_loop_body]
+def lch.schedule.run_loop.body
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (butterflyButterflyFieldInst :
+  butterfly.ButterflyField F Clause0_Clause0_Repr) (width : Std.Usize)
+  (twiddles : lch.twiddles.Twiddles F) (i : Std.Usize) (i1 : Std.Usize)
+  (i2 : Std.Usize) (i3 : Std.Usize) (i4 : Std.Usize)
+  (iter : core.ops.range.Range Std.Usize) (values : Slice F) :
+  RustM (ControlFlow ((core.ops.range.Range Std.Usize) × (Slice F)) (Slice F))
+  := do
+  let (o, iter1) ←
+    core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next
+      core.Usize.Insts.CoreIterRangeStep iter
+  match o with
+  | core.option.Option.None => ok (done values)
+  | core.option.Option.Some g =>
+    let p ←
+      lch.schedule.Cut.bounds
+        { tile := i, slab := i1, group := i2, groups := i3, log_n := i4 } g
+    let values1 ←
+      lch.schedule.group_pass true butterflyButterflyFieldInst values width p
+        i1 twiddles
+    ok (cont (iter1, values1))
+
+/-- [p3_binary_dft::lch::schedule::run]: loop 0:
+    Source: 'binary-dft/src/lch/schedule.rs', lines 395:8-397:9 -/
+@[rust_loop]
+def lch.schedule.run_loop
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (butterflyButterflyFieldInst :
+  butterfly.ButterflyField F Clause0_Clause0_Repr)
+  (iter : core.ops.range.Range Std.Usize) (values : Slice F)
+  (width : Std.Usize) (twiddles : lch.twiddles.Twiddles F) (i : Std.Usize)
+  (i1 : Std.Usize) (i2 : Std.Usize) (i3 : Std.Usize) (i4 : Std.Usize) :
+  RustM (Slice F)
+  := do
+  loop
+    (fun (iter1, values1) => lch.schedule.run_loop.body
+      butterflyButterflyFieldInst width twiddles i i1 i2 i3 i4 iter1 values1)
+    (iter, values)
+
+/-- [p3_binary_dft::lch::schedule::run]:
+    Source: 'binary-dft/src/lch/schedule.rs', lines 383:0-401:1 -/
+def lch.schedule.run
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (values : Slice F) (width : Std.Usize)
+  (log_n : Std.Usize) (twiddles : lch.twiddles.Twiddles F)
+  (schedule : lch.schedule.Schedule) :
+  RustM (Slice F)
+  := do
+  let cut ← lch.schedule.Cut.new schedule log_n
+  if INVERSE
+  then
+    let values1 ←
+      if cut.tile > 0#usize
+      then
+        lch.schedule.deep_tiles true butterflyButterflyFieldInst values width
+          cut.tile twiddles
+      else ok values
+    lch.schedule.run_loop butterflyButterflyFieldInst
+      { start := 0#usize, «end» := cut.groups } values1 width twiddles
+      cut.tile cut.slab cut.group cut.groups cut.log_n
+  else
+    lch.schedule.forward_below butterflyButterflyFieldInst values width cut
+      cut.groups twiddles
+
+/-- [p3_binary_dft::lch::schedule::CACHE_LINE_BYTES]
+    Source: 'binary-dft/src/lch/schedule.rs', lines 56:0-56:35 -/
+@[global_simps, irreducible]
+def lch.schedule.CACHE_LINE_BYTES : Std.Usize := 64#usize
+
+/-- [p3_binary_dft::lch::schedule::STAGED_WORKERS]
+    Source: 'binary-dft/src/lch/schedule.rs', lines 51:0-51:44 -/
+@[global_simps, irreducible]
+def lch.schedule.STAGED_WORKERS : Std.Usize := 16#usize
+
+/-- [p3_binary_dft::lch::schedule::STAGING_TILE_BYTES]
+    Source: 'binary-dft/src/lch/schedule.rs', lines 39:0-39:44 -/
+@[global_simps, irreducible]
+def lch.schedule.STAGING_TILE_BYTES : RustM Std.Usize := 64#usize * 1024#usize
+
+/-- [p3_binary_dft::lch::schedule::DEEP_TILE_BYTES]
+    Source: 'binary-dft/src/lch/schedule.rs', lines 34:0-34:53 -/
+@[global_simps, irreducible]
+def lch.schedule.DEEP_TILE_BYTES : RustM Std.Usize := 128#usize * 1024#usize
+
+/-- [p3_binary_dft::lch::schedule::{p3_binary_dft::lch::schedule::Schedule}::for_workers]:
+    Source: 'binary-dft/src/lch/schedule.rs', lines 78:4-102:5 -/
+def lch.schedule.Schedule.for_workers
+  (F : Type _) (width : Std.Usize) (log_n : Std.Usize) (workers : Std.Usize) :
+  RustM lch.schedule.Schedule
+  := do
+  -- PATCHED: the element type passed explicitly (was `core.mem.size_of`)
+  let i ← core.mem.size_of F
+  let row_bytes ← i * width
+  let i1 ← lch.schedule.DEEP_TILE_BYTES
+  let i2 ← i1 / row_bytes
+  let i3 ← core.Usize.Insts.CoreCmpOrd.max i2 1#usize
+  let capacity ← p3_util.log2_floor_usize i3
+  let i4 ← p3_util.log2_ceil_usize workers
+  -- PATCHED: the exposed model of `saturating_sub` (was `core.num.Usize.saturating_sub`)
+  let i5 ← core.num.Usize.saturating_sub_exposed log_n i4
+  let log_tile_rows ← core.Usize.Insts.CoreCmpOrd.min capacity i5
+  let i6 ← core.num.Usize.div_ceil lch.schedule.CACHE_LINE_BYTES row_bytes
+  let i7 ← p3_util.log2_ceil_usize i6
+  let log_slab_rows ← core.Usize.Insts.CoreCmpOrd.min i7 log_tile_rows
+  let slab_bytes ← row_bytes <<< log_slab_rows
+  if workers >= lch.schedule.STAGED_WORKERS
+  then
+    let i8 ← lch.schedule.STAGING_TILE_BYTES
+    let i9 ← i8 / slab_bytes
+    let i10 ← core.Usize.Insts.CoreCmpOrd.max i9 1#usize
+    let log_staged_rows ← p3_util.log2_floor_usize i10
+    ok { log_tile_rows, log_staged_rows, log_slab_rows }
+  else ok { log_tile_rows, log_staged_rows := 0#usize, log_slab_rows }
+
+/-- [p3_binary_dft::lch::schedule::{p3_binary_dft::lch::schedule::Schedule}::new]:
+    Source: 'binary-dft/src/lch/schedule.rs', lines 71:4-73:5 -/
+def lch.schedule.Schedule.new
+  (F : Type _) (width : Std.Usize) (log_n : Std.Usize) :
+  RustM lch.schedule.Schedule
+  := do
+  let i ← p3_maybe_rayon.serial.current_num_threads
+  lch.schedule.Schedule.for_workers F width log_n i
+
+/-- [p3_binary_dft::lch::transform]: loop body 0:
+    Source: 'binary-dft/src/lch/mod.rs', lines 74:8-77:9 -/
+@[rust_loop_body]
+def lch.transform_loop.body
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (width : Std.Usize) (log_n : Std.Usize)
+  (twiddles : lch.twiddles.Twiddles F) (iter : core.ops.range.Range Std.Usize)
+  (values : Slice F) :
+  RustM (ControlFlow ((core.ops.range.Range Std.Usize) × (Slice F)) (Slice F))
+  := do
+  let (o, iter1) ←
+    core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next
+      core.Usize.Insts.CoreIterRangeStep iter
+  match o with
+  | core.option.Option.None => ok (done values)
+  | core.option.Option.Some step =>
+    let j ←
+      if INVERSE
+      then ok step
+      else do
+           let i ← log_n - 1#usize
+           i - step
+    let values1 ←
+      lch.schedule.stage_pass INVERSE butterflyButterflyFieldInst values width
+        j twiddles
+    ok (cont (iter1, values1))
+
+/-- [p3_binary_dft::lch::transform]: loop 0:
+    Source: 'binary-dft/src/lch/mod.rs', lines 74:8-77:9 -/
+@[rust_loop]
+def lch.transform_loop
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (iter : core.ops.range.Range Std.Usize)
+  (values : Slice F) (width : Std.Usize) (log_n : Std.Usize)
+  (twiddles : lch.twiddles.Twiddles F) :
+  RustM (Slice F)
+  := do
+  loop
+    (fun (iter1, values1) => lch.transform_loop.body INVERSE
+      butterflyButterflyFieldInst width log_n twiddles iter1 values1)
+    (iter, values)
+
+/-- [p3_binary_dft::lch::transform]:
+    Source: 'binary-dft/src/lch/mod.rs', lines 67:0-88:1 -/
+def lch.transform
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) (values : Slice F) (width : Std.Usize) (shift : F) :
+  RustM (Slice F)
+  := do
+  let i ← core.slice.Slice.len values
+  let i1 ← i / width
+  let log_n ← p3_util.log2_strict_usize i1
+  let i2 ←
+    butterflyButterflyFieldInst.p3_binary_fieldtowerTowerLevelInst.LOG_BITS
+  let i3 ← 1#usize <<< i2
+  massert (log_n <= i3)
+  let twiddles ←
+    lch.twiddles.Twiddles.new
+      butterflyButterflyFieldInst.p3_binary_fieldtowerTowerLevelInst log_n
+      shift
+  let i4 ← core.mem.size_of_val values
+  let i5 ← lch.schedule.DEEP_TILE_BYTES
+  if i4 <= i5
+  then
+    lch.transform_loop INVERSE butterflyButterflyFieldInst
+      { start := 0#usize, «end» := log_n } values width log_n twiddles
+  else
+    let s ← lch.schedule.Schedule.new F width log_n
+    lch.schedule.run INVERSE butterflyButterflyFieldInst values width log_n
+      twiddles s
 
 end p3_binary_dft

@@ -25,4 +25,36 @@ set_option maxRecDepth 2048
 
 namespace p3_binary_dft
 
+/-- Trait declaration: [p3_binary_dft::butterfly::ButterflyField]
+    Source: 'binary-dft/src/butterfly/mod.rs', lines 23:0-32:1
+    Visibility: public -/
+structure butterfly.ButterflyField (Self : Type _) (Self_Clause0_Repr : Type _)
+  where
+  p3_binary_fieldtowerTowerLevelInst : p3_binary_field.tower.TowerLevel Self
+    Self_Clause0_Repr
+  butterfly : forall (INVERSE : Bool), Slice Self → Slice Self → Self →
+    RustM ((Slice Self) × (Slice Self))
+
+/-- [p3_binary_dft::lch::twiddles::Twiddles]
+    Source: 'binary-dft/src/lch/twiddles.rs', lines 18:0-23:1 -/
+structure lch.twiddles.Twiddles (F : Type _) where
+  bases : alloc.vec.Vec F
+  steps : alloc.vec.Vec F
+
+/-- [p3_binary_dft::lch::schedule::Cut]
+    Source: 'binary-dft/src/lch/schedule.rs', lines 111:0-122:1 -/
+structure lch.schedule.Cut where
+  tile : Std.Usize
+  slab : Std.Usize
+  group : Std.Usize
+  groups : Std.Usize
+  log_n : Std.Usize
+
+/-- [p3_binary_dft::lch::schedule::Schedule]
+    Source: 'binary-dft/src/lch/schedule.rs', lines 60:0-67:1 -/
+structure lch.schedule.Schedule where
+  log_tile_rows : Std.Usize
+  log_staged_rows : Std.Usize
+  log_slab_rows : Std.Usize
+
 end p3_binary_dft

@@ -39,6 +39,18 @@ def log2_ceil_usize (n : Std.Usize) : RustM Std.Usize := do
   let i2 ← core.num.Usize.BITS - i1
   ok (UScalar.cast .Usize i2)
 
+/-- [p3_util::log2_floor_usize]:
+    Source: 'util/src/lib.rs', lines 34:0-39:1
+    Visibility: public -/
+def log2_floor_usize (n : Std.Usize) : RustM Std.Usize := do
+  if n = 0#usize
+  then ok 0#usize
+  else
+    let i ← core.num.Usize.BITS - 1#u32
+    let i1 ← core.num.Usize.leading_zeros n
+    let i2 ← i - i1
+    ok (UScalar.cast .Usize i2)
+
 /-- [p3_util::checked_pow2]:
     Source: 'util/src/lib.rs', lines 48:0-54:1
     Visibility: public -/

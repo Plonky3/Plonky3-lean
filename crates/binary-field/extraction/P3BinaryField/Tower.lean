@@ -27,6 +27,7 @@ Upstream: binary-field/src/tower.rs:52.
 
 The associated type of the backing integer is the second parameter, as aeneas writes it. -/
 structure tower.TowerLevel (Self Repr : Type) where
+  LOG_BITS : RustM Std.Usize
   p3_fieldfieldFieldInst : p3_field.field.Field Self
   cantor_basis : Std.Usize → RustM Self
 

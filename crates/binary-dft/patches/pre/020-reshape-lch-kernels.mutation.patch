@@ -1,0 +1,14 @@
+# Mutation of: 020-reshape-lch-kernels
+# Breaks:      the reshaped block walk also steps the twiddle at the first block of a group that does not start at block zero.
+#
+--- a/binary-dft/src/lch/schedule/hax_reshaped.rs
++++ b/binary-dft/src/lch/schedule/hax_reshaped.rs
+@@ -54,7 +54,7 @@
+     let mut i = 0;
+     while start < len {
+         let end = chunk_end(start, block_len, len);
+-        if i != 0 {
++        if i != 0 || first != 0 {
+             t += twiddles.step(first + i);
+         }
+         let (lo, hi) = group[start..end].split_at_mut(half);

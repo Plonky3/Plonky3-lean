@@ -1,0 +1,14 @@
+# Mutation of: 010-reshape-domain-steps
+# Breaks:      the reshaped loop adds the basis vector of index r instead of r + 1.
+#
+--- a/binary-dft/src/hax_reshaped.rs
++++ b/binary-dft/src/hax_reshaped.rs
+@@ -21,7 +21,7 @@
+     // Each entry is the previous one plus the next basis vector up.
+     let mut point = F::ZERO;
+     for r in 0..count {
+-        point += F::cantor_basis(r + 1);
++        point += F::cantor_basis(r);
+         steps.push(point);
+     }
+     steps

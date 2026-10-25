@@ -28,3 +28,12 @@ set_option maxHeartbeats 1000000
 set_option maxRecDepth 2048
 open p3_binary_dft
 
+/-- [p3_binary_dft::lch::schedule::fused_group]:
+    Source: 'binary-dft/src/lch/schedule.rs', lines 340:0-361:1 -/
+axiom lch.schedule.fused_group
+  {F : Type _} {Clause0_Clause0_Repr : Type _} (INVERSE : Bool)
+  (butterflyButterflyFieldInst : butterfly.ButterflyField F
+  Clause0_Clause0_Repr) :
+  Slice F → Std.Usize → Std.Usize → Std.Usize → Std.Usize →
+    lch.twiddles.Twiddles F → RustM (Slice F)
+

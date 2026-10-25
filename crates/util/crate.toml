@@ -25,6 +25,8 @@ start_from = [
   "p3_util::log2_strict_usize",
   # p3-merkle-tree's height ladder.
   "p3_util::log2_ceil_usize",
+  # p3-binary-dft's tile schedule.
+  "p3_util::log2_floor_usize",
   # p3-uni-stark's degree-bits validation.
   "p3_util::checked_pow2",
 ]
