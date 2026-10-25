@@ -462,4 +462,185 @@ theorem reduceQuery_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) (immcs :
       rfl)]
   simp only [lift_some_bind', List.map_map, Function.comp_def]
 
+/-! ## The input checks on honest openings -/
+
+/-- The dimensions one batch check passes to the scheme: each matrix's claimed width and LDE height. -/
+def inDims {Com : Type} (lb : ℕ) (c : Claim K Com) : List (ℕ × ℕ) :=
+  c.matrices.map fun m => (claimedWidth m, 2 ^ m.domain.log_n * 2 ^ lb)
+
+/-- The indices one batch check passes to the scheme: each query index shifted down to the batch's tallest height. -/
+def inReduced {Com : Type} (lb H : ℕ) (indices : List ℕ) (c : Claim K Com) : List ℕ :=
+  match (c.matrices.map fun m => 2 ^ m.domain.log_n * 2 ^ lb).max? with
+  | some h => indices.map (· / 2 ^ (H - Nat.log2 h))
+  | none => indices.map fun _ => 0
+
+/-- One batch's checks pass on an honest opening:
+
+- one row per matrix in every opened row set
+- every matrix opened at some point, below the tallest height
+- a scheme that accepts the rows at the dimensions and indices the check computes. -/
+theorem checkBatch_honest (immcs : MmcsOps K) {FME : Type} {lb H : ℕ} (indices : List ℕ)
+    (bo : BatchMultiOpening K immcs.MultiProof) (c : Claim K immcs.Commitment)
+    (hm : ∀ r ∈ bo.opened_values, r.length = c.matrices.length) (hp : ∀ m ∈ c.matrices, m.points ≠ [])
+    (hh : ∀ m ∈ c.matrices, m.domain.log_n + lb ≤ H)
+    (hmmcs : immcs.verify_multi_batch c.commitment (inDims lb c) (inReduced lb H indices c)
+      bo.opened_values bo.opening_proof = .ok ()) :
+    checkBatch (FME := FME) immcs lb H indices (bo, c) = pure () := by
+  unfold checkBatch
+  have h1 : (bo.opened_values.any fun x => decide (x.length ≠ c.matrices.length)) = false := by
+    simp only [List.any_eq_false, ne_eq, decide_not, Bool.not_eq_true', decide_eq_false_iff_not, not_not]
+    exact hm
+  simp only [h1, Bool.false_eq_true, ↓reduceIte]
+  rw [mapM_eq_pure_map (g := fun m => (claimedWidth m, 2 ^ m.domain.log_n * 2 ^ lb)) _ fun m hm' => by
+    obtain ⟨p, ps, hps⟩ := List.exists_cons_of_ne_nil (hp m hm')
+    simp only [hps, claimedWidth, List.headD_cons], pure_bind]
+  have hfin : ∀ red, red = inReduced lb H indices c →
+      (match immcs.verify_multi_batch c.commitment (c.matrices.map fun m => (claimedWidth m,
+          2 ^ m.domain.log_n * 2 ^ lb)) red bo.opened_values bo.opening_proof with
+        | .error e => throw (InputError.InputMmcsError e)
+        | .ok () => pure () : IRes immcs.Error FME Unit) = pure () := by
+    rintro red rfl
+    split
+    · rename_i e he
+      exact absurd (he.symm.trans hmmcs) (by simp)
+    · rfl
+  split
+  · next hmax =>
+    rw [pure_bind]
+    refine hfin _ ?_
+    simp only [inReduced, hmax]
+  · next h hmax =>
+    obtain ⟨m, hm', rfl⟩ := List.mem_map.mp (List.max?_mem hmax)
+    have hle : m.domain.log_n + lb ≤ H := hh m hm'
+    have hp2 : 2 ^ m.domain.log_n * 2 ^ lb = 2 ^ (m.domain.log_n + lb) := (pow_add _ _ _).symm
+    simp only [hp2, log2Strict_pow, lift_some_bind', show ¬ H < m.domain.log_n + lb by omega,
+      ↓reduceIte, pure_bind]
+    refine hfin _ ?_
+    simp only [inReduced, hmax, hp2, Nat.log2_two_pow]
+
+/-- Honest claims: per batch, the honest matrices behind it.
+
+- the claims list the honest matrices' claims, batch by batch
+- every domain has at least 4 rows, and its LDE lies at or below the tallest height H
+- every matrix is opened at some point, on the circle and off its LDE domain
+- the columns have degree below the trace size, and the claimed values are their evaluations. -/
+structure HonestClaims (G : Gen (K × K)) (lb H : ℕ) {Com : Type} (rounds : List (Claim K Com))
+    (hb : List (List (HMat K))) : Prop where
+  shape : List.Forall₂ (fun c ms => c.matrices = ms.map Prod.fst) rounds hb
+  log_n : ∀ m ∈ hb.flatten, 2 ≤ m.1.domain.log_n
+  height : ∀ m ∈ hb.flatten, m.1.domain.log_n + lb ≤ H
+  points_ne : ∀ m ∈ hb.flatten, m.1.points ≠ []
+  cols : ∀ m ∈ hb.flatten, ∀ f ∈ m.2, IsCirclePoly (2 ^ (m.1.domain.log_n - 1)) f
+  values : ∀ m ∈ hb.flatten, ∀ p ∈ m.1.points, p.values = m.2.map (· (ptOf p.point))
+  on_circle : ∀ m ∈ hb.flatten, ∀ p ∈ m.1.points, 1 + p.point * p.point ≠ 0
+  off_domain : ∀ m ∈ hb.flatten, ∀ p ∈ m.1.points, ∀ k < 2 ^ hgt lb m, ptOf p.point ≠ ptD G (hgt lb m) k
+
+theorem HonestClaims.honestAt {lb H : ℕ} {Com : Type} {rounds : List (Claim K Com)} {hb : List (List (HMat K))}
+    (hc : HonestClaims G lb H rounds hb) (h : ℕ) : HonestAt G lb hb.flatten h := by
+  rintro m hm rfl
+  refine ⟨⟨fun f hf => ?_, hc.values m hm⟩, hc.off_domain m hm⟩
+  rw [show hgt lb m - lb - 1 = m.1.domain.log_n - 1 by unfold hgt; omega]
+  exact hc.cols m hm f hf
+
+theorem HonestClaims.matOK (hV : CircleGenValid G) {lb H M : ℕ} {Com : Type} {rounds : List (Claim K Com)}
+    {hb : List (List (HMat K))} (hc : HonestClaims G lb H rounds hb) (hM : ∀ m ∈ hb.flatten, m.2.length ≤ M)
+    (hG : H + 1 ≤ G.adicity) (index : ℕ) : ∀ ms ∈ hb, ∀ m ∈ ms, MatOK G lb H M index m := by
+  intro ms hms m hm
+  have hm' : m ∈ hb.flatten := List.mem_flatten.mpr ⟨ms, hms, hm⟩
+  have hh := hc.height m hm'
+  have hn := hc.log_n m hm'
+  refine ⟨by omega, hh, hM m hm', hc.points_ne m hm', hc.values m hm', fun p hp => ⟨hc.on_circle m hm' p hp, ?_⟩⟩
+  rw [qPt_eq hV index (by unfold hgt; omega) (by unfold hgt; omega)]
+  exact hc.off_domain m hm' p hp _ (cfft_permute_index_lt _ _)
+
+theorem forall₂_get {α β : Type _} {R : α → β → Prop} {l₁ : List α} {l₂ : List β} (h : List.Forall₂ R l₁ l₂)
+    {i : ℕ} (h₁ : i < l₁.length) (h₂ : i < l₂.length) : R l₁[i] l₂[i] :=
+  (List.forall₂_iff_get.mp h).2 i h₁ h₂
+
+theorem map_zipIdx_fst {α γ : Type _} (F : α → γ) (l : List α) : l.zipIdx.map (fun e => F e.1) = l.map F := by
+  rw [show (fun e : α × ℕ => F e.1) = F ∘ Prod.fst from rfl, ← List.map_map, List.zipIdx_map_fst]
+
+/-- The input checks accept honest openings.
+
+Each query index i gives the inputs circle FRI rolls in: at every height h, tallest first, the folded DEEP
+function at the round's point.
+
+The openings are honest:
+
+- every batch opens, at each query, the columns of its matrices at the query point of their height
+- the first-layer siblings are the corrected DEEP functions at the conjugate points
+- the lambdas are what the prover extracts
+- both commitment schemes accept the honest rows. -/
+theorem open_inputs_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) (immcs fmmcs : MmcsOps K) {lb H M : ℕ}
+    (α β : K) (hlb : 1 ≤ lb) (hG : H + 1 ≤ G.adicity) {rounds : List (Claim K immcs.Commitment)}
+    {hb : List (List (HMat K))} (hc : HonestClaims G lb H rounds hb) (hM : ∀ m ∈ hb.flatten, m.2.length ≤ M)
+    (flc : fmmcs.Commitment) {lambdas : List K} (hlam : lambdas = (heightsOf lb hb.flatten).map (lamAt G lb α hb.flatten))
+    {indices : List ℕ} (hidx : ∀ i ∈ indices, i < 2 ^ H)
+    (ip : CircleInputProof K immcs.MultiProof fmmcs.MultiProof)
+    (hio : List.Forall₂ (fun bo (ms : List (HMat K)) => bo.opened_values =
+      indices.map fun i => ms.map fun m => m.2.map (· (qPt G H i (hgt lb m)))) ip.input_openings hb)
+    (hin : ∀ bc ∈ ip.input_openings.zip rounds, immcs.verify_multi_batch bc.2.commitment (inDims lb bc.2)
+      (inReduced lb H indices bc.2) bc.1.opened_values bc.1.opening_proof = .ok ())
+    (hfls : ip.first_layer_siblings = indices.map fun i =>
+      (heightsOf lb hb.flatten).map fun h => corr G lb α hb.flatten h (-qPt G H i h))
+    (hfl : fmmcs.verify_multi_batch flc (if indices = [] then [] else
+        (heightsOf lb hb.flatten).map fun h => (2, 2 ^ (h - 1))) (indices.map (· / 2))
+      (indices.map fun i => (heightsOf lb hb.flatten).map fun h => flVals G lb H α hb.flatten h i)
+      ip.first_layer_proof = .ok ()) :
+    open_inputs G immcs fmmcs lb H rounds flc lambdas β ((List.range M).map (α ^ ·))
+        (rounds.map fun c => c.matrices.map fun m => (α ^ claimedWidth m, (α ^ claimedWidth m) ^ 2)) indices ip =
+      pure (indices.map fun i =>
+        ((heightsOf lb hb.flatten).map fun h => (h - 1, friVal G lb H α β hb.flatten h i)).reverse) := by
+  obtain ⟨io, fls, flp⟩ := ip
+  dsimp only at hio hin hfls hfl
+  set L := hb.flatten
+  set hs := heightsOf lb L
+  have hlen : io.length = rounds.length := hio.length_eq.trans hc.shape.length_eq.symm
+  have hrowlen : ∀ bo ∈ io, bo.opened_values.length = indices.length := fun bo hbo => by
+    obtain ⟨ms, -, hbm⟩ := forall₂_mem_right hio.flip bo hbo
+    rw [hbm, List.length_map]
+  have hok := hc.matOK hV hM hG
+  unfold open_inputs
+  simp only [hfls, List.length_map, ne_eq, not_true_eq_false, ↓reduceIte, hlen]
+  have hany : (io.any fun bo => decide (bo.opened_values.length ≠ indices.length)) = false := by
+    simpa using hrowlen
+  simp only [hany, Bool.false_eq_true, ↓reduceIte]
+  rw [Plonky3Lean.Proofs.Fri.forM_eq_pure _ fun bc hbc => ?_, pure_bind]
+  swap
+  · obtain ⟨k, hk, rfl⟩ := List.getElem_of_mem hbc
+    have hk1 : k < io.length := by simp at hk; omega
+    have hk2 : k < hb.length := by rw [← hio.length_eq]; exact hk1
+    have hk3 : k < rounds.length := by rw [← hlen]; exact hk1
+    have hcm := forall₂_get hc.shape hk3 hk2
+    have hrow := forall₂_get hio hk1 hk2
+    simp only [List.getElem_zip]
+    refine checkBatch_honest immcs indices _ _ (fun r hr => ?_) (fun m hm => ?_) (fun m hm => ?_)
+      (by simpa using hin _ (List.getElem_mem hk))
+    · rw [hrow] at hr
+      obtain ⟨i, -, rfl⟩ := List.mem_map.mp hr
+      rw [hcm, List.length_map, List.length_map]
+    · rw [hcm] at hm
+      obtain ⟨m', hm', rfl⟩ := List.mem_map.mp hm
+      exact hc.points_ne m' (List.mem_flatten.mpr ⟨_, List.getElem_mem hk2, hm'⟩)
+    · rw [hcm] at hm
+      obtain ⟨m', hm', rfl⟩ := List.mem_map.mp hm
+      exact hc.height m' (List.mem_flatten.mpr ⟨_, List.getElem_mem hk2, hm'⟩)
+  rw [mapM_eq_pure_map (g := fun e : ℕ × ℕ => ((hs.map fun h => (h - 1, friVal G lb H α β L h e.1)).reverse,
+      hs.map (fun h => (2, 2 ^ (h - 1))), hs.map fun h => flVals G lb H α L h e.1)) _ fun e he => ?_, pure_bind]
+  swap
+  · obtain ⟨hq, hqe⟩ := List.mem_zipIdx' he
+    have hget : ∀ {β : Type} (F : ℕ → β), (indices.map F)[e.2]? = some (F e.1) := fun F => by
+      rw [List.getElem?_map, List.getElem?_eq_getElem hq, ← hqe]; rfl
+    refine reduceQuery_honest hV h2 immcs α β e.1 e.2 hlb hG (hidx _ (hqe ▸ List.getElem_mem hq)) hlen hc.shape
+      (hio.imp fun bo ms hbm => by rw [hbm, hget]) (hok e.1) hc.log_n hc.honestAt (hget _) hlam
+  have hdims : ((Option.map (fun x => x.2.1) (indices.zipIdx.map fun e : ℕ × ℕ =>
+      ((hs.map fun h => (h - 1, friVal G lb H α β L h e.1)).reverse, hs.map (fun h => (2, 2 ^ (h - 1))),
+        hs.map fun h => flVals G lb H α L h e.1)).head?).getD []) =
+      if indices = [] then [] else hs.map fun h => (2, 2 ^ (h - 1)) := by
+    cases indices <;> simp
+  rw [hdims, List.map_map, List.map_map]
+  simp only [Function.comp_def]
+  rw [map_zipIdx_fst (fun i => hs.map fun h => flVals G lb H α L h i),
+    map_zipIdx_fst (fun i => (hs.map fun h => (h - 1, friVal G lb H α β L h i)).reverse), hfl]
+
 end Plonky3Lean.Proofs.Circle
