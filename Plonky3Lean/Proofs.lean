@@ -18,6 +18,8 @@ public import Plonky3Lean.Proofs.Dft.Fields
 public import Plonky3Lean.Proofs.BinaryDft.Concrete
 public import Plonky3Lean.Proofs.BinaryDft.CompPoly
 public import Plonky3Lean.Proofs.BinaryDft.Extracted
+public import Plonky3Lean.Proofs.BinaryDft.ExtractedLch
+public import Plonky3Lean.Proofs.BinaryDft.ExtractedRun
 public import Plonky3Lean.Proofs.BinaryPcs.Params
 public import Plonky3Lean.Proofs.BinaryPcs.Fold
 public import Plonky3Lean.Proofs.BinaryPcs.Verifier

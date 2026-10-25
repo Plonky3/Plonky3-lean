@@ -3,6 +3,7 @@ module
 public import Plonky3Lean.Proofs.BinaryDft.Concrete
 public import Plonky3Lean.Proofs.BinaryDft.CompPoly
 public import Plonky3Lean.Proofs.BinaryDft.Extracted
+public import Plonky3Lean.Proofs.BinaryDft.ExtractedRun
 
 @[expose] public section
 
@@ -344,5 +345,84 @@ theorem towerLevel.transform {k b l : ℕ} (hk : k ≤ 7) (hl : l ≤ 2 ^ k)
     transform (towerLevel k b) false width (2 ^ l) shift x =
       some fun r => if r < 2 ^ l then ntt (Plonky3Lean.Proofs.Binary.cantorTower k) l shift x r else x r :=
   Proofs.BinaryDft.transform_ntt (towerLevel_cantor hk b) hl shift hw x
+
+/-! ## The extracted transform
+
+hax extracts the forward and inverse transform kernels, generic over the butterfly trait.
+
+A buffer of w columns is read as its rows: entry r w + c is column c of row r.
+
+The claims assume of the instance:
+
+- its tower-level members compute the field operations and the Cantor basis, as for the domain;
+- it reports the level's bit width 2^b, with b at most 31;
+- its butterfly sends each pair (u, v) of two runs of equal length to (u + t v, u + t v + v), or back, and panics on runs of different lengths.
+
+They also assume that the element size is the level's, and that the buffer's bytes fit a word with 1024 to spare.
+-/
+
+section ExtractedLch
+
+variable {F : Type} [Field F] [DecidableEq F] [CharP F 2] {R : Type} {L : Level F}
+  {inst : p3_binary_dft.butterfly.ButterflyField F R}
+
+/-- The shipped step table: entry r is beta_1 + ... + beta_(r+1), and the table panics at the level's bit width. -/
+theorem extracted.domain_point_steps (h : TowerComputes inst.p3_binary_fieldtowerTowerLevelInst L)
+    (count : Aeneas.Std.Usize) :
+    p3_binary_dft.domain.domain_point_steps inst.p3_binary_fieldtowerTowerLevelInst count =
+      if count.val < 2 ^ L.logBits then
+        .ok (mkVec ((List.range count.val).map fun r => ∑ q ∈ range (r + 1), L.cantor (q + 1)))
+      else .fail .panic := by
+  rw [domain_point_steps_eq_mirror h, Proofs.BinaryDft.domain_point_steps_eq]
+  split_ifs <;> rfl
+
+/-- The shipped forward transform of 2^l rows, l at most the bit width, lists the additive NTT of the rows over shift + S_l. -/
+theorem extracted.transform_ntt (hL : Cantor L) (hb : ButterflyComputes inst L) (hlb : L.logBits ≤ 31)
+    (hsz : core.mem.size_of F = .ok (uz L.bytes)) (hbytes : 0 < L.bytes) {l w : ℕ}
+    (hl : l ≤ 2 ^ L.logBits) (hw : 0 < w) (hwm : w ≤ Aeneas.Std.Usize.max) (values : Aeneas.Std.Slice F)
+    (hlen : values.val.length = 2 ^ l * w) (hfit : 2 ^ l * w * L.bytes + 1024 ≤ Aeneas.Std.Usize.max)
+    (shift : F) :
+    p3_binary_dft.lch.transform false inst values (uz w) shift =
+      .ok (mkSlice (flat w (2 ^ l) (ntt L.cantor l shift (rowsOf w values.val)))) :=
+  extracted_transform_ntt hL hb hlb hsz hbytes hl hw hwm values hlen hfit shift
+
+/-- Given the additive NTT of rows d over shift + S_l, the shipped inverse transform returns the rows d. -/
+theorem extracted.transform_intt (hL : Cantor L) (hb : ButterflyComputes inst L) (hlb : L.logBits ≤ 31)
+    (hsz : core.mem.size_of F = .ok (uz L.bytes)) (hbytes : 0 < L.bytes) {l w : ℕ}
+    (hl : l ≤ 2 ^ L.logBits) (hw : 0 < w) (hwm : w ≤ Aeneas.Std.Usize.max) (shift : F) (d : ℕ → ℕ → F)
+    (values : Aeneas.Std.Slice F) (hv : values.val = flat w (2 ^ l) (ntt L.cantor l shift d))
+    (hfit : 2 ^ l * w * L.bytes + 1024 ≤ Aeneas.Std.Usize.max) :
+    p3_binary_dft.lch.transform true inst values (uz w) shift = .ok (mkSlice (flat w (2 ^ l) d)) :=
+  extracted_transform_intt hL hb hlb hsz hbytes hl hw hwm shift d values hv hfit
+
+/-- The shipped inverse transform undoes the shipped forward transform. -/
+theorem extracted.transform_round_trip (hL : Cantor L) (hb : ButterflyComputes inst L) (hlb : L.logBits ≤ 31)
+    (hsz : core.mem.size_of F = .ok (uz L.bytes)) (hbytes : 0 < L.bytes) {l w : ℕ}
+    (hl : l ≤ 2 ^ L.logBits) (hw : 0 < w) (hwm : w ≤ Aeneas.Std.Usize.max) (values : Aeneas.Std.Slice F)
+    (hlen : values.val.length = 2 ^ l * w) (hfit : 2 ^ l * w * L.bytes + 1024 ≤ Aeneas.Std.Usize.max)
+    (shift : F) :
+    (do
+      let out ← p3_binary_dft.lch.transform false inst values (uz w) shift
+      p3_binary_dft.lch.transform true inst out (uz w) shift) = .ok values :=
+  extracted_transform_round_trip hL hb hlb hsz hbytes hl hw hwm values hlen hfit shift
+
+/-- The shipped transform of n rows panics in two cases:
+
+- n is not a power of two, zero included;
+- n is 2^l with l past the level's bit width 2^b. -/
+theorem extracted.transform_panics (hL : Cantor L) (hb : ButterflyComputes inst L) (hlb : L.logBits ≤ 31)
+    (hsz : core.mem.size_of F = .ok (uz L.bytes)) (hbytes : 0 < L.bytes) (inverse : Bool) {n w : ℕ}
+    (hwm : w ≤ Aeneas.Std.Usize.max) (values : Aeneas.Std.Slice F) (hlen : values.val.length = n * w)
+    (hfit : n * w * L.bytes + 1024 ≤ Aeneas.Std.Usize.max) (shift : F)
+    (h : (∀ k, n ≠ 2 ^ k) ∨ (∃ l, n = 2 ^ l ∧ 2 ^ L.logBits < l)) :
+    p3_binary_dft.lch.transform inverse inst values (uz w) shift = .fail .panic :=
+  extracted_transform_panics hL hb hlb hsz hbytes inverse hwm values hlen hfit shift h
+
+/-- The shipped transform panics at width zero, whatever the buffer and the instance. -/
+theorem extracted.transform_panics_width (inverse : Bool) (values : Aeneas.Std.Slice F) (shift : F) :
+    p3_binary_dft.lch.transform inverse inst values (uz 0) shift = .fail .panic :=
+  extracted_transform_panics_width inverse values shift
+
+end ExtractedLch
 
 end Plonky3Lean.Claims.BinaryDft

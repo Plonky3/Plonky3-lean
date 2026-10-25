@@ -273,6 +273,30 @@ name   = "Plonky3Lean.Claims.BinaryDft.extracted.domain_point"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.extracted.domain_point_steps"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.extracted.transform_intt"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.extracted.transform_ntt"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.extracted.transform_panics"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.extracted.transform_panics_width"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BinaryDft.extracted.transform_round_trip"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.BinaryDft.extracted.subspace_polynomial"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
