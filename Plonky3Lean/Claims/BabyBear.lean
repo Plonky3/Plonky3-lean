@@ -28,8 +28,8 @@ operators and inversion, which is exponentiation, the other
 `div_2exp_u64` with their `MONTY_POWERS_OF_TWO` table, `sum_array`,
 `dot_product`), `Sum::sum`, the integer conversions (`QuotientMap`'s
 `from_int` and its variants) and deserialization; the packed (SIMD)
-arithmetic, except AVX2's and NEON's (`Claims/BabyBear/Avx2.lean` and
-`Neon.lean`), and the extension-field arithmetic; the extension fields'
+arithmetic, except AVX2's, NEON's and AVX-512's (`Claims/BabyBear/Avx2.lean`,
+`Neon.lean` and `Avx512.lean`), and the extension-field arithmetic; the extension fields'
 `EXT_GENERATOR`s; the Poseidon1 and Poseidon2 permutations or the MDS layer;
 and the values of the round constants. Poseidon and the DFTs call `dot_product` and `sum` directly,
 so those calls are not covered.

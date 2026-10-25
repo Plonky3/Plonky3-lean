@@ -39,21 +39,46 @@ The charon flags in `toolchain.toml`'s `charon_args` restrict what is extracted
 for every crate: `Debug` bodies become `opaque`, and serde is excluded.
 
 Extraction is target-scoped to `thumbv7em-none-eabi`. That target has no SIMD,
-so the models are of the portable scalar paths. The exceptions are AVX2 and
-NEON: the `x86_64-avx2` and `aarch64-neon` variants of p3-field, p3-monty-31 and
-p3-baby-bear are extracted for x86_64 and AArch64 against models of the
-`core::arch` intrinsics (`arch/`), which are trusted, and checked against the
-hardware by `arch/tests/`. Of that code, only BabyBear's packed `Add`, `Sub`,
-`Mul`, `Neg` and `halve_avx2` / `halve_neon` are claimed
-(`Plonky3Lean/Claims/BabyBear/Avx2.lean` and `Neon.lean`). **Nothing here
-describes the AVX-512 code path**, or the rest of the AVX2 and NEON ones.
+so the models are of the portable scalar paths. The exceptions are AVX2, NEON
+and AVX-512: the `x86_64-avx2`, `aarch64-neon` and `x86_64-avx512` variants of
+p3-field, p3-monty-31 and p3-baby-bear are extracted for x86_64 and AArch64
+against models of the `core::arch` intrinsics (`arch/`), which are trusted. Of
+that code, only BabyBear's packed `Add`, `Sub`, `Mul`, `Neg` and `halve_avx2` /
+`halve_neon` / `halve_avx512` are claimed
+(`Plonky3Lean/Claims/BabyBear/Avx2.lean`, `Neon.lean` and `Avx512.lean`).
+Nothing here describes the rest of these code paths.
 
-The NEON variants also rest on one stand-in. monty-31's `confuse_compiler` is an
-optimisation barrier written as an empty `asm!` block, which the extractor
-rejects; under the extraction cfg it is the identity (pre-patch
-`monty-31/030`). That is its value, since the block's template is a comment and
-the code after it tells the compiler `y == x`, but the stand-in is trusted: the
-models say nothing about the code generation the barrier is there to affect.
+The AVX2 and NEON models are reviewed against Intel's and Arm's pseudocode and
+checked against the hardware by `arch/tests/`. **The AVX-512 models
+(`arch/src/x86_64/avx512.rs`) are reviewed against Intel's pseudocode but not
+yet tested against the hardware.** No machine or CI runner available to this
+project guarantees AVX-512, so `arch/tests/avx512.rs` and its mutations
+(`arch/check-mutations.sh`) only run where the CPU has it, and are otherwise
+skipped. Run under Miri instead, the same tests compare each model with
+`core::arch`'s own Rust implementation of the intrinsic, which is a second model
+rather than the hardware; they agree, and each recorded mutation but those of
+`vpermi2d` and `vpermi2q`, which Miri does not implement, is caught there. Until
+the tests run on an AVX-512 CPU, a transcription error in an AVX-512 model can
+make an AVX-512 claim false.
+
+These variants also rest on stand-ins for the `asm!` blocks the extractor
+rejects (docs/extractor-issues.md 213):
+
+- **`confuse_compiler`** (NEON, pre-patch `monty-31/030`; AVX-512's
+  `confuse_compiler` and `confuse_compiler_256`, `monty-31/040`): an
+  optimisation barrier written as an empty `asm!` block. Under the extraction
+  cfg it is the identity. That is its value, since the block's template is a
+  comment and the code after it tells the compiler `y == x`, but the stand-in is
+  trusted: the models say nothing about the code generation the barrier is there
+  to affect.
+- **The masked `vmovshdup`** (AVX-512's `mask_movehdup_epi32` and
+  `mask_movehdup_epi32_256`, `monty-31/040`): the single instruction
+  `vmovshdup dst{k}, a` with merge masking into `src`, written as `asm!` so that
+  LLVM keeps that instruction. Under the extraction cfg it is
+  `_mm512_mask_movehdup_ps(src, k, a)` (or the 256-bit form) on the vectors
+  cast to floats and back, the intrinsic for that instruction. The stand-in is
+  trusted to have the block's value: `mul` reaches it, so the AVX-512 `Mul`
+  claims rest on it, and on that intrinsic's model.
 
 ## 4. Specification libraries
 
