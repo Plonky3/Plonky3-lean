@@ -5,6 +5,7 @@ public import Plonky3Lean.Proofs.UniStark.Transcript
 public import Plonky3Lean.Proofs.UniStark.Extracted
 public import Plonky3Lean.Proofs.UniStark.Zk
 public import Plonky3Lean.Proofs.UniStark.ZkCompleteness
+public import Plonky3Lean.Proofs.UniStark.EndToEnd
 public import Plonky3Lean.Proofs.Commit.BabyBear
 public import CompPoly.Fields.BabyBear.Ext4
 
@@ -612,6 +613,88 @@ theorem honest_ood_check_masked : type_of% @Plonky3Lean.Proofs.UniStark.honest_o
   @Plonky3Lean.Proofs.UniStark.honest_ood_check_masked
 
 end zk
+
+/-! ## The full verifier -/
+
+/-
+The verifier is transcribed end to end, over the FRI transcription's sponge.
+
+Write b for the proof's degree bits, z for the zero-knowledge bit and L for the quotient sizing.
+
+```text
+    trace domain     subgroup of order 2^b
+    base domain      subgroup of order 2^(b - z)
+    quotient coset   shift g, order 2^(b + L), split into 2^(L + z) chunks
+    chunk domains    each committed over the trace domain
+```
+-/
+
+section verify
+
+open p3_uni_stark.verify.mirror
+
+/-- When every step accepts, the verifier accepts.
+
+The steps are the shape checks, the transcript and the opening argument on the claims at zeta.
+
+The last two are the recombination and the check at zeta. -/
+theorem verify_accepts : type_of% @Plonky3Lean.Proofs.UniStark.verify_accepts :=
+  @Plonky3Lean.Proofs.UniStark.verify_accepts
+
+/-- Completeness of the verifier, given the chunks' recombination.
+
+The trace satisfies the STARK's relation on the base subgroup.
+
+It is opened honestly at the drawn zeta, off that subgroup.
+
+The AIR reads the next row of both traces. -/
+theorem verify_complete : type_of% @Plonky3Lean.Proofs.UniStark.verify_complete :=
+  @Plonky3Lean.Proofs.UniStark.verify_complete
+
+/-- Completeness over Merkle commitments and the two-adic FRI scheme.
+
+The quotient chunks open to their interpolants, and the FRI prover is honest on the verifier's claims. -/
+theorem verify_complete_merkle : type_of% @Plonky3Lean.Proofs.UniStark.verify_complete_merkle :=
+  @Plonky3Lean.Proofs.UniStark.verify_complete_merkle
+
+/-- Completeness of the zero-knowledge path, over the hiding FRI scheme and Merkle commitments.
+
+- The quotient chunks open to their interpolants plus Z_i times their masks.
+- The verifier's claims are the public part of a randomized batch.
+- The proof's hidden values are the rest of it.
+- The FRI prover is honest on the randomized batch. -/
+theorem verify_complete_hiding : type_of% @Plonky3Lean.Proofs.UniStark.verify_complete_hiding :=
+  @Plonky3Lean.Proofs.UniStark.verify_complete_hiding
+
+/-- The verifier never panics on any proof, under these conditions:
+
+- the AIR binds its public values by constraints
+- the largest trace height lies within the generator table
+- the quotient sizing returns
+- the grinding difficulty before zeta is zero, or b < 64 with 2^b < p
+- the opening argument never panics
+- the configured extension degree is the basis's. -/
+theorem verify_ne_none : type_of% @Plonky3Lean.Proofs.UniStark.verify_ne_none :=
+  @Plonky3Lean.Proofs.UniStark.verify_ne_none
+
+/-- The grind before zeta panics exactly when it is reached at an unsafe difficulty.
+
+It is reached when the randomization commitment matches the scheme and the difficulty is positive. -/
+theorem ood_phase_run_eq_none : type_of% @Plonky3Lean.Proofs.UniStark.ood_phase_run_eq_none :=
+  @Plonky3Lean.Proofs.UniStark.ood_phase_run_eq_none
+
+/-- An AIR with boundary cells panics on every proof. -/
+theorem verify_boundary_none : type_of% @Plonky3Lean.Proofs.UniStark.verify_boundary_none :=
+  @Plonky3Lean.Proofs.UniStark.verify_boundary_none
+
+/-- At the pin, a supplied verifier key is never compared with the AIR.
+
+A key of positive width w, with an opening of width w, passes whatever width the AIR declares. -/
+theorem process_preprocessed_trace_any_key :
+    type_of% @Plonky3Lean.Proofs.UniStark.process_preprocessed_trace_any_key :=
+  @Plonky3Lean.Proofs.UniStark.process_preprocessed_trace_any_key
+
+end verify
 
 /-! ## BabyBear and its quartic extension -/
 
