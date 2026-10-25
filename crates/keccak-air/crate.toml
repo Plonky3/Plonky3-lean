@@ -24,6 +24,10 @@ watch = ["keccak-air/src", "keccak-air/Cargo.toml"]
 # The transcriptions in extraction/P3KeccakAir/Assumptions/Mirror/.
 # Hashes are pending tools/mirror.
 #
+# The packed generator is transcribed as well.
+#
+# Plonky3Lean/Proofs/KeccakAir/Binary/Packed.lean proves that it returns the packing of the trace.
+#
 # Plonky3Lean/Proofs/KeccakAir/Extracted.lean proves the transcribed tables equal to the extracted ones.
 #
 # Plonky3Lean/Proofs/KeccakAir/Binary/Round.lean proves the transcribed round on words is Rnd of FIPS 202.
@@ -183,3 +187,39 @@ rust = "p3_keccak_air::binary::air::NUM_FLAG_CONSTRAINTS"
 [[mirror]]
 lean = "p3_keccak_air.mirror.binary.NUM_STATE_BITS"
 rust = "p3_keccak_air::binary::air::NUM_STATE_BITS"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.BITS_PER_WORD"
+rust = "p3_keccak_air::binary::generation::BITS_PER_WORD"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.OUTPUT_FLAG_COLUMN"
+rust = "p3_keccak_air::binary::generation::OUTPUT_FLAG_COLUMN"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.trailing_zeros"
+rust = "core::num::{u32}::trailing_zeros"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.RowWords"
+rust = "p3_keccak_air::binary::generation::RowWords"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.RowWords.default"
+rust = "{impl core::default::Default for p3_keccak_air::binary::generation::RowWords}::default"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.generate_perm_words"
+rust = "p3_keccak_air::binary::generation::generate_perm_words"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.pack_row"
+rust = "p3_keccak_air::binary::generation::pack_block"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.pack_block"
+rust = "p3_keccak_air::binary::generation::pack_block"
+
+[[mirror]]
+lean = "p3_keccak_air.mirror.binary.generate_binary_trace_packed"
+rust = "p3_keccak_air::binary::generation::generate_binary_trace_packed"

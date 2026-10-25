@@ -1,5 +1,5 @@
 /-
-Transcriptions of the Keccak-f AIR over a field of characteristic 2: its column layout, its evaluation, its round on words and its trace generator.
+Transcriptions of the Keccak-f AIR over a field of characteristic 2: its column layout, its evaluation, its round on words, its trace generator and its packed trace generator.
 
 The evaluation and the generator do not extract: they are generic over the builder and the field traits, which aeneas rejects.
 
@@ -10,6 +10,11 @@ Each definition transcribes one Rust item, named in the crate's mirror entries.
 What a transcription abstracts, beyond those of the other AIR:
 
 * a state of 25 words indexed by lane 5 y + x is a map from that index to the word;
+* a block of packed words, and the 25 rows of witness words, are maps from the index to the entry;
+* the slice of the inputs a block overlaps is a drop then a take, and an index into a block never leaves it;
+* the trailing-zero count of a word is the index of its lowest set bit;
+* the parallel loop over blocks is a sequential loop, and the scratch rows are threaded through it;
+* the body of the loop over a block's rows is a separate definition;
 * a panic is none.
 
 Loops, branches and the order of assertions are kept.
@@ -175,5 +180,95 @@ def generate_binary_trace_rows [DecidableEq F] (inputs : List LState) (_extra_ca
       { KeccakBinaryCols.zero with round_flags := Function.update (fun _ => 0) NUM_ROUNDS 1 }
     let padding_rows := List.replicate (num_rows - num_perm_rows) padding_row
     some ⟨NUM_KECCAK_BINARY_COLS, (perm_rows ++ padding_rows).flatMap KeccakBinaryCols.cells⟩
+
+/-! ## The packed trace generator -/
+
+/-- The number of trace rows packed into one word. -/
+def BITS_PER_WORD : ℕ := 64
+
+/-- The column of the output flag, the only set cell of a padding row. -/
+def OUTPUT_FLAG_COLUMN : ℕ := NUM_ROUNDS
+
+/-- The number of trailing zero bits of a 32-bit word, 32 for the zero word. -/
+def trailing_zeros (x : BitVec 32) : ℕ := ((List.range 32).find? (x.getLsbD ·)).getD 32
+
+/-- The witness words of one row: the one-hot row kind, then the state lane by lane. -/
+structure RowWords where
+  flags : BitVec 32
+  state : LState
+
+/-- The default row: no flag and the zero state. -/
+def RowWords.default : RowWords := ⟨0, fun _ => 0⟩
+
+/-- Fill the words of the 25 rows of one permutation. -/
+def generate_perm_words (rows : ℕ → RowWords) (input : LState) : ℕ → RowWords :=
+  let (rows, state) := (List.range NUM_ROUNDS).foldl
+    (fun (acc : (ℕ → RowWords) × LState) round =>
+      let (rows, state) := acc
+      (Function.update rows round ⟨1#32 <<< round, state⟩, keccak_round state round)) (rows, input)
+  Function.update rows NUM_ROUNDS ⟨1#32 <<< NUM_ROUNDS, state⟩
+
+/-- Set bit `shift` of every column of a block that holds a 1 cell of a row. -/
+def pack_row (block : ℕ → BitVec 64) (words : RowWords) (shift : ℕ) : ℕ → BitVec 64 :=
+  -- The row kind is one-hot, so exactly one flag column takes a bit.
+  let flag := trailing_zeros words.flags
+  let block := Function.update block flag (block flag ||| 1#64 <<< shift)
+  -- A lane's cells are its bits, so its 64 columns take them in one sweep.
+  (List.range 25).foldl (fun block lane =>
+    (List.range 64).foldl (fun block index =>
+      let column := KECCAK_BINARY_ROWS_PER_PERM + 64 * lane + index
+      Function.update block column (block column ||| ((words.state lane >>> index) &&& 1) <<< shift))
+      block) block
+
+/-- Pack the rows `64 b` to `64 b + 63` of the trace into the block of physical row `b`. -/
+def pack_block (block : ℕ → BitVec 64) (block_index : ℕ) (inputs : List LState) (num_rows : ℕ)
+    (rows : ℕ → RowWords) : (ℕ → BitVec 64) × (ℕ → RowWords) :=
+  let num_perm_rows := inputs.length * KECCAK_BINARY_ROWS_PER_PERM
+  let block_start := block_index * BITS_PER_WORD
+  let block_end := min (block_start + BITS_PER_WORD) num_rows
+  let perm_rows_end := min block_end num_perm_rows
+  let (block, rows) :=
+    if block_start < perm_rows_end then
+      let first_perm := block_start / KECCAK_BINARY_ROWS_PER_PERM
+      let last_perm := (perm_rows_end - 1) / KECCAK_BINARY_ROWS_PER_PERM
+      -- Each permutation overlapping the block is regenerated, and its rows inside it are read out.
+      ((inputs.drop first_perm).take (last_perm + 1 - first_perm)).zipIdx.foldl
+        (fun (acc : (ℕ → BitVec 64) × (ℕ → RowWords)) (input, offset) =>
+          let (block, rows) := acc
+          let rows := generate_perm_words rows input
+          let perm_start := (first_perm + offset) * KECCAK_BINARY_ROWS_PER_PERM
+          let start := max block_start perm_start
+          let stop := min perm_rows_end (perm_start + KECCAK_BINARY_ROWS_PER_PERM)
+          let block := (List.range' start (stop - start)).foldl
+            (fun block row => pack_row block (rows (row - perm_start)) (row - block_start)) block
+          (block, rows)) (block, rows)
+    else (block, rows)
+  -- The state of a padding row is zero.
+  let pad_start := max block_start num_perm_rows
+  let block := (List.range' pad_start (block_end - pad_start)).foldl (fun block row =>
+    Function.update block OUTPUT_FLAG_COLUMN
+      (block OUTPUT_FLAG_COLUMN ||| 1#64 <<< (row - block_start))) block
+  (block, rows)
+
+/-- The trace packed into one word per 64 rows.
+
+Bit `k` of word `(w, j)` is set when cell `(64 w + k, j)` is 1, and the bits past the height are zero.
+
+The scratch rows of one permutation are reused from block to block.
+
+It panics when 2 is not 0 in the field, or when there is no input. -/
+def generate_binary_trace_packed [DecidableEq F] (inputs : List LState) : Option (Mat (BitVec 64)) :=
+  if (2 : F) ≠ 0 then none
+  else if inputs = [] then none
+  else
+    let num_perm_rows := inputs.length * KECCAK_BINARY_ROWS_PER_PERM
+    let num_rows := num_perm_rows.nextPowerOfTwo
+    let num_blocks := (num_rows + BITS_PER_WORD - 1) / BITS_PER_WORD
+    let (words, _) := (List.range num_blocks).foldl
+      (fun (acc : List (BitVec 64) × (ℕ → RowWords)) block_index =>
+        let (words, rows) := acc
+        let (block, rows) := pack_block (fun _ => 0) block_index inputs num_rows rows
+        (words ++ (List.range NUM_KECCAK_BINARY_COLS).map block, rows)) ([], fun _ => RowWords.default)
+    some ⟨NUM_KECCAK_BINARY_COLS, words⟩
 
 end p3_keccak_air.mirror.binary

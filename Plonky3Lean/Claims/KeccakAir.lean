@@ -6,6 +6,7 @@ public import Plonky3Lean.Proofs.KeccakAir.Extracted
 public import Plonky3Lean.Proofs.KeccakAir.Binary.Complete
 public import Plonky3Lean.Proofs.KeccakAir.Binary.Degree
 public import Plonky3Lean.Proofs.KeccakAir.Binary.Extracted
+public import Plonky3Lean.Proofs.KeccakAir.Binary.Packed
 
 @[expose] public section
 
@@ -64,6 +65,16 @@ The claims:
 - without the booleanity, it holds when the trace's state cells are bits
 - the generator's trace satisfies the AIR, with or without the booleanity
 - the extracted round on words computes Rnd of FIPS 202 below round 24, and panics from round 24
+
+## The packed generator
+
+The packed generator stores 64 rows of the trace in each word, one per bit.
+
+For each block of 64 rows, it regenerates the permutations that overlap the block.
+
+- It returns exactly the packing of the trace generator's trace, for any nonempty list of inputs.
+- A block that cuts a permutation, the last partial block and the padding rows pack as the trace does.
+- It panics on exactly the same inputs as the trace generator.
 -/
 
 open Plonky3Lean.Spec.Air Plonky3Lean.Spec.Keccak Plonky3Lean.Proofs.Air
@@ -297,5 +308,40 @@ theorem binary.num_constraints_gf2 (cb : Bool) :
   count_binary_gf2 cb
 
 end binary
+
+/-! ## The packed generator over a field of characteristic 2 -/
+
+section packed
+
+open Plonky3Lean.Proofs.KeccakAir.Binary p3_keccak_air.mirror.binary
+
+/-- The packed generator returns the trace packed 64 rows to a word.
+
+It panics exactly when the trace generator does.
+
+Bit `k` of word `(w, j)` says whether cell `(64 w + k, j)` is 1, and the bits past the height are zero. -/
+theorem binary.generate_binary_trace_packed.eq_pack (inputs : List LState) (e : ℕ) :
+    generate_binary_trace_packed (F := F) inputs = (generate_binary_trace_rows (F := F) inputs e).map packMat :=
+  Proofs.KeccakAir.Binary.packed_eq inputs e
+
+/-- In characteristic 2, on a nonempty list of inputs, the packed trace is a packed satisfying trace. -/
+theorem binary.generate_binary_trace_packed.complete [Inhabited F] (h2 : (2 : F) = 0) (cb : Bool)
+    {inputs : List LState} (hne : inputs ≠ []) (e : ℕ) :
+    ∃ M : Mat F, generate_binary_trace_packed (F := F) inputs = some (packMat M) ∧
+      Satisfies (constraints (binaryAir cb)) (instOf (binaryAir cb) M []) := by
+  obtain ⟨M, hM, hs⟩ := Proofs.KeccakAir.Binary.complete h2 cb hne e
+  exact ⟨M, by rw [Proofs.KeccakAir.Binary.packed_eq (F := F) inputs e, hM, Option.map_some], hs⟩
+
+/-- The packed generator panics exactly when 2 is not 0 in the field or there is no input. -/
+theorem binary.generate_binary_trace_packed.panics {inputs : List LState} :
+    generate_binary_trace_packed (F := F) inputs = none ↔ ¬ ((2 : F) = 0 ∧ inputs ≠ []) := by
+  rw [Proofs.KeccakAir.Binary.packed_eq (F := F) inputs 0]
+  by_cases h2 : (2 : F) = 0
+  · by_cases hne : inputs = []
+    · simp [generate_binary_trace_rows, h2, hne]
+    · simp [Proofs.KeccakAir.Binary.generate_binary_eq h2 hne, h2, hne]
+  · simp [generate_binary_trace_rows, h2]
+
+end packed
 
 end Plonky3Lean.Claims.KeccakAir
