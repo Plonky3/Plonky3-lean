@@ -460,4 +460,172 @@ theorem deep_tiles_eq_mirror {inst : p3_binary_dft.butterfly.ButterflyField F R}
   · simp only [p3_binary_dft.lch.schedule.hax_reshaped.deep_tiles_loop.body]
     rw [show K * TL = n * w by rw [hTL, hK]; ring, ite_of_neg (lt_irrefl _)]
 
+/-! ## The blocked run -/
+
+variable {R : Type} in
+theorem group_pass_stage {inst : p3_binary_dft.butterfly.ButterflyField F R} (inverse : Bool) (values : Slice F)
+    (w lo : ℕ) (slab : Std.Usize) (tw : p3_binary_dft.lch.twiddles.Twiddles F) (hlo : lo + 1 ≤ Usize.max) :
+    p3_binary_dft.lch.schedule.group_pass inverse inst values (uz w) (uz lo, uz (lo + 1)) slab tw =
+      p3_binary_dft.lch.schedule.stage_pass inverse inst values (uz w) (uz lo) tw := by
+  unfold p3_binary_dft.lch.schedule.group_pass
+  simp only [Aeneas.Std.uncurry]
+  rw [uz_sub (by omega) hlo, bind_ok, show lo + 1 - lo = 1 by omega, uz_one, ite_of_pos rfl]
+
+theorem foldlM_reverse {α : Type} (f : α → ℕ → Option α) (n : ℕ) (x : α) :
+    (List.range n).reverse.foldlM f x = (List.range n).foldlM (fun x k => f x (n - 1 - k)) x := by
+  rw [← range_map_rev, List.foldlM_map]
+
+open p3_binary_dft.lch.mirror in
+theorem cut_serial_facts {b w l : ℕ} (c : Cut) (hc : c = Cut.new (Schedule.new b w l) l) :
+    c.group = 1 ∧ c.tile ≤ l ∧ c.groups = l - c.tile ∧ c.log_n = l ∧
+      ∀ g < c.groups, c.bounds g = (c.tile + g, c.tile + g + 1) := by
+  subst hc
+  simp only [Cut.new, Schedule.new, Schedule.for_workers, show ¬ (16 ≤ 1) by omega, ite_false,
+    show ¬ (2 ≤ 0) by omega, Cut.bounds, mul_one, Nat.add_sub_cancel]
+  refine ⟨trivial, min_le_right _ _, Nat.div_one _, trivial, fun g hg => ?_⟩
+  simp only [Nat.div_one] at hg
+  simp only [Prod.mk.injEq, true_and]
+  omega
+
+open p3_binary_dft.lch.mirror in
+variable [DecidableEq F] {R : Type} {L : Level F} in
+/-- The extracted blocked run on the serial pool is the transcribed one. -/
+theorem run_eq_mirror {inst : p3_binary_dft.butterfly.ButterflyField F R} (hb : ButterflyComputes inst L)
+    (tw : Twiddles F) (hbl : tw.bases.length ≤ Usize.max) (hsl : tw.steps.length ≤ Usize.max)
+    (inverse : Bool) {b w l : ℕ} (hw : 0 < w) (x : ℕ → ℕ → F) (values : Slice F)
+    (hv : flat w (2 ^ l) x = values.val) (hbound : 2 ^ l * w + 1024 ≤ Usize.max) :
+    p3_binary_dft.lch.schedule.run inverse inst values (uz w) (uz l) (toTw tw) (toSched (Schedule.new b w l)) =
+      ofOption ((run L tw inverse w l (Schedule.new b w l) x).map fun y => mkSlice (flat w (2 ^ l) y)) := by
+  set sch := Schedule.new b w l with hsch
+  set c := Cut.new sch l with hc
+  obtain ⟨hg1, htile, hgroups, hcl, hbounds⟩ := cut_serial_facts c hc
+  have hnl : 2 ^ l ≤ 2 ^ l * w := Nat.le_mul_of_pos_right _ hw
+  have hl2 : l < 2 ^ l := Nat.lt_two_pow_self
+  have hlm : l ≤ Usize.max := by omega
+  have hst0 : sch.log_staged_rows = 0 := by simp [hsch, Schedule.new, Schedule.for_workers]
+  have hst1 : sch.log_tile_rows ≤ Usize.max := by
+    simp only [hsch, Schedule.new, Schedule.for_workers]; exact le_trans (min_le_right _ _) (by omega)
+  have hst3 : sch.log_slab_rows ≤ Usize.max := by
+    simp only [hsch, Schedule.new, Schedule.for_workers]
+    exact le_trans (min_le_right _ _) (le_trans (min_le_right _ _) (by omega))
+  -- One stage of a group, on any rows.
+  have hstage : ∀ (g : ℕ), g < c.groups → ∀ (inv : Bool) (y : ℕ → ℕ → F) (vs : Slice F),
+      flat w (2 ^ l) y = vs.val →
+      p3_binary_dft.lch.schedule.group_pass inv inst vs (uz w) (uz (c.bounds g).1, uz (c.bounds g).2)
+          (uz c.slab) (toTw tw) =
+        ofOption ((group_pass L tw inv w (2 ^ l) (c.bounds g) y).map fun y => mkSlice (flat w (2 ^ l) y)) := by
+    intro g hg inv y vs hy
+    rw [hbounds g hg, group_pass_stage inv vs w _ _ _ (by omega)]
+    simp only [group_pass, show c.tile + g + 1 - (c.tile + g) = 1 by omega, ite_true]
+    exact stage_pass_eq_mirror hb tw hbl hsl inv hw y vs hy
+      (Nat.pow_dvd_pow 2 (by omega)) (Nat.two_pow_pos l) hbound
+  have hdeep : ∀ (inv : Bool) (y : ℕ → ℕ → F) (vs : Slice F), flat w (2 ^ l) y = vs.val →
+      p3_binary_dft.lch.schedule.deep_tiles inv inst vs (uz w) (uz c.tile) (toTw tw) =
+        ofOption ((deep_tiles L tw inv (2 ^ l) c.tile y).map fun y => mkSlice (flat w (2 ^ l) y)) :=
+    fun inv y vs hy => deep_tiles_eq_mirror hb tw hbl hsl inv hw y vs hy (Nat.pow_dvd_pow 2 htile)
+      (Nat.two_pow_pos l) hbound
+  have hcm : c.tile + c.groups ≤ Usize.max := by omega
+  have hzero : (0#usize : Std.Usize) = uz 0 := UScalar.eq_of_val_eq (by rw [uz_val (by scalar_tac)]; rfl)
+  have htilepos : (uz c.tile > 0#usize) ↔ 0 < c.tile := by
+    rw [hzero, gt_iff_lt, uz_lt (by scalar_tac) (by omega)]
+  -- The inverse groups, bottom first.
+  have hinv : ∀ (y : ℕ → ℕ → F) (vs : Slice F), flat w (2 ^ l) y = vs.val →
+      p3_binary_dft.lch.schedule.run_loop inst { start := 0#usize, «end» := uz c.groups } vs (uz w) (toTw tw)
+          (uz c.tile) (uz c.slab) (uz c.group) (uz c.groups) (uz c.log_n) =
+        ofOption (((List.range c.groups).foldlM (fun x g => group_pass L tw true w (2 ^ l) (c.bounds g) x) y).map
+          fun y => mkSlice (flat w (2 ^ l) y)) := by
+    intro y vs hy
+    have := loop_foldlM_inv
+      (fun st => p3_binary_dft.lch.schedule.run_loop.body inst (uz w) (toTw tw) (uz c.tile) (uz c.slab)
+        (uz c.group) (uz c.groups) (uz c.log_n) st.1 st.2)
+      (fun (y : ℕ → ℕ → F) k => (({ start := uz k, «end» := uz c.groups } : core.ops.range.Range Std.Usize),
+        mkSlice (flat w (2 ^ l) y)))
+      (fun y => mkSlice (flat w (2 ^ l) y)) c.groups
+      (fun x g => group_pass L tw true w (2 ^ l) (c.bounds g) x)
+      (fun _ _ => True) (fun k hk c' _ => ?_) (fun c' _ => ?_) y trivial
+    · rw [hy, mkSlice_self] at this
+      exact this
+    · simp only [p3_binary_dft.lch.schedule.run_loop.body]
+      rw [show core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next
+          core.Usize.Insts.CoreIterRangeStep { start := uz k, «end» := uz c.groups } = _ from range_step k _
+            (by rw [uz_val (by omega)]; exact hk)]
+      simp only [usz_eq_uz, bind_ok, Aeneas.Std.uncurry]
+      rw [show p3_binary_dft.lch.schedule.Cut.mk (uz c.tile) (uz c.slab) (uz c.group) (uz c.groups)
+          (uz c.log_n) = toCut c from rfl,
+        cut_bounds_eq c hg1 k (by omega) (by omega), bind_ok,
+        hstage k hk true c' (mkSlice (flat w (2 ^ l) c')) (mkSlice_val (by rw [length_flat]; omega)).symm]
+      cases group_pass L tw true w (2 ^ l) (c.bounds k) c' <;> simp [ofOption]
+    · simp only [p3_binary_dft.lch.schedule.run_loop.body]
+      rw [show core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.next
+          core.Usize.Insts.CoreIterRangeStep { start := uz c.groups, «end» := uz c.groups } = _ from
+        range_next_none _ _ le_rfl]
+      simp
+  -- The forward groups, top first.
+  have hfwd : ∀ (y : ℕ → ℕ → F) (vs : Slice F), flat w (2 ^ l) y = vs.val →
+      p3_binary_dft.lch.schedule.forward_below_loop inst
+          ({ iter := { start := 0#usize, «end» := uz c.groups } } :
+            core.iter.adapters.rev.Rev (core.ops.range.Range Std.Usize)) vs (uz w) (toCut c) (toTw tw) =
+        ofOption (((List.range c.groups).foldlM
+          (fun x k => group_pass L tw false w (2 ^ l) (c.bounds (c.groups - 1 - k)) x) y).map
+          fun y => (mkSlice (flat w (2 ^ l) y), toCut c)) := by
+    intro y vs hy
+    have := loop_foldlM_inv
+      (fun st => p3_binary_dft.lch.schedule.forward_below_loop.body inst (uz w) (toCut c) (toTw tw) st.1 st.2)
+      (fun (y : ℕ → ℕ → F) k => (({ iter := { start := 0#usize, «end» := uz (c.groups - k) } } :
+          core.iter.adapters.rev.Rev (core.ops.range.Range Std.Usize)), mkSlice (flat w (2 ^ l) y)))
+      (fun y => (mkSlice (flat w (2 ^ l) y), toCut c)) c.groups
+      (fun x k => group_pass L tw false w (2 ^ l) (c.bounds (c.groups - 1 - k)) x)
+      (fun _ _ => True) (fun k hk c' _ => ?_) (fun c' _ => ?_) y trivial
+    · rw [hy, mkSlice_self, Nat.sub_zero] at this
+      exact this
+    · simp only [p3_binary_dft.lch.schedule.forward_below_loop.body,
+        core.iter.adapters.rev.Rev.Insts.CoreIterTraitsIteratorIterator.next,
+        core.ops.range.Range.Insts.CoreIterTraitsDouble_endedDoubleEndedIterator]
+      rw [range_next_back_lt _ (by omega) (by rw [show (0#usize : Std.Usize).val = 0 from rfl]; omega)]
+      simp only [bind_ok, Aeneas.Std.uncurry]
+      rw [show c.groups - k - 1 = c.groups - (k + 1) by omega, show c.groups - 1 - k = c.groups - (k + 1) by omega,
+        cut_bounds_eq c hg1 _ (by omega) (by omega), bind_ok,
+        show (toCut c).slab = uz c.slab from rfl,
+        hstage _ (by omega) false c' (mkSlice (flat w (2 ^ l) c')) (mkSlice_val (by rw [length_flat]; omega)).symm]
+      cases group_pass L tw false w (2 ^ l) (c.bounds (c.groups - (k + 1))) c' <;> simp [ofOption]
+    · simp only [p3_binary_dft.lch.schedule.forward_below_loop.body,
+        core.iter.adapters.rev.Rev.Insts.CoreIterTraitsIteratorIterator.next,
+        core.ops.range.Range.Insts.CoreIterTraitsDouble_endedDoubleEndedIterator]
+      rw [Nat.sub_self, ← hzero]
+      unfold core.IteratorRange.next_back
+      simp [core.Usize.Insts.CoreCmpPartialOrdUsize, core.mkUPartialOrd]
+  have hfl : ∀ z : ℕ → ℕ → F, flat w (2 ^ l) z = (mkSlice (flat w (2 ^ l) z)).val :=
+    fun z => (mkSlice_val (by rw [length_flat]; omega)).symm
+  unfold p3_binary_dft.lch.schedule.run run
+  rw [cut_new_eq sch hst1 hst0 hst3 hlm, bind_ok, ← hc,
+    show (toCut c).tile = uz c.tile from rfl, show (toCut c).slab = uz c.slab from rfl,
+    show (toCut c).group = uz c.group from rfl, show (toCut c).groups = uz c.groups from rfl,
+    show (toCut c).log_n = uz c.log_n from rfl]
+  cases inverse
+  · -- Forward: the groups top first, then the tiles.
+    simp only [Bool.false_eq_true, ite_false]
+    unfold p3_binary_dft.lch.schedule.forward_below forward_below
+    simp only [core.iter.traits.iterator.Iterator.rev.default, core.iter.adapters.rev.Rev.new, bind_ok]
+    rw [hfwd x values hv, foldlM_reverse]
+    cases (List.range c.groups).foldlM
+        (fun x k => group_pass L tw false w (2 ^ l) (c.bounds (c.groups - 1 - k)) x) x with
+    | none => simp [ofOption]
+    | some z =>
+      simp only [ofOption, Option.map_some, bind_ok, Aeneas.Std.uncurry, Option.bind_eq_bind, Option.bind_some,
+        show (toCut c).tile = uz c.tile from rfl]
+      by_cases h : 0 < c.tile
+      · rw [ite_of_pos (htilepos.mpr h), ite_of_pos h, hdeep false z _ (hfl z)]; rfl
+      · rw [ite_of_neg (fun h' => h (htilepos.mp h')), ite_of_neg h]; rfl
+  · -- Inverse: the tiles, then the groups bottom first.
+    simp only [ite_true]
+    by_cases h : 0 < c.tile
+    · rw [ite_of_pos (htilepos.mpr h), ite_of_pos h, hdeep true x values hv]
+      cases deep_tiles L tw true (2 ^ l) c.tile x with
+      | none => simp [ofOption]
+      | some z =>
+        simp only [ofOption, Option.map_some, bind_ok, Option.bind_eq_bind, Option.bind_some]
+        exact hinv z _ (hfl z)
+    · rw [ite_of_neg (fun h' => h (htilepos.mp h')), ite_of_neg h, bind_ok]
+      exact hinv x values hv
+
 end Plonky3Lean.Proofs.BinaryDft
