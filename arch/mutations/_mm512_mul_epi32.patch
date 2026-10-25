@@ -1,0 +1,14 @@
+# Mutation of: _mm512_mul_epi32
+# Breaks:      it zero-extends the factors instead of sign-extending them.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -158,7 +158,7 @@
+     let mut dst = [0u32; 16];
+     let mut k = 0;
+     while k < 8 {
+-        let p = (a.0[2 * k] as i32 as i64) * (b.0[2 * k] as i32 as i64);
++        let p = (a.0[2 * k] as i64) * (b.0[2 * k] as i64);
+         let (lo, hi) = split64(p as u64);
+         dst[2 * k] = lo;
+         dst[2 * k + 1] = hi;

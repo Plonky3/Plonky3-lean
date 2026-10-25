@@ -1,0 +1,290 @@
+# Patch:        040-redirect-avx512-intrinsics
+# Phase:        pre
+# Target:       baby-bear/src/x86_64_avx512/packing.rs, baby-bear/src/x86_64_avx512/poseidon2.rs, field/src/packed/interleaves.rs, field/src/packed/x86_64_avx.rs, monty-31/src/x86_64_avx512/packing.rs, monty-31/src/x86_64_avx512/poseidon1.rs, monty-31/src/x86_64_avx512/poseidon2.rs, monty-31/src/x86_64_avx512/utils.rs
+# Hunks:        16
+# Class:        cfg-hide
+# Gap:          docs/extractor-issues.md 210: the `core::arch` intrinsics have no
+#               Rust bodies to extract; and 213: aeneas rejects `asm!`.
+# Cost:         none in a normal build: every change is behind
+#               cfg(hax_backend_lean). In the extracted AVX-512 variants each
+#               intrinsic is its model in `arch/` (p3-arch-shims), trusted:
+#               reviewed against Intel's pseudocode, not yet tested against the
+#               hardware (`arch/tests/avx512.rs` needs an AVX-512 CPU). The two
+#               `confuse_compiler` barriers are the identity, and the two masked
+#               `vmovshdup` `asm!` blocks are the intrinsics for that
+#               instruction: stand-ins, listed in TRUST.md.
+# Upstreamable: no: the models exist only for the extractor. Models of the
+#               intrinsics in the extractor's library, and support for `asm!`,
+#               would make it unnecessary.
+# Drop when:    the extractor models the `core::arch::x86_64` AVX-512 intrinsics
+#               and `asm!`.
+# Test:         xcheck p3-baby-bear x86_64-unknown-linux-gnu -Ctarget-feature=+avx512f;
+#               xcheck p3-baby-bear x86_64-unknown-linux-gnu -Ctarget-feature=+avx512f --cfg hax_backend_lean
+# Mutation:     monty-31's packing imports the models in a normal build, which
+#               has no p3-arch-shims dependency, so the AVX-512 build fails.
+#
+# As 020 does for AVX2: every file on BabyBear's AVX-512 path that names a
+# vector or mask type, or calls an intrinsic, imports `core::arch::x86_64` in a
+# normal build and `p3_arch_shims::x86_64` under the cfg. The models have the
+# intrinsics' names and signatures, over `repr(transparent)` lane arrays (the
+# masks are `u16` and `u8`, as in `core::arch`), so no other line changes. 020
+# already makes p3-arch-shims a dependency of field, monty-31 and baby-bear
+# under the cfg, and redirects the AVX2 imports that the AVX-512 path shares
+# (`x86_64_avx.rs`'s `__m256i`, `__m128i` and intrinsics).
+#
+# monty-31's AVX-512 packing has four `asm!` blocks, which aeneas rejects:
+#
+# - `confuse_compiler` and `confuse_compiler_256` are `asm!("/*{0}*/",
+#   inlateout(zmm_reg) x => y, ...)` (and `ymm_reg`), followed by a check that
+#   `y == x`: the value is `x`, and the purpose is to stop LLVM from rewriting
+#   the multiplications that follow. Under the cfg each is the identity.
+# - `mask_movehdup_epi32` and `mask_movehdup_epi32_256` are the single
+#   instruction `vmovshdup {src_dst}{{{k}}}, {a}`, on zmm and ymm registers:
+#   `vmovshdup` with merge masking into `src`, the destination's input. That is
+#   the instruction of `_mm512_mask_movehdup_ps(src, k, a)` and
+#   `_mm256_mask_movehdup_ps(src, k, a)`, on the vectors cast to and from
+#   floats (`_mm512_castsi512_ps`, `_mm512_castps_si512`, and the 256-bit
+#   casts), which change no bits. The code's comment says it uses `asm!` only to
+#   keep LLVM from compiling the intrinsic to a slower `vpermt2ps`. Under the
+#   cfg each is that intrinsic call.
+#
+# `asm` and `unreachable_unchecked`, which only the blocks use, are imported
+# only in a normal build. The models say nothing about the optimisations; the
+# four stand-ins are listed in TRUST.md.
+#
+# The tests compile the AVX-512 path for x86_64: as shipped, which can only use
+# `core::arch` since p3-arch-shims is not a dependency without the cfg; and
+# under the cfg, which shows that the models fit every call site.
+#
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
+#
+diff --git a/baby-bear/src/x86_64_avx512/packing.rs b/baby-bear/src/x86_64_avx512/packing.rs
+--- a/baby-bear/src/x86_64_avx512/packing.rs
++++ b/baby-bear/src/x86_64_avx512/packing.rs
+@@ -1,4 +1,8 @@
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::x86_64::__m512i;
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::x86_64::__m512i;
+ use core::mem::transmute;
+ 
+ use p3_monty_31::{MontyParametersAVX512, PackedMontyField31AVX512};
+diff --git a/baby-bear/src/x86_64_avx512/poseidon2.rs b/baby-bear/src/x86_64_avx512/poseidon2.rs
+--- a/baby-bear/src/x86_64_avx512/poseidon2.rs
++++ b/baby-bear/src/x86_64_avx512/poseidon2.rs
+@@ -1,4 +1,8 @@
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::x86_64::__m512i;
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::x86_64::__m512i;
+ 
+ use p3_monty_31::{
+     InternalLayerParametersAVX512, mul_neg_2exp_neg_8_avx512, mul_neg_2exp_neg_n_avx512,
+diff --git a/field/src/packed/interleaves.rs b/field/src/packed/interleaves.rs
+--- a/field/src/packed/interleaves.rs
++++ b/field/src/packed/interleaves.rs
+@@ -158,7 +158,11 @@
+ 
+ #[cfg(all(target_arch = "x86_64", target_feature = "avx512f"))]
+ pub mod interleave {
++    // PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++    #[cfg(not(hax_backend_lean))]
+     use core::arch::x86_64::{self, __m512i, __mmask8, __mmask16};
++    #[cfg(hax_backend_lean)]
++    use p3_arch_shims::x86_64::{self, __m512i, __mmask8, __mmask16};
+     use core::mem::transmute;
+ 
+     const EVENS: __mmask16 = 0b0101010101010101;
+diff --git a/field/src/packed/x86_64_avx.rs b/field/src/packed/x86_64_avx.rs
+--- a/field/src/packed/x86_64_avx.rs
++++ b/field/src/packed/x86_64_avx.rs
+@@ -1,7 +1,10 @@
+ //! A collection of helper methods when AVX2 is available
+ 
+-#[cfg(target_feature = "avx512f")]
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(all(target_feature = "avx512f", not(hax_backend_lean)))]
+ use core::arch::x86_64::__m512i;
++#[cfg(all(target_feature = "avx512f", hax_backend_lean))]
++use p3_arch_shims::x86_64::__m512i;
+ // PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
+ #[cfg(not(hax_backend_lean))]
+ use core::arch::x86_64::{self, __m128i, __m256i};
+diff --git a/monty-31/src/x86_64_avx512/packing.rs b/monty-31/src/x86_64_avx512/packing.rs
+--- a/monty-31/src/x86_64_avx512/packing.rs
++++ b/monty-31/src/x86_64_avx512/packing.rs
+@@ -3,9 +3,17 @@
+ //! We check that this compiles to the expected assembly code in: https://godbolt.org/z/Mz1WGYKWe
+ 
+ use alloc::vec::Vec;
++// PATCHED: only the `asm!` blocks use it, which the cfg replaces.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::asm;
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::x86_64::{self, __m256i, __m512i, __mmask8, __mmask16};
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::x86_64::{self, __m256i, __m512i, __mmask8, __mmask16};
+ use core::array;
++// PATCHED: only the `asm!` barriers use it, which the cfg replaces.
++#[cfg(not(hax_backend_lean))]
+ use core::hint::unreachable_unchecked;
+ use core::iter::{Product, Sum};
+ use core::mem::transmute;
+@@ -323,6 +331,8 @@
+ /// Similar to `core::hint::black_box`, it can be used to stop the compiler applying undesirable
+ /// "optimizations". Unlike the built-in `black_box`, it does not force the value to be written to
+ /// and then read from the stack.
++// PATCHED: under hax's Lean backend, the identity below, since the extractor rejects `asm!`.
++#[cfg(not(hax_backend_lean))]
+ #[inline]
+ #[must_use]
+ fn confuse_compiler(x: __m512i) -> __m512i {
+@@ -342,6 +352,15 @@
+         }
+     }
+     y
++}
++
++// PATCHED: the `asm!` barrier's value: its template is a comment, and the check after it tells
++// the compiler that `y == x`. The optimisation it inhibits is not modelled.
++#[cfg(hax_backend_lean)]
++#[inline]
++#[must_use]
++fn confuse_compiler(x: __m512i) -> __m512i {
++    x
+ }
+ 
+ /// No-op. Prevents the compiler from deducing the value of the vector.
+@@ -351,6 +370,8 @@
+ /// Similar to `core::hint::black_box`, it can be used to stop the compiler applying undesirable
+ /// "optimizations". Unlike the built-in `black_box`, it does not force the value to be written to
+ /// and then read from the stack.
++// PATCHED: under hax's Lean backend, the identity below, since the extractor rejects `asm!`.
++#[cfg(not(hax_backend_lean))]
+ #[inline]
+ #[must_use]
+ fn confuse_compiler_256(x: __m256i) -> __m256i {
+@@ -372,6 +393,14 @@
+     y
+ }
+ 
++// PATCHED: the `asm!` barrier's value, as for `confuse_compiler`.
++#[cfg(hax_backend_lean)]
++#[inline]
++#[must_use]
++fn confuse_compiler_256(x: __m256i) -> __m256i {
++    x
++}
++
+ // MONTGOMERY MULTIPLICATION
+ //   This implementation is based on [1] but with minor changes. The reduction is as follows:
+ //
+@@ -465,6 +494,8 @@
+ /// the even elements according to `res[2 * i] := if k[2 * i] { a[2 * i + 1] } else { src[2 * i] }`,
+ /// and the odd elements according to
+ /// `res[2 * i + 1] := if k[2 * i + 1] { a[2 * i + 1] } else { src[2 * i + 1] }`.
++// PATCHED: under hax's Lean backend, the intrinsic below, since the extractor rejects `asm!`.
++#[cfg(not(hax_backend_lean))]
+ #[inline]
+ #[must_use]
+ fn mask_movehdup_epi32(src: __m512i, k: __mmask16, a: __m512i) -> __m512i {
+@@ -484,6 +515,22 @@
+             options(nomem, nostack, preserves_flags, pure),
+         );
+         dst
++    }
++}
++
++// PATCHED: the `asm!` block's instruction, `vmovshdup zmm{k}, zmm` with merge masking into
++// `src`, is `_mm512_mask_movehdup_ps(src, k, a)`, which the code avoids only because LLVM may
++// compile it to a slower instruction.
++#[cfg(hax_backend_lean)]
++#[inline]
++#[must_use]
++fn mask_movehdup_epi32(src: __m512i, k: __mmask16, a: __m512i) -> __m512i {
++    unsafe {
++        x86_64::_mm512_castps_si512(x86_64::_mm512_mask_movehdup_ps(
++            x86_64::_mm512_castsi512_ps(src),
++            k,
++            x86_64::_mm512_castsi512_ps(a),
++        ))
+     }
+ }
+ 
+@@ -492,6 +539,8 @@
+ /// the even elements according to `res[2 * i] := if k[2 * i] { a[2 * i + 1] } else { src[2 * i] }`,
+ /// and the odd elements according to
+ /// `res[2 * i + 1] := if k[2 * i + 1] { a[2 * i + 1] } else { src[2 * i + 1] }`.
++// PATCHED: under hax's Lean backend, the intrinsic below, since the extractor rejects `asm!`.
++#[cfg(not(hax_backend_lean))]
+ #[inline]
+ #[must_use]
+ fn mask_movehdup_epi32_256(src: __m256i, k: __mmask8, a: __m256i) -> __m256i {
+@@ -514,6 +563,21 @@
+     }
+ }
+ 
++// PATCHED: the `asm!` block's instruction, `vmovshdup ymm{k}, ymm` with merge masking into
++// `src`, is `_mm256_mask_movehdup_ps(src, k, a)`, as for `mask_movehdup_epi32`.
++#[cfg(hax_backend_lean)]
++#[inline]
++#[must_use]
++fn mask_movehdup_epi32_256(src: __m256i, k: __mmask8, a: __m256i) -> __m256i {
++    unsafe {
++        x86_64::_mm256_castps_si256(x86_64::_mm256_mask_movehdup_ps(
++            x86_64::_mm256_castsi256_ps(src),
++            k,
++            x86_64::_mm256_castsi256_ps(a),
++        ))
++    }
++}
++
+ /// Multiply a vector of unsigned field elements return a vector of unsigned field elements lying in [0, P).
+ ///
+ /// Note that the input does not need to be in canonical form but must satisfy
+diff --git a/monty-31/src/x86_64_avx512/poseidon1.rs b/monty-31/src/x86_64_avx512/poseidon1.rs
+--- a/monty-31/src/x86_64_avx512/poseidon1.rs
++++ b/monty-31/src/x86_64_avx512/poseidon1.rs
+@@ -1,7 +1,11 @@
+ //! AVX512-optimized Poseidon1 layers for MontyField31.
+ 
+ use alloc::vec::Vec;
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::x86_64::__m512i;
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::x86_64::__m512i;
+ use core::marker::PhantomData;
+ use core::mem::transmute;
+ 
+diff --git a/monty-31/src/x86_64_avx512/poseidon2.rs b/monty-31/src/x86_64_avx512/poseidon2.rs
+--- a/monty-31/src/x86_64_avx512/poseidon2.rs
++++ b/monty-31/src/x86_64_avx512/poseidon2.rs
+@@ -1,7 +1,11 @@
+ //! Vectorized AVX512 implementation of Poseidon2 for MontyField31
+ 
+ use alloc::vec::Vec;
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::x86_64::{self, __m512i};
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::x86_64::{self, __m512i};
+ use core::marker::PhantomData;
+ use core::mem::transmute;
+ 
+diff --git a/monty-31/src/x86_64_avx512/utils.rs b/monty-31/src/x86_64_avx512/utils.rs
+--- a/monty-31/src/x86_64_avx512/utils.rs
++++ b/monty-31/src/x86_64_avx512/utils.rs
+@@ -1,4 +1,8 @@
++// PATCHED: under hax's Lean backend, the lane-array models of the intrinsics.
++#[cfg(not(hax_backend_lean))]
+ use core::arch::x86_64::{self, __m512i};
++#[cfg(hax_backend_lean)]
++use p3_arch_shims::x86_64::{self, __m512i};
+ use core::mem::transmute;
+ 
+ use crate::{MontyParameters, PackedMontyParameters, TwoAdicData};

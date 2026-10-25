@@ -1,7 +1,7 @@
 # Patch:        010-restore-dropped-default-methods
 # Phase:        post
 # Target:       extraction/P3ArchShims/Extraction/Funs.lean
-# Hunks:        7
+# Hunks:        10
 # Class:        restore
 # Gap:          docs/extractor-issues.md 2: charon's multi-target mode
 #               (`--targets`) drops the default-method roots hax adds
@@ -12,7 +12,7 @@
 # Upstreamable: yes: as for monty-31's post 010.
 # Drop when:    as for monty-31's post 010.
 #
-# The seven vector types derive `Clone`, whose impls come out without
+# The ten vector types derive `Clone`, whose impls come out without
 # `clone_from`, as described in monty-31's post 010:
 #   clone_from := fun _ source => <clone> source        (= clone_from.default)
 #
@@ -54,7 +54,7 @@
  }
  
  /-- Trait implementation: [p3_arch_shims::aarch64::types::{impl core::marker::Copy for p3_arch_shims::aarch64::types::U32x2}]
-@@ -3011,6 +3019,8 @@
+@@ -5068,6 +5076,8 @@
  def x86_64.types.M256i.Insts.CoreCloneClone : core.clone.Clone
    x86_64.types.M256i := {
    clone := x86_64.types.M256i.Insts.CoreCloneClone.clone
@@ -63,7 +63,34 @@
  }
  
  /-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::marker::Copy for p3_arch_shims::x86_64::types::M256i}]
-@@ -3034,6 +3044,8 @@
+@@ -5091,6 +5101,8 @@
+ def x86_64.types.M512i.Insts.CoreCloneClone : core.clone.Clone
+   x86_64.types.M512i := {
+   clone := x86_64.types.M512i.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => x86_64.types.M512i.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::marker::Copy for p3_arch_shims::x86_64::types::M512i}]
+@@ -5114,6 +5126,8 @@
+ def x86_64.types.M512.Insts.CoreCloneClone : core.clone.Clone x86_64.types.M512
+   := {
+   clone := x86_64.types.M512.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => x86_64.types.M512.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::marker::Copy for p3_arch_shims::x86_64::types::M512}]
+@@ -5137,6 +5151,8 @@
+ def x86_64.types.M512d.Insts.CoreCloneClone : core.clone.Clone
+   x86_64.types.M512d := {
+   clone := x86_64.types.M512d.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => x86_64.types.M512d.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::marker::Copy for p3_arch_shims::x86_64::types::M512d}]
+@@ -5160,6 +5176,8 @@
  def x86_64.types.M128i.Insts.CoreCloneClone : core.clone.Clone
    x86_64.types.M128i := {
    clone := x86_64.types.M128i.Insts.CoreCloneClone.clone
@@ -72,7 +99,7 @@
  }
  
  /-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::marker::Copy for p3_arch_shims::x86_64::types::M128i}]
-@@ -3057,6 +3069,8 @@
+@@ -5183,6 +5201,8 @@
  def x86_64.types.M256.Insts.CoreCloneClone : core.clone.Clone x86_64.types.M256
    := {
    clone := x86_64.types.M256.Insts.CoreCloneClone.clone

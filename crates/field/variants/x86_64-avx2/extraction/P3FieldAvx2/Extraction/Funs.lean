@@ -30,7 +30,7 @@ noncomputable section
 namespace p3_field
 
 /-- [p3_field::packed::x86_64_avx::mm256_mod_add]:
-    Source: 'field/src/packed/x86_64_avx.rs', lines 89:0-102:1
+    Source: 'field/src/packed/x86_64_avx.rs', lines 92:0-105:1
     Visibility: public -/
 def packed.x86_64_avx.mm256_mod_add
   (lhs : p3_arch_shims.x86_64.types.M256i)
@@ -43,7 +43,7 @@ def packed.x86_64_avx.mm256_mod_add
   p3_arch_shims.x86_64.avx2._mm256_min_epu32 t u
 
 /-- [p3_field::packed::x86_64_avx::mm256_mod_sub]:
-    Source: 'field/src/packed/x86_64_avx.rs', lines 115:0-128:1
+    Source: 'field/src/packed/x86_64_avx.rs', lines 118:0-131:1
     Visibility: public -/
 def packed.x86_64_avx.mm256_mod_sub
   (lhs : p3_arch_shims.x86_64.types.M256i)

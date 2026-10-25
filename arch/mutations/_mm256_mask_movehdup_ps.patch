@@ -1,0 +1,14 @@
+# Mutation of: _mm256_mask_movehdup_ps
+# Breaks:      it moves the lanes whose mask bit is clear.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -619,7 +619,7 @@
+     let mut dst = [0u32; 8];
+     let mut j = 0;
+     while j < 8 {
+-        dst[j] = if bit8(k, j) { tmp[j] } else { src.0[j] };
++        dst[j] = if !bit8(k, j) { tmp[j] } else { src.0[j] };
+         j += 1;
+     }
+     __m256(dst)

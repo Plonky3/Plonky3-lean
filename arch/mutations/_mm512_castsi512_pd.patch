@@ -1,0 +1,14 @@
+# Mutation of: _mm512_castsi512_pd
+# Breaks:      it swaps the 32-bit halves of each element.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -784,7 +784,7 @@
+     let mut dst = [0u64; 8];
+     let mut k = 0;
+     while k < 8 {
+-        dst[k] = lane64(&a.0, k);
++        dst[k] = lane64(&a.0, k).rotate_left(32);
+         k += 1;
+     }
+     __m512d(dst)

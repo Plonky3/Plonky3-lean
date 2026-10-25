@@ -1,0 +1,14 @@
+# Mutation of: _mm512_maddubs_epi16
+# Breaks:      it does not saturate the 16-bit sums.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -232,7 +232,7 @@
+             let a1 = ((a.0[j] >> s1) & 0xff) as i32;
+             let b0 = ((b.0[j] >> s0) & 0xff) as u8 as i8 as i32;
+             let b1 = ((b.0[j] >> s1) & 0xff) as u8 as i8 as i32;
+-            let r = saturate16(a1 * b1 + a0 * b0);
++            let r = a1 * b1 + a0 * b0;
+             word |= ((r as u32) & 0xffff) << s0;
+             h += 1;
+         }

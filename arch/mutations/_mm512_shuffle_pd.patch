@@ -1,0 +1,14 @@
+# Mutation of: _mm512_shuffle_pd
+# Breaks:      it takes the even elements from `b` and the odd ones from `a`.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -691,7 +691,7 @@
+     let mut dst = [0u64; 8];
+     let mut j = 0;
+     while j < 8 {
+-        let src = if j % 2 == 0 { a.0 } else { b.0 };
++        let src = if j % 2 == 0 { b.0 } else { a.0 };
+         let base = 2 * (j / 2);
+         dst[j] = if (control >> j) & 1 == 0 {
+             src[base]

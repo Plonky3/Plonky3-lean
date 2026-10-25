@@ -1,0 +1,14 @@
+# Mutation of: _mm512_srli_epi32
+# Breaks:      it shifts arithmetically, copying the sign bit.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -256,7 +256,7 @@
+     let mut dst = [0u32; 16];
+     let mut j = 0;
+     while j < 16 {
+-        dst[j] = if s > 31 { 0 } else { a.0[j] >> s };
++        dst[j] = if s > 31 { 0 } else { ((a.0[j] as i32) >> s) as u32 };
+         j += 1;
+     }
+     __m512i(dst)

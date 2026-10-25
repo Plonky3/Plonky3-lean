@@ -1,6 +1,6 @@
 name = "Plonky3Lean"
 version = "0.1.0"
-defaultTargets = ["HaxExt", "P3BabyBear", "P3KoalaBear", "P3Util", "ToCompPoly", "Plonky3Lean", "P3ArchShims", "P3FieldAvx2", "P3Monty31Avx2", "P3BabyBearAvx2", "P3FieldNeon", "P3Monty31Neon", "P3BabyBearNeon"]
+defaultTargets = ["HaxExt", "P3BabyBear", "P3KoalaBear", "P3Util", "ToCompPoly", "Plonky3Lean", "P3ArchShims", "P3FieldAvx2", "P3Monty31Avx2", "P3BabyBearAvx2", "P3FieldNeon", "P3Monty31Neon", "P3BabyBearNeon", "P3FieldAvx512", "P3Monty31Avx512", "P3BabyBearAvx512"]
 
 # The two Lean libraries the generated code imports. Both revs must equal what
 # the hax release in toolchain.toml resolves (`cargo hax tools show`): the
@@ -189,6 +189,18 @@ srcDir = "crates/monty-31/variants/aarch64-neon/extraction"
 [[lean_lib]]
 name = "P3BabyBearNeon"
 srcDir = "crates/baby-bear/variants/aarch64-neon/extraction"
+
+[[lean_lib]]
+name = "P3FieldAvx512"
+srcDir = "crates/field/variants/x86_64-avx512/extraction"
+
+[[lean_lib]]
+name = "P3Monty31Avx512"
+srcDir = "crates/monty-31/variants/x86_64-avx512/extraction"
+
+[[lean_lib]]
+name = "P3BabyBearAvx512"
+srcDir = "crates/baby-bear/variants/x86_64-avx512/extraction"
 
 # Not a Plonky3 crate: the models of the `core::arch` intrinsics (arch/, crates/arch-shims/crate.toml).
 [[lean_lib]]

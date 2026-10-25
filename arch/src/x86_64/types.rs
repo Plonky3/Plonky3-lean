@@ -15,6 +15,31 @@ use core::fmt;
 #[repr(transparent)]
 pub struct M256i(pub [u32; 8]);
 
+/// `__m512i`, a 512-bit integer vector: sixteen 32-bit lanes, lane 0 the least significant.
+#[derive(Clone, Copy)]
+#[repr(transparent)]
+pub struct M512i(pub [u32; 16]);
+
+/// `__m512`, a 512-bit vector of sixteen single-precision floats, kept as their bit patterns.
+/// The shims that take one only move lanes, so no floating-point arithmetic is modelled.
+#[derive(Clone, Copy)]
+#[repr(transparent)]
+pub struct M512(pub [u32; 16]);
+
+/// `__m512d`, a 512-bit vector of eight double-precision floats, kept as their bit patterns,
+/// lane 0 the least significant. As for `__m512`, the shims that take one only move lanes.
+#[derive(Clone, Copy)]
+#[repr(transparent)]
+pub struct M512d(pub [u64; 8]);
+
+/// `__mmask16`, an AVX-512 mask register of sixteen bits: bit `j` is `k[j]`, the bit for lane
+/// `j`. An alias of `u16`, as in `core::arch`.
+pub type Mmask16 = u16;
+
+/// `__mmask8`, an AVX-512 mask register of eight bits: bit `j` is `k[j]`. An alias of `u8`, as
+/// in `core::arch`.
+pub type Mmask8 = u8;
+
 /// `__m128i`, a 128-bit integer vector: four 32-bit lanes, lane 0 the least significant.
 #[derive(Clone, Copy)]
 #[repr(transparent)]
@@ -40,3 +65,11 @@ macro_rules! debug_lanes {
 debug_lanes!(M256i, "__m256i");
 debug_lanes!(M128i, "__m128i");
 debug_lanes!(M256, "__m256");
+debug_lanes!(M512i, "__m512i");
+debug_lanes!(M512, "__m512");
+
+impl fmt::Debug for M512d {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "__m512d({:#018x?})", self.0)
+    }
+}

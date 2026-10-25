@@ -58,3 +58,21 @@ start_from = [
 ]
 opaque = ["p3_baby_bear::baby_bear"]
 renames = { p3_monty_31 = "p3_monty_31_neon" }
+
+# BabyBear's AVX-512 parameters, `PACKED_P` and `PACKED_MU`: the
+# `MontyParametersAVX512` impl, and the `PackedMontyParameters` impl that on
+# x86_64 with AVX-512F has it as a supertrait. As for x86_64-avx2: the traits are
+# the monty-31 variant's (`renames`), and `baby_bear` is opaque, bound to
+# P3BabyBear by variants/x86_64-avx512/extraction/P3BabyBearAvx512/Assumptions/.
+[[variant]]
+name = "x86_64-avx512"
+target = "x86_64-unknown-linux-gnu"
+target_features = ["avx512f"]
+lean_lib = "P3BabyBearAvx512"
+namespace = "p3_baby_bear_avx512"
+start_from = [
+  "{impl p3_monty_31::x86_64_avx512::packing::MontyParametersAVX512 for p3_baby_bear::baby_bear::BabyBearParameters}",
+  "{impl p3_monty_31::data_traits::PackedMontyParameters for p3_baby_bear::baby_bear::BabyBearParameters}",
+]
+opaque = ["p3_baby_bear::baby_bear"]
+renames = { p3_monty_31 = "p3_monty_31_avx512" }
