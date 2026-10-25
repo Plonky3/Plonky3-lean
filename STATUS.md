@@ -521,7 +521,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1815) whose dependencies include it; reaching one is not using it.
+(of 1827) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -564,7 +564,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1815) whose dependencies include the declaration.
+counts the claims (of 1827) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -2490,6 +2490,7 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Fri.lagrange_interpolate_at` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.merkle.binding` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.merkle.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.merkle.extracted` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.pcs.babyBear_difficulty` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.pcs.batch_dims_honest` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Fri.pcs.batch_honest` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -3483,17 +3484,28 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3KoalaBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3KoalaBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3MerkleTree.mmcs.hax_reshaped.arity_schedule_and_proof_levels.arities` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.arity_schedule_and_proof_levels.binary` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3MerkleTree.mmcs.hax_reshaped.arity_schedule_and_proof_levels.never_returns_8_4_2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.arity_schedule_and_proof_levels.panics_tall` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3MerkleTree.mmcs.hax_reshaped.hiding_verify_batch.binding` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3MerkleTree.mmcs.hax_reshaped.hiding_verify_batch.salted` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3MerkleTree.mmcs.hax_reshaped.tallest_first.eq` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3MerkleTree.mmcs.hax_reshaped.validate_heights.ok_max` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.validate_heights.panics_max` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3MerkleTree.mmcs.hax_reshaped.verify_batch.accepts_inv` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3MerkleTree.mmcs.hax_reshaped.verify_batch.accepts_of_walk` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3MerkleTree.mmcs.hax_reshaped.verify_batch.accepts_shape` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3MerkleTree.mmcs.hax_reshaped.verify_batch.binding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.binding_binary` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3MerkleTree.mmcs.hax_reshaped.verify_batch.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.complete_binary` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.iff_binary` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3MerkleTree.mmcs.hax_reshaped.verify_batch.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.never_panics_binary` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.panics_max` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.panics_tall` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.plan_binary` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.reads_binary` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3MerkleTree.mmcs.hax_reshaped.verify_batch.unread_8_1_cap_2` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3MerkleTree.salt_hits_le` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3MerkleTree.walk.binary_binding` | `Classical.choice`, `Quot.sound`, `propext` |
