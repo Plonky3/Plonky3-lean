@@ -4,6 +4,7 @@ public import Plonky3Lean.Proofs.Air.Examples
 public import Plonky3Lean.Proofs.Air.Extracted
 public import Plonky3Lean.Proofs.Air.SymbolicExt
 public import Plonky3Lean.Proofs.Air.VirtualColumn
+public import Plonky3Lean.Proofs.Air.NextRow
 
 @[expose] public section
 
@@ -482,5 +483,21 @@ theorem boundary_duplicate_scan (c : boundary.validate.closure) (l : List bounda
   any_spec c l s hs
 
 end extracted
+
+section nextRow
+
+/-- **Unread rows do not matter.**
+
+Drop the next row of the main trace, of the preprocessed trace, or of both.
+
+Take an AIR whose symbolic constraints never read a dropped row.
+
+Take two assignments that agree on every variable outside the dropped rows.
+
+Then every constraint polynomial has the same value at both. -/
+theorem next_row_unread : type_of% @Plonky3Lean.Proofs.Air.constraints_congr :=
+  @Plonky3Lean.Proofs.Air.constraints_congr
+
+end nextRow
 
 end Plonky3Lean.Claims.Air

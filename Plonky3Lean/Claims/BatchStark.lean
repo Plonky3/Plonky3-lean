@@ -601,9 +601,21 @@ theorem full_claims : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.commitmen
 
 Its openings are its polynomials at zeta, off its base trace domain.
 
+A next row is opened only when the AIR reads it, and otherwise neither the AIR nor its lookups read it.
+
 Its chunks recombine to s^n C / Z at zeta, and Z divides its constraint polynomial C. -/
 theorem full_check_at_zeta : type_of% @Plonky3Lean.Proofs.BatchStark.EndToEnd.Honest.check :=
   @Plonky3Lean.Proofs.BatchStark.EndToEnd.Honest.check
+
+/-- An instance's check at zeta ignores an unread row.
+
+Take two openings that differ only in the next row of a dropped trace.
+
+Assume neither the AIR's symbolic constraints nor its lookups read that row.
+
+Then the check returns one result on both. -/
+theorem check_at_zeta_unread : type_of% @Plonky3Lean.Proofs.BatchStark.verify_constraints_with_lookups_congr :=
+  @Plonky3Lean.Proofs.BatchStark.verify_constraints_with_lookups_congr
 
 /-- Completeness of the batch verifier, given each instance's chunk recombination.
 

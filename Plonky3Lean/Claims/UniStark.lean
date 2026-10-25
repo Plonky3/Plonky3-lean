@@ -366,6 +366,21 @@ theorem verify_constraints_complete (hV : GenValid G) (h2 : (2 : K) ≠ 0) {air 
           (constraints air))).eval ζ) = some (.ok ()) :=
   Plonky3Lean.Proofs.UniStark.verify_constraints_complete G hV h2 hb c hcs hcg hω hs hT hmain hprep hpub hper hpv hsat hζ α hpre
 
+/-- The verifier's fold ignores an unread row.
+
+Take two windows that differ only in the next row of a dropped trace.
+
+When the AIR's symbolic constraints never read that row, both fold to one value. -/
+theorem fold_unread : type_of% @Plonky3Lean.Proofs.UniStark.fold_unread :=
+  @Plonky3Lean.Proofs.UniStark.fold_unread
+
+/-- Completeness of the check at zeta, when the AIR never reads a dropped next row.
+
+That row may hold zeros, or any values of the right width. -/
+theorem verify_constraints_complete_unread :
+    type_of% @Plonky3Lean.Proofs.UniStark.verify_constraints_complete_unread :=
+  @Plonky3Lean.Proofs.UniStark.verify_constraints_complete_unread
+
 end verifier
 
 /-! ## Completeness -/
@@ -647,7 +662,9 @@ The trace satisfies the STARK's relation on the base subgroup.
 
 It is opened honestly at the drawn zeta, off that subgroup.
 
-The AIR reads the next row of both traces. -/
+A next row is opened only when the AIR reads it.
+
+When it is not opened, the AIR's symbolic constraints never read it. -/
 theorem verify_complete : type_of% @Plonky3Lean.Proofs.UniStark.verify_complete :=
   @Plonky3Lean.Proofs.UniStark.verify_complete
 

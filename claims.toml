@@ -225,6 +225,10 @@ name   = "Plonky3Lean.Claims.Air.when_when_accepts"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.Air.next_row_unread"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.BinaryDft.IsCantor.independent'"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -1233,6 +1237,10 @@ name   = "Plonky3Lean.Claims.UniStark.verifier_accumulator"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.UniStark.fold_unread"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.UniStark.verify_constraints_complete"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
@@ -1278,6 +1286,10 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.UniStark.verify_complete_merkle"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.UniStark.verify_constraints_complete_unread"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
@@ -6486,6 +6498,10 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
 name   = "Plonky3Lean.Claims.BatchStark.full_verify_complete_merkle"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.BatchStark.check_at_zeta_unread"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
