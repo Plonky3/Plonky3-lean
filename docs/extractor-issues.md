@@ -412,7 +412,8 @@ keeps its number and says so.
      `p3_arch_shims::x86_64` (`arch/`) in place of `core::arch::x86_64` under the
      cfg, in every file on BabyBear's AVX2 path: models with the same names and
      signatures, over lane arrays, each transcribing Intel's pseudocode and
-     tested against the hardware.
+     tested against the hardware. Pre-patch `monty-31/030` does the same for
+     BabyBear's NEON path, with `p3_arch_shims::aarch64` and Arm's pseudocode.
 211. **`--exclude` on a type that an extracted type refers to makes aeneas fail**
      with "Internal error". `--opaque` on the same item works: the type becomes
      an external declaration. The AVX2 variants make the scalar modules opaque
@@ -424,3 +425,7 @@ keeps its number and says so.
      differs: it gains the supertrait `MontyParametersAVX2`. Each variant is
      therefore renamed into its own namespace (`tools/extract/rename-variant.py`),
      and its `Assumptions/` bind its externals to the crate's own model.
+213. **aeneas rejects `asm!`.** monty-31's NEON backend has one block, the
+     optimisation barrier `confuse_compiler`, whose value is its input. Pre-patch
+     `monty-31/030` replaces it with the identity under the cfg, a stand-in that
+     TRUST.md lists.

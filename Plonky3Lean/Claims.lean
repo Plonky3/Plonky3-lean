@@ -3,6 +3,7 @@ module
 public import Plonky3Lean.Claims.Air
 public import Plonky3Lean.Claims.BabyBear
 public import Plonky3Lean.Claims.BabyBear.Avx2
+public import Plonky3Lean.Claims.BabyBear.Neon
 public import Plonky3Lean.Claims.Blake2s
 public import Plonky3Lean.Claims.Blake2sAir
 public import Plonky3Lean.Claims.Blake3

@@ -1,0 +1,14 @@
+# Mutation of: vtstq_u32
+# Breaks:      it tests equality (CMEQ) instead of a common bit.
+#
+--- a/src/aarch64/neon.rs
++++ b/src/aarch64/neon.rs
+@@ -148,7 +148,7 @@
+     let mut dst = [0u32; 4];
+     let mut e = 0;
+     while e < 4 {
+-        dst[e] = if a.0[e] & b.0[e] != 0 { u32::MAX } else { 0 };
++        dst[e] = if a.0[e] == b.0[e] { u32::MAX } else { 0 };
+         e += 1;
+     }
+     uint32x4_t(dst)

@@ -1,0 +1,14 @@
+# Mutation of: vtrn1q_u64
+# Breaks:      its operands are swapped.
+#
+--- a/src/aarch64/neon.rs
++++ b/src/aarch64/neon.rs
+@@ -511,7 +511,7 @@
+ /// `vtrn1q_u64` (`TRN1`, `esize = 64`, one pair).
+ #[inline]
+ pub unsafe fn vtrn1q_u64(a: uint64x2_t, b: uint64x2_t) -> uint64x2_t {
+-    uint64x2_t([a.0[0], b.0[0]])
++    uint64x2_t([b.0[0], a.0[0]])
+ }
+ 
+ /// `vtrn2q_u64` (`TRN2`, `esize = 64`, one pair).

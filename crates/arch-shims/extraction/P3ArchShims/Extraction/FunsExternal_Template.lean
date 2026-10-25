@@ -28,6 +28,42 @@ set_option maxHeartbeats 1000000
 set_option maxRecDepth 2048
 open p3_arch_shims
 
+/-- [p3_arch_shims::aarch64::types::{impl core::fmt::Debug for p3_arch_shims::aarch64::types::U32x4}::fmt]:
+    Source: 'src/aarch64/types.rs', lines 37:12-39:13; this code is generated from a macro invocation at: 'src/aarch64/types.rs', lines 44:0-44:33
+    Visibility: public -/
+axiom aarch64.types.U32x4.Insts.CoreFmtDebug.fmt
+  :
+  aarch64.types.U32x4 → core.fmt.Formatter → RustM ((core.result.Result
+    Unit core.fmt.Error) × core.fmt.Formatter × (core.fmt.Formatter →
+    core.fmt.Formatter))
+
+/-- [p3_arch_shims::aarch64::types::{impl core::fmt::Debug for p3_arch_shims::aarch64::types::I32x4}::fmt]:
+    Source: 'src/aarch64/types.rs', lines 37:12-39:13; this code is generated from a macro invocation at: 'src/aarch64/types.rs', lines 45:0-45:32
+    Visibility: public -/
+axiom aarch64.types.I32x4.Insts.CoreFmtDebug.fmt
+  :
+  aarch64.types.I32x4 → core.fmt.Formatter → RustM ((core.result.Result
+    Unit core.fmt.Error) × core.fmt.Formatter × (core.fmt.Formatter →
+    core.fmt.Formatter))
+
+/-- [p3_arch_shims::aarch64::types::{impl core::fmt::Debug for p3_arch_shims::aarch64::types::U64x2}::fmt]:
+    Source: 'src/aarch64/types.rs', lines 37:12-39:13; this code is generated from a macro invocation at: 'src/aarch64/types.rs', lines 46:0-46:33
+    Visibility: public -/
+axiom aarch64.types.U64x2.Insts.CoreFmtDebug.fmt
+  :
+  aarch64.types.U64x2 → core.fmt.Formatter → RustM ((core.result.Result
+    Unit core.fmt.Error) × core.fmt.Formatter × (core.fmt.Formatter →
+    core.fmt.Formatter))
+
+/-- [p3_arch_shims::aarch64::types::{impl core::fmt::Debug for p3_arch_shims::aarch64::types::U32x2}::fmt]:
+    Source: 'src/aarch64/types.rs', lines 37:12-39:13; this code is generated from a macro invocation at: 'src/aarch64/types.rs', lines 47:0-47:33
+    Visibility: public -/
+axiom aarch64.types.U32x2.Insts.CoreFmtDebug.fmt
+  :
+  aarch64.types.U32x2 → core.fmt.Formatter → RustM ((core.result.Result
+    Unit core.fmt.Error) × core.fmt.Formatter × (core.fmt.Formatter →
+    core.fmt.Formatter))
+
 /-- [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M256i}::fmt]:
     Source: 'src/x86_64/types.rs', lines 33:12-35:13; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 40:0-40:30
     Visibility: public -/

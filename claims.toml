@@ -7739,3 +7739,67 @@ axioms = ["Classical.choice", "Quot.sound", "propext"]
 [[claim]]
 name   = "Plonky3Lean.Claims.P3BabyBear.x86_64_avx2.halve_avx2.toField"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BabyBear.aarch64_neon.BabyBearParameters.MontyParameters.toPortable"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BabyBear.aarch64_neon.BabyBearParameters.valid"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BabyBear.aarch64_neon.PackedBabyBearNeon.add.from_vector_arg"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BabyBear.aarch64_neon.PackedBabyBearNeon.add.lanewise"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BabyBear.aarch64_neon.PackedBabyBearNeon.add.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BabyBear.aarch64_neon.PackedBabyBearNeon.mul.from_vector_arg"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BabyBear.aarch64_neon.PackedBabyBearNeon.mul.lanewise"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BabyBear.aarch64_neon.PackedBabyBearNeon.mul.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BabyBear.aarch64_neon.PackedBabyBearNeon.neg.from_vector_arg"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BabyBear.aarch64_neon.PackedBabyBearNeon.neg.lanewise"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BabyBear.aarch64_neon.PackedBabyBearNeon.neg.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BabyBear.aarch64_neon.PackedBabyBearNeon.sub.from_vector_arg"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BabyBear.aarch64_neon.PackedBabyBearNeon.sub.lanewise"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BabyBear.aarch64_neon.PackedBabyBearNeon.sub.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BabyBear.aarch64_neon.halve_neon.lanewise"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.P3BabyBear.aarch64_neon.halve_neon.toField"
+axioms = ["Classical.choice", "Quot.sound", "propext"]

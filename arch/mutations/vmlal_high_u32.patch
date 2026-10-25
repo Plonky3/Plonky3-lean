@@ -1,0 +1,14 @@
+# Mutation of: vmlal_high_u32
+# Breaks:      it multiplies the low halves.
+#
+--- a/src/aarch64/neon.rs
++++ b/src/aarch64/neon.rs
+@@ -448,7 +448,7 @@
+     let mut dst = [0u64; 2];
+     let mut e = 0;
+     while e < 2 {
+-        dst[e] = a.0[e].wrapping_add((b.0[2 + e] as u64) * (c.0[2 + e] as u64));
++        dst[e] = a.0[e].wrapping_add((b.0[e] as u64) * (c.0[e] as u64));
+         e += 1;
+     }
+     uint64x2_t(dst)

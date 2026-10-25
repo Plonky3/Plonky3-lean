@@ -17,8 +17,9 @@ Exactly the theorems in `Plonky3Lean.Claims` ([`STATUS.md`](STATUS.md) lists the
 with their axioms), about the Plonky3 commit pinned in `plonky3/`, under the
 assumptions in [`TRUST.md`](TRUST.md). In particular:
 
-- Only the portable scalar code paths are modelled. The AVX2, AVX-512 and NEON
-  backends are not.
+- The portable scalar code paths are modelled. Of the SIMD backends, only
+  BabyBear's AVX2 and NEON `add`, `sub`, `mul`, `neg` and halving are, against
+  trusted models of the intrinsics ([`TRUST.md`](TRUST.md)); AVX-512 is not.
 - A crate that is stubbed rather than extracted is assumed, not modelled.
 - "Plonky3 is formally verified" is not a claim this repository makes.
 

@@ -1,0 +1,14 @@
+# Mutation of: vreinterpretq_u64_u32
+# Breaks:      it puts lane `2k` in the high half, as on a big-endian target.
+#
+--- a/src/aarch64/neon.rs
++++ b/src/aarch64/neon.rs
+@@ -551,7 +551,7 @@
+     let mut dst = [0u64; 2];
+     let mut k = 0;
+     while k < 2 {
+-        dst[k] = (a.0[2 * k] as u64) | ((a.0[2 * k + 1] as u64) << 32);
++        dst[k] = (a.0[2 * k + 1] as u64) | ((a.0[2 * k] as u64) << 32);
+         k += 1;
+     }
+     uint64x2_t(dst)
