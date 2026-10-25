@@ -43,7 +43,7 @@ jobs:
       - name: Check the runner is AArch64 with NEON
         run: test "$(uname -m)" = aarch64 && grep -qw asimd /proc/cpuinfo
       - name: Check the differential tests are compiled in
-        run: cargo test --locked --release --manifest-path arch/Cargo.toml --test neon -- --list | grep -q ': test$'
+        run: cargo test --locked --release --manifest-path arch/Cargo.toml --test neon -- --list | grep -q -- ' test$'
       - name: Test the arch shims against the intrinsics
         run: cargo test --locked --release --manifest-path arch/Cargo.toml
       - name: Check that each shim's recorded mutation fails the tests
