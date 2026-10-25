@@ -170,7 +170,9 @@ theorem pcs.complete : type_of% @Plonky3Lean.Proofs.Circle.verify_complete_hones
 
 Then the prover returns the claimed values and a proof, and the verifier accepts the proof.
 
-The opened values come from the crate's Lagrange evaluation, which is proven, not assumed. -/
+The opened values come from the crate's Lagrange evaluation, which is proven, not assumed.
+
+A matrix of at least 1024 columns is reduced through the lifted transform, also proven. -/
 theorem pcs.open_complete : type_of% @Plonky3Lean.Proofs.Circle.open_verify_complete :=
   @Plonky3Lean.Proofs.Circle.open_verify_complete
 
@@ -182,6 +184,20 @@ theorem pcs.open_complete : type_of% @Plonky3Lean.Proofs.Circle.open_verify_comp
 The evaluation reads the first 2^n rows of the LDE, a twin coset of size 2^n. -/
 theorem pcs.open_matrix : type_of% @Plonky3Lean.Proofs.Circle.openMatrix_honest :=
   @Plonky3Lean.Proofs.Circle.openMatrix_honest
+
+/-- A wide matrix's lifted reduction is its row-by-row reduction.
+
+The prover reduces the first 2^s rows, a twin coset of the trace size 2^s.
+
+It interpolates the reduced column there and evaluates it on the LDE domain.
+
+For columns of the FFT space of order s, this gives the reduction at every row. -/
+theorem prover.lifted_reduction : type_of% @Plonky3Lean.Proofs.Circle.rowwise_alpha_reduce_lifted_honest :=
+  @Plonky3Lean.Proofs.Circle.rowwise_alpha_reduce_lifted_honest
+
+/-- The twiddles of a twin coset of size 2^s shifted by the generator of order 2^(h + 1), s <= h, are nonzero. -/
+theorem cfft.prefix_twiddles : type_of% @Plonky3Lean.Proofs.Circle.twC_prefix_ne_zero :=
+  @Plonky3Lean.Proofs.Circle.twC_prefix_ne_zero
 
 /-! ## The Lagrange evaluation on a twin coset, Section 3.3 -/
 

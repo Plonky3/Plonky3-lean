@@ -6973,6 +6973,14 @@ name   = "Plonky3Lean.Claims.Circle.pcs.open_matrix"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 
 [[claim]]
+name   = "Plonky3Lean.Claims.Circle.prover.lifted_reduction"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
+name   = "Plonky3Lean.Claims.Circle.cfft.prefix_twiddles"
+axioms = ["Classical.choice", "Quot.sound", "propext"]
+
+[[claim]]
 name   = "Plonky3Lean.Claims.Circle.bary.formula"
 axioms = ["Classical.choice", "Quot.sound", "propext"]
 

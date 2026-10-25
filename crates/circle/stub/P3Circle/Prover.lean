@@ -8,7 +8,7 @@ What a transcription abstracts, beyond the models of the verifier:
 - the Lagrange denominators, cached per height and point, are recomputed, which gives the cached values
 - a matrix opened at two points is read once for both, which gives the two single-point evaluations
 - the first rows of a matrix are the matrix cut to that height
-- a wide matrix's reduction through the lifted transform is the plain row reduction, which the crate tests it equals
+- the base-field flattening of a reduced column, and its reconstitution, are the identity
 - the domain's points through the parallel chain are its points, in natural order
 - a map keyed by height is a function of the height and its list of keys, read in increasing order
 - the prover's transcript is a record of its four phases, with explicit state, each returning its challenge and its grinding witness
@@ -136,17 +136,48 @@ def openedValues (log_blowup : ℕ) (rounds : List (List (Mat K) × List (List K
     if r.1.length ≠ r.2.length then none
     (r.1.zip r.2).mapM fun mp => openMatrix G log_blowup mp.1 mp.2
 
+/-- The rows of a matrix reduced with the powers of alpha, lifted from a twin coset to a target domain.
+
+The matrix holds the LDE on the twin coset, in circle FFT order.
+
+Its reduced column is interpolated on the coset and evaluated on the target domain. -/
+def rowwise_alpha_reduce_lifted (domain : CircleDomain K) (m : Mat K) (alpha : K) (target : CircleDomain K) :
+    Option (List K) := do
+  let reduced := rowwise_alpha_reduce (rowsOf m) alpha
+  if 2 ^ domain.log_n ≠ reduced.length then none
+  if target.log_n < domain.log_n then none
+  let coeffs ← p3_circle.cfft.mirror.interpolate G domain fun i => reduced.getD i 0
+  let lifted ← p3_circle.cfft.mirror.evaluate G target (2 ^ domain.log_n) coeffs
+  pure ((List.range (2 ^ target.log_n)).map lifted)
+
+/-- The reduced rows of a matrix of height 2^log_height.
+
+A matrix of at least 1024 columns is reduced from its first 2^(log_height - log_blowup) rows.
+
+They hold the LDE on the twin coset of the trace size, lifted back to the LDE domain.
+
+A narrower matrix is reduced row by row. -/
+def reducedRows (log_blowup log_height : ℕ) (mat : Mat K) (alpha : K) : Option (List K) := do
+  if log_height < log_blowup then none
+  let log_sub := log_height - log_blowup
+  if 0 < log_sub ∧ 1024 ≤ mat.width then do
+    let std ← CircleDomain.standard G log_height
+    let sub_domain := CircleDomain.new log_sub std.shift
+    let target ← CircleDomain.standard G log_height
+    rowwise_alpha_reduce_lifted G sub_domain ⟨2 ^ log_sub, mat.width, mat.entry⟩ alpha target
+  else pure (rowwise_alpha_reduce (rowsOf mat) alpha)
+
 /-- Add one matrix's DEEP quotients to the reduced openings of its height.
 
 The map holds, at each height, the running power of alpha and the reduced column. -/
-def accumulateMatrix (alpha : K) (st : (ℕ → K × List K) × List ℕ)
+def accumulateMatrix (log_blowup : ℕ) (alpha : K) (st : (ℕ → K × List K) × List ℕ)
     (mv : Mat K × List K × List (List K)) : Option ((ℕ → K × List K) × List ℕ) := do
   let (acc, keys) := st
   let (mat, points, values) := mv
   let log_height ← log2Strict mat.height
   let entry := if log_height ∈ keys then acc log_height else (1, List.replicate (2 ^ log_height) 0)
   let keys := if log_height ∈ keys then keys else keys ++ [log_height]
-  let reduced_rows := rowwise_alpha_reduce (rowsOf mat) alpha
+  let reduced_rows ← reducedRows G log_blowup log_height mat alpha
   let alpha_pow_width := alpha ^ mat.width
   let pts ← permutedPoints G log_height
   let entry ← (points.zip values).foldlM (fun (e : K × List K) pv => do
@@ -158,10 +189,10 @@ def accumulateMatrix (alpha : K) (st : (ℕ → K × List K) × List ℕ)
   pure (Function.update acc log_height entry, keys)
 
 /-- The reduced openings of every height. -/
-def reducedOpenings (alpha : K) (rounds : List (List (Mat K) × List (List K)))
+def reducedOpenings (log_blowup : ℕ) (alpha : K) (rounds : List (List (Mat K) × List (List K)))
     (values : List (List (List (List K)))) : Option ((ℕ → K × List K) × List ℕ) :=
   ((rounds.zip values).flatMap fun rv => (rv.1.1.zip (rv.1.2.zip rv.2)).map fun m => (m.1, m.2.1, m.2.2)).foldlM
-    (accumulateMatrix G alpha) (fun _ => (1, []), [])
+    (accumulateMatrix G log_blowup alpha) (fun _ => (1, []), [])
 
 /-- The lambda of every height, increasing, and its corrected column.
 
@@ -255,7 +286,7 @@ def open_ (immcs fmmcs : MmcsOps K) {S : Type _} (tx : CircleProverTx K fmmcs.Co
   let claims ← (mrounds.zip values).flatMap (fun rv => (rv.1.2.zip rv.2).flatMap fun pv =>
       pv.1.zip pv.2) |>.mapM fun tv => (Point.from_projective_line tv.1).map fun z => (z, tv.2)
   let (alpha, batch_pow_witness, s1) := tx.batch_phase s claims
-  let (ro, keys) ← reducedOpenings G alpha mrounds values
+  let (ro, keys) ← reducedOpenings G log_blowup alpha mrounds values
   let log_heights := keys.mergeSort (fun a b => decide (a ≤ b))
   let per_height ← extractLambdas G log_blowup ro log_heights
   let (first_layer_commitment, first_layer_data) := fmmcs.commit (per_height.map fun e => matOfPairs e.2.2)

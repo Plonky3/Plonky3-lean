@@ -93,16 +93,214 @@ def proverStep (pts : List (Point K)) (α αW : K) (rr : List K) (e : K × List 
 theorem ofC_ptOf {t : K} (ht : 1 + t * t ≠ 0) : Point.from_projective_line t = some (ofC (ptOf t)) := by
   rw [from_projective_line_eq, dite_eq_right ht, ptOf, dite_eq_right ht]
 
+/-! ## The lifted reduction of a wide matrix -/
+
+local notation "rev" => Plonky3Lean.Spec.Matrix.bitRev
+
+/-- Rows 2 j and 2 j + 1 of the circle FFT order hold a point of the half coset and its conjugate. -/
+theorem ptD_pair (hV : CircleGenValid G) {n : ℕ} (hG : n + 2 ≤ G.adicity) {j : ℕ} (hj : j < 2 ^ n) :
+    ptD G (n + 1) (cfft_permute_index (2 * j) (n + 1)) = genPt G (n + 2) + rev n j • genPt G n ∧
+      ptD G (n + 1) (cfft_permute_index (2 * j + 1) (n + 1)) = -(genPt G (n + 2) + rev n j • genPt G n) := by
+  set Q := genPt G (n + 2)
+  have h4 : genPt G n = 4 • Q := by
+    have := genPt_nsmul hV (j := n) (k := n + 2) (by omega) hG
+    rw [show n + 2 - n = 2 by omega] at this
+    rw [← this]; norm_num [Q]
+  have hzero : 2 ^ (n + 2) • Q = 0 := genPt_order_zero hV hG
+  have hr := Plonky3Lean.Proofs.Matrix.bitRev_lt n j
+  have hev : Q + rev n j • genPt G n = (2 * (2 * rev n j) + 1) • Q := by
+    rw [h4, smul_smul, show 2 * (2 * rev n j) + 1 = 1 + rev n j * 4 by ring, add_nsmul, one_nsmul]
+  refine ⟨?_, ?_⟩
+  · rw [ptD, cfft_permute_index_even hj, hev]
+  · rw [ptD, cfft_permute_index_odd hj, rev_complement n hj, hev, eq_neg_iff_add_eq_zero, ← add_nsmul,
+      show 2 * (2 * (2 ^ n - 1 - rev n j) + 1) + 1 + (2 * (2 * rev n j) + 1) = 2 ^ (n + 2) by rw [pow_add]; omega,
+      show n + 1 + 1 = n + 2 by omega, hzero]
+
+/-- The first 2^s points of the LDE domain of height h, in circle FFT order, are a twin coset of size 2^s.
+
+Its shift is the LDE's shift, the generator of order 2^(h + 1). -/
+theorem twinList_prefix (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {h s : ℕ} (hs : 1 ≤ s) (hsh : s ≤ h)
+    (hG : h + 1 ≤ G.adicity) : TwinList s (genPt G (h + 1)) fun r => ptD G h (cfft_permute_index r h) := by
+  have hsh' : 2 ^ s ≤ 2 ^ h := Nat.pow_le_pow_right two_pos hsh
+  refine ⟨fun i hi j hj hij => ?_, fun r hr => ?_⟩
+  · have hk := List.inj_on_of_nodup_map (standard_nodup hV h2 hG)
+      (List.mem_range.mpr (cfft_permute_index_lt h i)) (List.mem_range.mpr (cfft_permute_index_lt h j)) hij
+    rw [← cfft_permute_index_involutive (show i < 2 ^ h by omega), hk,
+      cfft_permute_index_involutive (show j < 2 ^ h by omega)]
+  obtain ⟨n, rfl⟩ : ∃ n, h = n + 1 := ⟨h - 1, by omega⟩
+  have hj : r / 2 < 2 ^ (s - 1) := by
+    rw [show 2 ^ s = 2 ^ (s - 1) * 2 by rw [← pow_succ]; congr 1; omega] at hr; omega
+  have hjn : r / 2 < 2 ^ n := lt_of_lt_of_le hj (Nat.pow_le_pow_right two_pos (by omega))
+  obtain ⟨he, ho⟩ := ptD_pair hV (show n + 2 ≤ G.adicity by omega) hjn
+  have hz : 2 ^ (s - 1) • rev n (r / 2) • genPt G n = 0 := by
+    have hrev : rev n (r / 2) = rev (s - 1) (r / 2) * 2 ^ (n - (s - 1)) := by
+      have := Plonky3Lean.Proofs.Matrix.bitRev_add_of_lt (k := n - (s - 1)) hj
+      rwa [show s - 1 + (n - (s - 1)) = n by omega] at this
+    rw [hrev, smul_smul, show 2 ^ (s - 1) * (rev (s - 1) (r / 2) * 2 ^ (n - (s - 1))) = 2 ^ n * rev (s - 1) (r / 2) by
+      rw [mul_left_comm, ← pow_add, show s - 1 + (n - (s - 1)) = n by omega, mul_comm], mul_nsmul,
+      genPt_order_zero hV (by omega), smul_zero]
+  rcases Nat.even_or_odd' r with ⟨j, rfl | rfl⟩
+  · rw [show 2 * j / 2 = j by omega] at he hz
+    simp [he, smul_add, hz]
+  · rw [show (2 * j + 1) / 2 = j by omega] at ho hz
+    simp [ho, smul_add, hz, show (2 * j + 1) % 2 = 1 by omega]
+
+/-- The twiddles of the twin coset of size 2^s shifted as the standard domain of size 2^h are nonzero.
+
+Every twiddle is one of:
+
+- a coordinate of a point of order at least 8
+- a y-coordinate of a point of order at least 4. -/
+theorem twC_prefix_ne_zero (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {h s : ℕ} (hs : 1 ≤ s) (hsh : s ≤ h)
+    (hG : h + 1 ≤ G.adicity) {j b : ℕ} (hj : j < s) :
+    twC (genPt G (h + 1)) (genPt G (s - 1)) s j b ≠ 0 := by
+  set S := genPt G (h + 1)
+  have hS : addOrderOf S = 2 ^ (h + 1) := addOrderOf_genPt hV h2 hG
+  have hg : genPt G (s - 1) = (2 ^ (h - s) * 2 ^ 2) • S := by
+    have := genPt_nsmul hV (show s - 1 ≤ h + 1 by omega) hG
+    rw [show h + 1 - (s - 1) = (h - s) + 2 by omega] at this
+    rw [← this, pow_add]
+  have hpt : ∀ r, S + r • genPt G (s - 1) = (2 * (2 * (2 ^ (h - s) * r)) + 1) • S := fun r => by
+    rw [hg, smul_smul, add_comm, ← succ_nsmul]; ring_nf
+  unfold twC
+  split_ifs with h0
+  · rw [hpt]
+    apply y_ne_zero_of_order
+    intro hd
+    have := addOrderOf_dvd_iff_nsmul_eq_zero.mp hd
+    rw [smul_smul, ← addOrderOf_dvd_iff_nsmul_eq_zero, hS, show 2 * (2 * (2 * (2 ^ (h - s) * rev (s - 1) b)) + 1) =
+      2 ^ 1 * (2 * (2 * (2 ^ (h - s) * rev (s - 1) b)) + 1) by ring] at this
+    have := le_of_two_pow_dvd this
+    omega
+  · rw [hpt, smul_smul]
+    apply x_ne_zero_of_order
+    intro hd
+    have := addOrderOf_dvd_iff_nsmul_eq_zero.mp hd
+    rw [smul_smul, ← addOrderOf_dvd_iff_nsmul_eq_zero, hS, show 4 * (2 ^ (j - 1) *
+      (2 * (2 * (2 ^ (h - s) * rev (s - 1 - j) b)) + 1)) =
+        2 ^ (j + 1) * (2 * (2 * (2 ^ (h - s) * rev (s - 1 - j) b)) + 1) by
+        rw [show j + 1 = (j - 1) + 2 by omega, pow_add]; ring] at this
+    have := le_of_two_pow_dvd this
+    omega
+
+/-- Row i of the transforms on the twin coset of size 2^s is row i of the LDE domain of size 2^h. -/
+theorem ptAt_prefix (hV : CircleGenValid G) {h s : ℕ} (hs : 1 ≤ s) (hsh : s ≤ h) (hG : h + 1 ≤ G.adicity)
+    {i : ℕ} (hi : i < 2 ^ s) :
+    ptAt (genPt G (h + 1)) (genPt G (s - 1)) s i = ptD G h (cfft_permute_index i h) := by
+  obtain ⟨n, rfl⟩ : ∃ n, h = n + 1 := ⟨h - 1, by omega⟩
+  have hj : i / 2 < 2 ^ (s - 1) := by
+    rw [show 2 ^ s = 2 ^ (s - 1) * 2 by rw [← pow_succ]; congr 1; omega] at hi; omega
+  obtain ⟨he, ho⟩ := ptD_pair hV (show n + 2 ≤ G.adicity by omega)
+    (lt_of_lt_of_le hj (Nat.pow_le_pow_right two_pos (by omega)))
+  have hr : rev n (i / 2) • genPt G n = rev (s - 1) (i / 2) • genPt G (s - 1) := by
+    have := Plonky3Lean.Proofs.Matrix.bitRev_add_of_lt (k := n - (s - 1)) hj
+    rw [show s - 1 + (n - (s - 1)) = n by omega] at this
+    rw [this, mul_comm, mul_nsmul, genPt_nsmul hV (by omega) (by omega)]
+  rcases Nat.even_or_odd' i with ⟨j, rfl | rfl⟩
+  · rw [show 2 * j / 2 = j by omega] at he hr
+    simp [ptAt, he, hr]
+  · rw [show (2 * j + 1) / 2 = j by omega] at ho hr
+    simp [ptAt, ho, hr, show (2 * j + 1) % 2 = 1 by omega, show (2 * j + 1) / 2 = j by omega]
+
+/-- The row reduction of the columns at a point: sum_j alpha^j f_j(Q). -/
+noncomputable def redF (α : K) (fs : List (C K → K)) (Q : C K) : K :=
+  dot_product ((List.range fs.length).map (α ^ ·)) (fs.map (· Q))
+
+theorem rowsOf_prefix (lb : ℕ) (m : HMat K) (s : ℕ) :
+    rowsOf (⟨2 ^ s, m.2.length, (ldeMat G lb m).entry⟩ : Mat K) = (List.range (2 ^ s)).map fun r =>
+      m.2.map (· (ptD G (hgt lb m) (cfft_permute_index r (hgt lb m)))) := by
+  simp only [rowsOf, ldeMat]
+  exact List.map_congr_left fun r _ => finRange_map_get_apply _ _
+
+theorem rowwise_alpha_reduce_map (α : K) (fs : List (C K → K)) (N : ℕ) (P : ℕ → C K) :
+    rowwise_alpha_reduce ((List.range N).map fun r => fs.map (· (P r))) α =
+      (List.range N).map fun r => redF α fs (P r) := by
+  simp [rowwise_alpha_reduce, redF]
+
+/-- The row reduction of columns of the FFT space lies in the FFT space. -/
+theorem isFftPoly_redF {D : ℕ} (hD : 1 ≤ D) (α : K) {fs : List (C K → K)} (hfs : ∀ f ∈ fs, IsFftPoly D f) :
+    IsFftPoly D (redF α fs) := by
+  have h : redF α fs = fun Q => ∑ j ∈ Finset.range fs.length, α ^ j * fs.getD j 0 Q := by
+    funext Q
+    rw [redF, show fs.length = (fs.map (· Q)).length by simp, dot_product_range]
+    simp only [List.length_map]
+    refine Finset.sum_congr rfl fun j hj => ?_
+    rw [show (0 : K) = (fun f : C K → K => f Q) 0 from rfl, List.getD_map]
+  rw [h]
+  refine IsFftPoly.sum hD _ fun j hj => IsFftPoly.smul _ (hfs _ ?_)
+  rw [List.getD_eq_getElem _ _ (Finset.mem_range.mp hj)]
+  exact List.getElem_mem _
+
+/-- The lifted reduction of an honest matrix is its row-by-row reduction.
+
+The columns lie in the FFT space of the trace size 2^s, so their reduction does too.
+
+Its values on the twin coset of the first 2^s rows determine it. -/
+theorem rowwise_alpha_reduce_lifted_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {lb : ℕ} (α : K)
+    (m : HMat K) (hs : 1 ≤ m.1.domain.log_n) (hG : hgt lb m + 1 ≤ G.adicity)
+    (hfft : ∀ f ∈ m.2, IsFftPoly (2 ^ (m.1.domain.log_n - 1)) f) :
+    rowwise_alpha_reduce_lifted G ⟨m.1.domain.log_n, ofC (genPt G (hgt lb m + 1))⟩
+        ⟨2 ^ m.1.domain.log_n, m.2.length, (ldeMat G lb m).entry⟩ α ⟨hgt lb m, ofC (genPt G (hgt lb m + 1))⟩ =
+      some (rowwise_alpha_reduce (rowsOf (ldeMat G lb m)) α) := by
+  set s := m.1.domain.log_n
+  set h := hgt lb m
+  have hsh : s ≤ h := by unfold s h hgt; omega
+  set P : ℕ → C K := fun r => ptD G h (cfft_permute_index r h)
+  have hP := twinList_prefix hV h2 hs hsh hG
+  have hred : rowwise_alpha_reduce (rowsOf (⟨2 ^ s, m.2.length, (ldeMat G lb m).entry⟩ : Mat K)) α =
+      (List.range (2 ^ s)).map fun r => redF α m.2 (P r) := by
+    rw [rowsOf_prefix, rowwise_alpha_reduce_map]
+  obtain ⟨cs, hcs, hcsv⟩ := interpolate_spec hV h2 hs (show s - 1 ≤ G.adicity by omega) (genPt G (h + 1))
+    (fun j hj b _ => twC_prefix_ne_zero hV h2 hs hsh hG hj)
+    (fun i => ((List.range (2 ^ s)).map fun r => redF α m.2 (P r)).getD i 0)
+  -- The interpolant agrees with the reduction on the twin coset, so everywhere.
+  have hagree : ∀ Q, fftEval s cs Q = redF α m.2 Q := by
+    obtain ⟨k, hk⟩ : ∃ k, s = k + 1 := ⟨s - 1, by omega⟩
+    have hk' : s - 1 = k := by omega
+    intro Q
+    have hfe : IsFftPoly (2 ^ k) (fftEval s cs) := hk ▸ IsFftPoly.fftEval k cs
+    have hrf : IsFftPoly (2 ^ k) (redF α m.2) := isFftPoly_redF Nat.one_le_two_pow α (hk' ▸ hfft)
+    refine sub_eq_zero.mp (IsFftPoly.eq_zero (m := k) (c := vn s (genPt G (h + 1))) h2
+      (by rw [hP.card, hk]) (fun R hR => ?_) (hfe.sub hrf) (fun R hR => ?_) Q)
+    · obtain ⟨j, hj, rfl⟩ := TwinList.mem.mp hR; rw [← hk]; exact hP.vn_eq hj
+    · obtain ⟨j, hj, rfl⟩ := TwinList.mem.mp hR
+      have := hcsv j hj
+      rw [ptAt_prefix hV hs hsh hG hj, List.getD_eq_getElem _ _ (by simpa using hj), List.getElem_map,
+        List.getElem_range] at this
+      rw [sub_eq_zero]; exact this
+  obtain ⟨y, hy, hyv⟩ := evaluate_standard hV hs hsh hG cs
+  unfold rowwise_alpha_reduce_lifted
+  simp only [hred, List.length_map, List.length_range, ne_eq, not_true_eq_false, ↓reduceIte,
+    show ¬ h < s by omega, Option.bind_eq_bind]
+  rw [hcs, Option.bind_some, hy, Option.bind_some, rowsOf_ldeMat, rowwise_alpha_reduce_map]
+  refine congrArg some (List.map_congr_left fun i hi => ?_)
+  rw [hyv i (List.mem_range.mp hi), hagree]
+  rfl
+
 /-- What one matrix needs for the prover's accumulation to be the honest reduction:
 
 - a domain of at least 2 rows, with room in the generator table
+- columns of the FFT space of the trace size
 - honest values at opening points on the circle and off the LDE domain. -/
 structure ProverMatOK (G : Gen (K × K)) (lb : ℕ) (m : HMat K) : Prop where
   log_n : 1 ≤ m.1.domain.log_n
+  fft : ∀ f ∈ m.2, IsFftPoly (2 ^ (m.1.domain.log_n - 1)) f
   adicity : hgt lb m + 1 ≤ G.adicity
   values : ∀ p ∈ m.1.points, p.values = m.2.map (· (ptOf p.point))
   on_circle : ∀ p ∈ m.1.points, 1 + p.point * p.point ≠ 0
   off_domain : ∀ p ∈ m.1.points, ∀ k < 2 ^ hgt lb m, ptOf p.point ≠ ptD G (hgt lb m) k
+
+/-- The prover's reduced rows of an honest matrix are its row-by-row reduction, whatever its width. -/
+theorem reducedRows_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {lb : ℕ} (α : K) (m : HMat K)
+    (hm : ProverMatOK G lb m) :
+    reducedRows G lb (hgt lb m) (ldeMat G lb m) α = some (rowwise_alpha_reduce (rowsOf (ldeMat G lb m)) α) := by
+  unfold reducedRows
+  simp only [show ¬ hgt lb m < lb by unfold hgt; omega, ↓reduceIte,
+    show hgt lb m - lb = m.1.domain.log_n by unfold hgt; omega]
+  split_ifs
+  · simp only [standard_eq hV _ hm.adicity, Option.bind_eq_bind, Option.bind_some, CircleDomain.new]
+    exact rowwise_alpha_reduce_lifted_honest hV h2 α m hm.log_n hm.adicity hm.fft
+  · rfl
 
 /-- The prover's step at one point adds, at every row, the DEEP term at that row's point. -/
 theorem proverStep_eq (h2 : (2 : K) ≠ 0) {lb : ℕ} (α : K) (m : HMat K) (hm : ProverMatOK G lb m)
@@ -202,7 +400,7 @@ theorem honestRO_snoc_ne (α : K) {lb : ℕ} {L : List (HMat K)} {m : HMat K} {h
 /-- The prover's accumulation of one honest matrix keeps its state the honest one. -/
 theorem accumulateMatrix_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {lb : ℕ} (α : K) {L : List (HMat K)}
     {st : (ℕ → K × List K) × List ℕ} (hst : ROInv G lb α L st) (m : HMat K) (hm : ProverMatOK G lb m) :
-    ∃ st', accumulateMatrix G α st (ldeMat G lb m, m.1.points.map (·.point), m.1.points.map (·.values)) = some st' ∧
+    ∃ st', accumulateMatrix G lb α st (ldeMat G lb m, m.1.points.map (·.point), m.1.points.map (·.values)) = some st' ∧
       ROInv G lb α (L ++ [m]) st' := by
   obtain ⟨acc, keys⟩ := st
   obtain ⟨hkeys, hacc⟩ := hst
@@ -226,7 +424,10 @@ theorem accumulateMatrix_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {lb
         ((honestRO G lb α L h).1, deepFnAt lb α L h (ptD G h (cfft_permute_index i h)))).2),
       if h ∈ keys then keys else keys ++ [h]), ?_, ?_⟩
   · unfold accumulateMatrix
-    simp only [ldeMat, log2Strict_pow, Option.bind_eq_bind, Option.bind_some]
+    simp only [show (ldeMat G lb m).height = 2 ^ hgt lb m from rfl, log2Strict_pow, Option.bind_eq_bind,
+      Option.bind_some]
+    simp only [reducedRows_honest hV h2 α m hm, Option.bind_some]
+    simp only [ldeMat]
     rw [show 2 ^ hgt lb m = 2 ^ h from rfl, hentry, permutedPoints_eq hV hh1 hm.adicity, Option.bind_some,
       zip_map_map, List.foldlM_map]
     erw [hfold]
@@ -249,7 +450,7 @@ noncomputable def accInput (G : Gen (K × K)) (lb : ℕ) (m : HMat K) : Mat K ×
 
 theorem foldlM_accumulate (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {lb : ℕ} (α : K) :
     ∀ (L : List (HMat K)), (∀ m ∈ L, ProverMatOK G lb m) → ∀ (L0 : List (HMat K)) (st : (ℕ → K × List K) × List ℕ),
-      ROInv G lb α L0 st → ∃ st', (L.map (accInput G lb)).foldlM (accumulateMatrix G α) st = some st' ∧
+      ROInv G lb α L0 st → ∃ st', (L.map (accInput G lb)).foldlM (accumulateMatrix G lb α) st = some st' ∧
         ROInv G lb α (L0 ++ L) st'
   | [], _, L0, st, hst => ⟨st, rfl, by simpa using hst⟩
   | m :: L, hL, L0, st, hst => by
@@ -264,7 +465,7 @@ theorem foldlM_accumulate (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {lb : ℕ
 /-- The prover's reduction of honest batches holds, at every height, the DEEP function on the LDE domain. -/
 theorem reducedOpenings_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {lb : ℕ} (α : K)
     (hb : List (List (HMat K))) (hok : ∀ m ∈ hb.flatten, ProverMatOK G lb m) :
-    ∃ st, reducedOpenings G α (hb.map fun ms => (ms.map (ldeMat G lb), ms.map fun m => m.1.points.map (·.point)))
+    ∃ st, reducedOpenings G lb α (hb.map fun ms => (ms.map (ldeMat G lb), ms.map fun m => m.1.points.map (·.point)))
         (hb.map fun ms => ms.map fun m => m.1.points.map (·.values)) = some st ∧ ROInv G lb α hb.flatten st := by
   have hflat : ((hb.map fun ms => (ms.map (ldeMat G lb), ms.map fun m => m.1.points.map (·.point))).zip
       (hb.map fun ms => ms.map fun m => m.1.points.map (·.values))).flatMap
@@ -320,7 +521,6 @@ theorem extractLambdas_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {lb H
 
 /-! ## Coefficients padded with zeros -/
 
-local notation "rev" => Plonky3Lean.Spec.Matrix.bitRev
 
 /-- The first 2^m coefficients, then zeros. -/
 def trunc (m : ℕ) (d : ℕ → K) : ℕ → K := fun k => if k < 2 ^ m then d k else 0
@@ -372,25 +572,6 @@ theorem trunc_add (m : ℕ) (d e : ℕ → K) : (fun k => trunc m d k + trunc m 
   funext k; simp only [trunc]; split_ifs <;> ring
 
 /-! ## The first layer -/
-
-/-- Rows 2 j and 2 j + 1 of the circle FFT order hold a point of the half coset and its conjugate. -/
-theorem ptD_pair (hV : CircleGenValid G) {n : ℕ} (hG : n + 2 ≤ G.adicity) {j : ℕ} (hj : j < 2 ^ n) :
-    ptD G (n + 1) (cfft_permute_index (2 * j) (n + 1)) = genPt G (n + 2) + rev n j • genPt G n ∧
-      ptD G (n + 1) (cfft_permute_index (2 * j + 1) (n + 1)) = -(genPt G (n + 2) + rev n j • genPt G n) := by
-  set Q := genPt G (n + 2)
-  have h4 : genPt G n = 4 • Q := by
-    have := genPt_nsmul hV (j := n) (k := n + 2) (by omega) hG
-    rw [show n + 2 - n = 2 by omega] at this
-    rw [← this]; norm_num [Q]
-  have hzero : 2 ^ (n + 2) • Q = 0 := genPt_order_zero hV hG
-  have hr := Plonky3Lean.Proofs.Matrix.bitRev_lt n j
-  have hev : Q + rev n j • genPt G n = (2 * (2 * rev n j) + 1) • Q := by
-    rw [h4, smul_smul, show 2 * (2 * rev n j) + 1 = 1 + rev n j * 4 by ring, add_nsmul, one_nsmul]
-  refine ⟨?_, ?_⟩
-  · rw [ptD, cfft_permute_index_even hj, hev]
-  · rw [ptD, cfft_permute_index_odd hj, rev_complement n hj, hev, eq_neg_iff_add_eq_zero, ← add_nsmul,
-      show 2 * (2 * (2 ^ n - 1 - rev n j) + 1) + 1 + (2 * (2 * rev n j) + 1) = 2 ^ (n + 2) by rw [pow_add]; omega,
-      show n + 1 + 1 = n + 2 by omega, hzero]
 
 theorem pairsOf_matOfPairs (v : List K) :
     pairsOf (matOfPairs v) = (List.range (v.length / 2)).map fun j => (v.getD (2 * j) 0, v.getD (2 * j + 1) 0) := by
@@ -1070,35 +1251,6 @@ theorem claimHeights_claimsOf (immcs : MmcsOps K) (lb : ℕ) (hb : List (List (H
 
 /-! ## The opened values: the circle Lagrange evaluation -/
 
-/-- The first 2^s points of the LDE domain of height h, in circle FFT order, are a twin coset of size 2^s.
-
-Its shift is the LDE's shift, the generator of order 2^(h + 1). -/
-theorem twinList_prefix (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {h s : ℕ} (hs : 1 ≤ s) (hsh : s ≤ h)
-    (hG : h + 1 ≤ G.adicity) : TwinList s (genPt G (h + 1)) fun r => ptD G h (cfft_permute_index r h) := by
-  have hsh' : 2 ^ s ≤ 2 ^ h := Nat.pow_le_pow_right two_pos hsh
-  refine ⟨fun i hi j hj hij => ?_, fun r hr => ?_⟩
-  · have hk := List.inj_on_of_nodup_map (standard_nodup hV h2 hG)
-      (List.mem_range.mpr (cfft_permute_index_lt h i)) (List.mem_range.mpr (cfft_permute_index_lt h j)) hij
-    rw [← cfft_permute_index_involutive (show i < 2 ^ h by omega), hk,
-      cfft_permute_index_involutive (show j < 2 ^ h by omega)]
-  obtain ⟨n, rfl⟩ : ∃ n, h = n + 1 := ⟨h - 1, by omega⟩
-  have hj : r / 2 < 2 ^ (s - 1) := by
-    rw [show 2 ^ s = 2 ^ (s - 1) * 2 by rw [← pow_succ]; congr 1; omega] at hr; omega
-  have hjn : r / 2 < 2 ^ n := lt_of_lt_of_le hj (Nat.pow_le_pow_right two_pos (by omega))
-  obtain ⟨he, ho⟩ := ptD_pair hV (show n + 2 ≤ G.adicity by omega) hjn
-  have hz : 2 ^ (s - 1) • rev n (r / 2) • genPt G n = 0 := by
-    have hrev : rev n (r / 2) = rev (s - 1) (r / 2) * 2 ^ (n - (s - 1)) := by
-      have := Plonky3Lean.Proofs.Matrix.bitRev_add_of_lt (k := n - (s - 1)) hj
-      rwa [show s - 1 + (n - (s - 1)) = n by omega] at this
-    rw [hrev, smul_smul, show 2 ^ (s - 1) * (rev (s - 1) (r / 2) * 2 ^ (n - (s - 1))) = 2 ^ n * rev (s - 1) (r / 2) by
-      rw [mul_left_comm, ← pow_add, show s - 1 + (n - (s - 1)) = n by omega, mul_comm], mul_nsmul,
-      genPt_order_zero hV (by omega), smul_zero]
-  rcases Nat.even_or_odd' r with ⟨j, rfl | rfl⟩
-  · rw [show 2 * j / 2 = j by omega] at he hz
-    simp [he, smul_add, hz]
-  · rw [show (2 * j + 1) / 2 = j by omega] at ho hz
-    simp [ho, smul_add, hz, show (2 * j + 1) % 2 = 1 by omega]
-
 /-- The prover opens an honest matrix at its points to the columns' values there.
 
 Take a matrix whose columns lie in the FFT space of the trace size 2^n, n >= 2.
@@ -1356,7 +1508,7 @@ theorem open_verify_complete (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) (immcs
   rw [hlogmax, Option.bind_some, proverClaims_honest hb hcirc, Option.bind_some]
   set α := (tp.batch_phase sp (claimsZOf hb)).1
   have hok : ∀ m ∈ L, ProverMatOK G lb m := fun m hm =>
-    ⟨by have := hc.log_n m hm; omega, by have := hc.height m hm; unfold hgt; omega, hc.values m hm,
+    ⟨by have := hc.log_n m hm; omega, hfft m hm, by have := hc.height m hm; unfold hgt; omega, hc.values m hm,
       hc.on_circle m hm, hc.off_domain m hm⟩
   obtain ⟨st, hst, hinv⟩ := reducedOpenings_honest hV h2 α hb hok
   erw [hst, Option.bind_some, extractLambdas_honest hV h2 α hlb hG hbd hc.honestAt hinv, Option.bind_some]

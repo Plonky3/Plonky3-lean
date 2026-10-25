@@ -375,6 +375,14 @@ lean = "p3_circle.prover.mirror.permutedPoints"
 rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open"
 
 [[mirror]]
+lean = "p3_circle.prover.mirror.rowwise_alpha_reduce_lifted"
+rust = "p3_circle::cfft::CircleEvaluations::rowwise_alpha_reduce_lifted"
+
+[[mirror]]
+lean = "p3_circle.prover.mirror.reducedRows"
+rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open"
+
+[[mirror]]
 lean = "p3_circle.prover.mirror.accumulateMatrix"
 rust = "{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open"
 
