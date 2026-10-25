@@ -3,6 +3,7 @@ module
 public import P3UniStark
 public import Plonky3Lean.Spec.UniStark
 public import Plonky3Lean.Proofs.Air.Semantics
+public import Plonky3Lean.Proofs.Air.NextRow
 public import Mathlib.RingTheory.MvPolynomial.Tower
 
 @[expose] public section
@@ -147,6 +148,24 @@ theorem verifier_accumulator {air : Air F} {env : Var → K} {main preprocessed 
     air.eval (verifierFolder main preprocessed pv periodic first last trans α) 0 =
       combine α ((constraints air).map (MvPolynomial.aeval env)) :=
   air.parametric _ _ _ _ (builderRel_verifier h α) [] 0 (by simp [combine_nil])
+
+/-- **The verifier's fold ignores an unread row.**
+
+Take two windows of the AIR's widths that differ only in the next row of a dropped trace.
+
+When the AIR never reads that row, the verifier folds both to one value. -/
+theorem fold_unread {air : Air F} {dm dp : Bool} (hu : NextRowUnread air dm dp)
+    {main main' preprocessed preprocessed' : RowWindow K} {pv : List F} {periodic : List K}
+    (hs : WindowShapes air main preprocessed (pv.map (algebraMap F K)) periodic)
+    (hs' : WindowShapes air main' preprocessed' (pv.map (algebraMap F K)) periodic)
+    (hmc : main.current = main'.current) (hpc : preprocessed.current = preprocessed'.current)
+    (hmn : dm = false → main.next = main'.next) (hpn : dp = false → preprocessed.next = preprocessed'.next)
+    (first last trans α : K) :
+    air.eval (verifierFolder main preprocessed pv periodic first last trans α) 0 =
+      air.eval (verifierFolder main' preprocessed' pv periodic first last trans α) 0 := by
+  rw [verifier_accumulator (holds_windowEnv hs first last trans) α,
+    verifier_accumulator (holds_windowEnv hs' first last trans) α,
+    constraints_congr hu (windowEnv_congr hmc hpc hmn hpn _ _ _ _ _)]
 
 end verifier
 

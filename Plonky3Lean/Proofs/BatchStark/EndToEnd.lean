@@ -33,6 +33,7 @@ open p3_batch_stark.transcript.mirror p3_batch_stark.constraints.mirror p3_batch
 open p3_commit.domain.mirror p3_commit.periodic.mirror p3_field.coset.mirror p3_dft.mirror
 open p3_commit.pcs.univariate.mirror
 open Plonky3Lean.Proofs.UniStark Plonky3Lean.Proofs.Commit Plonky3Lean.Proofs.Dft
+open Plonky3Lean.Proofs.Air (NextRowUnread)
 
 variable {F K C Com S P PE : Type} [Field F] [DecidableEq F] [Inhabited F] [Field K] [DecidableEq K]
   [Algebra F K]
@@ -647,7 +648,11 @@ variable (G : Gen K)
 
 Take a trace coset off which zeta lies, trace polynomials and permutation columns.
 
-Assume the openings are their values at zeta, and the AIR reads the next row of both traces.
+Assume the openings are their values at zeta.
+
+A next row is opened only when the AIR reads it.
+
+When it is not opened, neither the AIR's symbolic constraints nor its lookups read it.
 
 Assume the vanishing polynomial divides the instance's constraint polynomial C.
 
@@ -655,16 +660,21 @@ Assume the chunks recombine to the quotient s^n C / Z at zeta.
 
 Then the check accepts. -/
 theorem check_at_zeta_complete {D : ℕ} (hV : GenValid G) (hN : GenNested G) (h2 : (2 : K) ≠ 0)
-    (B : Module.Basis (Fin D) F K) (ba : BatchAir F) (hb : ba.air.public_boundary_io = []) (i : ℕ)
-    (ov : Opened K) {lookups : List (Lookup F)} {ch : List K} (hL : LaidOut ba.air ch lookups)
+    (B : Module.Basis (Fin D) F K) (ba : BatchAir F) (hb : ba.air.public_boundary_io = [])
+    (hu : NextRowUnread ba.air (!ba.opens_main_next) (!ba.opens_preprocessed_next)) (i : ℕ)
+    (ov : Opened K) {lookups : List (Lookup F)}
+    (hlu : ∀ l ∈ lookups, LookupUnread (!ba.opens_main_next) (!ba.opens_preprocessed_next) l)
+    {ch : List K} (hL : LaidOut ba.air ch lookups)
     {pv : List F} (hpv : pv.length = ba.air.num_public_values) (c : Coset G)
     (main prep periodic P : ℕ → K[X]) (T α : K) {ζ : K}
     (hζ : ¬ InCoset c.shift c.subgroup_generator c.log_size ζ) (qdoms : List (Coset G))
     (htl : ov.trace_local = openRow (instAssign G c main prep periodic pv) (.main 0) ba.air.width ζ)
-    (htn : ov.trace_next = some (openRow (instAssign G c main prep periodic pv) (.main 1) ba.air.width ζ))
+    (htn : ov.trace_next = if ba.opens_main_next then
+      some (openRow (instAssign G c main prep periodic pv) (.main 1) ba.air.width ζ) else none)
     (hpre : ov.preprocessed = some ⟨openRow (instAssign G c main prep periodic pv) (.prep 0)
-        ba.air.preprocessed_width ζ, some (openRow (instAssign G c main prep periodic pv) (.prep 1)
-        ba.air.preprocessed_width ζ)⟩ ∨ (ov.preprocessed = none ∧ ba.air.preprocessed_width = 0))
+        ba.air.preprocessed_width ζ, if ba.opens_preprocessed_next then
+        some (openRow (instAssign G c main prep periodic pv) (.prep 1) ba.air.preprocessed_width ζ) else none⟩ ∨
+      (ov.preprocessed = none ∧ ba.air.preprocessed_width = 0))
     (hpl : recompose_permutation B (if lookups.isEmpty then 0 else lookups.length + 1) ov.permutation_local =
       some (permOpening c.subgroup_generator ζ P lookups).current)
     (hpn : recompose_permutation B (if lookups.isEmpty then 0 else lookups.length + 1) ov.permutation_next =
@@ -688,25 +698,51 @@ theorem check_at_zeta_complete {D : ℕ} (hV : GenValid G) (hN : GenNested G) (h
     have hj : j < ba.air.num_periodic_columns := by simpa [openRow] using h2'
     simp only [List.getElem_map, openRow, List.getElem_range, hσ, instAssign, starkAssign]
     rw [hperK j hj, List.getD_eq_getElem _ _ (by omega)]
+  -- The rows the check reads: the honest current rows, and next rows honest when opened.
   have hpre' : (ov.preprocessed.map (·.current)).getD [] = openRow σ (.prep 0) ba.air.preprocessed_width ζ ∧
-      (ov.preprocessed.bind (·.next)).getD (List.replicate ba.air.preprocessed_width 0) =
-        openRow σ (.prep 1) ba.air.preprocessed_width ζ := by
+      ((ov.preprocessed.bind (·.next)).getD (List.replicate ba.air.preprocessed_width 0)).length =
+        ba.air.preprocessed_width ∧
+      ((!ba.opens_preprocessed_next) = false →
+        (ov.preprocessed.bind (·.next)).getD (List.replicate ba.air.preprocessed_width 0) =
+          openRow σ (.prep 1) ba.air.preprocessed_width ζ) := by
     rcases hpre with h | ⟨h, h0⟩
-    · simp [h]
+    · cases hp : ba.opens_preprocessed_next <;> simp [h, hp, openRow]
     · simp [h, h0, openRow]
+  have htn' : ((!ba.opens_main_next) = false →
+      ov.trace_next.getD (List.replicate ba.air.width 0) = openRow σ (.main 1) ba.air.width ζ) ∧
+      (ov.trace_next.getD (List.replicate ba.air.width 0)).length = ba.air.width := by
+    cases hm : ba.opens_main_next <;> simp [htn, hm, openRow]
   have hperm : (if lookups = [] then none else some T).toList = if lookups = [] then [] else [T] := by
     split_ifs <;> rfl
-  have hcomp := verify_constraints_with_lookups_complete G hV h2 hb c main prep periodic hpv P hL T α hζ hdvd
+  have hcomp : verify_constraints_with_lookups G ba.air (openRow σ (.main 0) ba.air.width ζ)
+      (ov.trace_next.getD (List.replicate ba.air.width 0)) (openRow σ (.prep 0) ba.air.preprocessed_width ζ)
+      ((ov.preprocessed.bind (·.next)).getD (List.replicate ba.air.preprocessed_width 0))
+      (permOpening c.subgroup_generator ζ P lookups).current (permOpening c.subgroup_generator ζ P lookups).next
+      ch (if lookups = [] then [] else [T]) (openRow σ .periodic ba.air.num_periodic_columns ζ) lookups pv c ζ α
+      ((quotientPoly c.shift c.subgroup_generator c.log_size
+        (instancePoly G ba.air c main prep periodic pv P ch T α lookups)).eval ζ) = some (.ok ()) := by
+    rw [verify_constraints_with_lookups_congr G hu hlu hL (tl := openRow σ (.main 0) ba.air.width ζ)
+      (tn := ov.trace_next.getD (List.replicate ba.air.width 0)) (tn' := openRow σ (.main 1) ba.air.width ζ)
+      (pl := openRow σ (.prep 0) ba.air.preprocessed_width ζ)
+      (pn := (ov.preprocessed.bind (·.next)).getD (List.replicate ba.air.preprocessed_width 0))
+      (pn' := openRow σ (.prep 1) ba.air.preprocessed_width ζ)
+      (per := openRow σ .periodic ba.air.num_periodic_columns ζ) (pv := pv) T
+      (fun h0 => by simp [permOpening, h0])
+      ⟨by simp [openRow], htn'.2, by simp [openRow], hpre'.2.1, by simp [hpv], by simp [openRow]⟩
+      ⟨by simp [openRow], by simp [openRow], by simp [openRow], by simp [openRow], by simp [hpv],
+        by simp [openRow]⟩ htn'.1 hpre'.2.2]
+    exact verify_constraints_with_lookups_complete G hV h2 hb c main prep periodic hpv P hL T α hζ hdvd
   simp only [List.isEmpty_iff] at hpl hpn
   unfold check_at_zeta
-  simp only [hrec, panicOf_some, pure_bind, List.isEmpty_iff, hpl, hpn, htn, Option.getD_some, size_eq,
-    (new_ok_iff _ _).2 hscreen, hpv', hpre'.1, hpre'.2, hperm, htl]
+  simp only [hrec, panicOf_some, pure_bind, List.isEmpty_iff, hpl, hpn, size_eq,
+    (new_ok_iff _ _).2 hscreen, hpv', hpre'.1, hperm, htl]
   rw [hcomp, panicOf_some, pure_bind]
 
 /-- An honest instance at zeta, with base trace coset c, trace polynomials and permutation columns P.
 
 - The AIR binds its public values by constraints, and its lookups are laid out.
-- Zeta lies off c, and the AIR reads the next row of both traces.
+- Zeta lies off c.
+- A next row is opened only when the AIR reads it, and otherwise neither the AIR nor its lookups read it.
 - The openings are the polynomials' values at zeta, the permutation rows flattened over the basis.
 - The periodic columns screen, with their periodic polynomials.
 - The chunks recombine to the quotient s^n C / Z at zeta, and Z divides the constraint polynomial C.
@@ -718,11 +754,15 @@ structure Honest {D : ℕ} (B : Module.Basis (Fin D) F K) (ba : BatchAir F) (ov 
   laid : LaidOut ba.air ch lookups
   pv_len : pv.length = ba.air.num_public_values
   off : ¬ InCoset c.shift c.subgroup_generator c.log_size ζ
+  unread : NextRowUnread ba.air (!ba.opens_main_next) (!ba.opens_preprocessed_next)
+  lookups_unread : ∀ l ∈ lookups, LookupUnread (!ba.opens_main_next) (!ba.opens_preprocessed_next) l
   trace_local : ov.trace_local = openRow (instAssign G c main prep periodic pv) (.main 0) ba.air.width ζ
-  trace_next : ov.trace_next = some (openRow (instAssign G c main prep periodic pv) (.main 1) ba.air.width ζ)
+  trace_next : ov.trace_next = if ba.opens_main_next then
+    some (openRow (instAssign G c main prep periodic pv) (.main 1) ba.air.width ζ) else none
   pre : ov.preprocessed = some ⟨openRow (instAssign G c main prep periodic pv) (.prep 0)
-      ba.air.preprocessed_width ζ, some (openRow (instAssign G c main prep periodic pv) (.prep 1)
-      ba.air.preprocessed_width ζ)⟩ ∨ (ov.preprocessed = none ∧ ba.air.preprocessed_width = 0)
+      ba.air.preprocessed_width ζ, if ba.opens_preprocessed_next then
+      some (openRow (instAssign G c main prep periodic pv) (.prep 1) ba.air.preprocessed_width ζ) else none⟩ ∨
+    (ov.preprocessed = none ∧ ba.air.preprocessed_width = 0)
   perm_local : recompose_permutation B (if lookups.isEmpty then 0 else lookups.length + 1) ov.permutation_local =
     some (permOpening c.subgroup_generator ζ P lookups).current
   perm_next : recompose_permutation B (if lookups.isEmpty then 0 else lookups.length + 1) ov.permutation_next =
@@ -744,7 +784,7 @@ theorem Honest.check {D : ℕ} (hV : GenValid G) (hN : GenNested G) (h2 : (2 : K
     {T : K} (h : Honest G B ba ov lookups t ch pv c qdoms ζ α main prep periodic P T) (i : ℕ) :
     check_at_zeta G B ba i ov ba.air.preprocessed_width lookups t ch pv c qdoms ζ α = pure () := by
   rw [h.terminal]
-  exact check_at_zeta_complete G hV hN h2 B ba h.boundary i ov h.laid h.pv_len c main prep periodic P T α h.off
+  exact check_at_zeta_complete G hV hN h2 B ba h.boundary h.unread i ov h.lookups_unread h.laid h.pv_len c main prep periodic P T α h.off
     qdoms h.trace_local h.trace_next h.pre h.perm_local h.perm_next h.npc h.screen h.periodic_eq h.recombine h.dvd
 
 end zeta

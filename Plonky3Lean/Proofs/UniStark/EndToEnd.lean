@@ -200,15 +200,29 @@ theorem periodic_at (G : Gen K) (hV : GenValid G) (hN : GenNested G) (h2 : (2 : 
     exact (Nat.pow_dvd_pow_iff_le_right (by norm_num)).1 this
   exact evaluate_periodic_column_at_eq G hV hN h2 c col hp.2.symm hl x
 
+/-- An accepted preprocessed opening sets the width to its current row's, which is positive. -/
+theorem process_preprocessed_trace_some {C : Type} {aw : ℕ} {used : Bool} {p : PreprocessedOpening K}
+    {vk : Option (PreprocessedVerifierKey C)} {pw : ℕ} {pre : Option (C × PreprocessedOpening K)}
+    (h : process_preprocessed_trace aw used (some p) vk = .ok (pw, pre)) :
+    pw = p.current.length ∧ 0 < pw := by
+  rcases vk with _ | ⟨w, d, cm⟩ <;> rcases used <;>
+    simp only [process_preprocessed_trace, bind, Except.bind, pure, Except.pure, throw, throwThe,
+      MonadExceptOf.throw, Option.map_none, Option.map_some, Option.getD_none, Option.getD_some] at h <;>
+    split_ifs at h <;> simp_all <;> omega
+
 open p3_air.builder.mirror Plonky3Lean.Spec.Air Plonky3Lean.Spec.Commit Plonky3Lean.Spec.UniStark
   Plonky3Lean.Proofs.Air in
 /-- Completeness of the verifier, given the chunks' recombination.
 
 Take a trace that satisfies the STARK's relation on the base subgroup of order n = 2^(b - z).
 
-The AIR reads the next row of both traces, and its periodic columns have their periodic polynomials.
+Its periodic columns have their periodic polynomials.
 
 Open the trace and the preprocessed trace honestly at the drawn zeta, off the base subgroup.
+
+A next row is opened only when the AIR reads it.
+
+When it is not opened, the AIR's symbolic constraints never read it.
 
 Assume the steps before the claims accept.
 
@@ -216,11 +230,11 @@ Assume the opening argument accepts the claims, and the chunks recombine to the 
 
 Then the verifier accepts. -/
 theorem verify_complete {D : ℕ} (G : Gen K) (hV : GenValid G) (hN : GenNested G) (h2 : (2 : K) ≠ 0)
-    (g : K) (B : Module.Basis (Fin D) F K) (cfg : Config) (air : Air F) (opn : Bool)
+    (g : K) (B : Module.Basis (Fin D) F K) (cfg : Config) (air : Air F) (omn opn : Bool)
     (sp : StarkSponge F K C Com S)
     (pcs : List (p3_fri.verifier.mirror.Claim G C) → Option ℕ → S → Option (Except PE Unit))
     (proof : Proof C P F K) (pv : List F) (vk : Option (PreprocessedVerifierKey C)) (s0 : S)
-    (hb : air.public_boundary_io = []) {lq : ℕ} (td c qd : Coset G)
+    (hb : air.public_boundary_io = []) (hu : NextRowUnread air (!omn) (!opn)) {lq : ℕ} (td c qd : Coset G)
     (htd : td.shift = 1 ∧ td.log_size = proof.degree_bits)
     (hc : c.shift = 1 ∧ c.log_size = proof.degree_bits - cfg.zk.toNat)
     (hqd : qd.shift = g ∧ qd.log_size = proof.degree_bits + lq)
@@ -232,7 +246,7 @@ theorem verify_complete {D : ℕ} (G : Gen K) (hV : GenValid G) (hN : GenNested 
     (hlq : get_log_num_quotient_chunks_for_domain air
       { preprocessed_width := pw, main_width := air.width, num_public_values := air.num_public_values,
         num_periodic_columns := air.num_periodic_columns } (2 ^ c.log_size) cfg.zk.toNat = .ok lq)
-    (hshape : check_shape air true cfg.zk cfg.D (2 ^ (lq + cfg.zk.toNat)) cfg.ood_pow_bits pv
+    (hshape : check_shape air omn cfg.zk cfg.D (2 ^ (lq + cfg.zk.toNat)) cfg.ood_pow_bits pv
       proof.trace_local proof.trace_next proof.quotient_chunks proof.random
       proof.random_commitment.isSome proof.ood_pow_witness = .ok ())
     {α ζ : K} {s1 s2 : S}
@@ -255,16 +269,17 @@ theorem verify_complete {D : ℕ} (G : Gen K) (hV : GenValid G) (hN : GenNested 
         ((air.periodic_columns.getD j []).map (algebraMap F K)))
     (htl : proof.trace_local =
       openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 0) air.width ζ)
-    (htn : proof.trace_next = some
-      (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 1) air.width ζ))
+    (htn : proof.trace_next = if omn then some
+      (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 1) air.width ζ) else none)
     (hpre : (proof.preprocessed = some ⟨
         openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.prep 0)
           air.preprocessed_width ζ,
-        some (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.prep 1)
-          air.preprocessed_width ζ)⟩) ∨
+        if opn then some (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.prep 1)
+          air.preprocessed_width ζ) else none⟩) ∨
       (proof.preprocessed = none ∧ air.preprocessed_width = 0 ∧ pw = 0))
-    (hpcs : pcs (opening_claims G true proof proof.random
-      (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 1) air.width ζ)
+    (hpcs : pcs (opening_claims G omn proof proof.random
+      (if omn then openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 1) air.width ζ
+        else [])
       pre td (List.replicate (2 ^ (lq + cfg.zk.toNat)) td) ζ (ζ * c.subgroup_generator))
       (pre.map fun _ => cfg.zk.toNat + 2) s2 = some (.ok ()))
     (hrec : recompose_quotient_from_chunks G B
@@ -272,7 +287,7 @@ theorem verify_complete {D : ℕ} (G : Gen K) (hV : GenValid G) (hN : GenNested 
       proof.quotient_chunks ζ = some ((quotientPoly c.shift c.subgroup_generator c.log_size
         (combinedPoly α (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic)
           (constraints air))).eval ζ)) :
-    verify_with_preprocessed G g B cfg air true opn sp pcs proof pv vk s0 = some (.ok ()) := by
+    verify_with_preprocessed G g B cfg air omn opn sp pcs proof pv vk s0 = some (.ok ()) := by
   set σ := starkAssignK (K := K) s ω c.log_size main prep (pv.getD · 0) periodic with hσ
   have hood : check_ood_point G c ζ = .ok () := by
     simp [check_ood_point, (vanishing_poly_at_point_eq_zero G hV c ζ).not.2 hζc, pure, Except.pure]
@@ -284,26 +299,29 @@ theorem verify_complete {D : ℕ} (G : Gen K) (hV : GenValid G) (hN : GenNested 
     have hj : j < air.num_periodic_columns := by simpa [openRow] using h2'
     simp only [List.getElem_map, openRow, List.getElem_range, hσ, starkAssignK, starkAssign]
     rw [hperK j hj, List.getD_eq_getElem _ _ (by omega)]
-  -- The preprocessed rows the check reads are the honest ones.
+  -- The preprocessed rows the check reads: the honest current row, and a next row honest when opened.
   have hpre' : ((proof.preprocessed.map (·.current)) = some (openRow σ (.prep 0) air.preprocessed_width ζ) ∧
-      (match proof.preprocessed.bind (·.next) with
+      ∃ n, (match proof.preprocessed.bind (·.next) with
         | some v => some v
-        | none => if pw > 0 then some (List.replicate pw 0) else none) =
-        some (openRow σ (.prep 1) air.preprocessed_width ζ)) ∨
+        | none => if pw > 0 then some (List.replicate pw 0) else none) = some n ∧
+        n.length = air.preprocessed_width ∧ ((!opn) = false → n = openRow σ (.prep 1) air.preprocessed_width ζ)) ∨
       (proof.preprocessed.map (·.current) = none ∧
         (match proof.preprocessed.bind (·.next) with
           | some v => some v
           | none => if pw > 0 then some (List.replicate pw 0) else none) = none ∧
         air.preprocessed_width = 0) := by
     rcases hpre with h | ⟨h, h0, hp0⟩
-    · left; simp [h]
+    · obtain ⟨hpw, hpos⟩ := process_preprocessed_trace_some (h ▸ hpp)
+      simp only [openRow, List.length_map, List.length_range] at hpw
+      rw [hpw] at hpos
+      left; rcases opn <;> simp [h, openRow, hpos, hpw]
     · right; simp [h, h0, hp0]
-  refine verify_accepts G hV g B cfg air true opn sp pcs proof pv vk s0 hb td c qd htd hc hqd hlo hhi
+  refine verify_accepts G hV g B cfg air omn opn sp pcs proof pv vk s0 hb td c qd htd hc hqd hlo hhi
     hW hpp hkey hlq hshape hα hζ hood ((new_ok_iff _ _).2 hscreen) hpv
-    (by simp [htn]) hpcs hrec ?_
-  rw [htl, htn, Option.getD_some]
-  exact verify_constraints_complete G hV h2 hb c hcs hcg hω hs hT hmain hprep hpub hper hpvl hsat hζc α
-    hpre'
+    (by rcases omn <;> simp [htn]) hpcs hrec ?_
+  rw [htl]
+  exact verify_constraints_complete_unread G hV h2 hb hu c hcs hcg hω hs hT hmain hprep hpub hper hpvl hsat
+    hζc α (fun h => by simp_all) (by rcases omn <;> simp [htn, openRow]) hpre'
 
 /-! ## The FRI scheme over Merkle commitments -/
 
@@ -397,14 +415,14 @@ theorem merkle_accepts (G : Gen K) (hV : GenValid G) (hN : GenNested G) (h2 : (2
   rfl
 
 theorem verify_complete_merkle {D : ℕ} (G : Gen K) (hV : GenValid G) (hN : GenNested G) (h2 : (2 : K) ≠ 0)
-    (g : K) (B : Module.Basis (Fin D) F K) (cfg : Config) (air : Air F) (opn : Bool)
+    (g : K) (B : Module.Basis (Fin D) F K) (cfg : Config) (air : Air F) (omn opn : Bool)
     (hashI : List (List K) → DI) (cmpI : List DI → DI) (zI : DI) (capI : ℕ)
     (hashF : List (List K) → DF) (cmpF : List DF → DF) (zF : DF) (capF : ℕ) (params : FriParameters)
     (commit_of : C → (merkleOps hashI cmpI zI capI).Commitment)
     (sp : StarkSponge F K C (merkleOps hashF cmpF zF capF).Commitment S)
     (proof : Proof C (FriProof K (merkleOps hashF cmpF zF capF).Commitment (merkleOps hashF cmpF zF capF).MultiProof
       (merkleOps hashI cmpI zI capI).MultiProof) F K) (pv : List F) (vk : Option (PreprocessedVerifierKey C)) (s0 : S)
-    (hb : air.public_boundary_io = []) {lq : ℕ} (td c qd : p3_commit.domain.mirror.Coset G)
+    (hb : air.public_boundary_io = []) (hu : NextRowUnread air (!omn) (!opn)) {lq : ℕ} (td c qd : p3_commit.domain.mirror.Coset G)
     (htd : td.shift = 1 ∧ td.log_size = proof.degree_bits)
     (hc : c.shift = 1 ∧ c.log_size = proof.degree_bits - cfg.zk.toNat)
     (hqd : qd.shift = g ∧ qd.log_size = proof.degree_bits + lq)
@@ -416,7 +434,7 @@ theorem verify_complete_merkle {D : ℕ} (G : Gen K) (hV : GenValid G) (hN : Gen
     (hlq : get_log_num_quotient_chunks_for_domain air
       { preprocessed_width := pw, main_width := air.width, num_public_values := air.num_public_values,
         num_periodic_columns := air.num_periodic_columns } (2 ^ c.log_size) cfg.zk.toNat = .ok lq)
-    (hshape : check_shape air true cfg.zk cfg.D (2 ^ (lq + cfg.zk.toNat)) cfg.ood_pow_bits pv
+    (hshape : check_shape air omn cfg.zk cfg.D (2 ^ (lq + cfg.zk.toNat)) cfg.ood_pow_bits pv
       proof.trace_local proof.trace_next proof.quotient_chunks proof.random
       proof.random_commitment.isSome proof.ood_pow_witness = .ok ())
     {α ζ : K} {s1 s2 : S}
@@ -439,13 +457,13 @@ theorem verify_complete_merkle {D : ℕ} (G : Gen K) (hV : GenValid G) (hN : Gen
         ((air.periodic_columns.getD j []).map (algebraMap F K)))
     (htl : proof.trace_local =
       openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 0) air.width ζ)
-    (htn : proof.trace_next = some
-      (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 1) air.width ζ))
+    (htn : proof.trace_next = if omn then some
+      (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 1) air.width ζ) else none)
     (hpre : (proof.preprocessed = some ⟨
         openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.prep 0)
           air.preprocessed_width ζ,
-        some (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.prep 1)
-          air.preprocessed_width ζ)⟩) ∨
+        if opn then some (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.prep 1)
+          air.preprocessed_width ζ) else none⟩) ∨
       (proof.preprocessed = none ∧ air.preprocessed_width = 0 ∧ pw = 0))
     (hfit : ∀ e ∈ constraints air, FitsChunks (2 ^ c.log_size) (2 ^ (lq + cfg.zk.toNat))
       (constraintPoly (starkAssign s ω c.log_size main prep (pv.getD · 0) periodic) e))
@@ -455,24 +473,25 @@ theorem verify_complete_merkle {D : ℕ} (G : Gen K) (hV : GenValid G) (hN : Gen
         some ((chunkInterp hV qd (lq + cfg.zk.toNat) (quotientPoly c.shift c.subgroup_generator c.log_size
           (combinedPoly α (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (constraints air))) i).eval ζ))
     (hM : MerkleHonest G g hashI cmpI zI capI hashF cmpF zF capF sp.sponge params
-      (opening_claims G true proof proof.random
-        (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 1) air.width ζ)
+      (opening_claims G omn proof proof.random
+        (if omn then openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 1) air.width ζ
+          else [])
         pre td (List.replicate (2 ^ (lq + cfg.zk.toNat)) td) ζ (ζ * c.subgroup_generator))
       proof.opening_proof s2 commit_of) :
-    verify_with_preprocessed G g B cfg air true opn sp
+    verify_with_preprocessed G g B cfg air omn opn sp
       (fun cl _ st => (p3_fri.two_adic_pcs.mirror.verify G g (merkleOps hashF cmpF zF capF)
       (merkleOps hashI cmpI zI capI) sp.sponge params cl proof.opening_proof st commit_of).run)
       proof pv vk s0 = some (.ok ()) := by
   have hdeg := degree_quotient_lt (K := K) Nat.one_le_two_pow hfit α
   rw [← hcs, ← hcg, ← pow_add, show lq + cfg.zk.toNat + c.log_size = qd.log_size by omega] at hdeg
-  exact verify_complete G hV hN h2 g B cfg air opn sp _ proof pv vk s0 hb td c qd htd hc hqd hlo hhi hW
+  exact verify_complete G hV hN h2 g B cfg air omn opn sp _ proof pv vk s0 hb hu td c qd htd hc hqd hlo hhi hW
     hpp hkey hlq hshape hα hζ hζc hcs hcg hω hs hT hmain hprep hpub hper hpvl hsat hnpc hscreen hperK htl
     htn hpre (merkle_accepts G hV hN h2 g hashI cmpI zI capI hashF cmpF zF capF sp.sponge params _
       proof.opening_proof s2 commit_of hM)
     (recompose_quotient hV qd _ B hN (by omega) _ hdeg _ hlen hv)
 
 theorem verify_complete_hiding {D : ℕ} (G : Gen K) (hV : GenValid G) (hN : GenNested G) (h2 : (2 : K) ≠ 0)
-    (g : K) (B : Module.Basis (Fin D) F K) (cfg : Config) (air : Air F) (opn : Bool)
+    (g : K) (B : Module.Basis (Fin D) F K) (cfg : Config) (air : Air F) (omn opn : Bool)
     (hashI : List (List K) → DI) (cmpI : List DI → DI) (zI : DI) (capI : ℕ)
     (hashF : List (List K) → DF) (cmpF : List DF → DF) (zF : DF) (capF : ℕ) (params : FriParameters)
     (commit_of : C → (merkleOps hashI cmpI zI capI).Commitment)
@@ -480,7 +499,7 @@ theorem verify_complete_hiding {D : ℕ} (G : Gen K) (hV : GenValid G) (hN : Gen
     (sp : StarkSponge F K C (merkleOps hashF cmpF zF capF).Commitment S)
     (proof : Proof C (List (List (List (List K))) × FriProof K (merkleOps hashF cmpF zF capF).Commitment (merkleOps hashF cmpF zF capF).MultiProof
       (merkleOps hashI cmpI zI capI).MultiProof) F K) (pv : List F) (vk : Option (PreprocessedVerifierKey C)) (s0 : S)
-    (hb : air.public_boundary_io = []) {lq : ℕ} (td c qd : p3_commit.domain.mirror.Coset G)
+    (hb : air.public_boundary_io = []) (hu : NextRowUnread air (!omn) (!opn)) {lq : ℕ} (td c qd : p3_commit.domain.mirror.Coset G)
     (htd : td.shift = 1 ∧ td.log_size = proof.degree_bits)
     (hc : c.shift = 1 ∧ c.log_size = proof.degree_bits - cfg.zk.toNat)
     (hqd : qd.shift = g ∧ qd.log_size = proof.degree_bits + lq)
@@ -492,7 +511,7 @@ theorem verify_complete_hiding {D : ℕ} (G : Gen K) (hV : GenValid G) (hN : Gen
     (hlq : get_log_num_quotient_chunks_for_domain air
       { preprocessed_width := pw, main_width := air.width, num_public_values := air.num_public_values,
         num_periodic_columns := air.num_periodic_columns } (2 ^ c.log_size) cfg.zk.toNat = .ok lq)
-    (hshape : check_shape air true cfg.zk cfg.D (2 ^ (lq + cfg.zk.toNat)) cfg.ood_pow_bits pv
+    (hshape : check_shape air omn cfg.zk cfg.D (2 ^ (lq + cfg.zk.toNat)) cfg.ood_pow_bits pv
       proof.trace_local proof.trace_next proof.quotient_chunks proof.random
       proof.random_commitment.isSome proof.ood_pow_witness = .ok ())
     {α ζ : K} {s1 s2 : S}
@@ -515,13 +534,13 @@ theorem verify_complete_hiding {D : ℕ} (G : Gen K) (hV : GenValid G) (hN : Gen
         ((air.periodic_columns.getD j []).map (algebraMap F K)))
     (htl : proof.trace_local =
       openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 0) air.width ζ)
-    (htn : proof.trace_next = some
-      (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 1) air.width ζ))
+    (htn : proof.trace_next = if omn then some
+      (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 1) air.width ζ) else none)
     (hpre : (proof.preprocessed = some ⟨
         openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.prep 0)
           air.preprocessed_width ζ,
-        some (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.prep 1)
-          air.preprocessed_width ζ)⟩) ∨
+        if opn then some (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.prep 1)
+          air.preprocessed_width ζ) else none⟩) ∨
       (proof.preprocessed = none ∧ air.preprocessed_width = 0 ∧ pw = 0))
     (hfit : ∀ e ∈ constraints air, FitsChunks (2 ^ c.log_size) (2 ^ (lq + cfg.zk.toNat))
       (constraintPoly (starkAssign s ω c.log_size main prep (pv.getD · 0) periodic) e))
@@ -533,8 +552,9 @@ theorem verify_complete_hiding {D : ℕ} (G : Gen K) (hV : GenValid G) (hN : Gen
           (combinedPoly α (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (constraints air))) i +
           chunkZ hV qd (lq + cfg.zk.toNat) i * mask hV qd (lq + cfg.zk.toNat) t i).eval ζ))
     (full : List (p3_fri.verifier.mirror.Claim G C))
-    (hcl : (opening_claims G true proof proof.random
-        (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 1) air.width ζ)
+    (hcl : (opening_claims G omn proof proof.random
+        (if omn then openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 1) air.width ζ
+          else [])
         pre td (List.replicate (2 ^ (lq + cfg.zk.toNat)) td) ζ (ζ * c.subgroup_generator)) =
       (hideClaims r (pre.map fun _ => cfg.zk.toNat + 2) full).1)
     (hrand : proof.opening_proof.1 = (hideClaims r (pre.map fun _ => cfg.zk.toNat + 2) full).2)
@@ -546,7 +566,7 @@ theorem verify_complete_hiding {D : ℕ} (G : Gen K) (hV : GenValid G) (hN : Gen
       hiddenCount r (pre.map fun _ => cfg.zk.toNat + 2) e.2 ≤ p.values.length)
     (hM : MerkleHonest G g hashI cmpI zI capI hashF cmpF zF capF sp.sponge params full
       proof.opening_proof.2 s2 commit_of) :
-    verify_with_preprocessed G g B cfg air true opn sp
+    verify_with_preprocessed G g B cfg air omn opn sp
       (fun cl idx st => (p3_fri.hiding_pcs.mirror.verify_hiding G g (merkleOps hashF cmpF zF capF)
       (merkleOps hashI cmpI zI capI) sp.sponge params cfg.D r idx cl proof.opening_proof.1
       proof.opening_proof.2 st commit_of).run)
@@ -558,7 +578,7 @@ theorem verify_complete_hiding {D : ℕ} (G : Gen K) (hV : GenValid G) (hN : Gen
       have := merkle_accepts G hV hN h2 g hashI cmpI zI capI hashF cmpF zF capF sp.sponge params full
         proof.opening_proof.2 s2 commit_of hM
       exact ExceptT.ext (by rw [this]; rfl))
-  refine verify_complete G hV hN h2 g B cfg air opn sp _ proof pv vk s0 hb td c qd htd hc hqd hlo hhi hW
+  refine verify_complete G hV hN h2 g B cfg air omn opn sp _ proof pv vk s0 hb hu td c qd htd hc hqd hlo hhi hW
     hpp hkey hlq hshape hα hζ hζc hcs hcg hω hs hT hmain hprep hpub hper hpvl hsat hnpc hscreen hperK htl
     htn hpre ?_ (recompose_quotient_masked hV qd _ B hN (by omega) _ hdeg t ζ _ hlen hv)
   simp only [hcl, hrand, hacc]

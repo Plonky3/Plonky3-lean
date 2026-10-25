@@ -292,6 +292,59 @@ theorem eval_air_and_lookups_verifier {air : Air F} {env : Var → K} {main prep
       List.length_nil]
     congr 1; ring
 
+/-! ## Unread rows -/
+
+/-- A lookup never reads the next row of a dropped trace: its flags, tuples and multiplicities avoid it. -/
+def LookupUnread (dm dp : Bool) (l : Lookup F) : Prop :=
+  (∀ x ∈ l.flags.getD [], SymbolicExpr.Avoids (readsNextRow dm dp) x) ∧
+  (∀ e ∈ l.elements, ∀ x ∈ e, SymbolicExpr.Avoids (readsNextRow dm dp) x) ∧
+  ∀ x ∈ l.multiplicities, SymbolicExpr.Avoids (readsNextRow dm dp) x
+
+/-- Lookups that never read a dropped next row have one value at two assignments that agree off it. -/
+theorem lookupValues_congr {dm dp : Bool} {lookups : List (Lookup F)} (hl : ∀ l ∈ lookups, LookupUnread dm dp l)
+    {env env' : Var → K} (h : ∀ v, ¬ nextRowVar dm dp v → env v = env' v) (ch : List K) (perm : RowWindow K)
+    (T first last trans : K) :
+    lookupValues env ch perm T first last trans lookups = lookupValues env' ch perm T first last trans lookups := by
+  have hcol : lookups.map (columnAt env ch) = lookups.map (columnAt env' ch) :=
+    List.map_congr_left fun l hlm => by
+      obtain ⟨hf, he, hm⟩ := hl l hlm
+      have hx : ∀ x : SymbolicExpression F, SymbolicExpr.Avoids (readsNextRow dm dp) x →
+          (MvPolynomial.aeval env ∘ toPoly) x = (MvPolynomial.aeval env' ∘ toPoly) x :=
+        fun x hx => aeval_toPoly_congr h hx
+      simp only [columnAt, List.map_congr_left fun x hm' => hx x (hf x hm'),
+        List.map_congr_left fun x hm' => hx x (hm x hm'),
+        List.map_congr_left fun e he' => List.map_congr_left fun x hx' => hx x (he e he' x hx')]
+  simp only [lookupValues, hcol]
+
+/-- **The check at zeta ignores an unread row.**
+
+Take two openings of the AIR's widths that differ only in the next row of a dropped trace.
+
+When neither the AIR nor its lookups read that row, the check returns one result on both. -/
+theorem verify_constraints_with_lookups_congr (G : Gen K) {air : Air F} {dm dp : Bool}
+    (hu : NextRowUnread air dm dp) {lookups : List (Lookup F)} (hl : ∀ l ∈ lookups, LookupUnread dm dp l)
+    {ch : List K} (hL : LaidOut air ch lookups) {tl tn tn' pl pn pn' ml mn per : List K} {pv : List F} (T : K)
+    (hperm : lookups ≠ [] → lookups.length < ml.length ∧ 0 < mn.length)
+    (hs : WindowShapes air ⟨tl, tn⟩ ⟨pl, pn⟩ (pv.map (algebraMap F K)) per)
+    (hs' : WindowShapes air ⟨tl, tn'⟩ ⟨pl, pn'⟩ (pv.map (algebraMap F K)) per)
+    (hmn : dm = false → tn = tn') (hpn : dp = false → pn = pn') (c : Coset G) (ζ α q : K) :
+    verify_constraints_with_lookups G air tl tn pl pn ml mn ch (if lookups = [] then [] else [T]) per lookups
+        pv c ζ α q =
+      verify_constraints_with_lookups G air tl tn' pl pn' ml mn ch (if lookups = [] then [] else [T]) per
+        lookups pv c ζ α q := by
+  have hfold : ∀ first last trans,
+      p3_batch_stark.checker.mirror.eval_air_and_lookups air (verifierPermFolder ⟨tl, tn⟩ ⟨pl, pn⟩ pv per
+        first last trans α ⟨ml, mn⟩ ch (if lookups = [] then [] else [T])) 0 lookups =
+      p3_batch_stark.checker.mirror.eval_air_and_lookups air (verifierPermFolder ⟨tl, tn'⟩ ⟨pl, pn'⟩ pv per
+        first last trans α ⟨ml, mn⟩ ch (if lookups = [] then [] else [T])) 0 lookups := fun first last trans => by
+    have hag := windowEnv_congr (dm := dm) (dp := dp) (main := ⟨tl, tn⟩) (main' := ⟨tl, tn'⟩)
+      (preprocessed := ⟨pl, pn⟩) (preprocessed' := ⟨pl, pn'⟩) rfl rfl (fun h => by rw [hmn h])
+      (fun h => by rw [hpn h]) (pv.map (algebraMap F K)) first last trans per
+    rw [eval_air_and_lookups_verifier (holds_windowEnv hs first last trans) α hL ⟨ml, mn⟩ hperm T,
+      eval_air_and_lookups_verifier (holds_windowEnv hs' first last trans) α hL ⟨ml, mn⟩ hperm T,
+      constraints_congr hu hag, lookupValues_congr hl hag]
+  simp only [verify_constraints_with_lookups, hfold]
+
 /-! ## Ring maps commute with the constraints -/
 
 section map

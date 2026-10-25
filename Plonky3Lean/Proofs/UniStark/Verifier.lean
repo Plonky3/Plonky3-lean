@@ -193,4 +193,74 @@ theorem verify_constraints_complete (hV : GenValid G) (h2 : (2 : K) ≠ 0) {air 
   ring_nf
   simp
 
+/-- The check at zeta ignores an unread row.
+
+Take two openings of the AIR's widths that differ only in the next row of a dropped trace.
+
+When the AIR never reads that row, the check returns one result on both. -/
+theorem verify_constraints_congr {air : Air F} {dm dp : Bool} (hu : NextRowUnread air dm dp)
+    {tl tn tn' : List K} {pl pn pn' : Option (List K)} {periodic : List K} {pv : List F}
+    (hs : WindowShapes air ⟨tl, tn⟩ (preprocessedWindow pl pn) (pv.map (algebraMap F K)) periodic)
+    (hs' : WindowShapes air ⟨tl, tn'⟩ (preprocessedWindow pl pn') (pv.map (algebraMap F K)) periodic)
+    (hlen : pn.map List.length = pn'.map List.length) (hmn : dm = false → tn = tn')
+    (hpn : dp = false → pn = pn') (c : Coset G) (ζ α q : K) :
+    verify_constraints G air tl tn pl pn periodic pv c ζ α q =
+      verify_constraints G air tl tn' pl pn' periodic pv c ζ α q := by
+  have hpc : (preprocessedWindow pl pn).current = (preprocessedWindow pl pn').current := by
+    rcases pl with _ | _ <;> rcases pn with _ | _ <;> rcases pn' with _ | _ <;> simp_all [preprocessedWindow]
+  have hfold := fold_unread hu hs hs' rfl hpc (fun h => by rw [hmn h]) (fun h => by rw [hpn h])
+  simp only [verify_constraints, hlen, hfold]
+
+/-- Completeness of the check at zeta, when a dropped next row is zeros or any row.
+
+This is the completeness above, for an AIR that never reads the dropped rows.
+
+- The next main row is honest unless the main trace is dropped, and has the trace's width.
+- The next preprocessed row is honest unless the preprocessed trace is dropped, and has its width. -/
+theorem verify_constraints_complete_unread (hV : GenValid G) (h2 : (2 : K) ≠ 0) {air : Air F}
+    (hb : air.public_boundary_io = []) {dm dp : Bool} (hu : NextRowUnread air dm dp) (c : Coset G) {s ω : F}
+    (hcs : c.shift = algebraMap F K s) (hcg : c.subgroup_generator = algebraMap F K ω)
+    (hω : IsPrimitiveRoot ω (2 ^ c.log_size)) (hs : s ≠ 0)
+    {T : Instance F} (hT : T.height = 2 ^ c.log_size) {main prep periodic : ℕ → F[X]} {pv : List F}
+    (hmain : ∀ i < 2 ^ c.log_size, ∀ j, (main j).eval (s * ω ^ i) = T.main i j)
+    (hprep : ∀ i < 2 ^ c.log_size, ∀ j, (prep j).eval (s * ω ^ i) = T.prep i j)
+    (hpub : ∀ j, pv.getD j 0 = T.pub j)
+    (hper : ∀ i < 2 ^ c.log_size, ∀ j, (periodic j).eval (s * ω ^ i) = T.periodic j i)
+    (hpv : pv.length = air.num_public_values)
+    (hsat : SatisfiesStark (constraints air) T ω) {ζ : K}
+    (hζ : ¬ InCoset c.shift c.subgroup_generator c.log_size ζ) (α : K) {tn : List K}
+    (htn : dm = false →
+      tn = openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 1) air.width ζ)
+    (htnl : tn.length = air.width) {pl pn : Option (List K)}
+    (hpre : (pl = some (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic)
+        (.prep 0) air.preprocessed_width ζ) ∧ ∃ n, pn = some n ∧ n.length = air.preprocessed_width ∧
+        (dp = false → n = openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic)
+          (.prep 1) air.preprocessed_width ζ)) ∨
+      (pl = none ∧ pn = none ∧ air.preprocessed_width = 0)) :
+    verify_constraints G air
+      (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) (.main 0) air.width ζ)
+      tn pl pn
+      (openRow (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic) .periodic
+        air.num_periodic_columns ζ) pv c ζ α
+      ((quotientPoly c.shift c.subgroup_generator c.log_size
+        (combinedPoly α (starkAssignK s ω c.log_size main prep (pv.getD · 0) periodic)
+          (constraints air))).eval ζ) = some (.ok ()) := by
+  set σ := starkAssignK (K := K) s ω c.log_size main prep (pv.getD · 0) periodic
+  have hok := fun pn' hp => verify_constraints_complete G hV h2 hb c hcs hcg hω hs hT hmain hprep hpub
+    hper hpv hsat hζ α (pl := pl) (pn := pn') hp
+  rcases hpre with ⟨rfl, n, rfl, hnl, hn⟩ | ⟨rfl, rfl, h0⟩
+  · rw [verify_constraints_congr G hu (tn' := openRow σ (.main 1) air.width ζ)
+      (pn' := some (openRow σ (.prep 1) air.preprocessed_width ζ))
+      ⟨by simp [openRow], htnl, by simp [preprocessedWindow, openRow], by simpa [preprocessedWindow] using hnl,
+        by simp [hpv], by simp [openRow]⟩
+      ⟨by simp [openRow], by simp [openRow], by simp [preprocessedWindow, openRow],
+        by simp [preprocessedWindow, openRow], by simp [hpv], by simp [openRow]⟩
+      (by simp [hnl, openRow]) htn (fun h => by rw [hn h])]
+    exact hok _ (Or.inl ⟨rfl, rfl⟩)
+  · rw [verify_constraints_congr G hu (tn' := openRow σ (.main 1) air.width ζ) (pn' := none)
+      ⟨by simp [openRow], htnl, by rw [h0]; rfl, by rw [h0]; rfl, by simp [hpv], by simp [openRow]⟩
+      ⟨by simp [openRow], by simp [openRow], by rw [h0]; rfl, by rw [h0]; rfl, by simp [hpv],
+        by simp [openRow]⟩ rfl htn (fun _ => rfl)]
+    exact hok _ (Or.inr ⟨rfl, rfl, h0⟩)
+
 end Plonky3Lean.Proofs.UniStark
