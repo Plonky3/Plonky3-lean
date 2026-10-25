@@ -134,18 +134,6 @@ theorem le_foldl_max : ∀ (l : List ℕ) (a x : ℕ), x ∈ l ∨ x ≤ a → x
 
 theorem le_topLog {lh : List ℕ} {x : ℕ} (hx : x ∈ lh) : x ≤ topLog lh := le_foldl_max lh 0 x (Or.inl hx)
 
-theorem length_path_bspecs {F : Type _} (h : List (List F) → D) (c : List D → D) (z : D) (lh : List ℕ) (n : ℕ)
-    (rowsOf : ℕ → ℕ → List F) :
-    ∀ L e (L0 : ℕ → D) i, (path c [z, z] z L0 (bspecs h lh n rowsOf e L) i).length = L := by
-  intro L
-  induction L with
-  | zero => intro e L0 i; simp [bspecs, path]
-  | succ L ih =>
-    intro e L0 i
-    simp only [bspecs, path, List.length_append, List.length_map, ih, filter_ne_length,
-      Nat.mod_lt i (show 0 < 2 by norm_num), ↓reduceIte]
-    omega
-
 /-! ## Completeness and binding -/
 
 section scheme

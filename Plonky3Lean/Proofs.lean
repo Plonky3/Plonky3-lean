@@ -192,6 +192,9 @@ public import Plonky3Lean.Proofs.MerkleTree.Accept
 public import Plonky3Lean.Proofs.MerkleTree.Schedule
 public import Plonky3Lean.Proofs.MerkleTree.Bugs
 public import Plonky3Lean.Proofs.MerkleTree.Edge
+public import Plonky3Lean.Proofs.MerkleTree.BinaryPlan
+public import Plonky3Lean.Proofs.MerkleTree.Binary
+public import Plonky3Lean.Proofs.MerkleTree.BinaryTotal
 public import Plonky3Lean.Proofs.Challenger.Duplex
 public import Plonky3Lean.Proofs.Challenger.Grinding
 public import Plonky3Lean.Proofs.Challenger.Fields
