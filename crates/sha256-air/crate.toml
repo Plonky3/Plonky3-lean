@@ -27,6 +27,10 @@ watch = ["sha256-air/src", "sha256-air/Cargo.toml"]
 # The transcriptions in extraction/P3Sha256Air/Assumptions/Mirror/.
 # Hashes are pending tools/mirror.
 #
+# The packed generator is transcribed as well.
+#
+# Plonky3Lean/Proofs/Sha256Air/Binary/Packed.lean proves that it returns the packing of the trace.
+#
 # Plonky3Lean/Proofs/Sha256Air/Extracted.lean proves the transcribed constants and sigma functions equal to the extracted ones.
 
 [[mirror]]
@@ -332,3 +336,7 @@ rust = "p3_sha256_air::binary::generation::generate_trace_row"
 [[mirror]]
 lean = "p3_sha256_air.mirror.binary.generate_binary_trace_rows"
 rust = "p3_sha256_air::binary::generation::generate_binary_trace_rows"
+
+[[mirror]]
+lean = "p3_sha256_air.mirror.binary.generate_binary_trace_packed"
+rust = "p3_sha256_air::binary::generation::generate_binary_trace_packed"

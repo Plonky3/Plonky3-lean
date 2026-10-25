@@ -1,5 +1,5 @@
 /-
-Transcriptions of the SHA-256 AIR over a field of characteristic 2: its column layout, its evaluation, its sigma functions on words and its trace generator.
+Transcriptions of the SHA-256 AIR over a field of characteristic 2: its column layout, its evaluation, its sigma functions on words, its trace generator and its packed trace generator.
 
 The evaluation and the generator do not extract: they are generic over the builder and the field traits, which aeneas rejects.
 
@@ -11,6 +11,8 @@ What a transcription abstracts, beyond those of the other AIR:
 
 * a slice of words is a list of maps from the bit index to the bit, and an array of carry words is a list of maps from the carry index to the carry;
 * the assertion that an addition gets one stored-carry word per middle word, which every call meets, is dropped;
+* a block of packed words is a map from the column to the word, and a group of 64 inputs is a drop then a take;
+* the parallel loop over groups is a sequential loop, and the scratch row is threaded through it;
 * a panic is none.
 
 Loops, branches and the order of assertions are kept.
@@ -328,5 +330,35 @@ def generate_binary_trace_rows [DecidableEq F] (inputs : List (List Word)) (_ext
   if ¬ (inputs.length ≠ 0 ∧ 2 ^ Nat.log 2 inputs.length = inputs.length) then none
   let rows ← inputs.mapM (generate_trace_row Sha256BinaryCols.zero)
   pure ⟨NUM_SHA256_BINARY_COLS, rows.flatMap Sha256BinaryCols.cells⟩
+
+/-- The trace packed into one word per 64 rows.
+
+Bit `k` of word `(w, j)` is set when cell `(64 w + k, j)` is 1.
+
+Each group of 64 inputs fills one packed row, one lane per input.
+
+A scratch row is reused from lane to lane and from group to group.
+
+It panics when 2 is not 0 in the field, or when the number of inputs is not a positive power of two. -/
+def generate_binary_trace_packed [DecidableEq F] (inputs : List (List Word)) :
+    Option (Mat (BitVec 64)) := do
+  if (2 : F) ≠ 0 then none
+  if inputs.length = 0 then none
+  if 2 ^ Nat.log 2 inputs.length ≠ inputs.length then none
+  let num_blocks := (inputs.length + 63) / 64
+  let (words, _) ← (List.range num_blocks).foldlM
+    (fun (acc : List (BitVec 64) × Sha256BinaryCols F) w => do
+      let (words, row) := acc
+      let input_block := (inputs.drop (64 * w)).take 64
+      let (block, row) ← input_block.zipIdx.foldlM
+        (fun (acc : (ℕ → BitVec 64) × Sha256BinaryCols F) (input, lane) => do
+          let (block, row) := acc
+          let row ← generate_trace_row row input
+          -- Set bit `lane` of every column whose cell is 1.
+          let block := row.cells.zipIdx.foldl (fun block (bit, column) =>
+            if bit = 1 then Function.update block column (block column ||| 1#64 <<< lane) else block) block
+          pure (block, row)) (fun _ => 0, row)
+      pure (words ++ (List.range NUM_SHA256_BINARY_COLS).map block, row)) ([], Sha256BinaryCols.zero)
+  pure ⟨NUM_SHA256_BINARY_COLS, words⟩
 
 end p3_sha256_air.mirror.binary

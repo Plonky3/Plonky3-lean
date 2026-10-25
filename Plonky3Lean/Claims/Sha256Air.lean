@@ -5,6 +5,7 @@ public import Plonky3Lean.Proofs.Sha256Air.Degree
 public import Plonky3Lean.Proofs.Sha256Air.Extracted
 public import Plonky3Lean.Proofs.Sha256Air.Binary.Sound
 public import Plonky3Lean.Proofs.Sha256Air.Binary.Complete
+public import Plonky3Lean.Proofs.Sha256Air.Binary.Packed
 
 @[expose] public section
 
@@ -61,6 +62,18 @@ A row holds, all as bits:
 - In characteristic 2, on a power-of-two number of inputs, the generator's trace satisfies the AIR.
 - Every constraint has degree multiple at most 2.
 - The AIR asserts exactly the number of constraints it reports.
+
+# The packed generator
+
+The packed generator stores 64 rows of the trace in each word, one per bit.
+
+```text
+    packed row w, column j:   bit k  =  [cell (64 w + k, j) = 1]
+```
+
+- It returns exactly the packing of the trace generator's trace.
+- It panics on exactly the same inputs.
+- The cells of a filled row do not depend on the scratch row it reuses.
 -/
 
 open Plonky3Lean.Spec.Air Plonky3Lean.Spec.Sha256 Plonky3Lean.Proofs.Air
@@ -244,5 +257,41 @@ theorem binary.num_constraints_gf2 (cb : Bool) :
         (symbolicBuilder (AirLayout.from_air (binaryAir (F := ZMod 2) cb))) []).length =
       p3_sha256_air.mirror.binary.num_constraints cb :=
   binary_num_constraints cb
+
+/-! ## The packed generator -/
+
+/-- The packed generator returns the trace packed 64 rows to a word.
+
+It panics exactly when the trace generator does.
+
+Bit `k` of word `(w, j)` says whether cell `(64 w + k, j)` is 1, and the bits past the height are zero. -/
+theorem binary.generate_binary_trace_packed.eq_pack [DecidableEq F] (inputs : List (List (BitVec 32))) (e : ℕ) :
+    p3_sha256_air.mirror.binary.generate_binary_trace_packed (F := F) inputs =
+      (p3_sha256_air.mirror.binary.generate_binary_trace_rows (F := F) inputs e).map packMat :=
+  Proofs.Sha256Air.Binary.packed_eq inputs e
+
+/-- In characteristic 2, on a power-of-two number of inputs, the packed trace is a packed satisfying trace. -/
+theorem binary.generate_binary_trace_packed.complete [Inhabited F] [DecidableEq F] (h2 : (2 : F) = 0)
+    (cb : Bool) {inputs : List (List (BitVec 32))}
+    (h : inputs.length ≠ 0 ∧ 2 ^ Nat.log 2 inputs.length = inputs.length) (e : ℕ) :
+    ∃ M : Mat F, p3_sha256_air.mirror.binary.generate_binary_trace_packed (F := F) inputs = some (packMat M) ∧
+      Satisfies (constraints (binaryAir cb)) (instOf (binaryAir cb) M []) := by
+  obtain ⟨M, hM, hs⟩ := Proofs.Sha256Air.Binary.binary_complete h2 cb h e
+  exact ⟨M, by rw [Proofs.Sha256Air.Binary.packed_eq (F := F) inputs e, hM, Option.map_some], hs⟩
+
+/-- The packed generator panics unless 2 is 0 and the number of inputs is a positive power of two. -/
+theorem binary.generate_binary_trace_packed.panics [DecidableEq F] {inputs : List (List (BitVec 32))}
+    (h : ¬ ((2 : F) = 0 ∧ (inputs.length ≠ 0 ∧ 2 ^ Nat.log 2 inputs.length = inputs.length))) :
+    p3_sha256_air.mirror.binary.generate_binary_trace_packed (F := F) inputs = none := by
+  rw [Proofs.Sha256Air.Binary.packed_eq (F := F) inputs 0, binary.generate_binary_trace_rows.panics h, Option.map_none]
+
+/-- From any scratch row, filling a row never panics, and the filled cells are those filled from the zero row. -/
+theorem binary.generate_trace_row.cells_scratch (r : p3_sha256_air.mirror.binary.Sha256BinaryCols F)
+    (input : List (BitVec 32)) :
+    ∃ r', p3_sha256_air.mirror.binary.generate_trace_row r input = some r' ∧
+      ∃ r0, p3_sha256_air.mirror.binary.generate_trace_row
+          p3_sha256_air.mirror.binary.Sha256BinaryCols.zero input = some r0 ∧ r'.cells = r0.cells :=
+  ⟨_, Proofs.Sha256Air.Binary.gen_eq_from r input, _, Proofs.Sha256Air.Binary.gen_eqB input,
+    Proofs.Sha256Air.Binary.cells_finalFrom r input⟩
 
 end Plonky3Lean.Claims.Sha256Air
