@@ -161,13 +161,15 @@ partial def claimClosure (env : Environment) (start : Name) : NameSet := Id.run 
 
 #eval show CommandElabM Unit from do
   let env ← getEnv
+  -- `moduleNames` builds the array on each call; build it once.
+  let modNames := env.header.moduleNames
   let libs : List String := LIBS
   -- Names travel as one string, since a list literal of every claim overflows the code generator.
   let names (s : String) : List Name := (s.splitOn " ").filter (· ≠ "") |>.map String.toName
   let claims : List Name := names CLAIMS
   let mirrors : List Name := names MIRRORS
   let inLib (n : Name) : Bool := match env.getModuleIdxFor? n with
-    | some i => libs.any fun l => (env.header.moduleNames[i.toNat]!).toString.startsWith l
+    | some i => libs.any fun l => (modNames[i.toNat]!).toString.startsWith l
     | none => false
   let opaques := env.constants.toList.filterMap fun (n, ci) =>
     if ci matches .opaqueInfo _ && inLib n && !n.isInternal then some n else none
@@ -176,7 +178,7 @@ partial def claimClosure (env : Environment) (start : Name) : NameSet := Id.run 
   for n in opaques do
     let doc := (← findDocString? env n).getD ""
     let m := match env.getModuleIdxFor? n with
-      | some i => (env.header.moduleNames[i.toNat]!).toString
+      | some i => (modNames[i.toNat]!).toString
       | none => ""
     IO.println (Json.compress (Json.mkObj [("kind", "opaque"), ("name", toString n),
       ("module", m), ("doc", doc), ("reach", count n)]))
@@ -189,7 +191,7 @@ partial def claimClosure (env : Environment) (start : Name) : NameSet := Id.run 
       if ci.type.getForallBody.getAppFn.constName? == some `CoreModels.core.intrinsics.Transmute then
         let doc := (← findDocString? env n).getD ""
         let m := match env.getModuleIdxFor? n with
-          | some i => (env.header.moduleNames[i.toNat]!).toString
+          | some i => (modNames[i.toNat]!).toString
           | none => ""
         IO.println (Json.compress (Json.mkObj [("kind", "layout"), ("name", toString n),
           ("module", m), ("doc", doc)]))
