@@ -15,7 +15,7 @@ target `thumbv7em-none-eabi`
 | Crate | State | Generated lines | Hand-written lines | `opaque` | Mirrored | Dropped by the extractor | Patches (pre / post) | Patches with a cost |
 |---|---|---:|---:|---:|---:|---:|---|---|
 | `air` | scoped | 364 | 935 | 0 | 67 | 0 | 0 / 1 | post `010` |
-| `arch-shims` | extracted | 3178 | 129 | 7 | 0 | 0 | 0 / 1 |  |
+| `arch-shims` | extracted | 5352 | 156 | 10 | 0 | 0 | 0 / 1 |  |
 | `baby-bear` | extracted | 2953 | 126 | 4 | 0 | 0 | 5 / 3 | pre `020`, pre `030`, pre `040`, pre `050` |
 | `batch-stark` | scoped | 116 | 1413 | 0 | 81 | 0 | 0 / 0 |  |
 | `binary-dft` | scoped | 1073 | 694 | 2 | 52 | 0 | 2 / 1 | pre `010`, pre `020`, post `010` |
@@ -42,7 +42,7 @@ target `thumbv7em-none-eabi`
 | `mds` | scoped | 101 | 46 | 0 | 0 | 0 | 0 / 0 |  |
 | `merkle-tree` | scoped | 1306 | 47 | 0 | 0 | 0 | 2 / 0 | pre `010`, pre `020` |
 | `mersenne-31` | scoped | 1444 | 261 | 0 | 12 | 30 | 1 / 1 | pre `010` |
-| `monty-31` | scoped | 1581 | 329 | 0 | 13 | 29 | 3 / 1 | pre `010`, pre `020`, pre `030` |
+| `monty-31` | scoped | 1581 | 329 | 0 | 13 | 29 | 4 / 1 | pre `010`, pre `020`, pre `030`, pre `040` |
 | `multi-stark` | scoped | 338 | 1323 | 0 | 103 | 0 | 3 / 1 | pre `010`, pre `020`, pre `030`, post `010` |
 | `multilinear-util` | scoped | 222 | 1117 | 0 | 75 | 0 | 2 / 0 | pre `010`, pre `020` |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
@@ -77,10 +77,13 @@ A crate extracted again for another target (`[[variant]]` in its `crate.toml`), 
 |---|---|---|---|---:|---:|---:|---:|---:|
 | `baby-bear@x86_64-avx2` | `x86_64-unknown-linux-gnu +avx2` | `P3BabyBearAvx2` | `p3_baby_bear_avx2` | 198 | 127 | 0 | 0 | 1 |
 | `baby-bear@aarch64-neon` | `aarch64-unknown-linux-gnu +neon` | `P3BabyBearNeon` | `p3_baby_bear_neon` | 198 | 127 | 0 | 0 | 1 |
+| `baby-bear@x86_64-avx512` | `x86_64-unknown-linux-gnu +avx512f` | `P3BabyBearAvx512` | `p3_baby_bear_avx512` | 198 | 127 | 0 | 0 | 1 |
 | `field@x86_64-avx2` | `x86_64-unknown-linux-gnu +avx2` | `P3FieldAvx2` | `p3_field` | 85 | 33 | 0 | 0 | 0 |
 | `field@aarch64-neon` | `aarch64-unknown-linux-gnu +neon` | `P3FieldNeon` | `p3_field` | 85 | 33 | 0 | 0 | 0 |
+| `field@x86_64-avx512` | `x86_64-unknown-linux-gnu +avx512f` | `P3FieldAvx512` | `p3_field` | 85 | 34 | 0 | 0 | 0 |
 | `monty-31@x86_64-avx2` | `x86_64-unknown-linux-gnu +avx2` | `P3Monty31Avx2` | `p3_monty_31_avx2` | 426 | 118 | 0 | 0 | 1 |
 | `monty-31@aarch64-neon` | `aarch64-unknown-linux-gnu +neon` | `P3Monty31Neon` | `p3_monty_31_neon` | 428 | 129 | 0 | 0 | 1 |
+| `monty-31@x86_64-avx512` | `x86_64-unknown-linux-gnu +avx512f` | `P3Monty31Avx512` | `p3_monty_31_avx512` | 413 | 118 | 0 | 0 | 1 |
 
 ## Extraction gaps
 
@@ -546,12 +549,22 @@ Nothing translated is dropped.
 charon errors: 0.
 Nothing translated is dropped.
 
+### `baby-bear@x86_64-avx512`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ### `field@x86_64-avx2`
 
 charon errors: 0.
 Nothing translated is dropped.
 
 ### `field@aarch64-neon`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `field@x86_64-avx512`
 
 charon errors: 0.
 Nothing translated is dropped.
@@ -566,12 +579,17 @@ Nothing translated is dropped.
 charon errors: 0.
 Nothing translated is dropped.
 
+### `monty-31@x86_64-avx512`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ## Assumptions
 
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1949) whose dependencies include it; reaching one is not using it.
+(of 1965) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -582,7 +600,10 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 | `arch-shims` | `x86_64.types.M128i.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `arch-shims` | `x86_64.types.M256.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `arch-shims` | `x86_64.types.M256i.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
-| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 104 |
+| `arch-shims` | `x86_64.types.M512.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `arch-shims` | `x86_64.types.M512d.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `arch-shims` | `x86_64.types.M512i.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 120 |
 | `baby-bear` | `mds.MDSBabyBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon2.BabyBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
@@ -627,6 +648,8 @@ layouts (`HaxExt.lean`). A pair with no instance does not elaborate.
 |---|---|---|
 | `monty-31@x86_64-avx2` | `p3_monty_31_avx2.Transmute.m256iToMontyArray` | the layout of `montyArrayToM256i`, read the other way |
 | `monty-31@x86_64-avx2` | `p3_monty_31_avx2.Transmute.montyArrayToM256i` | `MontyField31` is `repr(transparent)` over its `value: u32` (its other field is a `PhantomData`), so the array is eight `u32`s, element `i` at byte `4 i`; and `__m256i`'s lane `i` is bytes `4 i` to `4 i + 3`, as in p3-arch-shims' `repr(transparent)` lane array |
+| `monty-31@x86_64-avx512` | `p3_monty_31_avx512.Transmute.m512iToMontyArray` | the layout of `montyArrayToM512i`, read the other way |
+| `monty-31@x86_64-avx512` | `p3_monty_31_avx512.Transmute.montyArrayToM512i` | `MontyField31` is `repr(transparent)` over its `value: u32` (its other field is a `PhantomData`), so the array is sixteen `u32`s, element `i` at byte `4 i`; and `__m512i`'s lane `i` is bytes `4 i` to `4 i + 3`, as in p3-arch-shims' `repr(transparent)` lane array |
 | `monty-31@aarch64-neon` | `p3_monty_31_neon.Transmute.montyArrayToI32x4` | the layout of `montyArrayToU32x4`, with `int32x4_t`'s lane `i` at the same bytes as `uint32x4_t`'s, as in p3-arch-shims' `repr(transparent)` lane array of `i32`s |
 | `monty-31@aarch64-neon` | `p3_monty_31_neon.Transmute.montyArrayToU32x4` | `MontyField31` is `repr(transparent)` over its `value: u32` (its other field is a `PhantomData`), so the array is four `u32`s, element `i` at byte `4 i`; and `uint32x4_t`'s lane `i` is bytes `4 i` to `4 i + 3`, as in p3-arch-shims' `repr(transparent)` lane array |
 | `monty-31@aarch64-neon` | `p3_monty_31_neon.Transmute.u32x4ToMontyArray` | the layout of `montyArrayToU32x4`, read the other way |
@@ -637,7 +660,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1949) whose dependencies include the declaration.
+counts the claims (of 1965) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -2176,6 +2199,7 @@ counts the claims (of 1949) whose dependencies include the declaration.
 | `monty-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method or constant of `MontyField31`. No existing body changes. |
 | `monty-31/pre/020-redirect-avx2-intrinsics` | none in a normal build: p3-arch-shims is a dependency only under cfg(hax_backend_lean). In the extracted AVX2 variants each intrinsic is its model in `arch/` (p3-arch-shims), trusted: reviewed against Intel's pseudocode and tested against the hardware (`arch/tests/`). |
 | `monty-31/pre/030-redirect-neon-intrinsics` | none in a normal build: every change is behind cfg(hax_backend_lean). In the extracted NEON variants each intrinsic is its model in `arch/` (p3-arch-shims), trusted: reviewed against Arm's pseudocode and tested against the hardware (`arch/tests/neon.rs`). `confuse_compiler`, an optimisation barrier written as an empty `asm!` block, is the identity: a stand-in, listed in TRUST.md. |
+| `monty-31/pre/040-redirect-avx512-intrinsics` | none in a normal build: every change is behind cfg(hax_backend_lean). In the extracted AVX-512 variants each intrinsic is its model in `arch/` (p3-arch-shims), trusted: reviewed against Intel's pseudocode, not yet tested against the hardware (`arch/tests/avx512.rs` needs an AVX-512 CPU). The two `confuse_compiler` barriers are the identity, and the two masked `vmovshdup` `asm!` blocks are the intrinsics for that instruction: stand-ins, listed in TRUST.md. |
 | `multi-stark/pre/010-import-packed-extension-iter` | none: the added items are behind cfg(hax_backend_lean), so a normal build is token for token as shipped. |
 | `multi-stark/pre/020-raw-data-bounds` | none: each added bound is implied by `Field` in a normal build. |
 | `multi-stark/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. No existing body changes. |
@@ -3125,6 +3149,22 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3BabyBear.x86_64_avx2.PackedBabyBearAVX2.sub.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.x86_64_avx2.halve_avx2.lanewise` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.x86_64_avx2.halve_avx2.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx512.BabyBearParameters.MontyParameters.toPortable` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx512.BabyBearParameters.valid` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx512.PackedBabyBearAVX512.add.from_vector_arg` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx512.PackedBabyBearAVX512.add.lanewise` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx512.PackedBabyBearAVX512.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx512.PackedBabyBearAVX512.mul.from_vector_arg` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx512.PackedBabyBearAVX512.mul.lanewise` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx512.PackedBabyBearAVX512.mul.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx512.PackedBabyBearAVX512.neg.from_vector_arg` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx512.PackedBabyBearAVX512.neg.lanewise` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx512.PackedBabyBearAVX512.neg.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx512.PackedBabyBearAVX512.sub.from_vector_arg` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx512.PackedBabyBearAVX512.sub.lanewise` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx512.PackedBabyBearAVX512.sub.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx512.halve_avx512.lanewise` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx512.halve_avx512.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.Proofs.Binary.N128.injective'` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.Proofs.Binary.cantorTower.indep'` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BinaryField.Proofs.Binary.cantorTower.span'` | `Classical.choice`, `Quot.sound`, `propext` |
