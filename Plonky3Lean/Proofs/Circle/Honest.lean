@@ -643,4 +643,137 @@ theorem open_inputs_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) (immcs f
   rw [map_zipIdx_fst (fun i => hs.map fun h => flVals G lb H α L h i),
     map_zipIdx_fst (fun i => (hs.map fun h => (h - 1, friVal G lb H α β L h i)).reverse), hfl]
 
+/-! ## The inputs circle FRI folds -/
+
+/-- The coefficients circle FRI rolls in at round r: the folded DEEP function of height H - r, if it is a height. -/
+noncomputable def friCoeffs (G : Gen (K × K)) (lb H : ℕ) (α β : K) (L : List (HMat K)) (r : ℕ) : ℕ → K :=
+  if H - r ∈ heightsOf lb L then foldCoeffs (deepCoeffs G lb α L (H - r)) β else fun _ => 0
+
+theorem heightsOf_pairwise (lb : ℕ) (L : List (HMat K)) : (heightsOf lb L).Pairwise (· < ·) :=
+  pairwise_lt_mergeSort (Plonky3Lean.Proofs.Fri.keysAfter_spec _ [] List.nodup_nil).1
+
+theorem map_filter_eq_filterMap {α β : Type _} (p : α → Prop) [DecidablePred p] (f : α → β) (g : α → Option β)
+    (l : List α) (h : ∀ a ∈ l, g a = if p a then some (f a) else none) : (l.filter (p ·)).map f = l.filterMap g := by
+  induction l with
+  | nil => rfl
+  | cons a l ih =>
+    have ih' := ih fun b hb => h b (List.mem_cons_of_mem _ hb)
+    rw [List.filterMap_cons, h a List.mem_cons_self]
+    by_cases hp : p a <;> simp [hp, ih']
+
+/-- The honest inputs of a query, tallest first, are the inputs the fold chain rolls in. -/
+theorem friInput_eq_rollsFrom {lb H : ℕ} (α β : K) (L : List (HMat K)) (index : ℕ)
+    (hbd : ∀ h ∈ heightsOf lb L, lb + 2 ≤ h ∧ h ≤ H) :
+    ((heightsOf lb L).map fun h => (h - 1, friVal G lb H α β L h index)).reverse =
+      rollsFrom G (friCoeffs G lb H α β L) (fun r => H - r ∈ heightsOf lb L) (H - 1) (H - (lb + 1))
+        (index / 2) 0 := by
+  set hs := heightsOf lb L
+  have hrev : hs.reverse = ((List.range (H - (lb + 1))).filter fun r => H - r ∈ hs).map (H - ·) := by
+    refine List.Pairwise.eq_of_mem_iff (r := (· > ·)) ?_ ?_ fun h => ?_
+    · exact List.pairwise_reverse.mpr ((heightsOf_pairwise lb L).imp id)
+    · rw [List.pairwise_map]
+      refine (List.pairwise_lt_range.sublist List.filter_sublist).imp_of_mem fun {a b} _ hb hab => ?_
+      have := List.mem_range.mp (List.mem_filter.mp hb).1
+      omega
+    · simp only [List.mem_reverse, List.mem_map, List.mem_filter, List.mem_range, decide_eq_true_eq]
+      constructor
+      · intro hh
+        have := hbd h hh
+        exact ⟨H - h, ⟨by omega, by rwa [show H - (H - h) = h by omega]⟩, by omega⟩
+      · rintro ⟨r, ⟨-, hr⟩, rfl⟩; exact hr
+  rw [← List.map_reverse, hrev, rollsFrom, Nat.sub_zero, List.map_map]
+  simp only [add_zero, List.map_id_fun', id_eq]
+  refine map_filter_eq_filterMap _ _ _ _ fun r hr => ?_
+  have hr' := List.mem_range.mp hr
+  split_ifs with hp
+  · have hp' : H - r ∈ heightsOf lb L := hp
+    simp only [Function.comp_apply, friVal, friCoeffs, hp', ↓reduceIte, show H - (H - r) = r by omega,
+      show H - r - lb - 1 = H - (lb + 1) - r by omega, show H - r - 1 = H - 1 - r by omega]
+  · rfl
+
+/-! ## Completeness of the verifier on honest openings -/
+
+open p3_fri.mirror p3_fri.config.mirror in
+/-- Completeness of the PCS verifier, from honest openings.
+
+Take claims whose checks before the transcript pass, and a transcript that accepts the proof's witnesses.
+
+Take honest claims: columns of degree below the trace size, opened off the LDE domain.
+
+Take honest input openings, first-layer siblings, and the lambdas the prover extracts.
+
+Take honest commit-phase siblings, and the folded constant as the final value.
+
+Take commitment schemes that accept the honest rows.
+
+Then the verifier accepts.
+
+Nothing is assumed about the DEEP quotient: its degree follows from the DEEP quotient lemma. -/
+theorem verify_complete_honest (hV : CircleGenValid G) (h2 : (2 : K) ≠ 0) {S : Type} (immcs fmmcs : MmcsOps K)
+    (tx : CircleVerifierTx K fmmcs.Commitment S) (params : FriParameters)
+    (rounds : List (Claim K immcs.Commitment))
+    (proof : CirclePcsProof K fmmcs.Commitment immcs.MultiProof fmmcs.MultiProof) (s : S) {H : ℕ}
+    (hmax : (claimHeights params.log_blowup rounds).max? = some H) (hlb : params.log_blowup + 1 ≤ H)
+    (had : H < G.adicity) {la : List ℕ}
+    (hshape : validate_proof_shape (ME := fmmcs.Error) (IE := InputError immcs.Error fmmcs.Error) params
+      proof.fri_proof (H - (params.log_blowup + 1)) = pure la)
+    (hbp : ¬ (params.batch_proof_of_work_bits = 0 ∧ proof.batch_pow_witness ≠ 0))
+    {r : Replayed K} (hreplay : replay_transcript (ME := fmmcs.Error) (IE := InputError immcs.Error fmmcs.Error)
+      tx rounds proof s = pure r)
+    (hβ : r.betas.length = H - (params.log_blowup + 1)) (hidx : ∀ i ∈ r.indices, i < 2 ^ H)
+    {hb : List (List (HMat K))} (hc : HonestClaims G params.log_blowup H rounds hb)
+    (hio : List.Forall₂ (fun bo (ms : List (HMat K)) => bo.opened_values = r.indices.map fun i =>
+      ms.map fun m => m.2.map (· (qPt G H i (hgt params.log_blowup m))))
+      proof.fri_proof.input_openings.input_openings hb)
+    (hin : ∀ bc ∈ proof.fri_proof.input_openings.input_openings.zip rounds, immcs.verify_multi_batch
+      bc.2.commitment (inDims params.log_blowup bc.2) (inReduced params.log_blowup H r.indices bc.2)
+      bc.1.opened_values bc.1.opening_proof = .ok ())
+    (hfls : proof.fri_proof.input_openings.first_layer_siblings = r.indices.map fun i =>
+      (heightsOf params.log_blowup hb.flatten).map fun h =>
+        corr G params.log_blowup r.alpha hb.flatten h (-qPt G H i h))
+    (hlam : proof.lambdas = (heightsOf params.log_blowup hb.flatten).map
+      (lamAt G params.log_blowup r.alpha hb.flatten))
+    (hfl : fmmcs.verify_multi_batch proof.first_layer_commitment (if r.indices = [] then [] else
+        (heightsOf params.log_blowup hb.flatten).map fun h => (2, 2 ^ (h - 1))) (r.indices.map (· / 2))
+      (r.indices.map fun i => (heightsOf params.log_blowup hb.flatten).map fun h =>
+        flVals G params.log_blowup H r.alpha hb.flatten h i)
+      proof.fri_proof.input_openings.first_layer_proof = .ok ())
+    (hsv : ∀ k < H - (params.log_blowup + 1), ∀ (q i : ℕ), r.indices[q]? = some i →
+      ((proof.fri_proof.commit_phase_openings.map (·.sibling_values)).getD k [])[q]? =
+        some [xEval (H - (params.log_blowup + 1) - k)
+          (layer (friCoeffs G params.log_blowup H r.alpha r.bivariate_beta hb.flatten) (r.betas.getD · 0) k)
+          (-(sgn (i / 2) k * Xq G (H - 1) (i / 2) k))])
+    (hfinal : proof.fri_proof.final_poly =
+      preLayer (friCoeffs G params.log_blowup H r.alpha r.bivariate_beta hb.flatten) (r.betas.getD · 0)
+        (H - (params.log_blowup + 1)) 0)
+    (hmmcs : ∀ k < H - (params.log_blowup + 1), ∀ (c : fmmcs.Commitment)
+      (o : CommitPhaseMultiStep K fmmcs.MultiProof),
+      proof.fri_proof.commit_phase_commits[k]? = some c → proof.fri_proof.commit_phase_openings[k]? = some o →
+      fmmcs.verify_multi_batch c [(2, 2 ^ (H - 1 - (k + 1)))] (r.indices.map fun i => i / 2 / 2 ^ (k + 1))
+        ((r.indices.map fun i => i / 2 / 2 ^ (k + 1)).map fun j =>
+          [honestWord G (H - 1) (H - (params.log_blowup + 1))
+            (friCoeffs G params.log_blowup H r.alpha r.bivariate_beta hb.flatten) (r.betas.getD · 0) k j])
+          o.opening_proof = .ok ()) :
+    verify G immcs fmmcs tx params rounds proof s = pure () := by
+  set lb := params.log_blowup
+  set L := hb.flatten
+  have hbd : ∀ h ∈ heightsOf lb L, lb + 2 ≤ h ∧ h ≤ H :=
+    fun h hh => heightsOf_bounds hc.log_n hc.height hh
+  have hM : ∀ m ∈ L, m.2.length ≤ ((rounds.flatMap fun c => c.matrices.flatMap fun m =>
+      m.points.map (·.values.length)).max?).getD 0 := fun m hm => by
+    obtain ⟨p, ps, hps⟩ := List.exists_cons_of_ne_nil (hc.points_ne m hm)
+    refine List.le_max?_getD_of_mem ?_
+    obtain ⟨ms, hms, hm'⟩ := List.mem_flatten.mp hm
+    obtain ⟨c, hcr, hcm⟩ := forall₂_mem_right hc.shape ms hms
+    rw [List.mem_flatMap]
+    refine ⟨c, hcr, List.mem_flatMap.mpr ⟨m.1, by rw [hcm]; exact List.mem_map_of_mem hm', ?_⟩⟩
+    rw [hps, List.map_cons, hc.values m hm p (by rw [hps]; exact List.mem_cons_self), List.length_map]
+    exact List.mem_cons_self
+  refine verify_complete hV h2 immcs fmmcs tx params rounds proof s hmax hlb had hshape hbp hreplay
+    (friCoeffs G lb H r.alpha r.bivariate_beta L) (fun r' => H - r' ∈ heightsOf lb L)
+    (fun r' hr' => by simp [friCoeffs, hr']) hβ ?_ hsv hfinal hmmcs
+  rw [open_inputs_honest hV h2 immcs fmmcs r.alpha r.bivariate_beta (validate_proof_shape_spec hshape).2.blowup (by omega) hc hM
+    proof.first_layer_commitment hlam hidx proof.fri_proof.input_openings hio hin hfls hfl]
+  exact congrArg pure (List.map_congr_left fun i _ => friInput_eq_rollsFrom r.alpha r.bivariate_beta L i hbd)
+
 end Plonky3Lean.Proofs.Circle
