@@ -10,9 +10,18 @@ on each transcription.
 ## 1. The Lean kernel and toolchain
 
 Pinned in `lean-toolchain` to an official `leanprover/lean4` release. Claims are
-checked by the kernel. Where a proof uses `native_decide`, the compiled evaluator
-is trusted as well, and the claim's axioms in `claims.toml` show
-`Lean.ofReduceBool`.
+checked by the kernel, except where a proof reaches the compiled evaluator, which
+is then trusted too. `native_decide` always reaches it, and `bv_decide` does
+whenever it calls the SAT solver: the solver's certificate is checked by a
+verified checker, but that check runs compiled, not in the kernel. Each adds an
+axiom `<declaration>._native.<tactic>.ax_<n>_<m>`, which states that the compiled
+code returned `true` for that one invocation, and `claims.toml` records it like
+any other axiom.
+
+No proof here uses `native_decide`. Two use `bv_decide`: one is closed by
+`bv_normalize` and adds nothing, and `clear_msb_toNat` calls the solver, which is
+why `P3Mersenne31.mersenne_31.Mersenne31.from_int_u32.toField` is the one claim
+whose axioms are not just `propext`, `Quot.sound` and `Classical.choice`.
 
 ## 2. The Lean libraries the generated code imports
 
