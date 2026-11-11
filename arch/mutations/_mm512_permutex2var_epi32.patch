@@ -1,0 +1,15 @@
+# Mutation of: _mm512_permutex2var_epi32
+# Breaks:      it reads the table selector from `idx` bit 5 instead of bit 4.
+# Miri:        Miri does not implement `vpermi2d` or `vpermi2q`.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -713,7 +713,7 @@
+     let mut j = 0;
+     while j < 16 {
+         let off = (idx.0[j] & 0xf) as usize;
+-        dst[j] = if (idx.0[j] >> 4) & 1 == 1 {
++        dst[j] = if (idx.0[j] >> 5) & 1 == 1 {
+             b.0[off]
+         } else {
+             a.0[off]

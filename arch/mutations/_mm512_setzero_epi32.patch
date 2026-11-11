@@ -1,0 +1,14 @@
+# Mutation of: _mm512_setzero_epi32
+# Breaks:      it sets every bit.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -761,7 +761,7 @@
+ /// `dst[MAX:0] := 0`
+ #[inline]
+ pub unsafe fn _mm512_setzero_epi32() -> __m512i {
+-    __m512i([0u32; 16])
++    __m512i([u32::MAX; 16])
+ }
+ 
+ /// `_mm512_castsi512_ps`: a reinterpretation, no instruction. "This intrinsic is only used for

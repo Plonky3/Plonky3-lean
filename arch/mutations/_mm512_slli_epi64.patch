@@ -1,0 +1,14 @@
+# Mutation of: _mm512_slli_epi64
+# Breaks:      it zeroes the result from a shift of 32, as for 32-bit lanes.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -272,7 +272,7 @@
+     let mut dst = [0u32; 16];
+     let mut k = 0;
+     while k < 8 {
+-        let v = if s > 63 { 0 } else { lane64(&a.0, k) << s };
++        let v = if s > 31 { 0 } else { lane64(&a.0, k) << s };
+         let (lo, hi) = split64(v);
+         dst[2 * k] = lo;
+         dst[2 * k + 1] = hi;

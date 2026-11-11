@@ -1,0 +1,14 @@
+# Mutation of: _mm512_mask_blend_epi64
+# Breaks:      it takes `a` where the mask bit is set.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -433,7 +433,7 @@
+     let mut dst = [0u32; 16];
+     let mut j = 0;
+     while j < 8 {
+-        let src = if bit8(k, j) { b.0 } else { a.0 };
++        let src = if bit8(k, j) { a.0 } else { b.0 };
+         dst[2 * j] = src[2 * j];
+         dst[2 * j + 1] = src[2 * j + 1];
+         j += 1;

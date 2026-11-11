@@ -1,0 +1,29 @@
+# Patch:        010-restore-dropped-default-methods
+# Phase:        post
+# Target:       extraction/P3Monty31Avx512/Extraction/Funs.lean
+# Hunks:        1
+# Class:        restore
+# Gap:          docs/extractor-issues.md 2: charon's multi-target mode
+#               (`--targets`) drops the default-method roots hax adds
+#               (`core::clone::Clone::clone_from`).
+# Cost:         none. The added field is the body of the CoreModels default
+#               method it stands for (`clone.Clone.clone_from.default`),
+#               inlined.
+# Upstreamable: yes: as for monty-31's post 010.
+# Drop when:    as for monty-31's post 010.
+#
+# The variant re-emits the derived `Clone` impl of `MontyField31`, which comes
+# out without `clone_from`, as described in monty-31's post 010:
+#   clone_from := fun _ source => <clone> source        (= clone_from.default)
+#
+--- a/extraction/P3Monty31Avx512/Extraction/Funs.lean
++++ b/extraction/P3Monty31Avx512/Extraction/Funs.lean
+@@ -50,6 +50,8 @@
+   := {
+   clone := monty_31.MontyField31.Insts.CoreCloneClone.clone corecloneCloneInst
+     data_traitsMontyParametersInst
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => (monty_31.MontyField31.Insts.CoreCloneClone.clone corecloneCloneInst data_traitsMontyParametersInst) source
+ }
+ 
+ /-- [p3_monty_31::x86_64_avx512::packing::EVENS]

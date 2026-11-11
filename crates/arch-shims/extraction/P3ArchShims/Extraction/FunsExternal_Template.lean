@@ -65,7 +65,7 @@ axiom aarch64.types.U32x2.Insts.CoreFmtDebug.fmt
     core.fmt.Formatter))
 
 /-- [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M256i}::fmt]:
-    Source: 'src/x86_64/types.rs', lines 33:12-35:13; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 40:0-40:30
+    Source: 'src/x86_64/types.rs', lines 58:12-60:13; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 65:0-65:30
     Visibility: public -/
 axiom x86_64.types.M256i.Insts.CoreFmtDebug.fmt
   :
@@ -74,7 +74,7 @@ axiom x86_64.types.M256i.Insts.CoreFmtDebug.fmt
     core.fmt.Formatter))
 
 /-- [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M128i}::fmt]:
-    Source: 'src/x86_64/types.rs', lines 33:12-35:13; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 41:0-41:30
+    Source: 'src/x86_64/types.rs', lines 58:12-60:13; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 66:0-66:30
     Visibility: public -/
 axiom x86_64.types.M128i.Insts.CoreFmtDebug.fmt
   :
@@ -83,11 +83,38 @@ axiom x86_64.types.M128i.Insts.CoreFmtDebug.fmt
     core.fmt.Formatter))
 
 /-- [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M256}::fmt]:
-    Source: 'src/x86_64/types.rs', lines 33:12-35:13; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 42:0-42:28
+    Source: 'src/x86_64/types.rs', lines 58:12-60:13; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 67:0-67:28
     Visibility: public -/
 axiom x86_64.types.M256.Insts.CoreFmtDebug.fmt
   :
   x86_64.types.M256 → core.fmt.Formatter → RustM ((core.result.Result Unit
+    core.fmt.Error) × core.fmt.Formatter × (core.fmt.Formatter →
+    core.fmt.Formatter))
+
+/-- [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M512i}::fmt]:
+    Source: 'src/x86_64/types.rs', lines 58:12-60:13; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 68:0-68:30
+    Visibility: public -/
+axiom x86_64.types.M512i.Insts.CoreFmtDebug.fmt
+  :
+  x86_64.types.M512i → core.fmt.Formatter → RustM ((core.result.Result Unit
+    core.fmt.Error) × core.fmt.Formatter × (core.fmt.Formatter →
+    core.fmt.Formatter))
+
+/-- [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M512}::fmt]:
+    Source: 'src/x86_64/types.rs', lines 58:12-60:13; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 69:0-69:28
+    Visibility: public -/
+axiom x86_64.types.M512.Insts.CoreFmtDebug.fmt
+  :
+  x86_64.types.M512 → core.fmt.Formatter → RustM ((core.result.Result Unit
+    core.fmt.Error) × core.fmt.Formatter × (core.fmt.Formatter →
+    core.fmt.Formatter))
+
+/-- [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M512d}::fmt]:
+    Source: 'src/x86_64/types.rs', lines 72:4-74:5
+    Visibility: public -/
+axiom x86_64.types.M512d.Insts.CoreFmtDebug.fmt
+  :
+  x86_64.types.M512d → core.fmt.Formatter → RustM ((core.result.Result Unit
     core.fmt.Error) × core.fmt.Formatter × (core.fmt.Formatter →
     core.fmt.Formatter))
 

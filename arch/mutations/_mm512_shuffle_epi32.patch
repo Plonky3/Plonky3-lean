@@ -1,0 +1,14 @@
+# Mutation of: _mm512_shuffle_epi32
+# Breaks:      it selects from the low 128 bits for every 128-bit lane.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -641,7 +641,7 @@
+         let lane = j / 4;
+         let e = j % 4;
+         let sel = ((control >> (2 * e)) & 3) as usize;
+-        dst[j] = a.0[4 * lane + sel];
++        dst[j] = a.0[sel];
+         j += 1;
+     }
+     __m512i(dst)

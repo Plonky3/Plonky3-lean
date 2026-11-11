@@ -6,11 +6,13 @@ public import P3Monty31Avx2
 public import P3BabyBearAvx2
 public import P3Monty31Neon
 public import P3BabyBearNeon
+public import P3Monty31Avx512
+public import P3BabyBearAvx512
 
 @[expose] public section
 
 /-!
-# Packed Monty31: what a `PackedMontyField31AVX2` or `PackedMontyField31Neon` means
+# Packed Monty31: what an AVX2, NEON or AVX-512 `PackedMontyField31` means
 
 p3-monty-31's AVX2 backend packs eight `MontyField31` into one `__m256i`. Its model is
 the `P3Monty31Avx2` variant (`crates/monty-31/variants/x86_64-avx2`), in the namespace
@@ -32,7 +34,8 @@ the `P3Monty31Avx2` variant (`crates/monty-31/variants/x86_64-avx2`), in the nam
   (`P3BabyBearAvx2`, `crates/baby-bear/variants/x86_64-avx2`) extracts for
   `BabyBearParameters`. Each is an alias of a generated name and adds nothing to it.
 
-The NEON backend's readings, at width 4, are in `Neon` (below).
+The NEON backend's readings, at width 4, are in `Neon`, and the AVX-512 backend's, at width
+16, in `Avx512` (below).
 -/
 
 open Aeneas Aeneas.Std CoreModels
@@ -186,5 +189,82 @@ noncomputable abbrev BabyBearMontyParamsNeon :=
   p3_baby_bear_neon.baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsMontyParameters
 
 end Neon
+
+/-! ## AVX-512
+
+p3-monty-31's AVX-512 backend packs sixteen `MontyField31` into one `__m512i`. Its model is the
+`P3Monty31Avx512` variant (`crates/monty-31/variants/x86_64-avx512`), in the namespace
+`p3_monty_31_avx512`; its `MontyField31` is P3Monty31's. The readings are AVX2's at width 16,
+in the namespace `Plonky3Lean.Spec.Packed.Avx512`. -/
+
+namespace Avx512
+
+/-- Rust's `PackedMontyField31AVX512<MP>`: sixteen `MontyField31<MP>`. -/
+abbrev PackedAvx512 (MP : Type) :=
+  p3_monty_31_avx512.x86_64_avx512.packing.PackedMontyField31AVX512 MP
+
+/-- An `__m512i`, as p3-arch-shims models it: sixteen `u32` lanes. -/
+abbrev M512i := p3_arch_shims.x86_64.types.M512i
+
+/-- A packed value as the vector of its lanes. -/
+def toVector {MP : Type} (x : PackedAvx512 MP) : Vector (Monty31.Element MP) 16 :=
+  ⟨x.val.toArray, by simp⟩
+
+/-- Every lane of a packed value is canonical, `< p`. -/
+def Canonical {MP : Type} (p : ℕ) (x : PackedAvx512 MP) : Prop :=
+  ∀ i : Fin 16, Monty31.Canonical p (toVector x)[i]
+
+/-- Lane `i` of an `__m512i`. -/
+def lane (v : M512i) (i : Fin 16) : Std.U32 :=
+  v.val[i.val]!
+
+/-- Every lane of the vector is canonical, in `0..p`. This implies the safety condition of
+`PackedMontyField31AVX512::from_vector`, which documents the weaker "each element of vector must
+be in `0..=P`". -/
+def FromVectorSafe (p : ℕ) (v : M512i) : Prop :=
+  ∀ i : Fin 16, (lane v i).val < p
+
+/-- The variant's `MontyParameters` dictionary, read as P3Monty31's: the same members. -/
+def toPortable {MP : Type} (inst : p3_monty_31_avx512.data_traits.MontyParameters MP) :
+    p3_monty_31.data_traits.MontyParameters MP where
+  PRIME := inst.PRIME
+  MONTY_BITS := inst.MONTY_BITS
+  MONTY_MU := inst.MONTY_MU
+  MONTY_MASK := inst.MONTY_MASK
+  coremarkerCopyInst := inst.coremarkerCopyInst
+  coredefaultDefaultInst := inst.coredefaultDefaultInst
+  corefmtDebugInst := inst.corefmtDebugInst
+  corecmpEqInst := inst.corecmpEqInst
+  corecmpPartialEqInst := inst.corecmpPartialEqInst
+  corehashHashInst := inst.corehashHashInst
+
+/-- The parameters of a `PackedMontyParameters` impl on x86_64 with AVX-512F: valid
+`MontyParameters` (`Monty31.Valid`, through `toPortable`), and `PACKED_P` and `PACKED_MU`
+holding `p = PRIME` and `mu = MONTY_MU` in every lane, which `MontyParametersAVX512` documents
+and nothing checks. -/
+structure Valid {MP : Type} (inst : p3_monty_31_avx512.data_traits.PackedMontyParameters MP)
+    (p mu : Std.U32) : Prop where
+  monty : Monty31.Valid (toPortable inst.MontyParametersInst) p mu
+  packed_p : ∃ v, inst.x86_64_avx512packingMontyParametersAVX512Inst.PACKED_P = .ok v ∧
+    ∀ i, lane v i = p
+  packed_mu : ∃ v, inst.x86_64_avx512packingMontyParametersAVX512Inst.PACKED_MU = .ok v ∧
+    ∀ i, lane v i = mu
+
+/-! ### BabyBear -/
+
+/-- Rust's `PackedBabyBearAVX512 = PackedMontyField31AVX512<BabyBearParameters>`. -/
+abbrev PackedBabyBearAVX512 := PackedAvx512 p3_baby_bear.baby_bear.BabyBearParameters
+
+/-- The `PackedMontyParameters` dictionary the baby-bear variant extracts for
+`BabyBearParameters` on x86_64 with AVX-512F: its `MontyParameters` and its
+`MontyParametersAVX512` (`PACKED_P`, `PACKED_MU`, `baby-bear/src/x86_64_avx512/packing.rs`). -/
+noncomputable abbrev BabyBearPackedParams :=
+  p3_baby_bear_avx512.baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsPackedMontyParameters
+
+/-- Its `MontyParameters` dictionary, in the monty-31 variant's record. -/
+noncomputable abbrev BabyBearMontyParamsAvx512 :=
+  p3_baby_bear_avx512.baby_bear.BabyBearParameters.Insts.P3_monty_31Data_traitsMontyParameters
+
+end Avx512
 
 end Plonky3Lean.Spec.Packed

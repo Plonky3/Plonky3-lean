@@ -1,0 +1,14 @@
+# Mutation of: _mm512_movehdup_ps
+# Breaks:      it copies the even lanes in the low 128 bits (`vmovsldup`).
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -578,7 +578,7 @@
+ #[inline]
+ pub unsafe fn _mm512_movehdup_ps(a: __m512) -> __m512 {
+     __m512([
+-        a.0[1], a.0[1], a.0[3], a.0[3], a.0[5], a.0[5], a.0[7], a.0[7], a.0[9], a.0[9], a.0[11],
++        a.0[0], a.0[0], a.0[2], a.0[2], a.0[5], a.0[5], a.0[7], a.0[7], a.0[9], a.0[9], a.0[11],
+         a.0[11], a.0[13], a.0[13], a.0[15], a.0[15],
+     ])
+ }

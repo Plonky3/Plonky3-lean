@@ -56,15 +56,33 @@ def aarch64.types.U64x2 := Array Std.U64 2#usize
 def x86_64.types.M256i := Array Std.U32 8#usize
 
 /-- [p3_arch_shims::x86_64::types::M256]
-    Source: 'src/x86_64/types.rs', lines 27:0-27:30
+    Source: 'src/x86_64/types.rs', lines 52:0-52:30
     Visibility: public -/
 @[reducible]
 def x86_64.types.M256 := Array Std.U32 8#usize
 
 /-- [p3_arch_shims::x86_64::types::M128i]
-    Source: 'src/x86_64/types.rs', lines 21:0-21:31
+    Source: 'src/x86_64/types.rs', lines 46:0-46:31
     Visibility: public -/
 @[reducible]
 def x86_64.types.M128i := Array Std.U32 4#usize
+
+/-- [p3_arch_shims::x86_64::types::M512i]
+    Source: 'src/x86_64/types.rs', lines 21:0-21:32
+    Visibility: public -/
+@[reducible]
+def x86_64.types.M512i := Array Std.U32 16#usize
+
+/-- [p3_arch_shims::x86_64::types::M512]
+    Source: 'src/x86_64/types.rs', lines 27:0-27:31
+    Visibility: public -/
+@[reducible]
+def x86_64.types.M512 := Array Std.U32 16#usize
+
+/-- [p3_arch_shims::x86_64::types::M512d]
+    Source: 'src/x86_64/types.rs', lines 33:0-33:31
+    Visibility: public -/
+@[reducible]
+def x86_64.types.M512d := Array Std.U64 8#usize
 
 end p3_arch_shims

@@ -1,0 +1,17 @@
+# Mutation of: _mm512_sub_epi64
+# Breaks:      it subtracts the 32-bit halves apart, dropping the borrow between them.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -109,7 +109,10 @@
+     let mut dst = [0u32; 16];
+     let mut k = 0;
+     while k < 8 {
+-        let (lo, hi) = split64(lane64(&a.0, k).wrapping_sub(lane64(&b.0, k)));
++        let (lo, hi) = (
++            a.0[2 * k].wrapping_sub(b.0[2 * k]),
++            a.0[2 * k + 1].wrapping_sub(b.0[2 * k + 1]),
++        );
+         dst[2 * k] = lo;
+         dst[2 * k + 1] = hi;
+         k += 1;

@@ -1,0 +1,14 @@
+# Mutation of: _mm512_mask_sub_epi32
+# Breaks:      it takes the unselected lanes from `a` instead of `src`.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -361,7 +361,7 @@
+         dst[j] = if bit16(k, j) {
+             a.0[j].wrapping_sub(b.0[j])
+         } else {
+-            src.0[j]
++            a.0[j]
+         };
+         j += 1;
+     }

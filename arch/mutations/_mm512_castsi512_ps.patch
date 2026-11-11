@@ -1,0 +1,16 @@
+# Mutation of: _mm512_castsi512_ps
+# Breaks:      it swaps lanes 0 and 1.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -768,7 +768,9 @@
+ /// compilation and does not generate any instructions, thus it has zero latency."
+ #[inline]
+ pub unsafe fn _mm512_castsi512_ps(a: __m512i) -> __m512 {
+-    __m512(a.0)
++    let mut l = a.0;
++    l.swap(0, 1);
++    __m512(l)
+ }
+ 
+ /// `_mm512_castps_si512`: a reinterpretation, no instruction (as for `_mm512_castsi512_ps`).

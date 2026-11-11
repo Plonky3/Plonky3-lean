@@ -102,6 +102,7 @@ public import Plonky3Lean.Proofs.Symmetric.Roots
 public import Plonky3Lean.Proofs.Field.BabyBear
 public import Plonky3Lean.Proofs.Field.BabyBear.Arith
 public import Plonky3Lean.Proofs.Field.BabyBear.Avx2
+public import Plonky3Lean.Proofs.Field.BabyBear.Avx512
 public import Plonky3Lean.Proofs.Field.BabyBear.Constants
 public import Plonky3Lean.Proofs.Field.BabyBear.Element
 public import Plonky3Lean.Proofs.Field.BabyBear.Extension
@@ -179,6 +180,9 @@ public import Plonky3Lean.Proofs.Field.Mersenne31.Sum
 public import Plonky3Lean.Proofs.Field.Avx2.Shims
 public import Plonky3Lean.Proofs.Field.Avx2.Kernels
 public import Plonky3Lean.Proofs.Field.Avx2.Packing
+public import Plonky3Lean.Proofs.Field.Avx512.Shims
+public import Plonky3Lean.Proofs.Field.Avx512.Kernels
+public import Plonky3Lean.Proofs.Field.Avx512.Packing
 public import Plonky3Lean.Proofs.Field.Neon.Shims
 public import Plonky3Lean.Proofs.Field.Neon.Kernels
 public import Plonky3Lean.Proofs.Field.Neon.Packing

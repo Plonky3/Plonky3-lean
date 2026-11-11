@@ -3006,6 +3006,2063 @@ def x86_64.avx2._mm_set1_epi32 (a : Std.I32) : RustM x86_64.types.M128i := do
   let a1 ← core.array.repeat 4#usize core.U32.Insts.CoreCloneClone i
   ok a1
 
+/-- [p3_arch_shims::x86_64::avx512::lane64]:
+    Source: 'src/x86_64/avx512.rs', lines 27:0-29:1 -/
+def x86_64.avx512.lane64
+  (a : Array Std.U32 16#usize) (k : Std.Usize) : RustM Std.U64 := do
+  let i ← 2#usize * k
+  let i1 ← Array.index_usize a i
+  let i2 ← lift (UScalar.cast .U64 i1)
+  let i3 ← i + 1#usize
+  let i4 ← Array.index_usize a i3
+  let i5 ← lift (UScalar.cast .U64 i4)
+  let i6 ← i5 <<< 32#i32
+  ok (i2 ||| i6)
+
+/-- [p3_arch_shims::x86_64::avx512::split64]:
+    Source: 'src/x86_64/avx512.rs', lines 32:0-34:1 -/
+def x86_64.avx512.split64 (v : Std.U64) : RustM (Std.U32 × Std.U32) := do
+  let i ← lift (UScalar.cast .U32 v)
+  let i1 ← v >>> 32#i32
+  let i2 ← lift (UScalar.cast .U32 i1)
+  ok (i, i2)
+
+/-- [p3_arch_shims::x86_64::avx512::imm8]:
+    Source: 'src/x86_64/avx512.rs', lines 37:0-39:1 -/
+def x86_64.avx512.imm8 (imm : Std.I32) : RustM Std.U32 := do
+  let i ← lift (IScalar.hcast .U32 imm)
+  ok (i &&& 255#u32)
+
+/-- [p3_arch_shims::x86_64::avx512::imm8u]:
+    Source: 'src/x86_64/avx512.rs', lines 42:0-44:1 -/
+def x86_64.avx512.imm8u (imm : Std.U32) : RustM Std.U32 := do
+  ok (imm &&& 255#u32)
+
+/-- [p3_arch_shims::x86_64::avx512::bit16]:
+    Source: 'src/x86_64/avx512.rs', lines 47:0-49:1 -/
+def x86_64.avx512.bit16 (k : Std.U16) (j : Std.Usize) : RustM Bool := do
+  let i ← k >>> j
+  let i1 ← lift (i &&& 1#u16)
+  ok (i1 = 1#u16)
+
+/-- [p3_arch_shims::x86_64::avx512::bit8]:
+    Source: 'src/x86_64/avx512.rs', lines 52:0-54:1 -/
+def x86_64.avx512.bit8 (k : Std.U8) (j : Std.Usize) : RustM Bool := do
+  let i ← k >>> j
+  let i1 ← lift (i &&& 1#u8)
+  ok (i1 = 1#u8)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_add_epi32]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 67:4-70:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_add_epi32_loop.body
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × (Array
+    Std.U32 16#usize) × Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if j < 16#usize
+  then
+    let i ← Array.index_usize a j
+    let i1 ← Array.index_usize b j
+    let i2 ← core.num.U32.wrapping_add i i1
+    let a1 ← Array.update dst j i2
+    let j1 ← j + 1#usize
+    ok (cont (a, b, a1, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_add_epi32]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 67:4-70:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_add_epi32_loop
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, j1) => x86_64.avx512._mm512_add_epi32_loop.body a1 b1
+      dst1 j1)
+    (a, b, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_add_epi32]:
+    Source: 'src/x86_64/avx512.rs', lines 64:0-72:1
+    Visibility: public -/
+def x86_64.avx512._mm512_add_epi32
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_add_epi32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_sub_epi32]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 81:4-84:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_sub_epi32_loop.body
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × (Array
+    Std.U32 16#usize) × Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if j < 16#usize
+  then
+    let i ← Array.index_usize a j
+    let i1 ← Array.index_usize b j
+    let i2 ← core.num.U32.wrapping_sub i i1
+    let a1 ← Array.update dst j i2
+    let j1 ← j + 1#usize
+    ok (cont (a, b, a1, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_sub_epi32]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 81:4-84:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_sub_epi32_loop
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, j1) => x86_64.avx512._mm512_sub_epi32_loop.body a1 b1
+      dst1 j1)
+    (a, b, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_sub_epi32]:
+    Source: 'src/x86_64/avx512.rs', lines 78:0-86:1
+    Visibility: public -/
+def x86_64.avx512._mm512_sub_epi32
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_sub_epi32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_add_epi64]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 95:4-100:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_add_epi64_loop.body
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (k : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × (Array
+    Std.U32 16#usize) × Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if k < 8#usize
+  then
+    let i ← x86_64.avx512.lane64 a k
+    let i1 ← x86_64.avx512.lane64 b k
+    let i2 ← core.num.U64.wrapping_add i i1
+    let (lo, hi) ← x86_64.avx512.split64 i2
+    let i3 ← 2#usize * k
+    let dst1 ← Array.update dst i3 lo
+    let i4 ← i3 + 1#usize
+    let a1 ← Array.update dst1 i4 hi
+    let k1 ← k + 1#usize
+    ok (cont (a, b, a1, k1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_add_epi64]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 95:4-100:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_add_epi64_loop
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (k : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, k1) => x86_64.avx512._mm512_add_epi64_loop.body a1 b1
+      dst1 k1)
+    (a, b, dst, k)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_add_epi64]:
+    Source: 'src/x86_64/avx512.rs', lines 92:0-102:1
+    Visibility: public -/
+def x86_64.avx512._mm512_add_epi64
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_add_epi64_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_sub_epi64]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 111:4-116:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_sub_epi64_loop.body
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (k : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × (Array
+    Std.U32 16#usize) × Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if k < 8#usize
+  then
+    let i ← x86_64.avx512.lane64 a k
+    let i1 ← x86_64.avx512.lane64 b k
+    let i2 ← core.num.U64.wrapping_sub i i1
+    let (lo, hi) ← x86_64.avx512.split64 i2
+    let i3 ← 2#usize * k
+    let dst1 ← Array.update dst i3 lo
+    let i4 ← i3 + 1#usize
+    let a1 ← Array.update dst1 i4 hi
+    let k1 ← k + 1#usize
+    ok (cont (a, b, a1, k1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_sub_epi64]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 111:4-116:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_sub_epi64_loop
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (k : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, k1) => x86_64.avx512._mm512_sub_epi64_loop.body a1 b1
+      dst1 k1)
+    (a, b, dst, k)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_sub_epi64]:
+    Source: 'src/x86_64/avx512.rs', lines 108:0-118:1
+    Visibility: public -/
+def x86_64.avx512._mm512_sub_epi64
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_sub_epi64_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_min_epu32]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 128:4-131:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_min_epu32_loop.body
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × (Array
+    Std.U32 16#usize) × Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if j < 16#usize
+  then
+    let i ← Array.index_usize a j
+    let i1 ← Array.index_usize b j
+    let i2 ← if i <= i1
+               then ok i
+               else ok i1
+    let a1 ← Array.update dst j i2
+    let j1 ← j + 1#usize
+    ok (cont (a, b, a1, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_min_epu32]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 128:4-131:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_min_epu32_loop
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, j1) => x86_64.avx512._mm512_min_epu32_loop.body a1 b1
+      dst1 j1)
+    (a, b, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_min_epu32]:
+    Source: 'src/x86_64/avx512.rs', lines 125:0-133:1
+    Visibility: public -/
+def x86_64.avx512._mm512_min_epu32
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_min_epu32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mul_epu32]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 143:4-148:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_mul_epu32_loop.body
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (k : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × (Array
+    Std.U32 16#usize) × Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if k < 8#usize
+  then
+    let i ← 2#usize * k
+    let i1 ← Array.index_usize a i
+    let i2 ← lift (UScalar.cast .U64 i1)
+    let i3 ← Array.index_usize b i
+    let i4 ← lift (UScalar.cast .U64 i3)
+    let i5 ← i2 * i4
+    let (lo, hi) ← x86_64.avx512.split64 i5
+    let dst1 ← Array.update dst i lo
+    let i6 ← i + 1#usize
+    let a1 ← Array.update dst1 i6 hi
+    let k1 ← k + 1#usize
+    ok (cont (a, b, a1, k1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mul_epu32]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 143:4-148:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_mul_epu32_loop
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (k : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, k1) => x86_64.avx512._mm512_mul_epu32_loop.body a1 b1
+      dst1 k1)
+    (a, b, dst, k)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mul_epu32]:
+    Source: 'src/x86_64/avx512.rs', lines 140:0-150:1
+    Visibility: public -/
+def x86_64.avx512._mm512_mul_epu32
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_mul_epu32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mul_epi32]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 160:4-166:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_mul_epi32_loop.body
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (k : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × (Array
+    Std.U32 16#usize) × Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if k < 8#usize
+  then
+    let i ← 2#usize * k
+    let i1 ← Array.index_usize a i
+    let i2 ← lift (UScalar.hcast .I32 i1)
+    let i3 ← lift (IScalar.cast .I64 i2)
+    let i4 ← Array.index_usize b i
+    let i5 ← lift (UScalar.hcast .I32 i4)
+    let i6 ← lift (IScalar.cast .I64 i5)
+    let p ← i3 * i6
+    let i7 ← lift (IScalar.hcast .U64 p)
+    let (lo, hi) ← x86_64.avx512.split64 i7
+    let dst1 ← Array.update dst i lo
+    let i8 ← i + 1#usize
+    let a1 ← Array.update dst1 i8 hi
+    let k1 ← k + 1#usize
+    ok (cont (a, b, a1, k1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mul_epi32]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 160:4-166:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_mul_epi32_loop
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (k : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, k1) => x86_64.avx512._mm512_mul_epi32_loop.body a1 b1
+      dst1 k1)
+    (a, b, dst, k)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mul_epi32]:
+    Source: 'src/x86_64/avx512.rs', lines 157:0-168:1
+    Visibility: public -/
+def x86_64.avx512._mm512_mul_epi32
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_mul_epi32_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_and_si512]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 177:4-180:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_and_si512_loop.body
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × (Array
+    Std.U32 16#usize) × Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if j < 16#usize
+  then
+    let i ← Array.index_usize a j
+    let i1 ← Array.index_usize b j
+    let i2 ← lift (i &&& i1)
+    let a1 ← Array.update dst j i2
+    let j1 ← j + 1#usize
+    ok (cont (a, b, a1, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_and_si512]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 177:4-180:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_and_si512_loop
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, j1) => x86_64.avx512._mm512_and_si512_loop.body a1 b1
+      dst1 j1)
+    (a, b, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_and_si512]:
+    Source: 'src/x86_64/avx512.rs', lines 174:0-182:1
+    Visibility: public -/
+def x86_64.avx512._mm512_and_si512
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_and_si512_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_madd_epi16]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 193:4-200:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_madd_epi16_loop.body
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × (Array
+    Std.U32 16#usize) × Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if j < 16#usize
+  then
+    let i ← Array.index_usize a j
+    let i1 ← lift (i &&& 65535#u32)
+    let i2 ← lift (UScalar.cast .U16 i1)
+    let i3 ← lift (UScalar.hcast .I16 i2)
+    let a_lo ← lift (IScalar.cast .I32 i3)
+    let i4 ← i >>> 16#i32
+    let i5 ← lift (UScalar.cast .U16 i4)
+    let i6 ← lift (UScalar.hcast .I16 i5)
+    let a_hi ← lift (IScalar.cast .I32 i6)
+    let i7 ← Array.index_usize b j
+    let i8 ← lift (i7 &&& 65535#u32)
+    let i9 ← lift (UScalar.cast .U16 i8)
+    let i10 ← lift (UScalar.hcast .I16 i9)
+    let b_lo ← lift (IScalar.cast .I32 i10)
+    let i11 ← i7 >>> 16#i32
+    let i12 ← lift (UScalar.cast .U16 i11)
+    let i13 ← lift (UScalar.hcast .I16 i12)
+    let b_hi ← lift (IScalar.cast .I32 i13)
+    let i14 ← a_hi * b_hi
+    let i15 ← a_lo * b_lo
+    let i16 ← core.num.I32.wrapping_add i14 i15
+    let i17 ← lift (IScalar.hcast .U32 i16)
+    let a1 ← Array.update dst j i17
+    let j1 ← j + 1#usize
+    ok (cont (a, b, a1, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_madd_epi16]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 193:4-200:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_madd_epi16_loop
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, j1) => x86_64.avx512._mm512_madd_epi16_loop.body a1 b1
+      dst1 j1)
+    (a, b, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_madd_epi16]:
+    Source: 'src/x86_64/avx512.rs', lines 190:0-202:1
+    Visibility: public -/
+def x86_64.avx512._mm512_madd_epi16
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_madd_epi16_loop a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::saturate16]:
+    Source: 'src/x86_64/avx512.rs', lines 205:0-213:1 -/
+def x86_64.avx512.saturate16 (x : Std.I32) : RustM Std.I32 := do
+  if x > 32767#i32
+  then ok 32767#i32
+  else if x < (-32768)#i32
+       then ok (-32768)#i32
+       else ok x
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_maddubs_epi16]: loop body 1:
+    Source: 'src/x86_64/avx512.rs', lines 228:8-238:9
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_maddubs_epi16_loop0_loop0.body
+  (j : Std.Usize) (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (word : Std.U32) (h : Std.I32) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × Std.U32 ×
+    Std.I32) (x86_64.types.M512i × x86_64.types.M512i × Std.U32))
+  := do
+  if h < 2#i32
+  then
+    let s0 ← 16#i32 * h
+    let s1 ← s0 + 8#i32
+    let i ← Array.index_usize a j
+    let i1 ← i >>> s0
+    let i2 ← lift (i1 &&& 255#u32)
+    let a0 ← lift (UScalar.hcast .I32 i2)
+    let i3 ← i >>> s1
+    let i4 ← lift (i3 &&& 255#u32)
+    let a1 ← lift (UScalar.hcast .I32 i4)
+    let i5 ← Array.index_usize b j
+    let i6 ← i5 >>> s0
+    let i7 ← lift (i6 &&& 255#u32)
+    let i8 ← lift (UScalar.cast .U8 i7)
+    let i9 ← lift (UScalar.hcast .I8 i8)
+    let b0 ← lift (IScalar.cast .I32 i9)
+    let i10 ← i5 >>> s1
+    let i11 ← lift (i10 &&& 255#u32)
+    let i12 ← lift (UScalar.cast .U8 i11)
+    let i13 ← lift (UScalar.hcast .I8 i12)
+    let b1 ← lift (IScalar.cast .I32 i13)
+    let i14 ← a1 * b1
+    let i15 ← a0 * b0
+    let i16 ← i14 + i15
+    let r ← x86_64.avx512.saturate16 i16
+    let i17 ← lift (IScalar.hcast .U32 r)
+    let i18 ← lift (i17 &&& 65535#u32)
+    let i19 ← i18 <<< s0
+    let word1 ← lift (word ||| i19)
+    let h1 ← h + 1#i32
+    ok (cont (a, b, word1, h1))
+  else ok (done (a, b, word))
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_maddubs_epi16]: loop 1:
+    Source: 'src/x86_64/avx512.rs', lines 228:8-238:9
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_maddubs_epi16_loop0_loop0
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) (j : Std.Usize)
+  (word : Std.U32) (h : Std.I32) :
+  RustM (x86_64.types.M512i × x86_64.types.M512i × Std.U32)
+  := do
+  loop
+    (fun (a1, b1, word1, h1) =>
+      x86_64.avx512._mm512_maddubs_epi16_loop0_loop0.body j a1 b1 word1 h1)
+    (a, b, word, h)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_maddubs_epi16]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 225:4-241:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_maddubs_epi16_loop0.body
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × (Array
+    Std.U32 16#usize) × Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if j < 16#usize
+  then
+    let (a1, b1, word) ←
+      x86_64.avx512._mm512_maddubs_epi16_loop0_loop0 a b j 0#u32 0#i32
+    let a2 ← Array.update dst j word
+    let j1 ← j + 1#usize
+    ok (cont (a1, b1, a2, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_maddubs_epi16]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 225:4-241:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_maddubs_epi16_loop0
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, j1) => x86_64.avx512._mm512_maddubs_epi16_loop0.body a1
+      b1 dst1 j1)
+    (a, b, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_maddubs_epi16]:
+    Source: 'src/x86_64/avx512.rs', lines 222:0-243:1
+    Visibility: public -/
+def x86_64.avx512._mm512_maddubs_epi16
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_maddubs_epi16_loop0 a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_srli_epi32]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 258:4-261:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_srli_epi32_loop.body
+  (s : Std.U32) (a : x86_64.types.M512i) (dst : Array Std.U32 16#usize)
+  (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × (Array Std.U32 16#usize) ×
+    Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if j < 16#usize
+  then
+    let (a1, i) ←
+      if s > 31#u32
+      then ok (a, 0#u32)
+      else do
+           let i1 ← Array.index_usize a j
+           let i2 ← i1 >>> s
+           ok (a, i2)
+    let a2 ← Array.update dst j i
+    let j1 ← j + 1#usize
+    ok (cont (a1, a2, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_srli_epi32]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 258:4-261:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_srli_epi32_loop
+  (a : x86_64.types.M512i) (s : Std.U32) (dst : Array Std.U32 16#usize)
+  (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, dst1, j1) => x86_64.avx512._mm512_srli_epi32_loop.body s a1 dst1
+      j1)
+    (a, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_srli_epi32]:
+    Source: 'src/x86_64/avx512.rs', lines 254:0-263:1
+    Visibility: public -/
+def x86_64.avx512._mm512_srli_epi32
+  (IMM8 : Std.U32) (a : x86_64.types.M512i) : RustM x86_64.types.M512i := do
+  let s ← x86_64.avx512.imm8u IMM8
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_srli_epi32_loop a s dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_slli_epi64]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 274:4-280:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_slli_epi64_loop.body
+  (s : Std.U32) (a : x86_64.types.M512i) (dst : Array Std.U32 16#usize)
+  (k : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × (Array Std.U32 16#usize) ×
+    Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if k < 8#usize
+  then
+    let (a1, v) ←
+      if s > 63#u32
+      then ok (a, 0#u64)
+      else do
+           let i ← x86_64.avx512.lane64 a k
+           let v1 ← i <<< s
+           ok (a, v1)
+    let (lo, hi) ← x86_64.avx512.split64 v
+    let i ← 2#usize * k
+    let dst1 ← Array.update dst i lo
+    let i1 ← i + 1#usize
+    let a2 ← Array.update dst1 i1 hi
+    let k1 ← k + 1#usize
+    ok (cont (a1, a2, k1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_slli_epi64]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 274:4-280:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_slli_epi64_loop
+  (a : x86_64.types.M512i) (s : Std.U32) (dst : Array Std.U32 16#usize)
+  (k : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, dst1, k1) => x86_64.avx512._mm512_slli_epi64_loop.body s a1 dst1
+      k1)
+    (a, dst, k)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_slli_epi64]:
+    Source: 'src/x86_64/avx512.rs', lines 270:0-282:1
+    Visibility: public -/
+def x86_64.avx512._mm512_slli_epi64
+  (IMM8 : Std.U32) (a : x86_64.types.M512i) : RustM x86_64.types.M512i := do
+  let s ← x86_64.avx512.imm8u IMM8
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_slli_epi64_loop a s dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_slli_epi32]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 298:4-305:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_mask_slli_epi32_loop.body
+  (k : Std.U16) (s : Std.U32) (src : x86_64.types.M512i)
+  (a : x86_64.types.M512i) (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × (Array
+    Std.U32 16#usize) × Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if j < 16#usize
+  then
+    let b ← x86_64.avx512.bit16 k j
+    let (src1, a1, i) ←
+      if b
+      then
+        do
+        let (mi, i1) ←
+          if s > 31#u32
+          then ok (a, 0#u32)
+          else
+            do
+            let i2 ← Array.index_usize a j
+            let i3 ← i2 <<< s
+            ok (a, i3)
+        ok (src, mi, i1)
+      else do
+           let i1 ← Array.index_usize src j
+           ok (src, a, i1)
+    let a2 ← Array.update dst j i
+    let j1 ← j + 1#usize
+    ok (cont (src1, a1, a2, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_slli_epi32]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 298:4-305:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_mask_slli_epi32_loop
+  (src : x86_64.types.M512i) (k : Std.U16) (a : x86_64.types.M512i)
+  (s : Std.U32) (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (src1, a1, dst1, j1) => x86_64.avx512._mm512_mask_slli_epi32_loop.body
+      k s src1 a1 dst1 j1)
+    (src, a, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_slli_epi32]:
+    Source: 'src/x86_64/avx512.rs', lines 290:0-307:1
+    Visibility: public -/
+def x86_64.avx512._mm512_mask_slli_epi32
+  (IMM8 : Std.U32) (src : x86_64.types.M512i) (k : Std.U16)
+  (a : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let s ← x86_64.avx512.imm8u IMM8
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_mask_slli_epi32_loop src k a s dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_shrdi_epi64]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 319:4-325:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_shrdi_epi64_loop.body
+  (s : Std.U32) (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (k : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × (Array
+    Std.U32 16#usize) × Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if k < 8#usize
+  then
+    let i ← x86_64.avx512.lane64 b k
+    let i1 ← lift (UScalar.cast .U128 i)
+    let i2 ← i1 <<< 64#i32
+    let i3 ← x86_64.avx512.lane64 a k
+    let i4 ← lift (UScalar.cast .U128 i3)
+    let i5 ← lift (i2 ||| i4)
+    let tmp ← i5 >>> s
+    let i6 ← lift (UScalar.cast .U64 tmp)
+    let (lo, hi) ← x86_64.avx512.split64 i6
+    let i7 ← 2#usize * k
+    let dst1 ← Array.update dst i7 lo
+    let i8 ← i7 + 1#usize
+    let a1 ← Array.update dst1 i8 hi
+    let k1 ← k + 1#usize
+    ok (cont (a, b, a1, k1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_shrdi_epi64]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 319:4-325:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_shrdi_epi64_loop
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) (s : Std.U32)
+  (dst : Array Std.U32 16#usize) (k : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, k1) => x86_64.avx512._mm512_shrdi_epi64_loop.body s a1
+      b1 dst1 k1)
+    (a, b, dst, k)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_shrdi_epi64]:
+    Source: 'src/x86_64/avx512.rs', lines 315:0-327:1
+    Visibility: public -/
+def x86_64.avx512._mm512_shrdi_epi64
+  (IMM8 : Std.I32) (a : x86_64.types.M512i) (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let i ← x86_64.avx512.imm8 IMM8
+  let s ← lift (i &&& 63#u32)
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_shrdi_epi64_loop a b s dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_add_epi32]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 341:4-348:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_mask_add_epi32_loop.body
+  (k : Std.U16) (src : x86_64.types.M512i) (a : x86_64.types.M512i)
+  (b : x86_64.types.M512i) (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i ×
+    x86_64.types.M512i × (Array Std.U32 16#usize) × Std.Usize) (Array Std.U32
+    16#usize))
+  := do
+  if j < 16#usize
+  then
+    let b1 ← x86_64.avx512.bit16 k j
+    let (src1, a1, b2, i) ←
+      if b1
+      then
+        do
+        let i1 ← Array.index_usize a j
+        let i2 ← Array.index_usize b j
+        let i3 ← core.num.U32.wrapping_add i1 i2
+        ok (src, a, b, i3)
+      else do
+           let i1 ← Array.index_usize src j
+           ok (src, a, b, i1)
+    let a2 ← Array.update dst j i
+    let j1 ← j + 1#usize
+    ok (cont (src1, a1, b2, a2, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_add_epi32]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 341:4-348:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_mask_add_epi32_loop
+  (src : x86_64.types.M512i) (k : Std.U16) (a : x86_64.types.M512i)
+  (b : x86_64.types.M512i) (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (src1, a1, b1, dst1, j1) =>
+      x86_64.avx512._mm512_mask_add_epi32_loop.body k src1 a1 b1 dst1 j1)
+    (src, a, b, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_add_epi32]:
+    Source: 'src/x86_64/avx512.rs', lines 338:0-350:1
+    Visibility: public -/
+def x86_64.avx512._mm512_mask_add_epi32
+  (src : x86_64.types.M512i) (k : Std.U16) (a : x86_64.types.M512i)
+  (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_mask_add_epi32_loop src k a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_sub_epi32]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 360:4-367:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_mask_sub_epi32_loop.body
+  (k : Std.U16) (src : x86_64.types.M512i) (a : x86_64.types.M512i)
+  (b : x86_64.types.M512i) (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i ×
+    x86_64.types.M512i × (Array Std.U32 16#usize) × Std.Usize) (Array Std.U32
+    16#usize))
+  := do
+  if j < 16#usize
+  then
+    let b1 ← x86_64.avx512.bit16 k j
+    let (src1, a1, b2, i) ←
+      if b1
+      then
+        do
+        let i1 ← Array.index_usize a j
+        let i2 ← Array.index_usize b j
+        let i3 ← core.num.U32.wrapping_sub i1 i2
+        ok (src, a, b, i3)
+      else do
+           let i1 ← Array.index_usize src j
+           ok (src, a, b, i1)
+    let a2 ← Array.update dst j i
+    let j1 ← j + 1#usize
+    ok (cont (src1, a1, b2, a2, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_sub_epi32]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 360:4-367:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_mask_sub_epi32_loop
+  (src : x86_64.types.M512i) (k : Std.U16) (a : x86_64.types.M512i)
+  (b : x86_64.types.M512i) (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (src1, a1, b1, dst1, j1) =>
+      x86_64.avx512._mm512_mask_sub_epi32_loop.body k src1 a1 b1 dst1 j1)
+    (src, a, b, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_sub_epi32]:
+    Source: 'src/x86_64/avx512.rs', lines 357:0-369:1
+    Visibility: public -/
+def x86_64.avx512._mm512_mask_sub_epi32
+  (src : x86_64.types.M512i) (k : Std.U16) (a : x86_64.types.M512i)
+  (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_mask_sub_epi32_loop src k a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_maskz_sub_epi32]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 379:4-386:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_maskz_sub_epi32_loop.body
+  (k : Std.U16) (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × (Array
+    Std.U32 16#usize) × Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if j < 16#usize
+  then
+    let b1 ← x86_64.avx512.bit16 k j
+    let (a1, b2, i) ←
+      if b1
+      then
+        do
+        let i1 ← Array.index_usize a j
+        let i2 ← Array.index_usize b j
+        let i3 ← core.num.U32.wrapping_sub i1 i2
+        ok (a, b, i3)
+      else ok (a, b, 0#u32)
+    let a2 ← Array.update dst j i
+    let j1 ← j + 1#usize
+    ok (cont (a1, b2, a2, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_maskz_sub_epi32]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 379:4-386:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_maskz_sub_epi32_loop
+  (k : Std.U16) (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, j1) => x86_64.avx512._mm512_maskz_sub_epi32_loop.body k
+      a1 b1 dst1 j1)
+    (a, b, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_maskz_sub_epi32]:
+    Source: 'src/x86_64/avx512.rs', lines 376:0-388:1
+    Visibility: public -/
+def x86_64.avx512._mm512_maskz_sub_epi32
+  (k : Std.U16) (a : x86_64.types.M512i) (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_maskz_sub_epi32_loop k a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_sub_epi64]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 398:4-408:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_mask_sub_epi64_loop.body
+  (k : Std.U8) (src : x86_64.types.M512i) (a : x86_64.types.M512i)
+  (b : x86_64.types.M512i) (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i ×
+    x86_64.types.M512i × (Array Std.U32 16#usize) × Std.Usize) (Array Std.U32
+    16#usize))
+  := do
+  if j < 8#usize
+  then
+    let b1 ← x86_64.avx512.bit8 k j
+    let (src1, a1, b2, v) ←
+      if b1
+      then
+        do
+        let i ← x86_64.avx512.lane64 a j
+        let i1 ← x86_64.avx512.lane64 b j
+        let v1 ← core.num.U64.wrapping_sub i i1
+        ok (src, a, b, v1)
+      else do
+           let v1 ← x86_64.avx512.lane64 src j
+           ok (src, a, b, v1)
+    let (lo, hi) ← x86_64.avx512.split64 v
+    let i ← 2#usize * j
+    let dst1 ← Array.update dst i lo
+    let i1 ← i + 1#usize
+    let a2 ← Array.update dst1 i1 hi
+    let j1 ← j + 1#usize
+    ok (cont (src1, a1, b2, a2, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_sub_epi64]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 398:4-408:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_mask_sub_epi64_loop
+  (src : x86_64.types.M512i) (k : Std.U8) (a : x86_64.types.M512i)
+  (b : x86_64.types.M512i) (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (src1, a1, b1, dst1, j1) =>
+      x86_64.avx512._mm512_mask_sub_epi64_loop.body k src1 a1 b1 dst1 j1)
+    (src, a, b, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_sub_epi64]:
+    Source: 'src/x86_64/avx512.rs', lines 395:0-410:1
+    Visibility: public -/
+def x86_64.avx512._mm512_mask_sub_epi64
+  (src : x86_64.types.M512i) (k : Std.U8) (a : x86_64.types.M512i)
+  (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_mask_sub_epi64_loop src k a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_blend_epi32]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 420:4-423:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_mask_blend_epi32_loop.body
+  (k : Std.U16) (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × (Array
+    Std.U32 16#usize) × Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if j < 16#usize
+  then
+    let b1 ← x86_64.avx512.bit16 k j
+    let (a1, b2, i) ←
+      if b1
+      then do
+           let i1 ← Array.index_usize b j
+           ok (a, b, i1)
+      else do
+           let i1 ← Array.index_usize a j
+           ok (a, b, i1)
+    let a2 ← Array.update dst j i
+    let j1 ← j + 1#usize
+    ok (cont (a1, b2, a2, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_blend_epi32]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 420:4-423:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_mask_blend_epi32_loop
+  (k : Std.U16) (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, j1) => x86_64.avx512._mm512_mask_blend_epi32_loop.body
+      k a1 b1 dst1 j1)
+    (a, b, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_blend_epi32]:
+    Source: 'src/x86_64/avx512.rs', lines 417:0-425:1
+    Visibility: public -/
+def x86_64.avx512._mm512_mask_blend_epi32
+  (k : Std.U16) (a : x86_64.types.M512i) (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_mask_blend_epi32_loop k a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_blend_epi64]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 435:4-440:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_mask_blend_epi64_loop.body
+  (k : Std.U8) (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × (Array
+    Std.U32 16#usize) × Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if j < 8#usize
+  then
+    let b1 ← x86_64.avx512.bit8 k j
+    let (a1, b2, src) ← if b1
+                          then ok (a, b, b)
+                          else ok (a, b, a)
+    let i ← 2#usize * j
+    let i1 ← Array.index_usize src i
+    let dst1 ← Array.update dst i i1
+    let i2 ← i + 1#usize
+    let i3 ← Array.index_usize src i2
+    let i4 ← i + 1#usize
+    let a2 ← Array.update dst1 i4 i3
+    let j1 ← j + 1#usize
+    ok (cont (a1, b2, a2, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_blend_epi64]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 435:4-440:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_mask_blend_epi64_loop
+  (k : Std.U8) (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, j1) => x86_64.avx512._mm512_mask_blend_epi64_loop.body
+      k a1 b1 dst1 j1)
+    (a, b, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_blend_epi64]:
+    Source: 'src/x86_64/avx512.rs', lines 432:0-442:1
+    Visibility: public -/
+def x86_64.avx512._mm512_mask_blend_epi64
+  (k : Std.U8) (a : x86_64.types.M512i) (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_mask_blend_epi64_loop k a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm256_mask_add_epi32]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 452:4-459:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm256_mask_add_epi32_loop.body
+  (k : Std.U8) (src : x86_64.types.M256i) (a : x86_64.types.M256i)
+  (b : x86_64.types.M256i) (dst : Array Std.U32 8#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M256i × x86_64.types.M256i ×
+    x86_64.types.M256i × (Array Std.U32 8#usize) × Std.Usize) (Array Std.U32
+    8#usize))
+  := do
+  if j < 8#usize
+  then
+    let b1 ← x86_64.avx512.bit8 k j
+    let (src1, a1, b2, i) ←
+      if b1
+      then
+        do
+        let i1 ← Array.index_usize a j
+        let i2 ← Array.index_usize b j
+        let i3 ← core.num.U32.wrapping_add i1 i2
+        ok (src, a, b, i3)
+      else do
+           let i1 ← Array.index_usize src j
+           ok (src, a, b, i1)
+    let a2 ← Array.update dst j i
+    let j1 ← j + 1#usize
+    ok (cont (src1, a1, b2, a2, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm256_mask_add_epi32]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 452:4-459:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm256_mask_add_epi32_loop
+  (src : x86_64.types.M256i) (k : Std.U8) (a : x86_64.types.M256i)
+  (b : x86_64.types.M256i) (dst : Array Std.U32 8#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 8#usize)
+  := do
+  loop
+    (fun (src1, a1, b1, dst1, j1) =>
+      x86_64.avx512._mm256_mask_add_epi32_loop.body k src1 a1 b1 dst1 j1)
+    (src, a, b, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm256_mask_add_epi32]:
+    Source: 'src/x86_64/avx512.rs', lines 449:0-461:1
+    Visibility: public -/
+def x86_64.avx512._mm256_mask_add_epi32
+  (src : x86_64.types.M256i) (k : Std.U8) (a : x86_64.types.M256i)
+  (b : x86_64.types.M256i) :
+  RustM x86_64.types.M256i
+  := do
+  let dst ← core.array.repeat 8#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm256_mask_add_epi32_loop src k a b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_cmplt_epu32_mask]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 475:4-480:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_cmplt_epu32_mask_loop.body
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) (k : Std.U16)
+  (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × Std.U16 ×
+    Std.Usize) Std.U16)
+  := do
+  if j < 16#usize
+  then
+    let i ← Array.index_usize a j
+    let i1 ← Array.index_usize b j
+    let k1 ← if i < i1
+               then do
+                    let i2 ← 1#u16 <<< j
+                    ok (k ||| i2)
+               else ok k
+    let j1 ← j + 1#usize
+    ok (cont (a, b, k1, j1))
+  else ok (done k)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_cmplt_epu32_mask]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 475:4-480:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_cmplt_epu32_mask_loop
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) (k : Std.U16)
+  (j : Std.Usize) :
+  RustM Std.U16
+  := do
+  loop
+    (fun (a1, b1, k1, j1) => x86_64.avx512._mm512_cmplt_epu32_mask_loop.body a1
+      b1 k1 j1)
+    (a, b, k, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_cmplt_epu32_mask]:
+    Source: 'src/x86_64/avx512.rs', lines 472:0-482:1
+    Visibility: public -/
+@[reducible]
+def x86_64.avx512._mm512_cmplt_epu32_mask
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) : RustM Std.U16 := do
+  x86_64.avx512._mm512_cmplt_epu32_mask_loop a b 0#u16 0#usize
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_cmplt_epi32_mask]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 492:4-497:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_cmplt_epi32_mask_loop.body
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) (k : Std.U16)
+  (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × Std.U16 ×
+    Std.Usize) Std.U16)
+  := do
+  if j < 16#usize
+  then
+    let i ← Array.index_usize a j
+    let i1 ← lift (UScalar.hcast .I32 i)
+    let i2 ← Array.index_usize b j
+    let i3 ← lift (UScalar.hcast .I32 i2)
+    let k1 ←
+      if i1 < i3
+      then do
+           let i4 ← 1#u16 <<< j
+           ok (k ||| i4)
+      else ok k
+    let j1 ← j + 1#usize
+    ok (cont (a, b, k1, j1))
+  else ok (done k)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_cmplt_epi32_mask]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 492:4-497:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_cmplt_epi32_mask_loop
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) (k : Std.U16)
+  (j : Std.Usize) :
+  RustM Std.U16
+  := do
+  loop
+    (fun (a1, b1, k1, j1) => x86_64.avx512._mm512_cmplt_epi32_mask_loop.body a1
+      b1 k1 j1)
+    (a, b, k, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_cmplt_epi32_mask]:
+    Source: 'src/x86_64/avx512.rs', lines 489:0-499:1
+    Visibility: public -/
+@[reducible]
+def x86_64.avx512._mm512_cmplt_epi32_mask
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) : RustM Std.U16 := do
+  x86_64.avx512._mm512_cmplt_epi32_mask_loop a b 0#u16 0#usize
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_cmple_epu32_mask]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 509:4-514:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_cmple_epu32_mask_loop.body
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) (k : Std.U16)
+  (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × Std.U16 ×
+    Std.Usize) Std.U16)
+  := do
+  if j < 16#usize
+  then
+    let i ← Array.index_usize a j
+    let i1 ← Array.index_usize b j
+    let k1 ←
+      if i <= i1
+      then do
+           let i2 ← 1#u16 <<< j
+           ok (k ||| i2)
+      else ok k
+    let j1 ← j + 1#usize
+    ok (cont (a, b, k1, j1))
+  else ok (done k)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_cmple_epu32_mask]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 509:4-514:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_cmple_epu32_mask_loop
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) (k : Std.U16)
+  (j : Std.Usize) :
+  RustM Std.U16
+  := do
+  loop
+    (fun (a1, b1, k1, j1) => x86_64.avx512._mm512_cmple_epu32_mask_loop.body a1
+      b1 k1 j1)
+    (a, b, k, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_cmple_epu32_mask]:
+    Source: 'src/x86_64/avx512.rs', lines 506:0-516:1
+    Visibility: public -/
+@[reducible]
+def x86_64.avx512._mm512_cmple_epu32_mask
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) : RustM Std.U16 := do
+  x86_64.avx512._mm512_cmple_epu32_mask_loop a b 0#u16 0#usize
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_cmple_epu64_mask]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 526:4-531:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_cmple_epu64_mask_loop.body
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) (k : Std.U8)
+  (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × Std.U8 ×
+    Std.Usize) Std.U8)
+  := do
+  if j < 8#usize
+  then
+    let i ← x86_64.avx512.lane64 a j
+    let i1 ← x86_64.avx512.lane64 b j
+    let k1 ← if i <= i1
+               then do
+                    let i2 ← 1#u8 <<< j
+                    ok (k ||| i2)
+               else ok k
+    let j1 ← j + 1#usize
+    ok (cont (a, b, k1, j1))
+  else ok (done k)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_cmple_epu64_mask]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 526:4-531:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_cmple_epu64_mask_loop
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) (k : Std.U8)
+  (j : Std.Usize) :
+  RustM Std.U8
+  := do
+  loop
+    (fun (a1, b1, k1, j1) => x86_64.avx512._mm512_cmple_epu64_mask_loop.body a1
+      b1 k1 j1)
+    (a, b, k, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_cmple_epu64_mask]:
+    Source: 'src/x86_64/avx512.rs', lines 523:0-533:1
+    Visibility: public -/
+@[reducible]
+def x86_64.avx512._mm512_cmple_epu64_mask
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) : RustM Std.U8 := do
+  x86_64.avx512._mm512_cmple_epu64_mask_loop a b 0#u8 0#usize
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_test_epi32_mask]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 543:4-548:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_test_epi32_mask_loop.body
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) (k : Std.U16)
+  (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × Std.U16 ×
+    Std.Usize) Std.U16)
+  := do
+  if j < 16#usize
+  then
+    let i ← Array.index_usize a j
+    let i1 ← Array.index_usize b j
+    let i2 ← lift (i &&& i1)
+    let k1 ←
+      if i2 != 0#u32
+      then do
+           let i3 ← 1#u16 <<< j
+           ok (k ||| i3)
+      else ok k
+    let j1 ← j + 1#usize
+    ok (cont (a, b, k1, j1))
+  else ok (done k)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_test_epi32_mask]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 543:4-548:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_test_epi32_mask_loop
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) (k : Std.U16)
+  (j : Std.Usize) :
+  RustM Std.U16
+  := do
+  loop
+    (fun (a1, b1, k1, j1) => x86_64.avx512._mm512_test_epi32_mask_loop.body a1
+      b1 k1 j1)
+    (a, b, k, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_test_epi32_mask]:
+    Source: 'src/x86_64/avx512.rs', lines 540:0-550:1
+    Visibility: public -/
+@[reducible]
+def x86_64.avx512._mm512_test_epi32_mask
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) : RustM Std.U16 := do
+  x86_64.avx512._mm512_test_epi32_mask_loop a b 0#u16 0#usize
+
+/-- [p3_arch_shims::x86_64::avx512::_mm256_cmplt_epu32_mask]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 560:4-565:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm256_cmplt_epu32_mask_loop.body
+  (a : x86_64.types.M256i) (b : x86_64.types.M256i) (k : Std.U8)
+  (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M256i × x86_64.types.M256i × Std.U8 ×
+    Std.Usize) Std.U8)
+  := do
+  if j < 8#usize
+  then
+    let i ← Array.index_usize a j
+    let i1 ← Array.index_usize b j
+    let k1 ← if i < i1
+               then do
+                    let i2 ← 1#u8 <<< j
+                    ok (k ||| i2)
+               else ok k
+    let j1 ← j + 1#usize
+    ok (cont (a, b, k1, j1))
+  else ok (done k)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm256_cmplt_epu32_mask]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 560:4-565:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm256_cmplt_epu32_mask_loop
+  (a : x86_64.types.M256i) (b : x86_64.types.M256i) (k : Std.U8)
+  (j : Std.Usize) :
+  RustM Std.U8
+  := do
+  loop
+    (fun (a1, b1, k1, j1) => x86_64.avx512._mm256_cmplt_epu32_mask_loop.body a1
+      b1 k1 j1)
+    (a, b, k, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm256_cmplt_epu32_mask]:
+    Source: 'src/x86_64/avx512.rs', lines 557:0-567:1
+    Visibility: public -/
+@[reducible]
+def x86_64.avx512._mm256_cmplt_epu32_mask
+  (a : x86_64.types.M256i) (b : x86_64.types.M256i) : RustM Std.U8 := do
+  x86_64.avx512._mm256_cmplt_epu32_mask_loop a b 0#u8 0#usize
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_movehdup_ps]:
+    Source: 'src/x86_64/avx512.rs', lines 579:0-584:1
+    Visibility: public -/
+def x86_64.avx512._mm512_movehdup_ps
+  (a : x86_64.types.M512) : RustM x86_64.types.M512 := do
+  let i ← Array.index_usize a 1#usize
+  let i1 ← Array.index_usize a 3#usize
+  let i2 ← Array.index_usize a 5#usize
+  let i3 ← Array.index_usize a 7#usize
+  let i4 ← Array.index_usize a 9#usize
+  let i5 ← Array.index_usize a 11#usize
+  let i6 ← Array.index_usize a 13#usize
+  let i7 ← Array.index_usize a 15#usize
+  ok
+    (Array.make 16#usize [
+      i, i, i1, i1, i2, i2, i3, i3, i4, i4, i5, i5, i6, i6, i7, i7
+      ])
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_movehdup_ps]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 600:4-603:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_mask_movehdup_ps_loop.body
+  (k : Std.U16) (tmp : Array Std.U32 16#usize) (src : x86_64.types.M512)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512 × (Array Std.U32 16#usize) ×
+    Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if j < 16#usize
+  then
+    let b ← x86_64.avx512.bit16 k j
+    let (src1, i) ←
+      if b
+      then do
+           let i1 ← Array.index_usize tmp j
+           ok (src, i1)
+      else do
+           let i1 ← Array.index_usize src j
+           ok (src, i1)
+    let a ← Array.update dst j i
+    let j1 ← j + 1#usize
+    ok (cont (src1, a, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_movehdup_ps]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 600:4-603:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_mask_movehdup_ps_loop
+  (src : x86_64.types.M512) (k : Std.U16) (tmp : Array Std.U32 16#usize)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (src1, dst1, j1) => x86_64.avx512._mm512_mask_movehdup_ps_loop.body k
+      tmp src1 dst1 j1)
+    (src, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_mask_movehdup_ps]:
+    Source: 'src/x86_64/avx512.rs', lines 593:0-605:1
+    Visibility: public -/
+def x86_64.avx512._mm512_mask_movehdup_ps
+  (src : x86_64.types.M512) (k : Std.U16) (a : x86_64.types.M512) :
+  RustM x86_64.types.M512
+  := do
+  let i ← Array.index_usize a 1#usize
+  let i1 ← Array.index_usize a 3#usize
+  let i2 ← Array.index_usize a 5#usize
+  let i3 ← Array.index_usize a 7#usize
+  let i4 ← Array.index_usize a 9#usize
+  let i5 ← Array.index_usize a 11#usize
+  let i6 ← Array.index_usize a 13#usize
+  let i7 ← Array.index_usize a 15#usize
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ←
+    x86_64.avx512._mm512_mask_movehdup_ps_loop src k
+      (Array.make 16#usize [
+        i, i, i1, i1, i2, i2, i3, i3, i4, i4, i5, i5, i6, i6, i7, i7
+        ]) dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm256_mask_movehdup_ps]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 621:4-624:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm256_mask_movehdup_ps_loop.body
+  (k : Std.U8) (tmp : Array Std.U32 8#usize) (src : x86_64.types.M256)
+  (dst : Array Std.U32 8#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M256 × (Array Std.U32 8#usize) ×
+    Std.Usize) (Array Std.U32 8#usize))
+  := do
+  if j < 8#usize
+  then
+    let b ← x86_64.avx512.bit8 k j
+    let (src1, i) ←
+      if b
+      then do
+           let i1 ← Array.index_usize tmp j
+           ok (src, i1)
+      else do
+           let i1 ← Array.index_usize src j
+           ok (src, i1)
+    let a ← Array.update dst j i
+    let j1 ← j + 1#usize
+    ok (cont (src1, a, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm256_mask_movehdup_ps]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 621:4-624:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm256_mask_movehdup_ps_loop
+  (src : x86_64.types.M256) (k : Std.U8) (tmp : Array Std.U32 8#usize)
+  (dst : Array Std.U32 8#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 8#usize)
+  := do
+  loop
+    (fun (src1, dst1, j1) => x86_64.avx512._mm256_mask_movehdup_ps_loop.body k
+      tmp src1 dst1 j1)
+    (src, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm256_mask_movehdup_ps]:
+    Source: 'src/x86_64/avx512.rs', lines 615:0-626:1
+    Visibility: public -/
+def x86_64.avx512._mm256_mask_movehdup_ps
+  (src : x86_64.types.M256) (k : Std.U8) (a : x86_64.types.M256) :
+  RustM x86_64.types.M256
+  := do
+  let i ← Array.index_usize a 1#usize
+  let i1 ← Array.index_usize a 3#usize
+  let i2 ← Array.index_usize a 5#usize
+  let i3 ← Array.index_usize a 7#usize
+  let dst ← core.array.repeat 8#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ←
+    x86_64.avx512._mm256_mask_movehdup_ps_loop src k
+      (Array.make 8#usize [ i, i, i1, i1, i2, i2, i3, i3 ]) dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_shuffle_epi32]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 640:4-646:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_shuffle_epi32_loop.body
+  (control : Std.U32) (a : x86_64.types.M512i) (dst : Array Std.U32 16#usize)
+  (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × (Array Std.U32 16#usize) ×
+    Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if j < 16#usize
+  then
+    let lane ← j / 4#usize
+    let e ← j % 4#usize
+    let i ← 2#usize * e
+    let i1 ← control >>> i
+    let i2 ← lift (i1 &&& 3#u32)
+    let sel ← lift (UScalar.cast .Usize i2)
+    let i3 ← 4#usize * lane
+    let i4 ← i3 + sel
+    let i5 ← Array.index_usize a i4
+    let a1 ← Array.update dst j i5
+    let j1 ← j + 1#usize
+    ok (cont (a, a1, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_shuffle_epi32]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 640:4-646:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_shuffle_epi32_loop
+  (a : x86_64.types.M512i) (control : Std.U32) (dst : Array Std.U32 16#usize)
+  (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, dst1, j1) => x86_64.avx512._mm512_shuffle_epi32_loop.body control
+      a1 dst1 j1)
+    (a, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_shuffle_epi32]:
+    Source: 'src/x86_64/avx512.rs', lines 636:0-648:1
+    Visibility: public -/
+def x86_64.avx512._mm512_shuffle_epi32
+  (MASK : Std.I32) (a : x86_64.types.M512i) : RustM x86_64.types.M512i := do
+  let control ← x86_64.avx512.imm8 MASK
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_shuffle_epi32_loop a control dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_shuffle_i64x2]: loop body 1:
+    Source: 'src/x86_64/avx512.rs', lines 666:8-669:9
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_shuffle_i64x2_loop0_loop0.body
+  (l : Std.Usize) (src : Array Std.U32 16#usize) (sel : Std.Usize)
+  (dst : Array Std.U32 16#usize) (e : Std.Usize) :
+  RustM (ControlFlow ((Array Std.U32 16#usize) × Std.Usize) (Array Std.U32
+    16#usize))
+  := do
+  if e < 4#usize
+  then
+    let i ← 4#usize * sel
+    let i1 ← i + e
+    let i2 ← Array.index_usize src i1
+    let i3 ← 4#usize * l
+    let i4 ← i3 + e
+    let a ← Array.update dst i4 i2
+    let e1 ← e + 1#usize
+    ok (cont (a, e1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_shuffle_i64x2]: loop 1:
+    Source: 'src/x86_64/avx512.rs', lines 666:8-669:9
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_shuffle_i64x2_loop0_loop0
+  (dst : Array Std.U32 16#usize) (l : Std.Usize) (src : Array Std.U32 16#usize)
+  (sel : Std.Usize) (e : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (dst1, e1) => x86_64.avx512._mm512_shuffle_i64x2_loop0_loop0.body l
+      src sel dst1 e1)
+    (dst, e)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_shuffle_i64x2]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 662:4-671:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_shuffle_i64x2_loop0.body
+  (control : Std.U32) (a : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (l : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i × (Array
+    Std.U32 16#usize) × Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if l < 4#usize
+  then
+    let (a1, b1, src) ← if l < 2#usize
+                          then ok (a, b, a)
+                          else ok (a, b, b)
+    let i ← 2#usize * l
+    let i1 ← control >>> i
+    let i2 ← lift (i1 &&& 3#u32)
+    let sel ← lift (UScalar.cast .Usize i2)
+    let dst1 ←
+      x86_64.avx512._mm512_shuffle_i64x2_loop0_loop0 dst l src sel 0#usize
+    let l1 ← l + 1#usize
+    ok (cont (a1, b1, dst1, l1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_shuffle_i64x2]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 662:4-671:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_shuffle_i64x2_loop0
+  (a : x86_64.types.M512i) (b : x86_64.types.M512i) (control : Std.U32)
+  (dst : Array Std.U32 16#usize) (l : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, l1) => x86_64.avx512._mm512_shuffle_i64x2_loop0.body
+      control a1 b1 dst1 l1)
+    (a, b, dst, l)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_shuffle_i64x2]:
+    Source: 'src/x86_64/avx512.rs', lines 658:0-673:1
+    Visibility: public -/
+def x86_64.avx512._mm512_shuffle_i64x2
+  (MASK : Std.I32) (a : x86_64.types.M512i) (b : x86_64.types.M512i) :
+  RustM x86_64.types.M512i
+  := do
+  let control ← x86_64.avx512.imm8 MASK
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_shuffle_i64x2_loop0 a b control dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_shuffle_pd]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 693:4-702:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_shuffle_pd_loop.body
+  (control : Std.U32) (a : x86_64.types.M512d) (b : x86_64.types.M512d)
+  (dst : Array Std.U64 8#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512d × x86_64.types.M512d × (Array
+    Std.U64 8#usize) × Std.Usize) (Array Std.U64 8#usize))
+  := do
+  if j < 8#usize
+  then
+    let i ← j % 2#usize
+    let (a1, b1, src) ← if i = 0#usize
+                          then ok (a, b, a)
+                          else ok (a, b, b)
+    let i1 ← j / 2#usize
+    let base ← 2#usize * i1
+    let i2 ← control >>> j
+    let i3 ← lift (i2 &&& 1#u32)
+    let i4 ←
+      if i3 = 0#u32
+      then Array.index_usize src base
+      else do
+           let i5 ← base + 1#usize
+           Array.index_usize src i5
+    let a2 ← Array.update dst j i4
+    let j1 ← j + 1#usize
+    ok (cont (a1, b1, a2, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_shuffle_pd]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 693:4-702:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_shuffle_pd_loop
+  (a : x86_64.types.M512d) (b : x86_64.types.M512d) (control : Std.U32)
+  (dst : Array Std.U64 8#usize) (j : Std.Usize) :
+  RustM (Array Std.U64 8#usize)
+  := do
+  loop
+    (fun (a1, b1, dst1, j1) => x86_64.avx512._mm512_shuffle_pd_loop.body
+      control a1 b1 dst1 j1)
+    (a, b, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_shuffle_pd]:
+    Source: 'src/x86_64/avx512.rs', lines 689:0-704:1
+    Visibility: public -/
+def x86_64.avx512._mm512_shuffle_pd
+  (MASK : Std.I32) (a : x86_64.types.M512d) (b : x86_64.types.M512d) :
+  RustM x86_64.types.M512d
+  := do
+  let control ← x86_64.avx512.imm8 MASK
+  let dst ← core.array.repeat 8#usize core.U64.Insts.CoreCloneClone 0#u64
+  let dst1 ← x86_64.avx512._mm512_shuffle_pd_loop a b control dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_permutex2var_epi32]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 714:4-722:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_permutex2var_epi32_loop.body
+  (a : x86_64.types.M512i) (idx : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i ×
+    x86_64.types.M512i × (Array Std.U32 16#usize) × Std.Usize) (Array Std.U32
+    16#usize))
+  := do
+  if j < 16#usize
+  then
+    let i ← Array.index_usize idx j
+    let i1 ← lift (i &&& 15#u32)
+    let off ← lift (UScalar.cast .Usize i1)
+    let i2 ← i >>> 4#i32
+    let i3 ← lift (i2 &&& 1#u32)
+    let (a1, b1, i4) ←
+      if i3 = 1#u32
+      then do
+           let i5 ← Array.index_usize b off
+           ok (a, b, i5)
+      else do
+           let i5 ← Array.index_usize a off
+           ok (a, b, i5)
+    let a2 ← Array.update dst j i4
+    let j1 ← j + 1#usize
+    ok (cont (a1, idx, b1, a2, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_permutex2var_epi32]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 714:4-722:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_permutex2var_epi32_loop
+  (a : x86_64.types.M512i) (idx : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, idx1, b1, dst1, j1) =>
+      x86_64.avx512._mm512_permutex2var_epi32_loop.body a1 idx1 b1 dst1 j1)
+    (a, idx, b, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_permutex2var_epi32]:
+    Source: 'src/x86_64/avx512.rs', lines 711:0-724:1
+    Visibility: public -/
+def x86_64.avx512._mm512_permutex2var_epi32
+  (a : x86_64.types.M512i) (idx : x86_64.types.M512i) (b : x86_64.types.M512i)
+  :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_permutex2var_epi32_loop a idx b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_permutex2var_epi64]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 736:4-743:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_permutex2var_epi64_loop.body
+  (a : x86_64.types.M512i) (idx : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × x86_64.types.M512i ×
+    x86_64.types.M512i × (Array Std.U32 16#usize) × Std.Usize) (Array Std.U32
+    16#usize))
+  := do
+  if j < 8#usize
+  then
+    let i ← 2#usize * j
+    let sel ← Array.index_usize idx i
+    let i1 ← lift (sel &&& 7#u32)
+    let off ← lift (UScalar.cast .Usize i1)
+    let i2 ← sel >>> 3#i32
+    let i3 ← lift (i2 &&& 1#u32)
+    let (a1, b1, src) ← if i3 = 1#u32
+                          then ok (a, b, b)
+                          else ok (a, b, a)
+    let i4 ← 2#usize * off
+    let i5 ← Array.index_usize src i4
+    let dst1 ← Array.update dst i i5
+    let i6 ← i4 + 1#usize
+    let i7 ← Array.index_usize src i6
+    let i8 ← i + 1#usize
+    let a2 ← Array.update dst1 i8 i7
+    let j1 ← j + 1#usize
+    ok (cont (a1, idx, b1, a2, j1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_permutex2var_epi64]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 736:4-743:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_permutex2var_epi64_loop
+  (a : x86_64.types.M512i) (idx : x86_64.types.M512i) (b : x86_64.types.M512i)
+  (dst : Array Std.U32 16#usize) (j : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, idx1, b1, dst1, j1) =>
+      x86_64.avx512._mm512_permutex2var_epi64_loop.body a1 idx1 b1 dst1 j1)
+    (a, idx, b, dst, j)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_permutex2var_epi64]:
+    Source: 'src/x86_64/avx512.rs', lines 733:0-745:1
+    Visibility: public -/
+def x86_64.avx512._mm512_permutex2var_epi64
+  (a : x86_64.types.M512i) (idx : x86_64.types.M512i) (b : x86_64.types.M512i)
+  :
+  RustM x86_64.types.M512i
+  := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_permutex2var_epi64_loop a idx b dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_set1_epi32]:
+    Source: 'src/x86_64/avx512.rs', lines 755:0-757:1
+    Visibility: public -/
+def x86_64.avx512._mm512_set1_epi32
+  (a : Std.I32) : RustM x86_64.types.M512i := do
+  let i ← lift (IScalar.hcast .U32 a)
+  let a1 ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone i
+  ok a1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_setzero_epi32]:
+    Source: 'src/x86_64/avx512.rs', lines 763:0-765:1
+    Visibility: public -/
+def x86_64.avx512._mm512_setzero_epi32 : RustM x86_64.types.M512i := do
+  let a ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  ok a
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_castsi512_ps]:
+    Source: 'src/x86_64/avx512.rs', lines 770:0-772:1
+    Visibility: public -/
+def x86_64.avx512._mm512_castsi512_ps
+  (a : x86_64.types.M512i) : RustM x86_64.types.M512 := do
+  ok a
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_castps_si512]:
+    Source: 'src/x86_64/avx512.rs', lines 776:0-778:1
+    Visibility: public -/
+def x86_64.avx512._mm512_castps_si512
+  (a : x86_64.types.M512) : RustM x86_64.types.M512i := do
+  ok a
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_castsi512_pd]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 786:4-789:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_castsi512_pd_loop.body
+  (a : x86_64.types.M512i) (dst : Array Std.U64 8#usize) (k : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512i × (Array Std.U64 8#usize) ×
+    Std.Usize) (Array Std.U64 8#usize))
+  := do
+  if k < 8#usize
+  then
+    let i ← x86_64.avx512.lane64 a k
+    let a1 ← Array.update dst k i
+    let k1 ← k + 1#usize
+    ok (cont (a, a1, k1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_castsi512_pd]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 786:4-789:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_castsi512_pd_loop
+  (a : x86_64.types.M512i) (dst : Array Std.U64 8#usize) (k : Std.Usize) :
+  RustM (Array Std.U64 8#usize)
+  := do
+  loop
+    (fun (a1, dst1, k1) => x86_64.avx512._mm512_castsi512_pd_loop.body a1 dst1
+      k1)
+    (a, dst, k)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_castsi512_pd]:
+    Source: 'src/x86_64/avx512.rs', lines 783:0-791:1
+    Visibility: public -/
+def x86_64.avx512._mm512_castsi512_pd
+  (a : x86_64.types.M512i) : RustM x86_64.types.M512d := do
+  let dst ← core.array.repeat 8#usize core.U64.Insts.CoreCloneClone 0#u64
+  let dst1 ← x86_64.avx512._mm512_castsi512_pd_loop a dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_castpd_si512]: loop body 0:
+    Source: 'src/x86_64/avx512.rs', lines 799:4-804:5
+    Visibility: public -/
+@[rust_loop_body]
+def x86_64.avx512._mm512_castpd_si512_loop.body
+  (a : x86_64.types.M512d) (dst : Array Std.U32 16#usize) (k : Std.Usize) :
+  RustM (ControlFlow (x86_64.types.M512d × (Array Std.U32 16#usize) ×
+    Std.Usize) (Array Std.U32 16#usize))
+  := do
+  if k < 8#usize
+  then
+    let i ← Array.index_usize a k
+    let (lo, hi) ← x86_64.avx512.split64 i
+    let i1 ← 2#usize * k
+    let dst1 ← Array.update dst i1 lo
+    let i2 ← i1 + 1#usize
+    let a1 ← Array.update dst1 i2 hi
+    let k1 ← k + 1#usize
+    ok (cont (a, a1, k1))
+  else ok (done dst)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_castpd_si512]: loop 0:
+    Source: 'src/x86_64/avx512.rs', lines 799:4-804:5
+    Visibility: public -/
+@[rust_loop]
+def x86_64.avx512._mm512_castpd_si512_loop
+  (a : x86_64.types.M512d) (dst : Array Std.U32 16#usize) (k : Std.Usize) :
+  RustM (Array Std.U32 16#usize)
+  := do
+  loop
+    (fun (a1, dst1, k1) => x86_64.avx512._mm512_castpd_si512_loop.body a1 dst1
+      k1)
+    (a, dst, k)
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_castpd_si512]:
+    Source: 'src/x86_64/avx512.rs', lines 796:0-806:1
+    Visibility: public -/
+def x86_64.avx512._mm512_castpd_si512
+  (a : x86_64.types.M512d) : RustM x86_64.types.M512i := do
+  let dst ← core.array.repeat 16#usize core.U32.Insts.CoreCloneClone 0#u32
+  let dst1 ← x86_64.avx512._mm512_castpd_si512_loop a dst 0#usize
+  ok dst1
+
+/-- [p3_arch_shims::x86_64::avx512::_mm512_castsi512_si256]:
+    Source: 'src/x86_64/avx512.rs', lines 811:0-815:1
+    Visibility: public -/
+def x86_64.avx512._mm512_castsi512_si256
+  (a : x86_64.types.M512i) : RustM x86_64.types.M256i := do
+  let i ← Array.index_usize a 0#usize
+  let i1 ← Array.index_usize a 1#usize
+  let i2 ← Array.index_usize a 2#usize
+  let i3 ← Array.index_usize a 3#usize
+  let i4 ← Array.index_usize a 4#usize
+  let i5 ← Array.index_usize a 5#usize
+  let i6 ← Array.index_usize a 6#usize
+  let i7 ← Array.index_usize a 7#usize
+  ok (Array.make 8#usize [ i, i1, i2, i3, i4, i5, i6, i7 ])
+
 /-- [p3_arch_shims::x86_64::types::{impl core::clone::Clone for p3_arch_shims::x86_64::types::M256i}::clone]:
     Source: 'src/x86_64/types.rs', lines 14:9-14:14
     Visibility: public -/
@@ -3031,15 +5088,90 @@ def x86_64.types.M256i.Insts.CoreMarkerCopy : core.marker.Copy
   cloneCloneInst := x86_64.types.M256i.Insts.CoreCloneClone
 }
 
-/-- [p3_arch_shims::x86_64::types::{impl core::clone::Clone for p3_arch_shims::x86_64::types::M128i}::clone]:
+/-- [p3_arch_shims::x86_64::types::{impl core::clone::Clone for p3_arch_shims::x86_64::types::M512i}::clone]:
     Source: 'src/x86_64/types.rs', lines 19:9-19:14
+    Visibility: public -/
+def x86_64.types.M512i.Insts.CoreCloneClone.clone
+  (self : x86_64.types.M512i) : RustM x86_64.types.M512i := do
+  ok self
+
+/-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::clone::Clone for p3_arch_shims::x86_64::types::M512i}]
+    Source: 'src/x86_64/types.rs', lines 19:9-19:14 -/
+@[reducible]
+def x86_64.types.M512i.Insts.CoreCloneClone : core.clone.Clone
+  x86_64.types.M512i := {
+  clone := x86_64.types.M512i.Insts.CoreCloneClone.clone
+  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
+  clone_from := fun _ source => x86_64.types.M512i.Insts.CoreCloneClone.clone source
+}
+
+/-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::marker::Copy for p3_arch_shims::x86_64::types::M512i}]
+    Source: 'src/x86_64/types.rs', lines 19:16-19:20 -/
+@[reducible]
+def x86_64.types.M512i.Insts.CoreMarkerCopy : core.marker.Copy
+  x86_64.types.M512i := {
+  cloneCloneInst := x86_64.types.M512i.Insts.CoreCloneClone
+}
+
+/-- [p3_arch_shims::x86_64::types::{impl core::clone::Clone for p3_arch_shims::x86_64::types::M512}::clone]:
+    Source: 'src/x86_64/types.rs', lines 25:9-25:14
+    Visibility: public -/
+def x86_64.types.M512.Insts.CoreCloneClone.clone
+  (self : x86_64.types.M512) : RustM x86_64.types.M512 := do
+  ok self
+
+/-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::clone::Clone for p3_arch_shims::x86_64::types::M512}]
+    Source: 'src/x86_64/types.rs', lines 25:9-25:14 -/
+@[reducible]
+def x86_64.types.M512.Insts.CoreCloneClone : core.clone.Clone x86_64.types.M512
+  := {
+  clone := x86_64.types.M512.Insts.CoreCloneClone.clone
+  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
+  clone_from := fun _ source => x86_64.types.M512.Insts.CoreCloneClone.clone source
+}
+
+/-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::marker::Copy for p3_arch_shims::x86_64::types::M512}]
+    Source: 'src/x86_64/types.rs', lines 25:16-25:20 -/
+@[reducible]
+def x86_64.types.M512.Insts.CoreMarkerCopy : core.marker.Copy x86_64.types.M512
+  := {
+  cloneCloneInst := x86_64.types.M512.Insts.CoreCloneClone
+}
+
+/-- [p3_arch_shims::x86_64::types::{impl core::clone::Clone for p3_arch_shims::x86_64::types::M512d}::clone]:
+    Source: 'src/x86_64/types.rs', lines 31:9-31:14
+    Visibility: public -/
+def x86_64.types.M512d.Insts.CoreCloneClone.clone
+  (self : x86_64.types.M512d) : RustM x86_64.types.M512d := do
+  ok self
+
+/-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::clone::Clone for p3_arch_shims::x86_64::types::M512d}]
+    Source: 'src/x86_64/types.rs', lines 31:9-31:14 -/
+@[reducible]
+def x86_64.types.M512d.Insts.CoreCloneClone : core.clone.Clone
+  x86_64.types.M512d := {
+  clone := x86_64.types.M512d.Insts.CoreCloneClone.clone
+  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
+  clone_from := fun _ source => x86_64.types.M512d.Insts.CoreCloneClone.clone source
+}
+
+/-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::marker::Copy for p3_arch_shims::x86_64::types::M512d}]
+    Source: 'src/x86_64/types.rs', lines 31:16-31:20 -/
+@[reducible]
+def x86_64.types.M512d.Insts.CoreMarkerCopy : core.marker.Copy
+  x86_64.types.M512d := {
+  cloneCloneInst := x86_64.types.M512d.Insts.CoreCloneClone
+}
+
+/-- [p3_arch_shims::x86_64::types::{impl core::clone::Clone for p3_arch_shims::x86_64::types::M128i}::clone]:
+    Source: 'src/x86_64/types.rs', lines 44:9-44:14
     Visibility: public -/
 def x86_64.types.M128i.Insts.CoreCloneClone.clone
   (self : x86_64.types.M128i) : RustM x86_64.types.M128i := do
   ok self
 
 /-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::clone::Clone for p3_arch_shims::x86_64::types::M128i}]
-    Source: 'src/x86_64/types.rs', lines 19:9-19:14 -/
+    Source: 'src/x86_64/types.rs', lines 44:9-44:14 -/
 @[reducible]
 def x86_64.types.M128i.Insts.CoreCloneClone : core.clone.Clone
   x86_64.types.M128i := {
@@ -3049,7 +5181,7 @@ def x86_64.types.M128i.Insts.CoreCloneClone : core.clone.Clone
 }
 
 /-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::marker::Copy for p3_arch_shims::x86_64::types::M128i}]
-    Source: 'src/x86_64/types.rs', lines 19:16-19:20 -/
+    Source: 'src/x86_64/types.rs', lines 44:16-44:20 -/
 @[reducible]
 def x86_64.types.M128i.Insts.CoreMarkerCopy : core.marker.Copy
   x86_64.types.M128i := {
@@ -3057,14 +5189,14 @@ def x86_64.types.M128i.Insts.CoreMarkerCopy : core.marker.Copy
 }
 
 /-- [p3_arch_shims::x86_64::types::{impl core::clone::Clone for p3_arch_shims::x86_64::types::M256}::clone]:
-    Source: 'src/x86_64/types.rs', lines 25:9-25:14
+    Source: 'src/x86_64/types.rs', lines 50:9-50:14
     Visibility: public -/
 def x86_64.types.M256.Insts.CoreCloneClone.clone
   (self : x86_64.types.M256) : RustM x86_64.types.M256 := do
   ok self
 
 /-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::clone::Clone for p3_arch_shims::x86_64::types::M256}]
-    Source: 'src/x86_64/types.rs', lines 25:9-25:14 -/
+    Source: 'src/x86_64/types.rs', lines 50:9-50:14 -/
 @[reducible]
 def x86_64.types.M256.Insts.CoreCloneClone : core.clone.Clone x86_64.types.M256
   := {
@@ -3074,7 +5206,7 @@ def x86_64.types.M256.Insts.CoreCloneClone : core.clone.Clone x86_64.types.M256
 }
 
 /-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::marker::Copy for p3_arch_shims::x86_64::types::M256}]
-    Source: 'src/x86_64/types.rs', lines 25:16-25:20 -/
+    Source: 'src/x86_64/types.rs', lines 50:16-50:20 -/
 @[reducible]
 def x86_64.types.M256.Insts.CoreMarkerCopy : core.marker.Copy x86_64.types.M256
   := {
@@ -3082,7 +5214,7 @@ def x86_64.types.M256.Insts.CoreMarkerCopy : core.marker.Copy x86_64.types.M256
 }
 
 /-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M256i}]
-    Source: 'src/x86_64/types.rs', lines 32:8-36:9; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 40:0-40:30 -/
+    Source: 'src/x86_64/types.rs', lines 57:8-61:9; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 65:0-65:30 -/
 @[reducible]
 def x86_64.types.M256i.Insts.CoreFmtDebug : core.fmt.Debug x86_64.types.M256i
   := {
@@ -3090,7 +5222,7 @@ def x86_64.types.M256i.Insts.CoreFmtDebug : core.fmt.Debug x86_64.types.M256i
 }
 
 /-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M128i}]
-    Source: 'src/x86_64/types.rs', lines 32:8-36:9; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 41:0-41:30 -/
+    Source: 'src/x86_64/types.rs', lines 57:8-61:9; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 66:0-66:30 -/
 @[reducible]
 def x86_64.types.M128i.Insts.CoreFmtDebug : core.fmt.Debug x86_64.types.M128i
   := {
@@ -3098,11 +5230,35 @@ def x86_64.types.M128i.Insts.CoreFmtDebug : core.fmt.Debug x86_64.types.M128i
 }
 
 /-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M256}]
-    Source: 'src/x86_64/types.rs', lines 32:8-36:9; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 42:0-42:28 -/
+    Source: 'src/x86_64/types.rs', lines 57:8-61:9; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 67:0-67:28 -/
 @[reducible]
 def x86_64.types.M256.Insts.CoreFmtDebug : core.fmt.Debug x86_64.types.M256
   := {
   fmt := x86_64.types.M256.Insts.CoreFmtDebug.fmt
+}
+
+/-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M512i}]
+    Source: 'src/x86_64/types.rs', lines 57:8-61:9; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 68:0-68:30 -/
+@[reducible]
+def x86_64.types.M512i.Insts.CoreFmtDebug : core.fmt.Debug x86_64.types.M512i
+  := {
+  fmt := x86_64.types.M512i.Insts.CoreFmtDebug.fmt
+}
+
+/-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M512}]
+    Source: 'src/x86_64/types.rs', lines 57:8-61:9; this code is generated from a macro invocation at: 'src/x86_64/types.rs', lines 69:0-69:28 -/
+@[reducible]
+def x86_64.types.M512.Insts.CoreFmtDebug : core.fmt.Debug x86_64.types.M512
+  := {
+  fmt := x86_64.types.M512.Insts.CoreFmtDebug.fmt
+}
+
+/-- Trait implementation: [p3_arch_shims::x86_64::types::{impl core::fmt::Debug for p3_arch_shims::x86_64::types::M512d}]
+    Source: 'src/x86_64/types.rs', lines 71:0-75:1 -/
+@[reducible]
+def x86_64.types.M512d.Insts.CoreFmtDebug : core.fmt.Debug x86_64.types.M512d
+  := {
+  fmt := x86_64.types.M512d.Insts.CoreFmtDebug.fmt
 }
 
 end p3_arch_shims

@@ -185,3 +185,28 @@ opaque = [
   "p3_monty_31::monty_31",
   "p3_monty_31::utils",
 ]
+
+# `PackedMontyField31AVX512`'s arithmetic, extracted for x86_64 with AVX-512F
+# against the intrinsic models (pre-patch 040, under which the `asm!` barriers
+# are the identity and each masked `vmovshdup` block is its intrinsic). As for
+# x86_64-avx2: the scalar modules are opaque, and bound to P3Monty31 by
+# variants/x86_64-avx512/extraction/P3Monty31Avx512/Assumptions/. Its own
+# namespace, since with AVX-512F `PackedMontyParameters` has the supertrait
+# `MontyParametersAVX512`.
+[[variant]]
+name = "x86_64-avx512"
+target = "x86_64-unknown-linux-gnu"
+target_features = ["avx512f"]
+lean_lib = "P3Monty31Avx512"
+namespace = "p3_monty_31_avx512"
+start_from = [
+  "{impl core::ops::arith::Add for p3_monty_31::x86_64_avx512::packing::PackedMontyField31AVX512<_>}::add",
+  "{impl core::ops::arith::Sub for p3_monty_31::x86_64_avx512::packing::PackedMontyField31AVX512<_>}::sub",
+  "{impl core::ops::arith::Neg for p3_monty_31::x86_64_avx512::packing::PackedMontyField31AVX512<_>}::neg",
+  "{impl core::ops::arith::Mul for p3_monty_31::x86_64_avx512::packing::PackedMontyField31AVX512<_>}::mul",
+  "p3_monty_31::x86_64_avx512::utils::halve_avx512",
+]
+opaque = [
+  "p3_monty_31::monty_31",
+  "p3_monty_31::utils",
+]

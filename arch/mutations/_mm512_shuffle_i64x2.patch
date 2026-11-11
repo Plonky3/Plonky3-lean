@@ -1,0 +1,14 @@
+# Mutation of: _mm512_shuffle_i64x2
+# Breaks:      it alternates `a` and `b` instead of taking the low half from `a`.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -660,7 +660,7 @@
+     let mut dst = [0u32; 16];
+     let mut l = 0;
+     while l < 4 {
+-        let src = if l < 2 { a.0 } else { b.0 };
++        let src = if l % 2 == 0 { a.0 } else { b.0 };
+         let sel = ((control >> (2 * l)) & 3) as usize;
+         let mut e = 0;
+         while e < 4 {

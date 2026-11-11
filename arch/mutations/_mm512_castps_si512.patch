@@ -1,0 +1,16 @@
+# Mutation of: _mm512_castps_si512
+# Breaks:      it swaps lanes 14 and 15.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -774,7 +774,9 @@
+ /// `_mm512_castps_si512`: a reinterpretation, no instruction (as for `_mm512_castsi512_ps`).
+ #[inline]
+ pub unsafe fn _mm512_castps_si512(a: __m512) -> __m512i {
+-    __m512i(a.0)
++    let mut l = a.0;
++    l.swap(14, 15);
++    __m512i(l)
+ }
+ 
+ /// `_mm512_castsi512_pd`: a reinterpretation, no instruction (as for `_mm512_castsi512_ps`).

@@ -1,0 +1,14 @@
+# Mutation of: _mm512_test_epi32_mask
+# Breaks:      it tests `a OR b` instead of `a AND b`.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -541,7 +541,7 @@
+     let mut k: __mmask16 = 0;
+     let mut j = 0;
+     while j < 16 {
+-        if a.0[j] & b.0[j] != 0 {
++        if a.0[j] | b.0[j] != 0 {
+             k |= 1 << j;
+         }
+         j += 1;

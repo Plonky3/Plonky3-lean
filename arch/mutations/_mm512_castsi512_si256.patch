@@ -1,0 +1,13 @@
+# Mutation of: _mm512_castsi512_si256
+# Breaks:      it takes the high 256 bits.
+#
+--- a/src/x86_64/avx512.rs
++++ b/src/x86_64/avx512.rs
+@@ -810,6 +810,6 @@
+ #[inline]
+ pub unsafe fn _mm512_castsi512_si256(a: __m512i) -> __m256i {
+     __m256i([
+-        a.0[0], a.0[1], a.0[2], a.0[3], a.0[4], a.0[5], a.0[6], a.0[7],
++        a.0[8], a.0[9], a.0[10], a.0[11], a.0[12], a.0[13], a.0[14], a.0[15],
+     ])
+ }
