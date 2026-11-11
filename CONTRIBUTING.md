@@ -8,8 +8,9 @@ specifications.
 
 What is claimed is exactly the theorems in `Plonky3Lean.Claims`, about the
 Plonky3 commit pinned in `plonky3/`, under the assumptions in
-[`TRUST.md`](TRUST.md). So far only the portable scalar code paths are modelled.
-"Plonky3 is formally verified" is not a claim this repository makes.
+[`TRUST.md`](TRUST.md). Which code paths are modelled, and which are not, is in
+[`README.md`](README.md). "Plonky3 is formally verified" is not a claim this
+repository makes.
 
 A crate is done when the code paths it ships are extracted rather than
 transcribed, and every public function on them is claimed against a CompPoly
@@ -102,10 +103,15 @@ checks need the pinned toolchain and are run locally.
 - Keep each PR to one change. Commits use a type and an optional scope:
   `feat(extract): …`, `fix(tools): …`, `docs(patches): …`, `refactor: …`, `chore: …`.
   PRs are squash-merged under the PR title.
-- After review, push fixes as new commits and reply on each thread. Post an update
-  comment rather than rewriting the description.
-- A PR stacked on another targets `main`, says "stacked on #N", and is rebased as
-  soon as its base merges.
+- After review, push fixes as new commits. Keep the title and description
+  current: rewrite them to describe the PR as it now stands, rather than posting
+  update comments.
+- Prefer `main` as the base of a PR stacked on another, and say "stacked on #N".
+  If a PR must target its base's branch, retarget it to `main` as soon as the
+  base merges: the squash leaves the base's original commits on the stacked
+  branch, so rebase it with `git rebase --onto origin/main <old base head>` and
+  force-push with lease. Delete the merged base branch, so that nothing can merge
+  into it.
 - [`.github/CODEOWNERS`](.github/CODEOWNERS) assigns `Plonky3Lean/Claims/`,
   `Plonky3Lean/Spec/`, `ToCompPoly/`, `claims.toml`, the pre-patches, `TRUST.md`
   and `toolchain.toml` to the Plonky3 maintainers. A change there needs their review.
