@@ -50,16 +50,17 @@ Nothing here describes the rest of these code paths.
 
 The AVX2 and NEON models are reviewed against Intel's and Arm's pseudocode and
 checked against the hardware by `arch/tests/`. **The AVX-512 models
-(`arch/src/x86_64/avx512.rs`) are reviewed against Intel's pseudocode but not
-yet tested against the hardware.** No machine or CI runner available to this
-project guarantees AVX-512, so `arch/tests/avx512.rs` and its mutations
-(`arch/check-mutations.sh`) only run where the CPU has it, and are otherwise
-skipped. Run under Miri instead, the same tests compare each model with
+(`arch/src/x86_64/avx512.rs`) are reviewed against Intel's pseudocode and
+checked against the hardware only when a CI run gets an AVX-512 CPU.** GitHub's
+x86 runners do not guarantee AVX-512, so `arch/tests/avx512.rs` and its
+mutations (`arch/check-mutations.sh`) run where the CPU has it and are
+otherwise skipped, with a warning on the run. A change to an AVX-512 model is
+therefore checked against the hardware only once a run that includes it gets
+such a runner; until then, a transcription error in it can make an AVX-512
+claim false. Run under Miri instead, the same tests compare each model with
 `core::arch`'s own Rust implementation of the intrinsic, which is a second model
 rather than the hardware; they agree, and each recorded mutation but those of
-`vpermi2d` and `vpermi2q`, which Miri does not implement, is caught there. Until
-the tests run on an AVX-512 CPU, a transcription error in an AVX-512 model can
-make an AVX-512 claim false.
+`vpermi2d` and `vpermi2q`, which Miri does not implement, is caught there.
 
 These variants also rest on stand-ins for the `asm!` blocks the extractor
 rejects (docs/extractor-issues.md 213):
