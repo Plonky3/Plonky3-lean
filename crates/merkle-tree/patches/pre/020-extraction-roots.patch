@@ -1,0 +1,120 @@
+# Patch:        020-extraction-roots
+# Phase:        pre
+# Target:       merkle-tree/src/hax_roots.rs, merkle-tree/src/lib.rs
+# Hunks:        2
+# Class:        bound
+# Gap:          docs/extractor-issues.md 4 (aeneas drops a method that no free
+#               function calls).
+# Cost:         none in a normal build: the module exists only under
+#               cfg(hax_backend_lean). In the extracted variant it adds free
+#               functions, each of which calls one reshaped body.
+#               No existing body changes.
+# Upstreamable: no: the module exists only for the extractor.
+# Drop when:    charon orders `--start-from` methods, so that the trait methods
+#               of the MMCS can be roots themselves.
+# Test:         lint p3-merkle-tree unexpected_cfgs
+# Mutation:     the module is gated on a misspelled cfg, so a normal
+#               `cargo check` reports `unexpected_cfgs`.
+#
+# The MMCS trait carries generic associated types, so its methods are not rooted directly.
+# Each wrapper calls one reshaped verifier body, with the hasher, the compression and the packing left generic.
+# The Lean model then takes each as an argument, and its theorems hold for every one.
+#
+diff --git a/merkle-tree/src/hax_roots.rs b/merkle-tree/src/hax_roots.rs
+new file mode 100644
+index 00000000..a68d21ae
+--- /dev/null
++++ b/merkle-tree/src/hax_roots.rs
+@@ -0,0 +1,78 @@
++//! PATCHED: extraction roots, one function per extracted item, only under the extraction cfg.
++
++use alloc::vec::Vec;
++
++use p3_matrix::Dimensions;
++use p3_symmetric::{CryptographicHasher, MerkleCap, PseudoCompressionFunction};
++
++use crate::merkle_tree::padded_len;
++use crate::mmcs::hax_reshaped;
++use crate::{MerkleTreeError, MerkleTreeMmcs};
++
++pub fn padded_len_root(raw_len: usize, n: usize) -> usize {
++    padded_len(raw_len, n)
++}
++
++pub fn validate_heights(dimensions: &[Dimensions]) -> Result<usize, MerkleTreeError> {
++    hax_reshaped::validate_heights(dimensions)
++}
++
++pub fn arity_schedule_and_proof_levels<const N: usize>(
++    cap_height: usize,
++    dimensions: &[Dimensions],
++) -> Result<(Vec<usize>, usize), MerkleTreeError> {
++    hax_reshaped::arity_schedule_and_proof_levels::<N>(cap_height, dimensions)
++}
++
++pub fn verify_batch<P, PW, F, W, H, C, const N: usize, const DIGEST_ELEMS: usize>(
++    mmcs: &MerkleTreeMmcs<P, PW, H, C, N, DIGEST_ELEMS>,
++    commit: &MerkleCap<F, [W; DIGEST_ELEMS]>,
++    dimensions: &[Dimensions],
++    index: usize,
++    opened_values: &[Vec<F>],
++    opening_proof: &[[W; DIGEST_ELEMS]],
++) -> Result<(), MerkleTreeError>
++where
++    F: Clone,
++    W: Copy + Default + PartialEq,
++    H: CryptographicHasher<F, [W; DIGEST_ELEMS]>,
++    C: PseudoCompressionFunction<[W; DIGEST_ELEMS], N>,
++{
++    hax_reshaped::verify_batch(mmcs, commit, dimensions, index, opened_values, opening_proof)
++}
++
++pub fn hiding_verify_batch<
++    P,
++    PW,
++    F,
++    W,
++    H,
++    C,
++    const N: usize,
++    const DIGEST_ELEMS: usize,
++    const SALT_ELEMS: usize,
++>(
++    inner: &MerkleTreeMmcs<P, PW, H, C, N, DIGEST_ELEMS>,
++    commit: &MerkleCap<F, [W; DIGEST_ELEMS]>,
++    dimensions: &[Dimensions],
++    index: usize,
++    opened_values: &[Vec<F>],
++    salts: &[Vec<F>],
++    siblings: &[[W; DIGEST_ELEMS]],
++) -> Result<(), MerkleTreeError>
++where
++    F: Clone,
++    W: Copy + Default + PartialEq,
++    H: CryptographicHasher<F, [W; DIGEST_ELEMS]>,
++    C: PseudoCompressionFunction<[W; DIGEST_ELEMS], N>,
++{
++    hax_reshaped::hiding_verify_batch::<P, PW, F, W, H, C, N, DIGEST_ELEMS, SALT_ELEMS>(
++        inner,
++        commit,
++        dimensions,
++        index,
++        opened_values,
++        salts,
++        siblings,
++    )
++}
+diff --git a/merkle-tree/src/lib.rs b/merkle-tree/src/lib.rs
+index bda9d759..2829bd4a 100644
+--- a/merkle-tree/src/lib.rs
++++ b/merkle-tree/src/lib.rs
+@@ -4,6 +4,9 @@
+ extern crate alloc;
+ 
+ mod builder;
++// PATCHED: extraction roots, only under hax's Lean backend.
++#[cfg(hax_backend_lean)]
++pub mod hax_roots;
+ mod hiding_mmcs;
+ mod merkle_tree;
+ mod mmcs;

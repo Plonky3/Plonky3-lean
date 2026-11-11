@@ -3,8 +3,11 @@
 # Target:       binary-field/src/challenger.rs, binary-field/src/coordinates.rs, binary-field/tests/pre_patch_010.rs
 # Hunks:        7
 # Class:        bound
-# Gap:          docs/extractor-issues.md 10 (charon#1266, as for baby-bear's
-#               pre 020).
+# Gap:          docs/extractor-issues.md 10 (charon#1266): baby-bear's pre 020
+#               drops `Field`'s `RawDataSerializable` supertrait in the
+#               extraction build. Without this patch the patched tree does not
+#               compile there: `F: RawDataSerializable` is not satisfied, and
+#               `into_bytes` and `NUM_BYTES` are not found.
 # Cost:         none: each added bound is implied by `TowerLevel: Field` in a
 #               normal build.
 # Upstreamable: no: the bounds are redundant upstream. Dropping baby-bear's
@@ -21,6 +24,9 @@
 # Under the cfg they no longer compile, so each states the bound itself.
 #
 # In a normal build `TowerLevel: Field` implies it, so nothing changes there.
+#
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
 #
 diff --git a/binary-field/src/challenger.rs b/binary-field/src/challenger.rs
 index a020ba60..9671e60f 100644

@@ -1,0 +1,13 @@
+# Mutation of: 030-extraction-roots
+# Breaks:      the module is gated on a misspelled cfg.
+#
+diff --git a/matrix/src/lib.rs b/matrix/src/lib.rs
+--- a/matrix/src/lib.rs
++++ b/matrix/src/lib.rs
+@@ -37,5 +37,5 @@
+ pub mod util;
+ // PATCHED: extraction roots, only under hax's Lean backend.
+-#[cfg(hax_backend_lean)]
++#[cfg(hax_backend_lea)]
+ pub mod hax_roots;
+ 

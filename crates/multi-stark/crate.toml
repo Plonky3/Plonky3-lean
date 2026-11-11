@@ -1,0 +1,432 @@
+# p3-multi-stark: the multilinear SuperSpartan-style STARK prover and verifier for AIRs.
+
+lean_lib = "P3MultiStark"
+
+# The verifier's field arithmetic that needs no transcript and no AIR is extracted: the boundary selectors, the successor row and the zerocheck's free coordinates.
+#
+# The rest is generic over the AIR and the challenger, or keeps a transcript holding a mutable borrow, which aeneas rejects (docs/extractor-issues.md 9 and 180).
+#
+# It is transcribed in extraction/P3MultiStark/Mirror/, with the abstractions each file's header lists.
+state = "scoped"
+
+features = []
+
+# One root: the `hax_roots` module that pre-patch 030 adds under cfg(hax_backend_lean).
+# Each of its functions calls one item, with the field left generic.
+start_from = ["p3_multi_stark::hax_roots"]
+
+watch = ["multi-stark/src", "lookup/src/types.rs", "lookup/src/indexed.rs", "multi-stark/Cargo.toml", "security/src/multilinear.rs", "multilinear-util/src/point.rs", "sumcheck/src/generic_degree/util.rs", "lookup/src/challenges.rs", "bus/src/plan/mod.rs"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_multi_stark.selectors.mirror.BoundaryEvals"
+rust = "p3_multi_stark::selectors::BoundaryEvals"
+
+[[mirror]]
+lean = "p3_multi_stark.selectors.mirror.atStep"
+rust = "p3_multi_stark::selectors::BoundaryEvals::at"
+
+[[mirror]]
+lean = "p3_multi_stark.selectors.mirror.BoundaryEvals.at"
+rust = "p3_multi_stark::selectors::BoundaryEvals::at"
+
+[[mirror]]
+lean = "p3_multi_stark.selectors.mirror.BoundaryEvals.apply"
+rust = "p3_multi_stark::selectors::BoundaryEvals::apply"
+
+[[mirror]]
+lean = "p3_multi_stark.selectors.mirror.BoundaryEvals.from_row"
+rust = "p3_multi_stark::selectors::BoundaryEvals::from_row"
+
+[[mirror]]
+lean = "p3_multi_stark.selectors.mirror.BoundaryEvals.from_row_with_prefix"
+rust = "p3_multi_stark::selectors::BoundaryEvals::from_row_with_prefix"
+
+[[mirror]]
+lean = "p3_multi_stark.opening.mirror.TableOpening"
+rust = "p3_multi_stark::opening::TableOpening"
+
+[[mirror]]
+lean = "p3_multi_stark.opening.mirror.TableOpening.empty"
+rust = "p3_multi_stark::opening::TableOpening::empty"
+
+[[mirror]]
+lean = "p3_multi_stark.opening.mirror.scatterStep"
+rust = "p3_multi_stark::opening::OpeningClaims::next_row"
+
+[[mirror]]
+lean = "p3_multi_stark.opening.mirror.next_row"
+rust = "p3_multi_stark::opening::OpeningClaims::next_row"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.ZerocheckError"
+rust = "p3_multi_stark::zerocheck::ZerocheckError"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.ZerocheckReduction"
+rust = "p3_multi_stark::zerocheck::ZerocheckReduction"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.checkAir"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.accumulate"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.entries"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.closing"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.check_constraint"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.round_degree"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::verify_reduction_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.check_claimed_sum"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::verify_reduction_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.MultiStarkInstanceShape"
+rust = "p3_multi_stark::transcript::MultiStarkInstanceShape"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.MultiStarkShape"
+rust = "p3_multi_stark::transcript::MultiStarkShape"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.MultiStarkShape.has_preprocessed"
+rust = "p3_multi_stark::transcript::MultiStarkShape::has_preprocessed"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.Step"
+rust = "p3_multi_stark::transcript::MultiStarkShape::pattern"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.Delegation"
+rust = "p3_multi_stark::transcript::MultiStarkShape::pattern"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.delegation"
+rust = "p3_multi_stark::transcript::delegation"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.MultiStarkShape.pattern"
+rust = "p3_multi_stark::transcript::MultiStarkShape::pattern"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.columnWords"
+rust = "p3_multi_stark::transcript::MultiStarkShape::domain_separator"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.instanceWords"
+rust = "p3_multi_stark::transcript::MultiStarkShape::domain_separator"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.MultiStarkShape.label"
+rust = "p3_multi_stark::transcript::MultiStarkShape::domain_separator"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.AirDegrees"
+rust = "p3_multi_stark::rounds::AirDegrees"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.ZerocheckStep"
+rust = "p3_multi_stark::zerocheck::transcript::ZerocheckShape::pattern"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.ZerocheckShape"
+rust = "p3_multi_stark::zerocheck::transcript::ZerocheckShape"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.ZerocheckShape.free_coordinates"
+rust = "p3_multi_stark::zerocheck::transcript::ZerocheckShape::free_coordinates"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.ZerocheckShape.pattern"
+rust = "p3_multi_stark::zerocheck::transcript::ZerocheckShape::pattern"
+
+[[mirror]]
+lean = "p3_multi_stark.transcript.mirror.ZerocheckShape.label"
+rust = "p3_multi_stark::zerocheck::transcript::ZerocheckShape::domain_separator"
+
+[[mirror]]
+lean = "p3_multi_stark.security.mirror.AirParams"
+rust = "p3_security::multilinear::MultilinearAirParams"
+
+[[mirror]]
+lean = "p3_multi_stark.security.mirror.air_terms"
+rust = "p3_security::multilinear::reduction_terms"
+
+[[mirror]]
+lean = "p3_multi_stark.security.mirror.num_variables"
+rust = "p3_multi_stark::security::assess_statement"
+
+[[mirror]]
+lean = "p3_multi_stark.security.mirror.charged_degree"
+rust = "p3_multi_stark::security::assess_statement"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.M"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.AirView"
+rust = "p3_multi_stark::folder::VerifierAir"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.BusTerm"
+rust = "p3_multi_stark::bus::BusContext::terminal_composition"
+
+[[mirror]]
+lean = "p3_multi_stark.zerocheck.mirror.Entry"
+rust = "p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus"
+
+[[mirror]]
+lean = "p3_multi_stark.security.mirror.Term"
+rust = "p3_security::SecurityTerm"
+
+[[mirror]]
+lean = "p3_multi_stark.security.mirror.Denominator"
+rust = "p3_security::multilinear::reduction_terms"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.SplitFraction"
+rust = "p3_multi_stark::fractional_gkr::SplitFraction"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.SplitFraction.gate"
+rust = "p3_multi_stark::fractional_gkr::SplitFraction::gate"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.FractionGkrError"
+rust = "p3_multi_stark::fractional_gkr::FractionGkrError"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.ROUND_POLY_LEN"
+rust = "p3_multi_stark::fractional_gkr::transcript::ROUND_POLY_LEN"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.FractionGkrLayerProof"
+rust = "p3_multi_stark::fractional_gkr::FractionGkrLayerProof"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.FractionGkrProof"
+rust = "p3_multi_stark::fractional_gkr::FractionGkrProof"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.FractionGkrOutput"
+rust = "p3_multi_stark::fractional_gkr::FractionGkrOutput"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.VerifierTranscript"
+rust = "p3_multi_stark::fractional_gkr::transcript::FractionGkrVerifierTranscript"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.VerifyState"
+rust = "p3_multi_stark::fractional_gkr::verify_fractional_gkr"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.firstBadRound"
+rust = "p3_multi_stark::fractional_gkr::verify_fractional_gkr"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.roundStep"
+rust = "p3_multi_stark::fractional_gkr::verify_fractional_gkr"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.verify_layer"
+rust = "p3_multi_stark::fractional_gkr::verify_fractional_gkr"
+
+[[mirror]]
+lean = "p3_multi_stark.fractional_gkr.mirror.verify_fractional_gkr"
+rust = "p3_multi_stark::fractional_gkr::verify_fractional_gkr"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.LookupInstancePlan"
+rust = "p3_multi_stark::lookup::LookupInstancePlan"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.log2_ceil_usize"
+rust = "p3_util::log2_ceil_usize"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.place"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.bus_capacity_ok"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.tupleWeights"
+rust = "p3_multi_stark::lookup::AirLinkClaim::new"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.blockWeights"
+rust = "p3_multi_stark::lookup::AirLinkClaim::new"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.claimed_sum"
+rust = "p3_multi_stark::lookup::AirLinkClaim::new"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.theta_bus_offset"
+rust = "p3_multi_stark::lookup::AirLinkClaim::new"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.bus_prefixes"
+rust = "p3_lookup::Challenges::new"
+
+[[mirror]]
+lean = "p3_multi_stark.logup_star.mirror.embed"
+rust = "p3_multi_stark::logup_star::position::embed"
+
+[[mirror]]
+lean = "p3_multi_stark.logup_star.mirror.fits"
+rust = "p3_multi_stark::logup_star::position::fits"
+
+[[mirror]]
+lean = "p3_multi_stark.logup_star.mirror.eval"
+rust = "p3_multi_stark::logup_star::position::eval"
+
+[[mirror]]
+lean = "p3_multi_stark.logup_star.mirror.claimed_sum"
+rust = "p3_multi_stark::logup_star::product::claimed_sum"
+
+[[mirror]]
+lean = "p3_multi_stark.bus.mirror.TerminalShare"
+rust = "p3_bus::BusTerminalShare"
+
+[[mirror]]
+lean = "p3_multi_stark.bus.mirror.BusBindingError"
+rust = "p3_multi_stark::bus::BusBindingError"
+
+[[mirror]]
+lean = "p3_multi_stark.bus.mirror.shareTerm"
+rust = "p3_multi_stark::bus::BusContext::terminal_composition"
+
+[[mirror]]
+lean = "p3_multi_stark.bus.mirror.terminal_composition"
+rust = "p3_multi_stark::bus::BusContext::terminal_composition"
+
+[[mirror]]
+lean = "p3_multi_stark.security.mirror.LookupParams"
+rust = "p3_security::multilinear::MultilinearLookupParams"
+
+[[mirror]]
+lean = "p3_multi_stark.security.mirror.lookup_terms"
+rust = "p3_security::multilinear::reduction_terms"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.Kind"
+rust = "p3_lookup::Kind"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.Lookup"
+rust = "p3_lookup::Lookup"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.Lookup.active"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.LookupBus"
+rust = "p3_multi_stark::lookup::LookupBus"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.busOf"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.LookupError"
+rust = "p3_multi_stark::lookup::LookupError"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.LookupPlan"
+rust = "p3_multi_stark::lookup::LookupPlan"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.shl_one"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.word"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.BusTable"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.assignBus"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.ActiveAir"
+rust = "p3_multi_stark::lookup::LookupInstancePlan"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.planStep"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.lookup.mirror.LookupPlan.build"
+rust = "p3_multi_stark::lookup::LookupPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.TraceWindow"
+rust = "p3_lookup::indexed::TraceWindow"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.IndexedRead"
+rust = "p3_lookup::indexed::IndexedRead"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.IndexedTable"
+rust = "p3_lookup::indexed::IndexedTable"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.IndexedLookups"
+rust = "p3_lookup::indexed::IndexedLookups"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.IndexedLookups.isEmpty"
+rust = "p3_lookup::indexed::IndexedLookups::is_empty"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.TablePlacement"
+rust = "p3_multi_stark::indexed::TablePlacement"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.ReaderPlacement"
+rust = "p3_multi_stark::indexed::ReaderPlacement"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.IndexedTablePlan"
+rust = "p3_multi_stark::indexed::IndexedTablePlan"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.IndexedPlanError"
+rust = "p3_lookup::indexed::IndexedLookupError"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.addTable"
+rust = "p3_multi_stark::indexed::IndexedPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.addRead"
+rust = "p3_multi_stark::indexed::IndexedPlan::build"
+
+[[mirror]]
+lean = "p3_multi_stark.indexed.mirror.IndexedPlan.from_declared"
+rust = "p3_multi_stark::indexed::IndexedPlan::build"

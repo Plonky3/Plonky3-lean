@@ -1,0 +1,14 @@
+# Mutation of: 020-extraction-roots
+# Breaks:      the module is gated on a misspelled cfg.
+#
+--- a/binary-pcs/src/lib.rs
++++ b/binary-pcs/src/lib.rs
+@@ -12,7 +12,7 @@
+ mod fold;
+ mod grouped_mmcs;
+ // PATCHED: extraction roots, only under hax's Lean backend.
+-#[cfg(hax_backend_lean)]
++#[cfg(hax_backend_lea)]
+ pub mod hax_roots;
+ mod mixed_trace;
+ mod packing;

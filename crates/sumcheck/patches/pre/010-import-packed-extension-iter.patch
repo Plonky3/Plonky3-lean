@@ -1,0 +1,34 @@
+# Patch:        010-import-packed-extension-iter
+# Phase:        pre
+# Target:       sumcheck/src/product_polynomial.rs
+# Hunks:        1
+# Class:        bound
+# Gap:          docs/extractor-issues.md 10 (charon#1266): baby-bear's pre 030
+#               moves `to_ext_iter` to the extension trait
+#               `PackedFieldExtensionIter` under the cfg. Without this patch
+#               p3-sumcheck does not compile there: E0599, `to_ext_iter` not
+#               found, 7 times.
+# Cost:         none: the added lines are behind cfg(hax_backend_lean), so a
+#               normal build is token for token as shipped.
+# Upstreamable: no: the imported trait exists only in the extracted variant.
+#               Dropping baby-bear's pre 030 makes this patch unnecessary.
+# Drop when:    baby-bear's pre 030 is dropped.
+# Test:         lint p3-sumcheck unused_imports
+# Mutation:     the import loses its cfg, so a normal build names a trait
+#               that does not exist there.
+#
+# The same change as multilinear-util's pre 010, for the one file of p3-sumcheck that calls `to_ext_iter`.
+#
+diff --git a/sumcheck/src/product_polynomial.rs b/sumcheck/src/product_polynomial.rs
+index cf6d9308..28e28758 100644
+--- a/sumcheck/src/product_polynomial.rs
++++ b/sumcheck/src/product_polynomial.rs
+@@ -21,6 +21,8 @@
+ 
+ use p3_challenger::fs::TranscriptField;
+ use p3_challenger::{CanObserve, CanSample, GrindingChallenger};
++#[cfg(hax_backend_lean)] // PATCHED: `to_ext_iter` lives on this trait in the extracted variant.
++use p3_field::PackedFieldExtensionIter;
+ use p3_field::{ExtensionField, Field, PackedFieldExtension, PackedValue, dot_product};
+ use p3_maybe_rayon::prelude::*;
+ use p3_multilinear_util::point::Point;

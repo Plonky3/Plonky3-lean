@@ -311,11 +311,11 @@ theorem baby_bear.BabyBear.neg.toField (a : Element) (ha : Canonical a) :
 
 /-- `a.halve()`, for canonical `a`, is canonical and stands for `toField a / 2`. -/
 theorem baby_bear.BabyBear.halve.toField (a : Element) (ha : Canonical a) :
-    p3_monty_31.monty_31.MontyField31.halve FieldParams a
+    p3_monty_31.monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.halve FieldParams a
       ⦃ c => Canonical c ∧ Spec.BabyBear.toField c * 2 = Spec.BabyBear.toField a ⦄ := by
   unfold Canonical at *
   rw [fieldSize_eq] at ha
-  unfold p3_monty_31.monty_31.MontyField31.halve
+  unfold p3_monty_31.monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.halve
   refine Aeneas.Std.WP.spec_bind (utils.halve_u32.spec _ ha) fun v hv => ?_
   refine Aeneas.Std.WP.spec_mono (new_monty.spec v) fun c hc => ?_
   unfold Spec.BabyBear.toField

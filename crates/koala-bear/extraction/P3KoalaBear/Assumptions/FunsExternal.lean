@@ -1,15 +1,19 @@
 -- [p3_koala_bear]: external functions.
--- HAND-WRITTEN, from hax's seed of Extraction/FunsExternal_Template.lean.
--- The generated code imports it by this module name. extract.sh fails if the
--- regenerated template declares different names than this file does.
 --
--- EDITED: aeneas's template gives `fmt` a `&mut Formatter` back-function in
--- its result, but `CoreModels`' `core.fmt.Debug.fmt` returns only the updated
--- `Formatter`. The four signatures below are adjusted to CoreModels' shape.
--- `axiom` -> `opaque`: an opaque constant asserts only that
--- some inhabitant exists, so it adds nothing to a theorem's axiom footprint.
--- These are the bodies of four derived `Debug` impls, which extract.sh
--- makes opaque on purpose.
+-- Hand-written from hax's seed, `Extraction/FunsExternal_Template.lean`.
+-- The generated code imports this module by name.
+-- extract.sh fails if the regenerated template declares different names.
+--
+-- EDITED: the four `fmt` signatures below follow CoreModels' shape.
+-- aeneas's template gives `fmt` a `&mut Formatter` back-function in its result.
+-- CoreModels' `core.fmt.Debug.fmt` returns only the updated `Formatter`.
+--
+-- EDITED: `axiom` -> `opaque`.
+-- These are the bodies of four derived `Debug` impls.
+-- extract.sh makes them opaque on purpose.
+--
+-- An opaque constant asserts only that some inhabitant exists.
+-- It adds nothing to a theorem's axiom footprint.
 module
 
 public import Aeneas

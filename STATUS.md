@@ -14,22 +14,52 @@ target `thumbv7em-none-eabi`
 
 | Crate | State | Generated lines | Hand-written lines | `opaque` | Mirrored | Dropped by the extractor | Patches (pre / post) | Patches with a cost |
 |---|---|---:|---:|---:|---:|---:|---|---|
-| `baby-bear` | extracted | 2953 | 121 | 4 | 0 | 0 | 4 / 3 | pre `020`, pre `030`, pre `040` |
-| `binary-field` | scoped | 21777 | 66 | 0 | 0 | 139 | 7 / 2 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050`, pre `060`, pre `070` |
-| `blake2s` | scoped | 148 | 51 | 1 | 0 | 0 | 1 / 0 | pre `010` |
-| `blake3` | scoped | 2609 | 40 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
+| `air` | scoped | 364 | 935 | 0 | 67 | 0 | 0 / 1 | post `010` |
+| `baby-bear` | extracted | 2953 | 126 | 4 | 0 | 0 | 5 / 3 | pre `020`, pre `030`, pre `040`, pre `050` |
+| `batch-stark` | scoped | 116 | 1413 | 0 | 81 | 0 | 0 / 0 |  |
+| `binary-dft` | scoped | 1073 | 694 | 2 | 52 | 0 | 2 / 1 | pre `010`, pre `020`, post `010` |
+| `binary-field` | scoped | 21777 | 106 | 0 | 0 | 137 | 7 / 2 | pre `010`, pre `020`, pre `030`, pre `040`, pre `050`, pre `060`, pre `070` |
+| `binary-pcs` | scoped | 506 | 878 | 0 | 10 | 0 | 2 / 1 | pre `010`, pre `020`, post `010` |
+| `blake2s` | scoped | 148 | 55 | 1 | 0 | 0 | 1 / 0 | pre `010` |
+| `blake2s-air` | scoped | 499 | 658 | 0 | 47 | 0 | 0 / 0 |  |
+| `blake3` | scoped | 2609 | 44 | 0 | 0 | 6 | 2 / 0 | pre `010`, pre `020` |
+| `blake3-air` | scoped | 240 | 955 | 0 | 117 | 0 | 0 / 0 |  |
 | `blake3-crate` | stub |  | 26 | 0 | 3 |  | 0 / 0 |  |
-| `field` | stub |  | 91 | 2 | 6 |  | 0 / 0 |  |
-| `goldilocks` | scoped | 574 | 423 | 0 | 19 | 27 | 1 / 1 |  |
-| `koala-bear` | extracted | 3024 | 121 | 4 | 0 | 0 | 0 / 3 |  |
-| `mds` | scoped | 101 | 43 | 0 | 0 | 0 | 0 / 0 |  |
-| `mersenne-31` | scoped | 1444 | 259 | 0 | 12 | 30 | 1 / 1 | pre `010` |
-| `monty-31` | scoped | 831 | 526 | 0 | 25 | 37 | 0 / 1 |  |
+| `bus` | scoped | 163 | 1435 | 0 | 122 | 0 | 1 / 0 | pre `010` |
+| `challenger` | scoped | 1552 | 227 | 0 | 12 | 6 | 1 / 1 | pre `010` |
+| `circle` | stub |  | 1591 | 0 | 100 |  | 0 / 0 |  |
+| `commit` | stub |  | 836 | 0 | 59 |  | 0 / 0 |  |
+| `dft` | stub |  | 992 | 0 | 67 |  | 0 / 0 |  |
+| `field` | stub |  | 382 | 7 | 25 |  | 0 / 0 |  |
+| `fri` | stub |  | 1598 | 0 | 114 |  | 0 / 0 |  |
+| `goldilocks` | scoped | 574 | 428 | 0 | 19 | 27 | 1 / 1 |  |
+| `keccak` | scoped | 1109 | 43 | 0 | 0 | 6 | 2 / 2 | pre `010`, pre `020` |
+| `keccak-air` | scoped | 624 | 773 | 0 | 48 | 0 | 0 / 0 |  |
+| `koala-bear` | extracted | 3024 | 126 | 4 | 0 | 0 | 0 / 3 |  |
+| `lookup` | scoped | 275 | 898 | 0 | 58 | 0 | 0 / 0 |  |
+| `matrix` | scoped | 1625 | 263 | 0 | 12 | 0 | 3 / 3 | pre `020`, pre `030`, post `020`, post `030` |
+| `mds` | scoped | 101 | 46 | 0 | 0 | 0 | 0 / 0 |  |
+| `merkle-tree` | scoped | 1306 | 47 | 0 | 0 | 0 | 2 / 0 | pre `010`, pre `020` |
+| `mersenne-31` | scoped | 1444 | 261 | 0 | 12 | 30 | 1 / 1 | pre `010` |
+| `monty-31` | scoped | 1581 | 329 | 0 | 13 | 29 | 1 / 1 | pre `010` |
+| `multi-stark` | scoped | 338 | 1323 | 0 | 103 | 0 | 3 / 1 | pre `010`, pre `020`, pre `030`, post `010` |
+| `multilinear-util` | scoped | 222 | 1117 | 0 | 75 | 0 | 2 / 0 | pre `010`, pre `020` |
 | `poseidon1` | stub |  | 72 | 3 | 4 |  | 0 / 0 |  |
 | `poseidon2` | stub |  | 68 | 2 | 4 |  | 0 / 0 |  |
-| `sha2` | scoped | 371 | 37 | 0 | 0 | 0 | 0 / 0 |  |
-| `sha256` | scoped | 208 | 38 | 0 | 0 | 1 | 1 / 0 | pre `010` |
-| `util` | scoped | 182 | 56 | 0 | 1 | 0 | 0 / 0 |  |
+| `security` | scoped | 1426 | 170 | 7 | 14 | 0 | 2 / 2 | pre `010`, pre `020`, post `020` |
+| `sha2` | scoped | 371 | 41 | 0 | 0 | 0 | 0 / 0 |  |
+| `sha256` | scoped | 208 | 42 | 0 | 0 | 1 | 1 / 0 | pre `010` |
+| `sha256-air` | scoped | 150 | 959 | 0 | 77 | 0 | 0 / 0 |  |
+| `stir` | stub |  | 695 | 0 | 40 |  | 0 / 0 |  |
+| `sumcheck` | scoped | 299 | 562 | 0 | 29 | 0 | 3 / 0 | pre `010`, pre `020`, pre `030` |
+| `symmetric` | scoped | 1078 | 66 | 1 | 0 | 4 | 4 / 2 | pre `010`, pre `020`, pre `030`, pre `040` |
+| `tiny-keccak` | scoped | 98 | 101 | 0 | 3 | 0 | 0 / 0 |  |
+| `uni-stark` | scoped | 252 | 903 | 0 | 42 | 0 | 0 / 0 |  |
+| `util` | scoped | 240 | 74 | 0 | 1 | 0 | 0 / 1 | post `010` |
+| `whir` | stub |  | 605 | 0 | 20 |  | 0 / 0 |  |
+| `word` | scoped | 4507 | 106 | 3 | 0 | 0 | 3 / 3 | pre `010`, pre `020`, pre `030` |
+| `word-backend` | stub |  | 419 | 0 | 26 |  | 0 / 0 |  |
+| `zk-codes` | stub |  | 248 | 0 | 19 |  | 0 / 0 |  |
 
 Generated lines are `extraction/<Lib>/Extraction/{Types,Funs}.lean`. Hand-written
 lines are every other `.lean` file of the crate. *Dropped by the extractor* counts
@@ -43,7 +73,22 @@ From each extracted crate's `extraction/gaps.toml`, which `extract.sh` writes fr
 charon's output and `--check` requires to reproduce. An item is *mirrored* when a
 `[[mirror]]` entry transcribes it by hand.
 
+### `air`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ### `baby-bear`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `batch-stark`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `binary-dft`
 
 charon errors: 0.
 Nothing translated is dropped.
@@ -51,7 +96,7 @@ Nothing translated is dropped.
 ### `binary-field`
 
 charon errors: 0.
-139 item(s) dropped, 0 of them mirrored.
+137 item(s) dropped, 0 of them mirrored.
 
 | Item | Source | Mirrored |
 |---|---|---|
@@ -71,7 +116,6 @@ charon errors: 0.
 | `p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::add_assign_lane` | `` |  |
 | `p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::extract` | `` |  |
 | `p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::from_ext_slice` | `` |  |
-| `p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::packed_ext_powers` | `` |  |
 | `p3_binary_field::gf2::{impl core::clone::Clone}::clone` | `` |  |
 | `p3_binary_field::gf2::{impl core::cmp::Ord}::cmp` | `` |  |
 | `p3_binary_field::gf2::{impl core::cmp::PartialOrd}::partial_cmp` | `` |  |
@@ -146,7 +190,6 @@ charon errors: 0.
 | `p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::add_assign_lane` | `` |  |
 | `p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::extract` | `` |  |
 | `p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::from_ext_slice` | `` |  |
-| `p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::packed_ext_powers` | `` |  |
 | `p3_binary_field::poly192::{impl}::limbs` | `` |  |
 | `p3_binary_field::poly64::ALPHA` | `` |  |
 | `p3_binary_field::poly64::TOWER_GENERATOR` | `` |  |
@@ -195,7 +238,17 @@ charon errors: 0.
 | `p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::mul_2exp_u64` | `` |  |
 | `p3_binary_field::tower::{impl p3_field::field::PrimeCharacteristicRing}::xor` | `` |  |
 
+### `binary-pcs`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ### `blake2s`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `blake2s-air`
 
 charon errors: 0.
 Nothing translated is dropped.
@@ -213,6 +266,30 @@ charon errors: 0.
 | `p3_blake3::{impl p3_symmetric::hasher::CryptographicHasher}::LANES` | `` |  |
 | `p3_blake3::{impl p3_symmetric::hasher::CryptographicHasher}::hash_iter` | `` |  |
 | `p3_blake3::{impl p3_symmetric::hasher::CryptographicHasher}::hash_iter::BUFLEN` | `` |  |
+
+### `blake3-air`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `bus`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `challenger`
+
+charon errors: 0.
+6 item(s) dropped, 0 of them mirrored.
+
+| Item | Source | Mirrored |
+|---|---|---|
+| `p3_challenger::fs::codecs::bytes_to_field::{impl p3_challenger::fs::codecs::codec::Codec}::SECURITY_BITS` | `` |  |
+| `p3_challenger::fs::codecs::bytes_to_field::{impl p3_challenger::fs::codecs::codec::Codec}::sample` | `` |  |
+| `p3_challenger::fs::codecs::bytes_to_field::{impl p3_challenger::fs::codecs::codec::Codec}::wire_len` | `` |  |
+| `p3_challenger::fs::codecs::decode_field::EXTRA_BYTES` | `` |  |
+| `p3_challenger::fs::codecs::decode_field::decode_field_via_extra_bytes` | `` |  |
+| `p3_challenger::fs::codecs::decode_field::required_bytes` | `` |  |
 
 ### `goldilocks`
 
@@ -249,12 +326,46 @@ charon errors: 0.
 | `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `` | yes |
 | `p3_goldilocks::goldilocks::{impl p3_field::integers::QuotientMap}::from_int` | `` | yes |
 
+### `keccak`
+
+charon errors: 0.
+6 item(s) dropped, 0 of them mirrored.
+
+| Item | Source | Mirrored |
+|---|---|---|
+| `p3_keccak::finalize_iter` | `` |  |
+| `p3_keccak::finalize_iter::BUFLEN` | `` |  |
+| `p3_keccak::finalize_slices` | `` |  |
+| `p3_keccak::{impl core::clone::Clone}::clone` | `` |  |
+| `p3_keccak::{impl p3_symmetric::hasher::CryptographicHasher}::LANES` | `` |  |
+| `p3_keccak::{impl p3_symmetric::hasher::CryptographicHasher}::hash_iter` | `` |  |
+
+### `keccak-air`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ### `koala-bear`
 
 charon errors: 0.
 Nothing translated is dropped.
 
+### `lookup`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `matrix`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ### `mds`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `merkle-tree`
 
 charon errors: 0.
 Nothing translated is dropped.
@@ -300,7 +411,7 @@ charon errors: 0.
 ### `monty-31`
 
 charon errors: 0.
-37 item(s) dropped, 2 of them mirrored.
+29 item(s) dropped, 2 of them mirrored.
 
 | Item | Source | Mirrored |
 |---|---|---|
@@ -319,28 +430,35 @@ charon errors: 0.
 | `p3_monty_31::monty_31::{impl core::ops::arith::MulAssign}::mul_assign` | `` |  |
 | `p3_monty_31::monty_31::{impl core::ops::arith::SubAssign}::sub_assign` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::Field}::BENEFITS_FROM_LOCKSTEP_EVALUATION` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::Field}::GENERATOR` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::Field}::order` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::Field}::try_inverse` | `` | yes |
 | `p3_monty_31::monty_31::{impl p3_field::field::Field}::try_inverse::NUM_PRIME_BITS` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::NEG_ONE` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::ONE` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::TWO` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::div_2exp_u64` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::dot_product` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::from_prime_subfield` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::mul_2exp_u64` | `` | yes |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeCharacteristicRing}::sum_array` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeField32}::ORDER_U32` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeField32}::as_canonical_u32` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeField64}::ORDER_U64` | `` |  |
-| `p3_monty_31::monty_31::{impl p3_field::field::PrimeField64}::as_canonical_u64` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::field::PrimeField}::as_canonical_biguint` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_checked` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_canonical_unchecked` | `` |  |
 | `p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap}::from_int` | `` |  |
 | `p3_monty_31::monty_31::{impl}::HALF` | `` |  |
-| `p3_monty_31::monty_31::{impl}::to_u32` | `` |  |
+
+### `multi-stark`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `multilinear-util`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `security`
+
+charon errors: 0.
+Nothing translated is dropped.
 
 ### `sha2`
 
@@ -356,7 +474,44 @@ charon errors: 0.
 |---|---|---|
 | `p3_sha256::{impl core::clone::Clone}::clone` | `` |  |
 
+### `sha256-air`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `sumcheck`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `symmetric`
+
+charon errors: 0.
+4 item(s) dropped, 0 of them mirrored.
+
+| Item | Source | Mirrored |
+|---|---|---|
+| `p3_symmetric::compression::{impl core::clone::Clone}::clone` | `` |  |
+| `p3_symmetric::compression::{impl p3_symmetric::compression::PseudoCompressionFunction}::LANES` | `` |  |
+| `p3_symmetric::hasher::CryptographicHasher::hash_many` | `` |  |
+| `p3_symmetric::sponge::{impl core::clone::Clone}::clone` | `` |  |
+
+### `tiny-keccak`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `uni-stark`
+
+charon errors: 0.
+Nothing translated is dropped.
+
 ### `util`
+
+charon errors: 0.
+Nothing translated is dropped.
+
+### `word`
 
 charon errors: 0.
 Nothing translated is dropped.
@@ -366,18 +521,25 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 748) whose dependencies include it; reaching one is not using it.
+(of 1917) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
-| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 66 |
+| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 72 |
 | `baby-bear` | `mds.MDSBabyBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon2.BabyBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `binary-dft` | `p3_binary_dft.lch.schedule.fused_group` | charon is told to leave it opaque, since aeneas rejects the rayon iterator its body drives | 5 |
+| `binary-dft` | `core.mem.size_of` | the model does not compute type layouts, and no claim depends on the value | 5 |
 | `blake2s` | `p3_blake2s.Blake2s256.hash` | its body goes through `blake2`'s incremental `Digest`, whose buffer type aeneas rejects (docs/extractor-issues.md 16) | 3 |
-| `field` | `p3_field.exponentiation.exp_1420470955` | its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here | 1 |
-| `field` | `p3_field.exponentiation.exp_1725656503` | its body is a chain of `square`/`mul` calls on a `PrimeCharacteristicRing` whose methods are not modelled here | 1 |
-| `koala-bear` | `koala_bear.KoalaBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 68 |
+| `field` | `p3_field.exponentiation.exp_1420470955` | its body is a chain of squarings and products, and those ring methods are not modelled here | 1 |
+| `field` | `p3_field.exponentiation.exp_1725656503` | its body is a chain of squarings and products, and those ring methods are not modelled here | 1 |
+| `field` | `p3_field.field.Field.unmodelledAlgebra` | no model that builds a field instance projects it | 0 |
+| `field` | `p3_field.field.Field.unmodelledBits` | no model that builds a field instance projects it | 0 |
+| `field` | `p3_field.field.Field.unmodelledCopy` | no model that builds a field instance projects it | 0 |
+| `field` | `p3_field.field.PrimeField.unmodelledField` | no model that builds a prime field instance projects it | 0 |
+| `field` | `p3_field.field.PrimeField.unmodelledQuotientMapU64` | no model that builds a prime field instance projects it | 0 |
+| `koala-bear` | `koala_bear.KoalaBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 69 |
 | `koala-bear` | `mds.MDSKoalaBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `koala-bear` | `poseidon1.KoalaBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `koala-bear` | `poseidon2.KoalaBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
@@ -386,6 +548,17 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 | `poseidon1` | `p3_poseidon1.internal.PartialRoundConstants` | p3-poseidon1 is a stub, and the extraction never observes this type's layout | 0 |
 | `poseidon2` | `p3_poseidon2.Poseidon2.new` | p3-poseidon2 is a stub, and its body is not modelled | 0 |
 | `poseidon2` | `p3_poseidon2.external.ExternalLayerConstants.new` | because a body with that assertion would make the `ok`-ness of every caller depend on it | 0 |
+| `security` | `budget.report.SecurityReport.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `security` | `budget.report.SecurityTerm.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `security` | `budget.shape.AirShape.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `security` | `budget.shape.InstanceShape.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `security` | `budget.shape.LookupShape.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `security` | `budget.shape.ProtocolParams.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
+| `security` | `p3_security.binary.BinaryPcsRegime.queriesForTargetCount` | p3-security derives it from a floating-point bound, which aeneas cannot translate | 1 |
+| `symmetric` | `p3_symmetric.hasher.CryptographicHasher.hash_iter_slices.default` | aeneas stops on its iterator adapters, so crate.toml makes it opaque (docs/extractor-issues.md 30) | 0 |
+| `word` | `index.IndexError.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 9 |
+| `word` | `word.Word32.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 8 |
+| `word` | `word.Word64.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 8 |
 
 ## Transcriptions
 
@@ -393,19 +566,886 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 748) whose dependencies include the declaration.
+counts the claims (of 1917) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
+| `air` | `p3_air.symbolic.mirror.SymbolicVariable.degree_multiple` | `p3_air::symbolic::variable::SymbolicVariable::degree_multiple` | not translated | 61 |
+| `air` | `p3_air.symbolic.mirror.SymbolicVariable.poly_degree` | `p3_air::symbolic::variable::SymbolicVariable::poly_degree` | not translated | 61 |
+| `air` | `p3_air.symbolic.mirror.SymbolicVariableExt.degree_multiple` | `p3_air::symbolic::variable::SymbolicVariableExt::degree_multiple` | not translated | 5 |
+| `air` | `p3_air.symbolic.mirror.SymbolicVariableExt.poly_degree` | `p3_air::symbolic::variable::SymbolicVariableExt::poly_degree` | not translated | 5 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_multiple` | `p3_air::symbolic::SymbolicExpr::degree_multiple` | not translated | 59 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_with` | `p3_air::symbolic::SymbolicExpr::degree_memo` | not translated | 38 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.degree_multiple_with_transition` | `p3_air::symbolic::SymbolicExpr::degree_multiple_with_transition` | not translated | 5 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.poly_degree` | `p3_air::symbolic::SymbolicExpr::poly_degree` | not translated | 20 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.as_const` | `p3_air::symbolic::SymbolicExpr::as_const` | not translated | 56 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_add` | `p3_air::symbolic::SymbolicExpr::sym_add` | not translated | 51 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_neg` | `p3_air::symbolic::SymbolicExpr::sym_neg` | not translated | 52 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_sub` | `p3_air::symbolic::SymbolicExpr::sym_sub` | not translated | 51 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.sym_mul` | `p3_air::symbolic::SymbolicExpr::sym_mul` | not translated | 51 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpr.const` | `{impl p3_field::PrimeCharacteristicRing for p3_air::symbolic::SymbolicExpr<A>}::from_prime_subfield` | not translated | 49 |
+| `air` | `p3_air.symbolic.mirror.instSymLeafBaseLeaf` | `{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression::BaseLeaf<F>}::degree_multiple` | not translated | 60 |
+| `air` | `p3_air.symbolic.mirror.instSymLeafExtLeaf` | `{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression_ext::ExtLeaf<F, EF>}::degree_multiple` | not translated | 4 |
+| `air` | `p3_air.symbolic.mirror.SymbolicExpressionExt.to_base` | `p3_air::symbolic::expression_ext::SymbolicExpressionExt::to_base` | not translated | 1 |
+| `air` | `p3_air.builder.mirror.AirBuilder.is_transition_window` | `p3_air::builder::AirBuilder::is_transition_window` | not translated | 21 |
+| `air` | `p3_air.builder.mirror.AirBuilder.when` | `p3_air::builder::AirBuilder::when` | not translated | 42 |
+| `air` | `p3_air.builder.mirror.AirBuilder.when_ne` | `p3_air::builder::AirBuilder::when_ne` | not translated | 3 |
+| `air` | `p3_air.builder.mirror.AirBuilder.when_first_row` | `p3_air::builder::AirBuilder::when_first_row` | not translated | 19 |
+| `air` | `p3_air.builder.mirror.AirBuilder.when_last_row` | `p3_air::builder::AirBuilder::when_last_row` | not translated | 3 |
+| `air` | `p3_air.builder.mirror.AirBuilder.when_transition` | `p3_air::builder::AirBuilder::when_transition` | not translated | 13 |
+| `air` | `p3_air.builder.mirror.AirBuilder.when_transition_window` | `p3_air::builder::AirBuilder::when_transition_window` | not translated | 0 |
+| `air` | `p3_air.builder.mirror.AirBuilder.assert_zeros` | `p3_air::builder::AirBuilder::assert_zeros` | not translated | 53 |
+| `air` | `p3_air.builder.mirror.AirBuilder.bool_check` | `p3_field::PrimeCharacteristicRing::bool_check` | not translated | 55 |
+| `air` | `p3_air.builder.mirror.AirBuilder.assert_bools` | `p3_air::builder::AirBuilder::assert_bools` | not translated | 52 |
+| `air` | `p3_air.builder.mirror.AirBuilder.assert_one` | `p3_air::builder::AirBuilder::assert_one` | not translated | 19 |
+| `air` | `p3_air.builder.mirror.AirBuilder.assert_eq` | `p3_air::builder::AirBuilder::assert_eq` | not translated | 13 |
+| `air` | `p3_air.builder.mirror.AirBuilder.assert_eq_arrays` | `p3_air::builder::AirBuilder::assert_eq_arrays` | not translated | 0 |
+| `air` | `p3_air.builder.mirror.AirBuilder.assert_bool` | `p3_air::builder::AirBuilder::assert_bool` | not translated | 29 |
+| `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_zeros_ext` | `p3_air::builder::ExtensionBuilder::assert_zeros_ext` | not translated | 0 |
+| `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_eq_ext` | `p3_air::builder::ExtensionBuilder::assert_eq_ext` | not translated | 2 |
+| `air` | `p3_air.builder.mirror.ExtensionBuilder.assert_one_ext` | `p3_air::builder::ExtensionBuilder::assert_one_ext` | not translated | 1 |
+| `air` | `p3_air.builder.mirror.ExtensionBuilder.when` | `{impl p3_air::builder::ExtensionBuilder for p3_air::filtered::FilteredAirBuilder<'_, AB>}::assert_zero_ext` | not translated | 17 |
+| `air` | `p3_air.builder.mirror.PairCol.get` | `p3_air::virtual_column::PairCol::get` | not translated | 2 |
+| `air` | `p3_air.builder.mirror.VirtualPairCol.new` | `p3_air::virtual_column::VirtualPairCol::new` | not translated | 0 |
+| `air` | `p3_air.builder.mirror.VirtualPairCol.new_preprocessed` | `p3_air::virtual_column::VirtualPairCol::new_preprocessed` | not translated | 0 |
+| `air` | `p3_air.builder.mirror.VirtualPairCol.new_main` | `p3_air::virtual_column::VirtualPairCol::new_main` | not translated | 0 |
+| `air` | `p3_air.builder.mirror.VirtualPairCol.constant'` | `p3_air::virtual_column::VirtualPairCol::constant` | not translated | 0 |
+| `air` | `p3_air.builder.mirror.VirtualPairCol.single` | `p3_air::virtual_column::VirtualPairCol::single` | not translated | 0 |
+| `air` | `p3_air.builder.mirror.VirtualPairCol.single_preprocessed` | `p3_air::virtual_column::VirtualPairCol::single_preprocessed` | not translated | 0 |
+| `air` | `p3_air.builder.mirror.VirtualPairCol.single_main` | `p3_air::virtual_column::VirtualPairCol::single_main` | not translated | 0 |
+| `air` | `p3_air.builder.mirror.VirtualPairCol.sum_main` | `p3_air::virtual_column::VirtualPairCol::sum_main` | not translated | 0 |
+| `air` | `p3_air.builder.mirror.VirtualPairCol.sum_preprocessed` | `p3_air::virtual_column::VirtualPairCol::sum_preprocessed` | not translated | 0 |
+| `air` | `p3_air.builder.mirror.VirtualPairCol.diff_preprocessed` | `p3_air::virtual_column::VirtualPairCol::diff_preprocessed` | not translated | 0 |
+| `air` | `p3_air.builder.mirror.VirtualPairCol.diff_main` | `p3_air::virtual_column::VirtualPairCol::diff_main` | not translated | 0 |
+| `air` | `p3_air.builder.mirror.VirtualPairCol.apply` | `p3_air::virtual_column::VirtualPairCol::apply` | not translated | 2 |
+| `air` | `p3_air.air.mirror.BoundaryPublic.row` | `p3_air::boundary::BoundaryPublic::row` | not translated | 6 |
+| `air` | `p3_air.air.mirror.validate` | `p3_air::boundary::validate` | not translated | 6 |
+| `air` | `p3_air.air.mirror.Air.periodic_values` | `p3_air::air::BaseAir::periodic_values` | not translated | 22 |
+| `air` | `p3_air.air.mirror.resolve` | `p3_air::symbolic::expression::SymbolicExpression::resolve` | not translated | 20 |
+| `air` | `p3_air.air.mirror.AirLayout.from_air` | `p3_air::symbolic::builder::AirLayout::from_air` | not translated | 81 |
+| `air` | `p3_air.air.mirror.AirLayout.validate_against_air` | `p3_air::symbolic::builder::AirLayout::validate_against_air` | not translated | 19 |
+| `air` | `p3_air.air.mirror.symbolicBuilder` | `p3_air::symbolic::builder::SymbolicAirBuilder::new` | not translated | 49 |
+| `air` | `p3_air.air.mirror.get_symbolic_constraints` | `p3_air::symbolic::builder::get_symbolic_constraints` | not translated | 15 |
+| `air` | `p3_air.air.mirror.constraint_degree_from_poly_degree` | `p3_air::symbolic::builder::constraint_degree_from_poly_degree` | not translated | 16 |
+| `air` | `p3_air.air.mirror.get_max_constraint_degree` | `p3_air::symbolic::builder::get_max_constraint_degree_extension` | not translated | 14 |
+| `air` | `p3_air.air.mirror.log2_ceil_usize` | `p3_util::log2_ceil_usize` | not translated | 16 |
+| `air` | `p3_air.air.mirror.get_log_quotient_degree` | `p3_uni_stark::symbolic::get_log_quotient_degree_extension` | not translated | 8 |
+| `air` | `p3_air.air.mirror.DebugState.assert_zero` | `{impl p3_air::named::NamedAirBuilder for p3_air::check_constraints::DebugConstraintBuilder<'_, F, EF>}::assert_zero_named` | not translated | 26 |
+| `air` | `p3_air.air.mirror.debugBuilder` | `p3_air::check_constraints::DebugConstraintBuilder::new` | not translated | 26 |
+| `air` | `p3_air.air.mirror.debugExtBuilder` | `{impl p3_air::named::NamedExtensionBuilder for p3_air::check_constraints::DebugConstraintBuilder<'_, F, EF>}::assert_zero_ext_named` | not translated | 7 |
+| `air` | `p3_air.air.mirror.assert_periodic_column_shapes` | `p3_air::check_constraints::assert_periodic_column_shapes` | not translated | 5 |
+| `air` | `p3_air.air.mirror.boundary_io_mismatches` | `p3_air::check_constraints::boundary_io_mismatches` | not translated | 5 |
+| `air` | `p3_air.air.mirror.rowBuilder` | `p3_air::check_constraints::check_constraints` | not translated | 10 |
+| `air` | `p3_air.air.mirror.check_constraints` | `p3_air::check_constraints::check_constraints` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.BatchShape` | `p3_batch_stark::transcript::BatchShape` | not translated | 15 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.BatchShape.num_instances` | `p3_batch_stark::transcript::BatchShape::num_instances` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.BatchShape.has_lookups` | `p3_batch_stark::transcript::BatchShape::has_lookups` | not translated | 14 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.Step` | `p3_batch_stark::transcript::BatchShape::pattern` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.BatchShape.lookupSteps` | `p3_batch_stark::transcript::BatchShape::pattern` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.BatchShape.pattern` | `p3_batch_stark::transcript::BatchShape::pattern` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.DomainSeparator` | `p3_challenger::fs::DomainSeparator` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.BatchShape.domain_separator` | `p3_batch_stark::transcript::BatchShape::domain_separator` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.Msg` | `p3_batch_stark::transcript::BatchVerifierTranscript` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.BatchTranscriptFailure` | `p3_batch_stark::transcript::BatchTranscriptFailure` | not translated | 14 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.St` | `p3_challenger::fs::VerifierState` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.St.step` | `p3_challenger::fs::VerifierState` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.St.draw` | `p3_challenger::fs::VerifierState::challenge_extension` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.new` | `p3_batch_stark::transcript::BatchVerifierTranscript::new` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.instance_bindings` | `p3_batch_stark::transcript::BatchVerifierTranscript::instance_bindings` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.main_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::main_phase` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.preprocessed_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::preprocessed_phase` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.observe_pow` | `p3_challenger::fs::VerifierState::observe_pow` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.LayoutState` | `p3_batch_stark::transcript::lay_out_lookup_challenges` | not translated | 22 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.lookupKey` | `p3_batch_stark::transcript::lay_out_lookup_challenges` | not translated | 22 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.orInsert` | `p3_batch_stark::transcript::lay_out_lookup_challenges` | not translated | 22 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.busId` | `p3_batch_stark::transcript::lay_out_lookup_challenges` | not translated | 22 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.busIds` | `p3_batch_stark::transcript::lay_out_lookup_challenges` | not translated | 22 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.lay_out_lookup_challenges` | `p3_batch_stark::transcript::lay_out_lookup_challenges` | not translated | 19 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.lookup_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::lookup_phase` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.permutation_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::permutation_phase` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.quotient_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::quotient_phase` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.ood_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::ood_phase` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.transcript.mirror.delegate` | `p3_batch_stark::transcript::BatchVerifierTranscript::delegate` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.AirInfo` | `p3_batch_stark::verifier::verify_batch` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.instInhabitedAirInfo` | `p3_batch_stark::verifier::verify_batch` | not translated | 6 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.Config` | `p3_batch_stark::verifier::verify_batch` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.Config.is_zk` | `p3_uni_stark::StarkGenericConfig::is_zk` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.CommonData` | `p3_batch_stark::common::CommonData` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.Opened` | `p3_batch_stark::proof::OpenedValuesWithLookups` | not translated | 7 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.instInhabitedOpened` | `p3_batch_stark::proof::OpenedValuesWithLookups` | not translated | 6 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.BatchProof` | `p3_batch_stark::proof::BatchProof` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.BatchError` | `p3_batch_stark::error::BatchVerificationError` | not translated | 7 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.validate_degree_bits` | `p3_uni_stark::verifier::validate_degree_bits` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.preprocessedWidth` | `p3_batch_stark::verifier::verify_batch` | not translated | 7 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.Checked` | `p3_batch_stark::verifier::verify_batch` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.ensure` | `p3_batch_stark::verifier::verify_batch` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.heightResult` | `p3_lookup::types::check_multiplicity_height_bound` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.check_instance` | `p3_batch_stark::verifier::verify_batch` | not translated | 5 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.check_shape` | `p3_batch_stark::verifier::verify_batch` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.shapeOf` | `p3_batch_stark::verifier::verify_batch` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.replay` | `p3_batch_stark::verifier::verify_batch` | not translated | 4 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.opening_reads` | `p3_batch_stark::verifier::commitments_with_opening_points` | not translated | 2 |
+| `batch-stark` | `p3_batch_stark.verifier.mirror.verify_batch` | `p3_batch_stark::verifier::verify_batch` | not translated | 2 |
+| `batch-stark` | `p3_batch_stark.constraints.mirror.verifierPermFolder` | `p3_batch_stark::folder::VerifierConstraintFolderWithLookups` | not translated | 14 |
+| `batch-stark` | `p3_batch_stark.constraints.mirror.verify_constraints_with_lookups` | `p3_batch_stark::verifier::VerifierData::verify_constraints_with_lookups` | not translated | 14 |
+| `batch-stark` | `p3_batch_stark.checker.mirror.rowBuilder` | `p3_air::DebugConstraintBuilder::new_with_permutation` | not translated | 1 |
+| `batch-stark` | `p3_batch_stark.checker.mirror.eval_air_and_lookups` | `p3_lookup::LookupProtocol::eval_air_and_lookups` | not translated | 15 |
+| `batch-stark` | `p3_batch_stark.checker.mirror.check_constraints` | `p3_batch_stark::check_constraints::check_constraints` | not translated | 1 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.BatchProof` | `p3_batch_stark::proof::BatchProof` | not translated | 12 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.Opened` | `p3_batch_stark::proof::OpenedValuesWithLookups` | not translated | 12 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.PreprocessedMeta` | `p3_batch_stark::common::PreprocessedInstanceMeta` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.GlobalPreprocessed` | `p3_batch_stark::common::GlobalPreprocessed` | not translated | 10 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.CommonData` | `p3_batch_stark::common::CommonData` | not translated | 12 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.Error` | `p3_batch_stark::error::BatchVerificationError` | not translated | 10 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.validate_degree_bits_at` | `p3_uni_stark::verifier::validate_degree_bits` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.instance_sizes` | `p3_batch_stark::verifier::verify_batch` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.check_instance` | `p3_batch_stark::verifier::verify_batch` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.check_shape` | `p3_batch_stark::verifier::verify_batch` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.instance_bindings` | `p3_batch_stark::transcript::BatchVerifierTranscript::instance_bindings` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.main_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::main_phase` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.preprocessed_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::preprocessed_phase` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.lookup_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::lookup_phase` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.permutation_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::permutation_phase` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.quotient_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::quotient_phase` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.ood_phase` | `p3_batch_stark::transcript::BatchVerifierTranscript::ood_phase` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.replay` | `p3_batch_stark::verifier::verify_batch` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.trace_domains` | `p3_batch_stark::verifier::commitments_with_opening_points` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.quotient_domains` | `p3_batch_stark::verifier::commitments_with_opening_points` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.preprocessed_round` | `p3_batch_stark::verifier::commitments_with_opening_points` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.permutation_round` | `p3_batch_stark::verifier::commitments_with_opening_points` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.commitments_with_opening_points` | `p3_batch_stark::verifier::commitments_with_opening_points` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.recompose_permutation` | `p3_batch_stark::verifier::verify_batch` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.check_at_zeta` | `p3_batch_stark::verifier::verify_batch` | not translated | 9 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.check_all_at_zeta` | `p3_batch_stark::verifier::verify_batch` | not translated | 8 |
+| `batch-stark` | `p3_batch_stark.verify.mirror.verify_batch` | `p3_batch_stark::verifier::verify_batch` | not translated | 8 |
+| `binary-dft` | `p3_maybe_rayon.serial.current_num_threads` | `p3_maybe_rayon::serial::current_num_threads` | not translated | 5 |
+| `binary-dft` | `core.mem.size_of_val` | `core::mem::size_of_val` | not translated | 5 |
+| `binary-dft` | `p3_binary_dft.mirror.Level.cantorBasis` | `p3_binary_field::tower::TowerLevel::cantor_basis` | not translated | 32 |
+| `binary-dft` | `p3_binary_dft.mirror.trailingZeros` | `core::num::usize::trailing_zeros` | not translated | 16 |
+| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point.loop` | `p3_binary_dft::domain::domain_point` | not translated | 29 |
+| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point` | `p3_binary_dft::domain::domain_point` | not translated | 29 |
+| `binary-dft` | `p3_binary_dft.domain.mirror.domain_point_steps` | `p3_binary_dft::domain::domain_point_steps` | not translated | 16 |
+| `binary-dft` | `p3_binary_dft.domain.mirror.subspace_polynomial` | `p3_binary_dft::domain::subspace_polynomial` | not translated | 2 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.vanishing` | `p3_binary_dft::naive::normalised_subspace_poly` | not translated | 4 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.normalised_subspace_poly` | `p3_binary_dft::naive::normalised_subspace_poly` | not translated | 4 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.basisAt` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_ntt_batch` | not translated | 3 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.NaiveAdditiveNtt.shifted_ntt_batch` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_ntt_batch` | not translated | 3 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.blockLoop` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_intt_batch` | not translated | 2 |
+| `binary-dft` | `p3_binary_dft.naive.mirror.NaiveAdditiveNtt.shifted_intt_batch` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::naive::NaiveAdditiveNtt<F>}::shifted_intt_batch` | not translated | 2 |
+| `binary-dft` | `p3_binary_dft.butterfly.mirror.pairOp` | `p3_binary_dft::butterfly::butterfly_values` | not translated | 15 |
+| `binary-dft` | `p3_binary_dft.butterfly.mirror.butterfly_values` | `p3_binary_dft::butterfly::butterfly_values` | not translated | 14 |
+| `binary-dft` | `p3_binary_dft.butterfly.mirror.packed_butterfly` | `p3_binary_dft::butterfly::packed_butterfly` | not translated | 14 |
+| `binary-dft` | `p3_binary_dft.butterfly.mirror.plain_butterfly` | `p3_binary_dft::butterfly::plain_butterfly` | not translated | 14 |
+| `binary-dft` | `p3_binary_dft.butterfly.mirror.typed_butterfly` | `p3_binary_dft::butterfly::subfield::typed_butterfly` | not translated | 1 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Twiddles` | `p3_binary_dft::lch::twiddles::Twiddles` | not translated | 15 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Twiddles.new` | `p3_binary_dft::lch::twiddles::Twiddles::new` | not translated | 13 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Twiddles.at` | `p3_binary_dft::lch::twiddles::Twiddles::at` | not translated | 14 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Twiddles.step` | `p3_binary_dft::lch::twiddles::Twiddles::step` | not translated | 14 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.BUTTERFLY_GRAIN` | `p3_binary_dft::lch::schedule::BUTTERFLY_GRAIN` | not translated | 14 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.DEEP_TILE_BYTES` | `p3_binary_dft::lch::schedule::DEEP_TILE_BYTES` | not translated | 13 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.blockButterfly` | `p3_binary_dft::lch::schedule::stage_pass` | not translated | 14 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.walkBlocks` | `p3_binary_dft::lch::schedule::stage_pass` | not translated | 14 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.stage_pass` | `p3_binary_dft::lch::schedule::stage_pass` | not translated | 14 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.tile_stages` | `p3_binary_dft::lch::schedule::tile_stages` | not translated | 13 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.deep_tiles` | `p3_binary_dft::lch::schedule::deep_tiles` | not translated | 13 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Schedule` | `p3_binary_dft::lch::schedule::Schedule` | not translated | 13 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Schedule.for_workers` | `p3_binary_dft::lch::schedule::Schedule::for_workers` | not translated | 13 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Schedule.new` | `p3_binary_dft::lch::schedule::Schedule::new` | not translated | 13 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Cut` | `p3_binary_dft::lch::schedule::Cut` | not translated | 13 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Cut.new` | `p3_binary_dft::lch::schedule::Cut::new` | not translated | 13 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.Cut.bounds` | `p3_binary_dft::lch::schedule::Cut::bounds` | not translated | 13 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.group_pass` | `p3_binary_dft::lch::schedule::group_pass` | not translated | 13 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.forward_below` | `p3_binary_dft::lch::schedule::forward_below` | not translated | 13 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.run` | `p3_binary_dft::lch::schedule::run` | not translated | 13 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.log2Floor` | `p3_util::log2_floor_usize` | not translated | 13 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.log2Ceil` | `p3_util::log2_ceil_usize` | not translated | 13 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.transform` | `p3_binary_dft::lch::transform` | not translated | 12 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.transform_cosets` | `p3_binary_dft::lch::transform_cosets` | not translated | 4 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.LchNtt.shifted_ntt_batch` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::lch::LchNtt<F>}::shifted_ntt_batch` | not translated | 2 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.LchNtt.shifted_intt_batch` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::lch::LchNtt<F>}::shifted_intt_batch` | not translated | 2 |
+| `binary-dft` | `p3_binary_dft.lch.mirror.LchNtt.ntt_batch_padded` | `{impl p3_binary_dft::traits::AdditiveNtt<F> for p3_binary_dft::lch::LchNtt<F>}::ntt_batch_padded` | not translated | 4 |
+| `binary-dft` | `p3_binary_dft.traits.mirror.ntt_batch_padded` | `p3_binary_dft::traits::AdditiveNtt::ntt_batch_padded` | not translated | 0 |
+| `binary-dft` | `p3_binary_dft.traits.mirror.padded_len` | `p3_binary_dft::traits::padded_len` | not translated | 2 |
+| `binary-dft` | `p3_binary_dft.traits.mirror.ntt_batch_borrowed` | `p3_binary_dft::traits::AdditiveNtt::ntt_batch_borrowed` | not translated | 0 |
+| `binary-dft` | `p3_binary_dft.traits.mirror.shifted_lde_batch` | `p3_binary_dft::traits::AdditiveNtt::shifted_lde_batch` | not translated | 1 |
+| `binary-dft` | `p3_binary_dft.encoder.mirror.encode_batch` | `{impl p3_commit::Encoder<BinaryField128> for p3_binary_dft::encoder::AdditiveRsEncoder<BinaryField128, Ntt>}::encode_batch` | not translated | 1 |
+| `binary-dft` | `p3_binary_dft.encoder.mirror.encode_batch_padded` | `{impl p3_commit::Encoder<BinaryField128> for p3_binary_dft::encoder::AdditiveRsEncoder<BinaryField128, Ntt>}::encode_batch_padded` | not translated | 0 |
+| `binary-pcs` | `p3_binary_pcs.params.mirror.try_new_with_folding` | `p3_binary_pcs::params::BinaryPcsConfig::try_new_with_folding` | not translated | 3 |
+| `binary-pcs` | `p3_binary_pcs.params.mirror.BinaryPcsConfig.try_with_folding` | `p3_binary_pcs::params::BinaryPcsConfig::try_with_folding` | not translated | 3 |
+| `binary-pcs` | `p3_binary_pcs.params.mirror.BinaryPcsConfig.fold_batches` | `p3_binary_pcs::params::BinaryPcsConfig::fold_batches` | not translated | 3 |
+| `binary-pcs` | `p3_binary_pcs.params.mirror.BinaryPcsRegime.max_security_bits` | `p3_security::binary::BinaryPcsRegime::max_security_bits` | not translated | 7 |
+| `binary-pcs` | `p3_binary_pcs.transcript.mirror.BinaryPcsShape.new` | `p3_binary_pcs::transcript::BinaryPcsShape::new` | not translated | 4 |
+| `binary-pcs` | `p3_binary_pcs.fold.mirror.fold_pair` | `p3_binary_pcs::fold::fold_pair` | not translated | 9 |
+| `binary-pcs` | `p3_binary_pcs.fold.mirror.fold_round` | `p3_binary_pcs::fold::fold_round` | not translated | 1 |
+| `binary-pcs` | `p3_binary_pcs.fold.mirror.fold_coset` | `p3_binary_pcs::fold::fold_coset` | not translated | 3 |
+| `binary-pcs` | `p3_binary_pcs.verifier.mirror.verify_query_paths` | `p3_binary_pcs::verifier::verify_query_paths` | not translated | 2 |
+| `binary-pcs` | `p3_binary_pcs.verifier.mirror.verify_opening` | `{impl p3_binary_pcs::pcs::BinaryPcs<F, EF, MT, MX, E>}::verify_opening` | not translated | 0 |
+| `blake2s-air` | `p3_blake2s_air.mirror.IV` | `p3_blake2s_air::constants::IV` | not translated | 12 |
+| `blake2s-air` | `p3_blake2s_air.mirror.SIGMA` | `p3_blake2s_air::constants::SIGMA` | not translated | 13 |
+| `blake2s-air` | `p3_blake2s_air.mirror.NUM_ROUNDS` | `p3_blake2s_air::binary::NUM_ROUNDS` | not translated | 12 |
+| `blake2s-air` | `p3_blake2s_air.mirror.G_PER_ROUND` | `p3_blake2s_air::binary::G_PER_ROUND` | not translated | 12 |
+| `blake2s-air` | `p3_blake2s_air.mirror.G_SCHEDULE` | `p3_blake2s_air::binary::G_SCHEDULE` | not translated | 14 |
+| `blake2s-air` | `p3_blake2s_air.mirror.NUM_INPUT_WORDS` | `p3_blake2s_air::binary::generation::NUM_INPUT_WORDS` | not translated | 1 |
+| `blake2s-air` | `p3_blake2s_air.mirror.NUM_INPUT_BITS` | `p3_blake2s_air::binary::air::NUM_INPUT_BITS` | not translated | 1 |
+| `blake2s-air` | `p3_blake2s_air.mirror.CONSTRAINTS_PER_G` | `p3_blake2s_air::binary::air::CONSTRAINTS_PER_G` | not translated | 1 |
+| `blake2s-air` | `p3_blake2s_air.mirror.NUM_G_CONSTRAINTS` | `p3_blake2s_air::binary::air::NUM_G_CONSTRAINTS` | not translated | 1 |
+| `blake2s-air` | `p3_blake2s_air.mirror.num_constraints` | `{impl p3_air::air::BaseAir<F> for p3_blake2s_air::binary::air::Blake2sBinaryAir}::num_constraints` | not translated | 1 |
+| `blake2s-air` | `p3_blake2s_air.mirror.col.chaining_value` | `p3_blake2s_air::binary::columns::Blake2sBinaryCols` | not translated | 9 |
+| `blake2s-air` | `p3_blake2s_air.mirror.NUM_BLAKE2S_BINARY_COLS` | `p3_blake2s_air::binary::columns::NUM_BLAKE2S_BINARY_COLS` | not translated | 10 |
+| `blake2s-air` | `p3_blake2s_air.mirror.u32_to_bits_le` | `p3_air::utils::u32_to_bits_le` | not translated | 11 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sBinaryGCols` | `p3_blake2s_air::binary::columns::Blake2sBinaryGCols` | not translated | 12 |
+| `blake2s-air` | `p3_blake2s_air.mirror.State` | `p3_blake2s_air::binary::air::State` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.xor_rotl` | `p3_blake2s_air::binary::air::xor_rotl` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.xor_rotl_var` | `p3_blake2s_air::binary::air::xor_rotl_var` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.maj` | `p3_blake2s_air::binary::air::maj` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.add2` | `p3_blake2s_air::binary::air::add2` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.add3` | `p3_blake2s_air::binary::air::add3` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.eval_g` | `p3_blake2s_air::binary::air::eval_g` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.eval` | `{impl p3_air::air::Air<AB> for p3_blake2s_air::binary::air::Blake2sBinaryAir}::eval` | not translated | 8 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sCompressionInput` | `p3_blake2s_air::binary::generation::Blake2sCompressionInput` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sCompressionInput.flag_word` | `p3_blake2s_air::binary::generation::Blake2sCompressionInput::flag_word` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.GWords` | `p3_blake2s_air::binary::generation::GWords` | not translated | 9 |
+| `blake2s-air` | `p3_blake2s_air.mirror.carries_word` | `p3_blake2s_air::binary::generation::carries_word` | not translated | 10 |
+| `blake2s-air` | `p3_blake2s_air.mirror.g_words` | `p3_blake2s_air::binary::generation::g_words` | not translated | 9 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sBinaryCols` | `p3_blake2s_air::binary::columns::Blake2sBinaryCols` | not translated | 9 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sBinaryCols.cells` | `p3_blake2s_air::binary::columns::Blake2sBinaryCols` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Blake2sBinaryCols.ofCells` | `{impl core::borrow::Borrow<p3_blake2s_air::binary::columns::Blake2sBinaryCols<T>> for [T]}::borrow` | not translated | 2 |
+| `blake2s-air` | `p3_blake2s_air.mirror.word_to_bits_le` | `p3_blake2s_air::binary::generation::word_to_bits_le` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.generate_g` | `p3_blake2s_air::binary::generation::generate_g` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.generate_trace_row` | `p3_blake2s_air::binary::generation::generate_trace_row` | not translated | 7 |
+| `blake2s-air` | `p3_blake2s_air.mirror.generate_binary_trace_rows` | `p3_blake2s_air::binary::generation::generate_binary_trace_rows` | not translated | 6 |
+| `blake2s-air` | `p3_blake2s_air.mirror.read_word` | `p3_blake2s_air::binary::generation::read_word` | not translated | 4 |
+| `blake2s-air` | `p3_blake2s_air.mirror.state_after_round` | `p3_blake2s_air::binary::generation::Blake2sBinaryCols::state_after_round` | not translated | 3 |
+| `blake2s-air` | `p3_blake2s_air.mirror.compression_output` | `p3_blake2s_air::binary::generation::Blake2sBinaryCols::compression_output` | not translated | 2 |
+| `blake2s-air` | `p3_blake2s_air.mirror.Planes` | `p3_blake2s_air::binary::generation::generate_block` | not translated | 5 |
+| `blake2s-air` | `p3_blake2s_air.mirror.add_planes` | `p3_blake2s_air::binary::generation::add_planes` | not translated | 4 |
+| `blake2s-air` | `p3_blake2s_air.mirror.xor_rotate_right` | `p3_blake2s_air::binary::generation::xor_rotate_right` | not translated | 4 |
+| `blake2s-air` | `p3_blake2s_air.mirror.transpose_step` | `p3_blake2s_air::binary::generation::transpose_bits` | not translated | 6 |
+| `blake2s-air` | `p3_blake2s_air.mirror.transpose_bits` | `p3_blake2s_air::binary::generation::transpose_bits` | not translated | 6 |
+| `blake2s-air` | `p3_blake2s_air.mirror.lane_mask` | `p3_blake2s_air::binary::generation::lane_mask` | not translated | 3 |
+| `blake2s-air` | `p3_blake2s_air.mirror.input_words` | `p3_blake2s_air::binary::generation::input_words` | not translated | 3 |
+| `blake2s-air` | `p3_blake2s_air.mirror.g_planes` | `p3_blake2s_air::binary::generation::g_planes` | not translated | 3 |
+| `blake2s-air` | `p3_blake2s_air.mirror.generate_block` | `p3_blake2s_air::binary::generation::generate_block` | not translated | 3 |
+| `blake2s-air` | `p3_blake2s_air.mirror.generate_binary_trace_packed` | `p3_blake2s_air::binary::generation::generate_binary_trace_packed` | not translated | 3 |
+| `blake3-air` | `p3_blake3_air.mirror.BITS_PER_LIMB` | `p3_blake3_air::constants::BITS_PER_LIMB` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.U32_LIMBS` | `p3_blake3_air::constants::U32_LIMBS` | not translated | 0 |
+| `blake3-air` | `p3_blake3_air.mirror.IV` | `p3_blake3_air::constants::IV` | not translated | 18 |
+| `blake3-air` | `p3_blake3_air.mirror.ivHalf` | `p3_blake3_air::constants::IV` | not translated | 17 |
+| `blake3-air` | `p3_blake3_air.mirror.MSG_PERMUTATION` | `p3_blake3_air::constants::MSG_PERMUTATION` | not translated | 18 |
+| `blake3-air` | `p3_blake3_air.mirror.permute` | `p3_blake3_air::constants::permute` | not translated | 16 |
+| `blake3-air` | `p3_blake3_air.mirror.col.inputs` | `p3_blake3_air::columns::Blake3Cols` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.col.chaining_values` | `p3_blake3_air::columns::Blake3Cols` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.col.counter_low` | `p3_blake3_air::columns::Blake3Cols` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.col.counter_hi` | `p3_blake3_air::columns::Blake3Cols` | not translated | 0 |
+| `blake3-air` | `p3_blake3_air.mirror.col.block_len` | `p3_blake3_air::columns::Blake3Cols` | not translated | 0 |
+| `blake3-air` | `p3_blake3_air.mirror.col.flags` | `p3_blake3_air::columns::Blake3Cols` | not translated | 0 |
+| `blake3-air` | `p3_blake3_air.mirror.col.initial_row0` | `p3_blake3_air::columns::Blake3Cols` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.col.initial_row2` | `p3_blake3_air::columns::Blake3Cols` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.col.state` | `p3_blake3_air::columns::Blake3Cols` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.col.final_round_helpers` | `p3_blake3_air::columns::Blake3Cols` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.col.outputs` | `p3_blake3_air::columns::Blake3Cols` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.NUM_BLAKE3_COLS` | `p3_blake3_air::columns::NUM_BLAKE3_COLS` | not translated | 10 |
+| `blake3-air` | `p3_blake3_air.mirror.Blake3State` | `p3_blake3_air::columns::Blake3State` | not translated | 10 |
+| `blake3-air` | `p3_blake3_air.mirror.stateAt` | `p3_blake3_air::columns::Blake3State` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.FullRound` | `p3_blake3_air::columns::FullRound` | not translated | 10 |
+| `blake3-air` | `p3_blake3_air.mirror.fullRoundAt` | `p3_blake3_air::columns::FullRound` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.QuarterRound` | `p3_blake3_air::columns::QuarterRound` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.pack_bits_le` | `p3_air::utils::pack_bits_le` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.low16` | `p3_air::utils::pack_bits_le` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.high16` | `p3_air::utils::pack_bits_le` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.mul_2exp` | `p3_field::PrimeCharacteristicRing::mul_2exp_u64` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.add3` | `p3_air::utils::add3` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.add2` | `p3_air::utils::add2` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.xor_32_shift` | `p3_air::utils::xor_32_shift` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.quarter_round_function` | `p3_blake3_air::air::Blake3Air::quarter_round_function` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.full_round_to_column_quarter_round` | `p3_blake3_air::air::Blake3Air::full_round_to_column_quarter_round` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.full_round_to_diagonal_quarter_round` | `p3_blake3_air::air::Blake3Air::full_round_to_diagonal_quarter_round` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.verify_round` | `p3_blake3_air::air::Blake3Air::verify_round` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.initial_row_3` | `{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.assert_inputs` | `{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.assert_initial_row0` | `{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.assert_initial_row2` | `{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.m_values` | `{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.initial_state` | `{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.round_input` | `{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.verify_rounds` | `{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.final` | `{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.assert_helpers` | `{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.assert_outputs_bool` | `{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.assert_output_row0` | `{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.assert_output_xor` | `{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.eval` | `{impl p3_air::air::Air<AB> for p3_blake3_air::air::Blake3Air}::eval` | not translated | 9 |
+| `blake3-air` | `p3_blake3_air.mirror.Blake3Cols` | `p3_blake3_air::columns::Blake3Cols` | not translated | 4 |
+| `blake3-air` | `p3_blake3_air.mirror.Blake3Cols.zeroState` | `p3_blake3_air::columns::Blake3Cols` | not translated | 4 |
+| `blake3-air` | `p3_blake3_air.mirror.Blake3Cols.zero` | `p3_blake3_air::columns::Blake3Cols` | not translated | 4 |
+| `blake3-air` | `p3_blake3_air.mirror.Blake3Cols.words` | `p3_blake3_air::columns::Blake3Cols` | not translated | 6 |
+| `blake3-air` | `p3_blake3_air.mirror.Blake3Cols.stateCells` | `p3_blake3_air::columns::Blake3State` | not translated | 4 |
+| `blake3-air` | `p3_blake3_air.mirror.Blake3Cols.roundCells` | `p3_blake3_air::columns::FullRound` | not translated | 4 |
+| `blake3-air` | `p3_blake3_air.mirror.Blake3Cols.cells` | `p3_blake3_air::columns::Blake3Cols` | not translated | 4 |
+| `blake3-air` | `p3_blake3_air.mirror.u32_to_bits_le` | `p3_air::utils::u32_to_bits_le` | not translated | 10 |
+| `blake3-air` | `p3_blake3_air.mirror.lowLimb` | `p3_blake3_air::generation::save_state_to_trace` | not translated | 4 |
+| `blake3-air` | `p3_blake3_air.mirror.highLimb` | `p3_blake3_air::generation::save_state_to_trace` | not translated | 4 |
+| `blake3-air` | `p3_blake3_air.mirror.ivWord` | `p3_blake3_air::generation::generate_trace_rows_for_perm` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.verifiable_half_round` | `p3_blake3_air::generation::verifiable_half_round` | not translated | 8 |
+| `blake3-air` | `p3_blake3_air.mirror.save_state_to_trace` | `p3_blake3_air::generation::save_state_to_trace` | not translated | 4 |
+| `blake3-air` | `p3_blake3_air.mirror.setWords` | `p3_blake3_air::generation::generate_trace_row_for_round` | not translated | 6 |
+| `blake3-air` | `p3_blake3_air.mirror.halfRounds` | `p3_blake3_air::generation::generate_trace_row_for_round` | not translated | 4 |
+| `blake3-air` | `p3_blake3_air.mirror.generate_trace_row_for_round` | `p3_blake3_air::generation::generate_trace_row_for_round` | not translated | 4 |
+| `blake3-air` | `p3_blake3_air.mirror.generate_trace_rows_for_perm` | `p3_blake3_air::generation::generate_trace_rows_for_perm` | not translated | 4 |
+| `blake3-air` | `p3_blake3_air.mirror.generate_trace_rows` | `p3_blake3_air::generation::generate_trace_rows` | not translated | 4 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.NUM_ROUNDS` | `p3_blake3_air::binary::NUM_ROUNDS` | not translated | 6 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.G_PER_ROUND` | `p3_blake3_air::binary::G_PER_ROUND` | not translated | 6 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.G_SCHEDULE` | `p3_blake3_air::binary::G_SCHEDULE` | not translated | 6 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.slot` | `p3_blake3_air::binary::G_SCHEDULE` | not translated | 6 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.col.chaining_value` | `p3_blake3_air::binary::columns::Blake3BinaryCols` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.col.block` | `p3_blake3_air::binary::columns::Blake3BinaryCols` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.col.counter_low` | `p3_blake3_air::binary::columns::Blake3BinaryCols` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.col.counter_high` | `p3_blake3_air::binary::columns::Blake3BinaryCols` | not translated | 1 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.col.block_len` | `p3_blake3_air::binary::columns::Blake3BinaryCols` | not translated | 1 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.col.flags` | `p3_blake3_air::binary::columns::Blake3BinaryCols` | not translated | 1 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.col.g` | `p3_blake3_air::binary::columns::Blake3BinaryCols` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.col.add1_carries` | `p3_blake3_air::binary::columns::Blake3BinaryCols` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.col.d1` | `p3_blake3_air::binary::columns::Blake3BinaryCols` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.col.b1` | `p3_blake3_air::binary::columns::Blake3BinaryCols` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.col.add2_carries` | `p3_blake3_air::binary::columns::Blake3BinaryCols` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.col.d2` | `p3_blake3_air::binary::columns::Blake3BinaryCols` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.col.b2` | `p3_blake3_air::binary::columns::Blake3BinaryCols` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.NUM_BLAKE3_BINARY_COLS` | `p3_blake3_air::binary::columns::NUM_BLAKE3_BINARY_COLS` | not translated | 6 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.NUM_INPUT_WORDS` | `p3_blake3_air::binary::generation::NUM_INPUT_WORDS` | not translated | 2 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.NUM_INPUT_BITS` | `p3_blake3_air::binary::air::NUM_INPUT_BITS` | not translated | 2 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.CONSTRAINTS_PER_G` | `p3_blake3_air::binary::air::CONSTRAINTS_PER_G` | not translated | 1 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.NUM_G_CONSTRAINTS` | `p3_blake3_air::binary::air::NUM_G_CONSTRAINTS` | not translated | 1 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.num_constraints` | `{impl p3_air::air::BaseAir<F> for p3_blake3_air::binary::air::Blake3BinaryAir}::num_constraints` | not translated | 1 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.iv_word` | `p3_blake3_air::binary::iv_word` | not translated | 6 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.xor_rotl` | `p3_blake3_air::binary::air::xor_rotl` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.maj` | `p3_blake3_air::binary::air::maj` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.add2` | `p3_blake3_air::binary::air::add2` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.add3` | `p3_blake3_air::binary::air::add3` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.State` | `p3_blake3_air::binary::air::State` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.eval_g` | `p3_blake3_air::binary::air::eval_g` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.initial_d` | `{impl p3_air::air::Air<AB> for p3_blake3_air::binary::air::Blake3BinaryAir}::eval` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.assert_inputs` | `{impl p3_air::air::Air<AB> for p3_blake3_air::binary::air::Blake3BinaryAir}::eval` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.initial_state` | `{impl p3_air::air::Air<AB> for p3_blake3_air::binary::air::Blake3BinaryAir}::eval` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.g_step` | `{impl p3_air::air::Air<AB> for p3_blake3_air::binary::air::Blake3BinaryAir}::eval` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.rounds` | `{impl p3_air::air::Air<AB> for p3_blake3_air::binary::air::Blake3BinaryAir}::eval` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.eval` | `{impl p3_air::air::Air<AB> for p3_blake3_air::binary::air::Blake3BinaryAir}::eval` | not translated | 5 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.WState` | `p3_blake3_air::binary::generation::g_words` | not translated | 2 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.GWords` | `p3_blake3_air::binary::generation::GWords` | not translated | 2 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.carries_word` | `p3_blake3_air::binary::generation::carries_word` | not translated | 3 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.g_words` | `p3_blake3_air::binary::generation::g_words` | not translated | 2 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.Blake3CompressionInput` | `p3_blake3_air::binary::generation::Blake3CompressionInput` | not translated | 2 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.Blake3BinaryGCols` | `p3_blake3_air::binary::columns::Blake3BinaryGCols` | not translated | 3 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.Blake3BinaryCols` | `p3_blake3_air::binary::columns::Blake3BinaryCols` | not translated | 3 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.Blake3BinaryGCols.cells` | `p3_blake3_air::binary::columns::Blake3BinaryGCols` | not translated | 2 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.Blake3BinaryCols.cells` | `p3_blake3_air::binary::columns::Blake3BinaryCols` | not translated | 2 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.word_to_bits_le` | `p3_blake3_air::binary::generation::word_to_bits_le` | not translated | 2 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.generate_g` | `p3_blake3_air::binary::generation::generate_g` | not translated | 2 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.generate_trace_row` | `p3_blake3_air::binary::generation::generate_trace_row` | not translated | 2 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.generate_binary_trace_rows` | `p3_blake3_air::binary::generation::generate_binary_trace_rows` | not translated | 2 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.read_word` | `p3_blake3_air::binary::generation::read_word` | not translated | 1 |
+| `blake3-air` | `p3_blake3_air.mirror.binary.compression_output` | `p3_blake3_air::binary::columns::Blake3BinaryCols::compression_output` | not translated | 1 |
 | `blake3-crate` | `blake3.BLOCK_LEN` | `blake3::BLOCK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.CHUNK_LEN` | `blake3::CHUNK_LEN` | stub | 4 |
 | `blake3-crate` | `blake3.OUT_LEN` | `blake3::OUT_LEN` | stub | 0 |
+| `bus` | `p3_bus.mirror.BusDirection` | `p3_bus::direction::BusDirection` | not translated | 10 |
+| `bus` | `p3_bus.mirror.BusDirection.index` | `p3_bus::direction::BusDirection::index` | not translated | 8 |
+| `bus` | `p3_bus.mirror.BusDirection.ALL` | `p3_bus::direction::BusDirection::ALL` | not translated | 0 |
+| `bus` | `p3_bus.mirror.BusNameError` | `p3_bus::name::BusNameError` | not translated | 9 |
+| `bus` | `p3_bus.mirror.BusName.MAX_LEN` | `p3_bus::name::BusName::MAX_LEN` | not translated | 9 |
+| `bus` | `p3_bus.mirror.isAsciiAlphabetic` | `core::num::u8::is_ascii_alphabetic` | not translated | 9 |
+| `bus` | `p3_bus.mirror.isAsciiAlphanumeric` | `core::num::u8::is_ascii_alphanumeric` | not translated | 9 |
+| `bus` | `p3_bus.mirror.BusName.try_new` | `p3_bus::name::BusName::try_new` | not translated | 9 |
+| `bus` | `p3_bus.mirror.BusBoundary` | `p3_bus::builder::BusBoundary` | not translated | 10 |
+| `bus` | `p3_bus.mirror.BusBoundary.contains_row` | `p3_bus::builder::BusBoundary::contains_row` | not translated | 1 |
+| `bus` | `p3_bus.mirror.BusActivation` | `p3_bus::builder::BusActivation` | not translated | 9 |
+| `bus` | `p3_bus.mirror.BusBuilder` | `p3_bus::builder::BusInteractionRecorder` | not translated | 2 |
+| `bus` | `p3_bus.mirror.BusBuilder.push_bus_interaction` | `p3_bus::builder::BusInteractionBuilder::push_bus_interaction` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.MAX_RAM_BIT_WIDTH` | `p3_bus::ram::statement::MAX_RAM_BIT_WIDTH` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.MIN_RAM_ACCESS_COUNT` | `p3_bus::ram::statement::MIN_RAM_ACCESS_COUNT` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamBoundary` | `p3_bus::ram::statement::RamBoundary` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamBoundary.is_segment` | `p3_bus::ram::statement::RamBoundary::is_segment` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamBoundary.image_buses` | `p3_bus::ram::statement::RamBoundary::image_buses` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamStatement` | `p3_bus::ram::statement::RamStatement` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamError` | `p3_bus::ram::error::RamError` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamStatement.access_payload_width` | `p3_bus::ram::statement::RamStatement::access_payload_width` | not translated | 0 |
+| `bus` | `p3_bus.ram.mirror.RamStatement.image_payload_width` | `p3_bus::ram::statement::RamStatement::image_payload_width` | not translated | 0 |
+| `bus` | `p3_bus.ram.mirror.RamStatement.validate` | `p3_bus::ram::statement::RamStatement::validate` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamStatement.leaf_contribution` | `p3_bus::ram::statement::RamStatement::leaf_contribution` | not translated | 0 |
+| `bus` | `p3_bus.ram.mirror.RamLayout` | `p3_bus::ram::statement::RamLayout` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.checked_add` | `core::num::usize::checked_add` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.take` | `p3_bus::ram::statement::RamLayout::new` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamLayout.new` | `p3_bus::ram::statement::RamLayout::new` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamLayout.access_columns` | `p3_bus::ram::statement::RamLayout::access_columns` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamLayout.image_columns` | `p3_bus::ram::statement::RamLayout::image_columns` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir` | `p3_bus::ram::air::RamAir` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.new` | `p3_bus::ram::air::RamAir::new` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.slice` | `core::slice::index::Index::index` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.xor` | `p3_bus::ram::air::xor` | not translated | 3 |
+| `bus` | `p3_bus.ram.mirror.xor3` | `p3_bus::ram::air::xor3` | not translated | 3 |
+| `bus` | `p3_bus.ram.mirror.majority` | `p3_bus::ram::air::majority` | not translated | 3 |
+| `bus` | `p3_bus.ram.mirror.or` | `p3_bus::ram::air::or` | not translated | 3 |
+| `bus` | `p3_bus.ram.mirror.assert_strict_increase` | `p3_bus::ram::air::assert_strict_increase` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.eval_booleanity` | `p3_bus::ram::air::RamAir::eval_booleanity` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.eval_run_start` | `p3_bus::ram::air::RamAir::eval_run_start` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.eval_order` | `p3_bus::ram::air::RamAir::eval_order` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.eval_run_marker` | `p3_bus::ram::air::RamAir::eval_run_marker` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.channel` | `p3_bus::ram::statement::channel` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.declare` | `p3_bus::ram::air::RamAir::declare` | not translated | 2 |
+| `bus` | `p3_bus.ram.mirror.RamAir.eval` | `p3_bus::ram::air::RamAir::eval` | not translated | 2 |
+| `bus` | `p3_bus.product.mirror.combine` | `p3_bus::product::math::combine` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.interpolate_pair` | `p3_bus::product::math::interpolate_pair` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.interpolate_quad` | `p3_bus::product::math::interpolate_quad` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.has_distinct_round_nodes` | `p3_bus::product::math::has_distinct_round_nodes` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrRootShape` | `p3_bus::product::shape::ProductGkrRootShape` | not translated | 8 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShapeError` | `p3_bus::product::error::ProductGkrShapeError` | not translated | 7 |
+| `bus` | `p3_bus.product.mirror.ProductGkrError` | `p3_bus::product::error::ProductGkrError` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.USIZE_MAX` | `core::num::usize::MAX` | not translated | 7 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape` | `p3_bus::product::shape::ProductGkrShape` | not translated | 14 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape.new` | `p3_bus::product::shape::ProductGkrShape::new` | not translated | 7 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape.root_message_len` | `p3_bus::product::shape::ProductGkrShape::root_message_len` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.layersLoop` | `p3_bus::product::shape::ProductGkrShape::layers` | not translated | 12 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape.layers` | `p3_bus::product::shape::ProductGkrShape::layers` | not translated | 12 |
+| `bus` | `p3_bus.product.mirror.ProductGkrShape.identity_padding_evaluation` | `p3_bus::product::shape::ProductGkrShape::identity_padding_evaluation` | not translated | 2 |
+| `bus` | `p3_bus.product.mirror.ProductGkrRootShape.encode` | `p3_bus::product::shape::ProductGkrRootShape::encode` | not translated | 0 |
+| `bus` | `p3_bus.product.mirror.ProductGkrRootShape.decode` | `p3_bus::product::shape::ProductGkrRootShape::decode` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrLayerProof` | `p3_bus::product::proof::ProductGkrLayerProof` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.ROUND_POLY_LEN` | `p3_bus::product::proof::ROUND_POLY_LEN` | not translated | 0 |
+| `bus` | `p3_bus.product.mirror.ProductGkrProof` | `p3_bus::product::proof::ProductGkrProof` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrOutput` | `p3_bus::product::proof::ProductGkrOutput` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrProof.validate_shape` | `p3_bus::product::proof::ProductGkrProof::validate_shape` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.VerifierTranscript` | `p3_bus::product::transcript::ProductGkrVerifierTranscript` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.VerifyState` | `p3_bus::product::proof::ProductGkrProof::verify` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.verify_layer` | `p3_bus::product::proof::ProductGkrProof::verify` | not translated | 1 |
+| `bus` | `p3_bus.product.mirror.ProductGkrProof.verify` | `p3_bus::product::proof::ProductGkrProof::verify` | not translated | 1 |
+| `bus` | `p3_bus.plan.mirror.log2_ceil_usize` | `p3_util::log2_ceil_usize` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.checked_next_power_of_two` | `core::num::usize::checked_next_power_of_two` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.checked_add` | `core::num::usize::checked_add` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.BusDomain` | `p3_bus::plan::BusDomain` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.BusDomain.identity_bit` | `p3_bus::plan::BusDomain::identity_bit` | not translated | 3 |
+| `bus` | `p3_bus.plan.mirror.BusTupleSlot` | `p3_bus::plan::BusTupleSlot` | not translated | 3 |
+| `bus` | `p3_bus.plan.mirror.BusBlockOwner` | `p3_bus::plan::BusBlockOwner` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.BusBlock` | `p3_bus::plan::BusBlock` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.BusSecurityGeometry` | `p3_bus::plan::BusSecurityGeometry` | not translated | 8 |
+| `bus` | `p3_bus.plan.mirror.BusPlan` | `p3_bus::plan::BusPlan` | not translated | 8 |
+| `bus` | `p3_bus.plan.mirror.BusPlan.tuple_slot` | `p3_bus::plan::BusPlan::tuple_slot` | not translated | 3 |
+| `bus` | `p3_bus.plan.mirror.BusPlan.blocks` | `p3_bus::plan::BusPlan::blocks` | not translated | 0 |
+| `bus` | `p3_bus.plan.mirror.UnsupportedBusAccess` | `p3_bus::plan::UnsupportedBusAccess` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.BusExpressionLocation` | `p3_bus::plan::BusExpressionLocation` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.BusPlanError` | `p3_bus::plan::error::BusPlanError` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.SymbolicBusInteraction` | `p3_bus::builder::SymbolicBusInteraction` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.BusPlanInput` | `p3_bus::plan::BusPlanInput` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.leafAccess` | `p3_bus::plan::validate_expression` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.validateWalk` | `p3_bus::plan::validate_expression` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.validate_expression` | `p3_bus::plan::validate_expression` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.validate_interaction` | `p3_bus::plan::validate_interaction` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.PendingBlock` | `p3_bus::plan::PendingBlock` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.pendingLe` | `p3_bus::plan::BusPlan::build` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.collectWidths` | `p3_bus::plan::BusPlan::build` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.layoutBlocks` | `p3_bus::plan::BusPlan::build` | not translated | 7 |
+| `bus` | `p3_bus.plan.mirror.BusPlan.build` | `p3_bus::plan::BusPlan::build` | not translated | 7 |
+| `bus` | `p3_bus.evaluation.mirror.BusEvaluation` | `p3_bus::evaluation::BusEvaluation` | not translated | 2 |
+| `bus` | `p3_bus.evaluation.mirror.BusNode` | `p3_bus::evaluation::BusNode` | not translated | 2 |
+| `bus` | `p3_bus.evaluation.mirror.BusEvaluationError` | `p3_bus::evaluation::error::BusEvaluationError` | not translated | 2 |
+| `bus` | `p3_bus.evaluation.mirror.compile_leaf` | `p3_bus::evaluation::compile_leaf` | not translated | 2 |
+| `bus` | `p3_bus.evaluation.mirror.compile_expression` | `p3_bus::evaluation::compile_expression` | not translated | 2 |
+| `bus` | `p3_bus.evaluation.mirror.fingerprint_weights` | `p3_bus::argument::BusChallenges::fingerprint_weights` | not translated | 0 |
+| `bus` | `p3_bus.evaluation.mirror.BusFactorPlan` | `p3_bus::evaluation::BusFactorPlan` | not translated | 1 |
+| `bus` | `p3_bus.evaluation.mirror.nodeValue` | `p3_bus::evaluation::BusFactorPlan::evaluate` | not translated | 2 |
+| `bus` | `p3_bus.evaluation.mirror.BusFactorPlan.evaluate` | `p3_bus::evaluation::BusFactorPlan::evaluate` | not translated | 1 |
+| `bus` | `p3_bus.evaluation.mirror.BusPlan.compile_factor` | `p3_bus::evaluation::BusPlan::compile_factor` | not translated | 1 |
+| `bus` | `p3_bus.timestamped.mirror.CLOCK_RANGE_BITS` | `p3_bus::timestamped::CLOCK_RANGE_BITS` | not translated | 3 |
+| `bus` | `p3_bus.timestamped.mirror.CLOCK_GAP_BITS` | `p3_bus::timestamped::CLOCK_GAP_BITS` | not translated | 2 |
+| `bus` | `p3_bus.timestamped.mirror.TimestampedMemoryError` | `p3_bus::timestamped::error::TimestampedMemoryError` | not translated | 1 |
+| `bus` | `p3_bus.timestamped.mirror.clock_orbit` | `p3_bus::timestamped::clock_orbit` | not translated | 1 |
+| `bus` | `p3_bus.timestamped.mirror.check_orbit` | `p3_bus::timestamped::TimestampedMemory::new` | not translated | 1 |
+| `bus` | `p3_bus.timestamped.mirror.check_accesses` | `p3_bus::timestamped::TimestampedMemory::check_against` | not translated | 0 |
+| `bus` | `p3_bus.timestamped.mirror.high_step` | `p3_bus::timestamped::high_step` | not translated | 2 |
+| `bus` | `p3_bus.timestamped.mirror.gap_factors` | `p3_bus::timestamped::TimestampedMemory::gap_factors` | not translated | 1 |
+| `bus` | `p3_bus.timestamped.mirror.slot_offset` | `p3_bus::timestamped::TimestampedMemory::slot_offset` | not translated | 0 |
+| `bus` | `p3_bus.timestamped.mirror.ClockRangeAir.low` | `p3_bus::timestamped::air::ClockRangeAir::low` | not translated | 2 |
+| `bus` | `p3_bus.timestamped.mirror.ClockRangeAir.high` | `p3_bus::timestamped::air::ClockRangeAir::high` | not translated | 2 |
+| `bus` | `p3_bus.timestamped.mirror.gap_constraint` | `p3_bus::timestamped::TimestampedMemoryInteractionBuilder::timestamped_access` | not translated | 0 |
+| `bus` | `p3_bus.security.mirror.BusSecurityDims` | `p3_security::bus::ProductGkrSecurityProfile` | not translated | 1 |
+| `bus` | `p3_bus.security.mirror.BusPlan.security_dims` | `p3_bus::security::BusPlan::security_model` | not translated | 1 |
+| `bus` | `p3_bus.security.mirror.components` | `p3_security::bus::BusSecurityModel::components` | not translated | 1 |
+| `bus` | `p3_bus.plan.mirror.layoutStep` | `p3_bus::plan::BusPlan::build` | not translated | 7 |
+| `challenger` | `p3_challenger.duplex_challenger.mirror.sample` | `{impl p3_challenger::CanSample<EF> for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::sample` | not translated | 1 |
+| `challenger` | `p3_challenger.duplex_challenger.mirror.sample_bits` | `{impl p3_challenger::CanSampleBits<usize> for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::sample_bits` | not translated | 0 |
+| `challenger` | `p3_challenger.mirror.squeezeLoop` | `p3_field::helpers::squeeze_field_order_num_limbs` | not translated | 2 |
+| `challenger` | `p3_challenger.mirror.squeeze_field_order_num_limbs` | `p3_field::helpers::squeeze_field_order_num_limbs` | not translated | 2 |
+| `challenger` | `p3_challenger.mirror.maxPackedLoop` | `p3_field::helpers::max_packed_injective_limbs_with_max_digit` | not translated | 1 |
+| `challenger` | `p3_challenger.mirror.absorb_radix_bits` | `p3_field::helpers::absorb_radix_bits` | not translated | 1 |
+| `challenger` | `p3_challenger.mirror.max_absorb_injective_limbs` | `p3_field::helpers::max_absorb_injective_limbs` | not translated | 1 |
+| `challenger` | `p3_challenger.mirror.MultiField32Challenger.new` | `p3_challenger::multi_field_challenger::MultiField32Challenger::new` | not translated | 1 |
+| `challenger` | `p3_challenger.mirror.split_pf_to_field_order_limbs` | `p3_field::helpers::split_pf_to_field_order_limbs` | not translated | 1 |
+| `challenger` | `p3_challenger.mirror.refill` | `p3_challenger::multi_field_challenger::MultiField32Challenger::refill_f_squeeze_from_inner` | not translated | 1 |
+| `challenger` | `p3_challenger.mirror.sampleFromQueue` | `{impl p3_challenger::CanSample<EF> for p3_challenger::multi_field_challenger::MultiField32Challenger<F, PF, P, WIDTH, RATE>}::sample` | not translated | 1 |
+| `challenger` | `p3_challenger.mirror.grindState` | `{impl p3_challenger::grinding_challenger::GrindingChallenger for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::grind` | not translated | 1 |
+| `circle` | `p3_circle.point.mirror.Point` | `p3_circle::point::Point` | stub | 45 |
+| `circle` | `p3_circle.point.mirror.tryInverse` | `p3_field::Field::try_inverse` | stub | 10 |
+| `circle` | `p3_circle.point.mirror.Point.new` | `p3_circle::point::Point::new` | stub | 40 |
+| `circle` | `p3_circle.point.mirror.Point.ZERO` | `p3_circle::point::Point::ZERO` | stub | 18 |
+| `circle` | `p3_circle.point.mirror.Point.from_projective_line` | `p3_circle::point::Point::from_projective_line` | stub | 11 |
+| `circle` | `p3_circle.point.mirror.Point.to_projective_line` | `p3_circle::point::Point::to_projective_line` | stub | 1 |
+| `circle` | `p3_circle.point.mirror.Point.double` | `p3_circle::point::Point::double` | stub | 13 |
+| `circle` | `p3_circle.point.mirror.Point.repeated_double` | `p3_circle::point::Point::repeated_double` | stub | 0 |
+| `circle` | `p3_circle.point.mirror.Point.vnStep` | `p3_circle::point::Point::v_n` | stub | 32 |
+| `circle` | `p3_circle.point.mirror.Point.v_n` | `p3_circle::point::Point::v_n` | stub | 17 |
+| `circle` | `p3_circle.point.mirror.Point.vnProdLoop` | `p3_circle::point::Point::v_n_prod` | stub | 11 |
+| `circle` | `p3_circle.point.mirror.Point.v_n_prod` | `p3_circle::point::Point::v_n_prod` | stub | 11 |
+| `circle` | `p3_circle.point.mirror.Point.neg` | `{impl core::ops::Neg for p3_circle::point::Point<F>}::neg` | stub | 19 |
+| `circle` | `p3_circle.point.mirror.Point.add` | `{impl core::ops::Add<p3_circle::point::Point<F>> for p3_circle::point::Point<EF>}::add` | stub | 31 |
+| `circle` | `p3_circle.point.mirror.Point.sub` | `{impl core::ops::Sub<p3_circle::point::Point<F>> for p3_circle::point::Point<EF>}::sub` | stub | 17 |
+| `circle` | `p3_circle.point.mirror.Point.v_tilde_p` | `p3_circle::point::Point::v_tilde_p` | stub | 0 |
+| `circle` | `p3_circle.point.mirror.Point.recip_v_tilde_p_num_den` | `p3_circle::point::Point::recip_v_tilde_p_num_den` | stub | 3 |
+| `circle` | `p3_circle.point.mirror.Point.s_p_at_p` | `p3_circle::point::Point::s_p_at_p` | stub | 11 |
+| `circle` | `p3_circle.point.mirror.Point.v_p` | `p3_circle::point::Point::v_p` | stub | 14 |
+| `circle` | `p3_circle.point.mirror.Point.mulLoop` | `{impl core::ops::Mul<usize> for p3_circle::point::Point<F>}::mul` | stub | 12 |
+| `circle` | `p3_circle.point.mirror.Point.mul` | `{impl core::ops::Mul<usize> for p3_circle::point::Point<F>}::mul` | stub | 12 |
+| `circle` | `p3_circle.point.mirror.Point.generator` | `p3_circle::point::Point::generator` | stub | 26 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain` | `p3_circle::domain::CircleDomain` | stub | 33 |
+| `circle` | `p3_circle.domain.mirror.interleave` | `itertools::Itertools::interleave` | stub | 11 |
+| `circle` | `p3_circle.domain.mirror.chain` | `itertools::iterate` | stub | 18 |
+| `circle` | `p3_circle.domain.mirror.parallel_point_chain` | `p3_circle::domain::parallel_point_chain` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.forward_backward_index` | `p3_circle::domain::forward_backward_index` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.new` | `p3_circle::domain::CircleDomain::new` | stub | 4 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.standard` | `p3_circle::domain::CircleDomain::standard` | stub | 20 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.is_standard` | `p3_circle::domain::CircleDomain::is_standard` | stub | 1 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.subgroup_generator` | `p3_circle::domain::CircleDomain::subgroup_generator` | stub | 25 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.coset0` | `p3_circle::domain::CircleDomain::coset0` | stub | 16 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.coset1` | `p3_circle::domain::CircleDomain::coset1` | stub | 11 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.points` | `p3_circle::domain::CircleDomain::points` | stub | 11 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.points_vec` | `p3_circle::domain::CircleDomain::points_vec` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.nth_point` | `p3_circle::domain::CircleDomain::nth_point` | stub | 7 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.vanishing_poly` | `p3_circle::domain::CircleDomain::vanishing_poly` | stub | 6 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.size` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::size` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.first_point` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::first_point` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.next_point` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::next_point` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.try_create_disjoint_domain` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::try_create_disjoint_domain` | stub | 1 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.split_domains` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::split_domains` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.split_evals` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::split_evals` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.vanishing_poly_at_point` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::vanishing_poly_at_point` | stub | 0 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.selectors_at_point` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::selectors_at_point` | stub | 2 |
+| `circle` | `p3_circle.domain.mirror.CircleDomain.selectors_on_coset` | `{impl p3_commit::PolynomialSpace for p3_circle::domain::CircleDomain<F>}::selectors_on_coset` | stub | 1 |
+| `circle` | `p3_circle.ordering.mirror.cfft_permute_index` | `p3_circle::ordering::cfft_permute_index` | stub | 21 |
+| `circle` | `p3_circle.ordering.mirror.cfft_permute_slice` | `p3_circle::ordering::cfft_permute_slice` | stub | 4 |
+| `circle` | `p3_circle.ordering.mirror.cfft_permute_slice_chunked_in_place` | `p3_circle::ordering::cfft_permute_slice_chunked_in_place` | stub | 1 |
+| `circle` | `p3_circle.verifier.mirror.FriError` | `p3_fri::verifier::FriError` | stub | 6 |
+| `circle` | `p3_circle.verifier.mirror.Res` | `p3_circle::verifier::verify_queries` | stub | 6 |
+| `circle` | `p3_circle.verifier.mirror.crash` | `p3_circle::verifier::verify_queries` | stub | 5 |
+| `circle` | `p3_circle.verifier.mirror.lift` | `p3_circle::verifier::verify_queries` | stub | 6 |
+| `circle` | `p3_circle.verifier.mirror.CircleFriProof` | `p3_circle::proof::CircleFriProof` | stub | 5 |
+| `circle` | `p3_circle.verifier.mirror.validate_proof_shape` | `p3_circle::verifier::validate_proof_shape` | stub | 4 |
+| `circle` | `p3_circle.verifier.mirror.rebuildRow` | `p3_circle::verifier::fold_query` | stub | 7 |
+| `circle` | `p3_circle.verifier.mirror.ChainState` | `p3_circle::verifier::fold_query` | stub | 7 |
+| `circle` | `p3_circle.verifier.mirror.foldStep` | `p3_circle::verifier::fold_query` | stub | 7 |
+| `circle` | `p3_circle.verifier.mirror.fold_query` | `p3_circle::verifier::fold_query` | stub | 6 |
+| `circle` | `p3_circle.verifier.mirror.mapInputError` | `p3_circle::verifier::verify_queries` | stub | 5 |
+| `circle` | `p3_circle.verifier.mirror.checkRound` | `p3_circle::verifier::verify_queries` | stub | 5 |
+| `circle` | `p3_circle.verifier.mirror.checkQuery` | `p3_circle::verifier::verify_queries` | stub | 5 |
+| `circle` | `p3_circle.verifier.mirror.verify_queries` | `p3_circle::verifier::verify_queries` | stub | 5 |
+| `circle` | `p3_circle.pcs.mirror.InputError` | `p3_circle::pcs::InputError` | stub | 5 |
+| `circle` | `p3_circle.pcs.mirror.CircleInputProof` | `p3_circle::pcs::CircleInputProof` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.CirclePcsProof` | `p3_circle::pcs::CirclePcsProof` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.CircleVerifierTx` | `p3_circle::transcript::CircleVerifierTranscript` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.Claim` | `p3_circle::pcs::CommitmentWithClaims` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.IRes` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 5 |
+| `circle` | `p3_circle.pcs.mirror.Replayed` | `p3_circle::pcs::ReplayedChallenges` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.txResult` | `p3_circle::pcs::replay_transcript` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.replay_transcript` | `p3_circle::pcs::replay_transcript` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.checkBatch` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.reduceMatrix` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 5 |
+| `circle` | `p3_circle.pcs.mirror.firstLayerLeaf` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 6 |
+| `circle` | `p3_circle.pcs.mirror.reduceBatch` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.reduceQuery` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.open_inputs` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.claimedWidth` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 4 |
+| `circle` | `p3_circle.pcs.mirror.verify` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::verify` | stub | 4 |
+| `circle` | `p3_circle.prover.mirror.CircleProverTx` | `p3_circle::transcript::CircleProverTranscript` | stub | 2 |
+| `circle` | `p3_circle.prover.mirror.rowsOf` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 4 |
+| `circle` | `p3_circle.prover.mirror.matOfPairs` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 4 |
+| `circle` | `p3_circle.prover.mirror.pairsOf` | `p3_circle::folding::fold_y` | stub | 3 |
+| `circle` | `p3_circle.prover.mirror.compute_lagrange_den_on_domain` | `p3_circle::point::compute_lagrange_den_on_domain` | stub | 7 |
+| `circle` | `p3_circle.prover.mirror.evaluate_at_point_with_den` | `p3_circle::cfft::CircleEvaluations::evaluate_at_point_with_den` | stub | 4 |
+| `circle` | `p3_circle.prover.mirror.openMatrix` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 3 |
+| `circle` | `p3_circle.prover.mirror.openedValues` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 1 |
+| `circle` | `p3_circle.prover.mirror.permutedPoints` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 4 |
+| `circle` | `p3_circle.prover.mirror.rowwise_alpha_reduce_lifted` | `p3_circle::cfft::CircleEvaluations::rowwise_alpha_reduce_lifted` | stub | 3 |
+| `circle` | `p3_circle.prover.mirror.reducedRows` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 2 |
+| `circle` | `p3_circle.prover.mirror.accumulateMatrix` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 2 |
+| `circle` | `p3_circle.prover.mirror.reducedOpenings` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 2 |
+| `circle` | `p3_circle.prover.mirror.extractLambdas` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 2 |
+| `circle` | `p3_circle.prover.mirror.commitRound` | `p3_circle::prover::commit_phase` | stub | 2 |
+| `circle` | `p3_circle.prover.mirror.commitPhase` | `p3_circle::prover::commit_phase` | stub | 2 |
+| `circle` | `p3_circle.prover.mirror.answerQueries` | `p3_circle::prover::answer_queries` | stub | 1 |
+| `circle` | `p3_circle.prover.mirror.openInputs` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 1 |
+| `circle` | `p3_circle.prover.mirror.firstLayerSiblings` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 1 |
+| `circle` | `p3_circle.prover.mirror.open_` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_circle::pcs::CirclePcs<Val, InputMmcs, FriMmcs>}::open` | stub | 1 |
+| `commit` | `p3_commit.domain.mirror.LagrangeSelectors` | `p3_commit::domain::LagrangeSelectors` | stub | 39 |
+| `commit` | `p3_commit.domain.mirror.Coset.size` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::size` | stub | 37 |
+| `commit` | `p3_commit.domain.mirror.Coset.first_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::first_point` | stub | 27 |
+| `commit` | `p3_commit.domain.mirror.Coset.next_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::next_point` | stub | 20 |
+| `commit` | `p3_commit.domain.mirror.Coset.try_create_disjoint_domain` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::try_create_disjoint_domain` | stub | 21 |
+| `commit` | `p3_commit.domain.mirror.Coset.create_disjoint_domain` | `p3_commit::domain::PolynomialSpace::create_disjoint_domain` | stub | 1 |
+| `commit` | `p3_commit.domain.mirror.Coset.split_domains` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::split_domains` | stub | 19 |
+| `commit` | `p3_commit.domain.mirror.Coset.split_evals` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::split_evals` | stub | 4 |
+| `commit` | `p3_commit.domain.mirror.Coset.vanishing_poly_at_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::vanishing_poly_at_point` | stub | 33 |
+| `commit` | `p3_commit.domain.mirror.Coset.selectors_at_point` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::selectors_at_point` | stub | 32 |
+| `commit` | `p3_commit.domain.mirror.Coset.selectors_on_coset` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::selectors_on_coset` | stub | 7 |
+| `commit` | `p3_commit.domain.mirror.Coset.evaluate_polynomial_at` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::evaluate_polynomial_at` | stub | 19 |
+| `commit` | `p3_commit.domain.mirror.Coset.default_evaluate_periodic_column_at` | `p3_commit::domain::PolynomialSpace::evaluate_periodic_column_at` | stub | 1 |
+| `commit` | `p3_commit.domain.mirror.Coset.evaluate_periodic_column_at` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::evaluate_periodic_column_at` | stub | 17 |
+| `commit` | `p3_commit.domain.mirror.Coset.default_evaluate_periodic_columns_at` | `p3_commit::domain::PolynomialSpace::evaluate_periodic_columns_at` | stub | 10 |
+| `commit` | `p3_commit.domain.mirror.Coset.evaluate_periodic_columns_at` | `{impl p3_commit::domain::PolynomialSpace for p3_field::coset::TwoAdicMultiplicativeCoset<Val>}::evaluate_periodic_columns_at` | stub | 16 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicColumnShapeError` | `p3_commit::periodic::PeriodicColumnShapeError` | stub | 21 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicColumns` | `p3_commit::periodic::PeriodicColumns` | stub | 21 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicColumns.new` | `p3_commit::periodic::PeriodicColumns::new` | stub | 21 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicColumns.max_period` | `p3_commit::periodic::PeriodicColumns::max_period` | stub | 4 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicLdeTable` | `p3_commit::periodic::PeriodicLdeTable` | stub | 8 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicLdeTable.new` | `p3_commit::periodic::PeriodicLdeTable::new` | stub | 4 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicLdeTable.empty` | `p3_commit::periodic::PeriodicLdeTable::empty` | stub | 5 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicLdeTable.is_empty` | `p3_commit::periodic::PeriodicLdeTable::is_empty` | stub | 2 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicLdeTable.packed_group_period` | `p3_commit::periodic::PeriodicLdeTable::packed_group_period` | stub | 1 |
+| `commit` | `p3_commit.periodic.mirror.PeriodicLdeTable.get` | `p3_commit::periodic::PeriodicLdeTable::get` | stub | 3 |
+| `commit` | `p3_commit.periodic.mirror.unitEvalOnLde` | `{impl p3_commit::periodic::PeriodicEvaluator<F, D> for ()}::eval_on_lde` | stub | 1 |
+| `commit` | `p3_commit.periodic.mirror.unitEvalAtPoint` | `{impl p3_commit::periodic::PeriodicEvaluator<F, D> for ()}::eval_at_point` | stub | 1 |
+| `commit` | `p3_commit.periodic.mirror.build_periodic_lde_table` | `p3_commit::pcs::univariate::UnivariateStarkPcs::build_periodic_lde_table` | stub | 4 |
+| `commit` | `p3_commit.pcs.univariate.mirror.PointOpening` | `p3_commit::pcs::univariate::PointOpening` | stub | 63 |
+| `commit` | `p3_commit.pcs.univariate.mirror.MatrixOpening` | `p3_commit::pcs::univariate::MatrixOpening` | stub | 63 |
+| `commit` | `p3_commit.pcs.univariate.mirror.CommitmentOpening` | `p3_commit::pcs::univariate::CommitmentOpening` | stub | 54 |
+| `commit` | `p3_commit.pcs.univariate.mirror.commit_preprocessing` | `p3_commit::pcs::univariate::UnivariateStarkPcs::commit_preprocessing` | stub | 1 |
+| `commit` | `p3_commit.pcs.univariate.mirror.commit_quotient` | `p3_commit::pcs::univariate::UnivariateStarkPcs::commit_quotient` | stub | 2 |
+| `commit` | `p3_commit.pcs.univariate.mirror.get_evaluations_on_domain_no_random` | `p3_commit::pcs::univariate::UnivariateStarkPcs::get_evaluations_on_domain_no_random` | stub | 1 |
+| `commit` | `p3_commit.pcs.univariate.mirror.open_with_preprocessing` | `p3_commit::pcs::univariate::UnivariateStarkPcs::open_with_preprocessing` | stub | 1 |
+| `commit` | `p3_commit.pcs.univariate.mirror.verify_with_preprocessing` | `p3_commit::pcs::univariate::UnivariateStarkPcs::verify_with_preprocessing` | stub | 1 |
+| `commit` | `p3_commit.pcs.univariate.mirror.get_opt_randomization_poly_commitment` | `p3_commit::pcs::univariate::UnivariateStarkPcs::get_opt_randomization_poly_commitment` | stub | 1 |
+| `commit` | `p3_commit.testing.mirror.TrivialPcs` | `p3_commit::testing::TrivialPcs` | stub | 3 |
+| `commit` | `p3_commit.testing.mirror.eval_coeffs_at_pt` | `p3_commit::testing::eval_coeffs_at_pt` | stub | 2 |
+| `commit` | `p3_commit.testing.mirror.natural_domain_for_degree` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_commit::testing::TrivialPcs<Val, Dft>}::natural_domain_for_degree` | stub | 2 |
+| `commit` | `p3_commit.testing.mirror.TrivialPcs.commit` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_commit::testing::TrivialPcs<Val, Dft>}::commit` | stub | 2 |
+| `commit` | `p3_commit.testing.mirror.TrivialPcs.open` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_commit::testing::TrivialPcs<Val, Dft>}::open` | stub | 2 |
+| `commit` | `p3_commit.testing.mirror.TrivialPcs.verify` | `{impl p3_commit::pcs::univariate::Pcs<Challenge, Challenger> for p3_commit::testing::TrivialPcs<Val, Dft>}::verify` | stub | 2 |
+| `commit` | `p3_commit.testing.mirror.TrivialPcs.get_evaluations_on_domain` | `{impl p3_commit::pcs::univariate::UnivariateStarkPcs<Challenge, Challenger> for p3_commit::testing::TrivialPcs<Val, Dft>}::get_evaluations_on_domain` | stub | 1 |
+| `commit` | `p3_commit.mmcs.mirror.commit_matrix` | `p3_commit::mmcs::Mmcs::commit_matrix` | stub | 1 |
+| `commit` | `p3_commit.mmcs.mirror.commit_vec` | `p3_commit::mmcs::Mmcs::commit_vec` | stub | 1 |
+| `commit` | `p3_commit.mmcs.mirror.get_matrix_heights` | `p3_commit::mmcs::Mmcs::get_matrix_heights` | stub | 1 |
+| `commit` | `p3_commit.mmcs.mirror.get_max_height` | `p3_commit::mmcs::Mmcs::get_max_height` | stub | 1 |
+| `commit` | `p3_commit.adapters.extension_mmcs.mirror.commit` | `{impl p3_commit::mmcs::Mmcs<EF> for p3_commit::adapters::extension_mmcs::ExtensionMmcs<F, EF, InnerMmcs>}::commit` | stub | 1 |
+| `commit` | `p3_commit.adapters.extension_mmcs.mirror.open_batch` | `{impl p3_commit::mmcs::Mmcs<EF> for p3_commit::adapters::extension_mmcs::ExtensionMmcs<F, EF, InnerMmcs>}::open_batch` | stub | 1 |
+| `commit` | `p3_commit.adapters.extension_mmcs.mirror.get_matrices` | `{impl p3_commit::mmcs::Mmcs<EF> for p3_commit::adapters::extension_mmcs::ExtensionMmcs<F, EF, InnerMmcs>}::get_matrices` | stub | 1 |
+| `commit` | `p3_commit.adapters.extension_mmcs.mirror.verify_batch` | `{impl p3_commit::mmcs::Mmcs<EF> for p3_commit::adapters::extension_mmcs::ExtensionMmcs<F, EF, InnerMmcs>}::verify_batch` | stub | 1 |
+| `commit` | `p3_commit.adapters.extension_mmcs.mirror.flatten_to_base` | `p3_field::field::BasedVectorSpace::flatten_to_base` | stub | 1 |
+| `commit` | `p3_commit.adapters.extension_mmcs.mirror.reconstitute_from_base` | `p3_field::field::BasedVectorSpace::reconstitute_from_base` | stub | 1 |
+| `commit` | `p3_commit.encoder.mirror.zero_padded` | `p3_commit::encoder::zero_padded` | stub | 1 |
+| `commit` | `p3_commit.encoder.mirror.encode_batch` | `{impl p3_commit::encoder::Encoder<F> for D}::encode_batch` | stub | 3 |
+| `commit` | `p3_commit.encoder.mirror.encode_batch_padded` | `p3_commit::encoder::Encoder::encode_batch_padded` | stub | 1 |
+| `commit` | `p3_commit.encoder.mirror.encode_batch_borrowed` | `p3_commit::encoder::Encoder::encode_batch_borrowed` | stub | 1 |
+| `dft` | `p3_dft.butterflies.mirror.DitButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DitButterfly<F>}::apply` | stub | 23 |
+| `dft` | `p3_dft.butterflies.mirror.DifButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterfly<F>}::apply` | stub | 10 |
+| `dft` | `p3_dft.butterflies.mirror.DifButterflyZeros.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterflyZeros<F>}::apply` | stub | 0 |
+| `dft` | `p3_dft.butterflies.mirror.TwiddleFreeButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::TwiddleFreeButterfly}::apply` | stub | 20 |
+| `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.new` | `p3_dft::butterflies::ScaledDitButterfly::new` | stub | 6 |
+| `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.apply` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::ScaledDitButterfly<F>}::apply` | stub | 5 |
+| `dft` | `p3_dft.butterflies.mirror.DitButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DitButterfly<F>}::apply_to_rows` | stub | 1 |
+| `dft` | `p3_dft.butterflies.mirror.DifButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterfly<F>}::apply_to_rows` | stub | 1 |
+| `dft` | `p3_dft.butterflies.mirror.ScaledDitButterfly.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::ScaledDitButterfly<F>}::apply_to_rows` | stub | 1 |
+| `dft` | `p3_dft.butterflies.mirror.DifButterflyZeros.apply_to_rows` | `{impl p3_dft::butterflies::Butterfly<F> for p3_dft::butterflies::DifButterflyZeros<F>}::apply_to_rows` | stub | 0 |
+| `dft` | `p3_dft.mirror.bitRev` | `p3_util::reverse_bits_len` | stub | 100 |
+| `dft` | `p3_dft.mirror.revIndex` | `p3_util::reverse_slice_index_bits` | stub | 53 |
+| `dft` | `p3_dft.util.mirror.divide_by_height` | `p3_dft::util::divide_by_height` | stub | 4 |
+| `dft` | `p3_dft.util.mirror.coset_shift_cols` | `p3_dft::util::coset_shift_cols` | stub | 5 |
+| `dft` | `p3_dft.naive.mirror.NaiveDft.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::naive::NaiveDft}::dft_batch` | stub | 3 |
+| `dft` | `p3_dft.traits.mirror.coset_dft_batch` | `p3_dft::traits::TwoAdicSubgroupDft::coset_dft_batch` | stub | 1 |
+| `dft` | `p3_dft.traits.mirror.idft_batch` | `p3_dft::traits::TwoAdicSubgroupDft::idft_batch` | stub | 2 |
+| `dft` | `p3_dft.traits.mirror.coset_idft_batch` | `p3_dft::traits::TwoAdicSubgroupDft::coset_idft_batch` | stub | 3 |
+| `dft` | `p3_dft.traits.mirror.coset_lde_batch_with_transform` | `p3_dft::traits::TwoAdicSubgroupDft::coset_lde_batch_with_transform` | stub | 1 |
+| `dft` | `p3_dft.traits.mirror.via_base` | `p3_dft::traits::TwoAdicSubgroupDft::dft_algebra_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_dit.mirror.Radix2Dit.get_or_compute_twiddles` | `p3_dft::radix_2_dit::Radix2Dit::get_or_compute_twiddles` | stub | 5 |
+| `dft` | `p3_dft.radix_2_dit.mirror.dit_layer` | `p3_dft::radix_2_dit::dit_layer` | stub | 5 |
+| `dft` | `p3_dft.radix_2_dit.mirror.Radix2Dit.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit::Radix2Dit<F>}::dft_batch` | stub | 5 |
+| `dft` | `p3_dft.radix_2_dit.mirror.Radix2Dit.coset_lde_batch_with_transform` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit::Radix2Dit<F>}::coset_lde_batch_with_transform` | stub | 1 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.butterfly_layer` | `p3_dft::radix_2_bowers::butterfly_layer` | stub | 7 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.bowers_g` | `p3_dft::radix_2_bowers::bowers_g` | stub | 5 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.bowers_g_t` | `p3_dft::radix_2_bowers::bowers_g_t` | stub | 5 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.Radix2Bowers.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_bowers::Radix2Bowers}::dft_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.Radix2Bowers.idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_bowers::Radix2Bowers}::idft_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.Radix2Bowers.lde_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_bowers::Radix2Bowers}::lde_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.Radix2Bowers.coset_lde_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_bowers::Radix2Bowers}::coset_lde_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.Radix2Bowers.coset_lde_batch_with_transform` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_bowers::Radix2Bowers}::coset_lde_batch_with_transform` | stub | 1 |
+| `dft` | `p3_dft.radix_2_bowers.mirror.bit_reversed_zero_pad` | `p3_matrix::dense::DenseMatrix::bit_reversed_zero_pad` | stub | 3 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.get_or_compute_twiddles` | `p3_dft::radix_2_dit_parallel::Radix2DitParallel::get_or_compute_twiddles` | stub | 1 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.get_or_compute_inverse_twiddles` | `p3_dft::radix_2_dit_parallel::Radix2DitParallel::get_or_compute_inverse_twiddles` | stub | 4 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.get_or_compute_coset_twiddles` | `p3_dft::radix_2_dit_parallel::Radix2DitParallel::get_or_compute_coset_twiddles` | stub | 2 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.dit_layer_twiddle_free` | `p3_dft::radix_2_dit_parallel::dit_layer_twiddle_free` | stub | 5 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.dit_layer_first_one` | `p3_dft::radix_2_dit_parallel::dit_layer_first_one` | stub | 5 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.dit_layer` | `p3_dft::radix_2_dit_parallel::dit_layer` | stub | 2 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.dit_layer_rev` | `p3_dft::radix_2_dit_parallel::dit_layer_rev` | stub | 6 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.first_half` | `p3_dft::radix_2_dit_parallel::first_half` | stub | 5 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.second_half` | `p3_dft::radix_2_dit_parallel::second_half` | stub | 5 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.first_half_general` | `p3_dft::radix_2_dit_parallel::first_half_general` | stub | 2 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.second_half_general` | `p3_dft::radix_2_dit_parallel::second_half_general` | stub | 2 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.coset_dft` | `p3_dft::radix_2_dit_parallel::coset_dft` | stub | 2 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.first_half_general_oop` | `p3_dft::radix_2_dit_parallel::first_half_general_oop` | stub | 1 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.coset_dft_oop` | `p3_dft::radix_2_dit_parallel::coset_dft_oop` | stub | 1 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit_parallel::Radix2DitParallel<F>}::dft_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.coset_dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit_parallel::Radix2DitParallel<F>}::coset_dft_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit_parallel::Radix2DitParallel<F>}::idft_batch` | stub | 3 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.coset_idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_dit_parallel::Radix2DitParallel<F>}::coset_idft_batch` | stub | 1 |
+| `dft` | `p3_dft.radix_2_dit_parallel.mirror.Radix2DitParallel.lde_with_consumer` | `p3_dft::radix_2_dit_parallel::Radix2DitParallel::lde_with_consumer` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.roots_of_unity_table` | `p3_dft::radix_2_small_batch::Radix2DFTSmallBatch::roots_of_unity_table` | stub | 3 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.cache` | `p3_dft::radix_2_small_batch::Radix2DFTSmallBatch::update_twiddles` | stub | 3 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.estimate_num_rows_in_l1` | `p3_dft::radix_2_small_batch::estimate_num_rows_in_l1` | stub | 3 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par` | `p3_dft::radix_2_small_batch::dft_layer_par` | stub | 3 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par_double_dit` | `p3_dft::radix_2_small_batch::dft_layer_par_double` | stub | 2 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par_triple_dit` | `p3_dft::radix_2_small_batch::dft_layer_par_triple` | stub | 2 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par_double_dif` | `{impl p3_dft::radix_2_small_batch::MultiLayerButterfly<F, p3_dft::butterflies::DifButterfly<F>> for p3_dft::radix_2_small_batch::MultiLayerDifButterfly}::apply_2_layers` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.dft_layer_par_triple_dif` | `{impl p3_dft::radix_2_small_batch::MultiLayerButterfly<F, p3_dft::butterflies::DifButterfly<F>> for p3_dft::radix_2_small_batch::MultiLayerDifButterfly}::apply_3_layers` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.extra_layers_dit` | `p3_dft::radix_2_small_batch::dft_layer_par_extra_layers` | stub | 2 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.remaining_layers` | `p3_dft::radix_2_small_batch::remaining_layers` | stub | 2 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.initial_layers` | `p3_dft::radix_2_small_batch::initial_layers` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.par_remaining_layers` | `p3_dft::radix_2_small_batch::par_remaining_layers` | stub | 2 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.par_initial_layers` | `p3_dft::radix_2_small_batch::par_initial_layers` | stub | 1 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.Radix2DFTSmallBatch.dft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_small_batch::Radix2DFTSmallBatch<F>}::dft_batch` | stub | 2 |
+| `dft` | `p3_dft.radix_2_small_batch.mirror.Radix2DFTSmallBatch.idft_batch` | `{impl p3_dft::traits::TwoAdicSubgroupDft<F> for p3_dft::radix_2_small_batch::Radix2DFTSmallBatch<F>}::idft_batch` | stub | 1 |
 | `field` | `p3_field.dup.Dup` | `p3_field::dup::Dup` | stub | 0 |
-| `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 2 |
-| `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 0 |
+| `field` | `p3_field.field.PrimeCharacteristicRing` | `p3_field::field::PrimeCharacteristicRing` | stub | 33 |
+| `field` | `p3_field.field.Field` | `p3_field::field::Field` | stub | 28 |
 | `field` | `p3_field.field.PrimeField` | `p3_field::field::PrimeField` | stub | 0 |
+| `field` | `p3_field.field.Algebra` | `p3_field::field::Algebra` | stub | 27 |
+| `field` | `p3_field.integers.QuotientMap` | `p3_field::integers::QuotientMap` | stub | 0 |
+| `field` | `p3_field.field.PrimeField64` | `p3_field::field::PrimeField64` | stub | 0 |
+| `field` | `p3_field.field.PrimeField32` | `p3_field::field::PrimeField32` | stub | 0 |
+| `field` | `p3_field.field.BasedVectorSpace` | `p3_field::field::BasedVectorSpace` | stub | 0 |
+| `field` | `p3_field.field.BasedVectorSpace.Blanket` | `{impl p3_field::field::BasedVectorSpace<F> for F}` | stub | 0 |
 | `field` | `p3_field.field.UniformSamplingField` | `p3_field::field::UniformSamplingField` | stub | 0 |
 | `field` | `p3_field.helpers.halve_u32` | `p3_field::helpers::halve_u32` | stub | 1 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset` | `p3_field::coset::TwoAdicMultiplicativeCoset` | stub | 114 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.new` | `p3_field::coset::TwoAdicMultiplicativeCoset::new` | stub | 36 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.subgroup_generator` | `p3_field::coset::TwoAdicMultiplicativeCoset::subgroup_generator` | stub | 69 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.shift_inverse` | `p3_field::coset::TwoAdicMultiplicativeCoset::shift_inverse` | stub | 43 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.size` | `p3_field::coset::TwoAdicMultiplicativeCoset::size` | stub | 46 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.shrink_coset` | `p3_field::coset::TwoAdicMultiplicativeCoset::shrink_coset` | stub | 1 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.exp_power_of_2` | `p3_field::coset::TwoAdicMultiplicativeCoset::exp_power_of_2` | stub | 1 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.set_shift` | `p3_field::coset::TwoAdicMultiplicativeCoset::set_shift` | stub | 1 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.shift_by` | `p3_field::coset::TwoAdicMultiplicativeCoset::shift_by` | stub | 1 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.contains` | `p3_field::coset::TwoAdicMultiplicativeCoset::contains` | stub | 1 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.generator_exp` | `p3_field::coset::TwoAdicMultiplicativeCoset::generator_exp` | stub | 1 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.element` | `p3_field::coset::TwoAdicMultiplicativeCoset::element` | stub | 1 |
+| `field` | `p3_field.coset.mirror.TwoAdicMultiplicativeCoset.iter` | `p3_field::coset::TwoAdicMultiplicativeCoset::iter` | stub | 8 |
+| `fri` | `p3_fri.config.mirror.FriParameters` | `p3_fri::config::FriParameters` | stub | 29 |
+| `fri` | `p3_fri.config.mirror.FriProverError` | `p3_fri::config::FriProverError` | stub | 3 |
+| `fri` | `p3_fri.config.mirror.FriParameters.final_poly_len` | `p3_fri::config::FriParameters::final_poly_len` | stub | 20 |
+| `fri` | `p3_fri.config.mirror.FriParameters.blowup` | `p3_fri::config::FriParameters::blowup` | stub | 0 |
+| `fri` | `p3_fri.config.mirror.FriParameters.conjectured_soundness_bits` | `p3_fri::config::FriParameters::conjectured_soundness_bits` | stub | 0 |
+| `fri` | `p3_fri.config.mirror.FriParameters.validate_input_height` | `p3_fri::config::FriParameters::validate_input_height` | stub | 3 |
+| `fri` | `p3_fri.config.mirror.compute_log_arity_for_round` | `p3_fri::config::compute_log_arity_for_round` | stub | 25 |
+| `fri` | `p3_fri.config.mirror.fold_schedule_loop` | `p3_fri::config::fold_schedule` | stub | 25 |
+| `fri` | `p3_fri.config.mirror.fold_schedule` | `p3_fri::config::fold_schedule` | stub | 25 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.inv` | `p3_field::Field::inverse` | stub | 34 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.batchInv` | `p3_field::batch_multiplicative_inverse` | stub | 34 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.lagrange_interpolate_at` | `p3_fri::two_adic_pcs::lagrange_interpolate_at` | stub | 30 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.foldPair` | `{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_matrix` | stub | 5 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.fold_row` | `{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_row` | stub | 29 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.foldPairs` | `{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_matrix` | stub | 5 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.foldRounds` | `{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_matrix` | stub | 5 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.fold_matrix_scalar` | `{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_matrix` | stub | 5 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.isPow2` | `core::num::usize::is_power_of_two` | stub | 1 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.use_packed_fold` | `p3_fri::two_adic_pcs::use_packed_fold` | stub | 1 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.foldPacked` | `p3_fri::two_adic_pcs::fold_matrix_packed` | stub | 1 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.packedRound` | `p3_fri::two_adic_pcs::fold_matrix_packed` | stub | 1 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.packedRounds` | `p3_fri::two_adic_pcs::fold_matrix_packed` | stub | 1 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.fold_matrix_packed` | `p3_fri::two_adic_pcs::fold_matrix_packed` | stub | 1 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.fold_matrix` | `{impl p3_fri::config::FriFoldingStrategy<F, EF> for p3_fri::two_adic_pcs::TwoAdicFriFolding<InputProof, InputError>}::fold_matrix` | stub | 1 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.bitrevCoset` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 11 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.MatToOpen` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 4 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.compute_inverse_denominators` | `p3_fri::two_adic_pcs::compute_inverse_denominators` | stub | 4 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.reducePoint` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 3 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.reduceMat` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 3 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.reduced_openings` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::open` | stub | 3 |
+| `fri` | `p3_fri.mirror.MmcsOps` | `p3_commit::Mmcs` | stub | 32 |
+| `fri` | `p3_fri.mirror.CommitPhaseMultiStep` | `p3_fri::proof::CommitPhaseMultiStep` | stub | 26 |
+| `fri` | `p3_fri.mirror.BatchMultiOpening` | `p3_fri::proof::BatchMultiOpening` | stub | 27 |
+| `fri` | `p3_fri.mirror.FriProof` | `p3_fri::proof::FriProof` | stub | 20 |
+| `fri` | `p3_fri.mirror.TranscriptFailure` | `p3_fri::transcript::TranscriptFailure` | stub | 24 |
+| `fri` | `p3_fri.mirror.ProverTx` | `p3_fri::transcript::ProverTranscript` | stub | 0 |
+| `fri` | `p3_fri.mirror.VerifierTx` | `p3_fri::transcript::VerifierTranscript` | stub | 20 |
+| `fri` | `p3_fri.prover.mirror.matOfFlat` | `p3_matrix::dense::DenseMatrix::new` | stub | 0 |
+| `fri` | `p3_fri.prover.mirror.flatOfMat` | `p3_matrix::Matrix::to_row_major_matrix` | stub | 0 |
+| `fri` | `p3_fri.prover.mirror.CommitPhaseResult` | `p3_fri::prover::CommitPhaseResult` | stub | 0 |
+| `fri` | `p3_fri.prover.mirror.Folder` | `p3_fri::config::FriFoldingStrategy::fold_matrix` | stub | 0 |
+| `fri` | `p3_fri.prover.mirror.commitRound` | `p3_fri::prover::commit_phase` | stub | 0 |
+| `fri` | `p3_fri.prover.mirror.commit_phase` | `p3_fri::prover::commit_phase` | stub | 0 |
+| `fri` | `p3_fri.prover.mirror.answer_queries` | `p3_fri::prover::answer_queries` | stub | 0 |
+| `fri` | `p3_fri.prover.mirror.open_inputs` | `p3_fri::prover::open_inputs` | stub | 0 |
+| `fri` | `p3_fri.prover.mirror.prove_fri` | `p3_fri::prover::prove_fri_with_schedule` | stub | 0 |
+| `fri` | `p3_fri.verifier.mirror.FriError` | `p3_fri::verifier::FriError` | stub | 37 |
+| `fri` | `p3_fri.verifier.mirror.FriError.ofTranscript` | `{impl core::convert::From<p3_fri::transcript::TranscriptFailure> for p3_fri::verifier::FriError<CommitMmcsErr, InputError>}::from` | stub | 20 |
+| `fri` | `p3_fri.verifier.mirror.Res` | `p3_fri::verifier::verify_fri` | stub | 37 |
+| `fri` | `p3_fri.verifier.mirror.crash` | `p3_fri::verifier::verify_fri` | stub | 0 |
+| `fri` | `p3_fri.verifier.mirror.lift` | `p3_fri::verifier::verify_fri` | stub | 30 |
+| `fri` | `p3_fri.verifier.mirror.Claim` | `p3_commit::CommitmentWithOpeningPoints` | stub | 46 |
+| `fri` | `p3_fri.verifier.mirror.check_canonical_pow_witnesses` | `p3_fri::verifier::check_canonical_pow_witnesses` | stub | 20 |
+| `fri` | `p3_fri.verifier.mirror.rebuildRow` | `p3_fri::verifier::fold_query` | stub | 25 |
+| `fri` | `p3_fri.verifier.mirror.ChainState` | `p3_fri::verifier::fold_query` | stub | 24 |
+| `fri` | `p3_fri.verifier.mirror.foldStep` | `p3_fri::verifier::fold_query` | stub | 24 |
+| `fri` | `p3_fri.verifier.mirror.badRound` | `p3_fri::verifier::fold_query` | stub | 23 |
+| `fri` | `p3_fri.verifier.mirror.fold_query` | `p3_fri::verifier::fold_query` | stub | 23 |
+| `fri` | `p3_fri.verifier.mirror.openingPoints` | `p3_fri::verifier::open_inputs` | stub | 26 |
+| `fri` | `p3_fri.verifier.mirror.ladderOffsets` | `p3_fri::verifier::open_inputs` | stub | 26 |
+| `fri` | `p3_fri.verifier.mirror.queryPoint` | `p3_fri::verifier::open_inputs` | stub | 29 |
+| `fri` | `p3_fri.verifier.mirror.pointTerm` | `p3_fri::verifier::open_inputs` | stub | 26 |
+| `fri` | `p3_fri.verifier.mirror.RedState` | `p3_fri::verifier::open_inputs` | stub | 26 |
+| `fri` | `p3_fri.verifier.mirror.reduceMatrix` | `p3_fri::verifier::open_inputs` | stub | 26 |
+| `fri` | `p3_fri.verifier.mirror.reduceQuery` | `p3_fri::verifier::open_inputs` | stub | 26 |
+| `fri` | `p3_fri.verifier.mirror.checkBatch` | `p3_fri::verifier::open_inputs` | stub | 23 |
+| `fri` | `p3_fri.verifier.mirror.checkDenominators` | `p3_fri::verifier::open_inputs` | stub | 23 |
+| `fri` | `p3_fri.verifier.mirror.open_inputs` | `p3_fri::verifier::open_inputs` | stub | 22 |
+| `fri` | `p3_fri.verifier.mirror.inputLogHeights` | `p3_fri::verifier::verify_fri` | stub | 23 |
+| `fri` | `p3_fri.verifier.mirror.horner` | `p3_field::HornerIter::horner` | stub | 21 |
+| `fri` | `p3_fri.verifier.mirror.checkQuery` | `p3_fri::verifier::verify_fri` | stub | 20 |
+| `fri` | `p3_fri.verifier.mirror.checkRound` | `p3_fri::verifier::verify_fri` | stub | 20 |
+| `fri` | `p3_fri.verifier.mirror.open_inputs'` | `p3_fri::verifier::verify_fri` | stub | 20 |
+| `fri` | `p3_fri.verifier.mirror.verify_fri` | `p3_fri::verifier::verify_fri` | stub | 20 |
+| `fri` | `p3_fri.transcript.mirror.Step` | `p3_challenger::fs::Interaction` | stub | 4 |
+| `fri` | `p3_fri.transcript.mirror.FriShape` | `p3_fri::transcript::FriShape` | stub | 27 |
+| `fri` | `p3_fri.transcript.mirror.FriShape.with_schedule` | `p3_fri::transcript::FriShape::with_schedule` | stub | 20 |
+| `fri` | `p3_fri.transcript.mirror.FriShape.new` | `p3_fri::transcript::FriShape::new` | stub | 0 |
+| `fri` | `p3_fri.transcript.mirror.FriShape.pattern` | `p3_fri::transcript::FriShape::pattern` | stub | 3 |
+| `fri` | `p3_fri.transcript.mirror.PcsShape` | `p3_fri::pcs_transcript::PcsShape` | stub | 16 |
+| `fri` | `p3_fri.transcript.mirror.PcsShape.pattern` | `p3_fri::pcs_transcript::PcsShape::pattern` | stub | 1 |
+| `fri` | `p3_fri.mirror.PcsTranscriptFailure` | `p3_fri::pcs_transcript::PcsTranscriptFailure` | stub | 15 |
+| `fri` | `p3_fri.verifier.mirror.FriError.ofPcsTranscript` | `{impl core::convert::From<p3_fri::pcs_transcript::PcsTranscriptFailure> for p3_fri::verifier::FriError<CommitMmcsErr, InputError>}::from` | stub | 13 |
+| `fri` | `p3_fri.transcript.mirror.Sponge` | `p3_challenger::DuplexChallenger` | stub | 33 |
+| `fri` | `p3_fri.transcript.mirror.sample_bits` | `{impl p3_challenger::CanSampleBits<usize> for p3_challenger::duplex_challenger::DuplexChallenger<F, P, WIDTH, RATE>}::sample_bits` | stub | 32 |
+| `fri` | `p3_fri.transcript.mirror.check_witness` | `p3_challenger::grinding_challenger::GrindingChallenger::check_witness` | stub | 32 |
+| `fri` | `p3_fri.transcript.mirror.commit_round` | `p3_fri::transcript::VerifierTranscript::commit_round` | stub | 15 |
+| `fri` | `p3_fri.transcript.mirror.commit_rounds` | `p3_fri::transcript::VerifierTranscript::commit_rounds` | stub | 15 |
+| `fri` | `p3_fri.transcript.mirror.query_phase` | `p3_fri::transcript::VerifierTranscript::query_phase` | stub | 15 |
+| `fri` | `p3_fri.transcript.mirror.verifierTx` | `p3_fri::transcript::VerifierTranscript` | stub | 13 |
+| `fri` | `p3_fri.transcript.mirror.PcsShape.from_claims` | `p3_fri::pcs_transcript::PcsShape::from_claims` | stub | 14 |
+| `fri` | `p3_fri.transcript.mirror.claimed_openings` | `p3_fri::pcs_transcript::PcsVerifierTranscript::claimed_openings` | stub | 14 |
+| `fri` | `p3_fri.transcript.mirror.batch_phase` | `p3_fri::pcs_transcript::PcsVerifierTranscript::batch_phase` | stub | 14 |
+| `fri` | `p3_fri.two_adic_pcs.mirror.verify` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::verify` | stub | 13 |
+| `fri` | `p3_fri.hiding_pcs.mirror.withRandomCols` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::commit` | stub | 1 |
+| `fri` | `p3_fri.hiding_pcs.mirror.randomize` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::commit` | stub | 1 |
+| `fri` | `p3_fri.hiding_pcs.mirror.hiding_budget` | `p3_fri::hiding_pcs::HidingFriPcs::hiding_budget` | stub | 16 |
+| `fri` | `p3_fri.hiding_pcs.mirror.HidingFriProverError` | `p3_fri::hiding_pcs::HidingFriProverError` | stub | 5 |
+| `fri` | `p3_fri.hiding_pcs.mirror.check_hiding_budget` | `p3_fri::hiding_pcs::HidingFriPcs::check_hiding_budget` | stub | 5 |
+| `fri` | `p3_fri.hiding_pcs.mirror.lde_mask_height` | `p3_fri::hiding_pcs::HidingFriPcs::lde_mask_height` | stub | 4 |
+| `fri` | `p3_fri.hiding_pcs.mirror.maskCoeffs` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::get_quotient_ldes` | stub | 1 |
+| `fri` | `p3_fri.hiding_pcs.mirror.lastMask` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::get_quotient_ldes` | stub | 5 |
+| `fri` | `p3_fri.hiding_pcs.mirror.maskDraws` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::get_quotient_ldes` | stub | 5 |
+| `fri` | `p3_fri.hiding_pcs.mirror.quotientMaskValues` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::get_quotient_ldes` | stub | 5 |
+| `fri` | `p3_fri.hiding_pcs.mirror.mergeHiddenPoint` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::verify_with_preprocessing` | stub | 12 |
+| `fri` | `p3_fri.hiding_pcs.mirror.mergeHiddenMatrix` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::verify_with_preprocessing` | stub | 10 |
+| `fri` | `p3_fri.hiding_pcs.mirror.mergeHiddenRound` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::verify_with_preprocessing` | stub | 9 |
+| `fri` | `p3_fri.hiding_pcs.mirror.mergeHidden` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::verify_with_preprocessing` | stub | 9 |
+| `fri` | `p3_fri.hiding_pcs.mirror.verify_hiding` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::verify_with_preprocessing` | stub | 6 |
+| `fri` | `p3_fri.hiding_pcs.mirror.splitHidden` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::open_with_preprocessing` | stub | 4 |
+| `fri` | `p3_fri.hiding_pcs.mirror.HidingRound` | `p3_fri::hiding_pcs::HidingFriPcsProverData` | stub | 3 |
+| `fri` | `p3_fri.hiding_pcs.mirror.checkHidingRound` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::open_with_preprocessing` | stub | 3 |
+| `fri` | `p3_fri.hiding_pcs.mirror.checkHidingRounds` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::open_with_preprocessing` | stub | 3 |
+| `fri` | `p3_fri.hiding_pcs.mirror.open_hiding` | `{impl p3_commit::UnivariateStarkPcs<Challenge, Challenger> for p3_fri::hiding_pcs::HidingFriPcs<Val, Dft, InputMmcs, FriMmcs, R>}::open_with_preprocessing` | stub | 3 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreOpsArithSubGoldilocksGoldilocks.sub` | `{impl core::ops::arith::Sub for p3_goldilocks::goldilocks::Goldilocks}::sub` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.CoreCmpPartialEqGoldilocks.eq` | `{impl core::cmp::PartialEq for p3_goldilocks::goldilocks::Goldilocks}::eq` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldFieldPrimeCharacteristicRing.halve` | `{impl p3_field::field::PrimeCharacteristicRing for p3_goldilocks::goldilocks::Goldilocks}::halve` | not translated | 2 |
@@ -425,19 +1465,136 @@ counts the claims (of 748) whose dependencies include the declaration.
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_int` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_int` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_checked` | dropped | 1 |
 | `goldilocks` | `p3_goldilocks.goldilocks.Goldilocks.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_unchecked` | `{impl p3_field::integers::QuotientMap for p3_goldilocks::goldilocks::Goldilocks}::from_canonical_unchecked` | dropped | 2 |
+| `keccak-air` | `p3_keccak_air.mirror.NUM_ROUNDS` | `p3_keccak_air::NUM_ROUNDS` | not translated | 18 |
+| `keccak-air` | `p3_keccak_air.mirror.BITS_PER_LIMB` | `p3_keccak_air::BITS_PER_LIMB` | not translated | 9 |
+| `keccak-air` | `p3_keccak_air.mirror.U64_LIMBS` | `p3_keccak_air::U64_LIMBS` | not translated | 9 |
+| `keccak-air` | `p3_keccak_air.mirror.R` | `p3_keccak_air::constants::R` | not translated | 23 |
+| `keccak-air` | `p3_keccak_air.mirror.RC` | `p3_keccak_air::constants::RC` | not translated | 10 |
+| `keccak-air` | `p3_keccak_air.mirror.RC_BITS` | `p3_keccak_air::constants::RC_BITS` | not translated | 21 |
+| `keccak-air` | `p3_keccak_air.mirror.NUM_KECCAK_COLS` | `p3_keccak_air::columns::NUM_KECCAK_COLS` | not translated | 9 |
+| `keccak-air` | `p3_keccak_air.mirror.KeccakCols` | `p3_keccak_air::columns::KeccakCols` | not translated | 2 |
+| `keccak-air` | `p3_keccak_air.mirror.KeccakCols.cells` | `p3_keccak_air::columns::KeccakCols` | not translated | 2 |
+| `keccak-air` | `p3_keccak_air.mirror.col.a` | `p3_keccak_air::columns::KeccakCols` | not translated | 9 |
+| `keccak-air` | `p3_keccak_air.mirror.b` | `p3_keccak_air::columns::KeccakCols::b` | not translated | 9 |
+| `keccak-air` | `p3_keccak_air.mirror.a_prime_prime_prime` | `p3_keccak_air::columns::KeccakCols::a_prime_prime_prime` | not translated | 9 |
+| `keccak-air` | `p3_keccak_air.mirror.KeccakCols.a_prime_prime_prime'` | `p3_keccak_air::columns::KeccakCols::a_prime_prime_prime` | not translated | 2 |
+| `keccak-air` | `p3_keccak_air.mirror.double` | `p3_field::PrimeCharacteristicRing::double` | not translated | 18 |
+| `keccak-air` | `p3_keccak_air.mirror.xor` | `p3_field::PrimeCharacteristicRing::xor` | not translated | 18 |
+| `keccak-air` | `p3_keccak_air.mirror.xor3` | `p3_field::PrimeCharacteristicRing::xor3` | not translated | 9 |
+| `keccak-air` | `p3_keccak_air.mirror.andn` | `p3_field::PrimeCharacteristicRing::andn` | not translated | 9 |
+| `keccak-air` | `p3_keccak_air.mirror.sum` | `{impl core::iter::Sum<T> for p3_air::symbolic::SymbolicExpr<A>}::sum` | not translated | 16 |
+| `keccak-air` | `p3_keccak_air.mirror.eval_round_flags` | `p3_keccak_air::round_flags::eval_round_flags` | not translated | 9 |
+| `keccak-air` | `p3_keccak_air.mirror.eval` | `{impl p3_air::air::Air<AB> for p3_keccak_air::air::KeccakAir}::eval` | not translated | 9 |
+| `keccak-air` | `p3_keccak_air.mirror.u64_to_bits_le` | `p3_air::utils::u64_to_bits_le` | not translated | 6 |
+| `keccak-air` | `p3_keccak_air.mirror.u64_to_16_bit_limbs` | `p3_air::utils::u64_to_16_bit_limbs` | not translated | 2 |
+| `keccak-air` | `p3_keccak_air.mirror.generate_trace_row_for_round` | `p3_keccak_air::generation::generate_trace_row_for_round` | not translated | 2 |
+| `keccak-air` | `p3_keccak_air.mirror.generate_trace_rows_for_perm` | `p3_keccak_air::generation::generate_trace_rows_for_perm` | not translated | 2 |
+| `keccak-air` | `p3_keccak_air.mirror.generate_trace_rows` | `p3_keccak_air::generation::generate_trace_rows` | not translated | 2 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.KECCAK_BINARY_ROWS_PER_PERM` | `p3_keccak_air::binary::columns::KECCAK_BINARY_ROWS_PER_PERM` | not translated | 5 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.NUM_KECCAK_BINARY_COLS` | `p3_keccak_air::binary::columns::NUM_KECCAK_BINARY_COLS` | not translated | 9 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.KeccakBinaryCols` | `p3_keccak_air::binary::columns::KeccakBinaryCols` | not translated | 4 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.KeccakBinaryCols.cells` | `p3_keccak_air::binary::columns::KeccakBinaryCols` | not translated | 4 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.col.a` | `p3_keccak_air::binary::columns::KeccakBinaryCols` | not translated | 9 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.rho_pi_source` | `p3_keccak_air::binary::rho_pi_source` | not translated | 11 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.eval` | `{impl p3_air::air::Air<AB> for p3_keccak_air::binary::air::KeccakBinaryAir}::eval` | not translated | 7 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.keccak_round` | `p3_keccak_air::binary::generation::keccak_round` | not translated | 6 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.write_state` | `p3_keccak_air::binary::generation::write_state` | not translated | 4 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.generate_perm_rows` | `p3_keccak_air::binary::generation::generate_perm_rows` | not translated | 4 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.generate_binary_trace_rows` | `p3_keccak_air::binary::generation::generate_binary_trace_rows` | not translated | 4 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.num_constraints` | `{impl p3_air::air::BaseAir<F> for p3_keccak_air::binary::air::KeccakBinaryAir}::num_constraints` | not translated | 1 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.NUM_FLAG_CONSTRAINTS` | `p3_keccak_air::binary::air::NUM_FLAG_CONSTRAINTS` | not translated | 1 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.NUM_STATE_BITS` | `p3_keccak_air::binary::air::NUM_STATE_BITS` | not translated | 1 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.BITS_PER_WORD` | `p3_keccak_air::binary::generation::BITS_PER_WORD` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.OUTPUT_FLAG_COLUMN` | `p3_keccak_air::binary::generation::OUTPUT_FLAG_COLUMN` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.trailing_zeros` | `core::num::{u32}::trailing_zeros` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.RowWords` | `p3_keccak_air::binary::generation::RowWords` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.RowWords.default` | `{impl core::default::Default for p3_keccak_air::binary::generation::RowWords}::default` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.generate_perm_words` | `p3_keccak_air::binary::generation::generate_perm_words` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.pack_row` | `p3_keccak_air::binary::generation::pack_block` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.pack_block` | `p3_keccak_air::binary::generation::pack_block` | not translated | 3 |
+| `keccak-air` | `p3_keccak_air.mirror.binary.generate_binary_trace_packed` | `p3_keccak_air::binary::generation::generate_binary_trace_packed` | not translated | 3 |
+| `lookup` | `p3_lookup.mirror.Kind` | `p3_lookup::types::Kind` | not translated | 29 |
+| `lookup` | `p3_lookup.mirror.Lookup` | `p3_lookup::types::Lookup` | not translated | 44 |
+| `lookup` | `p3_lookup.mirror.Lookup.num_denoms` | `p3_lookup::types::Lookup::num_denoms` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.checked_add_u32` | `core::num::u32::checked_add` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.SymbolicInteraction` | `p3_lookup::builder::SymbolicInteraction` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.SymbolicLocalInteraction` | `p3_lookup::builder::SymbolicLocalInteraction` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.SymbolicExclusiveBranch` | `p3_lookup::builder::SymbolicExclusiveBranch` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.SymbolicExclusiveInteraction` | `p3_lookup::builder::SymbolicExclusiveInteraction` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.assert_uniform_widths` | `p3_lookup::types::assert_uniform_widths` | not translated | 22 |
+| `lookup` | `p3_lookup.mirror.assert_uniform_tuple_width` | `p3_lookup::types::assert_uniform_tuple_width` | not translated | 22 |
+| `lookup` | `p3_lookup.mirror.from_interactions` | `p3_lookup::types::Lookups::from_interactions` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.bus_widths` | `p3_lookup::types::bus_widths` | not translated | 4 |
+| `lookup` | `p3_lookup.mirror.assert_bus_widths` | `p3_lookup::types::assert_bus_widths` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.pack_bus` | `p3_lookup::types::Lookups::pack_same_bus_with_degree` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.pack_same_bus_with_degree` | `p3_lookup::types::Lookups::pack_same_bus_with_degree` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.total_count_weight` | `p3_lookup::types::Lookups::total_count_weight` | not translated | 15 |
+| `lookup` | `p3_lookup.mirror.check_bus_widths` | `p3_lookup::types::check_bus_widths` | not translated | 4 |
+| `lookup` | `p3_lookup.mirror.check_multiplicity_height_bound` | `p3_lookup::types::check_multiplicity_height_bound` | not translated | 15 |
+| `lookup` | `p3_lookup.mirror.PermBuilder` | `p3_air::air::PermutationAirBuilder` | not translated | 17 |
+| `lookup` | `p3_lookup.mirror.zip_eq` | `itertools::Itertools::zip_eq` | not translated | 18 |
+| `lookup` | `p3_lookup.mirror.combine_elements` | `p3_lookup::logup::LogUpGadget::combine_elements` | not translated | 19 |
+| `lookup` | `p3_lookup.mirror.compute_combined_sum_terms` | `p3_lookup::logup::LogUpGadget::compute_combined_sum_terms` | not translated | 17 |
+| `lookup` | `p3_lookup.mirror.compute_exclusive_terms` | `p3_lookup::logup::LogUpGadget::compute_exclusive_terms` | not translated | 17 |
+| `lookup` | `p3_lookup.mirror.eval_fraction` | `p3_lookup::logup::LogUpGadget::eval_fraction` | not translated | 16 |
+| `lookup` | `p3_lookup.mirror.eval_accumulator` | `p3_lookup::logup::LogUpGadget::eval_accumulator` | not translated | 16 |
+| `lookup` | `p3_lookup.mirror.eval_all` | `p3_lookup::protocol::LookupProtocol::eval_all` | not translated | 15 |
+| `lookup` | `p3_lookup.mirror.verify_terminal_sum` | `p3_lookup::logup::LogUpGadget::verify_terminal_sum` | not translated | 11 |
+| `lookup` | `p3_lookup.mirror.constraint_degree_with_transition` | `p3_lookup::logup::LogUpGadget::constraint_degree_with_transition` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.LookupTraceBuilder` | `p3_lookup::traits::LookupTraceBuilder` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.dot_product` | `p3_field::helpers::dot_product` | not translated | 4 |
+| `lookup` | `p3_lookup.mirror.combine_tuple` | `p3_lookup::logup::combine_tuple` | not translated | 3 |
+| `lookup` | `p3_lookup.mirror.chunks` | `p3_maybe_rayon::serial::ParallelSliceMut::par_chunks_mut` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.batch_multiplicative_inverse` | `p3_field::batch_inverse::batch_multiplicative_inverse` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.lookup_row_terms` | `p3_lookup::logup::LogUpGadget::generate_permutation` | not translated | 2 |
+| `lookup` | `p3_lookup.mirror.rowContext` | `p3_lookup::logup::LogUpGadget::generate_permutation` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.process_chunk` | `p3_lookup::logup::LogUpGadget::generate_permutation` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.prefix_sum` | `p3_lookup::logup::LogUpGadget::generate_permutation` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.generate_permutation` | `p3_lookup::logup::LogUpGadget::generate_permutation` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.Challenges.new` | `p3_lookup::challenges::Challenges::new` | not translated | 20 |
+| `lookup` | `p3_lookup.mirror.Count.from_i32` | `p3_lookup::count::Count::from` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.Count.neg` | `p3_lookup::count::Count::neg` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.Recorded` | `p3_lookup::symbolic::InteractionSymbolicBuilder` | not translated | 2 |
+| `lookup` | `p3_lookup.mirror.Recorded.push_interaction` | `p3_lookup::symbolic::InteractionSymbolicBuilder::push_interaction` | not translated | 2 |
+| `lookup` | `p3_lookup.mirror.Recorded.push_exclusive_interaction` | `p3_lookup::symbolic::InteractionSymbolicBuilder::push_exclusive_interaction` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.LookupBus.lookup_key` | `p3_lookup::bus::LookupBus::lookup_key` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.LookupBus.table_entry` | `p3_lookup::bus::LookupBus::table_entry` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.LookupBus.lookup_key_exclusive` | `p3_lookup::bus::LookupBus::lookup_key_exclusive` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.PermutationCheckBus.send` | `p3_lookup::bus::PermutationCheckBus::send` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.PermutationCheckBus.receive` | `p3_lookup::bus::PermutationCheckBus::receive` | not translated | 1 |
+| `lookup` | `p3_lookup.mirror.MultiSet.add` | `p3_lookup::debug_util::MultiSet::add` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.MultiSet.assert_empty` | `p3_lookup::debug_util::MultiSet::assert_empty` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.LookupDebugInstance` | `p3_lookup::debug_util::LookupDebugInstance` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.accumulate_lookup` | `p3_lookup::debug_util::accumulate_lookup` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.check_lookups` | `p3_lookup::debug_util::check_lookups` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.TraceWindow` | `p3_lookup::indexed::TraceWindow` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.IndexedLookupError` | `p3_lookup::indexed::IndexedLookupError` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.check_columns` | `p3_lookup::indexed::IndexedLookups::check_columns` | not translated | 0 |
+| `lookup` | `p3_lookup.mirror.IndexedLookups.new` | `p3_lookup::indexed::IndexedLookups::new` | not translated | 0 |
+| `matrix` | `p3_matrix.interpolation.mirror.compute_adjusted_weights` | `p3_matrix::interpolation::compute_adjusted_weights` | not translated | 27 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_coset_with_precomputation` | `p3_matrix::interpolation::Interpolate::interpolate_coset_with_precomputation` | not translated | 28 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_coset` | `p3_matrix::interpolation::Interpolate::interpolate_coset` | not translated | 27 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_subgroup` | `p3_matrix::interpolation::Interpolate::interpolate_subgroup` | not translated | 0 |
+| `matrix` | `p3_matrix.interpolation.mirror.barycentric_weights` | `p3_matrix::interpolation::barycentric_weights` | not translated | 9 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_with_precomputation` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_with_precomputation` | not translated | 7 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_arbitrary_point` | `p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_point` | not translated | 7 |
+| `matrix` | `p3_matrix.interpolation.mirror.recover_coefficients` | `p3_matrix::interpolation::InterpolateArbitrary::recover_coefficients` | not translated | 2 |
+| `matrix` | `p3_matrix.interpolation.mirror.interpolate_lagrange` | `p3_matrix::interpolation::interpolate_lagrange` | not translated | 1 |
+| `matrix` | `p3_matrix.util.mirror.reverse_matrix_index_bits` | `p3_matrix::util::reverse_matrix_index_bits` | not translated | 17 |
+| `matrix` | `p3_matrix.extension.mirror.flat_row_subseq` | `{impl p3_matrix::Matrix<F> for p3_matrix::extension::FlatMatrixView<F, EF, Inner>}::row_subseq_unchecked` | not translated | 1 |
+| `matrix` | `p3_matrix.extension.mirror.flat_iter_take` | `{impl core::iter::traits::iterator::Iterator for p3_matrix::extension::FlatIter<F, I>}::next` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.mersenne_31.Mersenne31.Insts.CoreIterTraitsAccumSumMersenne31.sum` | `{impl core::iter::traits::accum::Sum for p3_mersenne_31::mersenne_31::Mersenne31}::sum` | dropped | 2 |
 | `mersenne-31` | `p3_mersenne_31.mersenne_31.Mersenne31.Insts.P3_fieldFieldPrimeCharacteristicRing.sum_array` | `{impl p3_field::field::PrimeCharacteristicRing for p3_mersenne_31::mersenne_31::Mersenne31}::sum_array` | dropped | 0 |
-| `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS` | `p3_mersenne_31::complex::{impl}::CIRCLE_TWO_ADIC_GENERATORS` | dropped | 2 |
+| `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS` | `p3_mersenne_31::complex::{impl}::CIRCLE_TWO_ADIC_GENERATORS` | dropped | 3 |
 | `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.COMPLEX_GENERATOR` | `p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::COMPLEX_GENERATOR` | dropped | 1 |
-| `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.circle_two_adic_generator` | `p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::circle_two_adic_generator` | dropped | 1 |
+| `mersenne-31` | `p3_mersenne_31.complex.Mersenne31.circle_two_adic_generator` | `p3_mersenne_31::complex::{impl p3_field::extension::complex::ComplexExtendable}::circle_two_adic_generator` | dropped | 2 |
 | `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.QUADRATIC_W` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::W` | not translated | 2 |
 | `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.QUADRATIC_DTH_ROOT` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::DTH_ROOT` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.mul_by_w` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::mul_by_w` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.QUADRATIC_EXT_TWO_ADIC_GENERATOR_33` | `{impl p3_field::extension::complex::HasTwoAdicComplexBinomialExtension<2> for p3_mersenne_31::mersenne_31::Mersenne31}::complex_ext_two_adic_generator` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.CUBIC_W` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<3> for p3_mersenne_31::mersenne_31::Mersenne31}::W` | not translated | 1 |
 | `mersenne-31` | `p3_mersenne_31.extension.Mersenne31.CUBIC_DTH_ROOT` | `{impl p3_field::extension::complex::HasComplexBinomialExtension<3> for p3_mersenne_31::mersenne_31::Mersenne31}::DTH_ROOT` | not translated | 1 |
-| `mersenne-31` | `p3_mersenne_31.complex.new_complex_new` | `p3_field::extension::complex::Complex::new_complex` | not translated | 2 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.halve` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::halve` | not translated | 2 |
+| `mersenne-31` | `p3_mersenne_31.complex.new_complex_new` | `p3_field::extension::complex::Complex::new_complex` | not translated | 3 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1InternalLayerMonty31` | `p3_monty_31::no_packing::poseidon1::Poseidon1InternalLayerMonty31` | not translated | 0 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon1.Poseidon1ExternalLayerMonty31` | `p3_monty_31::no_packing::poseidon1::Poseidon1ExternalLayerMonty31` | not translated | 0 |
 | `monty-31` | `p3_monty_31.no_packing.poseidon2.Poseidon2InternalLayerMonty31` | `p3_monty_31::no_packing::poseidon2::Poseidon2InternalLayerMonty31` | not translated | 0 |
@@ -451,17 +1608,184 @@ counts the claims (of 748) whose dependencies include the declaration.
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.exp_u64.step` | `p3_field::field::PrimeCharacteristicRing::exp_u64` | not translated | 4 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.mul_2exp_u64` | `{impl p3_field::field::PrimeCharacteristicRing for p3_monty_31::monty_31::MontyField31<_>}::mul_2exp_u64` | dropped | 4 |
 | `monty-31` | `p3_monty_31.monty_31.MontyField31.try_inverse` | `{impl p3_field::field::Field for p3_monty_31::monty_31::MontyField31<_>}::try_inverse` | dropped | 3 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU32.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<u32> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_int` | `{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_int` | `{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_int` | `{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_int` | `{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_int` | `{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<_>}::from_int` | not translated | 1 |
-| `monty-31` | `p3_monty_31.monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked` | `{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<_>}::from_canonical_checked` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.selectors.mirror.BoundaryEvals` | `p3_multi_stark::selectors::BoundaryEvals` | not translated | 14 |
+| `multi-stark` | `p3_multi_stark.selectors.mirror.atStep` | `p3_multi_stark::selectors::BoundaryEvals::at` | not translated | 13 |
+| `multi-stark` | `p3_multi_stark.selectors.mirror.BoundaryEvals.at` | `p3_multi_stark::selectors::BoundaryEvals::at` | not translated | 13 |
+| `multi-stark` | `p3_multi_stark.selectors.mirror.BoundaryEvals.apply` | `p3_multi_stark::selectors::BoundaryEvals::apply` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.selectors.mirror.BoundaryEvals.from_row` | `p3_multi_stark::selectors::BoundaryEvals::from_row` | not translated | 4 |
+| `multi-stark` | `p3_multi_stark.selectors.mirror.BoundaryEvals.from_row_with_prefix` | `p3_multi_stark::selectors::BoundaryEvals::from_row_with_prefix` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.opening.mirror.TableOpening` | `p3_multi_stark::opening::TableOpening` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.opening.mirror.TableOpening.empty` | `p3_multi_stark::opening::TableOpening::empty` | not translated | 0 |
+| `multi-stark` | `p3_multi_stark.opening.mirror.scatterStep` | `p3_multi_stark::opening::OpeningClaims::next_row` | not translated | 8 |
+| `multi-stark` | `p3_multi_stark.opening.mirror.next_row` | `p3_multi_stark::opening::OpeningClaims::next_row` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.ZerocheckError` | `p3_multi_stark::zerocheck::ZerocheckError` | not translated | 8 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.ZerocheckReduction` | `p3_multi_stark::zerocheck::ZerocheckReduction` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.checkAir` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.accumulate` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | not translated | 5 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.entries` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | not translated | 4 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.closing` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | not translated | 4 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.check_constraint` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | not translated | 4 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.round_degree` | `p3_multi_stark::zerocheck::AirZerocheck::verify_reduction_with_lookup_and_bus` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.check_claimed_sum` | `p3_multi_stark::zerocheck::AirZerocheck::verify_reduction_with_lookup_and_bus` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.MultiStarkInstanceShape` | `p3_multi_stark::transcript::MultiStarkInstanceShape` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.MultiStarkShape` | `p3_multi_stark::transcript::MultiStarkShape` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.MultiStarkShape.has_preprocessed` | `p3_multi_stark::transcript::MultiStarkShape::has_preprocessed` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.Step` | `p3_multi_stark::transcript::MultiStarkShape::pattern` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.Delegation` | `p3_multi_stark::transcript::MultiStarkShape::pattern` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.delegation` | `p3_multi_stark::transcript::delegation` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.MultiStarkShape.pattern` | `p3_multi_stark::transcript::MultiStarkShape::pattern` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.columnWords` | `p3_multi_stark::transcript::MultiStarkShape::domain_separator` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.instanceWords` | `p3_multi_stark::transcript::MultiStarkShape::domain_separator` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.MultiStarkShape.label` | `p3_multi_stark::transcript::MultiStarkShape::domain_separator` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.AirDegrees` | `p3_multi_stark::rounds::AirDegrees` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.ZerocheckStep` | `p3_multi_stark::zerocheck::transcript::ZerocheckShape::pattern` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.ZerocheckShape` | `p3_multi_stark::zerocheck::transcript::ZerocheckShape` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.ZerocheckShape.free_coordinates` | `p3_multi_stark::zerocheck::transcript::ZerocheckShape::free_coordinates` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.ZerocheckShape.pattern` | `p3_multi_stark::zerocheck::transcript::ZerocheckShape::pattern` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.transcript.mirror.ZerocheckShape.label` | `p3_multi_stark::zerocheck::transcript::ZerocheckShape::domain_separator` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.security.mirror.AirParams` | `p3_security::multilinear::MultilinearAirParams` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.security.mirror.air_terms` | `p3_security::multilinear::reduction_terms` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.security.mirror.num_variables` | `p3_multi_stark::security::assess_statement` | not translated | 0 |
+| `multi-stark` | `p3_multi_stark.security.mirror.charged_degree` | `p3_multi_stark::security::assess_statement` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.M` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.AirView` | `p3_multi_stark::folder::VerifierAir` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.BusTerm` | `p3_multi_stark::bus::BusContext::terminal_composition` | not translated | 4 |
+| `multi-stark` | `p3_multi_stark.zerocheck.mirror.Entry` | `p3_multi_stark::zerocheck::AirZerocheck::check_constraint_with_lookup_and_bus` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.security.mirror.Term` | `p3_security::SecurityTerm` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.security.mirror.Denominator` | `p3_security::multilinear::reduction_terms` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.SplitFraction` | `p3_multi_stark::fractional_gkr::SplitFraction` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.SplitFraction.gate` | `p3_multi_stark::fractional_gkr::SplitFraction::gate` | not translated | 6 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.FractionGkrError` | `p3_multi_stark::fractional_gkr::FractionGkrError` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.ROUND_POLY_LEN` | `p3_multi_stark::fractional_gkr::transcript::ROUND_POLY_LEN` | not translated | 0 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.FractionGkrLayerProof` | `p3_multi_stark::fractional_gkr::FractionGkrLayerProof` | not translated | 4 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.FractionGkrProof` | `p3_multi_stark::fractional_gkr::FractionGkrProof` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.FractionGkrOutput` | `p3_multi_stark::fractional_gkr::FractionGkrOutput` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.VerifierTranscript` | `p3_multi_stark::fractional_gkr::transcript::FractionGkrVerifierTranscript` | not translated | 3 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.VerifyState` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | not translated | 3 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.firstBadRound` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | not translated | 3 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.roundStep` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | not translated | 3 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.verify_layer` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | not translated | 3 |
+| `multi-stark` | `p3_multi_stark.fractional_gkr.mirror.verify_fractional_gkr` | `p3_multi_stark::fractional_gkr::verify_fractional_gkr` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.LookupInstancePlan` | `p3_multi_stark::lookup::LookupInstancePlan` | not translated | 8 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.log2_ceil_usize` | `p3_util::log2_ceil_usize` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.place` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.bus_capacity_ok` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.tupleWeights` | `p3_multi_stark::lookup::AirLinkClaim::new` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.blockWeights` | `p3_multi_stark::lookup::AirLinkClaim::new` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.claimed_sum` | `p3_multi_stark::lookup::AirLinkClaim::new` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.theta_bus_offset` | `p3_multi_stark::lookup::AirLinkClaim::new` | not translated | 0 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.bus_prefixes` | `p3_lookup::Challenges::new` | not translated | 0 |
+| `multi-stark` | `p3_multi_stark.logup_star.mirror.embed` | `p3_multi_stark::logup_star::position::embed` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.logup_star.mirror.fits` | `p3_multi_stark::logup_star::position::fits` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.logup_star.mirror.eval` | `p3_multi_stark::logup_star::position::eval` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.logup_star.mirror.claimed_sum` | `p3_multi_stark::logup_star::product::claimed_sum` | not translated | 0 |
+| `multi-stark` | `p3_multi_stark.bus.mirror.TerminalShare` | `p3_bus::BusTerminalShare` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.bus.mirror.BusBindingError` | `p3_multi_stark::bus::BusBindingError` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.bus.mirror.shareTerm` | `p3_multi_stark::bus::BusContext::terminal_composition` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.bus.mirror.terminal_composition` | `p3_multi_stark::bus::BusContext::terminal_composition` | not translated | 1 |
+| `multi-stark` | `p3_multi_stark.security.mirror.LookupParams` | `p3_security::multilinear::MultilinearLookupParams` | not translated | 0 |
+| `multi-stark` | `p3_multi_stark.security.mirror.lookup_terms` | `p3_security::multilinear::reduction_terms` | not translated | 0 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.Kind` | `p3_lookup::Kind` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.Lookup` | `p3_lookup::Lookup` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.Lookup.active` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.LookupBus` | `p3_multi_stark::lookup::LookupBus` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.busOf` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.LookupError` | `p3_multi_stark::lookup::LookupError` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.LookupPlan` | `p3_multi_stark::lookup::LookupPlan` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.shl_one` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.word` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.BusTable` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.assignBus` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.ActiveAir` | `p3_multi_stark::lookup::LookupInstancePlan` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.planStep` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.lookup.mirror.LookupPlan.build` | `p3_multi_stark::lookup::LookupPlan::build` | not translated | 7 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.TraceWindow` | `p3_lookup::indexed::TraceWindow` | not translated | 6 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.IndexedRead` | `p3_lookup::indexed::IndexedRead` | not translated | 6 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.IndexedTable` | `p3_lookup::indexed::IndexedTable` | not translated | 6 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.IndexedLookups` | `p3_lookup::indexed::IndexedLookups` | not translated | 6 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.IndexedLookups.isEmpty` | `p3_lookup::indexed::IndexedLookups::is_empty` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.TablePlacement` | `p3_multi_stark::indexed::TablePlacement` | not translated | 6 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.ReaderPlacement` | `p3_multi_stark::indexed::ReaderPlacement` | not translated | 6 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.IndexedTablePlan` | `p3_multi_stark::indexed::IndexedTablePlan` | not translated | 6 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.IndexedPlanError` | `p3_lookup::indexed::IndexedLookupError` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.addTable` | `p3_multi_stark::indexed::IndexedPlan::build` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.addRead` | `p3_multi_stark::indexed::IndexedPlan::build` | not translated | 2 |
+| `multi-stark` | `p3_multi_stark.indexed.mirror.IndexedPlan.from_declared` | `p3_multi_stark::indexed::IndexedPlan::build` | not translated | 2 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.split_at` | `p3_multilinear_util::point::Point::split_at` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.reversed` | `p3_multilinear_util::point::Point::reversed` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.split_by_coordinate` | `p3_multilinear_util::point::split_by_coordinate` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.fill_equality_table_serial` | `p3_multilinear_util::point::Point::fill_equality_table_serial` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.fill_equality_table_in_chunks` | `p3_multilinear_util::point::Point::fill_equality_table_in_chunks` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.fill_equality_table` | `p3_multilinear_util::point::Point::fill_equality_table` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_table` | `p3_multilinear_util::point::Point::equality_table` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_weights_msb` | `p3_multilinear_util::point::Point::equality_weights_msb` | not translated | 2 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_weights_lsb` | `p3_multilinear_util::point::Point::equality_weights_lsb` | not translated | 2 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.equality_at_vertex` | `p3_multilinear_util::point::Point::equality_at_vertex` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.hypercube` | `p3_multilinear_util::point::Point::hypercube` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.expand_from_univariate` | `p3_multilinear_util::point::Point::expand_from_univariate` | not translated | 9 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_eq` | `p3_multilinear_util::point::Point::eval_eq` | not translated | 22 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_select` | `p3_multilinear_util::point::Point::eval_select` | not translated | 7 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.eval_next` | `p3_multilinear_util::point::Point::eval_next` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.point.mirror.Point.transpose` | `p3_multilinear_util::point::Point::transpose` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.fill_buffer_batch` | `p3_multilinear_util::eq_batch::fill_buffer_batch` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_1_batch` | `p3_multilinear_util::eq_batch::eval_eq_1_batch` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_2_batch` | `p3_multilinear_util::eq_batch::eval_eq_2_batch` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_3_batch` | `p3_multilinear_util::eq_batch::eval_eq_3_batch` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.add_or_set` | `p3_multilinear_util::eq_batch::add_or_set` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch_basic` | `p3_multilinear_util::eq_batch::eval_eq_batch_basic` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.packed_eq_poly_batch` | `p3_multilinear_util::eq_batch::packed_eq_poly_batch` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.extEvaluator` | `{impl p3_multilinear_util::eq_batch::EqualityEvaluator for p3_multilinear_util::eq_batch::ExtFieldEvaluator<F, EF>}` | not translated | 19 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.baseEvaluator` | `{impl p3_multilinear_util::eq_batch::EqualityEvaluator for p3_multilinear_util::eq_batch::BaseFieldEvaluator<F, EF>}` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_packed_batch` | `p3_multilinear_util::eq_batch::eval_eq_packed_batch` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch_common` | `p3_multilinear_util::eq_batch::eval_eq_batch_common` | not translated | 20 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_batch` | `p3_multilinear_util::eq_batch::eval_eq_batch` | not translated | 19 |
+| `multilinear-util` | `p3_multilinear_util.eq_batch.mirror.eval_eq_base_batch` | `p3_multilinear_util::eq_batch::eval_eq_base_batch` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new` | `p3_multilinear_util::poly::Poly::new` | not translated | 9 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.as_constant` | `p3_multilinear_util::poly::Poly::as_constant` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.zero` | `p3_multilinear_util::poly::Poly::zero` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.truncate_to_half` | `p3_multilinear_util::poly::Poly::truncate_to_half` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.pad_zeros` | `p3_multilinear_util::poly::Poly::pad_zeros` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_from_point` | `p3_multilinear_util::poly::Poly::new_from_point` | not translated | 17 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_next_from_point` | `p3_multilinear_util::poly::Poly::new_next_from_point` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_mut` | `p3_multilinear_util::poly::Poly::fix_prefix_var_mut` | not translated | 6 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.sum_prefix_var_mut` | `p3_multilinear_util::poly::Poly::sum_prefix_var_mut` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_mut_monomial` | `p3_multilinear_util::poly::Poly::fix_prefix_var_mut_monomial` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut_whole` | `p3_multilinear_util::poly::Poly::fix_suffix_var_mut_whole` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut_split` | `p3_multilinear_util::poly::Poly::fix_suffix_var_mut_split` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var_mut` | `p3_multilinear_util::poly::Poly::fix_suffix_var_mut` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var` | `p3_multilinear_util::poly::Poly::fix_prefix_var` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_at` | `p3_multilinear_util::poly::Poly::fix_prefix_var_at` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_suffix_var` | `p3_multilinear_util::poly::Poly::fix_suffix_var` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.fix_prefix_var_to_packed` | `p3_multilinear_util::poly::Poly::fix_prefix_var_to_packed` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.pack` | `p3_multilinear_util::poly::Poly::pack` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.unpack` | `p3_multilinear_util::poly::Poly::unpack` | not translated | 2 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.eval_multilinear_recursive` | `p3_multilinear_util::poly::eval_multilinear_recursive` | not translated | 12 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.eq_serial` | `p3_multilinear_util::poly::Poly::new_packed_from_point::eq_serial` | not translated | 16 |
+| `multilinear-util` | `p3_multilinear_util.poly.mirror.Poly.new_packed_from_point` | `p3_multilinear_util::poly::Poly::new_packed_from_point` | not translated | 16 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.new_unpacked` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::new_unpacked` | not translated | 14 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.new_packed` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::new_packed` | not translated | 14 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.num_scalar_evals` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::num_scalar_evals` | not translated | 14 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.num_variables` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::num_variables` | not translated | 14 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_base` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_base` | not translated | 5 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_ext` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_ext` | not translated | 6 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_ext_packed` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_ext_packed` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.accumulate_scalar_into` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::accumulate_scalar_into` | not translated | 2 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.compress_prefix_into` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::compress_prefix_into` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.packed_basis_dot` | `p3_multilinear_util::split_eq::packed_kernel::packed_basis_dot` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.compress_hi_dot_packed` | `p3_multilinear_util::split_eq::packed_kernel::compress_hi_dot_packed` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.compress_suffix_dot` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::compress_suffix_dot` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.dot_with_base_shifted` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::dot_with_base_shifted` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.EqMaybePacked.last_scalar` | `p3_multilinear_util::split_eq::eq::EqMaybePacked::last_scalar` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.new_unpacked` | `p3_multilinear_util::split_eq::SplitEq::new_unpacked` | not translated | 0 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.new_packed` | `p3_multilinear_util::split_eq::SplitEq::new_packed` | not translated | 14 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.num_variables` | `p3_multilinear_util::split_eq::SplitEq::num_variables` | not translated | 14 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.eval_base` | `p3_multilinear_util::split_eq::SplitEq::eval_base` | not translated | 5 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.eval_ext` | `p3_multilinear_util::split_eq::SplitEq::eval_ext` | not translated | 6 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.accumulate_into` | `p3_multilinear_util::split_eq::SplitEq::accumulate_into` | not translated | 2 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.materialize` | `p3_multilinear_util::split_eq::SplitEq::materialize` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.SplitEq.compress_suffix_into` | `p3_multilinear_util::split_eq::SplitEq::compress_suffix_into` | not translated | 1 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.Poly.eval_base` | `p3_multilinear_util::poly::Poly::eval_base` | not translated | 3 |
+| `multilinear-util` | `p3_multilinear_util.split_eq.mirror.Poly.eval_ext` | `p3_multilinear_util::poly::Poly::eval_ext` | not translated | 6 |
 | `poseidon1` | `p3_poseidon1.external.FullRoundLayerConstructor` | `p3_poseidon1::external::FullRoundLayerConstructor` | stub | 0 |
 | `poseidon1` | `p3_poseidon1.internal.PartialRoundLayerConstructor` | `p3_poseidon1::internal::PartialRoundLayerConstructor` | stub | 0 |
 | `poseidon1` | `p3_poseidon1.Poseidon1Constants` | `p3_poseidon1::Poseidon1Constants` | stub | 0 |
@@ -470,15 +1794,290 @@ counts the claims (of 748) whose dependencies include the declaration.
 | `poseidon2` | `p3_poseidon2.external.ExternalLayerConstructor` | `p3_poseidon2::external::ExternalLayerConstructor` | stub | 0 |
 | `poseidon2` | `p3_poseidon2.internal.InternalLayerConstructor` | `p3_poseidon2::internal::InternalLayerConstructor` | stub | 0 |
 | `poseidon2` | `p3_poseidon2.Poseidon2` | `p3_poseidon2::Poseidon2` | stub | 0 |
+| `security` | `p3_security.binary.BinaryPcsRegime.queries_for_target` | `p3_security::binary::BinaryPcsRegime::queries_for_target` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.deepBitsR` | `p3_security::deep::deep_ali_error` | not translated | 2 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.deepFactorR` | `p3_security::deep::deep_ali_error` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.aliBitsR` | `p3_security::air::composition_error` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.listSizeLdrR` | `p3_security::proximity::list_size_ldr_m` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.alphaLdrR` | `p3_security::proximity::alpha_ldr_m` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.queryBitsR` | `p3_security::fri::query_phase_error` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.johnsonLineLogR` | `p3_security::proximity::johnson_exceptional_line_count_log2` | not translated | 2 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.commitLdrBitsR` | `p3_security::fri::commit_phase_error_ldr_m` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.commitUdrBitsR` | `p3_security::fri::commit_phase_error_udr` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.regimeBitsR` | `p3_security::stark::proven_security_regime` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.foldingPowBitsR` | `p3_security::assumption::SecurityAssumption::folding_pow_bits` | not translated | 1 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.upperX` | `p3_security::proximity::compute_upper_m` | not translated | 2 |
+| `security` | `Plonky3Lean.Proofs.Security.Real.sumBitsR` | `p3_security::error::ErrorBits::sum` | not translated | 1 |
+| `sha256-air` | `p3_sha256_air.mirror.BLOCK_WORDS` | `p3_sha256_air::constants::BLOCK_WORDS` | not translated | 19 |
+| `sha256-air` | `p3_sha256_air.mirror.NUM_COMPRESSION_ROUNDS` | `p3_sha256_air::constants::NUM_COMPRESSION_ROUNDS` | not translated | 19 |
+| `sha256-air` | `p3_sha256_air.mirror.SCHEDULE_EXTENSIONS` | `p3_sha256_air::constants::SCHEDULE_EXTENSIONS` | not translated | 19 |
+| `sha256-air` | `p3_sha256_air.mirror.STATE_WORDS` | `p3_sha256_air::constants::STATE_WORDS` | not translated | 19 |
+| `sha256-air` | `p3_sha256_air.mirror.WORD_BITS` | `p3_sha256_air::constants::WORD_BITS` | not translated | 10 |
+| `sha256-air` | `p3_sha256_air.mirror.BITS_PER_LIMB` | `p3_sha256_air::constants::BITS_PER_LIMB` | not translated | 10 |
+| `sha256-air` | `p3_sha256_air.mirror.U32_LIMBS` | `p3_sha256_air::constants::U32_LIMBS` | not translated | 3 |
+| `sha256-air` | `p3_sha256_air.mirror.CHAIN_LEN` | `p3_sha256_air::columns::CHAIN_LEN` | not translated | 16 |
+| `sha256-air` | `p3_sha256_air.mirror.INPUT_WORDS` | `p3_sha256_air::generation::INPUT_WORDS` | not translated | 0 |
+| `sha256-air` | `p3_sha256_air.mirror.SHA256_K` | `p3_sha256_air::constants::SHA256_K` | not translated | 21 |
+| `sha256-air` | `p3_sha256_air.mirror.SHA256_IV` | `p3_sha256_air::constants::SHA256_IV` | not translated | 1 |
+| `sha256-air` | `p3_sha256_air.mirror.kOf` | `p3_sha256_air::constants::SHA256_K` | not translated | 20 |
+| `sha256-air` | `p3_sha256_air.mirror.col.h_in` | `p3_sha256_air::columns::Sha256Cols` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.NUM_SHA256_COLS` | `p3_sha256_air::columns::NUM_SHA256_COLS` | not translated | 10 |
+| `sha256-air` | `p3_sha256_air.mirror.double` | `p3_field::PrimeCharacteristicRing::double` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.xor` | `p3_field::PrimeCharacteristicRing::xor` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.xor3` | `p3_field::PrimeCharacteristicRing::xor3` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.exp_u64` | `p3_field::PrimeCharacteristicRing::exp_u64` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.mul_2exp_u64` | `p3_field::PrimeCharacteristicRing::mul_2exp_u64` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.pack_bits_le` | `p3_air::utils::pack_bits_le` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.add2` | `p3_air::utils::add2` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.add3` | `p3_air::utils::add3` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.add2_expr_out` | `p3_sha256_air::air::add2_expr_out` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.add3_expr_out` | `p3_sha256_air::air::add3_expr_out` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.pack_word` | `p3_sha256_air::air::pack_word` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.SigmaSpec` | `p3_sha256_air::air::SigmaSpec` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.ShiftKind` | `p3_sha256_air::air::ShiftKind` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.sigma_params` | `p3_sha256_air::air::sigma_params` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.assert_packed_equals_bits` | `p3_sha256_air::air::assert_packed_equals_bits` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.assert_sigma_matches` | `p3_sha256_air::air::assert_sigma_matches` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.assert_ch_matches` | `p3_sha256_air::air::assert_ch_matches` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.assert_maj_matches` | `p3_sha256_air::air::assert_maj_matches` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.eval_bit_range_checks` | `p3_sha256_air::air::eval_bit_range_checks` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.eval_initial_state` | `p3_sha256_air::air::eval_initial_state` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.eval_message_schedule` | `p3_sha256_air::air::eval_message_schedule` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.eval_compression` | `p3_sha256_air::air::eval_compression` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.eval_finalization` | `p3_sha256_air::air::eval_finalization` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.eval` | `{impl p3_air::air::Air<AB> for p3_sha256_air::air::Sha256Air}::eval` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.Sha256RoundCols` | `p3_sha256_air::columns::Sha256RoundCols` | not translated | 3 |
+| `sha256-air` | `p3_sha256_air.mirror.Sha256Cols` | `p3_sha256_air::columns::Sha256Cols` | not translated | 3 |
+| `sha256-air` | `p3_sha256_air.mirror.Sha256Cols.cells` | `p3_sha256_air::columns::Sha256Cols` | not translated | 3 |
+| `sha256-air` | `p3_sha256_air.mirror.u32_to_bits_le` | `p3_air::utils::u32_to_bits_le` | not translated | 20 |
+| `sha256-air` | `p3_sha256_air.mirror.u32_to_limbs` | `p3_sha256_air::constants::u32_to_limbs` | not translated | 3 |
+| `sha256-air` | `p3_sha256_air.mirror.WorkVars` | `p3_sha256_air::generation::generate_trace_row_for_compression` | not translated | 3 |
+| `sha256-air` | `p3_sha256_air.mirror.generate_trace_row_for_compression` | `p3_sha256_air::generation::generate_trace_row_for_compression` | not translated | 3 |
+| `sha256-air` | `p3_sha256_air.mirror.generate_trace_rows` | `p3_sha256_air::generation::generate_trace_rows` | not translated | 3 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.T1_CARRIES` | `p3_sha256_air::binary::T1_CARRIES` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.SCHEDULE_CARRIES` | `p3_sha256_air::binary::SCHEDULE_CARRIES` | not translated | 9 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.rotr_index` | `p3_sha256_air::binary::rotr_index` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.col.a_chain` | `p3_sha256_air::binary::columns::Sha256BinaryCols` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.NUM_SHA256_BINARY_COLS` | `p3_sha256_air::binary::columns::NUM_SHA256_BINARY_COLS` | not translated | 8 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.NUM_INPUT_BITS` | `p3_sha256_air::binary::air::NUM_INPUT_BITS` | not translated | 1 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.STORED_CARRY_ADD` | `p3_sha256_air::binary::air::STORED_CARRY_ADD` | not translated | 1 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.SUM_CARRY_ADD` | `p3_sha256_air::binary::air::SUM_CARRY_ADD` | not translated | 1 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.CONSTRAINTS_PER_SCHEDULE_WORD` | `p3_sha256_air::binary::air::CONSTRAINTS_PER_SCHEDULE_WORD` | not translated | 1 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.CONSTRAINTS_PER_ROUND` | `p3_sha256_air::binary::air::CONSTRAINTS_PER_ROUND` | not translated | 1 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.NUM_HASH_CONSTRAINTS` | `p3_sha256_air::binary::air::NUM_HASH_CONSTRAINTS` | not translated | 1 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.num_constraints` | `{impl p3_air::air::BaseAir<F> for p3_sha256_air::binary::air::Sha256BinaryAir}::num_constraints` | not translated | 1 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.xor3_rot` | `p3_sha256_air::binary::air::xor3_rot` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.xor3_shift` | `p3_sha256_air::binary::air::xor3_shift` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.maj` | `p3_sha256_air::binary::air::maj` | not translated | 11 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.add_many_step` | `p3_sha256_air::binary::air::add_many` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.add_many` | `p3_sha256_air::binary::air::add_many` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.eval` | `{impl p3_air::air::Air<AB> for p3_sha256_air::binary::air::Sha256BinaryAir}::eval` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.big_sigma0` | `p3_sha256_air::binary::generation::big_sigma0` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.big_sigma1` | `p3_sha256_air::binary::generation::big_sigma1` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.small_sigma0` | `p3_sha256_air::binary::generation::small_sigma0` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.small_sigma1` | `p3_sha256_air::binary::generation::small_sigma1` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.Sha256BinaryScheduleCols` | `p3_sha256_air::binary::columns::Sha256BinaryScheduleCols` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.Sha256BinaryRoundCols` | `p3_sha256_air::binary::columns::Sha256BinaryRoundCols` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.Sha256BinaryCols` | `p3_sha256_air::binary::columns::Sha256BinaryCols` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.Sha256BinaryCols.cells` | `p3_sha256_air::binary::columns::Sha256BinaryCols` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.carry_bits` | `p3_sha256_air::binary::generation::carry_bits` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.add_with_carries` | `p3_sha256_air::binary::generation::add_with_carries` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.generate_trace_row` | `p3_sha256_air::binary::generation::generate_trace_row` | not translated | 6 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.generate_binary_trace_rows` | `p3_sha256_air::binary::generation::generate_binary_trace_rows` | not translated | 5 |
+| `sha256-air` | `p3_sha256_air.mirror.binary.generate_binary_trace_packed` | `p3_sha256_air::binary::generation::generate_binary_trace_packed` | not translated | 3 |
+| `stir` | `p3_stir.utils.mirror.eval_poly` | `p3_stir::utils::eval_poly` | stub | 7 |
+| `stir` | `p3_stir.utils.mirror.eval_poly_parallel` | `p3_stir::utils::eval_poly_parallel` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.divide_by_linear` | `p3_stir::utils::divide_by_linear` | stub | 0 |
+| `stir` | `p3_stir.utils.mirror.add_polys` | `p3_stir::utils::add_polys` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.eval_degree_correction` | `p3_stir::utils::eval_degree_correction` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.combine_on_coset` | `p3_stir::utils::combine_on_coset` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.eval_poly_at_base` | `p3_stir::utils::eval_poly_at_base` | stub | 5 |
+| `stir` | `p3_stir.utils.mirror.reduce_mod_x_pow_minus_c` | `p3_stir::utils::reduce_mod_x_pow_minus_c` | stub | 6 |
+| `stir` | `p3_stir.utils.mirror.vanishing_poly_from_roots` | `p3_stir::utils::vanishing_poly_from_roots` | stub | 3 |
+| `stir` | `p3_stir.utils.mirror.next_domain_shift` | `p3_stir::utils::next_domain_shift` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.fold_domain_params` | `p3_stir::utils::fold_domain_params` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.OodFilter` | `p3_stir::utils::OodFilter` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.OodFilter.new` | `p3_stir::utils::OodFilter::new` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.OodFilter.accepts` | `p3_stir::utils::OodFilter::accepts` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.allDistinct` | `p3_stir::utils::interpolate_poly` | stub | 4 |
+| `stir` | `p3_stir.utils.mirror.interpolate_poly` | `p3_stir::utils::interpolate_poly` | stub | 4 |
+| `stir` | `p3_stir.utils.mirror.check_ans_interpolates` | `p3_stir::utils::check_ans_interpolates` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.fold_codeword` | `p3_stir::utils::fold_codeword` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.fold_pass` | `p3_stir::utils::fold_pass` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.fold_poly_coeffs` | `p3_stir::utils::fold_poly_coeffs` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.fold_fiber` | `p3_stir::utils::fold_fiber` | stub | 1 |
+| `stir` | `p3_stir.utils.mirror.lagrange_eval_at` | `p3_stir::utils::lagrange_eval_at` | stub | 0 |
+| `stir` | `p3_stir.utils.mirror.lagrange_interpolate_at` | `p3_stir::utils::lagrange_interpolate_at` | stub | 5 |
+| `stir` | `p3_stir.verifier.mirror.StirError` | `p3_stir::error::StirError` | stub | 7 |
+| `stir` | `p3_stir.verifier.mirror.VirtualRoundContext` | `p3_stir::verifier::VirtualRoundContext` | stub | 4 |
+| `stir` | `p3_stir.verifier.mirror.materialize_virtual_fiber` | `p3_stir::verifier::materialize_virtual_fiber` | stub | 4 |
+| `stir` | `p3_stir.verifier.mirror.query_fold_value` | `p3_stir::verifier::query_fold_value` | stub | 3 |
+| `stir` | `p3_stir.verifier.mirror.check_ans_length` | `p3_stir::verifier::check_ans_length` | stub | 3 |
+| `stir` | `p3_stir.verifier.mirror.resolve_ans_polynomial` | `p3_stir::verifier::resolve_ans_polynomial` | stub | 2 |
+| `stir` | `p3_stir.verifier.mirror.external_fibers_in_draw_order` | `p3_stir::verifier::external_fibers_in_draw_order` | stub | 1 |
+| `stir` | `p3_stir.verifier.mirror.fetch_committed_rows` | `p3_stir::verifier::fetch_round_rows` | stub | 0 |
+| `stir` | `p3_stir.verifier.mirror.QueryState` | `p3_stir::verifier::RoundVerifier` | stub | 1 |
+| `stir` | `p3_stir.verifier.mirror.fold_queries` | `p3_stir::verifier::RoundVerifier::fetch_and_fold` | stub | 1 |
+| `stir` | `p3_stir.verifier.mirror.all_points_and_values` | `p3_stir::verifier::RoundVerifier::all_points_and_values` | stub | 0 |
+| `stir` | `p3_stir.verifier.mirror.finish_ctx` | `p3_stir::verifier::RoundVerifier::finish` | stub | 2 |
+| `stir` | `p3_stir.verifier.mirror.round_geometry` | `p3_stir::verifier::RoundVerifier::new` | stub | 1 |
+| `stir` | `p3_stir.verifier.mirror.excluded_domains` | `p3_stir::verifier::RoundVerifier::excluded_domains` | stub | 0 |
+| `stir` | `p3_stir.verifier.mirror.set_gamma` | `p3_stir::verifier::RoundVerifier::set_gamma` | stub | 1 |
+| `stir` | `p3_stir.verifier.mirror.check_final_queries` | `p3_stir::verifier::FinalRoundVerifier::fetch_and_check` | stub | 0 |
+| `stir` | `p3_stir.pcs.plan.mirror.combine_coefficients` | `p3_stir::pcs::plan::combine_coefficients` | stub | 2 |
+| `sumcheck` | `p3_sumcheck.lagrange.mirror.lagrange_weights_01inf` | `p3_sumcheck::lagrange::lagrange_weights_01inf` | not translated | 26 |
+| `sumcheck` | `p3_sumcheck.lagrange.mirror.lagrange_weights_01inf_multi` | `p3_sumcheck::lagrange::lagrange_weights_01inf_multi` | not translated | 2 |
+| `sumcheck` | `p3_sumcheck.lagrange.mirror.extrapolate_01inf` | `p3_sumcheck::lagrange::extrapolate_01inf` | not translated | 24 |
+| `sumcheck` | `p3_sumcheck.mirror.Basis.reduce_claim` | `p3_sumcheck::strategy::Basis::reduce_claim` | not translated | 22 |
+| `sumcheck` | `p3_sumcheck.mirror.SumcheckShape.seed` | `p3_sumcheck::transcript::SumcheckShape::domain_separator` | not translated | 12 |
+| `sumcheck` | `p3_sumcheck.mirror.VerifierTranscript.round` | `p3_sumcheck::transcript::VerifierTranscript::round` | not translated | 12 |
+| `sumcheck` | `p3_sumcheck.mirror.verify_rounds` | `p3_sumcheck::data::SumcheckData::verify_rounds` | not translated | 12 |
+| `sumcheck` | `p3_sumcheck.mirror.verify_final_sumcheck_rounds` | `p3_sumcheck::data::verify_final_sumcheck_rounds` | not translated | 7 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.new` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::new` | not translated | 7 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.RoundPolyInterpolator.eval` | `p3_sumcheck::generic_degree::util::RoundPolyInterpolator::eval` | not translated | 6 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.GenericDegreeShape.seed` | `p3_sumcheck::generic_degree::transcript::GenericDegreeShape::domain_separator` | not translated | 1 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.VerifierTranscript.round` | `p3_sumcheck::generic_degree::transcript::VerifierTranscript::round` | not translated | 1 |
+| `sumcheck` | `p3_sumcheck.generic_degree.mirror.verify` | `p3_sumcheck::generic_degree::proof::GenericDegreeProof::verify` | not translated | 1 |
+| `sumcheck` | `p3_sumcheck.strategy.mirror.round_reduce` | `p3_sumcheck::strategy::round_reduce` | not translated | 4 |
+| `sumcheck` | `p3_sumcheck.strategy.mirror.round_step` | `p3_sumcheck::strategy::round_step` | not translated | 4 |
+| `sumcheck` | `p3_sumcheck.strategy.mirror.chunk_round_step` | `p3_sumcheck::strategy::chunk_round_step` | not translated | 4 |
+| `sumcheck` | `p3_sumcheck.strategy.mirror.sumcheck_coefficients_prefix` | `p3_sumcheck::strategy::sumcheck_coefficients_prefix` | not translated | 4 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.dot` | `p3_field::dot_product` | not translated | 9 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.horner` | `p3_field::HornerIter::horner` | not translated | 5 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.EqStatement.combine_evals` | `p3_sumcheck::constraints::statement::eq::EqStatement::combine_evals` | not translated | 7 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.EqStatement.weights_at` | `p3_sumcheck::constraints::statement::eq::EqStatement::weights_at` | not translated | 6 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.SelectStatement.combine_evals` | `p3_sumcheck::constraints::statement::select::SelectStatement::combine_evals` | not translated | 7 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.SelectStatement.weights_at` | `p3_sumcheck::constraints::statement::select::SelectStatement::weights_at` | not translated | 6 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.SelectStatement.verify` | `p3_sumcheck::constraints::statement::select::SelectStatement::verify` | not translated | 5 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.Constraint.new` | `p3_sumcheck::constraints::Constraint::new` | not translated | 5 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.Constraint.new_with_existing_claim` | `p3_sumcheck::constraints::Constraint::new_with_existing_claim` | not translated | 5 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.Constraint.combine_evals` | `p3_sumcheck::constraints::Constraint::combine_evals` | not translated | 7 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.subpoint` | `p3_multilinear_util::point::Point::get_subpoint_over_range` | not translated | 6 |
+| `sumcheck` | `p3_sumcheck.constraints.mirror.VariableOrder.eval_constraints_poly` | `p3_sumcheck::strategy::VariableOrder::eval_constraints_poly` | not translated | 6 |
+| `tiny-keccak` | `tiny_keccak.keccakf.keccakf` | `tiny_keccak::keccakf::keccakf` | not translated | 14 |
+| `tiny-keccak` | `tiny_keccak.keccakf.rounds` | `tiny_keccak::keccakf::keccakf` | not translated | 14 |
+| `tiny-keccak` | `tiny_keccak.keccakf.round` | `tiny_keccak::keccakf::keccakf` | not translated | 14 |
+| `uni-stark` | `p3_uni_stark.folder.mirror.ConstraintLayout` | `p3_air::symbolic::builder::ConstraintLayout` | not translated | 5 |
+| `uni-stark` | `p3_uni_stark.folder.mirror.ConstraintLayout.total_constraints` | `p3_air::symbolic::builder::ConstraintLayout::total_constraints` | not translated | 4 |
+| `uni-stark` | `p3_uni_stark.folder.mirror.ConstraintLayout.decompose_alpha` | `p3_air::symbolic::builder::ConstraintLayout::decompose_alpha` | not translated | 4 |
+| `uni-stark` | `p3_uni_stark.folder.mirror.get_constraint_layout` | `p3_air::symbolic::builder::get_constraint_layout` | not translated | 4 |
+| `uni-stark` | `p3_uni_stark.folder.mirror.batched_linear_combination` | `p3_field::field::chunked_linear_combination` | not translated | 4 |
+| `uni-stark` | `p3_uni_stark.folder.mirror.proverFolder` | `{impl p3_air::AirBuilder for p3_uni_stark::folder::ProverConstraintFolder<'a, SC>}` | not translated | 4 |
+| `uni-stark` | `p3_uni_stark.folder.mirror.finalize_constraints` | `p3_uni_stark::folder::ProverConstraintFolder::finalize_constraints` | not translated | 4 |
+| `uni-stark` | `p3_uni_stark.folder.mirror.verifierFolder` | `{impl p3_air::AirBuilder for p3_uni_stark::folder::VerifierConstraintFolder<'a, SC>}` | not translated | 30 |
+| `uni-stark` | `p3_uni_stark.prover.mirror.get_log_quotient_degree_extension` | `p3_uni_stark::symbolic::get_log_quotient_degree_extension` | not translated | 7 |
+| `uni-stark` | `p3_uni_stark.prover.mirror.get_log_num_quotient_chunks_for_domain` | `p3_uni_stark::symbolic::get_log_num_quotient_chunks_for_domain` | not translated | 7 |
+| `uni-stark` | `p3_uni_stark.prover.mirror.num_quotient_chunks` | `p3_uni_stark::prover::prove_with_preprocessed` | not translated | 0 |
+| `uni-stark` | `p3_uni_stark.prover.mirror.wrappingRow` | `p3_matrix::Matrix::vertically_packed_row` | not translated | 1 |
+| `uni-stark` | `p3_uni_stark.prover.mirror.quotient_values` | `p3_uni_stark::prover::quotient_values_inner` | not translated | 1 |
+| `uni-stark` | `p3_uni_stark.verifier.mirror.InvalidProofShapeError` | `p3_uni_stark::error::InvalidProofShapeError` | not translated | 24 |
+| `uni-stark` | `p3_uni_stark.verifier.mirror.VerificationError` | `p3_uni_stark::error::VerificationError` | not translated | 30 |
+| `uni-stark` | `p3_uni_stark.verifier.mirror.from_ext_basis_coefficients` | `p3_field::field::ExtensionField::from_ext_basis_coefficients` | not translated | 22 |
+| `uni-stark` | `p3_uni_stark.verifier.mirror.chunkFactor` | `p3_uni_stark::verifier::recompose_quotient_from_chunks` | not translated | 22 |
+| `uni-stark` | `p3_uni_stark.verifier.mirror.recompose_quotient_from_chunks` | `p3_uni_stark::verifier::recompose_quotient_from_chunks` | not translated | 22 |
+| `uni-stark` | `p3_uni_stark.verifier.mirror.preprocessedWindow` | `p3_uni_stark::verifier::verify_constraints` | not translated | 12 |
+| `uni-stark` | `p3_uni_stark.verifier.mirror.verify_constraints` | `p3_uni_stark::verifier::verify_constraints` | not translated | 12 |
+| `uni-stark` | `p3_uni_stark.verifier.mirror.check_shape` | `p3_uni_stark::verifier::verify_with_preprocessed` | not translated | 7 |
+| `uni-stark` | `p3_uni_stark.verifier.mirror.check_ood_point` | `p3_uni_stark::verifier::prepare_opening_claims` | not translated | 7 |
+| `uni-stark` | `p3_uni_stark.transcript.mirror.StarkShape` | `p3_uni_stark::transcript::StarkShape` | not translated | 4 |
+| `uni-stark` | `p3_uni_stark.transcript.mirror.Step` | `p3_uni_stark::transcript::StarkShape::pattern` | not translated | 4 |
+| `uni-stark` | `p3_uni_stark.transcript.mirror.StarkShape.pattern` | `p3_uni_stark::transcript::StarkShape::pattern` | not translated | 1 |
+| `uni-stark` | `p3_uni_stark.transcript.mirror.Msg` | `p3_uni_stark::transcript::StarkVerifierTranscript` | not translated | 3 |
+| `uni-stark` | `p3_uni_stark.transcript.mirror.StarkTranscriptFailure` | `p3_uni_stark::transcript::StarkTranscriptFailure` | not translated | 10 |
+| `uni-stark` | `p3_uni_stark.transcript.mirror.optional_commitment` | `p3_uni_stark::transcript::StarkVerifierTranscript::optional_commitment` | not translated | 3 |
+| `uni-stark` | `p3_uni_stark.transcript.mirror.constraint_phase` | `p3_uni_stark::transcript::StarkVerifierTranscript::constraint_phase` | not translated | 2 |
+| `uni-stark` | `p3_uni_stark.transcript.mirror.ood_phase` | `p3_uni_stark::transcript::StarkVerifierTranscript::ood_phase` | not translated | 2 |
+| `uni-stark` | `p3_uni_stark.verify.mirror.PreprocessedVerifierKey` | `p3_uni_stark::preprocessed::PreprocessedVerifierKey` | not translated | 7 |
+| `uni-stark` | `p3_uni_stark.verify.mirror.Proof` | `p3_uni_stark::proof::Proof` | not translated | 6 |
+| `uni-stark` | `p3_uni_stark.verify.mirror.validate_degree_bits` | `p3_uni_stark::verifier::validate_degree_bits` | not translated | 15 |
+| `uni-stark` | `p3_uni_stark.verify.mirror.checked_log_size_sum` | `p3_util::checked_log_size_sum` | not translated | 15 |
+| `uni-stark` | `p3_uni_stark.verify.mirror.natural_domain_for_degree` | `{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::natural_domain_for_degree` | not translated | 15 |
+| `uni-stark` | `p3_uni_stark.verify.mirror.process_preprocessed_trace` | `p3_uni_stark::verifier::process_preprocessed_trace` | not translated | 7 |
+| `uni-stark` | `p3_uni_stark.verify.mirror.ofTranscriptFailure` | `{impl core::convert::From<p3_uni_stark::transcript::StarkTranscriptFailure> for p3_uni_stark::error::VerificationError<PcsErr>}::from` | not translated | 6 |
+| `uni-stark` | `p3_uni_stark.verify.mirror.constraint_phase` | `p3_uni_stark::transcript::StarkVerifierTranscript::constraint_phase` | not translated | 6 |
+| `uni-stark` | `p3_uni_stark.verify.mirror.ood_phase` | `p3_uni_stark::transcript::StarkVerifierTranscript::ood_phase` | not translated | 7 |
+| `uni-stark` | `p3_uni_stark.verify.mirror.opening_claims` | `p3_uni_stark::verifier::prepare_opening_claims` | not translated | 6 |
+| `uni-stark` | `p3_uni_stark.verify.mirror.prepare_opening_claims` | `p3_uni_stark::verifier::prepare_opening_claims` | not translated | 6 |
+| `uni-stark` | `p3_uni_stark.verify.mirror.verify_with_preprocessed` | `p3_uni_stark::verifier::verify_with_preprocessed` | not translated | 6 |
 | `util` | `p3_util.branch_hint` | `p3_util::branch_hint` | not translated | 12 |
+| `whir` | `p3_whir.mirror.two_adic_generator` | `p3_field::TwoAdicField::two_adic_generator` | stub | 6 |
+| `whir` | `p3_whir.transcript.mirror.query_draws` | `p3_whir::transcript::query_draws` | stub | 7 |
+| `whir` | `p3_whir.transcript.mirror.query_summand_depths` | `p3_whir::transcript::query_summand_depths` | stub | 10 |
+| `whir` | `p3_whir.transcript.mirror.stratified_index` | `p3_whir::transcript::stratified_index` | stub | 9 |
+| `whir` | `p3_whir.transcript.mirror.play_query_indices` | `p3_whir::transcript::play_query_indices` | stub | 8 |
+| `whir` | `p3_whir.mirror.WhirConfig.round_folding_factor` | `p3_whir::parameters::whir::WhirConfig::round_folding_factor` | stub | 6 |
+| `whir` | `p3_whir.mirror.querySite` | `p3_whir::transcript::WhirShape::new` | stub | 6 |
+| `whir` | `p3_whir.mirror.WhirConfig.site` | `p3_whir::transcript::WhirShape::query_index_site` | stub | 6 |
+| `whir` | `p3_whir.mirror.query_pow` | `p3_whir::transcript::WhirVerifierTranscript::query_pow` | stub | 5 |
+| `whir` | `p3_whir.mirror.verify_merkle_proof` | `p3_whir::pcs::verifier::WhirVerifier::verify_merkle_proof` | stub | 5 |
+| `whir` | `p3_whir.mirror.verify_stir_challenges` | `p3_whir::pcs::verifier::WhirVerifier::verify_stir_challenges` | stub | 5 |
+| `whir` | `p3_whir.mirror.parse_with_round` | `p3_whir::pcs::committer::reader::ParsedCommitment::parse_with_round` | stub | 6 |
+| `whir` | `p3_whir.mirror.replay` | `p3_whir::pcs::verifier::WhirVerifier::replay` | stub | 5 |
+| `whir` | `p3_whir.mirror.verify` | `p3_whir::pcs::verifier::WhirVerifier::verify` | stub | 5 |
+| `whir` | `p3_whir.parameters.mirror.schedule` | `p3_whir::parameters::whir::WhirConfig::new_with_max_domain_log` | stub | 2 |
+| `whir` | `p3_whir.parameters.mirror.finalRoundConfig` | `p3_whir::parameters::whir::WhirConfig::final_round_config` | stub | 2 |
+| `whir` | `p3_whir.utils.mirror.eval_ze_star_n` | `p3_whir::utils::eval_ze_star_n` | stub | 4 |
+| `whir` | `p3_whir.utils.mirror.par_eval_ze_star_n` | `p3_whir::utils::par_eval_ze_star_n` | stub | 0 |
+| `whir` | `p3_whir.utils.mirror.par_add_scaled_powers` | `p3_whir::utils::par_add_scaled_powers` | stub | 0 |
+| `whir` | `p3_whir.utils.mirror.padded_ood_t1` | `p3_whir::utils::padded_ood_t1` | stub | 3 |
+| `word-backend` | `p3_word_backend.keys.code.mirror.ShiftCode.new` | `p3_word_backend::keys::code::ShiftCode::new` | stub | 2 |
+| `word-backend` | `p3_word_backend.keys.code.mirror.ShiftCode.shift` | `p3_word_backend::keys::code::ShiftCode::shift` | stub | 2 |
+| `word-backend` | `p3_word_backend.keys.code.mirror.KeyCode.new` | `p3_word_backend::keys::code::KeyCode::new` | stub | 2 |
+| `word-backend` | `p3_word_backend.keys.code.mirror.KeyCode.operation` | `p3_word_backend::keys::code::KeyCode::operation` | stub | 2 |
+| `word-backend` | `p3_word_backend.keys.code.mirror.KeyCode.sequence` | `p3_word_backend::keys::code::KeyCode::sequence` | stub | 2 |
+| `word-backend` | `p3_word_backend.keys.code.mirror.ShiftSequenceCode.new` | `p3_word_backend::keys::code::ShiftSequenceCode::new` | stub | 0 |
+| `word-backend` | `p3_word_backend.keys.code.mirror.ShiftSequenceCode.shifts` | `p3_word_backend::keys::code::ShiftSequenceCode::shifts` | stub | 2 |
+| `word-backend` | `p3_word_backend.columns.mirror.check_shape` | `p3_word_backend::statement::StatementShape::check_shape` | stub | 3 |
+| `word-backend` | `p3_word_backend.columns.mirror.packedAdd32` | `{impl core::ops::arith::Add for p3_binary_field::bitslice::packing::PackedGf2<U>}::add` | stub | 1 |
+| `word-backend` | `p3_word_backend.columns.mirror.packedAdd64` | `{impl core::ops::arith::Add for p3_binary_field::bitslice::packing::PackedGf2<U>}::add` | stub | 1 |
+| `word-backend` | `p3_word_backend.columns.mirror.readTerm` | `p3_word_backend::columns::OperationColumns::extend` | stub | 4 |
+| `word-backend` | `p3_word_backend.columns.mirror.evaluate` | `p3_word_backend::columns::OperationColumns::extend` | stub | 4 |
+| `word-backend` | `p3_word_backend.columns.mirror.OperationColumns.extend` | `p3_word_backend::columns::OperationColumns::extend` | stub | 3 |
+| `word-backend` | `p3_word_backend.columns.mirror.OperationColumns.new` | `p3_word_backend::columns::OperationColumns::new` | stub | 3 |
+| `word-backend` | `p3_word_backend.shift.wiring.mirror.evaluate_word` | `p3_word_backend::shift::wiring::evaluate_word` | stub | 0 |
+| `word-backend` | `p3_word_backend.shift.wiring.mirror.shift_transpose` | `p3_word_backend::shift::wiring::shift_transpose` | stub | 4 |
+| `word-backend` | `p3_word_backend.shift.wiring.mirror.shift_weights` | `p3_word_backend::shift::wiring::shift_weights` | stub | 2 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.Tree.depth` | `p3_word_backend::integer_mul::Tree::depth` | stub | 2 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.IntegerMulReduction.new` | `p3_word_backend::integer_mul::IntegerMulReduction::new` | stub | 1 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.check_field` | `p3_word_backend::integer_mul::IntegerMulReduction::check_field` | stub | 5 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.generator_squarings` | `p3_word_backend::integer_mul::exponent::generator_squarings` | stub | 8 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.factor_weights` | `p3_word_backend::integer_mul::exponent::factor_weights` | stub | 0 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.result_weights` | `p3_word_backend::integer_mul::exponent::result_weights` | stub | 0 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.factor_leaves` | `p3_word_backend::integer_mul::factor_leaves` | stub | 6 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.result_leaves` | `p3_word_backend::integer_mul::result_leaves` | stub | 6 |
+| `word-backend` | `p3_word_backend.integer_mul.mirror.product_layers` | `p3_word_backend::integer_mul::product_layers` | stub | 5 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.new` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::new` | stub | 3 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.evaluation_point` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::evaluation_point` | stub | 7 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.message_row_iter` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::message_row_iter` | stub | 2 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.randomness_row_iter` | `p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::randomness_row_iter` | stub | 2 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.message_row` | `{impl p3_zk_codes::encoding::LinearZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::message_row` | stub | 2 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.randomness_row` | `{impl p3_zk_codes::encoding::LinearZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::randomness_row` | stub | 2 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.message_len` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::message_len` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.randomness_len` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::randomness_len` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.query_bound` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::query_bound` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.codeword_len` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::codeword_len` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.error` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::error` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.sample_message` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::sample_message` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.sample_randomness` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::sample_randomness` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.encode` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::encode` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.simulate` | `{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::simulate` | stub | 4 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.encode_with_randomness` | `{impl p3_zk_codes::encoding::ZkEncodingWithRandomness<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::encode_with_randomness` | stub | 11 |
+| `zk-codes` | `p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.encode_batch_with_randomness` | `{impl p3_zk_codes::encoding::ZkEncodingWithRandomness<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::encode_batch_with_randomness` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.encoding.mirror.stack_codewords` | `p3_zk_codes::encoding::stack_codewords` | stub | 1 |
+| `zk-codes` | `p3_zk_codes.encoding.mirror.encode_batch_with_randomness` | `p3_zk_codes::encoding::ZkEncodingWithRandomness::encode_batch_with_randomness` | stub | 1 |
 
 ## Patches with a cost
 
 | Patch | Cost |
 |---|---|
+| `air/post/010-exposed-saturating-sub` | `core.num.Usize.saturating_sub_exposed` in HaxExt.lean, a model of `usize::saturating_sub`, trusted as the rest of HaxExt is. |
 | `baby-bear/pre/020-field-cfg-raw-data-serializable-supertrait` | none in a normal build (see below). In the extracted variant, `Field` no longer implies `RawDataSerializable`. |
 | `baby-bear/pre/030-field-cfg-rpitit-packed-methods` | none in a normal build: every change is behind cfg(hax_backend_lean). In the extracted variant, four default methods are absent and `to_ext_iter` sits on an extension trait. |
 | `baby-bear/pre/040-field-cfg-rpitit-bit-plane-expansion` | none in a normal build: the change is behind cfg(hax_backend_lean). In the extracted variant, `Field::prepare_bit_plane_expansion` is absent. |
+| `baby-bear/pre/050-field-cfg-packed-ext-powers` | none in a normal build: every change is behind cfg(hax_backend_lean). In the extracted variant, `PackedFieldExtension::packed_ext_powers` and its 8 impls are absent. |
+| `binary-dft/pre/010-reshape-domain-steps` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `domain_point_steps` calls the reshaped body, which a differential test equates with the original. |
+| `binary-dft/pre/020-reshape-lch-kernels` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the twiddle state, the stage pass, the tile stages and the deep tiles call the reshaped bodies, which differential tests equate with the originals, panics included. |
+| `binary-dft/post/010-exposed-ops-and-layout` | the exposed model of `saturating_sub` on usize in HaxExt.lean, trusted as the rest of HaxExt is. |
 | `binary-field/pre/010-cfg-raw-data-serializable-bounds` | none: each added bound is implied by `TowerLevel: Field` in a normal build. |
 | `binary-field/pre/020-cfg-hide-ghash-bit-plane-expansion` | none in a normal build: the change is behind cfg(hax_backend_lean). In the extracted variant, `Ghash128::prepare_bit_plane_expansion` is absent. |
 | `binary-field/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of a field type. No existing body changes. |
@@ -486,11 +2085,45 @@ counts the claims (of 748) whose dependencies include the declaration.
 | `binary-field/pre/050-poly192-copied-limbs` | none in a normal build: the copy is compiled but unused there. In the extracted variant, `Mul`, `Mul<Poly64>` and `square` read the coordinates through `limbs_owned`, which copies each coordinate's bits, instead of borrowing them in place. |
 | `binary-field/pre/060-field-default-shims` | none in a normal build: the copies are compiled but unused there. In the extracted variant, inherent `inverse`, `is_zero` and `is_one` shadow the `Field` defaults at every call site on a concrete field type of this crate, and call copies of the default bodies. |
 | `binary-field/pre/070-field-api-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of a field type. No existing body changes. |
+| `binary-pcs/pre/010-raw-data-bounds` | none: each added bound is implied by `TowerLevel: Field` in a normal build. |
+| `binary-pcs/pre/020-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. No existing body changes. |
+| `binary-pcs/post/010-exposed-saturating-add` | `core.num.Usize.saturating_add_exposed` in HaxExt.lean, a model of `usize::saturating_add`, trusted as the rest of HaxExt is. |
 | `blake2s/pre/010-reshape-hash-many` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the scalar `hash_many` calls the reshaped body, which a differential test equates with the original. |
 | `blake3/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds one free function, which calls `Blake3::hash_many`. No existing body changes. |
 | `blake3/pre/020-reshape-batch` | none in a normal build: the reshaped driver is compiled only under cfg(hax_backend_lean), as the crate's `batch` module, and under cfg(test), beside the shipped one. The extracted variant hashes on the one-lane backend, which is what the extraction target compiles. |
+| `bus/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. No existing body changes. |
+| `challenger/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of the crate. No existing body changes. |
+| `keccak/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of the crate. No existing body changes. |
+| `keccak/pre/020-reshape-batch-and-lane` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the batched hash and the one-lane permutation call the reshaped bodies, which a differential test equates with the originals. |
+| `matrix/pre/020-cfg-hide-row-iterators` | none in a normal build: every change is behind cfg(hax_lean_matrix), which only p3-matrix's extraction sets. In the extracted variant, the matrix trait keeps only the shape, element access and strided view. |
+| `matrix/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. |
+| `matrix/post/020-trait-default-for-impl-def` | none: the attribute only lets `impl_def` unfold the definition. |
+| `matrix/post/030-exposed-saturating-sub` | `core.num.Usize.saturating_sub_exposed` in HaxExt.lean, a model of `usize::saturating_sub`, trusted as the rest of HaxExt is. |
+| `merkle-tree/pre/010-reshape-verifier` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the single-index verifier and the hiding verifier call the reshaped bodies, which a differential test equates with the shipped ones. |
+| `merkle-tree/pre/020-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one reshaped body. No existing body changes. |
 | `mersenne-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of `Mersenne31`. No existing body changes. |
+| `monty-31/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method or constant of `MontyField31`. No existing body changes. |
+| `multi-stark/pre/010-import-packed-extension-iter` | none: the added items are behind cfg(hax_backend_lean), so a normal build is token for token as shipped. |
+| `multi-stark/pre/020-raw-data-bounds` | none: each added bound is implied by `Field` in a normal build. |
+| `multi-stark/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. No existing body changes. |
+| `multi-stark/post/010-exposed-saturating-sub` | `core.num.Usize.saturating_sub_exposed` in HaxExt.lean, a model of `usize::saturating_sub`, trusted as the rest of HaxExt is. |
+| `multilinear-util/pre/010-import-packed-extension-iter` | none: every added line is behind cfg(hax_backend_lean), so a normal build is token for token as shipped. |
+| `multilinear-util/pre/020-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. No existing body changes. |
+| `security/pre/010-budget-folding-round` | None in a normal build, where the new function is compiled but unused. In the extracted variant, the report computes its folding term with it. Its body is the original match, verbatim. |
+| `security/pre/020-budget-binding-index` | None in a normal build, where the two new functions are compiled but unused. In the extracted variant, the binding term is read at the first minimum. That minimum is taken over the seven bit counts. |
+| `security/post/020-exposed-saturating-ops` | the exposed models of `saturating_sub` on usize, u64 and u128, `saturating_add` on u32 and u64, and `saturating_mul` on u64, in HaxExt.lean, trusted as the rest of HaxExt is. |
 | `sha256/pre/010-reshape-compress` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `Sha256Compress::compress` calls the reshaped body, which a differential test equates with the original. |
+| `sumcheck/pre/010-import-packed-extension-iter` | none: the added lines are behind cfg(hax_backend_lean), so a normal build is token for token as shipped. |
+| `sumcheck/pre/020-ring-switch-raw-data-bounds` | none: each added bound is implied by `TowerLevel: Field` in a normal build. |
+| `sumcheck/pre/030-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one item of the crate. No existing body changes. |
+| `symmetric/pre/010-extraction-roots` | none in a normal build: the module exists only under cfg(hax_backend_lean). In the extracted variant it adds free functions, each of which calls one method of the crate. No existing body changes. |
+| `symmetric/pre/020-reshape-padding-free-sponge` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `PaddingFreeSponge::hash_iter` calls the reshaped body, which a differential test equates with the original. |
+| `symmetric/pre/030-reshape-pad10-sponge` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `Pad10Sponge::hash_iter` calls the reshaped body, which a differential test equates with the original. |
+| `symmetric/pre/040-reshape-compress-from-hasher` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, `CompressionFunctionFromHasher::compress` hands the hasher a vector of the same items, which a differential test equates with the original. |
+| `util/post/010-exposed-saturating-sub` | `core.num.Usize.saturating_sub_exposed` in HaxExt.lean, a model of `usize::saturating_sub`, trusted as the rest of HaxExt is. |
+| `word/pre/010-shift-marker-without-fn-type` | none in a normal build: the change is behind cfg(hax_backend_lean). In the extracted variant, the width marker of a shift is `PhantomData<W>`. |
+| `word/pre/020-reshape-system-loops` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the constructor and the verifier call the reshaped bodies, which a differential test equates with the shipped ones. |
+| `word/pre/030-reshape-composition-loops` | none in a normal build: only the selection is behind cfg(hax_backend_lean). In the extracted variant, the layout, the lowering and the resolver call the reshaped bodies, which a differential test equates with the shipped ones. |
 
 Upstream tests (`test-pre-patches.py`): 6715 of Plonky3's 6769 pass as shipped and 6715 with the pre-extraction patches, with 0 divergence(s).
 
@@ -501,6 +2134,669 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 
 | Claim | Axioms |
 |---|---|
+| `Air.assert_bool_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.assert_eq_accepts` | `Quot.sound`, `propext` |
+| `Air.assert_one_accepts` | `Quot.sound`, `propext` |
+| `Air.assert_zero_accepts` | `Quot.sound`, `propext` |
+| `Air.assert_zeros_accepts` | `Quot.sound`, `propext` |
+| `Air.bb_assert_eq_ext` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.bb_assert_one_ext` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.bb_assert_zero_ext` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.bb_ext_poly_degree_bound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.bb_ext_sym_add_denotes` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.bb_ext_sym_mul_denotes` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.bb_ext_sym_sub_denotes` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.bb_when_ext` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.boundary_duplicate_scan` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.boundary_first_last_one_row` |  |
+| `Air.boundary_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.boundary_row_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.check_constraints_ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.const_constraint_fails` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.constraint_degree_from_poly_degree_extracted` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.constraint_degree_least` | `Quot.sound`, `propext` |
+| `Air.debug_row_asserts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.degree_multiple_bound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.ext_variable_degree_multiple` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.ext_variable_poly_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.next_row_of_last_row` | `Quot.sound`, `propext` |
+| `Air.next_row_unread` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.num_quotient_chunks` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.packMat.bit` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.packMat.length` | `Quot.sound`, `propext` |
+| `Air.periodic_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.poly_degree_bound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.quotient_fits_one_transition` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.quotient_fits_with_periodic` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.resolve_eval` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.satisfies_height_zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.selector_form_iff_domain_form` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.sym_add_denotes` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.sym_mul_denotes` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.sym_neg_denotes` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.sym_sub_denotes` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.symbolic_constraints_cache` | `Quot.sound`, `propext` |
+| `Air.symbolic_constraints_denote` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.to_base_denotes` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.transition_vacuous_height_one` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.transition_window` | `Quot.sound`, `propext` |
+| `Air.two_transitions_overflow` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.variable_degree_multiple` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.variable_poly_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.virtual_column_apply` | `Quot.sound`, `propext` |
+| `Air.virtual_column_panics` | `Quot.sound`, `propext` |
+| `Air.when_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.when_first_row_accepts` | `Quot.sound`, `propext` |
+| `Air.when_last_row_accepts` | `Quot.sound`, `propext` |
+| `Air.when_ne_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Air.when_transition_accepts` | `Quot.sound`, `propext` |
+| `Air.when_when_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.accepted_height_bound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.batch_opening_count` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.bus_ids` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.bus_width_check` | `Quot.sound`, `propext` |
+| `BatchStark.bus_width_check_before_layout` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.bus_width_check_layout` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.challenge_layout` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.check_at_zeta` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.check_at_zeta_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.check_at_zeta_in_domain` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.check_at_zeta_unread` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.checker_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.checks_at_zeta` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.combiner_is_bus_denominator` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.cross_table_soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.empty_group_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.fiat_shamir_order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.full_check_at_zeta` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.full_claims` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.full_lookup_grind_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.full_no_instances_vacuous` | `Quot.sound`, `propext` |
+| `BatchStark.full_ood_grind_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.full_permutation_round_exact` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.full_recombine_chunks` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.full_recombine_chunks_masked` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.full_verify_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.full_verify_boundary_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.full_verify_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.full_verify_complete_hiding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.full_verify_complete_merkle` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.full_verify_lookup_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.full_verify_ne_none` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.full_verify_ood_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.instCharPExt4FieldSize_plonky3Lean` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.layout_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.logup_charge_bounds_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.logup_exact_count` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.lookup_pair_layout` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.one_row_trace` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.one_sender_unbalanced` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.opening_count_sum` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.p_sends_balance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.permutation_round_order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.randomization_mismatch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.replay_never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.seed_binds_shape` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.selector_count_balance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.selector_count_pin` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.selector_count_row0` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.table_shape` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.uni_stark_opening_count` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.verify_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.verify_never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BatchStark.wrong_table_count` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.IsCantor.independent'` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.IsCantor.map'` | `Quot.sound`, `propext` |
+| `BinaryDft.LchNtt.ntt_batch_padded.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.LchNtt.ntt_batch_padded.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.NaiveAdditiveNtt.panics_height` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.NaiveAdditiveNtt.shifted_intt_batch.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.NaiveAdditiveNtt.shifted_ntt_batch.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.NaiveAdditiveNtt.shifted_ntt_batch.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.Twiddles.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.compPoly_W_eval` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.domain_point.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.domain_point_steps.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.encode_batch.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.extracted.domain_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.extracted.domain_point_steps` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.extracted.subspace_polynomial` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.extracted.transform_intt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.extracted.transform_ntt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.extracted.transform_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.extracted.transform_panics_width` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.extracted.transform_round_trip` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.inetwork_network` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.inetwork_ntt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.network_inetwork` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.network_ntt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.normalized.cantor` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.ntt_map` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.ntt_pad` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.pairOp.eq` | `Quot.sound`, `propext` |
+| `BinaryDft.point.step` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.run.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.shifted_lde_batch.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.stage_pass.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.subspace_polynomial.eq` | `Quot.sound`, `propext` |
+| `BinaryDft.towerLevel.cantor` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.towerLevel.transform` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.transform.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.transform_intt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.transform_ntt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.twiddle.cantor` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.typed_butterfly.eq` | `Quot.sound`, `propext` |
+| `BinaryDft.vanishing.add` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.vanishing.point_eq_zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryDft.vanishing.succ` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.bindAll.mle` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.extracted.fold_pair` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.extracted.fold_pair.ntt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.extracted.num_fold_batches` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.extracted.shape` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.extracted.try_new_with_folding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.extracted.try_with_folding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.extracted.try_with_folding.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.field_error` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.final.uniform` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.fold_batches` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.fold_coset.ntt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.fold_pair.ntt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.fold_pair.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.fold_round.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.security_regime` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.shape` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.towerLevel.fold_pair` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.try_new_with_folding.ok` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.try_new_with_folding.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.try_with_folding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.verify_query_paths.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `BinaryPcs.verify_query_paths.no_panic` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.G_SCHEDULE.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.G_SCHEDULE.eq_rfc` | `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.add_planes.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.add_planes.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.carries_word.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.g_words.eq_rfc` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.g_words.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.g_words.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.transpose_bits.bit` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.transpose_bits.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.xor_rotate_right.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.binary.generation.xor_rotate_right.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.check_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.constants.IV.eq_rfc` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.constants.SIGMA.eq_rfc` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.degree_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.generate_binary_trace_packed.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.generate_binary_trace_packed.eq_pack` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.generate_binary_trace_packed.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.generate_binary_trace_rows.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.generate_trace_row.output` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.num_constraints_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.read_word.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.row_sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.sound.inputs` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake2sAir.spec.hash_abc` | `Quot.sound`, `propext` |
+| `Blake2sAir.spec.rounds_abc` | `Quot.sound`, `propext` |
+| `Blake2sAir.spec.selftest` | `Quot.sound`, `propext` |
+| `Blake2sAir.state_after_round.panics` | `Quot.sound`, `propext` |
+| `Blake2sAir.transpose_bits.bit` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.add2_small_field` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.add3_small_field` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.binary.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.binary.degree_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.binary.generate_some` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.binary.generation.carries_word.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.binary.num_constraints` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.binary.quotient_fits_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.binary.sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.check_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.constants.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.constants.eq_spec` | `propext` |
+| `Blake3Air.degree_babyBear` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.degree_goldilocks` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.degree_koalaBear` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.degree_mersenne31` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.generate_some` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.generated_outputs` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.generation.verifiable_half_round.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.quotient_fits_babyBear` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.ringChar_fields` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Blake3Air.sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.builder.BusBoundary.contains_row.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.builder.BusBoundary.contains_row.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.bus_soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.clock_orbit_fields` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.direction.BusDirection.index.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.factor_is_leaf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.flattening_faithful` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.forged_cycle` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.gap_check` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.gap_factors_digits` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.grand_product_soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.identity_padding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.identity_padding.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.layout_injective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.multiset_identity` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.planner_block_unique` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.planner_blocks` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.planner_domains` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.planner_layout` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.ram.statement.RamStatement.access_payload_width.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.ram.statement.RamStatement.access_payload_width.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.ram.statement.RamStatement.image_payload_width.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.ram.statement.RamStatement.image_payload_width.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.ram_consistent` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.ram_consistent_machine` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.schedule` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.schedule_dimensions` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.security_numerators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.security_profile` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.sorted_trace_consistent` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.strict_increase` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Bus.verifier_total` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.bary.denominators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.bary.evaluate` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.bary.formula` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.bary.off_poles` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.bary.panics_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.bary.size_one_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.bary.size_two_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.bary.unique` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.bary.v_component` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.cfft.basis` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.cfft.evaluate` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.cfft.interpolate` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.cfft.prefix_twiddles` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.cfft.twiddles` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.extract_lambda` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.extract_lambda_orthogonal` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.extract_lambda_split` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.fft_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.fft_span` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.orthogonal` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.prover_verifier` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.quotient_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.re_im` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.reduce_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.split_vn` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.deep.term_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.domain.disjoint_domain` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.domain.standard_disjoint` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.domain.standard_nodup` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.domain.standard_points` | `Quot.sound`, `propext` |
+| `Circle.domain.vanishing` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.folding.fold_x` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.folding.fold_y` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.folding.query_twiddles` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.generator.m31_card` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.generator.m31_rust` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.generator.m31_valid` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.generator.order` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.ordering.chunked` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.ordering.involutive` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.pcs.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.pcs.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.pcs.one_row_panics` | `Quot.sound`, `propext` |
+| `Circle.pcs.open_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.pcs.open_matrix` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.pcs.open_panics_at_infinity` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.pcs.panics_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.point.double` | `Quot.sound`, `propext` |
+| `Circle.point.from_projective_line` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.point.mul` | `Quot.sound`, `propext` |
+| `Circle.point.projective_line_inverse` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.point.s_p_at_p` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.point.v_n` | `Quot.sound`, `propext` |
+| `Circle.point.v_p` | `Quot.sound`, `propext` |
+| `Circle.prover.answers` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.prover.commit_phase` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.prover.first_layer` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.prover.lambdas` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.prover.lifted_reduction` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.prover.reduced_openings` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.query.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.query.deep` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.query.first_layer` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.query.first_layer_fold` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.query.first_layer_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.query.fold_chain` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.query.fold_step` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.query.next_point` | `Quot.sound`, `propext` |
+| `Circle.selectors.at_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.selectors.at_point_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.selectors.m31_first_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.selectors.m31_last_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.selectors.on_coset` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Circle.selectors.on_domain` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.PeriodicColumns.new.error` | `Quot.sound`, `propext` |
+| `Commit.PeriodicColumns.new.ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.PeriodicLdeTable.get.packed` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.PeriodicLdeTable.is_empty` | `Quot.sound`, `propext` |
+| `Commit.PeriodicLdeTable.packed_group_period` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.babyBear.facts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.babyBear.selectors_on_disjoint_domain` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.build_periodic_lde_table` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.build_periodic_lde_table.nil` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.build_periodic_lde_table.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.commit_quotient` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.commit_quotient.counts` | `Quot.sound`, `propext` |
+| `Commit.coset.contains` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.coset.element` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.coset.exp_power_of_2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.coset.iter` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.coset.set_shift` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.create_disjoint_domain` | `Quot.sound`, `propext` |
+| `Commit.create_disjoint_domain.disjoint` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.create_disjoint_domain.shape` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.create_disjoint_domain.some_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.default_evaluate_periodic_column_at` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.delegating_defaults` | `Quot.sound`, `propext` |
+| `Commit.encode_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.encode_batch.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.encode_batch_borrowed` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.evaluate_periodic_column_at` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.evaluate_periodic_column_at.panics_long` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.evaluate_periodic_column_at.panics_not_pow` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.evaluate_periodic_columns_at` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.evaluate_polynomial_at` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.mmcs.commit_matrix` | `propext` |
+| `Commit.mmcs.extension` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.mmcs.get_max_height` | `propext` |
+| `Commit.mmcs.reference` | `Quot.sound`, `propext` |
+| `Commit.natural_domain_for_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.natural_domain_for_degree.panics` | `Quot.sound`, `propext` |
+| `Commit.next_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.open_with_preprocessing` |  |
+| `Commit.paddedLen` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.pcs.binding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.selectors_at_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.selectors_at_point.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.selectors_on_coset` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.selectors_on_coset.at_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.selectors_on_coset.disjoint_domain` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.selectors_on_coset.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.split_domains` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.split_domains.partition` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.split_domains.points` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.split_domains.some_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.split_evals` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.split_evals.panics` | `Quot.sound`, `propext` |
+| `Commit.trivial.contract` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.trivial.contract.parallel` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.trivial.get_evaluations_on_domain.height` | `Quot.sound`, `propext` |
+| `Commit.unit_evaluator` | `Quot.sound`, `propext` |
+| `Commit.vanishing_poly_at_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.vanishing_poly_at_point.eq_zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Commit.verify_with_preprocessing` |  |
+| `Dft.babyBear.generators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.bitrev_table` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.bowers.coset_lde_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.bowers.coset_lde_batch_with_transform` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.bowers.dft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.bowers.g` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.bowers.g_t` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.bowers.idft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.bowers.lde_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.cooley_tukey` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.cooley_tukey.coset` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.cosetIdft_cosetDft` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.coset_table.first` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.coset_table.second` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.default.algebra` | `Quot.sound`, `propext` |
+| `Dft.default.coset_dft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.default.coset_idft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.default.coset_idft_batch.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.default.coset_lde_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.default.idft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.dft.column` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.dft.linear` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.dif.apply_to_rows` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.dit.apply_to_rows` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.gentleman_sande` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.goldilocks.generators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.idft.interpolant` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.idft_dft` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.koalaBear.generators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.layer.bit_reversed` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.lde.column` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.lde.extends` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.mersenne31Complex.generators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.naive.dft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.naive.dft_batch.panics_not_pow` | `Quot.sound`, `propext` |
+| `Dft.naive.dft_batch.panics_too_big` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.parallel.coset_dft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.parallel.coset_idft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.parallel.dft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.parallel.idft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.parallel.lde` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.radix2Dit.coset_lde_batch_with_transform` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.radix2Dit.dft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.radix2Dit.dft_batch.panics_not_pow` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.radix2Dit.dft_batch.panics_too_big` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.scaled.apply_to_rows` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.smallBatch.dft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Dft.smallBatch.idft_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.answer_queries.siblings` | `Quot.sound`, `propext` |
+| `Fri.babyBear.facts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.deep.batched_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.deep.constant` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.deep.degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.deep.eval` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.deep.reduced_opening` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.deep.verifier` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.edge.point_in_domain` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.edge.short_round` | `propext` |
+| `Fri.edge.too_tall` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.edge.zero_blowup` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.edge.zero_queries` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.final_poly` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.first_word.chain` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.first_word.degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.first_word.inputs` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.first_word.prover` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.first_word.rolls` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.first_word.verifier` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold.coset_word` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold.degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold.of_degree_lt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold.split` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold.two_pow` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold_chain.final_le` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold_chain.honest` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold_chain.row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold_chain.step` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold_matrix.rows` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold_matrix_scalar.codeword` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold_matrix_scalar.rows` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold_query.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold_query.rebuild` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold_query.sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold_row.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold_schedule.nil` | `Quot.sound`, `propext` |
+| `Fri.fold_schedule.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.fold_schedule.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.budget_min` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.even_rows` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.exact` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.mask_column` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.mask_heights` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.mask_residual` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.masks` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.masks_cancel` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.masks_cancel_of_counts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.masks_panic` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.masks_survive_of_counts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.merge_honest` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.merge_rejects` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.merge_split` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.merge_total` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.of_merge` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.one_row` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.open_ok` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.open_reopened` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.open_short` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.small_domain` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.split_panics` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.zero_codewords` | `Quot.sound`, `propext` |
+| `Fri.hiding_pcs.zero_codewords_prover` | `propext` |
+| `Fri.honest_round` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.honest_round.degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.lagrange_interpolate_at` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.merkle.binding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.merkle.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.merkle.extracted` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.babyBear_difficulty` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.batch_dims_honest` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.batch_honest` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.batch_indices_honest` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.batch_phase.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.check_witness.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.claims_replay` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.commit_rounds.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.commit_rounds_length` | `Quot.sound`, `propext` |
+| `Fri.pcs.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.complete_merkle` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.complete_of_fri` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.denominators_honest` | `Quot.sound`, `propext` |
+| `Fri.pcs.fri_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.fri_complete_of_chain` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.fri_panics_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.inputs_honest` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.panics_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.query_indices_lt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pcs.query_phase.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pow.accepting_card` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.pow.babyBear_count` | `propext` |
+| `Fri.reduceQuery.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.reduced_openings.agree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.reduced_openings.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.shape.batch_pow` | `Quot.sound`, `propext` |
+| `Fri.shape.commit_pow` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.shape.indices_last` | `propext` |
+| `Fri.shape.query_pow` | `Quot.sound`, `propext` |
+| `Fri.shifted_index` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Fri.verify_fri.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.R.eq_fips` | `propext` |
+| `KeccakAir.RC.eq_RC_BITS` | `propext` |
+| `KeccakAir.RC_BITS.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.binary.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.binary.degree_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.binary.generate_binary_trace_packed.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.binary.generate_binary_trace_packed.eq_pack` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.binary.generate_binary_trace_packed.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.binary.generation.keccak_round.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.binary.generation.keccak_round.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.binary.keccak_round.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.binary.num_constraints_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.binary.onehot` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.binary.sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.binary.sound_boolean_trace` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.check_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.constants.RC.eq_lfsr` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.constants.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.degree_babyBear` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.degree_goldilocks` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.degree_koalaBear` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.degree_mersenne31` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.flags` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.quotient_fits_babyBear` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.ringChar_fields` | `Classical.choice`, `Quot.sound`, `propext` |
+| `KeccakAir.sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.accepts_bus_relation` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.accumulator_trace` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.air_soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.bus_soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.bus_soundness_security` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.challenge_table` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.combine_elements_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.combined_sum_terms_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.constant_count_weight` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.denominator_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.exclusive_idle` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.exclusive_selects` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.exclusive_terms_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.extracted_bounded` | `Quot.sound`, `propext` |
+| `Lookup.extracted_provided` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.fingerprint_injective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.fingerprint_width_alias` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.fraction_pin_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.height_bound` | `Quot.sound`, `propext` |
+| `Lookup.height_bound_soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.honest_pinned` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.honest_running_sum` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.horner` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.instCharPExt4FieldSize_plonky3Lean` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.integer_balance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.local_weight_exact` | `Quot.sound`, `propext` |
+| `Lookup.logDeriv_eq_zero_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.overflow` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.permutation` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.pin_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.pin_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.pole_blocks_prover` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.pole_pair_frees` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.pole_zero_count_frees` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.prover_combiner` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.prover_fraction_honest` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.prover_pairs` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.prover_rejects_periodic` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.query_without_entry` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.receive_weight` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.reported_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.set_inclusion` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.table_entry_weight` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.terminal_height_one` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.terminal_is_sum` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Lookup.terminal_sum` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.barycentric_weights.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.bitRevRows_bitRevRows` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.bitRev_bitRev` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.bit_reversed_zero_pad.identity` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.bitrev.get` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.bitrev.get.unsound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.bitrev.new_view` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.bitrev.new_view.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.dense.get` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.dense.get_unchecked` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.dense.get_unchecked.out_of_bounds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.dense.height` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.dense.new` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.flat.index` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.flat.row_subseq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.hpair.get` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.hpair.get.unsound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.hpair.new` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.interpolate_arbitrary_point.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.interpolate_coset.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.interpolate_coset.unique` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.interpolate_coset_with_precomputation.at_zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.interpolate_lagrange.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.log2_strict_usize` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.log2_strict_usize.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.recover_coefficients.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.reverse_bits_len` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.reverse_matrix_index_bits.disjoint` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.reverse_matrix_index_bits.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.strided.get` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.strided.get.unsound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.strided.new_view` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.strided.new_view.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.truncated.get` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.truncated.new_with_range` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.vpair.get` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.vpair.get.unsound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.vpair.height.overflow` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Matrix.vpair.new` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.QuotientMap.from_canonical_checked_i128` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.QuotientMap.from_canonical_checked_i32` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.QuotientMap.from_canonical_checked_i64` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -529,6 +2825,127 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Monty31.utils.to_monty_64.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.utils.to_monty_64_signed.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Monty31.utils.to_monty_signed.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.bus_capacity` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.bus_closing` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.bus_family` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.bus_share_term` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.claim_check` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.closing_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.closing_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.closing_loop` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.closing_never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.closing_wrong_count` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.fraction_root` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_branch_bad` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_charge` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_lambda_bad` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_layer` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_layer_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_layer_sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_round_counts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_rounds_bad` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.gkr_verifier` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.indexed_plan` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.indexed_plan_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.indexed_plan_reads` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.indexed_plan_sorted` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.indexed_plan_tables` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.indexed_plan_trivial` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.instCharPExt4FieldSize_plonky3Lean` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.instance_term` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.instance_wrong_width` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.logup_fingerprint` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.logup_star_claim` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_leaf_denominators` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_leaf_sum` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_link` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_placed` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_plan_ids` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_plan_no_variable` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_plan_outcome` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_plan_wf` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_plan_widths` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.lookup_weights` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.next_row_opening` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.opening.OpeningClaims.next_row.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.padded_denominator` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.position_closed_form` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.position_fits` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.prover_selectors` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.pushforward_identity` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.round_degree_charged` | `Quot.sound`, `propext` |
+| `MultiStark.selectors.BoundaryEvals.apply.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.selectors.BoundaryEvals.at.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.selectors.BoundaryEvals.from_row.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.selectors.BoundaryEvals.from_row.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.selectors.BoundaryEvals.from_row_with_prefix.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.selectors_are_extensions` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.selectors_on_rows` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.statement_before_challenges` | `Quot.sound`, `propext` |
+| `MultiStark.statement_seed_binds` | `Quot.sound`, `propext` |
+| `MultiStark.suffix_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.transition_gated` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.ungated_next_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.zerocheck.transcript.ZerocheckShape.free_coordinates.eq_spec` | `Quot.sound`, `propext` |
+| `MultiStark.zerocheck_by_instance` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.zerocheck_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.zerocheck_priced` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.zerocheck_sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultiStark.zerocheck_transcript` | `propext` |
+| `MultilinearUtil.accumulate_into` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.batched_table` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.compress_suffix_into` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eqTable_bottom_bit` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eqTable_top_bit` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.equality_at_vertex` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.equality_weights.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.equality_weights_lsb` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.equality_weights_msb` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_base` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_base.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_base.short` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_eq.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_eq_base_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_eq_batch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_eq_batch.empty` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_ext` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_multilinear_recursive` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_multilinear_recursive.long` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_multilinear_recursive.short` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_next` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_next.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.eval_select` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.expand_from_univariate` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.expand_from_univariate.univariate` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.fix_prefix_var` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.fix_prefix_var_at` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.fix_prefix_var_mut` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.fix_prefix_var_mut.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.fix_prefix_var_to_packed` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.fix_suffix_var` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.fix_suffix_var_mut` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.hypercube` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.hypercube.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.materialize` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.mle_eval` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.mle_isMultilinear` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.mle_unique` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.mle_vertex` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.new_from_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.new_from_point.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.new_next_from_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.new_packed_from_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.new_packed_from_point.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.nextTable_eval_next` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.pack_unpack` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.point.eval_eq.eq_mirror` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.point.eval_eq.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.point.eval_eq.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.split_eval_base` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.split_eval_base.constant` | `Classical.choice`, `Quot.sound`, `propext` |
+| `MultilinearUtil.sum_prefix_var_mut` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.baby_bear.BabyBear.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.baby_bear.BabyBear.from_monty.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.baby_bear.BabyBear.halve.toField` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -1071,6 +3488,41 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Blake3.digest.kat_1025` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Blake3.digest.kat_2049` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Blake3.digest.kat_65` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.bytes_to_field.bias` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.bytes_to_field.budget` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.duplex_challenger.DuplexChallenger.duplexing.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.duplex_challenger.DuplexChallenger.finalize.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.duplex_challenger.DuplexChallenger.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.duplex_challenger.DuplexChallenger.observe.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.duplex_challenger.DuplexChallenger.sample.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.grinding.DuplexChallenger.grind.accepts_iff_check` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.grinding.accept_count` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.grinding.check_witness.zero` | `propext` |
+| `P3Challenger.grinding.no_fixed_low_bit` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.hash_challenger.HashChallenger.flush.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.hash_challenger.HashChallenger.observe.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.hash_challenger.HashChallenger.sample_after_observe.fresh` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.multi_field.new_accepts_babybear_in_koalabear` | `propext` |
+| `P3Challenger.multi_field.packing_injective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.multi_field.sample_panics_without_limbs` | `Quot.sound`, `propext` |
+| `P3Challenger.multi_field.squeeze_limbs_31` |  |
+| `P3Challenger.multi_field.squeeze_limbs_goldilocks` |  |
+| `P3Challenger.pad.collision_of_charP` | `Quot.sound`, `propext` |
+| `P3Challenger.pad.injective` | `Quot.sound`, `propext` |
+| `P3Challenger.pad.lengths_distinct` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.sample_after_observe.fresh` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.sample_bits.bias` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.sample_bits.count` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.sample_uniform_bits.rejected` | `Quot.sound`, `propext` |
+| `P3Challenger.sample_uniform_bits.uniform` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.serializing.mask_uniform` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.transcript.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Challenger.uniform_sampling.halves_fit` | `propext` |
+| `P3Challenger.uniform_sampling.m_babybear` | `propext` |
+| `P3Challenger.uniform_sampling.m_goldilocks` | `propext` |
+| `P3Challenger.uniform_sampling.m_koalabear` | `propext` |
+| `P3Challenger.uniform_sampling.m_mersenne31` | `propext` |
+| `P3Challenger.uniform_sampling.rejected_at_max` | `propext` |
 | `P3Goldilocks.goldilocks.Goldilocks.GENERATOR.generates` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Goldilocks.goldilocks.Goldilocks.NEG_ONE.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Goldilocks.goldilocks.Goldilocks.ORDER_U64.eq_fieldSize` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -1107,6 +3559,28 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Goldilocks.goldilocks.Goldilocks.two_adic_generator.order` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Goldilocks.goldilocks.Goldilocks.two_adic_generator.panics` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Goldilocks.goldilocks.reduce128.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.Keccak256Hash.hash_many.empty` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.Keccak256Hash.hash_many.eq_keccak256` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.Keccak256Hash.hash_many.ragged` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.KeccakF.perm_computes` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.KeccakF.permute_mut_packed.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.KeccakF.permute_mut_u64.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.KeccakF.permute_mut_u8.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.KeccakF.permute_u64.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.KeccakF.permute_u8.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.Sha3_256Hash.hash_many.empty` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.Sha3_256Hash.hash_many.eq_sha3_256` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.Sha3_256Hash.hash_many.ragged` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.keccak256.abc` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.keccak256.empty` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.keccakP.zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.sha3_256.abc` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.sha3_256.empty` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.tiny_keccak.PI.eq_walk` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.tiny_keccak.RHO.eq_triangular` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.tiny_keccak.keccakf.RC.eq_lfsr` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.tiny_keccak.keccakf.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Keccak.tiny_keccak.keccakf.zero` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3KoalaBear.koala_bear.KoalaBear.add.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3KoalaBear.koala_bear.KoalaBear.from_monty.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3KoalaBear.koala_bear.KoalaBear.halve.toField` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -1185,6 +3659,35 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3KoalaBear.poseidon2.const_check_6.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3KoalaBear.poseidon2.const_check_7.holds` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3KoalaBear.poseidon2.const_check_8.holds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.arity_schedule_and_proof_levels.arities` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.arity_schedule_and_proof_levels.binary` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.arity_schedule_and_proof_levels.never_returns_8_4_2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.arity_schedule_and_proof_levels.panics_tall` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.hiding_verify_batch.binding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.hiding_verify_batch.salted` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.tallest_first.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.validate_heights.ok_max` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.validate_heights.panics_max` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.accepts_inv` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.accepts_of_walk` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.accepts_shape` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.binding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.binding_binary` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.complete_binary` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.iff_binary` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.never_panics_binary` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.panics_max` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.panics_tall` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.plan_binary` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.reads_binary` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.mmcs.hax_reshaped.verify_batch.unread_8_1_cap_2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.salt_hits_le` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.walk.binary_binding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.walk.binary_honest` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.walk.binding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3MerkleTree.walk.honest` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Mersenne31.complex.Mersenne31.CIRCLE_TWO_ADIC_GENERATORS.order` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Mersenne31.complex.Mersenne31.COMPLEX_GENERATOR.order` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Mersenne31.complex.Mersenne31.circle_two_adic_generator.order` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -1234,12 +3737,252 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3Mersenne31.mersenne_31.from_u62.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Mersenne31.mersenne_31.partial_reduce.spec` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Mersenne31.mersenne_31.reduce_64.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.binary.field_error_numerator.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.binary.field_security_bits.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.binary.max_security_bits.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.budget.report.SecurityReport.security_level.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.budget.security_report.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.budget.security_report.overstates_composition` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.deep.deep_ali_error.charges_list_once` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.deep.deep_ali_error.l_squared_would_bind` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.error.ErrorBits.sum.le_term` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fixed.bits_per_query.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fixed.ceil_log2.not_rounded_up` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fixed.ceil_log2.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fixed.ceil_log2.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fixed.floor_log2.gt_log2_sub_two` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fixed.floor_log2.le_log2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fixed.floor_log2.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fri.commit_phase_error_ldr_m.max_le_sum` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.fri.commit_phase_error_udr.le_paper` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.proximity.compute_upper_m.boundary` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.proximity.compute_upper_m.iff_eta_pos` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.proximity.johnson_exceptional_line_count_log2.eq_dkt26` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Security.whir.folding_pow_bits.short_of_target` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Sha256.Sha256Compress.compress.abc` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Sha256.Sha256Compress.compress.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Sha256.compress256.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Sha256.digest.abc` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Sha256.digest.empty` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3Sha256.digest.two_blocks` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.compression.CompressionFunctionFromHasher.compress.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.compression.TruncatedPermutation.compress.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.compression.TruncatedPermutation.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.hash.Hash.from_into` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.hash.MerkleCap.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.pad10Blocks.injective` | `Quot.sound`, `propext` |
+| `P3Symmetric.paddingFree.extend` | `Quot.sound`, `propext` |
+| `P3Symmetric.paddingFree.nil` | `Quot.sound`, `propext` |
+| `P3Symmetric.paddingFree.trailing_zeros` | `Quot.sound`, `propext` |
+| `P3Symmetric.sponge.Increment.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.sponge.Increment.permute.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.sponge.Pad10Sponge.hash_iter.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.sponge.Pad10Sponge.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.sponge.PaddingFreeSponge.hash_iter.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.sponge.PaddingFreeSponge.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Symmetric.truncated.collision_of_inverse` | `Quot.sound`, `propext` |
+| `P3Word.Component.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Composition.interface.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Composition.lower.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Composition.lower.sound32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Composition.lower.sound64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Composition.new.laid_out` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Composition.resolve.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Composition.resolve.injective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Composition.resolve.lt_len` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.ConstraintSystem.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.ConstraintSystem.new.ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.ConstraintSystem.verify.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Shift.apply.of_new32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Shift.apply.of_new64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Shift.apply.word32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Shift.apply.word64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Shift.new.word32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.Shift.new.word64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.ShiftKind.code.round_trip` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.ShiftKind.from_code.none` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.ValueIndex.new.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.mul32.iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.mul64.iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.validateSpec.ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3Word.verifySpec.ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.IntegerMulReduction.new.none` | `Quot.sound`, `propext` |
+| `P3WordBackend.KeyCode.injective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.KeyCode.round_trip` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.OperationColumns.new.flat` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.Shift.new.fixed32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.Shift.new.fixed64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.accepts.iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.backend.word32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.backend.word64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.check_field.two_pow` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.evaluate.eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.factor_leaves.prod` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.product_layers.blocks` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.product_layers.children` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.product_layers.factor_root` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.product_layers.length` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.product_layers.result_root` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.result_leaves.prod` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.row.collision` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.row.sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.sem32.xor` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.sem64.xor` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.shift_transpose.word32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.shift_transpose.word64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.shift_weights.word32` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3WordBackend.shift_weights.word64` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.SHA256_K.eq_fips` | `propext` |
+| `Sha256Air.binary.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.binary.degree_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.binary.generate_binary_trace_packed.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.binary.generate_binary_trace_packed.eq_pack` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.binary.generate_binary_trace_packed.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.binary.generate_binary_trace_rows.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.binary.generate_trace_row.cells_scratch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.binary.generation.sigma.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.binary.num_constraints_gf2` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.binary.sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.check_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.constants.SHA256_IV.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.constants.SHA256_K.eq_fips` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.constants.u32_to_limbs.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.degree_babyBear` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.degree_goldilocks` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.degree_koalaBear` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.degree_mersenne31` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.generate_trace_rows.panics` | `Quot.sound`, `propext` |
+| `Sha256Air.num_constraints_babyBear` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.quotient_fits_babyBear` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.ringChar_fields` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sha256Air.sound` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.add_polys` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.babyBear.facts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.check_ans_interpolates` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.check_ans_length` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.combine_coefficients` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.combine_coefficients.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.combine_on_coset` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.coset_membership` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.degCor_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.eval_degree_correction` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.eval_poly` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.eval_poly_at_base` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.eval_poly_parallel` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.external_fibers_in_draw_order.no_panic` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.fold_codeword` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.fold_fiber` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.fold_of_polynomial` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.fold_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.fold_poly_coeffs` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.fold_queries` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.geometric_sum` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.interpolate_poly` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.interpolate_poly.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.lagrange_interpolate_at` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.materialize_virtual_fiber` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.next_domain_avoids_points` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.next_polynomial` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.ood_filter` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.polyFold_degree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.query_fold_value.initial` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.query_fold_value.virtual` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.reduce_mod_x_pow_minus_c` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.reduce_mod_x_pow_minus_c.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.resolve_ans_polynomial.compact` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.resolve_ans_polynomial.no_panic` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.round_completeness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.round_geometry` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.set_gamma` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.split_parts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.vanishing_poly_from_roots` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Stir.virtual_oracle` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.RoundPolyInterpolator.eval.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.RoundPolyInterpolator.new.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.extrapolate_01inf.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.lagrange.extrapolate_01inf.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.lagrange.lagrange_weights_01inf.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.lagrange.lagrange_weights_01inf_multi.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.lagrange.lagrange_weights_01inf_multi.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.protocol.completeness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.protocol.soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.reduce_claim.evaluation` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.reduce_claim.projective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.reduce_claim.sum_check` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.strategy.Basis.reduce_claim.eq_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.strategy.Basis.reduce_claim.evaluation` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.strategy.Basis.reduce_claim.projective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.strategy.Basis.reduce_claim.sum_check` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.sumcheck_coefficients_prefix.honest` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.sumcheck_coefficients_prefix.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.verify.completeness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.verify.soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.verify.spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.verify_final_sumcheck_rounds.missing` | `Quot.sound`, `propext` |
+| `Sumcheck.verify_final_sumcheck_rounds.zero` | `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.accept` | `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.completeness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.history` | `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.invalid_witness` | `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.message_before_challenge` | `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.never_missing_witness` | `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.round_count` | `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.soundness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Sumcheck.verify_rounds.witness_count` | `Quot.sound`, `propext` |
+| `UniStark.StarkOpeningLayout_new_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.babyBear.ext4_table` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.babyBear.prover_eq_verifier` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.babyBear.selectors_disagree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.check_ood_point_ok` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.check_shape_ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.checked_pow2_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.constraint_phase_eq` | `propext` |
+| `UniStark.degree_quotientPoly_lt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.degree_quotient_lt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.eval_quotientPoly` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.eval_starkAssign` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.finalize_decompose` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.firstPlusTransition_disagree` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.fold_unread` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.foldl_horner` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.get_constraint_layout.from_air` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.get_log_num_quotient_chunks_for_domain_eq` | `Quot.sound`, `propext` |
+| `UniStark.honest_ood_check` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.honest_ood_check_masked` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.natDegree_masked_lt` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.ood_phase_ok` | `propext` |
+| `UniStark.ood_phase_run_eq_none` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.pattern_order` | `propext` |
+| `UniStark.process_preprocessed_trace_any_key` | `Quot.sound`, `propext` |
+| `UniStark.prover_constraints` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.prover_eq_verifier` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.prover_value_eq_quotient` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.quotient_values_eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.recombination_masked` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.recombine` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.recompose_eq` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.recompose_quotient` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.recompose_quotient_masked` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.satisfiesStark_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.selector_entries` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.starkRowEnv_eq_zero_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.validate_degree_bits_spec` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.vanishing_chunk_first` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.vanishing_dvd_combinedPoly` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.verifier_accumulator` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.verify_accepts` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.verify_boundary_none` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.verify_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.verify_complete_hiding` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.verify_complete_merkle` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.verify_constraints_complete` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.verify_constraints_complete_unread` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.verify_constraints_none_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.verify_constraints_ok_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.verify_ne_none` | `Classical.choice`, `Quot.sound`, `propext` |
+| `UniStark.zeta_binds` | `Quot.sound`, `propext` |
+| `UniStark.zk_fits` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.cong` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.inverse` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.never_panics` | `Classical.choice`, `Quot.sound`, `propext` |
@@ -1249,6 +3992,65 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `Util.gcd_inversion_prime_field_32.pos_inverse_small_prime` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.wrong_of_large_a` | `Classical.choice`, `Quot.sound`, `propext` |
 | `Util.gcd_inversion_prime_field_32.zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.KoalaBear.fold.row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.KoalaBear.verify.completeness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.combine_evals` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.eval_constraints_poly` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.fold.restrict` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.fold.row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.iteration.claim` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.parse_with_round.history` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.play_query_indices.count` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.play_query_indices.opened` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.play_query_indices.range` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.query_summand_depths.sum` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.round.claim` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.round.weight` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.schedule.later_fold_exceeds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.schedule.valid` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.stratified_index.stratum` | `Quot.sound`, `propext` |
+| `Whir.sumcheck.rounds` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.two_adic_generator.panics` | `propext` |
+| `Whir.verify.completeness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.verify.no_panic` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.verify.round_count` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.verify.unexpected_final_sumcheck` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.weight.ood` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.weight.query` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.zk.eval_ze_star_n` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.zk.padded_ood` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.zk.padded_ood_bijective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `Whir.zk.padded_ood_zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.accessors` | `Quot.sound`, `propext` |
+| `ZkCodes.beyond_adicity` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.default_encode_batch_with_randomness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.encode_batch_with_randomness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.encode_linear` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.encode_rows` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.encode_with_randomness` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.encode_with_randomness.panics_msg_len` | `Quot.sound`, `propext` |
+| `ZkCodes.encode_with_randomness.panics_rand_len` | `Quot.sound`, `propext` |
+| `ZkCodes.encode_with_randomness.radix2Dit` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.encode_with_randomness.smallBatch` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.evaluation_point` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.evaluation_point.panics` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.message_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.new` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.new.some_iff` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.randomness_row` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.rs_generating` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.rs_isZk` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.rs_isZk_subgroup` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.rs_mem_code` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.rs_not_isZk_of_zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.rs_not_isZk_succ` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.rs_view_balanced` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.rs_view_bijective` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.sampling` | `Quot.sound`, `propext` |
+| `ZkCodes.simulate` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.simulate.t_zero` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.simulate.wraps` | `Classical.choice`, `Quot.sound`, `propext` |
+| `ZkCodes.simulate_matches_encode` | `Classical.choice`, `Quot.sound`, `propext` |
 
 ## Known warnings
 

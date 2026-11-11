@@ -5,9 +5,9 @@
 # Class:        equiv-rewrite
 # Gap:          docs/extractor-issues.md 9: every tower level reaches the level
 #               below through `TowerLevel::{from_repr, to_repr, mul_alpha}`, and
-#               `TowerLevel: Field` pulls in p3-field's trait hierarchy, which
-#               aeneas rejects as a group of mixed mutually recursive
-#               definitions.
+#               `TowerLevel: Field` pulls in p3-field's trait hierarchy. Without
+#               this patch aeneas stops: "Mixed-recursive declaration groups are
+#               not supported".
 # Cost:         none in a normal build: the copies are compiled but unused there.
 #               In the extracted variant, inherent `from_repr`, `to_repr` and
 #               `mul_alpha` shadow the `TowerLevel` methods at every call site on a
@@ -34,6 +34,9 @@
 # The differential test compares each copy with the trait method: exhaustively up
 # to `GF(2^16)`, on edge values and 10000 pseudo-random inputs above.
 # The `TowerLevel` imports that the shims leave unused are allowed under the cfg.
+#
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
 #
 --- a/binary-field/src/clmul/mod.rs
 +++ b/binary-field/src/clmul/mod.rs

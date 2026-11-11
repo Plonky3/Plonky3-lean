@@ -1,0 +1,96 @@
+# Patch:        010-import-packed-extension-iter
+# Phase:        pre
+# Target:       multilinear-util/src/eq_batch.rs, multilinear-util/src/poly/maybe_packed.rs, multilinear-util/src/poly/mod.rs, multilinear-util/src/split_eq/eq.rs, multilinear-util/src/split_eq/packed_kernel.rs
+# Hunks:        5
+# Class:        bound
+# Gap:          docs/extractor-issues.md 10 (charon#1266): baby-bear's pre 030
+#               moves `to_ext_iter` to the extension trait
+#               `PackedFieldExtensionIter` under the cfg. Without this patch
+#               p3-multilinear-util does not compile there: E0599,
+#               `to_ext_iter` not found, 17 times.
+# Cost:         none: every added line is behind cfg(hax_backend_lean), so a
+#               normal build is token for token as shipped.
+# Upstreamable: no: the imported trait exists only in the extracted variant.
+#               Dropping baby-bear's pre 030 makes this patch unnecessary.
+# Drop when:    baby-bear's pre 030 is dropped.
+# Test:         lint p3-multilinear-util unused_imports
+# Mutation:     one import loses its cfg, so a normal build names a trait
+#               that does not exist there.
+#
+# Baby-bear's pre 030 moves `to_ext_iter` onto a blanket extension trait in the extracted variant.
+#
+# A call resolves only where that trait is in scope, as pre 030 does for p3-matrix.
+#
+# Each of the five files that calls it imports the trait under the cfg.
+#
+# In two of them `PackedFieldExtension` was imported only for that call.
+#
+# Under the cfg that import is unused, so it gets `allow(unused_imports)` there, also only under the cfg.
+#
+diff --git a/multilinear-util/src/eq_batch.rs b/multilinear-util/src/eq_batch.rs
+index 2c10d82a..ad46eaa9 100644
+--- a/multilinear-util/src/eq_batch.rs
++++ b/multilinear-util/src/eq_batch.rs
+@@ -52,6 +52,8 @@
+ use alloc::vec;
+ use alloc::vec::Vec;
+ 
++#[cfg(hax_backend_lean)] // PATCHED: `to_ext_iter` lives on this trait in the extracted variant.
++use p3_field::PackedFieldExtensionIter;
+ use p3_field::{
+     Algebra, ExtensionField, Field, PackedFieldExtension, PackedValue, PrimeCharacteristicRing,
+     dot_product,
+diff --git a/multilinear-util/src/poly/maybe_packed.rs b/multilinear-util/src/poly/maybe_packed.rs
+index ddd06589..b38c580b 100644
+--- a/multilinear-util/src/poly/maybe_packed.rs
++++ b/multilinear-util/src/poly/maybe_packed.rs
+@@ -21,6 +21,9 @@
+ use alloc::vec::Vec;
+ use core::borrow::Borrow;
+ 
++#[cfg(hax_backend_lean)] // PATCHED: `to_ext_iter` lives on this trait in the extracted variant.
++use p3_field::PackedFieldExtensionIter;
++#[cfg_attr(hax_backend_lean, allow(unused_imports))] // PATCHED: only `to_ext_iter` uses one of these.
+ use p3_field::{ExtensionField, Field, PackedFieldExtension, PackedValue};
+ use p3_util::log2_strict_usize;
+ 
+diff --git a/multilinear-util/src/poly/mod.rs b/multilinear-util/src/poly/mod.rs
+index 378b65fd..97f7e7f0 100644
+--- a/multilinear-util/src/poly/mod.rs
++++ b/multilinear-util/src/poly/mod.rs
+@@ -6,6 +6,8 @@ use core::borrow::Borrow;
+ use core::marker::PhantomData;
+ 
+ pub use maybe_packed::{PolyMaybePacked, PolyMaybePackedView};
++#[cfg(hax_backend_lean)] // PATCHED: `to_ext_iter` lives on this trait in the extracted variant.
++use p3_field::PackedFieldExtensionIter;
+ use p3_field::{
+     Algebra, ExtensionField, Field, PackedFieldExtension, PackedValue, PrimeCharacteristicRing,
+ };
+diff --git a/multilinear-util/src/split_eq/eq.rs b/multilinear-util/src/split_eq/eq.rs
+index bacabef8..7d02019c 100644
+--- a/multilinear-util/src/split_eq/eq.rs
++++ b/multilinear-util/src/split_eq/eq.rs
+@@ -15,6 +15,8 @@
+ //! Evaluating eq(z, .) over all x in {0,1}^k produces a table of 2^k values.
+ 
+ use itertools::Itertools;
++#[cfg(hax_backend_lean)] // PATCHED: `to_ext_iter` lives on this trait in the extracted variant.
++use p3_field::PackedFieldExtensionIter;
+ use p3_field::{ExtensionField, Field, PackedFieldExtension, PackedValue, dot_product};
+ use p3_util::log2_strict_usize;
+ 
+diff --git a/multilinear-util/src/split_eq/packed_kernel.rs b/multilinear-util/src/split_eq/packed_kernel.rs
+index b99af616..8a95acf6 100644
+--- a/multilinear-util/src/split_eq/packed_kernel.rs
++++ b/multilinear-util/src/split_eq/packed_kernel.rs
+@@ -76,6 +76,9 @@
+ use core::mem::MaybeUninit;
+ 
+ use itertools::Itertools;
++#[cfg(hax_backend_lean)] // PATCHED: `to_ext_iter` lives on this trait in the extracted variant.
++use p3_field::PackedFieldExtensionIter;
++#[cfg_attr(hax_backend_lean, allow(unused_imports))] // PATCHED: only `to_ext_iter` uses one of these.
+ use p3_field::{
+     Algebra, BasedVectorSpace, ExtensionField, Field, PackedFieldExtension, PackedValue,
+     PrimeCharacteristicRing, dot_product,

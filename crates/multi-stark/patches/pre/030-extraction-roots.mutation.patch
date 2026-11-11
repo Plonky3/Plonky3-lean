@@ -1,0 +1,15 @@
+# Mutation of: 030-extraction-roots
+# Breaks:      the module is gated on a misspelled cfg.
+#
+diff --git a/multi-stark/src/lib.rs b/multi-stark/src/lib.rs
+--- a/multi-stark/src/lib.rs
++++ b/multi-stark/src/lib.rs
+@@ -40,7 +40,7 @@ pub mod transcript;
+ pub mod verifier;
+ pub mod zerocheck;
+ // PATCHED: extraction roots, only under hax's Lean backend.
+-#[cfg(hax_backend_lean)]
++#[cfg(hax_backend_lea)]
+ pub mod hax_roots;
+ 
+ pub use backend::{GenericBackend, ReprBackend, SubfieldBackend, ZerocheckBackend};

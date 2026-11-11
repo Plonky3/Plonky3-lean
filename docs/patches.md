@@ -211,3 +211,30 @@ Patches are not regenerated, and `new-patch.sh` never overwrites one.
 | Its mutation | Apply every pre patch to `plonky3/` (`tools/extract/config.py pre-patches`, in order), break what the patch promises, run `tools/extract/new-patch.sh <crate> mutation NNN-slug`, revert `plonky3/`, and run `tools/extract/check-mutations.py`. |
 | A patch no longer applies | Edit that `.patch` until `tools/extract/check-patches.sh` is green. |
 | A patch is obsolete | Delete it. Shrinking the set is the goal. |
+| The toolchain changed | Run `tools/extract/patch-necessity.py`. Delete each patch it reports as not needed, and make each surviving header's `Gap` give the failure it records. |
+
+## Is each patch still needed?
+
+`tools/extract/patch-necessity.py` answers this by experiment. For each patch,
+it runs `extract.sh --skip-tests --without <crate>/<phase>/<NNN>` in a scratch
+`EXTRACT_DIR`, and records the first step that fails without the patch:
+
+- the `cargo check` of the extracted variant (3);
+- charon or aeneas (4);
+- an `Assumptions/` file against its template (6);
+- another patch that then no longer applies (3 or 7);
+- `lake build` (8).
+
+A patch whose removal fails nothing is not needed, and the record says whether
+the generated output still changes.
+
+It restores the committed extraction after every run, and `extract.sh` restores
+`plonky3/`. Leaving a patch out says nothing about its tests or the
+upstream-test comparison (step 2 is skipped), so a patch it shrinks is then
+checked with `check-mutations.py` and `test-pre-patches.py` as usual.
+
+```
+tools/extract/patch-necessity.py                      # every patch
+tools/extract/patch-necessity.py baby-bear/post/020   # only these
+tools/extract/patch-necessity.py --list               # the patch ids
+```

@@ -1,0 +1,135 @@
+# Patch:        040-reshape-compress-from-hasher
+# Phase:        pre
+# Target:       symmetric/src/compression.rs, symmetric/src/hax_reshaped.rs
+# Hunks:        5
+# Class:        equiv-rewrite
+# Gap:          docs/extractor-issues.md 25 (the model of `flatten` needs the
+#               items to be iterators, not just `IntoIterator`).
+# Cost:         none in a normal build: only the selection is behind
+#               cfg(hax_backend_lean). In the extracted variant,
+#               `CompressionFunctionFromHasher::compress` hands the hasher a
+#               vector of the same items, which a differential test equates
+#               with the original.
+# Upstreamable: no: the original is the clearer code and allocates nothing;
+#               a `flatten` model over `IntoIterator` makes the patch
+#               unnecessary.
+# Drop when:    CoreModels' `Iterator::flatten` takes `IntoIterator` items.
+# Test:         test p3-symmetric --lib hax_reshaped
+# Mutation:     the reshaped body hands the chunks over last first, so it
+#               disagrees on every input with two distinct chunks.
+#
+# The original flattens an array of arrays, whose items are arrays and not iterators.
+# CoreModels' `flatten` takes only iterator items, so the generated call does not elaborate.
+# The reshaped body pushes the same items, in the same order, into a vector and hashes that.
+# A hasher sees the same item sequence either way.
+#
+diff --git a/symmetric/src/compression.rs b/symmetric/src/compression.rs
+index 10d3be0..b771090 100644
+--- a/symmetric/src/compression.rs
++++ b/symmetric/src/compression.rs
+@@ -106,10 +106,17 @@ where
+ {
+     const LANES: usize = <H as CryptographicHasher<T, [T; CHUNK]>>::LANES;
+ 
++    #[cfg(not(hax_backend_lean))] // PATCHED
+     fn compress(&self, input: [[T; CHUNK]; N]) -> [T; CHUNK] {
+         self.hasher.hash_iter(input.into_iter().flatten())
+     }
+ 
++    // PATCHED: the extracted variant takes the same items, collected for the extractor.
++    #[cfg(hax_backend_lean)]
++    fn compress(&self, input: [[T; CHUNK]; N]) -> [T; CHUNK] {
++        crate::hax_reshaped::compress_from_hasher::<T, H, N, CHUNK>(&self.hasher, input)
++    }
++
+     fn compress_many(&self, inputs: &[[[T; CHUNK]; N]], out: &mut [[T; CHUNK]]) {
+         // A ragged batch is a caller bug, so it fails loudly rather than dropping groups.
+         assert_eq!(
+diff --git a/symmetric/src/hax_reshaped.rs b/symmetric/src/hax_reshaped.rs
+index 541003a..72b3627 100644
+--- a/symmetric/src/hax_reshaped.rs
++++ b/symmetric/src/hax_reshaped.rs
+@@ -5,6 +5,9 @@
+ //!
+ //! Each body here runs one loop over the input and performs the same permutation calls, in the same order, as the original.
+ 
++use alloc::vec::Vec;
++
++use crate::hasher::CryptographicHasher;
+ use crate::permutation::{CryptographicPermutation, Derangement};
+ 
+ /// What the padding-free sponge returns on `input`.
+@@ -103,6 +106,29 @@ where
+     state[..OUT].try_into().unwrap()
+ }
+ 
++
++/// What the compression function built from a hasher returns on `input`.
++#[cfg_attr(not(hax_backend_lean), allow(dead_code))]
++pub(crate) fn compress_from_hasher<T, H, const N: usize, const CHUNK: usize>(
++    hasher: &H,
++    input: [[T; CHUNK]; N],
++) -> [T; CHUNK]
++where
++    T: Clone,
++    H: CryptographicHasher<T, [T; CHUNK]>,
++{
++    // The chunks, in order, as one run of N * CHUNK items.
++    //
++    //     [[a, b], [c, d]]  ->  [a, b, c, d]
++    let mut items = Vec::new();
++    for chunk in input {
++        for x in chunk {
++            items.push(x);
++        }
++    }
++    hasher.hash_iter(items)
++}
++
+ #[cfg(test)]
+ mod tests {
+     use alloc::vec::Vec;
+@@ -110,8 +136,8 @@ mod tests {
+     use proptest::prelude::*;
+ 
+     use crate::{
+-        CryptographicHasher, CryptographicPermutation, Increment, Pad10Sponge, PaddingFreeSponge,
+-        Permutation,
++        CompressionFunctionFromHasher, CryptographicHasher, CryptographicPermutation, Increment,
++        Pad10Sponge, PaddingFreeSponge, Permutation, PseudoCompressionFunction,
+     };
+ 
+     /// A position-sensitive, non-linear mixing of the whole state.
+@@ -203,4 +229,32 @@ mod tests {
+             check_pad10::<12, 8, 4>(&input);
+         }
+     }
++
++    fn check_compress<const N: usize, const CHUNK: usize>(input: [[u64; CHUNK]; N]) {
++        // A padding-free sponge over the mixing permutation is order sensitive, as a hasher must be.
++        let hasher = PaddingFreeSponge::<Mix, 16, 8, CHUNK>::new(Mix);
++        let original = CompressionFunctionFromHasher::<_, N, CHUNK>::new(hasher.clone()).compress(input);
++        let reshaped = super::compress_from_hasher::<u64, _, N, CHUNK>(&hasher, input);
++        assert_eq!(original, reshaped);
++    }
++
++    #[test]
++    fn compress_from_hasher_matches_on_edge_inputs() {
++        // Fixture state: distinct items, so a reordering of chunks or of items shows up.
++        //
++        //     N = 2, CHUNK = 4:  [[0, 1, 2, 3], [4, 5, 6, 7]]  ->  hash of [0, 1, ..., 7]
++        check_compress::<2, 4>(core::array::from_fn(|n| core::array::from_fn(|i| (4 * n + i) as u64)));
++        check_compress::<3, 2>(core::array::from_fn(|n| core::array::from_fn(|i| (2 * n + i) as u64)));
++        check_compress::<1, 8>([[u64::MAX; 8]]);
++        check_compress::<2, 1>([[0], [1]]);
++        check_compress::<4, 8>([[0; 8]; 4]);
++    }
++
++    proptest! {
++        #[test]
++        fn compress_from_hasher_matches(input in any::<[[u64; 4]; 2]>(), wide in any::<[[u64; 8]; 3]>()) {
++            check_compress::<2, 4>(input);
++            check_compress::<3, 8>(wide);
++        }
++    }
+ }

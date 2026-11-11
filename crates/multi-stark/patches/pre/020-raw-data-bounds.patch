@@ -1,0 +1,153 @@
+# Patch:        020-raw-data-bounds
+# Phase:        pre
+# Target:       multi-stark/src/backend.rs, multi-stark/src/config.rs, multi-stark/src/contract/constraints.rs, multi-stark/src/contract/table.rs, multi-stark/src/rounds/repr.rs
+# Hunks:        11
+# Class:        bound
+# Gap:          docs/extractor-issues.md 10 (charon#1266): baby-bear's pre 020
+#               drops `Field`'s `RawDataSerializable` supertrait under the
+#               cfg. Without this patch p3-multi-stark does not compile there:
+#               E0277 and E0599, a field's bytes are not available, 4 times,
+#               and 11 more once those are bounded.
+# Cost:         none: each added bound is implied by `Field` in a normal
+#               build.
+# Upstreamable: no: the bounds are redundant upstream. Dropping baby-bear's
+#               pre 020 makes them unnecessary.
+# Drop when:    baby-bear's pre 020 is dropped.
+# Test:         test p3-multi-stark --test mixed_width
+# Mutation:     the configuration's trace field must also be an iterator,
+#               which `TranscriptField` does not imply, so the test's
+#               configuration no longer compiles.
+#
+# Two places read a field element's bytes:
+#
+# - the contract encodes the constraints of each table, scalar by scalar;
+# - the representation backend indexes a lookup table by an element's first byte.
+#
+# Under the cfg `Field` no longer implies the serialization, so each bound on the way states it.
+#
+# The configuration trait states it on its trace and challenge fields, which covers the verifier's entry points.
+#
+# Every one of the 15 is needed: removing any one fails the cfg build.
+#
+# In a normal build `Field` implies each bound, so the upstream configurations still satisfy the trait.
+#
+diff --git a/multi-stark/src/backend.rs b/multi-stark/src/backend.rs
+--- a/multi-stark/src/backend.rs
++++ b/multi-stark/src/backend.rs
+@@ -262,7 +262,7 @@ impl<F, EF, A, S, R, const LATE_MATERIALIZATION: bool> private::Dispatch<F, EF,
+     for ReprBackend<S, R, LATE_MATERIALIZATION>
+ where
+     S: Field,
+-    F: HasSubfield<S>,
++    F: HasSubfield<S> + p3_field::RawDataSerializable, // PATCHED: was `HasSubfield<S>`
+     EF: ExtensionField<F> + HasSubfield<S> + From<R>,
+     R: Field + Algebra<F> + From<EF>,
+     R::Packing: Algebra<F::Packing>,
+diff --git a/multi-stark/src/config.rs b/multi-stark/src/config.rs
+--- a/multi-stark/src/config.rs
++++ b/multi-stark/src/config.rs
+@@ -29,7 +29,7 @@ pub trait MultiStarkConfig {
+     ///
+     /// The transcript requires an injective byte encoding for its domain separator.
+     /// Both supported prime fields and binary tower fields provide one.
+-    type Val: TranscriptField;
++    type Val: TranscriptField + p3_field::RawDataSerializable; // PATCHED: was `TranscriptField`
+ 
+     /// Extension field that challenges are drawn from.
+     ///
+@@ -37,7 +37,7 @@ pub trait MultiStarkConfig {
+     /// `ExtensionField` also admits the base field itself; that is appropriate
+     /// for sufficiently large fields, but does not enforce a security minimum.
+     /// Use [`crate::verify_with_security`] to enforce an explicit target.
+-    type Challenge: ExtensionField<Self::Val>;
++    type Challenge: ExtensionField<Self::Val> + p3_field::RawDataSerializable; // PATCHED: was `ExtensionField<Self::Val>`
+ 
+     /// Fiat-Shamir transcript used to derive challenges and absorb commitments.
+     type Challenger;
+diff --git a/multi-stark/src/contract/constraints.rs b/multi-stark/src/contract/constraints.rs
+--- a/multi-stark/src/contract/constraints.rs
++++ b/multi-stark/src/contract/constraints.rs
+@@ -34,8 +34,8 @@ pub(super) fn encode<F, EF, A>(
+     buses: &BusSymbolicBuilder<F, EF>,
+ ) -> Vec<u8>
+ where
+-    F: Field,
+-    EF: ExtensionField<F>,
++    F: Field + p3_field::RawDataSerializable, // PATCHED: was `Field`
++    EF: ExtensionField<F> + p3_field::RawDataSerializable, // PATCHED: was `ExtensionField<F>`
+     A: BaseAir<F> + Air<InteractionSymbolicBuilder<F, EF>>,
+ {
+     let mut arena = Arena::default();
+@@ -267,7 +267,7 @@ trait Leaf {
+     fn write(&self, arena: &mut Arena);
+ }
+ 
+-impl<F: Field> Leaf for BaseLeaf<F> {
++impl<F: Field + p3_field::RawDataSerializable> Leaf for BaseLeaf<F> { // PATCHED: the bound on `F` was `Field`
+     fn write(&self, arena: &mut Arena) {
+         match self {
+             Self::Variable(variable) => {
+@@ -297,7 +297,7 @@ impl<F: Field> Leaf for BaseLeaf<F> {
+     }
+ }
+ 
+-impl<F: Field, EF: ExtensionField<F>> Leaf for ExtLeaf<F, EF> {
++impl<F: Field + p3_field::RawDataSerializable, EF: ExtensionField<F> + p3_field::RawDataSerializable> Leaf for ExtLeaf<F, EF> { // PATCHED: the bound on `EF` was `ExtensionField<F>`
+     fn write(&self, arena: &mut Arena) {
+         match self {
+             Self::Base(expression) => {
+diff --git a/multi-stark/src/contract/table.rs b/multi-stark/src/contract/table.rs
+--- a/multi-stark/src/contract/table.rs
++++ b/multi-stark/src/contract/table.rs
+@@ -174,8 +174,8 @@ impl TableDeclaration {
+     #[must_use]
+     pub fn from_constraints<F, EF, A>(table: &A, heights: HeightRange) -> Self
+     where
+-        F: Field,
+-        EF: ExtensionField<F>,
++        F: Field + p3_field::RawDataSerializable, // PATCHED: was `Field`
++        EF: ExtensionField<F> + p3_field::RawDataSerializable, // PATCHED: was `ExtensionField<F>`
+         A: BaseAir<F> + Air<InteractionSymbolicBuilder<F, EF>> + Air<BusSymbolicBuilder<F, EF>>,
+     {
+         let layout = AirLayout::from_air::<F>(table);
+@@ -320,8 +320,8 @@ impl TableDeclaration {
+     /// The height range is left out, because no constraint system fixes it.
+     pub(super) fn disagreement<F, EF, A>(&self, table: &A) -> Option<&'static str>
+     where
+-        F: Field,
+-        EF: ExtensionField<F>,
++        F: Field + p3_field::RawDataSerializable, // PATCHED: was `Field`
++        EF: ExtensionField<F> + p3_field::RawDataSerializable, // PATCHED: was `ExtensionField<F>`
+         A: BaseAir<F> + Air<InteractionSymbolicBuilder<F, EF>> + Air<BusSymbolicBuilder<F, EF>>,
+     {
+         let read = Self::from_constraints::<F, EF, A>(table, self.heights);
+diff --git a/multi-stark/src/rounds/repr.rs b/multi-stark/src/rounds/repr.rs
+--- a/multi-stark/src/rounds/repr.rs
++++ b/multi-stark/src/rounds/repr.rs
+@@ -107,7 +107,7 @@ pub(super) struct LaneRound<P> {
+ 
+ /// The table entry of a trace-field element: the first byte of its serialization.
+ #[inline]
+-fn table_index<F: Field>(value: F) -> usize {
++fn table_index<F: Field + p3_field::RawDataSerializable>(value: F) -> usize { // PATCHED: the bound on `F` was `Field`
+     value.into_bytes().into_iter().next().map_or(0, usize::from)
+ }
+ 
+@@ -141,7 +141,7 @@ impl<R: Field> SubfieldFoldTables<R> {
+     fn new<S, F, EF>(r: EF) -> Option<Self>
+     where
+         S: Field,
+-        F: HasSubfield<S>,
++        F: HasSubfield<S> + p3_field::RawDataSerializable, // PATCHED: was `HasSubfield<S>`
+         EF: ExtensionField<F>,
+         R: From<EF>,
+     {
+@@ -184,7 +184,7 @@ impl<R: Field> SubfieldFoldTables<R> {
+ 
+ impl<'air, 'data, A, F, EF> RoundStateBase<'air, 'data, A, F, EF>
+ where
+-    F: Field,
++    F: Field + p3_field::RawDataSerializable, // PATCHED: was `Field`
+     EF: ExtensionField<F>,
+     A: BaseAir<F>,
+ {

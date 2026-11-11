@@ -1,0 +1,508 @@
+# p3-bus: the binary-native multiset bus, its grand-product reduction, and its memory arguments.
+
+lean_lib = "P3Bus"
+
+# The integer helpers are extracted: a direction's position, the boundary rows, and the RAM payload widths.
+#
+# Most other items are generic over the field traits or the builder, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# They are transcribed in extraction/P3Bus/Mirror/, with the abstractions each file's header lists.
+state = "scoped"
+
+features = []
+
+# One root: the `hax_roots` module that pre-patch 010 adds under cfg(hax_backend_lean).
+# Each of its functions calls one item.
+start_from = ["p3_bus::hax_roots"]
+
+watch = ["bus/src", "bus/Cargo.toml", "security/src/bus.rs", "multilinear-util/src/point.rs", "sumcheck/src/generic_degree"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_bus.mirror.BusDirection"
+rust = "p3_bus::direction::BusDirection"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusDirection.index"
+rust = "p3_bus::direction::BusDirection::index"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusDirection.ALL"
+rust = "p3_bus::direction::BusDirection::ALL"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusNameError"
+rust = "p3_bus::name::BusNameError"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusName.MAX_LEN"
+rust = "p3_bus::name::BusName::MAX_LEN"
+
+[[mirror]]
+lean = "p3_bus.mirror.isAsciiAlphabetic"
+rust = "core::num::u8::is_ascii_alphabetic"
+
+[[mirror]]
+lean = "p3_bus.mirror.isAsciiAlphanumeric"
+rust = "core::num::u8::is_ascii_alphanumeric"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusName.try_new"
+rust = "p3_bus::name::BusName::try_new"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusBoundary"
+rust = "p3_bus::builder::BusBoundary"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusBoundary.contains_row"
+rust = "p3_bus::builder::BusBoundary::contains_row"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusActivation"
+rust = "p3_bus::builder::BusActivation"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusBuilder"
+rust = "p3_bus::builder::BusInteractionRecorder"
+
+[[mirror]]
+lean = "p3_bus.mirror.BusBuilder.push_bus_interaction"
+rust = "p3_bus::builder::BusInteractionBuilder::push_bus_interaction"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.MAX_RAM_BIT_WIDTH"
+rust = "p3_bus::ram::statement::MAX_RAM_BIT_WIDTH"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.MIN_RAM_ACCESS_COUNT"
+rust = "p3_bus::ram::statement::MIN_RAM_ACCESS_COUNT"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamBoundary"
+rust = "p3_bus::ram::statement::RamBoundary"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamBoundary.is_segment"
+rust = "p3_bus::ram::statement::RamBoundary::is_segment"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamBoundary.image_buses"
+rust = "p3_bus::ram::statement::RamBoundary::image_buses"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamStatement"
+rust = "p3_bus::ram::statement::RamStatement"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamError"
+rust = "p3_bus::ram::error::RamError"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamStatement.access_payload_width"
+rust = "p3_bus::ram::statement::RamStatement::access_payload_width"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamStatement.image_payload_width"
+rust = "p3_bus::ram::statement::RamStatement::image_payload_width"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamStatement.validate"
+rust = "p3_bus::ram::statement::RamStatement::validate"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamStatement.leaf_contribution"
+rust = "p3_bus::ram::statement::RamStatement::leaf_contribution"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamLayout"
+rust = "p3_bus::ram::statement::RamLayout"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.checked_add"
+rust = "core::num::usize::checked_add"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.take"
+rust = "p3_bus::ram::statement::RamLayout::new"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamLayout.new"
+rust = "p3_bus::ram::statement::RamLayout::new"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamLayout.access_columns"
+rust = "p3_bus::ram::statement::RamLayout::access_columns"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamLayout.image_columns"
+rust = "p3_bus::ram::statement::RamLayout::image_columns"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamAir"
+rust = "p3_bus::ram::air::RamAir"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamAir.new"
+rust = "p3_bus::ram::air::RamAir::new"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.slice"
+rust = "core::slice::index::Index::index"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.xor"
+rust = "p3_bus::ram::air::xor"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.xor3"
+rust = "p3_bus::ram::air::xor3"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.majority"
+rust = "p3_bus::ram::air::majority"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.or"
+rust = "p3_bus::ram::air::or"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.assert_strict_increase"
+rust = "p3_bus::ram::air::assert_strict_increase"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamAir.eval_booleanity"
+rust = "p3_bus::ram::air::RamAir::eval_booleanity"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamAir.eval_run_start"
+rust = "p3_bus::ram::air::RamAir::eval_run_start"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamAir.eval_order"
+rust = "p3_bus::ram::air::RamAir::eval_order"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamAir.eval_run_marker"
+rust = "p3_bus::ram::air::RamAir::eval_run_marker"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.channel"
+rust = "p3_bus::ram::statement::channel"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamAir.declare"
+rust = "p3_bus::ram::air::RamAir::declare"
+
+[[mirror]]
+lean = "p3_bus.ram.mirror.RamAir.eval"
+rust = "p3_bus::ram::air::RamAir::eval"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.combine"
+rust = "p3_bus::product::math::combine"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.interpolate_pair"
+rust = "p3_bus::product::math::interpolate_pair"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.interpolate_quad"
+rust = "p3_bus::product::math::interpolate_quad"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.has_distinct_round_nodes"
+rust = "p3_bus::product::math::has_distinct_round_nodes"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrRootShape"
+rust = "p3_bus::product::shape::ProductGkrRootShape"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrShapeError"
+rust = "p3_bus::product::error::ProductGkrShapeError"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrError"
+rust = "p3_bus::product::error::ProductGkrError"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.USIZE_MAX"
+rust = "core::num::usize::MAX"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrShape"
+rust = "p3_bus::product::shape::ProductGkrShape"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrShape.new"
+rust = "p3_bus::product::shape::ProductGkrShape::new"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrShape.root_message_len"
+rust = "p3_bus::product::shape::ProductGkrShape::root_message_len"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.layersLoop"
+rust = "p3_bus::product::shape::ProductGkrShape::layers"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrShape.layers"
+rust = "p3_bus::product::shape::ProductGkrShape::layers"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrShape.identity_padding_evaluation"
+rust = "p3_bus::product::shape::ProductGkrShape::identity_padding_evaluation"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrRootShape.encode"
+rust = "p3_bus::product::shape::ProductGkrRootShape::encode"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrRootShape.decode"
+rust = "p3_bus::product::shape::ProductGkrRootShape::decode"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrLayerProof"
+rust = "p3_bus::product::proof::ProductGkrLayerProof"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ROUND_POLY_LEN"
+rust = "p3_bus::product::proof::ROUND_POLY_LEN"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrProof"
+rust = "p3_bus::product::proof::ProductGkrProof"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrOutput"
+rust = "p3_bus::product::proof::ProductGkrOutput"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrProof.validate_shape"
+rust = "p3_bus::product::proof::ProductGkrProof::validate_shape"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.VerifierTranscript"
+rust = "p3_bus::product::transcript::ProductGkrVerifierTranscript"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.VerifyState"
+rust = "p3_bus::product::proof::ProductGkrProof::verify"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.verify_layer"
+rust = "p3_bus::product::proof::ProductGkrProof::verify"
+
+[[mirror]]
+lean = "p3_bus.product.mirror.ProductGkrProof.verify"
+rust = "p3_bus::product::proof::ProductGkrProof::verify"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.log2_ceil_usize"
+rust = "p3_util::log2_ceil_usize"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.checked_next_power_of_two"
+rust = "core::num::usize::checked_next_power_of_two"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.checked_add"
+rust = "core::num::usize::checked_add"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusDomain"
+rust = "p3_bus::plan::BusDomain"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusDomain.identity_bit"
+rust = "p3_bus::plan::BusDomain::identity_bit"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusTupleSlot"
+rust = "p3_bus::plan::BusTupleSlot"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusBlockOwner"
+rust = "p3_bus::plan::BusBlockOwner"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusBlock"
+rust = "p3_bus::plan::BusBlock"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusSecurityGeometry"
+rust = "p3_bus::plan::BusSecurityGeometry"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusPlan"
+rust = "p3_bus::plan::BusPlan"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusPlan.tuple_slot"
+rust = "p3_bus::plan::BusPlan::tuple_slot"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusPlan.blocks"
+rust = "p3_bus::plan::BusPlan::blocks"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.UnsupportedBusAccess"
+rust = "p3_bus::plan::UnsupportedBusAccess"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusExpressionLocation"
+rust = "p3_bus::plan::BusExpressionLocation"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusPlanError"
+rust = "p3_bus::plan::error::BusPlanError"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.SymbolicBusInteraction"
+rust = "p3_bus::builder::SymbolicBusInteraction"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusPlanInput"
+rust = "p3_bus::plan::BusPlanInput"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.leafAccess"
+rust = "p3_bus::plan::validate_expression"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.validateWalk"
+rust = "p3_bus::plan::validate_expression"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.validate_expression"
+rust = "p3_bus::plan::validate_expression"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.validate_interaction"
+rust = "p3_bus::plan::validate_interaction"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.PendingBlock"
+rust = "p3_bus::plan::PendingBlock"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.pendingLe"
+rust = "p3_bus::plan::BusPlan::build"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.collectWidths"
+rust = "p3_bus::plan::BusPlan::build"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.layoutBlocks"
+rust = "p3_bus::plan::BusPlan::build"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.BusPlan.build"
+rust = "p3_bus::plan::BusPlan::build"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.BusEvaluation"
+rust = "p3_bus::evaluation::BusEvaluation"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.BusNode"
+rust = "p3_bus::evaluation::BusNode"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.BusEvaluationError"
+rust = "p3_bus::evaluation::error::BusEvaluationError"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.compile_leaf"
+rust = "p3_bus::evaluation::compile_leaf"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.compile_expression"
+rust = "p3_bus::evaluation::compile_expression"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.fingerprint_weights"
+rust = "p3_bus::argument::BusChallenges::fingerprint_weights"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.BusFactorPlan"
+rust = "p3_bus::evaluation::BusFactorPlan"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.nodeValue"
+rust = "p3_bus::evaluation::BusFactorPlan::evaluate"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.BusFactorPlan.evaluate"
+rust = "p3_bus::evaluation::BusFactorPlan::evaluate"
+
+[[mirror]]
+lean = "p3_bus.evaluation.mirror.BusPlan.compile_factor"
+rust = "p3_bus::evaluation::BusPlan::compile_factor"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.CLOCK_RANGE_BITS"
+rust = "p3_bus::timestamped::CLOCK_RANGE_BITS"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.CLOCK_GAP_BITS"
+rust = "p3_bus::timestamped::CLOCK_GAP_BITS"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.TimestampedMemoryError"
+rust = "p3_bus::timestamped::error::TimestampedMemoryError"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.clock_orbit"
+rust = "p3_bus::timestamped::clock_orbit"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.check_orbit"
+rust = "p3_bus::timestamped::TimestampedMemory::new"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.check_accesses"
+rust = "p3_bus::timestamped::TimestampedMemory::check_against"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.high_step"
+rust = "p3_bus::timestamped::high_step"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.gap_factors"
+rust = "p3_bus::timestamped::TimestampedMemory::gap_factors"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.slot_offset"
+rust = "p3_bus::timestamped::TimestampedMemory::slot_offset"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.ClockRangeAir.low"
+rust = "p3_bus::timestamped::air::ClockRangeAir::low"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.ClockRangeAir.high"
+rust = "p3_bus::timestamped::air::ClockRangeAir::high"
+
+[[mirror]]
+lean = "p3_bus.timestamped.mirror.gap_constraint"
+rust = "p3_bus::timestamped::TimestampedMemoryInteractionBuilder::timestamped_access"
+
+[[mirror]]
+lean = "p3_bus.security.mirror.BusSecurityDims"
+rust = "p3_security::bus::ProductGkrSecurityProfile"
+
+[[mirror]]
+lean = "p3_bus.security.mirror.BusPlan.security_dims"
+rust = "p3_bus::security::BusPlan::security_model"
+
+[[mirror]]
+lean = "p3_bus.security.mirror.components"
+rust = "p3_security::bus::BusSecurityModel::components"
+
+[[mirror]]
+lean = "p3_bus.plan.mirror.layoutStep"
+rust = "p3_bus::plan::BusPlan::build"

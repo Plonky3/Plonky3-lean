@@ -3,10 +3,11 @@
 # Target:       blake3/src/lib.rs, blake3/src/hax_reshaped/mod.rs, blake3/src/hax_reshaped/compress.rs, blake3/src/hax_reshaped/lanes/mod.rs, blake3/src/hax_reshaped/lanes/portable.rs
 # Hunks:        5
 # Class:        equiv-rewrite
-# Gap:          docs/extractor-issues.md 14 (no model of `IterMut`,
-#               `as_chunks` or `as_chunks_mut`), 12 (raw-pointer reads) and 17
-#               (loops under a borrowed `&Lanes`; the backend trait recursing
-#               with the tree).
+# Gap:          docs/extractor-issues.md 14 (no model of `IterMut`, `as_chunks`
+#               or `as_chunks_mut`), 12 (raw-pointer reads) and 17 (loops under
+#               a borrowed `&Lanes`; the backend trait recursing with the
+#               tree). Without this patch aeneas stops ("Arrow types are not
+#               supported yet", then an internal error).
 # Cost:         none in a normal build: the reshaped driver is compiled only
 #               under cfg(hax_backend_lean), as the crate's `batch` module, and
 #               under cfg(test), beside the shipped one. The extracted variant
@@ -26,6 +27,9 @@
 # The tree calls `subtree`, `chunk` and `parent` directly instead of through the backend trait, which loses the per-backend target features and nothing else.
 # Only the one-lane backend is kept, with no run-time dispatch and no hand-scheduled kernel hook.
 # The differential test runs it beside the shipped driver and `blake3::hash` on every block and chunk boundary and on random batches.
+#
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
 #
 --- a/blake3/src/lib.rs
 +++ b/blake3/src/lib.rs

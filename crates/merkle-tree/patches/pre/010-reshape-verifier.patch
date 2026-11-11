@@ -1,0 +1,817 @@
+# Patch:        010-reshape-verifier
+# Phase:        pre
+# Target:       merkle-tree/src/hiding_mmcs.rs, merkle-tree/src/mmcs/batch.rs, merkle-tree/src/mmcs/hax_reshaped.rs, merkle-tree/src/mmcs/mod.rs
+# Hunks:        6
+# Class:        equiv-rewrite
+# Gap:          docs/extractor-issues.md 30 (aeneas stops on the signatures of
+#               the iterator adapters the shipped verifier calls) and 31 (aeneas
+#               rejects a loop that pushes shared slices into a vector).
+# Cost:         none in a normal build: only the selection is behind
+#               cfg(hax_backend_lean). In the extracted variant, the single-index
+#               verifier and the hiding verifier call the reshaped bodies, which
+#               a differential test equates with the shipped ones.
+# Upstreamable: no: the shipped bodies are the clearer code; aeneas support for
+#               iterator adapters and borrowed slices in vectors makes the patch
+#               unnecessary.
+# Drop when:    aeneas translates the itertools adapters and a vector of borrowed
+#               slices.
+# Test:         test p3-merkle-tree --lib hax_reshaped
+# Mutation:     the reshaped verifier puts the injected rows' digest in the first
+#               slot of the injection instead of the second, so every opening of
+#               a batch with a shorter matrix disagrees with the shipped verifier.
+#
+# The shipped verifier sorts the matrices with an iterator adapter and walks them with a peekable iterator.
+# The reshaped body sorts the indices by insertion, tallest first with ties in input order, and walks them with a position.
+# It makes the same checks, in the same order, and the same hash and compression calls.
+#
+# The leaf and injection hashes take the rows through a small iterator over the sorted indices.
+# A vector of row slices built in a loop does not extract.
+#
+# The hiding verifier gets the same treatment: it salts the rows with indexed loops.
+#
+diff --git a/merkle-tree/src/hiding_mmcs.rs b/merkle-tree/src/hiding_mmcs.rs
+index 0f01bbb1..62b669da 100644
+--- a/merkle-tree/src/hiding_mmcs.rs
++++ b/merkle-tree/src/hiding_mmcs.rs
+@@ -168,6 +168,28 @@ where
+         prover_data.leaves.iter().map(|mat| &mat.left).collect()
+     }
+ 
++    // PATCHED: the extracted variant takes the same body, reshaped for the extractor.
++    #[cfg(hax_backend_lean)]
++    fn verify_batch(
++        &self,
++        commit: &Self::Commitment,
++        dimensions: &[Dimensions],
++        index: usize,
++        batch_opening: BatchOpeningRef<'_, P::Value, Self>,
++    ) -> Result<(), Self::Error> {
++        let (opened_values, (salts, siblings)) = batch_opening.unpack();
++        crate::mmcs::hax_reshaped::hiding_verify_batch::<_, _, _, _, _, _, N, DIGEST_ELEMS, SALT_ELEMS>(
++            &self.inner,
++            commit,
++            dimensions,
++            index,
++            opened_values,
++            salts,
++            siblings,
++        )
++    }
++
++    #[cfg(not(hax_backend_lean))] // PATCHED
+     fn verify_batch(
+         &self,
+         commit: &Self::Commitment,
+diff --git a/merkle-tree/src/mmcs/batch.rs b/merkle-tree/src/mmcs/batch.rs
+index 3813a66c..37681640 100644
+--- a/merkle-tree/src/mmcs/batch.rs
++++ b/merkle-tree/src/mmcs/batch.rs
+@@ -1,4 +1,6 @@
+ //! The [`Mmcs`] trait implementation: commit, then open and verify one index or many.
++// PATCHED: the extracted variant drops the shipped verifier and its imports.
++#![cfg_attr(hax_backend_lean, allow(unused_imports))]
+ 
+ use alloc::vec::Vec;
+ use core::cmp::Reverse;
+@@ -127,6 +129,19 @@ where
+         prover_data.leaves.iter().collect()
+     }
+ 
++    // PATCHED: the extracted variant takes the same body, reshaped for the extractor.
++    #[cfg(hax_backend_lean)]
++    fn verify_batch(
++        &self,
++        commit: &Self::Commitment,
++        dimensions: &[Dimensions],
++        index: usize,
++        batch_proof: BatchOpeningRef<'_, P::Value, Self>,
++    ) -> Result<(), Self::Error> {
++        let (opened_values, opening_proof) = batch_proof.unpack();
++        super::hax_reshaped::verify_batch(self, commit, dimensions, index, opened_values, opening_proof)
++    }
++
+     /// Verifies an opened batch of rows with respect to a given commitment (Merkle cap).
+     ///
+     /// At each tree level, the verifier determines whether this level used a full
+@@ -153,6 +168,7 @@ where
+     ///
+     /// # Returns
+     /// `Ok(())` if the verification is successful; otherwise returns a verification error.
++    #[cfg(not(hax_backend_lean))] // PATCHED
+     fn verify_batch(
+         &self,
+         commit: &Self::Commitment,
+diff --git a/merkle-tree/src/mmcs/hax_reshaped.rs b/merkle-tree/src/mmcs/hax_reshaped.rs
+new file mode 100644
+index 00000000..01a042b2
+--- /dev/null
++++ b/merkle-tree/src/mmcs/hax_reshaped.rs
+@@ -0,0 +1,694 @@
++//! PATCHED: verifier bodies in a shape hax's Lean backend translates.
++//!
++//! Aeneas stops on the iterator adapters of the shipped verifier (Plonky3-lean, docs/extractor-issues.md, 30).
++//!
++//! Each body here walks the matrices with an index into a sorted list instead.
++//!
++//! It makes the same checks, hash calls and compression calls, in the same order, as the shipped one.
++
++use alloc::vec::Vec;
++
++use p3_matrix::Dimensions;
++use p3_symmetric::{CryptographicHasher, MerkleCap, PseudoCompressionFunction};
++use p3_util::log2_ceil_usize;
++
++use crate::merkle_tree::padded_len;
++use crate::MerkleTreeError::{
++    CapMismatch, EmptyBatch, IncompatibleHeights, IndexOutOfBounds, WrongBatchSize, WrongCapSize,
++    WrongHeight, WrongWidth,
++};
++use crate::{MerkleTreeError, MerkleTreeMmcs};
++
++/// The rows of the matrices `order[start..end]`, in that order, as slices.
++pub(crate) struct Rows<'a, F> {
++    opened_values: &'a [Vec<F>],
++    order: &'a [usize],
++    pos: usize,
++    end: usize,
++}
++
++impl<'a, F> Iterator for Rows<'a, F> {
++    type Item = &'a [F];
++
++    fn next(&mut self) -> Option<&'a [F]> {
++        if self.pos < self.end {
++            let row = self.opened_values[self.order[self.pos]].as_slice();
++            self.pos += 1;
++            Some(row)
++        } else {
++            None
++        }
++    }
++}
++
++/// The matrix indices, tallest first, with ties in input order.
++pub(crate) fn tallest_first(dimensions: &[Dimensions]) -> Vec<usize> {
++    let mut order: Vec<usize> = Vec::new();
++    let mut i = 0;
++    while i < dimensions.len() {
++        // Every entry at least as tall stays in front, so equal heights keep their input order.
++        let height = dimensions[i].height;
++        let mut j = 0;
++        while j < order.len() && dimensions[order[j]].height >= height {
++            j += 1;
++        }
++        order.insert(j, i);
++        i += 1;
++    }
++    order
++}
++
++/// What the height check returns on these dimensions.
++pub(crate) fn validate_heights(dimensions: &[Dimensions]) -> Result<usize, MerkleTreeError> {
++    // The tallest height, or zero for an empty batch.
++    let mut max_height = 0;
++    let mut i = 0;
++    while i < dimensions.len() {
++        if dimensions[i].height > max_height {
++            max_height = dimensions[i].height;
++        }
++        i += 1;
++    }
++    if max_height == 0 {
++        return Err(EmptyBatch);
++    }
++    let log_max_height = log2_ceil_usize(max_height);
++
++    // Each height must be the one rung of the ladder its power of two names.
++    let mut i = 0;
++    while i < dimensions.len() {
++        let height = dimensions[i].height;
++        let bits_reduced = log_max_height - log2_ceil_usize(height);
++        let expected_height = ((max_height - 1) >> bits_reduced) + 1;
++        if height != expected_height {
++            return Err(IncompatibleHeights {
++                height,
++                max_height,
++                expected_height,
++                bits_reduced,
++            });
++        }
++        i += 1;
++    }
++    Ok(max_height)
++}
++
++/// What the width check returns on these rows.
++pub(crate) fn check_widths<T>(
++    dimensions: &[Dimensions],
++    opened_values: &[Vec<T>],
++) -> Result<(), MerkleTreeError> {
++    if opened_values.len() != dimensions.len() {
++        return Err(WrongBatchSize {
++            expected: dimensions.len(),
++            got: opened_values.len(),
++        });
++    }
++    let mut matrix = 0;
++    while matrix < dimensions.len() {
++        let width = opened_values[matrix].len();
++        if width != dimensions[matrix].width {
++            return Err(WrongWidth {
++                matrix,
++                expected: dimensions[matrix].width,
++                got: width,
++            });
++        }
++        matrix += 1;
++    }
++    Ok(())
++}
++
++/// What the arity choice returns, with the remaining matrices `order[from..]`.
++pub(crate) fn select_arity_step<const N: usize>(
++    curr_height_padded: usize,
++    leaf_height_npt: usize,
++    dimensions: &[Dimensions],
++    order: &[usize],
++    from: usize,
++) -> usize {
++    if curr_height_padded < N {
++        return 2;
++    }
++    let n_ary_target = (curr_height_padded / N).next_power_of_two();
++
++    // A matrix that lands between here and the next N-ary layer forces a binary step.
++    let mut k = from;
++    while k < order.len() {
++        let npt = dimensions[order[k]].height.next_power_of_two();
++        if npt != leaf_height_npt && npt > n_ary_target {
++            return 2;
++        }
++        k += 1;
++    }
++    N
++}
++
++/// What the schedule walk returns: the full arity schedule and how many of its levels a proof walks.
++pub(crate) fn arity_schedule_and_proof_levels<const N: usize>(
++    cap_height: usize,
++    dimensions: &[Dimensions],
++) -> Result<(Vec<usize>, usize), MerkleTreeError> {
++    let max_height = validate_heights(dimensions)?;
++    let order = tallest_first(dimensions);
++    let mut curr_height_padded = padded_len(max_height, N);
++    let leaf_height_npt = max_height.next_power_of_two();
++
++    // Skip the matrices hashed into the leaf layer.
++    let mut pos = 0;
++    while pos < order.len() && dimensions[order[pos]].height.next_power_of_two() == leaf_height_npt
++    {
++        pos += 1;
++    }
++
++    let mut schedule = Vec::new();
++    while curr_height_padded > 1 {
++        let step = select_arity_step::<N>(
++            curr_height_padded,
++            leaf_height_npt,
++            dimensions,
++            &order,
++            pos,
++        );
++        schedule.push(step);
++        let logical_next = curr_height_padded / step;
++        curr_height_padded = padded_len(logical_next, N);
++
++        // Consume the matrices injected at the next layer.
++        let logical_next_npt = logical_next.next_power_of_two();
++        if pos < order.len() {
++            let next_height = dimensions[order[pos]].height;
++            if next_height.next_power_of_two() == logical_next_npt {
++                while pos < order.len() && dimensions[order[pos]].height == next_height {
++                    pos += 1;
++                }
++            }
++        }
++    }
++
++    let total_levels = schedule.len();
++    let effective_cap_height = if cap_height < total_levels {
++        cap_height
++    } else {
++        total_levels
++    };
++    Ok((schedule, total_levels - effective_cap_height))
++}
++
++/// What the cap-size check returns.
++pub(crate) fn check_cap_size<F, D, const N: usize>(
++    cap_height: usize,
++    commit: &MerkleCap<F, D>,
++    dimensions: &[Dimensions],
++) -> Result<(), MerkleTreeError> {
++    let (schedule, proof_levels) = arity_schedule_and_proof_levels::<N>(cap_height, dimensions)?;
++    let mut expected = 1;
++    let mut l = proof_levels;
++    while l < schedule.len() {
++        expected *= schedule[l];
++        l += 1;
++    }
++    if commit.num_roots() != expected {
++        return Err(WrongCapSize {
++            expected,
++            got: commit.num_roots(),
++        });
++    }
++    Ok(())
++}
++
++/// What the single-index verifier returns.
++pub(crate) fn verify_batch<P, PW, F, W, H, C, const N: usize, const DIGEST_ELEMS: usize>(
++    mmcs: &MerkleTreeMmcs<P, PW, H, C, N, DIGEST_ELEMS>,
++    commit: &MerkleCap<F, [W; DIGEST_ELEMS]>,
++    dimensions: &[Dimensions],
++    mut index: usize,
++    opened_values: &[Vec<F>],
++    opening_proof: &[[W; DIGEST_ELEMS]],
++) -> Result<(), MerkleTreeError>
++where
++    F: Clone,
++    W: Copy + Default + PartialEq,
++    H: CryptographicHasher<F, [W; DIGEST_ELEMS]>,
++    C: PseudoCompressionFunction<[W; DIGEST_ELEMS], N>,
++{
++    if dimensions.len() != opened_values.len() {
++        return Err(WrongBatchSize {
++            expected: dimensions.len(),
++            got: opened_values.len(),
++        });
++    }
++    let max_height = validate_heights(dimensions)?;
++
++    check_cap_size::<F, [W; DIGEST_ELEMS], N>(mmcs.cap_height, commit, dimensions)?;
++    let (mut arity_schedule, proof_levels) =
++        arity_schedule_and_proof_levels::<N>(mmcs.cap_height, dimensions)?;
++    arity_schedule.truncate(proof_levels);
++    let mut expected_proof_len = 0;
++    let mut l = 0;
++    while l < arity_schedule.len() {
++        expected_proof_len += arity_schedule[l] - 1;
++        l += 1;
++    }
++    if opening_proof.len() != expected_proof_len {
++        return Err(WrongHeight {
++            expected_proof_len,
++            num_siblings: opening_proof.len(),
++        });
++    }
++
++    check_widths(dimensions, opened_values)?;
++
++    let order = tallest_first(dimensions);
++    let mut curr_height_padded = padded_len(max_height, N);
++
++    if index >= max_height {
++        return Err(IndexOutOfBounds { max_height, index });
++    }
++
++    // Hash the rows of the matrices in the leaf layer.
++    let leaf_height_npt = max_height.next_power_of_two();
++    let mut pos = 0;
++    while pos < order.len() && dimensions[order[pos]].height.next_power_of_two() == leaf_height_npt
++    {
++        pos += 1;
++    }
++    let mut digest: [W; DIGEST_ELEMS] = mmcs.hash.hash_iter_slices(Rows {
++        opened_values,
++        order: &order,
++        pos: 0,
++        end: pos,
++    });
++
++    let default_digest = [W::default(); DIGEST_ELEMS];
++    let mut proof_pos: usize = 0;
++
++    let mut level = 0;
++    while level < arity_schedule.len() {
++        let step = arity_schedule[level];
++        let num_siblings = step - 1;
++
++        // The path's own digest at its position, the siblings in order elsewhere, padding past the arity.
++        let pos_in_group = index % step;
++        let mut inputs = [default_digest; N];
++        let mut sibling_idx = 0;
++        let mut k = 0;
++        while k < N {
++            if k < step {
++                if k == pos_in_group {
++                    inputs[k] = digest;
++                } else {
++                    inputs[k] = opening_proof[proof_pos + sibling_idx];
++                    sibling_idx += 1;
++                }
++            }
++            k += 1;
++        }
++        proof_pos += num_siblings;
++
++        digest = mmcs.compress.compress(inputs);
++        index /= step;
++        let logical_next = curr_height_padded / step;
++        curr_height_padded = padded_len(logical_next, N);
++
++        // Mix in the rows of the matrices injected at the next layer.
++        let logical_next_npt = logical_next.next_power_of_two();
++        if pos < order.len() {
++            let next_height = dimensions[order[pos]].height;
++            if next_height.next_power_of_two() == logical_next_npt {
++                let start = pos;
++                while pos < order.len() && dimensions[order[pos]].height == next_height {
++                    pos += 1;
++                }
++                let next_height_openings_digest: [W; DIGEST_ELEMS] =
++                    mmcs.hash.hash_iter_slices(Rows {
++                        opened_values,
++                        order: &order,
++                        pos: start,
++                        end: pos,
++                    });
++
++                let mut inject_inputs = [default_digest; N];
++                inject_inputs[0] = digest;
++                inject_inputs[1] = next_height_openings_digest;
++                digest = mmcs.compress.compress(inject_inputs);
++            }
++        }
++        level += 1;
++    }
++
++    // The index now points into the cap layer.
++    let cap_index = index;
++    if cap_index < commit.num_roots() && commit[cap_index] == digest {
++        Ok(())
++    } else {
++        Err(CapMismatch)
++    }
++}
++
++/// What the hiding verifier returns, with `inner` the tree it salts.
++pub(crate) fn hiding_verify_batch<
++    P,
++    PW,
++    F,
++    W,
++    H,
++    C,
++    const N: usize,
++    const DIGEST_ELEMS: usize,
++    const SALT_ELEMS: usize,
++>(
++    inner: &MerkleTreeMmcs<P, PW, H, C, N, DIGEST_ELEMS>,
++    commit: &MerkleCap<F, [W; DIGEST_ELEMS]>,
++    dimensions: &[Dimensions],
++    index: usize,
++    opened_values: &[Vec<F>],
++    salts: &[Vec<F>],
++    siblings: &[[W; DIGEST_ELEMS]],
++) -> Result<(), MerkleTreeError>
++where
++    F: Clone,
++    W: Copy + Default + PartialEq,
++    H: CryptographicHasher<F, [W; DIGEST_ELEMS]>,
++    C: PseudoCompressionFunction<[W; DIGEST_ELEMS], N>,
++{
++    check_widths(dimensions, opened_values)?;
++
++    if opened_values.len() != salts.len() {
++        return Err(WrongBatchSize {
++            expected: opened_values.len(),
++            got: salts.len(),
++        });
++    }
++
++    // Each row followed by its salt.
++    let mut opened_salted_values: Vec<Vec<F>> = Vec::new();
++    let mut i = 0;
++    while i < opened_values.len() {
++        let mut row: Vec<F> = Vec::new();
++        let mut j = 0;
++        while j < opened_values[i].len() {
++            row.push(opened_values[i][j].clone());
++            j += 1;
++        }
++        let mut j = 0;
++        while j < salts[i].len() {
++            row.push(salts[i][j].clone());
++            j += 1;
++        }
++        opened_salted_values.push(row);
++        i += 1;
++    }
++
++    // Each width widened by the salt.
++    let mut salted_dimensions: Vec<Dimensions> = Vec::new();
++    let mut i = 0;
++    while i < dimensions.len() {
++        salted_dimensions.push(Dimensions {
++            width: dimensions[i].width + SALT_ELEMS,
++            height: dimensions[i].height,
++        });
++        i += 1;
++    }
++
++    verify_batch(
++        inner,
++        commit,
++        &salted_dimensions,
++        index,
++        &opened_salted_values,
++        siblings,
++    )
++}
++
++#[cfg(test)]
++mod tests {
++    use alloc::format;
++    use alloc::string::String;
++    use alloc::vec;
++    use alloc::vec::Vec;
++
++    use p3_commit::Mmcs;
++    use p3_matrix::dense::RowMajorMatrix;
++    use p3_matrix::{Dimensions, Matrix};
++    use p3_symmetric::{CryptographicHasher, MerkleCap, PseudoCompressionFunction};
++
++    use crate::MerkleTreeMmcs;
++
++    /// A digest of two words.
++    type D = [u64; 2];
++
++    /// A deterministic mixing hash over the flattened input stream.
++    #[derive(Clone)]
++    struct Mix;
++
++    fn mix(acc: u64, x: u64) -> u64 {
++        (acc ^ x.wrapping_add(0x9e37_79b9_7f4a_7c15))
++            .wrapping_mul(0xbf58_476d_1ce4_e5b9)
++            .rotate_left(31)
++    }
++
++    impl CryptographicHasher<u64, D> for Mix {
++        fn hash_iter<I: IntoIterator<Item = u64>>(&self, input: I) -> D {
++            let mut a = 1;
++            let mut b = 2;
++            for x in input {
++                a = mix(a, x);
++                b = mix(b, a);
++            }
++            [a, b]
++        }
++    }
++
++    impl<const N: usize> PseudoCompressionFunction<D, N> for Mix {
++        fn compress(&self, input: [D; N]) -> D {
++            self.hash_iter(input.into_iter().flatten())
++        }
++    }
++
++    type Mmcs2 = MerkleTreeMmcs<u64, u64, Mix, Mix, 2, 2>;
++    type Mmcs4 = MerkleTreeMmcs<u64, u64, Mix, Mix, 4, 2>;
++
++    /// A small deterministic stream of words.
++    struct Rng(u64);
++
++    impl Rng {
++        fn next(&mut self) -> u64 {
++            self.0 ^= self.0 << 13;
++            self.0 ^= self.0 >> 7;
++            self.0 ^= self.0 << 17;
++            self.0
++        }
++    }
++
++    /// Every height on the ladder of `max`, tallest first.
++    fn ladder(max: usize) -> Vec<usize> {
++        let log = p3_util::log2_ceil_usize(max);
++        let mut out: Vec<usize> = (0..=log).map(|k| ((max - 1) >> k) + 1).collect();
++        out.dedup();
++        out
++    }
++
++    fn show<T: core::fmt::Debug>(r: &T) -> String {
++        format!("{r:?}")
++    }
++
++    /// Compares the reshaped and the shipped verifier on one opening and its mutations.
++    fn compare<const N: usize>(
++        mmcs: &MerkleTreeMmcs<u64, u64, Mix, Mix, N, 2>,
++        commit: &MerkleCap<u64, D>,
++        dims: &[Dimensions],
++        index: usize,
++        rows: &[Vec<u64>],
++        proof: &[D],
++    ) {
++        let proof_vec = proof.to_vec();
++        let shipped =
++            mmcs.verify_batch(commit, dims, index, p3_commit::BatchOpeningRef::new(rows, &proof_vec));
++        let reshaped = super::verify_batch(mmcs, commit, dims, index, rows, proof);
++        assert_eq!(show(&shipped), show(&reshaped), "dims {dims:?} index {index}");
++    }
++
++    fn check_batch<const N: usize>(cap_height: usize, heights: &[usize], widths: &[usize], rng: &mut Rng) {
++        let mmcs = MerkleTreeMmcs::<u64, u64, Mix, Mix, N, 2>::new(Mix, Mix, cap_height);
++        let mats: Vec<RowMajorMatrix<u64>> = heights
++            .iter()
++            .zip(widths)
++            .map(|(&h, &w)| RowMajorMatrix::new((0..h * w).map(|_| rng.next() % 7).collect(), w.max(1)))
++            .collect();
++        // A width-zero matrix cannot be built from values, so widths here are at least one.
++        let dims: Vec<Dimensions> = mats.iter().map(|m| m.dimensions()).collect();
++
++        // Invariant: the schedule helpers agree on every claimed shape.
++        assert_eq!(
++            show(&super::validate_heights(&dims)),
++            show(&crate::mmcs::validate_commit_reachable_heights(dims.iter().map(|d| d.height)))
++        );
++        assert_eq!(
++            show(&super::arity_schedule_and_proof_levels::<N>(cap_height, &dims)),
++            show(&mmcs.arity_schedule_and_proof_levels(&dims))
++        );
++
++        let (commit, data) = mmcs.commit(mats);
++        let max = heights.iter().copied().max().unwrap();
++        for index in 0..max + 2 {
++            let index_open = index.min(max - 1);
++            let (rows, proof) = mmcs.open_batch(index_open, &data).unpack();
++
++            // Fixture state: the honest opening, at the queried index and past the end.
++            compare(&mmcs, &commit, &dims, index, &rows, &proof);
++
++            // Mutation: one sibling flipped, one dropped, one added.
++            if !proof.is_empty() {
++                let mut p = proof.clone();
++                p[0][0] ^= 1;
++                compare(&mmcs, &commit, &dims, index, &rows, &p);
++                compare(&mmcs, &commit, &dims, index, &rows, &proof[1..]);
++            }
++            let mut p = proof.clone();
++            p.push([0, 0]);
++            compare(&mmcs, &commit, &dims, index, &rows, &p);
++
++            // Mutation: one value changed, one row shortened, one row dropped.
++            let mut r = rows.clone();
++            r[0][0] ^= 1;
++            compare(&mmcs, &commit, &dims, index, &r, &proof);
++            let mut r = rows.clone();
++            r.last_mut().unwrap().pop();
++            compare(&mmcs, &commit, &dims, index, &r, &proof);
++            compare(&mmcs, &commit, &dims, index, &rows[1..], &proof);
++
++            // Mutation: the claimed dimensions change.
++            let mut d = dims.clone();
++            d[0].height += 1;
++            compare(&mmcs, &commit, &d, index, &rows, &proof);
++            let mut d = dims.clone();
++            d.reverse();
++            let mut r = rows.clone();
++            r.reverse();
++            compare(&mmcs, &commit, &d, index, &r, &proof);
++
++            // Mutation: a cap with one root too many.
++            let mut roots = commit.roots().to_vec();
++            roots.extend_from_slice(&roots.clone());
++            let doubled = MerkleCap::new(roots);
++            compare(&mmcs, &doubled, &dims, index, &rows, &proof);
++        }
++    }
++
++    #[test]
++    fn reshaped_verifier_matches_on_every_ladder_subset() {
++        let mut rng = Rng(0x1234_5678_9abc_def1);
++        for max in 1..=19 {
++            let ladder = ladder(max);
++            let shorter = &ladder[1..];
++            // Fixture state: the tallest matrix, plus every subset of the shorter rungs.
++            for mask in 0..(1usize << shorter.len()) {
++                let mut heights = vec![max];
++                for (bit, &h) in shorter.iter().enumerate() {
++                    if mask >> bit & 1 == 1 {
++                        heights.push(h);
++                    }
++                }
++                // A second matrix of the tallest height, to exercise a leaf group of two.
++                if mask % 3 == 0 {
++                    heights.push(max);
++                }
++                let widths: Vec<usize> = (0..heights.len()).map(|i| 1 + (i * 5 + max) % 4).collect();
++                for cap_height in [0, 1, 2, 9] {
++                    check_batch::<2>(cap_height, &heights, &widths, &mut rng);
++                    check_batch::<4>(cap_height, &heights, &widths, &mut rng);
++                    // Invariant: shuffled insertion order commits and verifies the same way.
++                    let mut rev_h = heights.clone();
++                    rev_h.reverse();
++                    let mut rev_w = widths.clone();
++                    rev_w.reverse();
++                    check_batch::<2>(cap_height, &rev_h, &rev_w, &mut rng);
++                }
++            }
++        }
++    }
++
++    #[test]
++    fn reshaped_hiding_verifier_matches() {
++        use rand::SeedableRng;
++        use rand::rngs::StdRng;
++
++        type Hiding = crate::MerkleTreeHidingMmcs<u64, u64, Mix, Mix, StdRng, 2, 2, 3>;
++        let mut rng = Rng(77);
++        for heights in [vec![8, 4, 1], vec![5, 3, 3, 1], vec![1], vec![2, 1]] {
++            let hiding = Hiding::new(Mix, Mix, 1, StdRng::seed_from_u64(5));
++            let inner = Mmcs2::new(Mix, Mix, 1);
++            let mats: Vec<RowMajorMatrix<u64>> = heights
++                .iter()
++                .enumerate()
++                .map(|(i, &h)| RowMajorMatrix::new((0..h * (i + 1)).map(|_| rng.next() % 5).collect(), i + 1))
++                .collect();
++            let dims: Vec<Dimensions> = mats.iter().map(|m| m.dimensions()).collect();
++            let (commit, data) = hiding.commit(mats);
++            for index in 0..heights[0] + 1 {
++                let (rows, (salts, siblings)) = hiding.open_batch(index.min(heights[0] - 1), &data).unpack();
++                let run = |rows: &[Vec<u64>], salts: &Vec<Vec<u64>>| {
++                    let proof = (salts.clone(), siblings.clone());
++                    let shipped =
++                        hiding.verify_batch(&commit, &dims, index, p3_commit::BatchOpeningRef::new(rows, &proof));
++                    let reshaped = super::hiding_verify_batch::<u64, u64, u64, u64, Mix, Mix, 2, 2, 3>(
++                        &inner, &commit, &dims, index, rows, salts, &siblings,
++                    );
++                    assert_eq!(show(&shipped), show(&reshaped), "heights {heights:?} index {index}");
++                };
++                // Fixture state: the honest opening.
++                run(&rows, &salts);
++                // Mutation: a salt changed, a salt shortened, a salt moved into the row.
++                let mut s2 = salts.clone();
++                s2[0][0] ^= 1;
++                run(&rows, &s2);
++                let mut s3 = salts.clone();
++                let moved = s3[0].pop().unwrap();
++                let mut r3 = rows.clone();
++                r3[0].push(moved);
++                run(&r3, &s3);
++                run(&rows, &s3);
++                // Mutation: one salt missing.
++                run(&rows, &salts[1..].to_vec());
++            }
++        }
++    }
++
++    #[test]
++    fn reshaped_helpers_match_on_claimed_shapes() {
++        // Fixture state: every claimed height pair and triple up to 12, valid or not, including zero.
++        for a in 0..=12usize {
++            for b in 0..=12usize {
++                for c in [0usize, 1, 3, 12] {
++                    let dims: Vec<Dimensions> = [a, b, c]
++                        .iter()
++                        .map(|&height| Dimensions { width: 1, height })
++                        .collect();
++                    assert_eq!(
++                        show(&super::validate_heights(&dims)),
++                        show(&crate::mmcs::validate_commit_reachable_heights(
++                            dims.iter().map(|d| d.height)
++                        ))
++                    );
++                    let mmcs2 = Mmcs2::new(Mix, Mix, 1);
++                    let mmcs4 = Mmcs4::new(Mix, Mix, 0);
++                    assert_eq!(
++                        show(&super::arity_schedule_and_proof_levels::<2>(1, &dims)),
++                        show(&mmcs2.arity_schedule_and_proof_levels(&dims))
++                    );
++                    assert_eq!(
++                        show(&super::arity_schedule_and_proof_levels::<4>(0, &dims)),
++                        show(&mmcs4.arity_schedule_and_proof_levels(&dims))
++                    );
++                }
++            }
++        }
++        // Mutation: the empty batch.
++        assert_eq!(show(&super::validate_heights(&[])), show(&crate::mmcs::validate_commit_reachable_heights([])));
++        let rows: Vec<Vec<u64>> = vec![vec![1, 2], vec![]];
++        let dims = [Dimensions { width: 2, height: 4 }, Dimensions { width: 1, height: 2 }];
++        assert_eq!(show(&super::check_widths(&dims, &rows)), show(&crate::mmcs::check_widths(&dims, &rows)));
++        assert_eq!(show(&super::check_widths(&dims, &rows[..1])), show(&crate::mmcs::check_widths(&dims, &rows[..1])));
++    }
++}
+diff --git a/merkle-tree/src/mmcs/mod.rs b/merkle-tree/src/mmcs/mod.rs
+index 3e6f48a2..3ba007b2 100644
+--- a/merkle-tree/src/mmcs/mod.rs
++++ b/merkle-tree/src/mmcs/mod.rs
+@@ -46,6 +46,9 @@ use crate::pruning::{MerkleAuthPath, PrunedMerklePaths, prune_paths, restore_pat
+ mod batch;
+ mod error;
+ mod geometry;
++// PATCHED: verifier bodies the extractor translates.
++#[cfg_attr(not(hax_backend_lean), allow(dead_code))]
++pub(crate) mod hax_reshaped;
+ mod pruned;
+ 
+ pub use error::{MerkleTreeError, PrunedProofError};

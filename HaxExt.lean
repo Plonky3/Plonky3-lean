@@ -126,6 +126,16 @@ def core.fmt.rt.Argument.new_display {T : Type} (_displayInst : core.fmt.Display
     RustM core.fmt.rt.Argument :=
   ok ⟨.Placeholder ()⟩
 
+/-- A formatted message with no arguments (`library/core/src/fmt/mod.rs`).
+
+The message type is `Unit`, so the text is not modelled.
+
+Only the panic it reaches is.
+
+p3-multilinear-util's equality polynomial formats its `assert_eq!` message with it. -/
+def core.fmt.Arguments.from_str (_s : Str) : RustM core.fmt.Arguments :=
+  ok ()
+
 /-! ## Iterators
 
 aeneas projects `fold` and `reduce` from an `Iterator` dictionary, and refers to the
@@ -199,5 +209,231 @@ def core.ops.range.Range.contains {Idx U : Type} (_ : core.cmp.PartialOrd Idx Id
     (self : core.ops.range.Range Idx) (item : U) : RustM Bool :=
   core.ops.range.RangeBounds.contains.default
     (core.ops.range.Range.Insts.CoreOpsRangeRangeBounds Idx) IdxU UIdx self item
+
+/-- `u64::trailing_zeros` (`library/core/src/num/uint_macros.rs`).
+
+It counts the trailing zero bits, and gives `64` for zero.
+
+p3-security's fixed-point ceiling logarithm calls it on a power of two. -/
+def core.num.U64.trailing_zeros (x : Std.U64) : RustM Std.U32 :=
+  ok ⟨BitVec.ofNat 32 (((List.range 64).find? fun i => x.val.testBit i).getD 64)⟩
+
+/-- `core::num::nonzero::ZeroablePrimitive` (`library/core/src/num/nonzero.rs`).
+
+It is the sealed trait of the primitives that a nonzero wrapper can hold.
+
+Only the zero test is modelled. -/
+structure core.num.nonzero.ZeroablePrimitive (T : Type) where
+  is_zero : T → Bool
+
+/-- `impl ZeroablePrimitive for u64`. -/
+def core.U64.Insts.CoreNumNonzeroZeroablePrimitiveNonZeroU64Inner :
+    core.num.nonzero.ZeroablePrimitive Std.U64 :=
+  { is_zero := fun x => x.val = 0 }
+
+/-- `core::num::NonZero<T>`, represented by its value.
+
+Its only constructor checks for zero, so every value the model builds is nonzero. -/
+def core.num.nonzero.NonZero (T : Type) : Type := T
+
+/-- `NonZero::new` (`library/core/src/num/nonzero.rs`) returns `Some` exactly for a nonzero value. -/
+def core.num.nonzero.NonZero.new {T : Type} (inst : core.num.nonzero.ZeroablePrimitive T)
+    (n : T) : RustM (core.option.Option (core.num.nonzero.NonZero T)) :=
+  ok (if inst.is_zero n then core.option.Option.None else core.option.Option.Some n)
+
+/-- `NonZero::get` (`library/core/src/num/nonzero.rs`): the wrapped value. -/
+def core.num.nonzero.NonZero.get {T : Type} (_ : core.num.nonzero.ZeroablePrimitive T)
+    (self : core.num.nonzero.NonZero T) : RustM T :=
+  ok self
+
+/-- `impl PartialEq for str` (`library/core/src/str/traits.rs`), byte-wise equality.
+
+Derived equality on a struct with a `&'static str` field calls it. -/
+def core.Str.Insts.CoreCmpPartialEqStr.eq (self other : Str) : RustM Bool :=
+  ok (decide (self = other))
+
+/-- `impl From<&str> for String` (`library/alloc/src/string.rs`): the same bytes, which a `&str` guarantees are UTF-8. -/
+def alloc.string.String.Insts.CoreConvertFromShared0Str.from (s : Str) :
+    RustM alloc.string.String :=
+  ok ((String.fromUTF8? ⟨(s.val.map fun b => b.bv.toNat.toUInt8).toArray⟩).getD "")
+
+/-- A word shifted right by the shift amount modulo the word size.
+
+Aeneas models it as a pure function, and the generated code binds it. -/
+def core.num.Usize.wrapping_shr (x : Std.Usize) (s : Std.U32) : RustM Std.Usize :=
+  ok (Aeneas.Std.core.num.Usize.wrapping_shr x s)
+
+/-- The wrapped right shift, with a flag set when the amount is at least the word size. -/
+def core.num.Usize.overflowing_shr (x : Std.Usize) (s : Std.U32) :
+    RustM (Std.Usize × Bool) :=
+  ok (Aeneas.Std.core.num.Usize.wrapping_shr x s, decide (UScalarTy.Usize.numBits ≤ s.val))
+
+/-- A word with its bits in reverse order: bit i moves to bit w - 1 - i. -/
+def core.num.Usize.reverse_bits (x : Std.Usize) : RustM Std.Usize :=
+  ok ⟨x.bv.reverse⟩
+
+/-- A vector borrowed as a slice.
+
+The model stores a vector as its elements, so this is the identity. -/
+def alloc.vec.Vec.Insts.CoreBorrowBorrowSlice (T : Type _) :
+    core.borrow.Borrow (alloc.vec.Vec T) (Slice T) :=
+  { borrow := rust_primitives.sequence.seq_to_slice }
+
+/-- A shared reference borrowed as its target.
+
+Aeneas erases shared references, so this is the identity. -/
+def core.Shared0T.Insts.CoreBorrowBorrow (T : Type _) : core.borrow.Borrow T T :=
+  { borrow := fun x => ok x }
+
+/-- Mutable borrowing.
+
+It returns the borrow and the function that writes it back, as aeneas encodes a mutable result. -/
+structure core.borrow.BorrowMut (Self : Type _) (Borrowed : Type _) where
+  coreborrowBorrowSelfBorrowedInst : core.borrow.Borrow Self Borrowed
+  borrow_mut : Self → RustM (Borrowed × (Borrowed → Self))
+
+/-- A vector borrowed mutably as a slice, the identity on the modelled elements. -/
+def alloc.vec.Vec.Insts.CoreBorrowBorrowMutSlice (T : Type _) (_A : Type _) :
+    core.borrow.BorrowMut (alloc.vec.Vec T) (Slice T) :=
+  { coreborrowBorrowSelfBorrowedInst := alloc.vec.Vec.Insts.CoreBorrowBorrowSlice T
+    borrow_mut := rust_primitives.sequence.seq_to_slice_mut }
+
+/-- The smallest power of two at least x, so 1 for 0.
+
+Rust panics on overflow in a debug build and returns 0 in a release build.
+
+This is the debug build, as for every arithmetic operation of the model. -/
+def core.num.Usize.next_power_of_two (x : Std.Usize) : RustM Std.Usize :=
+  if x.val.nextPowerOfTwo < 2 ^ UScalarTy.Usize.numBits then
+    ok ⟨BitVec.ofNat _ x.val.nextPowerOfTwo⟩
+  else fail .panic
+
+/-- The larger of two words, the second one on a tie. -/
+def core.Usize.Insts.CoreCmpOrd.max (self other : Std.Usize) : RustM Std.Usize :=
+  ok (if other < self then self else other)
+
+/-- The exact length of an iterator.
+
+The model reads the iterator's own length. -/
+def core.iter.traits.exact_size.ExactSizeIterator.len.default {Self Item : Type _}
+    (inst : core.iter.traits.exact_size.ExactSizeIterator Self Item) (self : Self) :
+    RustM Std.Usize :=
+  inst.len self
+
+/-- Exchanges the contents of two slices, and panics unless their lengths are equal. -/
+def core.slice.Slice.swap_with_slice {T : Type _} (a b : Slice T) : RustM (Slice T × Slice T) :=
+  if a.length = b.length then ok (b, a) else fail .panic
+
+/-- The length of a range of words: end - start, or 0 when start >= end. -/
+def core.ops.range.RangeUsize.Insts.CoreIterTraitsExact_sizeExactSizeIteratorUsize :
+    core.iter.traits.exact_size.ExactSizeIterator (core.ops.range.Range Std.Usize) Std.Usize := {
+  iteratorIteratorInst :=
+    core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator core.Usize.Insts.CoreIterRangeStep
+  len := fun r => ok ⟨BitVec.ofNat _ (r.«end».val - r.start.val)⟩
+}
+
+/-- Word subtraction clamped at 0.
+
+The Aeneas model of this operation has no exposed body, so nothing can be proved about it.
+
+Generated code that needs the value calls this exposed copy instead. -/
+def core.num.Usize.saturating_sub_exposed (x y : Std.Usize) : RustM Std.Usize :=
+  ok ⟨BitVec.ofNat _ (x.val - y.val)⟩
+
+/-- 64-bit subtraction clamped at 0, exposed as for the word. -/
+def core.num.U64.saturating_sub_exposed (x y : Std.U64) : RustM Std.U64 :=
+  ok ⟨BitVec.ofNat _ (x.val - y.val)⟩
+
+/-- 128-bit subtraction clamped at 0, exposed as for the word. -/
+def core.num.U128.saturating_sub_exposed (x y : Std.U128) : RustM Std.U128 :=
+  ok ⟨BitVec.ofNat _ (x.val - y.val)⟩
+
+/-- Word addition clamped at the largest word, exposed as for the subtraction. -/
+def core.num.Usize.saturating_add_exposed (x y : Std.Usize) : RustM Std.Usize :=
+  ok ⟨BitVec.ofNat _ (min (x.val + y.val) (2 ^ System.Platform.numBits - 1))⟩
+
+/-- 32-bit addition clamped at 2^32 - 1, exposed as for the word. -/
+def core.num.U32.saturating_add_exposed (x y : Std.U32) : RustM Std.U32 :=
+  ok ⟨BitVec.ofNat _ (min (x.val + y.val) (2 ^ 32 - 1))⟩
+
+/-- 64-bit addition clamped at 2^64 - 1, exposed as for the word. -/
+def core.num.U64.saturating_add_exposed (x y : Std.U64) : RustM Std.U64 :=
+  ok ⟨BitVec.ofNat _ (min (x.val + y.val) (2 ^ 64 - 1))⟩
+
+/-- 64-bit multiplication clamped at 2^64 - 1, exposed as for the word. -/
+def core.num.U64.saturating_mul_exposed (x y : Std.U64) : RustM Std.U64 :=
+  ok ⟨BitVec.ofNat _ (min (x.val * y.val) (2 ^ 64 - 1))⟩
+
+/-- Whether some item of a slice iterator satisfies a predicate.
+
+It stops at the first item that does, and returns the iterator past it. -/
+abbrev core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT.any {T F : Type _}
+    (FnInst : core.ops.function.FnMut F T Bool) :=
+  core.iter.traits.iterator.Iterator.any.default
+    (core.slice.iter.Iter.Insts.CoreIterTraitsIteratorIteratorSharedAT T) FnInst
+
+/-- An optional reference turned into an optional copy.
+
+References are erased in the model, so this is the identity. -/
+def core.option.OptionShared0T.copied {T : Type _} (_ : core.marker.Copy T)
+    (o : core.option.Option T) : RustM (core.option.Option T) :=
+  ok o
+
+/-! ## Vectors as iterator sinks and sources
+
+aeneas calls `Vec`'s `Extend` impl and the back end of a `Vec::drain`.
+
+`CoreModels` has neither. -/
+
+/-- One step of `Vec::extend`: push the next item, or stop. -/
+@[rust_loop_body]
+def alloc.vec.Vec.extend_loop.body {T I : Type}
+    (IteratorInst : core.iter.traits.iterator.Iterator I T) (v : alloc.vec.Vec T) (it : I) :
+    RustM (ControlFlow (alloc.vec.Vec T × I) (alloc.vec.Vec T)) := do
+  let (o, it') ← IteratorInst.next it
+  match o with
+  | core.option.Option.Some x =>
+    let v' ← alloc.vec.Vec.push v x
+    ok (cont (v', it'))
+  | core.option.Option.None => ok (done v)
+
+/-- `Vec::extend`'s loop: push every remaining item, in order. -/
+@[rust_loop]
+def alloc.vec.Vec.extend_loop {T I : Type}
+    (IteratorInst : core.iter.traits.iterator.Iterator I T) (v : alloc.vec.Vec T) (it : I) :
+    RustM (alloc.vec.Vec T) :=
+  loop (fun (v1, it1) => alloc.vec.Vec.extend_loop.body IteratorInst v1 it1) (v, it)
+
+/-- `impl Extend<T> for Vec<T>` (`library/alloc/src/vec/mod.rs`): push every item of the iterable, in order. -/
+def alloc.vec.Vec.Insts.CoreIterTraitsCollectExtend.extend {T I J : Type}
+    (IntoIterInst : core.iter.traits.collect.IntoIterator I T J) (self : alloc.vec.Vec T)
+    (iter : I) : RustM (alloc.vec.Vec T) := do
+  let it ← IntoIterInst.into_iter iter
+  alloc.vec.Vec.extend_loop IntoIterInst.iteratorIteratorInst self it
+
+/-- `impl<T: Copy> Extend<&T> for Vec<T>` (`library/alloc/src/vec/mod.rs`): push a copy of every item, in order. -/
+def alloc.vec.Vec.Insts.CoreIterTraitsCollectExtendSharedAT.extend {T I J : Type}
+    (_CopyInst : core.marker.Copy T) (IntoIterInst : core.iter.traits.collect.IntoIterator I T J)
+    (self : alloc.vec.Vec T) (iter : I) : RustM (alloc.vec.Vec T) :=
+  alloc.vec.Vec.Insts.CoreIterTraitsCollectExtend.extend IntoIterInst self iter
+
+/-- `DoubleEndedIterator::next_back` for `vec::Drain` (`library/alloc/src/vec/drain.rs`): remove the last drained item. -/
+def alloc.vec.drain.Drain.Insts.CoreIterTraitsDouble_endedDoubleEndedIterator.next_back
+    {T A : Type} (self : alloc.vec.drain.Drain T A) :
+    RustM (core.option.Option T × alloc.vec.drain.Drain T A) := do
+  let (s, pd) := self
+  let i ← rust_primitives.sequence.seq_len s
+  if i = 0#usize then ok (core.option.Option.None, self)
+  else
+    let j ← i - 1#usize
+    let (res, s1) ← rust_primitives.sequence.seq_remove s j
+    ok (core.option.Option.Some res, (s1, pd))
+
+@[reducible]
+def alloc.vec.drain.Drain.Insts.CoreIterTraitsDouble_endedDoubleEndedIterator (T A : Type) :
+    core.iter.traits.double_ended.DoubleEndedIterator (alloc.vec.drain.Drain T A) T := {
+  iteratorIteratorInst := alloc.vec.drain.Drain.Insts.CoreIterTraitsIteratorIterator T A
+  next_back := alloc.vec.drain.Drain.Insts.CoreIterTraitsDouble_endedDoubleEndedIterator.next_back
+}
 
 end CoreModels

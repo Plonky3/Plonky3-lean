@@ -1,0 +1,14 @@
+# Mutation of: 010-import-packed-extension-iter
+# Breaks:      one import loses its cfg, so a normal build names a trait that does not exist there.
+#
+--- a/multilinear-util/src/eq_batch.rs
++++ b/multilinear-util/src/eq_batch.rs
+@@ -52,7 +52,7 @@
+ use alloc::vec;
+ use alloc::vec::Vec;
+ 
+-#[cfg(hax_backend_lean)] // PATCHED: `to_ext_iter` lives on this trait in the extracted variant.
++// PATCHED: `to_ext_iter` lives on this trait in the extracted variant.
+ use p3_field::PackedFieldExtensionIter;
+ use p3_field::{
+     Algebra, ExtensionField, Field, PackedFieldExtension, PackedValue, PrimeCharacteristicRing,

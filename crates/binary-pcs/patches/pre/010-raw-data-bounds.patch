@@ -1,0 +1,160 @@
+# Patch:        010-raw-data-bounds
+# Phase:        pre
+# Target:       binary-pcs/src/boolean.rs, binary-pcs/src/boolean_trace.rs, binary-pcs/src/whir/boolean.rs, binary-pcs/src/whir/shape.rs
+# Hunks:        12
+# Class:        bound
+# Gap:          docs/extractor-issues.md 10 (charon#1266): baby-bear's pre 020
+#               drops `Field`'s `RawDataSerializable` supertrait under the
+#               cfg, and binary-field's pre 010 then bounds the blanket
+#               `BitCoordinates` impl on it. Without this patch rustc
+#               nightly-2026-09-17 panics on p3-binary-pcs under the cfg
+#               ("escaping bound vars"), while it reports the unmet bound on
+#               a serde derive over the bit ring switch's claims proof.
+# Cost:         none: each added bound is implied by `TowerLevel: Field` in a
+#               normal build.
+# Upstreamable: no: the bounds are redundant upstream. Dropping baby-bear's
+#               pre 020 makes them unnecessary.
+# Drop when:    baby-bear's pre 020 is dropped.
+# Test:         test p3-binary-pcs --test whir_boolean; test p3-binary-pcs --test boolean
+# Mutation:     the WHIR Boolean backend also asks its field to be an
+#               iterator, which `TowerLevel` does not imply, so the test's
+#               backend no longer compiles.
+#
+# The Boolean backends store the bit ring switch's claims proof, whose serde impls need a tower level's bytes.
+#
+# Under the cfg `TowerLevel` no longer implies them.
+#
+# rustc then fails to prove the derived impl's bound, and panics while it reports the failure.
+#
+# Stating the bound removes the panic, and 12 more bounds on the way satisfy every use:
+#
+# - the two serde bounds of the binary PCS's Boolean proof;
+# - the Boolean backends of the binary PCS and of WHIR, and the trace commitment over them;
+# - the WHIR proof shape of the bit readings.
+#
+# Every one of the 13 is needed: removing any one fails the cfg build.
+#
+# In a normal build `TowerLevel: Field` implies each bound, so nothing changes there.
+#
+diff --git a/binary-pcs/src/boolean.rs b/binary-pcs/src/boolean.rs
+--- a/binary-pcs/src/boolean.rs
++++ b/binary-pcs/src/boolean.rs
+@@ -325,7 +325,7 @@ where
+         + TranscriptField
+         + TowerLevel
+         + FoldAlphabet<EF>
+-        + Coordinates,
++        + Coordinates + p3_field::RawDataSerializable, // PATCHED: adds `RawDataSerializable`, which `Field` implies in a normal build
+     MT: Mmcs<EF>,
+     MX: Mmcs<EF, Error = MT::Error>,
+ {
+@@ -737,7 +737,7 @@ where
+         + TranscriptField
+         + TowerLevel
+         + FoldAlphabet<EF>
+-        + Coordinates,
++        + Coordinates + p3_field::RawDataSerializable, // PATCHED: adds `RawDataSerializable`, which `Field` implies in a normal build
+     MT: Mmcs<EF>,
+     MX: Mmcs<EF, Error = MT::Error>,
+     Challenger: FieldChallenger<EF>
+@@ -847,8 +847,8 @@ where
+ /// One Boolean opening: the reductions, and the commitment opening that discharges them.
+ #[derive(Clone, Serialize, Deserialize)]
+ #[serde(bound(
+-    serialize = "EF: TowerLevel, MT::Commitment: Serialize, MT::MultiProof: Serialize, MX::Commitment: Serialize, MX::MultiProof: Serialize",
+-    deserialize = "EF: TowerLevel, MT::Commitment: Deserialize<'de>, MT::MultiProof: Deserialize<'de>, MX::Commitment: Deserialize<'de>, MX::MultiProof: Deserialize<'de>"
++    serialize = "EF: TowerLevel + p3_field::RawDataSerializable, MT::Commitment: Serialize, MT::MultiProof: Serialize, MX::Commitment: Serialize, MX::MultiProof: Serialize", // PATCHED: adds `RawDataSerializable`, which `Field` implies in a normal build
++    deserialize = "EF: TowerLevel + p3_field::RawDataSerializable, MT::Commitment: Deserialize<'de>, MT::MultiProof: Deserialize<'de>, MX::Commitment: Deserialize<'de>, MX::MultiProof: Deserialize<'de>" // PATCHED: adds `RawDataSerializable`, which `Field` implies in a normal build
+ ))]
+ pub struct BooleanProof<EF: Field, MT: Mmcs<EF>, MX: Mmcs<EF>> {
+     /// One batched bit-alphabet ring switch, with every claim's elements in the order they came in.
+@@ -966,7 +966,7 @@ pub enum BooleanPcsError<EF, MmcsError> {
+ 
+ impl<EF, MT, MX> BooleanBackend<EF> for BooleanPcs<EF, MT, MX>
+ where
+-    EF: EncodableLevel + TowerLevel,
++    EF: EncodableLevel + TowerLevel + p3_field::RawDataSerializable, // PATCHED: adds `RawDataSerializable`, which `Field` implies in a normal build
+     MT: Mmcs<EF>,
+     MX: Mmcs<EF, Error = MT::Error>,
+ {
+diff --git a/binary-pcs/src/boolean_trace.rs b/binary-pcs/src/boolean_trace.rs
+--- a/binary-pcs/src/boolean_trace.rs
++++ b/binary-pcs/src/boolean_trace.rs
+@@ -140,7 +140,7 @@ where
+         + TranscriptField
+         + TowerLevel
+         + FoldAlphabet<EF>
+-        + Coordinates,
++        + Coordinates + p3_field::RawDataSerializable, // PATCHED: adds `RawDataSerializable`, which `Field` implies in a normal build
+     MT: Mmcs<EF>,
+     MX: Mmcs<EF, Error = MT::Error>,
+ {
+@@ -407,7 +407,7 @@ impl<EF, B, Challenger> MultilinearPcs<EF, Challenger> for BooleanTraceCommitmen
+ where
+     EF: BitCoordinates + ExtensionField<B::Val>,
+     B: BooleanMultilinearPcs<EF, Challenger>,
+-    B::Val: TranscriptField + TowerLevel,
++    B::Val: TranscriptField + TowerLevel + p3_field::RawDataSerializable, // PATCHED: adds `RawDataSerializable`, which `Field` implies in a normal build
+     Challenger: FieldChallenger<B::Val>
+         + GrindingChallenger<Witness = B::Val>
+         + CanSampleUniformBits<B::Val>
+@@ -507,7 +507,7 @@ impl<EF, B, Challenger> PrescribedPointPcs<EF, Challenger> for BooleanTraceCommi
+ where
+     EF: BitCoordinates + ExtensionField<B::Val>,
+     B: BooleanMultilinearPcs<EF, Challenger>,
+-    B::Val: TranscriptField + TowerLevel,
++    B::Val: TranscriptField + TowerLevel + p3_field::RawDataSerializable, // PATCHED: adds `RawDataSerializable`, which `Field` implies in a normal build
+     Challenger: FieldChallenger<B::Val>
+         + GrindingChallenger<Witness = B::Val>
+         + CanSampleUniformBits<B::Val>
+diff --git a/binary-pcs/src/whir/boolean.rs b/binary-pcs/src/whir/boolean.rs
+--- a/binary-pcs/src/whir/boolean.rs
++++ b/binary-pcs/src/whir/boolean.rs
+@@ -94,7 +94,7 @@ pub struct BooleanWhirPcs<F: Field, EF: ExtensionField<F>, Dft, MT, Challenger>
+ 
+ impl<F, EF, Dft, MT, Challenger> BooleanWhirPcs<F, EF, Dft, MT, Challenger>
+ where
+-    F: Field + TranscriptField + TowerLevel + Coordinates + Ord,
++    F: Field + TranscriptField + TowerLevel + Coordinates + Ord + p3_field::RawDataSerializable, // PATCHED: adds `RawDataSerializable`, which `Field` implies in a normal build
+     EF: BitCoordinates + ExtensionField<F>,
+     Dft: WhirDomain<F, EF>,
+     MT: Mmcs<F>,
+@@ -232,7 +232,7 @@ where
+ 
+ impl<F, EF, Dft, MT, Challenger> BooleanWhirPcs<F, EF, Dft, MT, Challenger>
+ where
+-    F: Field + TranscriptField + TowerLevel + Coordinates + Ord + Send + Sync,
++    F: Field + TranscriptField + TowerLevel + Coordinates + Ord + Send + Sync + p3_field::RawDataSerializable, // PATCHED: adds `RawDataSerializable`, which `Field` implies in a normal build
+     EF: BitChallengeField<F>,
+     Dft: WhirDomain<F, EF>,
+     MT: Mmcs<F>,
+@@ -462,7 +462,7 @@ where
+ impl<F, EF, Dft, MT, Challenger> BooleanMultilinearPcs<EF, Challenger>
+     for BooleanWhirPcs<F, EF, Dft, MT, Challenger>
+ where
+-    F: Field + TranscriptField + TowerLevel + Coordinates + Ord + Send + Sync,
++    F: Field + TranscriptField + TowerLevel + Coordinates + Ord + Send + Sync + p3_field::RawDataSerializable, // PATCHED: adds `RawDataSerializable`, which `Field` implies in a normal build
+     EF: BitChallengeField<F>,
+     Dft: WhirDomain<F, EF>,
+     MT: Mmcs<F>,
+@@ -576,7 +576,7 @@ where
+ 
+ impl<F, EF, Dft, MT, Challenger> BooleanBackend<EF> for BooleanWhirPcs<F, EF, Dft, MT, Challenger>
+ where
+-    F: Field + TranscriptField + TowerLevel + Coordinates + Ord + Send + Sync,
++    F: Field + TranscriptField + TowerLevel + Coordinates + Ord + Send + Sync + p3_field::RawDataSerializable, // PATCHED: adds `RawDataSerializable`, which `Field` implies in a normal build
+     EF: BitCoordinates + ExtensionField<F>,
+     Dft: WhirDomain<F, EF>,
+     MT: Mmcs<F>,
+diff --git a/binary-pcs/src/whir/shape.rs b/binary-pcs/src/whir/shape.rs
+--- a/binary-pcs/src/whir/shape.rs
++++ b/binary-pcs/src/whir/shape.rs
+@@ -123,7 +123,7 @@ impl ProofShape {
+         successor_tensors: bool,
+     ) -> Self
+     where
+-        F: TowerLevel,
++        F: TowerLevel + p3_field::RawDataSerializable, // PATCHED: adds `RawDataSerializable`, which `Field` implies in a normal build
+         EF: BitCoordinates + ExtensionField<F>,
+         Challenger: FieldChallenger<F> + GrindingChallenger<Witness = F>,
+     {

@@ -153,7 +153,7 @@ dry_run() {
     done | sort -u > "$tmp/.files"
     while read -r f; do
         mkdir -p "$tmp/$(dirname "$f")"
-        [ -f "$root/$f" ] && cp "$root/$f" "$tmp/$f"
+        if [ -f "$root/$f" ]; then cp "$root/$f" "$tmp/$f"; fi
     done < "$tmp/.files"
     for pf in "$@"; do
         patch -p1 -F0 --no-backup-if-mismatch -d "$tmp" < "$pf" >/dev/null \

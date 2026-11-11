@@ -1,0 +1,36 @@
+# Patch:        010-declare-hax-lean-matrix-cfg
+# Phase:        pre
+# Target:       Cargo.toml
+# Hunks:        1
+# Class:        bound
+# Gap:          none of its own: it declares the cfg that 020 gates on
+#               (docs/extractor-issues.md 10).
+# Cost:         none. Declares a cfg name to rustc's check-cfg; no code changes.
+# Upstreamable: no: the cfg exists only for this repository's extraction.
+# Drop when:    020 is dropped.
+# Test:         lint p3-matrix unexpected_cfgs
+# Mutation:     the declaration is removed, so a normal `cargo check` reports
+#               `unexpected_cfgs` for every `hax_lean_matrix` cfg 020 adds.
+#
+# Pre-patch 020 gates the row methods on a cfg that only p3-matrix's own extraction sets.
+#
+# It cannot use the shared extraction cfg.
+#
+# The crates above p3-matrix call the row methods, and other extractions compile them under that cfg.
+#
+# This adds the new name to the line baby-bear's pre 010 adds.
+#
+diff --git a/Cargo.toml b/Cargo.toml
+index 5889984..e427b45 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -60,7 +60,8 @@ rust.rust_2018_idioms = { level = "deny", priority = -1 }
+ rust.unused_must_use = "deny"
+ rust.rust_2024_incompatible_pat = "warn"
+ # PATCHED: hax's Lean backend compiles with `--cfg hax_backend_lean`.
+-rust.unexpected_cfgs = { level = "warn", check-cfg = ["cfg(hax_backend_lean)"] }
++# PATCHED: p3-matrix's extraction also compiles with `--cfg hax_lean_matrix`.
++rust.unexpected_cfgs = { level = "warn", check-cfg = ["cfg(hax_backend_lean)", "cfg(hax_lean_matrix)"] }
+ rustdoc.all = "warn"
+ 
+ [workspace.lints.clippy]

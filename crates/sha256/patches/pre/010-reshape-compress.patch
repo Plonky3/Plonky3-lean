@@ -5,6 +5,10 @@
 # Class:        equiv-rewrite
 # Gap:          docs/extractor-issues.md 14 (no model of `transmute`,
 #               `slice::from_ref`, `as_chunks_mut` or a zip over `IterMut`).
+#               Without this patch `lake build` fails on the generated
+#               `compress`: unknown `core.intrinsics.transmute`,
+#               `core.slice.raw.from_ref`, `core.slice.Slice.as_chunks_mut` and
+#               `IterMut`.
 # Cost:         none in a normal build: only the selection is behind
 #               cfg(hax_backend_lean). In the extracted variant,
 #               `Sha256Compress::compress` calls the reshaped body, which a
@@ -20,6 +24,9 @@
 # The original body reinterprets the two halves as one block with `transmute`, then writes each state word through `as_chunks_mut` zipped with the state.
 # The reshaped body copies the halves into a block and writes the words by index.
 # It calls the same `compress256` on the same block and initial state.
+#
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
 #
 diff --git a/sha256/src/hax_reshaped.rs b/sha256/src/hax_reshaped.rs
 new file mode 100644

@@ -1,0 +1,211 @@
+# Patch:        030-extraction-roots
+# Phase:        pre
+# Target:       matrix/src/lib.rs, matrix/src/hax_roots.rs
+# Hunks:        2
+# Class:        bound
+# Gap:          docs/extractor-issues.md 4 (charon leaves methods that no free
+#               function calls out of `ordered_decls`, and aeneas drops them).
+# Cost:         none in a normal build: the module exists only under
+#               cfg(hax_backend_lean). In the extracted variant it adds free
+#               functions, each of which calls one item of the crate.
+# Upstreamable: no: the module exists only for the extractor.
+# Drop when:    charon orders `--start-from` methods, so that the methods
+#               themselves can be roots.
+# Test:         lint p3-matrix unexpected_cfgs
+# Mutation:     the module is gated on a misspelled cfg, so a normal
+#               `cargo check` reports `unexpected_cfgs`.
+#
+# Each function calls one method of the dense matrix or of a view, and nothing else.
+#
+# That makes charon list the method, so aeneas extracts its body.
+#
+diff --git a/matrix/src/lib.rs b/matrix/src/lib.rs
+index ded9a11..051954a 100644
+--- a/matrix/src/lib.rs
++++ b/matrix/src/lib.rs
+@@ -35,6 +35,9 @@ pub mod row_index_mapped;
+ pub mod stack;
+ pub mod strided;
+ pub mod util;
++// PATCHED: extraction roots, only under hax's Lean backend.
++#[cfg(hax_backend_lean)]
++pub mod hax_roots;
+ 
+ /// A simple struct representing the shape of a matrix.
+ ///
+diff --git a/matrix/src/hax_roots.rs b/matrix/src/hax_roots.rs
+new file mode 100644
+index 0000000..d1e0130
+--- /dev/null
++++ b/matrix/src/hax_roots.rs
+@@ -0,0 +1,170 @@
++//! PATCHED: extraction roots, one function per extracted item, only under the extraction cfg.
++
++use alloc::vec::Vec;
++use core::ops::Range;
++
++use crate::bitrev::{BitReversalPerm, BitReversedMatrixView};
++use crate::dense::RowMajorMatrix;
++use crate::horizontally_truncated::HorizontallyTruncated;
++use crate::stack::{HorizontalPair, VerticalPair};
++use crate::strided::VerticallyStridedMatrixView;
++use crate::{Dimensions, Matrix};
++
++type M<T> = RowMajorMatrix<T>;
++
++pub fn dense_new<T: Clone + Send + Sync>(values: Vec<T>, width: usize) -> M<T> {
++    M::new(values, width)
++}
++pub fn dense_new_row<T: Clone + Send + Sync>(values: Vec<T>) -> M<T> {
++    M::new_row(values)
++}
++pub fn dense_new_col<T: Clone + Send + Sync>(values: Vec<T>) -> M<T> {
++    M::new_col(values)
++}
++pub fn dense_default<T: Clone + Send + Sync + Default>(width: usize, height: usize) -> M<T> {
++    M::default(width, height)
++}
++pub fn dense_width<T: Clone + Send + Sync>(m: &M<T>) -> usize {
++    m.width()
++}
++pub fn dense_height<T: Clone + Send + Sync>(m: &M<T>) -> usize {
++    m.height()
++}
++pub fn dense_dimensions<T: Clone + Send + Sync>(m: &M<T>) -> Dimensions {
++    m.dimensions()
++}
++pub fn dense_get<T: Clone + Send + Sync>(m: &M<T>, r: usize, c: usize) -> Option<T> {
++    m.get(r, c)
++}
++pub fn dense_row_mut<T: Clone + Send + Sync>(m: &mut M<T>, r: usize) -> &mut [T] {
++    m.row_mut(r)
++}
++pub fn dense_row_pair_mut<T: Clone + Send + Sync>(
++    m: &mut M<T>,
++    row_1: usize,
++    row_2: usize,
++) -> (&mut [T], &mut [T]) {
++    m.row_pair_mut(row_1, row_2)
++}
++pub fn dense_split_rows<T: Clone + Send + Sync>(m: &M<T>, r: usize) -> (M<T>, M<T>) {
++    let (a, b) = m.split_rows(r);
++    (M::new(a.values.to_vec(), a.width), M::new(b.values.to_vec(), b.width))
++}
++pub fn dense_pad_to_height<T: Clone + Send + Sync + Default>(m: &mut M<T>, h: usize, fill: T) {
++    m.pad_to_height(h, fill)
++}
++pub fn dense_pad_to_power_of_two_height<T: Clone + Send + Sync + Default>(m: &mut M<T>, fill: T) {
++    m.pad_to_power_of_two_height(fill)
++}
++pub fn dense_pad_to_min_power_of_two_height<T: Clone + Send + Sync + Default>(
++    m: &mut M<T>,
++    min_height: usize,
++    fill: T,
++) {
++    m.pad_to_min_power_of_two_height(min_height, fill)
++}
++pub fn dense_from_flat_padded<T: Clone + Send + Sync + Default>(
++    values: Vec<T>,
++    width: usize,
++    fill: T,
++) -> M<T> {
++    M::from_flat_padded(values, width, fill)
++}
++pub fn dense_widen_right<T: Copy + Send + Sync + Default>(m: &mut M<T>, extra: usize, fill: T) {
++    m.widen_right(extra, fill)
++}
++pub fn swap_rows<T: Clone + Send + Sync>(m: &mut M<T>, i: usize, j: usize) {
++    crate::util::swap_rows(m, i, j)
++}
++
++pub fn bitrev_view<T: Clone + Send + Sync>(m: M<T>) -> BitReversedMatrixView<M<T>> {
++    BitReversalPerm::new_view(m)
++}
++pub fn bitrev_height<T: Clone + Send + Sync>(v: &BitReversedMatrixView<M<T>>) -> usize {
++    v.height()
++}
++pub fn bitrev_get<T: Clone + Send + Sync>(
++    v: &BitReversedMatrixView<M<T>>,
++    r: usize,
++    c: usize,
++) -> Option<T> {
++    v.get(r, c)
++}
++
++pub fn strided_view<T: Clone + Send + Sync>(
++    m: M<T>,
++    stride: usize,
++    offset: usize,
++) -> VerticallyStridedMatrixView<M<T>> {
++    m.vertically_strided(stride, offset)
++}
++pub fn strided_height<T: Clone + Send + Sync>(v: &VerticallyStridedMatrixView<M<T>>) -> usize {
++    v.height()
++}
++pub fn strided_get<T: Clone + Send + Sync>(
++    v: &VerticallyStridedMatrixView<M<T>>,
++    r: usize,
++    c: usize,
++) -> Option<T> {
++    v.get(r, c)
++}
++
++pub fn truncated_new<T: Clone + Send + Sync>(
++    m: M<T>,
++    w: usize,
++) -> Option<HorizontallyTruncated<T, M<T>>> {
++    HorizontallyTruncated::new(m, w)
++}
++pub fn truncated_new_with_range<T: Clone + Send + Sync>(
++    m: M<T>,
++    range: Range<usize>,
++) -> Option<HorizontallyTruncated<T, M<T>>> {
++    HorizontallyTruncated::new_with_range(m, range)
++}
++pub fn truncated_width<T: Clone + Send + Sync>(v: &HorizontallyTruncated<T, M<T>>) -> usize {
++    v.width()
++}
++pub fn truncated_height<T: Clone + Send + Sync>(v: &HorizontallyTruncated<T, M<T>>) -> usize {
++    v.height()
++}
++pub fn truncated_get<T: Clone + Send + Sync>(
++    v: &HorizontallyTruncated<T, M<T>>,
++    r: usize,
++    c: usize,
++) -> Option<T> {
++    v.get(r, c)
++}
++
++pub fn vpair_new<T: Clone + Send + Sync>(top: M<T>, bottom: M<T>) -> VerticalPair<M<T>, M<T>> {
++    VerticalPair::new(top, bottom)
++}
++pub fn vpair_width<T: Clone + Send + Sync>(v: &VerticalPair<M<T>, M<T>>) -> usize {
++    v.width()
++}
++pub fn vpair_height<T: Clone + Send + Sync>(v: &VerticalPair<M<T>, M<T>>) -> usize {
++    v.height()
++}
++pub fn vpair_get<T: Clone + Send + Sync>(
++    v: &VerticalPair<M<T>, M<T>>,
++    r: usize,
++    c: usize,
++) -> Option<T> {
++    v.get(r, c)
++}
++
++pub fn hpair_new<T: Clone + Send + Sync>(left: M<T>, right: M<T>) -> HorizontalPair<M<T>, M<T>> {
++    HorizontalPair::new(left, right)
++}
++pub fn hpair_width<T: Clone + Send + Sync>(v: &HorizontalPair<M<T>, M<T>>) -> usize {
++    v.width()
++}
++pub fn hpair_height<T: Clone + Send + Sync>(v: &HorizontalPair<M<T>, M<T>>) -> usize {
++    v.height()
++}
++pub fn hpair_get<T: Clone + Send + Sync>(
++    v: &HorizontalPair<M<T>, M<T>>,
++    r: usize,
++    c: usize,
++) -> Option<T> {
++    v.get(r, c)
++}

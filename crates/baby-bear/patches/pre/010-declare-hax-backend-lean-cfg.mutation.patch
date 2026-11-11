@@ -4,12 +4,13 @@
 diff --git a/Cargo.toml b/Cargo.toml
 --- a/Cargo.toml
 +++ b/Cargo.toml
-@@ -59,8 +59,6 @@
+@@ -59,9 +59,6 @@
  rust.rust_2018_idioms = { level = "deny", priority = -1 }
  rust.unused_must_use = "deny"
  rust.rust_2024_incompatible_pat = "warn"
 -# PATCHED: hax's Lean backend compiles with `--cfg hax_backend_lean`.
--rust.unexpected_cfgs = { level = "warn", check-cfg = ["cfg(hax_backend_lean)"] }
+-# PATCHED: p3-matrix's extraction also compiles with `--cfg hax_lean_matrix`.
+-rust.unexpected_cfgs = { level = "warn", check-cfg = ["cfg(hax_backend_lean)", "cfg(hax_lean_matrix)"] }
  rustdoc.all = "warn"
  
  [workspace.lints.clippy]

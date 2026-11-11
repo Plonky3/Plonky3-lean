@@ -1,0 +1,69 @@
+# Patch:        010-shift-marker-without-fn-type
+# Phase:        pre
+# Target:       word/src/shift.rs, word/tests/pre_patch_010.rs
+# Hunks:        2
+# Class:        cfg-hide
+# Gap:          docs/extractor-issues.md 240 (aeneas has no function types).
+# Cost:         none in a normal build: the change is behind
+#               cfg(hax_backend_lean). In the extracted variant, the width
+#               marker of a shift is `PhantomData<W>`.
+# Upstreamable: no: the marker type matters only to the extractor.
+# Drop when:    aeneas translates function types, or the marker is dropped
+#               upstream.
+# Test:         test p3-word --test pre_patch_010
+# Mutation:     the shipped marker is gated on the wrong cfg, so a normal build
+#               has no `word` field and the crate does not compile.
+#
+# A shift carries its word width as a zero-sized marker of type `PhantomData<fn() -> W>`.
+# aeneas rejects the function type ("Arrow types are not supported yet").
+# It then drops the shift type and every item that names it, which is most of the crate.
+# Under the cfg the marker is `PhantomData<W>`.
+# Both are zero-sized and hold no value, so no function body changes.
+# The test pins what the marker must not change in a normal build: size, auto traits and value semantics.
+#
+diff --git a/word/src/shift.rs b/word/src/shift.rs
+index c2991b3b..50254f59 100644
+--- a/word/src/shift.rs
++++ b/word/src/shift.rs
+@@ -96,7 +96,11 @@ pub struct Shift<W: Word> {
+     /// The movement distance in bits.
+     amount: u8,
+     /// The word width fixed at the type level.
++    #[cfg(not(hax_backend_lean))] // PATCHED
+     word: PhantomData<fn() -> W>,
++    // PATCHED: hax's Lean backend has no function types, so the marker holds the word type.
++    #[cfg(hax_backend_lean)]
++    word: PhantomData<W>,
+ }
+ 
+ impl<W: Word> Copy for Shift<W> {}
+diff --git a/word/tests/pre_patch_010.rs b/word/tests/pre_patch_010.rs
+new file mode 100644
+index 00000000..cb211379
+--- /dev/null
++++ b/word/tests/pre_patch_010.rs
+@@ -0,0 +1,24 @@
++//! The width marker of a checked shift leaves the shift a plain copyable value.
++
++use core::mem::size_of;
++
++use p3_word::{Shift, ShiftKind, Word32, Word64};
++
++fn assert_value<T: Copy + Send + Sync + 'static>() {}
++
++#[test]
++fn shift_marker_keeps_shifts_plain_values() {
++    // Invariant: the marker adds no bytes, so a shift is its kind and its distance.
++    assert_eq!(size_of::<Shift<Word32>>(), 2);
++    assert_eq!(size_of::<Shift<Word64>>(), 2);
++
++    // Invariant: a shift crosses threads and copies freely at both widths.
++    assert_value::<Shift<Word32>>();
++    assert_value::<Shift<Word64>>();
++
++    // Fixture state: a rotation by 8 moves the low byte of 0x12 to the top.
++    let shift = Shift::<Word32>::new(ShiftKind::RotateRight, 8).unwrap();
++    let copy = shift;
++    assert_eq!(copy.apply(Word32::new(0x12)), Word32::new(0x1200_0000));
++    assert_eq!(shift, copy);
++}

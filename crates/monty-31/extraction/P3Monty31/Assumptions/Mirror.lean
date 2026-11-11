@@ -4,18 +4,19 @@
 Most of p3-monty-31 comes from its scoped extraction, `P3Monty31/Extraction/`
 (the `data_traits`, `mds`, `poseidon1`/`poseidon2` parameter traits,
 `MontyField31` itself, `MontyField31::new`, `new_monty`, `new_array`,
-`new_2d_array`, the `Add`/`Sub`/`Mul`/`Neg` impls, the `utils` reductions and
-conversions, the `Clone` impl). This file holds what that extraction does not
-produce:
+`new_2d_array`, the `Add`/`Sub`/`Mul`/`Neg` impls, `halve`, the `QuotientMap`
+conversions, the `utils` reductions and conversions, the `Clone`
+impl; the methods a pattern cannot root are reached through the extraction-only
+`hax_roots` module of pre-patch 010-extraction-roots). This file holds what that
+extraction does not produce:
 
-* `PrimeCharacteristicRing::halve`, which wraps the extracted `utils::halve_u32`.
-  charon does not translate it at all: it is a provided method of
-  `PrimeCharacteristicRing` that MontyField31 overrides and nothing calls, which
-  charon skips even as a root (docs/extractor-issues.md, 4). Its body is one line
-  and is transcribed below.
-* squaring, exponentiation, multiplication by powers of two, inversion and the
-  integer conversions (`QuotientMap`), which reach p3-field's trait hierarchy
-  (docs/extractor-issues.md, 9) or implement a generic trait charon cannot root.
+* squaring and exponentiation, p3-field's provided `square` and `exp_u64` at
+  this field. p3-field is a stub, so their bodies are not extracted.
+* multiplication by powers of two (`mul_2exp_u64`) and inversion
+  (`try_inverse`). For large exponents `mul_2exp_u64` calls the provided
+  `exp_u64`, which needs the whole `PrimeCharacteristicRing` impl dictionary,
+  and `try_inverse` calls `mul_2exp_u64`; aeneas cannot build that dictionary
+  (docs/extractor-issues.md, 9).
 * the `no_packing` Poseidon layer types and their constructor impls. On a
   target with no SIMD these are the layers baby-bear's Poseidon instances use.
   The constructor bodies are one struct literal each and are transcribed.
@@ -36,17 +37,6 @@ open Aeneas.Std hiding namespace core alloc
 open RustM ControlFlow Error
 
 namespace p3_monty_31
-
-/-! ## Scalar arithmetic (`monty-31/src/monty_31.rs`) -/
-
-/-- `<MontyField31<FP> as PrimeCharacteristicRing>::halve`. Upstream line 225:
-`Self::new_monty(halve_u32::<FP>(self.value))`. -/
-def monty_31.MontyField31.halve {FP : Type}
-    (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
-    (self : monty_31.MontyField31 FP) : RustM (monty_31.MontyField31 FP) := do
-  let v ← utils.halve_u32 data_traitsFieldParametersInst self.value
-  monty_31.MontyField31.new_monty
-    data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst v
 
 /-! ## Powers of two and inversion -/
 
@@ -156,195 +146,6 @@ def monty_31.MontyField31.try_inverse {FP : Type}
     let v ← monty_31.MontyField31.mul_2exp_u64 data_traitsFieldParametersInst uncorrected_value
       (UScalar.cast .U64 exp)
     ok (some v)
-
-/-! ## Integers into the field (`monty-31/src/monty_31.rs:518`) -/
-
-/-- Checked conversion from `u32`.
-
-```rust
-(int < FP::PRIME).then(|| Self::new(int))
-```
--/
-def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU32.from_canonical_checked
-    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
-    (int : Std.U32) : RustM (Option (monty_31.MontyField31 FP)) := do
-  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
-  let prime ← mp.PRIME
-  if int < prime then do
-    let v ← monty_31.MontyField31.new mp int
-    ok (some v)
-  else ok none
-
-/-- Conversion from `i32`.
-
-```rust
-Self::new_monty(to_monty_signed::<FP>(int))
-```
--/
-def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_int
-    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
-    (int : Std.I32) : RustM (monty_31.MontyField31 FP) := do
-  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
-  let v ← utils.to_monty_signed mp int
-  monty_31.MontyField31.new_monty mp v
-
-/-- Checked conversion from `i32`.
-
-The bound is `(PRIME >> 1) as i32`, that is `(p - 1)/2`.
-
-Inside `[-bound, bound]` it converts, and outside it returns `None`.
--/
-def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI32.from_canonical_checked
-    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
-    (int : Std.I32) : RustM (Option (monty_31.MontyField31 FP)) := do
-  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
-  let prime ← mp.PRIME
-  let half ← prime >>> 1#i32
-  let bound := UScalar.hcast .I32 half
-  if int <= bound then do
-    let neg_bound ← IScalar.neg bound
-    if int >= neg_bound then do
-      let v ← utils.to_monty_signed mp int
-      let e ← monty_31.MontyField31.new_monty mp v
-      ok (some e)
-    else ok none
-  else ok none
-
-/-- Conversion from `u64`.
-
-```rust
-Self::new_monty(to_monty_64::<FP>(int))
-```
--/
-def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_int
-    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
-    (int : Std.U64) : RustM (monty_31.MontyField31 FP) := do
-  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
-  let v ← utils.to_monty_64 mp int
-  monty_31.MontyField31.new_monty mp v
-
-/-- Checked conversion from `u64`.
-
-```rust
-(int < FP::PRIME as u64).then(|| Self::new(int as u32))
-```
--/
-def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU64.from_canonical_checked
-    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
-    (int : Std.U64) : RustM (Option (monty_31.MontyField31 FP)) := do
-  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
-  let prime ← mp.PRIME
-  if int < UScalar.cast .U64 prime then do
-    let v ← monty_31.MontyField31.new mp (UScalar.cast .U32 int)
-    ok (some v)
-  else ok none
-
-/-- Conversion from `i64`.
-
-```rust
-Self::new_monty(to_monty_64_signed::<FP>(int))
-```
--/
-def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_int
-    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
-    (int : Std.I64) : RustM (monty_31.MontyField31 FP) := do
-  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
-  let v ← utils.to_monty_64_signed mp int
-  monty_31.MontyField31.new_monty mp v
-
-/-- Checked conversion from `i64`.
-
-The bound is `(PRIME >> 1) as i64`, that is `(p - 1)/2`.
-
-Inside `[-bound, bound]` the input fits an `i32` and converts.
-
-Outside it returns `None`.
--/
-def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI64.from_canonical_checked
-    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
-    (int : Std.I64) : RustM (Option (monty_31.MontyField31 FP)) := do
-  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
-  let prime ← mp.PRIME
-  let half ← prime >>> 1#i32
-  let bound := UScalar.hcast .I64 half
-  if int <= bound then do
-    let neg_bound ← IScalar.neg bound
-    if int >= neg_bound then do
-      let v ← utils.to_monty_signed mp (IScalar.cast .I32 int)
-      let e ← monty_31.MontyField31.new_monty mp v
-      ok (some e)
-    else ok none
-  else ok none
-
-/-- Conversion from `u128`.
-
-```rust
-Self::new_monty(to_monty::<FP>((int % (FP::PRIME as u128)) as u32))
-```
--/
-def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_int
-    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
-    (int : Std.U128) : RustM (monty_31.MontyField31 FP) := do
-  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
-  let prime ← mp.PRIME
-  let r ← int % UScalar.cast .U128 prime
-  let v ← utils.to_monty mp (UScalar.cast .U32 r)
-  monty_31.MontyField31.new_monty mp v
-
-/-- Checked conversion from `u128`.
-
-```rust
-(int < FP::PRIME as u128).then(|| Self::new(int as u32))
-```
--/
-def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapU128.from_canonical_checked
-    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
-    (int : Std.U128) : RustM (Option (monty_31.MontyField31 FP)) := do
-  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
-  let prime ← mp.PRIME
-  if int < UScalar.cast .U128 prime then do
-    let v ← monty_31.MontyField31.new mp (UScalar.cast .U32 int)
-    ok (some v)
-  else ok none
-
-/-- Conversion from `i128`.
-
-```rust
-Self::new_monty(to_monty_signed::<FP>((int % (FP::PRIME as i128)) as i32))
-```
--/
-def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_int
-    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
-    (int : Std.I128) : RustM (monty_31.MontyField31 FP) := do
-  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
-  let prime ← mp.PRIME
-  let r ← int % UScalar.hcast .I128 prime
-  let v ← utils.to_monty_signed mp (IScalar.cast .I32 r)
-  monty_31.MontyField31.new_monty mp v
-
-/-- Checked conversion from `i128`.
-
-The bound is `(PRIME >> 1) as i128`, that is `(p - 1)/2`.
-
-Inside `[-bound, bound]` the input fits an `i32` and converts.
-
-Outside it returns `None`.
--/
-def monty_31.MontyField31.Insts.P3_fieldIntegersQuotientMapI128.from_canonical_checked
-    {FP : Type} (data_traitsFieldParametersInst : data_traits.FieldParameters FP)
-    (int : Std.I128) : RustM (Option (monty_31.MontyField31 FP)) := do
-  let mp := data_traitsFieldParametersInst.PackedMontyParametersInst.MontyParametersInst
-  let prime ← mp.PRIME
-  let half ← prime >>> 1#i32
-  let bound := UScalar.hcast .I128 half
-  if int <= bound then do
-    let neg_bound ← IScalar.neg bound
-    if int >= neg_bound then do
-      let v ← utils.to_monty_signed mp (IScalar.cast .I32 int)
-      let e ← monty_31.MontyField31.new_monty mp v
-      ok (some e)
-    else ok none
-  else ok none
 
 /-- `impl<FP: FieldParameters> PrimeField for MontyField31<FP>`
 (`monty-31/src/monty_31.rs:671`). `PrimeField` has no members here. -/

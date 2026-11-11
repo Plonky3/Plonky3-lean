@@ -1,0 +1,72 @@
+# Patch:        010-extraction-roots
+# Phase:        pre
+# Target:       bus/src/hax_roots.rs, bus/src/lib.rs
+# Hunks:        2
+# Class:        bound
+# Gap:          docs/extractor-issues.md 4 (aeneas drops a method that no free
+#               function calls). Each rooted item is a method, in a private
+#               module.
+# Cost:         none in a normal build: the module exists only under
+#               cfg(hax_backend_lean). In the extracted variant it adds free
+#               functions, each of which calls one item of the crate.
+#               No existing body changes.
+# Upstreamable: no: the module exists only for the extractor.
+# Drop when:    charon orders `--start-from` methods, so that the methods
+#               themselves can be roots.
+# Test:         lint p3-bus unexpected_cfgs
+# Mutation:     the module is gated on a misspelled cfg, so a normal
+#               `cargo check` reports `unexpected_cfgs`.
+#
+# The roots are the bus's integer helpers:
+#
+# - the position of a direction, and whether a row sits at a boundary;
+# - the payload widths of a RAM statement.
+#
+# Three siblings are not rooted, since aeneas stops on each:
+#
+# - the name check walks the bytes in a loop that returns early ("Could not match the contexts");
+# - the RAM statement's validation builds nested borrows ("Nested borrows are not supported yet");
+# - the RAM layout allocates columns through a closure over a mutable counter (an internal error).
+#
+diff --git a/bus/src/hax_roots.rs b/bus/src/hax_roots.rs
+new file mode 100644
+--- /dev/null
++++ b/bus/src/hax_roots.rs
+@@ -0,0 +1,24 @@
++//! PATCHED: extraction roots for hax's Lean backend, compiled only under `cfg(hax_backend_lean)`.
++//!
++//! Aeneas drops a method that no free function calls (Plonky3-lean, docs/extractor-issues.md, 4).
++//! Each function here calls one item and does nothing else, so that the item's own body is extracted.
++
++use crate::builder::BusBoundary;
++use crate::direction::BusDirection;
++use crate::ram::RamStatement;
++
++pub const fn direction_index(direction: BusDirection) -> usize {
++    direction.index()
++}
++
++pub const fn contains_row(boundary: BusBoundary, row: usize, height: usize) -> bool {
++    boundary.contains_row(row, height)
++}
++
++pub const fn access_payload_width(statement: &RamStatement) -> usize {
++    statement.access_payload_width()
++}
++
++pub const fn image_payload_width(statement: &RamStatement) -> usize {
++    statement.image_payload_width()
++}
+diff --git a/bus/src/lib.rs b/bus/src/lib.rs
+--- a/bus/src/lib.rs
++++ b/bus/src/lib.rs
+@@ -18,6 +18,9 @@ mod plan;
+ mod product;
+ mod ram;
+ mod security;
++// PATCHED: extraction roots, only under hax's Lean backend.
++#[cfg(hax_backend_lean)]
++pub mod hax_roots;
+ mod timestamped;
+ 
+ pub use argument::{BusArgumentError, BusChallenges, BusProof, BusReductionOutput};

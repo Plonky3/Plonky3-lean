@@ -1,0 +1,243 @@
+# Patch:        010-extraction-roots
+# Phase:        pre
+# Target:       challenger/src/hax_roots.rs, challenger/src/lib.rs
+# Hunks:        2
+# Class:        bound
+# Gap:          docs/extractor-issues.md 4 (aeneas drops a method that no free
+#               function calls).
+# Cost:         none in a normal build: the module exists only under
+#               cfg(hax_backend_lean). In the extracted variant it adds free
+#               functions, each of which calls one method of the crate.
+#               No existing body changes.
+# Upstreamable: no: the module exists only for the extractor.
+# Drop when:    charon orders `--start-from` methods, so that the methods
+#               themselves can be roots.
+# Test:         lint p3-challenger unexpected_cfgs
+# Mutation:     the module is gated on a misspelled cfg, so a normal
+#               `cargo check` reports `unexpected_cfgs`.
+#
+# Rooted at the trait methods themselves, aeneas emits nothing for them.
+# Rooted at one-line wrappers, each method is reachable, so its own body is extracted.
+#
+# The field, the permutation, the hasher and the inner byte challenger stay generic.
+# The Lean model then takes each as an argument, and its theorems hold for every one.
+#
+# The sampling methods of the duplex and serializing challengers are not rooted.
+# Their closures capture the challenger mutably (docs/extractor-issues.md 60 and 17).
+#
+diff --git a/challenger/src/hax_roots.rs b/challenger/src/hax_roots.rs
+new file mode 100644
+index 00000000..2272cda0
+--- /dev/null
++++ b/challenger/src/hax_roots.rs
+@@ -0,0 +1,196 @@
++//! PATCHED: extraction roots for hax's Lean backend, compiled only under `cfg(hax_backend_lean)`.
++//!
++//! Aeneas drops a method that no free function calls (Plonky3-lean, docs/extractor-issues.md, 4).
++//! Each function here calls one method and does nothing else, so that the method's own body is extracted.
++//!
++//! The field, the permutation, the hasher and the inner byte challenger stay generic.
++//! The Lean model then quantifies over every one of them.
++
++use alloc::vec::Vec;
++
++use p3_field::{PrimeCharacteristicRing, PrimeField32, PrimeField64};
++use p3_symmetric::{CryptographicHasher, CryptographicPermutation};
++
++use crate::fs::{BytesToFieldCodec, Codec, TranscriptError};
++use crate::{
++    CanFinalizeDigest, CanObserve, CanSample, DuplexChallenger, HashChallenger,
++    SerializingChallenger32, SerializingChallenger64,
++};
++
++pub fn hash_challenger_new<T, H, const OUT_LEN: usize>(
++    initial_state: Vec<T>,
++    hasher: H,
++) -> HashChallenger<T, H, OUT_LEN>
++where
++    T: Clone,
++    H: CryptographicHasher<T, [T; OUT_LEN]>,
++{
++    HashChallenger::new(initial_state, hasher)
++}
++
++pub fn hash_challenger_observe<T, H, const OUT_LEN: usize>(
++    challenger: &mut HashChallenger<T, H, OUT_LEN>,
++    value: T,
++) where
++    T: Clone,
++    H: CryptographicHasher<T, [T; OUT_LEN]>,
++{
++    CanObserve::<T>::observe(challenger, value)
++}
++
++pub fn hash_challenger_observe_slice<T, H, const OUT_LEN: usize>(
++    challenger: &mut HashChallenger<T, H, OUT_LEN>,
++    values: &[T],
++) where
++    T: Clone,
++    H: CryptographicHasher<T, [T; OUT_LEN]>,
++{
++    CanObserve::<T>::observe_slice(challenger, values)
++}
++
++pub fn hash_challenger_observe_array<T, H, const N: usize, const OUT_LEN: usize>(
++    challenger: &mut HashChallenger<T, H, OUT_LEN>,
++    values: [T; N],
++) where
++    T: Clone,
++    H: CryptographicHasher<T, [T; OUT_LEN]>,
++{
++    CanObserve::<[T; N]>::observe(challenger, values)
++}
++
++pub fn hash_challenger_observe_nested<T, H, const OUT_LEN: usize>(
++    challenger: &mut HashChallenger<T, H, OUT_LEN>,
++    valuess: Vec<Vec<T>>,
++) where
++    T: Clone,
++    H: CryptographicHasher<T, [T; OUT_LEN]>,
++{
++    CanObserve::<Vec<Vec<T>>>::observe(challenger, valuess)
++}
++
++pub fn hash_challenger_sample<T, H, const OUT_LEN: usize>(
++    challenger: &mut HashChallenger<T, H, OUT_LEN>,
++) -> T
++where
++    T: Clone,
++    H: CryptographicHasher<T, [T; OUT_LEN]>,
++{
++    CanSample::<T>::sample(challenger)
++}
++
++pub fn hash_challenger_sample_vec<T, H, const OUT_LEN: usize>(
++    challenger: &mut HashChallenger<T, H, OUT_LEN>,
++    n: usize,
++) -> Vec<T>
++where
++    T: Clone,
++    H: CryptographicHasher<T, [T; OUT_LEN]>,
++{
++    CanSample::<T>::sample_vec(challenger, n)
++}
++
++pub fn hash_challenger_finalize<T, H, const OUT_LEN: usize>(
++    challenger: HashChallenger<T, H, OUT_LEN>,
++) -> [T; OUT_LEN]
++where
++    T: Clone,
++    H: CryptographicHasher<T, [T; OUT_LEN]>,
++{
++    challenger.finalize()
++}
++
++pub fn duplex_challenger_new<F, P, const WIDTH: usize, const RATE: usize>(
++    permutation: P,
++) -> DuplexChallenger<F, P, WIDTH, RATE>
++where
++    F: Copy + Default,
++    P: CryptographicPermutation<[F; WIDTH]>,
++{
++    DuplexChallenger::new(permutation)
++}
++
++pub fn duplex_challenger_observe<F, P, const WIDTH: usize, const RATE: usize>(
++    challenger: &mut DuplexChallenger<F, P, WIDTH, RATE>,
++    value: F,
++) where
++    F: Copy + PrimeCharacteristicRing,
++    P: CryptographicPermutation<[F; WIDTH]>,
++{
++    CanObserve::<F>::observe(challenger, value)
++}
++
++pub fn duplex_challenger_observe_array<F, P, const N: usize, const WIDTH: usize, const RATE: usize>(
++    challenger: &mut DuplexChallenger<F, P, WIDTH, RATE>,
++    values: [F; N],
++) where
++    F: Copy + PrimeCharacteristicRing,
++    P: CryptographicPermutation<[F; WIDTH]>,
++{
++    CanObserve::<[F; N]>::observe(challenger, values)
++}
++
++pub fn duplex_challenger_finalize<F, P, const WIDTH: usize, const RATE: usize>(
++    challenger: DuplexChallenger<F, P, WIDTH, RATE>,
++) -> [F; RATE]
++where
++    F: Copy + PrimeCharacteristicRing,
++    P: CryptographicPermutation<[F; WIDTH]>,
++{
++    challenger.finalize()
++}
++
++pub fn serializing_challenger32_observe<F, Inner>(
++    challenger: &mut SerializingChallenger32<F, Inner>,
++    value: F,
++) where
++    F: PrimeField32,
++    Inner: CanObserve<u8>,
++{
++    CanObserve::<F>::observe(challenger, value)
++}
++
++pub fn serializing_challenger64_observe<F, Inner>(
++    challenger: &mut SerializingChallenger64<F, Inner>,
++    value: F,
++) where
++    F: PrimeField64,
++    Inner: CanObserve<u8>,
++{
++    CanObserve::<F>::observe(challenger, value)
++}
++
++pub fn bytes_to_field_observe<C, F>(challenger: &mut C, value: &F)
++where
++    F: PrimeField64,
++    C: CanObserve<u8> + CanSample<u8>,
++{
++    <BytesToFieldCodec<F> as Codec<C, F>>::observe(challenger, value)
++}
++
++pub fn bytes_to_field_encode<C, F>(value: &F, out: &mut Vec<u8>)
++where
++    F: PrimeField64,
++    C: CanObserve<u8> + CanSample<u8>,
++{
++    <BytesToFieldCodec<F> as Codec<C, F>>::encode(value, out)
++}
++
++pub fn bytes_to_field_decode<C, F>(bytes: &[u8]) -> Result<F, TranscriptError>
++where
++    F: PrimeField64,
++    C: CanObserve<u8> + CanSample<u8>,
++{
++    <BytesToFieldCodec<F> as Codec<C, F>>::decode(bytes)
++}
++
++
++pub fn duplex_challenger_absorb_rate_padded_with_tag<F, P, const WIDTH: usize, const RATE: usize>(
++    challenger: &mut DuplexChallenger<F, P, WIDTH, RATE>,
++    values: &[F],
++    length_tag: u8,
++) where
++    F: Copy + Default + p3_field::PrimeField,
++    P: CryptographicPermutation<[F; WIDTH]>,
++{
++    challenger.absorb_rate_padded_with_tag(values, length_tag)
++}
+diff --git a/challenger/src/lib.rs b/challenger/src/lib.rs
+index d82de41d..1050b24c 100644
+--- a/challenger/src/lib.rs
++++ b/challenger/src/lib.rs
+@@ -15,6 +15,9 @@ mod duplex_challenger;
+ pub mod fs;
+ mod grinding_challenger;
+ mod hash_challenger;
++// PATCHED: extraction roots, only under hax's Lean backend.
++#[cfg(hax_backend_lean)]
++pub mod hax_roots;
+ mod multi_field_challenger;
+ mod serializing_challenger;
+ #[cfg(any(test, feature = "test-utils"))]

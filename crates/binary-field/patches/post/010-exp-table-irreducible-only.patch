@@ -4,8 +4,9 @@
 # Hunks:        1
 # Class:        reshape
 # Gap:          docs/extractor-issues.md 13: registering `global_simps` on an
-#               irreducible constant unfolds it, which reaches the maximum
-#               recursion depth on the 511-entry `tables::EXP`.
+#               irreducible constant unfolds it. Without this patch `lake build`
+#               reaches the maximum recursion depth on the 511-entry
+#               `tables::EXP`.
 # Cost:         none. The constant and its value are unchanged; it is no longer
 #               a `global_simps` lemma, which only Aeneas's proof automation
 #               reads, and no proof here relies on it.

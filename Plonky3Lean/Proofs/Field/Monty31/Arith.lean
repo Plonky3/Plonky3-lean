@@ -262,12 +262,12 @@ theorem monty_31.MontyField31.neg.toField (hv : FieldValid finst p mu) {P : ℕ}
   exact ⟨hc.1, rfl⟩
 
 /-- `a.halve()`, for canonical `a`, is canonical and stands for `toField a / 2`. -/
-theorem monty_31.MontyField31.halve.toField (hv : FieldValid finst p mu) {P : ℕ}
+theorem monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.halve.toField (hv : FieldValid finst p mu) {P : ℕ}
     (hP : p.val = P) (a : Element FP) (ha : Canonical P a) :
-    monty_31.MontyField31.halve finst a ⦃ c => Canonical P c ∧ toField P c * 2 = toField P a ⦄ := by
+    monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.halve finst a ⦃ c => Canonical P c ∧ toField P c * 2 = toField P a ⦄ := by
   unfold Canonical at *
   rw [← hP] at ha
-  unfold monty_31.MontyField31.halve
+  unfold monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.halve
   refine WP.spec_bind (utils.halve_u32.spec hv _ ha) fun v hv' => ?_
   refine WP.spec_mono (monty_31.MontyField31.new_monty.spec v) fun c hc => ?_
   refine ⟨by rw [← hP, hc]; exact hv'.1, ?_⟩

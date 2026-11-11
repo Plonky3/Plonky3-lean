@@ -1,0 +1,191 @@
+# p3-uni-stark: the single-table STARK prover and verifier.
+
+lean_lib = "P3UniStark"
+
+# The integer helpers: the degree-bits validation, the batched-opening count, and the opening layout.
+#
+# Everything else is generic over the configuration, the field traits and the builder, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# It is transcribed in extraction/P3UniStark/Assumptions/Mirror/.
+state = "scoped"
+
+features = []
+
+start_from = [
+  "p3_uni_stark::verifier::validate_degree_bits",
+  "p3_uni_stark::security::num_batched_openings",
+  "p3_uni_stark::config::StarkOpeningLayout::new",
+]
+
+watch = ["uni-stark/src", "uni-stark/Cargo.toml", "air/src/symbolic/builder.rs", "field/src/field.rs", "matrix/src/lib.rs", "util/src/lib.rs", "util/src/zip_eq.rs"]
+
+# The transcriptions in extraction/P3UniStark/Assumptions/Mirror/.
+# Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_uni_stark.folder.mirror.ConstraintLayout"
+rust = "p3_air::symbolic::builder::ConstraintLayout"
+
+[[mirror]]
+lean = "p3_uni_stark.folder.mirror.ConstraintLayout.total_constraints"
+rust = "p3_air::symbolic::builder::ConstraintLayout::total_constraints"
+
+[[mirror]]
+lean = "p3_uni_stark.folder.mirror.ConstraintLayout.decompose_alpha"
+rust = "p3_air::symbolic::builder::ConstraintLayout::decompose_alpha"
+
+[[mirror]]
+lean = "p3_uni_stark.folder.mirror.get_constraint_layout"
+rust = "p3_air::symbolic::builder::get_constraint_layout"
+
+[[mirror]]
+lean = "p3_uni_stark.folder.mirror.batched_linear_combination"
+rust = "p3_field::field::chunked_linear_combination"
+
+[[mirror]]
+lean = "p3_uni_stark.folder.mirror.proverFolder"
+rust = "{impl p3_air::AirBuilder for p3_uni_stark::folder::ProverConstraintFolder<'a, SC>}"
+
+[[mirror]]
+lean = "p3_uni_stark.folder.mirror.finalize_constraints"
+rust = "p3_uni_stark::folder::ProverConstraintFolder::finalize_constraints"
+
+[[mirror]]
+lean = "p3_uni_stark.folder.mirror.verifierFolder"
+rust = "{impl p3_air::AirBuilder for p3_uni_stark::folder::VerifierConstraintFolder<'a, SC>}"
+
+[[mirror]]
+lean = "p3_uni_stark.prover.mirror.get_log_quotient_degree_extension"
+rust = "p3_uni_stark::symbolic::get_log_quotient_degree_extension"
+
+[[mirror]]
+lean = "p3_uni_stark.prover.mirror.get_log_num_quotient_chunks_for_domain"
+rust = "p3_uni_stark::symbolic::get_log_num_quotient_chunks_for_domain"
+
+[[mirror]]
+lean = "p3_uni_stark.prover.mirror.num_quotient_chunks"
+rust = "p3_uni_stark::prover::prove_with_preprocessed"
+
+[[mirror]]
+lean = "p3_uni_stark.prover.mirror.wrappingRow"
+rust = "p3_matrix::Matrix::vertically_packed_row"
+
+[[mirror]]
+lean = "p3_uni_stark.prover.mirror.quotient_values"
+rust = "p3_uni_stark::prover::quotient_values_inner"
+
+[[mirror]]
+lean = "p3_uni_stark.verifier.mirror.InvalidProofShapeError"
+rust = "p3_uni_stark::error::InvalidProofShapeError"
+
+[[mirror]]
+lean = "p3_uni_stark.verifier.mirror.VerificationError"
+rust = "p3_uni_stark::error::VerificationError"
+
+[[mirror]]
+lean = "p3_uni_stark.verifier.mirror.from_ext_basis_coefficients"
+rust = "p3_field::field::ExtensionField::from_ext_basis_coefficients"
+
+[[mirror]]
+lean = "p3_uni_stark.verifier.mirror.chunkFactor"
+rust = "p3_uni_stark::verifier::recompose_quotient_from_chunks"
+
+[[mirror]]
+lean = "p3_uni_stark.verifier.mirror.recompose_quotient_from_chunks"
+rust = "p3_uni_stark::verifier::recompose_quotient_from_chunks"
+
+[[mirror]]
+lean = "p3_uni_stark.verifier.mirror.preprocessedWindow"
+rust = "p3_uni_stark::verifier::verify_constraints"
+
+[[mirror]]
+lean = "p3_uni_stark.verifier.mirror.verify_constraints"
+rust = "p3_uni_stark::verifier::verify_constraints"
+
+[[mirror]]
+lean = "p3_uni_stark.verifier.mirror.check_shape"
+rust = "p3_uni_stark::verifier::verify_with_preprocessed"
+
+[[mirror]]
+lean = "p3_uni_stark.verifier.mirror.check_ood_point"
+rust = "p3_uni_stark::verifier::prepare_opening_claims"
+
+[[mirror]]
+lean = "p3_uni_stark.transcript.mirror.StarkShape"
+rust = "p3_uni_stark::transcript::StarkShape"
+
+[[mirror]]
+lean = "p3_uni_stark.transcript.mirror.Step"
+rust = "p3_uni_stark::transcript::StarkShape::pattern"
+
+[[mirror]]
+lean = "p3_uni_stark.transcript.mirror.StarkShape.pattern"
+rust = "p3_uni_stark::transcript::StarkShape::pattern"
+
+[[mirror]]
+lean = "p3_uni_stark.transcript.mirror.Msg"
+rust = "p3_uni_stark::transcript::StarkVerifierTranscript"
+
+[[mirror]]
+lean = "p3_uni_stark.transcript.mirror.StarkTranscriptFailure"
+rust = "p3_uni_stark::transcript::StarkTranscriptFailure"
+
+[[mirror]]
+lean = "p3_uni_stark.transcript.mirror.optional_commitment"
+rust = "p3_uni_stark::transcript::StarkVerifierTranscript::optional_commitment"
+
+[[mirror]]
+lean = "p3_uni_stark.transcript.mirror.constraint_phase"
+rust = "p3_uni_stark::transcript::StarkVerifierTranscript::constraint_phase"
+
+[[mirror]]
+lean = "p3_uni_stark.transcript.mirror.ood_phase"
+rust = "p3_uni_stark::transcript::StarkVerifierTranscript::ood_phase"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.PreprocessedVerifierKey"
+rust = "p3_uni_stark::preprocessed::PreprocessedVerifierKey"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.Proof"
+rust = "p3_uni_stark::proof::Proof"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.validate_degree_bits"
+rust = "p3_uni_stark::verifier::validate_degree_bits"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.checked_log_size_sum"
+rust = "p3_util::checked_log_size_sum"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.natural_domain_for_degree"
+rust = "{impl p3_commit::Pcs<Challenge, Challenger> for p3_fri::two_adic_pcs::TwoAdicFriPcs<Val, Dft, InputMmcs, FriMmcs>}::natural_domain_for_degree"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.process_preprocessed_trace"
+rust = "p3_uni_stark::verifier::process_preprocessed_trace"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.ofTranscriptFailure"
+rust = "{impl core::convert::From<p3_uni_stark::transcript::StarkTranscriptFailure> for p3_uni_stark::error::VerificationError<PcsErr>}::from"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.constraint_phase"
+rust = "p3_uni_stark::transcript::StarkVerifierTranscript::constraint_phase"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.ood_phase"
+rust = "p3_uni_stark::transcript::StarkVerifierTranscript::ood_phase"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.opening_claims"
+rust = "p3_uni_stark::verifier::prepare_opening_claims"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.prepare_opening_claims"
+rust = "p3_uni_stark::verifier::prepare_opening_claims"
+
+[[mirror]]
+lean = "p3_uni_stark.verify.mirror.verify_with_preprocessed"
+rust = "p3_uni_stark::verifier::verify_with_preprocessed"

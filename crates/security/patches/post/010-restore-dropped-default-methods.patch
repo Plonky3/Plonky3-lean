@@ -1,0 +1,147 @@
+# Patch:        010-restore-dropped-default-methods
+# Phase:        post
+# Target:       extraction/P3Security/Extraction/Funs.lean
+# Hunks:        12
+# Class:        restore
+# Gap:          docs/extractor-issues.md 2: charon's multi-target mode
+#               (`--targets`) forces `--translate-all-methods`, then filters
+#               unused methods after the merge, which drops the default-method
+#               roots hax adds (`clone_from`, `ne`). `--targets` is needed
+#               because of 1.
+# Cost:         none. Each added field is the body of the CoreModels default
+#               method it stands for (`clone.Clone.clone_from.default`,
+#               `cmp.PartialEq.ne.default`), inlined.
+# Upstreamable: yes: charon could keep `--start-from` roots through the
+#               multi-target merge, or hax could pass `--target` to charon's
+#               cargo (issue 1).
+# Drop when:    charon keeps `--start-from` roots through the multi-target
+#               merge, or hax can pass `--target` to charon's cargo.
+#
+# The six budget structs derive `Clone` and `PartialEq`, and come out without
+# `clone_from` and `ne`, so Lean rejects the structure literals. As for
+# goldilocks/post/010 and binary-field/post/020, the fields are added by hand:
+#   clone_from := fun _ source => <clone> source        (= clone_from.default)
+#   ne := fun self other => (eq self other) = false     (= ne.default)
+#
+--- a/extraction/P3Security/Extraction/Funs.lean
++++ b/extraction/P3Security/Extraction/Funs.lean
+@@ -558,6 +558,8 @@
+ def budget.report.SecurityTerm.Insts.CoreCloneClone : core.clone.Clone
+   budget.report.SecurityTerm := {
+   clone := budget.report.SecurityTerm.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => budget.report.SecurityTerm.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- Trait implementation: [p3_security::budget::report::{impl core::marker::Copy for p3_security::budget::report::SecurityTerm}]
+@@ -600,6 +602,10 @@
+ def budget.report.SecurityTerm.Insts.CoreCmpPartialEqSecurityTerm :
+   core.cmp.PartialEq budget.report.SecurityTerm budget.report.SecurityTerm := {
+   eq := budget.report.SecurityTerm.Insts.CoreCmpPartialEqSecurityTerm.eq
++  -- PATCHED: default method, body of `core.cmp.PartialEq.ne.default`
++  ne := fun self other => do
++    let b ← budget.report.SecurityTerm.Insts.CoreCmpPartialEqSecurityTerm.eq self other
++    ok (b = false)
+ }
+ 
+ /-- Trait implementation: [p3_security::budget::report::{impl core::cmp::Eq for p3_security::budget::report::SecurityTerm}]
+@@ -626,6 +632,8 @@
+ def budget.report.SecurityReport.Insts.CoreCloneClone : core.clone.Clone
+   budget.report.SecurityReport := {
+   clone := budget.report.SecurityReport.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => budget.report.SecurityReport.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- Trait implementation: [p3_security::budget::report::{impl core::marker::Copy for p3_security::budget::report::SecurityReport}]
+@@ -670,6 +678,10 @@
+   core.cmp.PartialEq budget.report.SecurityReport budget.report.SecurityReport
+   := {
+   eq := budget.report.SecurityReport.Insts.CoreCmpPartialEqSecurityReport.eq
++  -- PATCHED: default method, body of `core.cmp.PartialEq.ne.default`
++  ne := fun self other => do
++    let b ← budget.report.SecurityReport.Insts.CoreCmpPartialEqSecurityReport.eq self other
++    ok (b = false)
+ }
+ 
+ /-- Trait implementation: [p3_security::budget::report::{impl core::cmp::Eq for p3_security::budget::report::SecurityReport}]
+@@ -791,6 +803,8 @@
+ def budget.shape.ProtocolParams.Insts.CoreCloneClone : core.clone.Clone
+   budget.shape.ProtocolParams := {
+   clone := budget.shape.ProtocolParams.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => budget.shape.ProtocolParams.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- Trait implementation: [p3_security::budget::shape::{impl core::marker::Copy for p3_security::budget::shape::ProtocolParams}]
+@@ -852,6 +866,10 @@
+   core.cmp.PartialEq budget.shape.ProtocolParams budget.shape.ProtocolParams
+   := {
+   eq := budget.shape.ProtocolParams.Insts.CoreCmpPartialEqProtocolParams.eq
++  -- PATCHED: default method, body of `core.cmp.PartialEq.ne.default`
++  ne := fun self other => do
++    let b ← budget.shape.ProtocolParams.Insts.CoreCmpPartialEqProtocolParams.eq self other
++    ok (b = false)
+ }
+ 
+ /-- Trait implementation: [p3_security::budget::shape::{impl core::cmp::Eq for p3_security::budget::shape::ProtocolParams}]
+@@ -876,6 +894,8 @@
+ def budget.shape.InstanceShape.Insts.CoreCloneClone : core.clone.Clone
+   budget.shape.InstanceShape := {
+   clone := budget.shape.InstanceShape.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => budget.shape.InstanceShape.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- Trait implementation: [p3_security::budget::shape::{impl core::marker::Copy for p3_security::budget::shape::InstanceShape}]
+@@ -921,6 +941,10 @@
+ def budget.shape.InstanceShape.Insts.CoreCmpPartialEqInstanceShape :
+   core.cmp.PartialEq budget.shape.InstanceShape budget.shape.InstanceShape := {
+   eq := budget.shape.InstanceShape.Insts.CoreCmpPartialEqInstanceShape.eq
++  -- PATCHED: default method, body of `core.cmp.PartialEq.ne.default`
++  ne := fun self other => do
++    let b ← budget.shape.InstanceShape.Insts.CoreCmpPartialEqInstanceShape.eq self other
++    ok (b = false)
+ }
+ 
+ /-- Trait implementation: [p3_security::budget::shape::{impl core::cmp::Eq for p3_security::budget::shape::InstanceShape}]
+@@ -945,6 +969,8 @@
+ def budget.shape.LookupShape.Insts.CoreCloneClone : core.clone.Clone
+   budget.shape.LookupShape := {
+   clone := budget.shape.LookupShape.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => budget.shape.LookupShape.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- Trait implementation: [p3_security::budget::shape::{impl core::marker::Copy for p3_security::budget::shape::LookupShape}]
+@@ -987,6 +1013,10 @@
+ def budget.shape.LookupShape.Insts.CoreCmpPartialEqLookupShape :
+   core.cmp.PartialEq budget.shape.LookupShape budget.shape.LookupShape := {
+   eq := budget.shape.LookupShape.Insts.CoreCmpPartialEqLookupShape.eq
++  -- PATCHED: default method, body of `core.cmp.PartialEq.ne.default`
++  ne := fun self other => do
++    let b ← budget.shape.LookupShape.Insts.CoreCmpPartialEqLookupShape.eq self other
++    ok (b = false)
+ }
+ 
+ /-- Trait implementation: [p3_security::budget::shape::{impl core::cmp::Eq for p3_security::budget::shape::LookupShape}]
+@@ -1010,6 +1040,8 @@
+ def budget.shape.AirShape.Insts.CoreCloneClone : core.clone.Clone
+   budget.shape.AirShape := {
+   clone := budget.shape.AirShape.Insts.CoreCloneClone.clone
++  -- PATCHED: default method, body of `core.clone.Clone.clone_from.default`
++  clone_from := fun _ source => budget.shape.AirShape.Insts.CoreCloneClone.clone source
+ }
+ 
+ /-- Trait implementation: [p3_security::budget::shape::{impl core::marker::Copy for p3_security::budget::shape::AirShape}]
+@@ -1071,6 +1103,10 @@
+ def budget.shape.AirShape.Insts.CoreCmpPartialEqAirShape : core.cmp.PartialEq
+   budget.shape.AirShape budget.shape.AirShape := {
+   eq := budget.shape.AirShape.Insts.CoreCmpPartialEqAirShape.eq
++  -- PATCHED: default method, body of `core.cmp.PartialEq.ne.default`
++  ne := fun self other => do
++    let b ← budget.shape.AirShape.Insts.CoreCmpPartialEqAirShape.eq self other
++    ok (b = false)
+ }
+ 
+ /-- Trait implementation: [p3_security::budget::shape::{impl core::cmp::Eq for p3_security::budget::shape::AirShape}]

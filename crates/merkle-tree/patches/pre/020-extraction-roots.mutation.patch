@@ -1,0 +1,14 @@
+# Mutation of: 020-extraction-roots
+# Breaks:      the module is gated on a misspelled cfg.
+#
+--- a/merkle-tree/src/lib.rs
++++ b/merkle-tree/src/lib.rs
+@@ -5,7 +5,7 @@
+ 
+ mod builder;
+ // PATCHED: extraction roots, only under hax's Lean backend.
+-#[cfg(hax_backend_lean)]
++#[cfg(hax_backend_lea)]
+ pub mod hax_roots;
+ mod hiding_mmcs;
+ mod merkle_tree;

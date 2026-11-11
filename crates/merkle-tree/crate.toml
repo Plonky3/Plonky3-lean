@@ -1,0 +1,25 @@
+# p3-merkle-tree: the Merkle tree MMCS over matrices of several heights.
+
+lean_lib = "P3MerkleTree"
+
+# The verifier side: the single-index verifier, its schedule and the hiding verifier.
+#
+# All of it is generic over the hasher, the compression and the packing.
+#
+# The builder, the openings and the pruned multi-opening are not extracted.
+#
+# The builder is parallel, packed and unsafe.
+#
+# The MMCS trait has generic associated types, so its methods are not roots.
+#
+# The shipped verifier walks the matrices with iterator adapters, which aeneas rejects.
+#
+# Pre-patch 010 gives the verifiers bodies with indexed loops, and pre-patch 020 roots them.
+state = "scoped"
+
+features = []
+
+# One root: the module of one-line functions that pre-patch 020 adds.
+start_from = ["p3_merkle_tree::hax_roots"]
+
+watch = ["merkle-tree/src", "merkle-tree/Cargo.toml", "commit/src/mmcs.rs"]

@@ -1,0 +1,52 @@
+# Patch:        010-exposed-ops-and-layout
+# Phase:        post
+# Target:       extraction/P3BinaryDft/Extraction/Funs.lean
+# Hunks:        2
+# Class:        reshape
+# Gap:          docs/extractor-issues.md 22 (Aeneas's saturating operations
+#               have no exposed body).
+# Cost:         the exposed model of `saturating_sub` on usize in HaxExt.lean,
+#               trusted as the rest of HaxExt is.
+# Upstreamable: yes: aeneas can mark its saturating operations `@[expose]`,
+#               and pass the type argument of `size_of`.
+# Drop when:    aeneas exposes them and emits `size_of`'s type argument.
+#
+# The two saturating calls go to HaxExt's exposed model, so a proof can state what they return.
+#
+# One is the height of the step table, the other the tile height of the schedule.
+#
+# aeneas emits `size_of` without its type argument, which Lean cannot infer.
+#
+# The call passes the element type, which is in scope.
+#
+--- a/extraction/P3BinaryDft/Extraction/Funs.lean
++++ b/extraction/P3BinaryDft/Extraction/Funs.lean
+@@ -250,7 +250,8 @@
+   let bases1 ←
+     lch.twiddles.Twiddles.new_indexed_loop p3_binary_fieldtowerTowerLevelInst
+       { start := 0#usize, «end» := log_n } bases shift
+-  let i ← core.num.Usize.saturating_sub log_n 1#usize
++  -- PATCHED: the exposed model of `saturating_sub` (was `core.num.Usize.saturating_sub`)
++  let i ← core.num.Usize.saturating_sub_exposed log_n 1#usize
+   let steps ← domain.domain_point_steps p3_binary_fieldtowerTowerLevelInst i
+   ok { bases := bases1, steps }
+ 
+@@ -902,14 +903,16 @@
+   (F : Type _) (width : Std.Usize) (log_n : Std.Usize) (workers : Std.Usize) :
+   RustM lch.schedule.Schedule
+   := do
+-  let i ← core.mem.size_of
++  -- PATCHED: the element type passed explicitly (was `core.mem.size_of`)
++  let i ← core.mem.size_of F
+   let row_bytes ← i * width
+   let i1 ← lch.schedule.DEEP_TILE_BYTES
+   let i2 ← i1 / row_bytes
+   let i3 ← core.Usize.Insts.CoreCmpOrd.max i2 1#usize
+   let capacity ← p3_util.log2_floor_usize i3
+   let i4 ← p3_util.log2_ceil_usize workers
+-  let i5 ← core.num.Usize.saturating_sub log_n i4
++  -- PATCHED: the exposed model of `saturating_sub` (was `core.num.Usize.saturating_sub`)
++  let i5 ← core.num.Usize.saturating_sub_exposed log_n i4
+   let log_tile_rows ← core.Usize.Insts.CoreCmpOrd.min capacity i5
+   let i6 ← core.num.Usize.div_ceil lch.schedule.CACHE_LINE_BYTES row_bytes
+   let i7 ← p3_util.log2_ceil_usize i6

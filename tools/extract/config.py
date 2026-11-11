@@ -5,6 +5,7 @@
   config.py crates              one line per crate: <dir>|<lean_lib>|<state>
   config.py charon-args <dir>   the --charon-args string for one crate
   config.py rustflags <dir>     the RUSTFLAGS of one crate's extraction
+  config.py features <dir>      the Cargo features of one crate's extraction, comma-separated
   config.py package <dir>       the Cargo package one crate directory models
   config.py source <dir>        that package's source directory
   config.py pre-patches         every crates/*/patches/pre/*.patch, in apply order
@@ -78,6 +79,8 @@ def main(argv):
     elif argv[:1] == ["rustflags"] and len(argv) == 2:
         c = dict(crates())[argv[1]]
         print(" ".join([toolchain()["rustflags"], *c.get("rustflags", [])]))
+    elif argv[:1] == ["features"] and len(argv) == 2:
+        print(",".join(dict(crates())[argv[1]].get("features", [])))
     elif argv[:1] == ["package"] and len(argv) == 2:
         print(package(argv[1], dict(crates())[argv[1]]))
     elif argv[:1] == ["source"] and len(argv) == 2:

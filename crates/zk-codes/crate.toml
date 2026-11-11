@@ -1,0 +1,92 @@
+# p3-zk-codes: zero-knowledge Reed-Solomon encodings (eprint 2026/391, Section 3.2.1).
+
+lean_lib = "P3ZkCodes"
+
+# Nothing is extracted.
+#
+# The encoding is generic over p3-field's trait hierarchy and over the transform backend, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# Each item is transcribed over a field in stub/P3ZkCodes/, with the abstractions its file header lists.
+state = "stub"
+
+features = []
+
+watch = ["zk-codes/src", "zk-codes/Cargo.toml", "dft/src/traits.rs", "util/src/lib.rs"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.new"
+rust = "p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::new"
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.evaluation_point"
+rust = "p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::evaluation_point"
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.message_row_iter"
+rust = "p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::message_row_iter"
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.randomness_row_iter"
+rust = "p3_zk_codes::reed_solomon::ReedSolomonZkEncoding::randomness_row_iter"
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.message_row"
+rust = "{impl p3_zk_codes::encoding::LinearZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::message_row"
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.randomness_row"
+rust = "{impl p3_zk_codes::encoding::LinearZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::randomness_row"
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.message_len"
+rust = "{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::message_len"
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.randomness_len"
+rust = "{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::randomness_len"
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.query_bound"
+rust = "{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::query_bound"
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.codeword_len"
+rust = "{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::codeword_len"
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.error"
+rust = "{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::error"
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.sample_message"
+rust = "{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::sample_message"
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.sample_randomness"
+rust = "{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::sample_randomness"
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.encode"
+rust = "{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::encode"
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.simulate"
+rust = "{impl p3_zk_codes::encoding::ZkEncoding<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::simulate"
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.encode_with_randomness"
+rust = "{impl p3_zk_codes::encoding::ZkEncodingWithRandomness<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::encode_with_randomness"
+
+[[mirror]]
+lean = "p3_zk_codes.reed_solomon.mirror.ReedSolomonZkEncoding.encode_batch_with_randomness"
+rust = "{impl p3_zk_codes::encoding::ZkEncodingWithRandomness<F> for p3_zk_codes::reed_solomon::ReedSolomonZkEncoding<F, Dft>}::encode_batch_with_randomness"
+
+[[mirror]]
+lean = "p3_zk_codes.encoding.mirror.stack_codewords"
+rust = "p3_zk_codes::encoding::stack_codewords"
+
+[[mirror]]
+lean = "p3_zk_codes.encoding.mirror.encode_batch_with_randomness"
+rust = "p3_zk_codes::encoding::ZkEncodingWithRandomness::encode_batch_with_randomness"

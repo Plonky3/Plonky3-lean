@@ -57,6 +57,18 @@ name = "P3BabyBear"
 srcDir = "crates/baby-bear/extraction"
 
 [[lean_lib]]
+name = "P3Commit"
+srcDir = "crates/commit/stub"
+
+[[lean_lib]]
+name = "P3Dft"
+srcDir = "crates/dft/stub"
+
+[[lean_lib]]
+name = "P3BinaryDft"
+srcDir = "crates/binary-dft/extraction"
+
+[[lean_lib]]
 name = "P3Field"
 srcDir = "crates/field/stub"
 
@@ -67,6 +79,10 @@ srcDir = "crates/goldilocks/extraction"
 [[lean_lib]]
 name = "P3KoalaBear"
 srcDir = "crates/koala-bear/extraction"
+
+[[lean_lib]]
+name = "P3Matrix"
+srcDir = "crates/matrix/extraction"
 
 [[lean_lib]]
 name = "P3Mds"
@@ -93,6 +109,30 @@ name = "P3Util"
 srcDir = "crates/util/extraction"
 
 [[lean_lib]]
+name = "P3ZkCodes"
+srcDir = "crates/zk-codes/stub"
+
+[[lean_lib]]
+name = "P3MultilinearUtil"
+srcDir = "crates/multilinear-util/extraction"
+
+[[lean_lib]]
+name = "P3Sumcheck"
+srcDir = "crates/sumcheck/extraction"
+
+[[lean_lib]]
+name = "P3Stir"
+srcDir = "crates/stir/stub"
+
+[[lean_lib]]
+name = "P3Whir"
+srcDir = "crates/whir/stub"
+
+[[lean_lib]]
+name = "P3BinaryPcs"
+srcDir = "crates/binary-pcs/extraction"
+
+[[lean_lib]]
 name = "P3BinaryField"
 srcDir = "crates/binary-field/extraction"
 
@@ -104,6 +144,15 @@ srcDir = "crates/sha256/extraction"
 [[lean_lib]]
 name = "Sha2"
 srcDir = "crates/sha2/extraction"
+
+# Not a Plonky3 crate: the dependency p3-keccak permutes with (crates/tiny-keccak/crate.toml).
+[[lean_lib]]
+name = "TinyKeccak"
+srcDir = "crates/tiny-keccak/extraction"
+
+[[lean_lib]]
+name = "P3Keccak"
+srcDir = "crates/keccak/extraction"
 
 [[lean_lib]]
 name = "P3Blake2s"
@@ -117,3 +166,75 @@ srcDir = "crates/blake3/extraction"
 [[lean_lib]]
 name = "Blake3Crate"
 srcDir = "crates/blake3-crate/stub"
+
+[[lean_lib]]
+name = "P3Security"
+srcDir = "crates/security/extraction"
+
+[[lean_lib]]
+name = "P3Challenger"
+srcDir = "crates/challenger/extraction"
+
+[[lean_lib]]
+name = "P3Symmetric"
+srcDir = "crates/symmetric/extraction"
+
+[[lean_lib]]
+name = "P3MerkleTree"
+srcDir = "crates/merkle-tree/extraction"
+
+[[lean_lib]]
+name = "P3Air"
+srcDir = "crates/air/extraction"
+
+[[lean_lib]]
+name = "P3Lookup"
+srcDir = "crates/lookup/extraction"
+
+[[lean_lib]]
+name = "P3UniStark"
+srcDir = "crates/uni-stark/extraction"
+
+[[lean_lib]]
+name = "P3Fri"
+srcDir = "crates/fri/stub"
+
+[[lean_lib]]
+name = "P3KeccakAir"
+srcDir = "crates/keccak-air/extraction"
+
+[[lean_lib]]
+name = "P3Sha256Air"
+srcDir = "crates/sha256-air/extraction"
+
+[[lean_lib]]
+name = "P3Blake3Air"
+srcDir = "crates/blake3-air/extraction"
+
+[[lean_lib]]
+name = "P3Blake2sAir"
+srcDir = "crates/blake2s-air/extraction"
+
+[[lean_lib]]
+name = "P3BatchStark"
+srcDir = "crates/batch-stark/extraction"
+
+[[lean_lib]]
+name = "P3Bus"
+srcDir = "crates/bus/extraction"
+
+[[lean_lib]]
+name = "P3Circle"
+srcDir = "crates/circle/stub"
+
+[[lean_lib]]
+name = "P3MultiStark"
+srcDir = "crates/multi-stark/extraction"
+
+[[lean_lib]]
+name = "P3Word"
+srcDir = "crates/word/extraction"
+
+[[lean_lib]]
+name = "P3WordBackend"
+srcDir = "crates/word-backend/stub"

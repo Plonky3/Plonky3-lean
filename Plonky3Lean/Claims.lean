@@ -1,27 +1,56 @@
 module
 
+public import Plonky3Lean.Claims.Air
 public import Plonky3Lean.Claims.BabyBear
 public import Plonky3Lean.Claims.Blake2s
+public import Plonky3Lean.Claims.Blake2sAir
 public import Plonky3Lean.Claims.Blake3
+public import Plonky3Lean.Claims.Blake3Air
+public import Plonky3Lean.Claims.Bus
+public import Plonky3Lean.Claims.Commit
+public import Plonky3Lean.Claims.Challenger
+public import Plonky3Lean.Claims.Dft
 public import Plonky3Lean.Claims.BinaryField
+public import Plonky3Lean.Claims.BinaryDft
+public import Plonky3Lean.Claims.BinaryPcs
 public import Plonky3Lean.Claims.Goldilocks
 public import Plonky3Lean.Claims.KoalaBear
+public import Plonky3Lean.Claims.Lookup
+public import Plonky3Lean.Claims.Matrix
 public import Plonky3Lean.Claims.Mersenne31
+public import Plonky3Lean.Claims.Security
 public import Plonky3Lean.Claims.Monty31
+public import Plonky3Lean.Claims.MultilinearUtil
+public import Plonky3Lean.Claims.Sumcheck
+public import Plonky3Lean.Claims.Whir
 public import Plonky3Lean.Claims.Sha256
+public import Plonky3Lean.Claims.Symmetric
 public import Plonky3Lean.Claims.Util
+public import Plonky3Lean.Claims.Word
+public import Plonky3Lean.Claims.WordBackend
+public import Plonky3Lean.Claims.ZkCodes
 public import Plonky3Lean.Proofs
+public import Plonky3Lean.Claims.MerkleTree
+public import Plonky3Lean.Claims.UniStark
+public import Plonky3Lean.Claims.BatchStark
+public import Plonky3Lean.Claims.Keccak
+public import Plonky3Lean.Claims.Fri
+public import Plonky3Lean.Claims.Stir
+public import Plonky3Lean.Claims.Circle
+public import Plonky3Lean.Claims.KeccakAir
+public import Plonky3Lean.Claims.MultiStark
+public import Plonky3Lean.Claims.Sha256Air
 
 @[expose] public section
 
 /-!
 # Claims
 
-Every statement this repository asserts about Plonky3, and nothing else. This
-module is what a reader audits.
+Every statement this repository asserts about Plonky3, and nothing else.
 
-Each claim restates its theorem in full and takes its proof from
-`Plonky3Lean.Proofs`:
+This module is what a reader audits.
+
+Each claim restates its theorem in full and takes its proof from the proofs tree:
 
 ```
 theorem baby_bear.BabyBearParameters.PRIME.is_prime :
@@ -29,11 +58,13 @@ theorem baby_bear.BabyBearParameters.PRIME.is_prime :
   Proofs.P3BabyBear.baby_bear.BabyBearParameters.PRIME.is_prime
 ```
 
-A proof whose statement drifts no longer typechecks against its claim, so a
-claim changes only through a change to this module. CODEOWNERS assigns this
-module to the Plonky3 maintainers. CI checks the axioms of every claim against
-`claims.toml`.
+A proof whose statement drifts no longer typechecks against its claim.
 
-Group claims by subject in submodules (`Claims/BabyBear.lean`) and import each
-one here.
+So a claim changes only through a change to this module.
+
+CODEOWNERS assigns this module to the Plonky3 maintainers.
+
+CI checks the axioms of every claim against claims.toml.
+
+Claims are grouped by subject in submodules, such as Claims/BabyBear.lean, each imported here.
 -/

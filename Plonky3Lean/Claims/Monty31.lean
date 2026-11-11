@@ -165,8 +165,8 @@ open monty_31.MontyField31.Insts in
 theorem QuotientMap.from_canonical_checked_u32 {FP : Type} {inst : data_traits.FieldParameters FP}
     (hv : FieldValid inst p mu) (x : Std.U32) :
     P3_fieldIntegersQuotientMapU32.from_canonical_checked inst x ⦃ r =>
-      (x.val < p.val → ∃ e, r = some e ∧ e.value.val = x.val * 2 ^ 32 % p.val) ∧
-      (p.val ≤ x.val → r = none) ⦄ :=
+      (x.val < p.val → ∃ e, r = .Some e ∧ e.value.val = x.val * 2 ^ 32 % p.val) ∧
+      (p.val ≤ x.val → r = .None) ⦄ :=
   Proofs.Monty31.from_canonical_checked_u32.spec hv x
 
 open monty_31.MontyField31.Insts in
@@ -177,9 +177,9 @@ theorem QuotientMap.from_canonical_checked_i32 {FP : Type} {inst : data_traits.F
     (hv : FieldValid inst p mu) (x : Std.I32) :
     P3_fieldIntegersQuotientMapI32.from_canonical_checked inst x ⦃ r =>
       (-((p.val - 1) / 2 : ℕ) ≤ x.val → x.val ≤ ((p.val - 1) / 2 : ℕ) →
-        ∃ e, r = some e ∧ e.value.val < p.val ∧
+        ∃ e, r = .Some e ∧ e.value.val < p.val ∧
           (e.value.val : ℤ) % p.val = x.val * 2 ^ 32 % p.val) ∧
-      ((x.val < -((p.val - 1) / 2 : ℕ) ∨ ((p.val - 1) / 2 : ℕ) < x.val) → r = none) ⦄ :=
+      ((x.val < -((p.val - 1) / 2 : ℕ) ∨ ((p.val - 1) / 2 : ℕ) < x.val) → r = .None) ⦄ :=
   Proofs.Monty31.from_canonical_checked_i32.spec hv x
 
 open monty_31.MontyField31.Insts in
@@ -187,8 +187,8 @@ open monty_31.MontyField31.Insts in
 theorem QuotientMap.from_canonical_checked_u64 {FP : Type} {inst : data_traits.FieldParameters FP}
     (hv : FieldValid inst p mu) (x : Std.U64) :
     P3_fieldIntegersQuotientMapU64.from_canonical_checked inst x ⦃ r =>
-      (x.val < p.val → ∃ e, r = some e ∧ e.value.val = x.val * 2 ^ 32 % p.val) ∧
-      (p.val ≤ x.val → r = none) ⦄ :=
+      (x.val < p.val → ∃ e, r = .Some e ∧ e.value.val = x.val * 2 ^ 32 % p.val) ∧
+      (p.val ≤ x.val → r = .None) ⦄ :=
   Proofs.Monty31.from_canonical_checked_u64.spec hv x
 
 open monty_31.MontyField31.Insts in
@@ -196,8 +196,8 @@ open monty_31.MontyField31.Insts in
 theorem QuotientMap.from_canonical_checked_u128 {FP : Type} {inst : data_traits.FieldParameters FP}
     (hv : FieldValid inst p mu) (x : Std.U128) :
     P3_fieldIntegersQuotientMapU128.from_canonical_checked inst x ⦃ r =>
-      (x.val < p.val → ∃ e, r = some e ∧ e.value.val = x.val * 2 ^ 32 % p.val) ∧
-      (p.val ≤ x.val → r = none) ⦄ :=
+      (x.val < p.val → ∃ e, r = .Some e ∧ e.value.val = x.val * 2 ^ 32 % p.val) ∧
+      (p.val ≤ x.val → r = .None) ⦄ :=
   Proofs.Monty31.from_canonical_checked_u128.spec hv x
 
 open monty_31.MontyField31.Insts in
@@ -208,9 +208,9 @@ theorem QuotientMap.from_canonical_checked_i64 {FP : Type} {inst : data_traits.F
     (hv : FieldValid inst p mu) (x : Std.I64) :
     P3_fieldIntegersQuotientMapI64.from_canonical_checked inst x ⦃ r =>
       (-((p.val - 1) / 2 : ℕ) ≤ x.val → x.val ≤ ((p.val - 1) / 2 : ℕ) →
-        ∃ e, r = some e ∧ e.value.val < p.val ∧
+        ∃ e, r = .Some e ∧ e.value.val < p.val ∧
           (e.value.val : ℤ) % p.val = x.val * 2 ^ 32 % p.val) ∧
-      ((x.val < -((p.val - 1) / 2 : ℕ) ∨ ((p.val - 1) / 2 : ℕ) < x.val) → r = none) ⦄ :=
+      ((x.val < -((p.val - 1) / 2 : ℕ) ∨ ((p.val - 1) / 2 : ℕ) < x.val) → r = .None) ⦄ :=
   Proofs.Monty31.from_canonical_checked_i64.spec hv x
 
 open monty_31.MontyField31.Insts in
@@ -221,9 +221,9 @@ theorem QuotientMap.from_canonical_checked_i128 {FP : Type} {inst : data_traits.
     (hv : FieldValid inst p mu) (x : Std.I128) :
     P3_fieldIntegersQuotientMapI128.from_canonical_checked inst x ⦃ r =>
       (-((p.val - 1) / 2 : ℕ) ≤ x.val → x.val ≤ ((p.val - 1) / 2 : ℕ) →
-        ∃ e, r = some e ∧ e.value.val < p.val ∧
+        ∃ e, r = .Some e ∧ e.value.val < p.val ∧
           (e.value.val : ℤ) % p.val = x.val * 2 ^ 32 % p.val) ∧
-      ((x.val < -((p.val - 1) / 2 : ℕ) ∨ ((p.val - 1) / 2 : ℕ) < x.val) → r = none) ⦄ :=
+      ((x.val < -((p.val - 1) / 2 : ℕ) ∨ ((p.val - 1) / 2 : ℕ) < x.val) → r = .None) ⦄ :=
   Proofs.Monty31.from_canonical_checked_i128.spec hv x
 
 /-! ## Field elements -/

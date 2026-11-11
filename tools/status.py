@@ -132,7 +132,7 @@ LEAN_QUERY = """\
 import Plonky3Lean
 open Lean Elab Command
 
-partial def closure (env : Environment) (start : Name) : NameSet := Id.run do
+partial def claimClosure (env : Environment) (start : Name) : NameSet := Id.run do
   let mut seen : NameSet := {}
   let mut todo := #[start]
   while h : todo.size > 0 do
@@ -149,14 +149,16 @@ partial def closure (env : Environment) (start : Name) : NameSet := Id.run do
 #eval show CommandElabM Unit from do
   let env ← getEnv
   let libs : List String := LIBS
-  let claims : List Name := CLAIMS
-  let mirrors : List Name := MIRRORS
+  -- Names travel as one string, since a list literal of every claim overflows the code generator.
+  let names (s : String) : List Name := (s.splitOn " ").filter (· ≠ "") |>.map String.toName
+  let claims : List Name := names CLAIMS
+  let mirrors : List Name := names MIRRORS
   let inLib (n : Name) : Bool := match env.getModuleIdxFor? n with
     | some i => libs.any fun l => (env.header.moduleNames[i.toNat]!).toString.startsWith l
     | none => false
   let opaques := env.constants.toList.filterMap fun (n, ci) =>
     if ci matches .opaqueInfo _ && inLib n && !n.isInternal then some n else none
-  let closures := claims.map (closure env)
+  let closures := claims.map (claimClosure env)
   let count (t : Name) : Nat := (closures.filter (·.contains t)).length
   for n in opaques do
     let doc := (← findDocString? env n).getD ""
@@ -172,7 +174,7 @@ partial def closure (env : Environment) (start : Name) : NameSet := Id.run do
 
 
 def lean_facts(libs, claims, mirrors):
-    q = lambda xs: "[" + ", ".join(f"`{x}" for x in xs) + "]"
+    q = lambda xs: json.dumps(" ".join(str(x) for x in xs))
     src = (LEAN_QUERY.replace("LIBS", "[" + ", ".join(json.dumps(x) for x in libs) + "]")
            .replace("CLAIMS", q(claims)).replace("MIRRORS", q(mirrors)))
     with tempfile.NamedTemporaryFile("w", suffix=".lean", delete=False) as f:

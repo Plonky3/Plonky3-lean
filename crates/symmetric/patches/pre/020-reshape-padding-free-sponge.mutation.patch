@@ -1,0 +1,15 @@
+# Mutation of: 020-reshape-padding-free-sponge
+# Breaks:      the reshaped body permutes once more when the input ends on a block boundary.
+#
+diff --git a/symmetric/src/hax_reshaped.rs b/symmetric/src/hax_reshaped.rs
+--- a/symmetric/src/hax_reshaped.rs
++++ b/symmetric/src/hax_reshaped.rs
+@@ -40,7 +40,7 @@ where
+ 
+     // A partial block is permuted too.
+     // An input that ends on a block boundary, or an empty one, has nothing left to permute.
+-    if i != 0 {
++    if i != 0 || i == 0 {
+         permutation.permute_mut(&mut state);
+     }
+ 

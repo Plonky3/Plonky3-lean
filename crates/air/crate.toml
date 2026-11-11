@@ -1,0 +1,301 @@
+# p3-air: the AIR framework.
+
+lean_lib = "P3Air"
+
+# The integer helpers: the boundary-cell row and validation, the conversion of a polynomial degree to a constraint degree, and the degrees of a symbolic variable.
+#
+# Everything else is generic over the field traits or over the builder, which aeneas rejects (docs/extractor-issues.md 9).
+#
+# It is transcribed in extraction/P3Air/Assumptions/Mirror/.
+state = "scoped"
+
+features = []
+
+start_from = [
+  "p3_air::boundary::BoundaryPublic::row",
+  "p3_air::boundary::validate",
+  "p3_air::symbolic::builder::constraint_degree_from_poly_degree",
+  "p3_air::symbolic::variable::SymbolicVariable::degree_multiple",
+  "p3_air::symbolic::variable::SymbolicVariable::poly_degree",
+  "p3_air::symbolic::variable::SymbolicVariableExt::degree_multiple",
+  "p3_air::symbolic::variable::SymbolicVariableExt::poly_degree",
+]
+
+watch = ["air/src", "air/Cargo.toml"]
+
+# The transcriptions in extraction/P3Air/Assumptions/Mirror/.
+# Hashes are pending tools/mirror.
+#
+# Seven of them restate extracted items over natural numbers, for the transcribed checker to call.
+#
+# Plonky3Lean/Proofs/Air/Extracted.lean proves the extracted degree helpers and boundary row equal to them.
+#
+# The boundary validation is not yet proven equal: only its duplicate scan is.
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.SymbolicVariable.degree_multiple"
+rust = "p3_air::symbolic::variable::SymbolicVariable::degree_multiple"
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.SymbolicVariable.poly_degree"
+rust = "p3_air::symbolic::variable::SymbolicVariable::poly_degree"
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.SymbolicVariableExt.degree_multiple"
+rust = "p3_air::symbolic::variable::SymbolicVariableExt::degree_multiple"
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.SymbolicVariableExt.poly_degree"
+rust = "p3_air::symbolic::variable::SymbolicVariableExt::poly_degree"
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.SymbolicExpr.degree_multiple"
+rust = "p3_air::symbolic::SymbolicExpr::degree_multiple"
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.SymbolicExpr.degree_with"
+rust = "p3_air::symbolic::SymbolicExpr::degree_memo"
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.SymbolicExpr.degree_multiple_with_transition"
+rust = "p3_air::symbolic::SymbolicExpr::degree_multiple_with_transition"
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.SymbolicExpr.poly_degree"
+rust = "p3_air::symbolic::SymbolicExpr::poly_degree"
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.SymbolicExpr.as_const"
+rust = "p3_air::symbolic::SymbolicExpr::as_const"
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.SymbolicExpr.sym_add"
+rust = "p3_air::symbolic::SymbolicExpr::sym_add"
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.SymbolicExpr.sym_neg"
+rust = "p3_air::symbolic::SymbolicExpr::sym_neg"
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.SymbolicExpr.sym_sub"
+rust = "p3_air::symbolic::SymbolicExpr::sym_sub"
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.SymbolicExpr.sym_mul"
+rust = "p3_air::symbolic::SymbolicExpr::sym_mul"
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.SymbolicExpr.const"
+rust = "{impl p3_field::PrimeCharacteristicRing for p3_air::symbolic::SymbolicExpr<A>}::from_prime_subfield"
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.instSymLeafBaseLeaf"
+rust = "{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression::BaseLeaf<F>}::degree_multiple"
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.instSymLeafExtLeaf"
+rust = "{impl p3_air::symbolic::SymLeaf for p3_air::symbolic::expression_ext::ExtLeaf<F, EF>}::degree_multiple"
+
+[[mirror]]
+lean = "p3_air.symbolic.mirror.SymbolicExpressionExt.to_base"
+rust = "p3_air::symbolic::expression_ext::SymbolicExpressionExt::to_base"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.AirBuilder.is_transition_window"
+rust = "p3_air::builder::AirBuilder::is_transition_window"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.AirBuilder.when"
+rust = "p3_air::builder::AirBuilder::when"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.AirBuilder.when_ne"
+rust = "p3_air::builder::AirBuilder::when_ne"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.AirBuilder.when_first_row"
+rust = "p3_air::builder::AirBuilder::when_first_row"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.AirBuilder.when_last_row"
+rust = "p3_air::builder::AirBuilder::when_last_row"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.AirBuilder.when_transition"
+rust = "p3_air::builder::AirBuilder::when_transition"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.AirBuilder.when_transition_window"
+rust = "p3_air::builder::AirBuilder::when_transition_window"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.AirBuilder.assert_zeros"
+rust = "p3_air::builder::AirBuilder::assert_zeros"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.AirBuilder.bool_check"
+rust = "p3_field::PrimeCharacteristicRing::bool_check"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.AirBuilder.assert_bools"
+rust = "p3_air::builder::AirBuilder::assert_bools"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.AirBuilder.assert_one"
+rust = "p3_air::builder::AirBuilder::assert_one"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.AirBuilder.assert_eq"
+rust = "p3_air::builder::AirBuilder::assert_eq"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.AirBuilder.assert_eq_arrays"
+rust = "p3_air::builder::AirBuilder::assert_eq_arrays"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.AirBuilder.assert_bool"
+rust = "p3_air::builder::AirBuilder::assert_bool"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.ExtensionBuilder.assert_zeros_ext"
+rust = "p3_air::builder::ExtensionBuilder::assert_zeros_ext"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.ExtensionBuilder.assert_eq_ext"
+rust = "p3_air::builder::ExtensionBuilder::assert_eq_ext"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.ExtensionBuilder.assert_one_ext"
+rust = "p3_air::builder::ExtensionBuilder::assert_one_ext"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.ExtensionBuilder.when"
+rust = "{impl p3_air::builder::ExtensionBuilder for p3_air::filtered::FilteredAirBuilder<'_, AB>}::assert_zero_ext"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.PairCol.get"
+rust = "p3_air::virtual_column::PairCol::get"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.VirtualPairCol.new"
+rust = "p3_air::virtual_column::VirtualPairCol::new"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.VirtualPairCol.new_preprocessed"
+rust = "p3_air::virtual_column::VirtualPairCol::new_preprocessed"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.VirtualPairCol.new_main"
+rust = "p3_air::virtual_column::VirtualPairCol::new_main"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.VirtualPairCol.constant'"
+rust = "p3_air::virtual_column::VirtualPairCol::constant"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.VirtualPairCol.single"
+rust = "p3_air::virtual_column::VirtualPairCol::single"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.VirtualPairCol.single_preprocessed"
+rust = "p3_air::virtual_column::VirtualPairCol::single_preprocessed"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.VirtualPairCol.single_main"
+rust = "p3_air::virtual_column::VirtualPairCol::single_main"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.VirtualPairCol.sum_main"
+rust = "p3_air::virtual_column::VirtualPairCol::sum_main"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.VirtualPairCol.sum_preprocessed"
+rust = "p3_air::virtual_column::VirtualPairCol::sum_preprocessed"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.VirtualPairCol.diff_preprocessed"
+rust = "p3_air::virtual_column::VirtualPairCol::diff_preprocessed"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.VirtualPairCol.diff_main"
+rust = "p3_air::virtual_column::VirtualPairCol::diff_main"
+
+[[mirror]]
+lean = "p3_air.builder.mirror.VirtualPairCol.apply"
+rust = "p3_air::virtual_column::VirtualPairCol::apply"
+
+[[mirror]]
+lean = "p3_air.air.mirror.BoundaryPublic.row"
+rust = "p3_air::boundary::BoundaryPublic::row"
+
+[[mirror]]
+lean = "p3_air.air.mirror.validate"
+rust = "p3_air::boundary::validate"
+
+[[mirror]]
+lean = "p3_air.air.mirror.Air.periodic_values"
+rust = "p3_air::air::BaseAir::periodic_values"
+
+[[mirror]]
+lean = "p3_air.air.mirror.resolve"
+rust = "p3_air::symbolic::expression::SymbolicExpression::resolve"
+
+[[mirror]]
+lean = "p3_air.air.mirror.AirLayout.from_air"
+rust = "p3_air::symbolic::builder::AirLayout::from_air"
+
+[[mirror]]
+lean = "p3_air.air.mirror.AirLayout.validate_against_air"
+rust = "p3_air::symbolic::builder::AirLayout::validate_against_air"
+
+[[mirror]]
+lean = "p3_air.air.mirror.symbolicBuilder"
+rust = "p3_air::symbolic::builder::SymbolicAirBuilder::new"
+
+[[mirror]]
+lean = "p3_air.air.mirror.get_symbolic_constraints"
+rust = "p3_air::symbolic::builder::get_symbolic_constraints"
+
+[[mirror]]
+lean = "p3_air.air.mirror.constraint_degree_from_poly_degree"
+rust = "p3_air::symbolic::builder::constraint_degree_from_poly_degree"
+
+[[mirror]]
+lean = "p3_air.air.mirror.get_max_constraint_degree"
+rust = "p3_air::symbolic::builder::get_max_constraint_degree_extension"
+
+[[mirror]]
+lean = "p3_air.air.mirror.log2_ceil_usize"
+rust = "p3_util::log2_ceil_usize"
+
+[[mirror]]
+lean = "p3_air.air.mirror.get_log_quotient_degree"
+rust = "p3_uni_stark::symbolic::get_log_quotient_degree_extension"
+
+[[mirror]]
+lean = "p3_air.air.mirror.DebugState.assert_zero"
+rust = "{impl p3_air::named::NamedAirBuilder for p3_air::check_constraints::DebugConstraintBuilder<'_, F, EF>}::assert_zero_named"
+
+[[mirror]]
+lean = "p3_air.air.mirror.debugBuilder"
+rust = "p3_air::check_constraints::DebugConstraintBuilder::new"
+
+[[mirror]]
+lean = "p3_air.air.mirror.debugExtBuilder"
+rust = "{impl p3_air::named::NamedExtensionBuilder for p3_air::check_constraints::DebugConstraintBuilder<'_, F, EF>}::assert_zero_ext_named"
+
+[[mirror]]
+lean = "p3_air.air.mirror.assert_periodic_column_shapes"
+rust = "p3_air::check_constraints::assert_periodic_column_shapes"
+
+[[mirror]]
+lean = "p3_air.air.mirror.boundary_io_mismatches"
+rust = "p3_air::check_constraints::boundary_io_mismatches"
+
+[[mirror]]
+lean = "p3_air.air.mirror.rowBuilder"
+rust = "p3_air::check_constraints::check_constraints"
+
+[[mirror]]
+lean = "p3_air.air.mirror.check_constraints"
+rust = "p3_air::check_constraints::check_constraints"

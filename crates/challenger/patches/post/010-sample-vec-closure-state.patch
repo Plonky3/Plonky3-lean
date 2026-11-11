@@ -1,0 +1,116 @@
+# Patch:        010-sample-vec-closure-state
+# Phase:        post
+# Target:       extraction/P3Challenger/Extraction/Funs.lean
+# Hunks:        4
+# Class:        reshape
+# Gap:          docs/extractor-issues.md 60: aeneas gives a closure that
+#               captures `&mut self` a back function, which CoreModels'
+#               closure traits, `map` and `array::from_fn` do not carry.
+# Cost:         none. The provided method keeps its meaning: sample `n`
+#               times and collect the samples in order.
+# Upstreamable: yes: CoreModels could thread the closure state through
+#               `map` and `from_fn`, or aeneas could emit the pair shape.
+# Drop when:    the generated closure elaborates against CoreModels.
+#
+# The provided method of the sampling trait collects `n` samples with a closure over the challenger.
+# The closure's `call_mut` returns its output, its new state and a back function.
+# CoreModels expects the output and the new state, and `call_once` returns the output alone.
+# The closure's two methods take that shape.
+# The default itself becomes a loop that samples `n` times, as `(0..n).map(|_| self.sample()).collect()` does.
+# No model in this repository calls it: the hash challenger overrides it, and the rest is transcribed.
+#
+--- a/extraction/P3Challenger/Extraction/Funs.lean
++++ b/extraction/P3Challenger/Extraction/Funs.lean
+@@ -1231,13 +1231,16 @@
+ def CanSample.sample_vec.closure.Insts.CoreOpsFunctionFnMutTupleUsizeT.call_mut
+   {Self : Type _} {T : Type _} (CanSampleInst : CanSample Self T)
+   (c : CanSample.sample_vec.closure Self T) (tupled_args : Std.Usize) :
+-  RustM (T × (CanSample.sample_vec.closure Self T) ×
+-    (CanSample.sample_vec.closure Self T → CanSample.sample_vec.closure Self
+-    T))
++  -- PATCHED: CoreModels' `FnMut::call_mut` returns the output and the new state.
++  -- RustM (T × (CanSample.sample_vec.closure Self T) ×
++  --   (CanSample.sample_vec.closure Self T → CanSample.sample_vec.closure Self
++  --   T))
++  RustM (T × (CanSample.sample_vec.closure Self T))
+   := do
+   let (t, t1) ← CanSampleInst.sample c
+-  let back := fun c1 => c1
+-  ok (t, t1, back)
++  -- let back := fun c1 => c1
++  -- ok (t, t1, back)
++  ok (t, t1)
+ 
+ /-- [p3_challenger::CanSample::sample_vec::{impl core::ops::function::FnOnce<(usize,), T> for p3_challenger::CanSample::sample_vec::{closure}<'_0, Self, T>}::call_once]:
+     Source: 'challenger/src/lib.rs', lines 78:19-78:36 -/
+@@ -1245,12 +1248,16 @@
+   CanSample.sample_vec.closure.Insts.CoreOpsFunctionFnOnceTupleUsizeT.call_once
+   {Self : Type _} {T : Type _} (CanSampleInst : CanSample Self T)
+   (c : CanSample.sample_vec.closure Self T) (i : Std.Usize) :
+-  RustM (T × (CanSample.sample_vec.closure Self T))
++  -- PATCHED: CoreModels' `FnOnce::call_once` returns the output alone.
++  -- RustM (T × (CanSample.sample_vec.closure Self T))
++  RustM T
+   := do
+-  let (t, c1, call_mut_back) ←
++  -- let (t, c1, call_mut_back) ←
++  let (t, _) ←
+     CanSample.sample_vec.closure.Insts.CoreOpsFunctionFnMutTupleUsizeT.call_mut
+       CanSampleInst c i
+-  ok (t, call_mut_back c1)
++  -- ok (t, call_mut_back c1)
++  ok t
+ 
+ /-- Trait implementation: [p3_challenger::CanSample::sample_vec::{impl core::ops::function::FnOnce<(usize,), T> for p3_challenger::CanSample::sample_vec::{closure}<'_0, Self, T>}]
+     Source: 'challenger/src/lib.rs', lines 78:19-78:36 -/
+@@ -1282,12 +1289,43 @@
+ /-- [p3_challenger::CanSample::sample_vec]:
+     Source: 'challenger/src/lib.rs', lines 77:4-79:5
+     Visibility: public -/
++-- PATCHED: `(0..n).map(|_| self.sample()).collect()`, as a loop.
++-- aeneas threads `self` through `map` with a back function, which CoreModels' `map` lacks.
++@[rust_loop_body]
++def CanSample.sample_vec.default_loop.body
++  {Self : Type _} {T : Type _} (CanSampleInst : CanSample Self T) (n : Std.Usize)
++  (self : Self) (result : alloc.vec.Vec T) :
++  RustM (ControlFlow (Self × (alloc.vec.Vec T)) ((alloc.vec.Vec T) × Self))
++  := do
++  let i ← alloc.vec.Vec.len result
++  if i < n
++  then
++    let (t, self1) ← CanSampleInst.sample self
++    let result1 ← alloc.vec.Vec.push result t
++    ok (cont (self1, result1))
++  else ok (done (result, self))
++
++-- PATCHED: the loop of the body above.
++@[rust_loop]
++def CanSample.sample_vec.default_loop
++  {Self : Type _} {T : Type _} (CanSampleInst : CanSample Self T) (n : Std.Usize)
++  (self : Self) (result : alloc.vec.Vec T) :
++  RustM ((alloc.vec.Vec T) × Self)
++  := do
++  loop
++    (fun (self1, result1) => CanSample.sample_vec.default_loop.body CanSampleInst n self1 result1)
++    (self, result)
++
+ @[trait_default]
+ def CanSample.sample_vec.default
+   {Self : Type _} {T : Type _} (CanSampleInst : CanSample Self T) (self : Self)
+   (n : Std.Usize) :
+   RustM ((alloc.vec.Vec T) × Self)
+   := do
++  -- PATCHED: the loop above replaces the `map` and `collect` below.
++  let result ← alloc.vec.Vec.new T
++  CanSample.sample_vec.default_loop CanSampleInst n self result
++/-
+   let (m, map_back) ←
+     core.iter.traits.iterator.Iterator.map.default
+       (core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator
+@@ -1304,5 +1342,6 @@
+       m
+   let self1 := map_back m1
+   ok (v, self1)
++-/
+ 
+ end p3_challenger

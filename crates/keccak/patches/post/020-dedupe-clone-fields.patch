@@ -1,0 +1,39 @@
+# Patch:        020-dedupe-clone-fields
+# Phase:        post
+# Target:       extraction/P3Keccak/Extraction/Funs.lean
+# Hunks:        2
+# Class:        rename
+# Gap:          docs/extractor-issues.md 24: aeneas names the `Clone` witness
+#               of `Self` and the `Clone` witness of a type parameter
+#               alike, so a trait structure declares one field twice.
+# Cost:         none. Renames only; the bodies are untouched.
+# Upstreamable: yes: aeneas could suffix the witness with its parameter.
+# Drop when:    aeneas names the two witnesses apart.
+#
+# Post-patch `symmetric/010` names the witness of the permuted type `corecloneCloneInst1`.
+# The two impls of the permutation here fill that field under its new name.
+#
+--- a/extraction/P3Keccak/Extraction/Funs.lean
++++ b/extraction/P3Keccak/Extraction/Funs.lean
+@@ -813,8 +813,8 @@
+ impl_def KeccakF.Insts.P3_symmetricPermutationPermutationArrayU6425 :
+   p3_symmetric.permutation.Permutation KeccakF (Array Std.U64 25#usize) := {
+   corecloneCloneInst := KeccakF.Insts.CoreCloneClone
+-  corecloneCloneInst := core.Array.Insts.CoreCloneClone 25#usize
+-    core.U64.Insts.CoreCloneClone
++  corecloneCloneInst1 := core.Array.Insts.CoreCloneClone 25#usize
++    core.U64.Insts.CoreCloneClone -- PATCHED: was a second `corecloneCloneInst`
+   permute := p3_symmetric.permutation.Permutation.permute.default
+     KeccakF.Insts.P3_symmetricPermutationPermutationArrayU6425
+   permute_mut :=
+@@ -979,8 +979,8 @@
+ impl_def KeccakF.Insts.P3_symmetricPermutationPermutationArrayU8200 :
+   p3_symmetric.permutation.Permutation KeccakF (Array Std.U8 200#usize) := {
+   corecloneCloneInst := KeccakF.Insts.CoreCloneClone
+-  corecloneCloneInst := core.Array.Insts.CoreCloneClone 200#usize
+-    core.U8.Insts.CoreCloneClone
++  corecloneCloneInst1 := core.Array.Insts.CoreCloneClone 200#usize
++    core.U8.Insts.CoreCloneClone -- PATCHED: was a second `corecloneCloneInst`
+   permute := KeccakF.Insts.P3_symmetricPermutationPermutationArrayU8200.permute
+   permute_mut := p3_symmetric.permutation.Permutation.permute_mut.default
+     KeccakF.Insts.P3_symmetricPermutationPermutationArrayU8200

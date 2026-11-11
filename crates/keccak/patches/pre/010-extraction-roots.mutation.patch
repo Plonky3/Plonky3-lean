@@ -1,0 +1,14 @@
+# Mutation of: 010-extraction-roots
+# Breaks:      the module is gated on a misspelled cfg.
+#
+--- a/keccak/src/lib.rs
++++ b/keccak/src/lib.rs
+@@ -674,7 +674,7 @@
+ }
+ 
+ // PATCHED: extraction roots, only under hax's Lean backend.
+-#[cfg(hax_backend_lean)]
++#[cfg(hax_backend_lea)]
+ pub mod hax_roots;
+ 
+ // PATCHED: the extracted variant takes the batched hash reshaped for the extractor.

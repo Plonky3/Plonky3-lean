@@ -1,0 +1,470 @@
+# Patch:        020-reshape-system-loops
+# Phase:        pre
+# Target:       word/src/system.rs, word/src/system_reshaped.rs
+# Hunks:        5
+# Class:        equiv-rewrite
+# Gap:          docs/extractor-issues.md 241 (aeneas rejects the early returns
+#               of the system constructor, validation and verifier loops).
+# Cost:         none in a normal build: only the selection is behind
+#               cfg(hax_backend_lean). In the extracted variant, the
+#               constructor and the verifier call the reshaped bodies, which a
+#               differential test equates with the shipped ones.
+# Upstreamable: no: the shipped bodies are the clearer code; aeneas support for
+#               early returns from these loops makes the patch unnecessary.
+# Drop when:    aeneas translates an early return from a `for` loop over an
+#               array, and from several loops in a row.
+# Test:         test p3-word --lib system::reshaped
+# Mutation:     the reshaped verifier reports an unsatisfied AND relation as a
+#               zero relation, so the two verifiers disagree.
+#
+# aeneas drops three bodies of the system: the constructor, its address validation and the scalar verifier.
+# The constructor bounds the family sizes in a loop over an array, with an early return.
+# The validation and the verifier return early from three loops in a row.
+# The reshaped bodies spell the three family bounds out, and give each loop a function of its own.
+# They make the same checks, in the same order, with the same errors.
+# The differential test runs 8000 random systems over both widths, with terms past each segment.
+# It compares both constructors, then both verifiers on the right lengths and on lengths off by one.
+#
+diff --git a/word/src/system.rs b/word/src/system.rs
+index 19657134..c3a4dc62 100644
+--- a/word/src/system.rs
++++ b/word/src/system.rs
+@@ -198,7 +198,26 @@ pub struct ConstraintSystem<W: Word> {
+ }
+ 
+ impl<W: Word> ConstraintSystem<W> {
++    // PATCHED: the extracted variant takes the same body, reshaped for the extractor.
++    #[cfg(hax_backend_lean)]
++    pub fn new(
++        public_len: usize,
++        witness_len: usize,
++        zero_constraints: Vec<ZeroConstraint<W>>,
++        and_constraints: Vec<AndConstraint<W>>,
++        integer_mul_constraints: Vec<IntegerMulConstraint<W>>,
++    ) -> Result<Self, SystemError> {
++        Self::reshaped_new(
++            public_len,
++            witness_len,
++            zero_constraints,
++            and_constraints,
++            integer_mul_constraints,
++        )
++    }
++
+     /// Creates a system after validating every segment address.
++    #[cfg(not(hax_backend_lean))] // PATCHED
+     pub fn new(
+         public_len: usize,
+         witness_len: usize,
+@@ -385,7 +404,14 @@ impl<W: Word> ConstraintSystem<W> {
+         Ok(())
+     }
+ 
++    // PATCHED: the extracted variant takes the same body, reshaped for the extractor.
++    #[cfg(hax_backend_lean)]
++    pub fn verify(&self, public: &[W], witness: &[W]) -> Result<(), VerificationError> {
++        self.reshaped_verify(public, witness)
++    }
++
+     /// Checks all relations with the scalar reference implementation.
++    #[cfg(not(hax_backend_lean))] // PATCHED
+     pub fn verify(&self, public: &[W], witness: &[W]) -> Result<(), VerificationError> {
+         // Exact lengths prevent silently proving a prefix of either segment.
+         if public.len() != self.public_len() {
+@@ -429,6 +455,7 @@ impl<W: Word> ConstraintSystem<W> {
+         Ok(())
+     }
+ 
++    #[cfg(not(hax_backend_lean))] // PATCHED
+     fn validate(&self) -> Result<(), SystemError> {
+         // Validate each role separately so diagnostics identify the exact source.
+         for (constraint, relation) in self.zero_constraints.iter().enumerate() {
+@@ -525,6 +552,10 @@ impl<W: Word> ConstraintSystem<W> {
+     }
+ }
+ 
++// PATCHED: bodies in a shape hax's Lean backend translates.
++#[path = "system_reshaped.rs"]
++mod reshaped;
++
+ #[cfg(test)]
+ mod tests {
+     use alloc::vec;
+diff --git a/word/src/system_reshaped.rs b/word/src/system_reshaped.rs
+new file mode 100644
+index 00000000..fd4f5ead
+--- /dev/null
++++ b/word/src/system_reshaped.rs
+@@ -0,0 +1,372 @@
++//! PATCHED: system bodies in a shape hax's Lean backend translates.
++//!
++//! Aeneas rejects an early return from the shipped loops (Plonky3-lean, docs/extractor-issues.md, 241).
++//!
++//! Each loop here sits alone in its own function and walks its family with an index.
++//!
++//! The checks, their order and the errors are those of the shipped bodies.
++
++// The normal build reaches these bodies only from the differential tests below.
++#![cfg_attr(not(hax_backend_lean), allow(dead_code))]
++
++use alloc::vec::Vec;
++
++use super::{ConstraintKind, ConstraintSystem, OperandRole, SystemError, VerificationError};
++use crate::constraint::{AndConstraint, IntegerMulConstraint, ZeroConstraint};
++use crate::index::Segment;
++use crate::word::Word;
++
++impl<W: Word> ConstraintSystem<W> {
++    /// What the shipped constructor returns.
++    pub(super) fn reshaped_new(
++        public_len: usize,
++        witness_len: usize,
++        zero_constraints: Vec<ZeroConstraint<W>>,
++        and_constraints: Vec<AndConstraint<W>>,
++        integer_mul_constraints: Vec<IntegerMulConstraint<W>>,
++    ) -> Result<Self, SystemError> {
++        // Bound both segment lengths, public first.
++        let public_len = u32::try_from(public_len).map_err(|_| SystemError::SegmentTooLong {
++            segment: Segment::Public,
++            len: public_len,
++        })?;
++        let witness_len = u32::try_from(witness_len).map_err(|_| SystemError::SegmentTooLong {
++            segment: Segment::Witness,
++            len: witness_len,
++        })?;
++
++        // Bound the three family sizes in family order.
++        Self::validate_constraint_count(ConstraintKind::Zero, zero_constraints.len())?;
++        Self::validate_constraint_count(ConstraintKind::And, and_constraints.len())?;
++        Self::validate_constraint_count(
++            ConstraintKind::IntegerMul,
++            integer_mul_constraints.len(),
++        )?;
++
++        // Check every term address, as the shipped validation does.
++        let system = Self {
++            public_len,
++            witness_len,
++            zero_constraints,
++            and_constraints,
++            integer_mul_constraints,
++        };
++        system.reshaped_validate()?;
++        Ok(system)
++    }
++
++    /// What the shipped address validation returns.
++    pub(super) fn reshaped_validate(&self) -> Result<(), SystemError> {
++        // Families in zero, AND, then product order.
++        self.validate_zero_family()?;
++        self.validate_and_family()?;
++        self.validate_integer_mul_family()
++    }
++
++    fn validate_zero_family(&self) -> Result<(), SystemError> {
++        let mut constraint = 0;
++        while constraint < self.zero_constraints.len() {
++            let relation = &self.zero_constraints[constraint];
++            self.validate_operand(
++                ConstraintKind::Zero,
++                constraint,
++                OperandRole::Value,
++                relation.value(),
++            )?;
++            constraint += 1;
++        }
++        Ok(())
++    }
++
++    fn validate_and_family(&self) -> Result<(), SystemError> {
++        let mut constraint = 0;
++        while constraint < self.and_constraints.len() {
++            // Roles in left, right, then output order within one relation.
++            let relation = &self.and_constraints[constraint];
++            self.validate_and_relation(constraint, relation)?;
++            constraint += 1;
++        }
++        Ok(())
++    }
++
++    fn validate_and_relation(
++        &self,
++        constraint: usize,
++        relation: &AndConstraint<W>,
++    ) -> Result<(), SystemError> {
++        self.validate_operand(
++            ConstraintKind::And,
++            constraint,
++            OperandRole::Left,
++            relation.left(),
++        )?;
++        self.validate_operand(
++            ConstraintKind::And,
++            constraint,
++            OperandRole::Right,
++            relation.right(),
++        )?;
++        self.validate_operand(
++            ConstraintKind::And,
++            constraint,
++            OperandRole::Output,
++            relation.output(),
++        )
++    }
++
++    fn validate_integer_mul_family(&self) -> Result<(), SystemError> {
++        let mut constraint = 0;
++        while constraint < self.integer_mul_constraints.len() {
++            // Roles in left, right, low, then high order within one relation.
++            let relation = &self.integer_mul_constraints[constraint];
++            self.validate_integer_mul_relation(constraint, relation)?;
++            constraint += 1;
++        }
++        Ok(())
++    }
++
++    fn validate_integer_mul_relation(
++        &self,
++        constraint: usize,
++        relation: &IntegerMulConstraint<W>,
++    ) -> Result<(), SystemError> {
++        self.validate_operand(
++            ConstraintKind::IntegerMul,
++            constraint,
++            OperandRole::Left,
++            relation.left(),
++        )?;
++        self.validate_operand(
++            ConstraintKind::IntegerMul,
++            constraint,
++            OperandRole::Right,
++            relation.right(),
++        )?;
++        self.validate_operand(
++            ConstraintKind::IntegerMul,
++            constraint,
++            OperandRole::Low,
++            relation.low(),
++        )?;
++        self.validate_operand(
++            ConstraintKind::IntegerMul,
++            constraint,
++            OperandRole::High,
++            relation.high(),
++        )
++    }
++
++    /// What the shipped scalar verifier returns.
++    pub(super) fn reshaped_verify(
++        &self,
++        public: &[W],
++        witness: &[W],
++    ) -> Result<(), VerificationError> {
++        // Exact lengths, public first.
++        if public.len() != self.public_len() {
++            return Err(VerificationError::PublicLength {
++                expected: self.public_len(),
++                actual: public.len(),
++            });
++        }
++        if witness.len() != self.witness_len() {
++            return Err(VerificationError::WitnessLength {
++                expected: self.witness_len(),
++                actual: witness.len(),
++            });
++        }
++
++        // The first unsatisfied relation, families in zero, AND, then product order.
++        self.verify_zero_family(public, witness)?;
++        self.verify_and_family(public, witness)?;
++        self.verify_integer_mul_family(public, witness)
++    }
++
++    fn verify_zero_family(&self, public: &[W], witness: &[W]) -> Result<(), VerificationError> {
++        let mut constraint = 0;
++        while constraint < self.zero_constraints.len() {
++            if !self.zero_constraints[constraint].is_satisfied(public, witness) {
++                return Err(VerificationError::Unsatisfied {
++                    kind: ConstraintKind::Zero,
++                    constraint,
++                });
++            }
++            constraint += 1;
++        }
++        Ok(())
++    }
++
++    fn verify_and_family(&self, public: &[W], witness: &[W]) -> Result<(), VerificationError> {
++        let mut constraint = 0;
++        while constraint < self.and_constraints.len() {
++            if !self.and_constraints[constraint].is_satisfied(public, witness) {
++                return Err(VerificationError::Unsatisfied {
++                    kind: ConstraintKind::And,
++                    constraint,
++                });
++            }
++            constraint += 1;
++        }
++        Ok(())
++    }
++
++    fn verify_integer_mul_family(
++        &self,
++        public: &[W],
++        witness: &[W],
++    ) -> Result<(), VerificationError> {
++        let mut constraint = 0;
++        while constraint < self.integer_mul_constraints.len() {
++            if !self.integer_mul_constraints[constraint].is_satisfied(public, witness) {
++                return Err(VerificationError::Unsatisfied {
++                    kind: ConstraintKind::IntegerMul,
++                    constraint,
++                });
++            }
++            constraint += 1;
++        }
++        Ok(())
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use alloc::vec;
++    use alloc::vec::Vec;
++
++    use super::*;
++    use crate::constraint::Operand;
++    use crate::index::ValueIndex;
++    use crate::shift::{Shift, ShiftKind, ShiftedValue};
++    use crate::word::{Word32, Word64};
++
++    /// A small xorshift generator, so every run sees the same cases.
++    struct Rng(u64);
++
++    impl Rng {
++        fn next(&mut self) -> u64 {
++            self.0 ^= self.0 << 13;
++            self.0 ^= self.0 >> 7;
++            self.0 ^= self.0 << 17;
++            self.0
++        }
++
++        fn below(&mut self, bound: u64) -> usize {
++            (self.next() % bound) as usize
++        }
++    }
++
++    fn operand<W: Word>(rng: &mut Rng, public: usize, witness: usize) -> Operand<W> {
++        // Positions reach one past each segment, so some terms are out of range.
++        let len = rng.below(4);
++        let terms = (0..len)
++            .map(|_| {
++                let index = if rng.below(2) == 0 {
++                    ValueIndex::public(rng.below(public as u64 + 2)).unwrap()
++                } else {
++                    ValueIndex::witness(rng.below(witness as u64 + 2)).unwrap()
++                };
++                let kind = ShiftKind::from_code(rng.below(4) as u8).unwrap();
++                let shift = Shift::new(kind, rng.below(W::BITS as u64)).unwrap();
++                ShiftedValue::single(index, shift)
++            })
++            .collect();
++        Operand::new(terms)
++    }
++
++    type Families<W> = (
++        Vec<ZeroConstraint<W>>,
++        Vec<AndConstraint<W>>,
++        Vec<IntegerMulConstraint<W>>,
++    );
++
++    fn families<W: Word>(rng: &mut Rng, public: usize, witness: usize) -> Families<W> {
++        let zero = (0..rng.below(3))
++            .map(|_| ZeroConstraint::new(operand(rng, public, witness)))
++            .collect();
++        let and = (0..rng.below(3))
++            .map(|_| {
++                AndConstraint::new(
++                    operand(rng, public, witness),
++                    operand(rng, public, witness),
++                    operand(rng, public, witness),
++                )
++            })
++            .collect();
++        let product = (0..rng.below(3))
++            .map(|_| {
++                IntegerMulConstraint::new(
++                    operand(rng, public, witness),
++                    operand(rng, public, witness),
++                    operand(rng, public, witness),
++                    operand(rng, public, witness),
++                )
++            })
++            .collect();
++        (zero, and, product)
++    }
++
++    fn check_width<W: Word>(seed: u64, word: fn(u64) -> W) {
++        let mut rng = Rng(seed);
++        let mut accepted = 0;
++        let mut satisfied = 0;
++        for _ in 0..4000 {
++            // Fixture state: segments of 0 to 3 words, terms up to 2 past the end.
++            let public = rng.below(4);
++            let witness = rng.below(4);
++            let (zero, and, product) = families::<W>(&mut rng, public, witness);
++
++            // Invariant: both constructors return the same system or the same error.
++            let shipped = ConstraintSystem::new(
++                public,
++                witness,
++                zero.clone(),
++                and.clone(),
++                product.clone(),
++            );
++            let reshaped = ConstraintSystem::reshaped_new(public, witness, zero, and, product);
++            assert_eq!(shipped, reshaped);
++            let Ok(system) = shipped else { continue };
++            accepted += 1;
++
++            // Invariant: both verifiers agree, on the right lengths and on lengths off by one.
++            for (public_len, witness_len) in [
++                (public, witness),
++                (public + 1, witness),
++                (public, witness + 1),
++            ] {
++                // Small words make the relations hold often enough to exercise both outcomes.
++                let values: Vec<W> = (0..public_len + witness_len)
++                    .map(|_| word(rng.next() % 3))
++                    .collect();
++                let (public_words, witness_words) = values.split_at(public_len);
++                let result = system.verify(public_words, witness_words);
++                assert_eq!(result, system.reshaped_verify(public_words, witness_words));
++                satisfied += usize::from(result.is_ok());
++            }
++        }
++
++        // Invariant: the cases reach both outcomes of each body.
++        assert!(accepted > 100);
++        assert!(satisfied > 10);
++    }
++
++    #[test]
++    fn reshaped_system_bodies_match_the_shipped_ones() {
++        check_width::<Word32>(0x9e37_79b9_7f4a_7c15, |value| Word32::new(value as u32));
++        check_width::<Word64>(0xd1b5_4a32_d192_ed03, Word64::new);
++    }
++
++    #[cfg(target_pointer_width = "64")]
++    #[test]
++    fn reshaped_constructor_bounds_segments_like_the_shipped_one() {
++        // Fixture state: one word past the compact address space, in each segment.
++        let too_long = u32::MAX as usize + 1;
++        for (public, witness) in [(too_long, 0), (0, too_long), (too_long, too_long)] {
++            assert_eq!(
++                ConstraintSystem::<Word64>::new(public, witness, vec![], vec![], vec![]),
++                ConstraintSystem::<Word64>::reshaped_new(public, witness, vec![], vec![], vec![]),
++            );
++        }
++    }
++}

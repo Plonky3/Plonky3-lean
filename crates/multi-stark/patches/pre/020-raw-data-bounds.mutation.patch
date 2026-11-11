@@ -1,0 +1,15 @@
+# Mutation of: 020-raw-data-bounds
+# Breaks:      the trace field must also be an iterator, which no field is, so an upstream configuration no longer compiles.
+#
+diff --git a/multi-stark/src/config.rs b/multi-stark/src/config.rs
+--- a/multi-stark/src/config.rs
++++ b/multi-stark/src/config.rs
+@@ -29,7 +29,7 @@ pub trait MultiStarkConfig {
+     ///
+     /// The transcript requires an injective byte encoding for its domain separator.
+     /// Both supported prime fields and binary tower fields provide one.
+-    type Val: TranscriptField + p3_field::RawDataSerializable; // PATCHED: was `TranscriptField`
++    type Val: TranscriptField + p3_field::RawDataSerializable + core::iter::Iterator; // PATCHED: was `TranscriptField`
+ 
+     /// Extension field that challenges are drawn from.
+     ///

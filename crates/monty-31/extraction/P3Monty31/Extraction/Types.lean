@@ -129,6 +129,48 @@ structure data_traits.TrinomialQuinticData (Self : Type _) (Self_ArrayLike :
     core.convert.AsRef Self_ArrayLike (Slice (Array (monty_31.MontyField31
     Self) 5#usize))
 
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u32> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}]
+    Source: 'monty-31/src/monty_31.rs', lines 530:31-530:48 -/
+@[reducible]
+def monty_31.QuotientMapMontyField31U32.from_canonical_checked.closure (FP :
+  Type _) :=
+  Std.U32
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i32> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}]
+    Source: 'monty-31/src/monty_31.rs', lines 557:35-557:81 -/
+@[reducible]
+def monty_31.QuotientMapMontyField31I32.from_canonical_checked.closure (FP :
+  Type _) :=
+  Std.I32
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u64> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}]
+    Source: 'monty-31/src/monty_31.rs', lines 583:38-583:62 -/
+@[reducible]
+def monty_31.QuotientMapMontyField31U64.from_canonical_checked.closure (FP :
+  Type _) :=
+  Std.U64
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i64> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}]
+    Source: 'monty-31/src/monty_31.rs', lines 607:35-607:88 -/
+@[reducible]
+def monty_31.QuotientMapMontyField31I64.from_canonical_checked.closure (FP :
+  Type _) :=
+  Std.I64
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<u128> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}]
+    Source: 'monty-31/src/monty_31.rs', lines 632:39-632:63 -/
+@[reducible]
+def monty_31.QuotientMapMontyField31U128.from_canonical_checked.closure (FP :
+  Type _) :=
+  Std.U128
+
+/-- [p3_monty_31::monty_31::{impl p3_field::integers::QuotientMap<i128> for p3_monty_31::monty_31::MontyField31<FP>}::from_canonical_checked::{closure}]
+    Source: 'monty-31/src/monty_31.rs', lines 656:35-656:88 -/
+@[reducible]
+def monty_31.QuotientMapMontyField31I128.from_canonical_checked.closure (FP :
+  Type _) :=
+  Std.I128
+
 /-- Trait declaration: [p3_monty_31::mds::MDSUtils]
     Source: 'monty-31/src/mds.rs', lines 11:0-18:1
     Visibility: public -/

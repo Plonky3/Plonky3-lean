@@ -3,8 +3,10 @@
 # Target:       binary-field/src/ghash.rs, binary-field/tests/pre_patch_020.rs
 # Hunks:        2
 # Class:        cfg-hide
-# Gap:          docs/extractor-issues.md 10 (charon#1266, as for baby-bear's
-#               pre 040).
+# Gap:          docs/extractor-issues.md 10 (charon#1266): baby-bear's pre 040
+#               hides `Field::prepare_bit_plane_expansion` in the extraction
+#               build. Without this patch the patched tree does not compile
+#               there: the method "is not a member of trait `Field`".
 # Cost:         none in a normal build: the change is behind
 #               cfg(hax_backend_lean). In the extracted variant,
 #               `Ghash128::prepare_bit_plane_expansion` is absent.
@@ -19,6 +21,9 @@
 # `Ghash128` overrides it, so under the cfg the override names no trait method.
 #
 # The override is absent under the cfg, as the trait method is.
+#
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
 #
 diff --git a/binary-field/src/ghash.rs b/binary-field/src/ghash.rs
 index 9c0cc77f..e7fdf315 100644

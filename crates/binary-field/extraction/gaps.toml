@@ -71,10 +71,6 @@ item   = "p3_binary_field::extension::{impl p3_field::packed::packed_traits::Pac
 source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_binary_field::extension::{impl p3_field::packed::packed_traits::PackedFieldExtension}::packed_ext_powers"
-source = ""
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_binary_field::gf2::{impl core::clone::Clone}::clone"
 source = ""
 
@@ -368,10 +364,6 @@ source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
 item   = "p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::from_ext_slice"
-source = ""
-
-[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
-item   = "p3_binary_field::poly192::{impl p3_field::packed::packed_traits::PackedFieldExtension}::packed_ext_powers"
 source = ""
 
 [[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it

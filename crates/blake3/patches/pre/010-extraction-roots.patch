@@ -4,7 +4,8 @@
 # Hunks:        2
 # Class:        bound
 # Gap:          docs/extractor-issues.md 4 (aeneas drops a method that no free
-#               function calls).
+#               function calls). Without this patch the roots name a module
+#               that does not exist and charon exits 101.
 # Cost:         none in a normal build: the module exists only under
 #               cfg(hax_backend_lean). In the extracted variant it adds one free
 #               function, which calls `Blake3::hash_many`. No existing body
@@ -18,6 +19,9 @@
 #
 # Rooted at the trait method itself, aeneas emits nothing for it.
 # Rooted at a one-line wrapper, the method is reachable, so its own body is extracted.
+#
+# Tested:     test-pre-patches.py: 6715 of 6769 upstream tests pass as
+#             shipped, 6715 with the pre-patches; 0 divergences from this patch.
 #
 --- /dev/null
 +++ b/blake3/src/hax_roots.rs

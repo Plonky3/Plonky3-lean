@@ -1,0 +1,70 @@
+# p3-word: word-level relations over XOR, AND, shifts and integer multiplication.
+
+lean_lib = "P3Word"
+
+# The error types derive their messages through thiserror, which aeneas rejects.
+#
+# The backend's canonical term order is a chain of iterator adapters, which aeneas rejects.
+#
+# Everything else is rooted below.
+state = "scoped"
+
+features = []
+
+start_from = [
+  "p3_word::word",
+  "p3_word::index::ValueIndex::public",
+  "p3_word::index::ValueIndex::witness",
+  "p3_word::index::ValueIndex::segment",
+  "p3_word::index::ValueIndex::position",
+  "p3_word::shift::ShiftKind::code",
+  "p3_word::shift::ShiftKind::from_code",
+  "p3_word::shift::ShiftKind::is_lane32",
+  "p3_word::shift::Shift::new",
+  "p3_word::shift::Shift::identity",
+  "p3_word::shift::Shift::kind",
+  "p3_word::shift::Shift::amount",
+  "p3_word::shift::Shift::is_identity",
+  "p3_word::shift::Shift::apply",
+  "p3_word::shift::ShiftedValue::plain",
+  "p3_word::shift::ShiftedValue::single",
+  "p3_word::shift::ShiftedValue::pair",
+  "p3_word::shift::ShiftedValue::index",
+  "p3_word::shift::ShiftedValue::shifts",
+  "p3_word::shift::ShiftedValue::with_index",
+  "p3_word::shift::ShiftedValue::apply",
+  "p3_word::constraint::Operand::new",
+  "p3_word::constraint::Operand::single",
+  "p3_word::constraint::Operand::terms",
+  "p3_word::constraint::Operand::evaluate",
+  "p3_word::constraint::Operand::readdress",
+  "p3_word::constraint::ZeroConstraint::is_satisfied",
+  "p3_word::constraint::AndConstraint::is_satisfied",
+  "p3_word::constraint::IntegerMulConstraint::is_satisfied",
+  "p3_word::system::ConstraintKind::code",
+  "p3_word::system::ConstraintKind::from_code",
+  "p3_word::system::ConstraintSystem::new",
+  "p3_word::system::ConstraintSystem::public_is_empty",
+  "p3_word::system::ConstraintSystem::witness_is_empty",
+  "p3_word::system::ConstraintSystem::check_shape",
+  "p3_word::system::ConstraintSystem::verify",
+  "p3_word::component::Component::new",
+  "p3_word::component::Component::interface_slots",
+  "p3_word::component::Component::local_slots",
+  "p3_word::component::Component::relation_counts",
+  "p3_word::component::ComponentCall::new",
+  "p3_word::component::Composition::new",
+  "p3_word::component::Composition::public_base",
+  "p3_word::component::Composition::witness_base",
+  "p3_word::component::Composition::constraint_base",
+  "p3_word::component::Composition::interface",
+  "p3_word::component::Composition::inputs",
+  "p3_word::component::Composition::outputs",
+  "p3_word::component::Composition::locals",
+  "p3_word::component::Composition::interface_mut",
+  "p3_word::component::Composition::locals_mut",
+  "p3_word::component::Composition::lower",
+  "p3_word::component::Composition::resolve",
+]
+
+watch = ["word/src", "word/Cargo.toml"]

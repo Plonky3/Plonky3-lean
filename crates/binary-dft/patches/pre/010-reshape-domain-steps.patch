@@ -1,0 +1,140 @@
+# Patch:        010-reshape-domain-steps
+# Phase:        pre
+# Target:       binary-dft/src/domain.rs, binary-dft/src/hax_reshaped.rs, binary-dft/src/lib.rs
+# Hunks:        4
+# Class:        equiv-rewrite
+# Gap:          docs/extractor-issues.md 60 and 244 (aeneas gives a closure
+#               that updates a captured variable a back function that
+#               CoreModels cannot take).
+# Cost:         none in a normal build: only the selection is behind
+#               cfg(hax_backend_lean). In the extracted variant,
+#               `domain_point_steps` calls the reshaped body, which a
+#               differential test equates with the original.
+# Upstreamable: no: the original is the clearer code; aeneas support for
+#               closures with mutable captures makes the patch unnecessary.
+# Drop when:    aeneas translates a `map` closure that updates a captured
+#               variable.
+# Test:         test p3-binary-dft --lib hax_reshaped::tests
+# Mutation:     the reshaped loop adds the basis vector of index r instead
+#               of r + 1, so every table of one or more entries differs.
+#
+# The original folds a running sum through a `map` closure and collects it.
+# The reshaped body keeps the running sum in a loop and pushes each entry.
+# It asks for the same basis vectors, in the same order.
+#
+diff --git a/binary-dft/src/domain.rs b/binary-dft/src/domain.rs
+index 200e6045..f6c1fe97 100644
+--- a/binary-dft/src/domain.rs
++++ b/binary-dft/src/domain.rs
+@@ -40,6 +40,7 @@ pub fn domain_point<F: TowerLevel>(index: usize) -> F {
+ /// # Panics
+ ///
+ /// Panics if `count` is at least the bit width of the level.
++#[cfg(not(hax_backend_lean))] // PATCHED
+ #[must_use]
+ pub fn domain_point_steps<F: TowerLevel>(count: usize) -> Vec<F> {
+     // Each entry is the previous one plus the next basis vector up.
+@@ -52,6 +53,13 @@ pub fn domain_point_steps<F: TowerLevel>(count: usize) -> Vec<F> {
+         .collect()
+ }
+ 
++// PATCHED: the extracted variant takes the same steps from a plain loop.
++#[cfg(hax_backend_lean)]
++#[must_use]
++pub fn domain_point_steps<F: TowerLevel>(count: usize) -> Vec<F> {
++    crate::hax_reshaped::domain_point_steps::<F>(count)
++}
++
+ /// The subspace polynomial `W_j` of `S_j`, evaluated at `x`.
+ ///
+ /// - The recurrence is `W_0(x) = x` and `W_j(x) = W_(j-1)(x)^2 + W_(j-1)(x)`.
+diff --git a/binary-dft/src/hax_reshaped.rs b/binary-dft/src/hax_reshaped.rs
+new file mode 100644
+index 00000000..bc87a3e4
+--- /dev/null
++++ b/binary-dft/src/hax_reshaped.rs
+@@ -0,0 +1,71 @@
++//! PATCHED: bodies in a shape hax's Lean backend translates.
++//!
++//! Aeneas gives a closure that updates a captured variable a back function that CoreModels cannot take.
++//! Plonky3-lean, docs/extractor-issues.md, 60 and 244.
++//!
++//! The body here runs a plain loop and makes the same calls, in the same order, as the original.
++
++use alloc::vec::Vec;
++
++use p3_binary_field::TowerLevel;
++
++/// The steps between consecutive even domain points, from a plain loop.
++///
++/// # Panics
++///
++/// Panics if `count` is at least the bit width of the level.
++#[cfg_attr(not(hax_backend_lean), allow(dead_code))]
++pub(crate) fn domain_point_steps<F: TowerLevel>(count: usize) -> Vec<F> {
++    let mut steps = Vec::new();
++
++    // Each entry is the previous one plus the next basis vector up.
++    let mut point = F::ZERO;
++    for r in 0..count {
++        point += F::cantor_basis(r + 1);
++        steps.push(point);
++    }
++    steps
++}
++
++#[cfg(test)]
++mod tests {
++    use p3_binary_field::{
++        BinaryField2, BinaryField8, BinaryField32, BinaryField128, Gf2, Ghash128, Poly64,
++        TowerLevel,
++    };
++
++    use crate::domain_point_steps;
++
++    /// The shipped table and the loop agree at every count below the bit width.
++    fn check<F: TowerLevel>() {
++        // Fixture state: counts 0 ..= 2^b - 1, the whole range that does not panic.
++        //
++        //     count 0       -> []
++        //     count 2^b - 1 -> the last entry adds the top basis vector
++        for count in 0..(1usize << F::LOG_BITS) {
++            assert_eq!(
++                super::domain_point_steps::<F>(count),
++                domain_point_steps::<F>(count),
++                "count {count}"
++            );
++        }
++    }
++
++    #[test]
++    fn the_loop_matches_the_shipped_table() {
++        check::<Gf2>();
++        check::<BinaryField2>();
++        check::<BinaryField8>();
++        check::<BinaryField32>();
++        check::<BinaryField128>();
++        check::<Ghash128>();
++        check::<Poly64>();
++    }
++
++    #[test]
++    #[should_panic(expected = "Cantor basis index out of range")]
++    fn the_loop_panics_at_the_bit_width() {
++        // Invariant: the table asks for basis vector `count`, which a level of 2^b bits lacks.
++        let _ = super::domain_point_steps::<BinaryField8>(8);
++    }
++}
+diff --git a/binary-dft/src/lib.rs b/binary-dft/src/lib.rs
+index 5133d71e..f65fc38b 100644
+--- a/binary-dft/src/lib.rs
++++ b/binary-dft/src/lib.rs
+@@ -6,6 +6,8 @@ extern crate alloc;
+ mod butterfly;
+ mod domain;
+ mod encoder;
++// PATCHED
++mod hax_reshaped;
+ mod lch;
+ mod naive;
+ mod poly;

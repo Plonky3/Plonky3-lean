@@ -10,6 +10,7 @@
 | `extract/test-pre-patches.py` | Runs Plonky3's tests with and without the pre-extraction patches and records every divergence in the patch headers. |
 | `extract/check-mutations.py` | Runs each pre-extraction patch's own tests, and requires them to pass, and to fail under its recorded mutation. |
 | `extract/config.py` | Reads `toolchain.toml` and `crates/*/crate.toml` for the scripts above. |
+| `extract/patch-necessity.py` | Re-extracts once per patch with that patch left out (`extract.sh --skip-tests --without <crate>/<phase>/<NNN>`), and records the first step that fails without it. How a toolchain bump re-justifies each patch. |
 | `extract/gap-report.py` | Writes a crate's `extraction/gaps.toml` from charon's output: its errors, and every item translated but not emitted. Run by `extract.sh`. |
 | `check-claims.py` | Checks the axioms of every claim against `claims.toml`. Run by CI. |
 | `status.py` | Generates `STATUS.md` from the committed inputs and the Lean build. Run by CI with `--check`. |

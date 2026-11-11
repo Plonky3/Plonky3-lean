@@ -1,0 +1,13 @@
+# Mutation of: 020-extraction-roots
+# Breaks:      the module is gated on a misspelled cfg.
+#
+--- a/multilinear-util/src/lib.rs
++++ b/multilinear-util/src/lib.rs
+@@ -6,6 +6,6 @@
+ pub mod point;
+ pub mod poly;
+ pub mod split_eq;
+ // PATCHED: extraction roots, only under hax's Lean backend.
+-#[cfg(hax_backend_lean)]
++#[cfg(hax_backend_lea)]
+ pub mod hax_roots;

@@ -1,0 +1,28 @@
+# Patch:        010-exposed-saturating-add
+# Phase:        post
+# Target:       extraction/P3BinaryPcs/Extraction/Funs.lean
+# Hunks:        1
+# Class:        reshape
+# Gap:          docs/extractor-issues.md 22 (Aeneas's saturating operations
+#               have no exposed body).
+# Cost:         `core.num.Usize.saturating_add_exposed` in HaxExt.lean, a model
+#               of `usize::saturating_add`, trusted as the rest of HaxExt is.
+# Upstreamable: yes: aeneas can mark its saturating operations `@[expose]`.
+# Drop when:    aeneas exposes them.
+#
+# The constructor reports the codeword's log length, the clamped sum of the variables and the rate, when it overflows the word.
+#
+# The call goes to HaxExt's exposed model, as security/020 and matrix/030 do.
+#
+--- a/extraction/P3BinaryPcs/Extraction/Funs.lean
++++ b/extraction/P3BinaryPcs/Extraction/Funs.lean
+@@ -127,7 +127,8 @@
+   := do
+   let max_bits ← lift (UScalar.cast .Usize core.num.Usize.BITS)
+   let log_len ←
+-    core.num.Usize.saturating_add num_variables params1.log_inv_rate
++    -- PATCHED: the exposed model of `saturating_add` (was `core.num.Usize.saturating_add`)
++    core.num.Usize.saturating_add_exposed num_variables params1.log_inv_rate
+   let o ← core.num.Usize.checked_add num_variables params1.log_inv_rate
+   let in_range ←
+     match o with

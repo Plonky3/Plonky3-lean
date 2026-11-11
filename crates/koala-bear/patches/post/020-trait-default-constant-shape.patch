@@ -5,7 +5,8 @@
 # Class:        reshape
 # Gap:          docs/extractor-issues.md 3: aeneas's defining and using runs
 #               disagree on the signature of a trait-default associated constant
-#               that does not use `Self`.
+#               that does not use `Self`. Without this patch `lake build`
+#               fails with application type mismatches at the call sites.
 # Cost:         none. The same default constant is referenced, with the
 #               arguments and monad its definition actually has.
 # Upstreamable: yes: aeneas could emit one shape for such defaults in both

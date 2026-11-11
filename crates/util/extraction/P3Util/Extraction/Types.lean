@@ -3,6 +3,7 @@
 module
 public import Aeneas
 public import CoreModels
+public import P3Util.Extraction.TypesExternal
 @[expose] public section
 open CoreModels Aeneas
 open Aeneas.Std hiding namespace core alloc

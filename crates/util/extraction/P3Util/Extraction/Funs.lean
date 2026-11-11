@@ -29,6 +29,63 @@ noncomputable section
 
 namespace p3_util
 
+/-- [p3_util::log2_ceil_usize]:
+    Source: 'util/src/lib.rs', lines 24:0-26:1
+    Visibility: public -/
+def log2_ceil_usize (n : Std.Usize) : RustM Std.Usize := do
+  -- PATCHED: the exposed model of `saturating_sub` (was `core.num.Usize.saturating_sub`)
+  let i ← core.num.Usize.saturating_sub_exposed n 1#usize
+  let i1 ← core.num.Usize.leading_zeros i
+  let i2 ← core.num.Usize.BITS - i1
+  ok (UScalar.cast .Usize i2)
+
+/-- [p3_util::log2_floor_usize]:
+    Source: 'util/src/lib.rs', lines 34:0-39:1
+    Visibility: public -/
+def log2_floor_usize (n : Std.Usize) : RustM Std.Usize := do
+  if n = 0#usize
+  then ok 0#usize
+  else
+    let i ← core.num.Usize.BITS - 1#u32
+    let i1 ← core.num.Usize.leading_zeros n
+    let i2 ← i - i1
+    ok (UScalar.cast .Usize i2)
+
+/-- [p3_util::checked_pow2]:
+    Source: 'util/src/lib.rs', lines 48:0-54:1
+    Visibility: public -/
+def checked_pow2
+  (log_degree : Std.Usize) : RustM (core.option.Option Std.Usize) := do
+  let i ← lift (UScalar.cast .Usize core.num.Usize.BITS)
+  if log_degree < i
+  then let i1 ← 1#usize <<< log_degree
+       ok (core.option.Option.Some i1)
+  else ok core.option.Option.None
+
+/-- [p3_util::log2_strict_usize]:
+    Source: 'util/src/lib.rs', lines 78:0-87:1
+    Visibility: public -/
+def log2_strict_usize (n : Std.Usize) : RustM Std.Usize := do
+  let res ← core.num.Usize.trailing_zeros n
+  let i ← core.num.Usize.wrapping_shr n res
+  massert (i = 1#usize)
+  let i1 ← 1#usize <<< res
+  core.hint.assert_unchecked (n = i1)
+  ok (UScalar.cast .Usize res)
+
+/-- [p3_util::reverse_bits_len]:
+    Source: 'util/src/lib.rs', lines 203:0-214:1
+    Visibility: public -/
+def reverse_bits_len
+  (x : Std.Usize) (bit_len : Std.Usize) : RustM Std.Usize := do
+  let i ← lift (UScalar.cast .Usize core.num.Usize.BITS)
+  massert (bit_len <= i)
+  let i1 ← core.num.Usize.reverse_bits x
+  let i2 ← lift (UScalar.cast .U32 bit_len)
+  let i3 ← core.num.Usize.BITS - i2
+  let (i4, _) ← core.num.Usize.overflowing_shr i1 i3
+  ok i4
+
 /-- [p3_util::gcd_inner]: loop body 0:
     Source: 'util/src/lib.rs', lines 767:4-785:5
     Visibility: public -/

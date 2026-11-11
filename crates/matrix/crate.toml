@@ -1,0 +1,79 @@
+# p3-matrix: dense matrices and the views over them.
+
+lean_lib = "P3Matrix"
+
+# The shapes, element access and constructors of the dense matrix and of every view.
+#
+# All of it is generic over the element type.
+#
+# The row iterators, packed rows, dot products, extension view and interpolation are not extracted.
+#
+# The matrix trait returns opaque iterator types from its row methods, which aeneas cannot translate.
+#
+# The field-generic methods reach the field trait hierarchy, which aeneas rejects.
+#
+# Pre-patch 020 hides them from the extracted variant.
+state = "scoped"
+
+features = []
+
+# One root: the module of one-line functions that pre-patch 030 adds.
+start_from = ["p3_matrix::hax_roots"]
+
+# Pre-patch 020 gates on this cfg, which only this crate's run sets.
+#
+# The crates above p3-matrix call the row methods, and other extractions compile them.
+rustflags = ["--cfg", "hax_lean_matrix"]
+
+watch = ["matrix/src", "matrix/Cargo.toml", "util/src/lib.rs"]
+
+# The transcriptions in extraction/P3Matrix/Assumptions/Mirror.lean.
+# Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_matrix.interpolation.mirror.compute_adjusted_weights"
+rust = "p3_matrix::interpolation::compute_adjusted_weights"
+
+[[mirror]]
+lean = "p3_matrix.interpolation.mirror.interpolate_coset_with_precomputation"
+rust = "p3_matrix::interpolation::Interpolate::interpolate_coset_with_precomputation"
+
+[[mirror]]
+lean = "p3_matrix.interpolation.mirror.interpolate_coset"
+rust = "p3_matrix::interpolation::Interpolate::interpolate_coset"
+
+[[mirror]]
+lean = "p3_matrix.interpolation.mirror.interpolate_subgroup"
+rust = "p3_matrix::interpolation::Interpolate::interpolate_subgroup"
+
+[[mirror]]
+lean = "p3_matrix.interpolation.mirror.barycentric_weights"
+rust = "p3_matrix::interpolation::barycentric_weights"
+
+[[mirror]]
+lean = "p3_matrix.interpolation.mirror.interpolate_arbitrary_with_precomputation"
+rust = "p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_with_precomputation"
+
+[[mirror]]
+lean = "p3_matrix.interpolation.mirror.interpolate_arbitrary_point"
+rust = "p3_matrix::interpolation::InterpolateArbitrary::interpolate_arbitrary_point"
+
+[[mirror]]
+lean = "p3_matrix.interpolation.mirror.recover_coefficients"
+rust = "p3_matrix::interpolation::InterpolateArbitrary::recover_coefficients"
+
+[[mirror]]
+lean = "p3_matrix.interpolation.mirror.interpolate_lagrange"
+rust = "p3_matrix::interpolation::interpolate_lagrange"
+
+[[mirror]]
+lean = "p3_matrix.util.mirror.reverse_matrix_index_bits"
+rust = "p3_matrix::util::reverse_matrix_index_bits"
+
+[[mirror]]
+lean = "p3_matrix.extension.mirror.flat_row_subseq"
+rust = "{impl p3_matrix::Matrix<F> for p3_matrix::extension::FlatMatrixView<F, EF, Inner>}::row_subseq_unchecked"
+
+[[mirror]]
+lean = "p3_matrix.extension.mirror.flat_iter_take"
+rust = "{impl core::iter::traits::iterator::Iterator for p3_matrix::extension::FlatIter<F, I>}::next"

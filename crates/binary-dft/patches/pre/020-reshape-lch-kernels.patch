@@ -1,0 +1,490 @@
+# Patch:        020-reshape-lch-kernels
+# Phase:        pre
+# Target:       binary-dft/src/lch/schedule.rs, binary-dft/src/lch/schedule/hax_reshaped.rs, binary-dft/src/lch/twiddles.rs
+# Hunks:        8
+# Class:        equiv-rewrite
+# Gap:          docs/extractor-issues.md 14 (the models lack the mutable
+#               chunk iterators) and 60 (aeneas gives a closure that
+#               updates a captured variable a back function that CoreModels
+#               cannot take).
+# Cost:         none in a normal build: only the selection is behind
+#               cfg(hax_backend_lean). In the extracted variant, the twiddle
+#               state, the stage pass, the tile stages and the deep tiles call
+#               the reshaped bodies, which differential tests equate with the
+#               originals, panics included.
+# Upstreamable: no: the originals are the clearer code, and they parallelise.
+# Drop when:    aeneas translates `chunks_mut`, `par_chunks_mut` and the
+#               closures that drive them.
+# Test:         test p3-binary-dft --lib lch::schedule::hax_reshaped::tests
+# Mutation:     the reshaped block walk steps the twiddle at the first block
+#               too, so every stage with a nonzero step differs.
+#
+# The originals walk chunks of the buffer through `chunks_mut`, or through `par_chunks_mut` and a closure.
+# The reshaped bodies walk the same chunks by index, the last one short as the iterator leaves it.
+# They make the same twiddle and butterfly calls, in the same order, as the serial pool runs the originals.
+# Under the parallel feature the originals run tasks concurrently, on disjoint chunks, with the same calls per chunk.
+#
+diff --git a/binary-dft/src/lch/schedule.rs b/binary-dft/src/lch/schedule.rs
+index ca1cc374..0cf614d4 100644
+--- a/binary-dft/src/lch/schedule.rs
++++ b/binary-dft/src/lch/schedule.rs
+@@ -18,6 +18,9 @@ use crate::staging::{
+     Dispatch, StagedRuns, for_each_staged_tile, for_each_staged_tile_into_cosets, prefault,
+ };
+ 
++// PATCHED
++pub(super) mod hax_reshaped;
++
+ /// Field elements one butterfly task covers on each side of a block.
+ ///
+ /// - Stage `j` has blocks of `2^j * width` elements per side.
+@@ -164,6 +167,7 @@ impl Cut {
+ }
+ 
+ /// One stage, as a single pass over every row.
++#[cfg(not(hax_backend_lean))] // PATCHED
+ pub(super) fn stage_pass<F: ButterflyField, const INVERSE: bool>(
+     values: &mut [F],
+     width: usize,
+@@ -211,6 +215,7 @@ pub(super) fn stage_pass<F: ButterflyField, const INVERSE: bool>(
+ /// - The second term is what the local walk counts, so only the tile index is passed in.
+ ///
+ /// Forward runs the widest stage first, inverse the narrowest.
++#[cfg(not(hax_backend_lean))] // PATCHED
+ fn tile_stages<F: ButterflyField, const INVERSE: bool>(
+     tile: &mut [F],
+     row_len: usize,
+@@ -241,6 +246,7 @@ fn tile_stages<F: ButterflyField, const INVERSE: bool>(
+ /// Run the bottom `log_rows` stages inside each contiguous tile of `2^log_rows` rows.
+ ///
+ /// Those stages pair rows closer than a tile, so each tile is read once and written once.
++#[cfg(not(hax_backend_lean))] // PATCHED
+ fn deep_tiles<F: ButterflyField, const INVERSE: bool>(
+     values: &mut [F],
+     width: usize,
+@@ -255,6 +261,41 @@ fn deep_tiles<F: ButterflyField, const INVERSE: bool>(
+         });
+ }
+ 
++// PATCHED: the extracted variants walk the same chunks by index (hax_reshaped below).
++#[cfg(hax_backend_lean)]
++pub(super) fn stage_pass<F: ButterflyField, const INVERSE: bool>(
++    values: &mut [F],
++    width: usize,
++    j: usize,
++    twiddles: &Twiddles<F>,
++) {
++    hax_reshaped::stage_pass::<F, INVERSE>(values, width, j, twiddles);
++}
++
++// PATCHED
++#[cfg(hax_backend_lean)]
++fn tile_stages<F: ButterflyField, const INVERSE: bool>(
++    tile: &mut [F],
++    row_len: usize,
++    log_rows: usize,
++    stage_base: usize,
++    index: usize,
++    twiddles: &Twiddles<F>,
++) {
++    hax_reshaped::tile_stages::<F, INVERSE>(tile, row_len, log_rows, stage_base, index, twiddles);
++}
++
++// PATCHED
++#[cfg(hax_backend_lean)]
++fn deep_tiles<F: ButterflyField, const INVERSE: bool>(
++    values: &mut [F],
++    width: usize,
++    log_rows: usize,
++    twiddles: &Twiddles<F>,
++) {
++    hax_reshaped::deep_tiles::<F, INVERSE>(values, width, log_rows, twiddles);
++}
++
+ /// The runs that the `depth` stages ending at stage `top` gather, `2^log_slab` rows to a run.
+ ///
+ /// With `S = 2^(top + 1 - depth)` the row distance of the group's narrowest stage, task `t` stages
+diff --git a/binary-dft/src/lch/schedule/hax_reshaped.rs b/binary-dft/src/lch/schedule/hax_reshaped.rs
+new file mode 100644
+index 00000000..defa63d6
+--- /dev/null
++++ b/binary-dft/src/lch/schedule/hax_reshaped.rs
+@@ -0,0 +1,336 @@
++//! PATCHED: the stage kernels in a shape hax's Lean backend translates.
++//!
++//! The models lack the mutable chunk iterators, and aeneas cannot take the closures that drive them.
++//! Plonky3-lean, docs/extractor-issues.md, 14 and 60.
++//!
++//! Each body here walks the same chunks by index.
++//!
++//! It makes the same twiddle and butterfly calls, in the same order, as the serial pool runs the original.
++
++use super::BUTTERFLY_GRAIN;
++use crate::butterfly::ButterflyField;
++use crate::lch::twiddles::Twiddles;
++
++/// The end of the chunk of at most `size` elements that starts at `start`, in a run of `len`.
++#[inline]
++const fn chunk_end(start: usize, size: usize, len: usize) -> usize {
++    // The last chunk is short when the size does not divide the run.
++    if len - start < size {
++        len
++    } else {
++        start + size
++    }
++}
++
++/// The blocks of one group in ascending order, each twiddle stepped from the one before.
++///
++/// A block is `2 * half` elements, split at its half.
++///
++/// With `split` set, a half wider than the grain runs one butterfly per grain.
++///
++/// # Panics
++///
++/// - Panics if a block is empty, as the chunk iterator does.
++/// - Panics if the last block is shorter than its half.
++#[cfg_attr(not(hax_backend_lean), allow(dead_code))]
++pub(crate) fn walk_blocks<F: ButterflyField, const INVERSE: bool>(
++    group: &mut [F],
++    half: usize,
++    stage: usize,
++    first: usize,
++    split: bool,
++    twiddles: &Twiddles<F>,
++) {
++    // The group seeds its twiddle at its own first block.
++    let mut t = twiddles.at(stage, first);
++
++    // The chunk iterator rejects a zero chunk length.
++    let block_len = half << 1;
++    assert!(block_len != 0, "chunk size must be non-zero");
++
++    // Invariant: blocks are visited in ascending order, which the stepping relies on.
++    let len = group.len();
++    let mut start = 0;
++    let mut i = 0;
++    while start < len {
++        let end = chunk_end(start, block_len, len);
++        if i != 0 {
++            t += twiddles.step(first + i);
++        }
++        let (lo, hi) = group[start..end].split_at_mut(half);
++
++        // A half within the grain is one butterfly.
++        if !split || half <= BUTTERFLY_GRAIN {
++            F::butterfly::<INVERSE>(lo, hi, t);
++        } else {
++            grains::<F, INVERSE>(lo, hi, t);
++        }
++        start = end;
++        i += 1;
++    }
++}
++
++/// The butterfly of two runs, one grain of each at a time, until the shorter run ends.
++#[cfg_attr(not(hax_backend_lean), allow(dead_code))]
++fn grains<F: ButterflyField, const INVERSE: bool>(lo: &mut [F], hi: &mut [F], t: F) {
++    // The zipped chunk iterators stop at the shorter run.
++    let mut start = 0;
++    while start < lo.len() && start < hi.len() {
++        let lo_end = chunk_end(start, BUTTERFLY_GRAIN, lo.len());
++        let hi_end = chunk_end(start, BUTTERFLY_GRAIN, hi.len());
++        F::butterfly::<INVERSE>(&mut lo[start..lo_end], &mut hi[start..hi_end], t);
++        start += BUTTERFLY_GRAIN;
++    }
++}
++
++/// One stage, as a single pass over every row, one task of whole blocks at a time.
++///
++/// # Panics
++///
++/// - Panics if the width is zero.
++/// - Panics if a task or a block is empty, as the chunk iterator does.
++#[cfg_attr(not(hax_backend_lean), allow(dead_code))]
++pub(crate) fn stage_pass<F: ButterflyField, const INVERSE: bool>(
++    values: &mut [F],
++    width: usize,
++    j: usize,
++    twiddles: &Twiddles<F>,
++) {
++    let half = (1 << j) * width;
++    let per_task = (BUTTERFLY_GRAIN / half).max(1);
++    let task_len = per_task * (half << 1);
++
++    // The chunk iterator rejects a zero chunk length.
++    assert!(task_len != 0, "chunk size must be non-zero");
++
++    // Task `task` starts at block `task * per_task`.
++    let len = values.len();
++    let mut start = 0;
++    let mut task = 0;
++    while start < len {
++        let end = chunk_end(start, task_len, len);
++        walk_blocks::<F, INVERSE>(
++            &mut values[start..end],
++            half,
++            j,
++            task * per_task,
++            true,
++            twiddles,
++        );
++        start = end;
++        task += 1;
++    }
++}
++
++/// Run the `log_rows` adjacent stages a tile of `2^log_rows` rows is closed under.
++///
++/// Forward runs the widest stage first, inverse the narrowest.
++#[cfg_attr(not(hax_backend_lean), allow(dead_code))]
++pub(crate) fn tile_stages<F: ButterflyField, const INVERSE: bool>(
++    tile: &mut [F],
++    row_len: usize,
++    log_rows: usize,
++    stage_base: usize,
++    index: usize,
++    twiddles: &Twiddles<F>,
++) {
++    for step in 0..log_rows {
++        let jj = if INVERSE { step } else { log_rows - 1 - step };
++        let half = (1 << jj) * row_len;
++
++        // The tile's blocks continue the global block numbering from here.
++        let first = index << (log_rows - 1 - jj);
++        walk_blocks::<F, INVERSE>(tile, half, stage_base + jj, first, false, twiddles);
++    }
++}
++
++/// Run the bottom `log_rows` stages inside each contiguous tile of `2^log_rows` rows.
++///
++/// # Panics
++///
++/// Panics if a tile is empty, as the chunk iterator does.
++#[cfg_attr(not(hax_backend_lean), allow(dead_code))]
++pub(crate) fn deep_tiles<F: ButterflyField, const INVERSE: bool>(
++    values: &mut [F],
++    width: usize,
++    log_rows: usize,
++    twiddles: &Twiddles<F>,
++) {
++    // The chunk iterator rejects a zero chunk length.
++    let tile_len = (1 << log_rows) * width;
++    assert!(tile_len != 0, "chunk size must be non-zero");
++
++    // Tile `index` starts at row `index * 2^log_rows`.
++    let len = values.len();
++    let mut start = 0;
++    let mut index = 0;
++    while start < len {
++        let end = chunk_end(start, tile_len, len);
++        tile_stages::<F, INVERSE>(&mut values[start..end], width, log_rows, 0, index, twiddles);
++        start = end;
++        index += 1;
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    extern crate std;
++
++    use alloc::vec::Vec;
++    use std::panic::{AssertUnwindSafe, catch_unwind};
++
++    use p3_binary_field::{
++        BinaryField2, BinaryField8, BinaryField16, BinaryField32, BinaryField64, BinaryField128,
++        Gf2, Ghash128, Poly64,
++    };
++    use proptest::prelude::*;
++
++    use crate::butterfly::ButterflyField;
++    use crate::lch::twiddles::Twiddles;
++
++    /// Builds an element of any level from a 64-bit pattern, repeating it for wider levels.
++    fn sample<F: ButterflyField>(bits: u64) -> F {
++        F::from_le_byte_iter(bits.to_le_bytes().into_iter().cycle())
++    }
++
++    /// A buffer of `len` distinct-looking elements.
++    fn buffer<F: ButterflyField>(len: usize, seed: u64) -> Vec<F> {
++        (0..len)
++            .map(|i| sample::<F>(seed.wrapping_mul(0x9e37_79b9_7f4a_7c15).wrapping_add(i as u64)))
++            .collect()
++    }
++
++    /// Runs a kernel on a copy of the buffer, returning the result or the fact that it panicked.
++    fn outcome<F: ButterflyField>(values: &[F], kernel: impl FnOnce(&mut [F])) -> Option<Vec<F>> {
++        let mut values = values.to_vec();
++        catch_unwind(AssertUnwindSafe(|| kernel(&mut values))).ok().map(|()| values)
++    }
++
++    /// The shipped twiddle state and the loop agree on every stage base and every step.
++    fn check_twiddles<F: ButterflyField>(log_n: usize, shift_bits: u64) {
++        let shift = sample::<F>(shift_bits);
++        let shipped = Twiddles::new(log_n, shift);
++        let reshaped = Twiddles::new_indexed(log_n, shift);
++        for stage in 0..log_n {
++            assert_eq!(shipped.at(stage, 0), reshaped.at(stage, 0), "stage {stage}");
++        }
++        for index in 1..(1usize << log_n.saturating_sub(1)).min(1 << 12) {
++            assert_eq!(shipped.step(index), reshaped.step(index), "index {index}");
++        }
++    }
++
++    /// Every reshaped kernel agrees with the shipped one on a buffer, panics included.
++    ///
++    /// The buffer need not hold whole rows, so the short and panicking tails are covered too.
++    fn check_kernels<F: ButterflyField>(log_n: usize, width: usize, len: usize, shift_bits: u64) {
++        let values = buffer::<F>(len, shift_bits ^ len as u64);
++        let twiddles = Twiddles::new(log_n, sample::<F>(shift_bits));
++        let label = std::format!("log_n={log_n} width={width} len={len} shift={shift_bits:#x}");
++
++        for j in 0..log_n {
++            assert_eq!(
++                outcome(&values, |v| super::super::stage_pass::<F, false>(v, width, j, &twiddles)),
++                outcome(&values, |v| super::stage_pass::<F, false>(v, width, j, &twiddles)),
++                "forward stage {j} {label}"
++            );
++            assert_eq!(
++                outcome(&values, |v| super::super::stage_pass::<F, true>(v, width, j, &twiddles)),
++                outcome(&values, |v| super::stage_pass::<F, true>(v, width, j, &twiddles)),
++                "inverse stage {j} {label}"
++            );
++        }
++        for log_rows in 0..=log_n {
++            assert_eq!(
++                outcome(&values, |v| super::super::deep_tiles::<F, false>(
++                    v, width, log_rows, &twiddles
++                )),
++                outcome(&values, |v| super::deep_tiles::<F, false>(v, width, log_rows, &twiddles)),
++                "forward tiles of 2^{log_rows} {label}"
++            );
++            assert_eq!(
++                outcome(&values, |v| super::super::deep_tiles::<F, true>(
++                    v, width, log_rows, &twiddles
++                )),
++                outcome(&values, |v| super::deep_tiles::<F, true>(v, width, log_rows, &twiddles)),
++                "inverse tiles of 2^{log_rows} {label}"
++            );
++        }
++    }
++
++    /// The whole-row shapes, plus a tail that is not a whole row and an empty buffer.
++    fn check_shapes<F: ButterflyField>(log_n: usize, width: usize, shift_bits: u64) {
++        let rows = width << log_n;
++        for len in [rows, rows + 1, rows.saturating_sub(1), 0] {
++            check_kernels::<F>(log_n, width, len, shift_bits);
++        }
++    }
++
++    #[test]
++    fn the_twiddle_loop_matches_the_shipped_state() {
++        // Fixture state: heights up to the level's dimension, on the subspace and on a coset.
++        for shift in [0, 0x5555_1234_9abc_def0] {
++            check_twiddles::<Gf2>(1, shift);
++            check_twiddles::<BinaryField2>(2, shift);
++            check_twiddles::<BinaryField8>(8, shift);
++            check_twiddles::<BinaryField32>(20, shift);
++            check_twiddles::<BinaryField128>(20, shift);
++            check_twiddles::<Ghash128>(20, shift);
++            check_twiddles::<Poly64>(20, shift);
++        }
++    }
++
++    #[test]
++    fn the_kernels_match_on_every_small_shape() {
++        // Fixture state: heights 2^0 ..= 2^6, widths 1 ..= 3, two shifts.
++        //
++        //     width 1, log_n 2:  4 rows,  4 elements
++        //     width 3, log_n 6: 64 rows, 192 elements
++        for shift in [0, 0x5555_1234_9abc_def0] {
++            for width in 1..=3 {
++                for log_n in 0..=6 {
++                    check_shapes::<BinaryField8>(log_n, width, shift);
++                    check_shapes::<BinaryField32>(log_n, width, shift);
++                    check_shapes::<BinaryField128>(log_n, width, shift);
++                    check_shapes::<Ghash128>(log_n, width, shift);
++                    check_shapes::<Poly64>(log_n, width, shift);
++                }
++            }
++            check_shapes::<Gf2>(1, 2, shift);
++            check_shapes::<BinaryField2>(2, 3, shift);
++        }
++    }
++
++    #[test]
++    fn the_kernels_match_past_the_grain() {
++        // Fixture state: a half block of 2^11 elements, twice the grain of 2^10.
++        //
++        //     width 1, log_n 12: stage 11 pairs rows 2048 apart, two grains per half
++        //     width 3, log_n 10: stage 9 pairs rows 512 apart, 1536 elements per half
++        for shift in [0, 0x5555_1234_9abc_def0] {
++            check_shapes::<BinaryField16>(12, 1, shift);
++            check_shapes::<BinaryField64>(10, 3, shift);
++        }
++    }
++
++    #[test]
++    fn the_kernels_panic_alike_at_width_zero() {
++        // Invariant: a zero width divides by zero in the stage pass and has no tile length.
++        check_kernels::<BinaryField32>(3, 0, 0, 0);
++        check_kernels::<BinaryField32>(3, 0, 5, 0);
++    }
++
++    proptest! {
++        #![proptest_config(ProptestConfig::with_cases(64))]
++
++        #[test]
++        fn the_kernels_match(
++            log_n in 0usize..=7,
++            width in 1usize..=5,
++            extra in 0usize..=3,
++            shift: u64,
++        ) {
++            check_kernels::<BinaryField32>(log_n, width, (width << log_n) + extra, shift);
++            check_kernels::<BinaryField128>(log_n, width, (width << log_n) + extra, shift);
++        }
++    }
++}
+diff --git a/binary-dft/src/lch/twiddles.rs b/binary-dft/src/lch/twiddles.rs
+index f08c6a65..7e044457 100644
+--- a/binary-dft/src/lch/twiddles.rs
++++ b/binary-dft/src/lch/twiddles.rs
+@@ -24,6 +24,7 @@ pub(super) struct Twiddles<F> {
+ 
+ impl<F: TowerLevel> Twiddles<F> {
+     /// The twiddle state of a transform of `2^log_n` rows over the given coset.
++    #[cfg(not(hax_backend_lean))] // PATCHED
+     pub(super) fn new(log_n: usize, shift: F) -> Self {
+         // W_0 is the identity and W_{j+1} = W_j^2 + W_j, so the bases form a chain of squarings.
+         let mut base = shift;
+@@ -43,6 +44,29 @@ impl<F: TowerLevel> Twiddles<F> {
+         Self { bases, steps }
+     }
+ 
++    // PATCHED: the extracted variant takes the same state from a plain loop.
++    #[cfg(hax_backend_lean)]
++    pub(super) fn new(log_n: usize, shift: F) -> Self {
++        Self::new_indexed(log_n, shift)
++    }
++
++    /// PATCHED: the twiddle state, with the chain of squarings in a plain loop.
++    #[cfg_attr(not(hax_backend_lean), allow(dead_code))]
++    pub(super) fn new_indexed(log_n: usize, shift: F) -> Self {
++        // W_0 is the identity and W_{j+1} = W_j^2 + W_j, so the bases form a chain of squarings.
++        let mut bases = Vec::new();
++        let mut base = shift;
++        for _ in 0..log_n {
++            bases.push(base);
++            base = base.square() + base;
++        }
++
++        // One step table serves every stage, as in the original.
++        let steps = domain_point_steps::<F>(log_n.saturating_sub(1));
++
++        Self { bases, steps }
++    }
++
+     /// The twiddle of one block, computed from its index.
+     #[inline]
+     pub(super) fn at(&self, stage: usize, block: usize) -> F {

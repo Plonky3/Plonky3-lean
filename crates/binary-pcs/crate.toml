@@ -1,0 +1,71 @@
+# p3-binary-pcs: the multilinear PCS over binary towers (FRI-Binius, eprint 2024/504).
+
+lean_lib = "P3BinaryPcs"
+
+# Extracted, generic over the tower-level and encodable-level traits:
+#
+# - the fold of one pair;
+# - the schedule's constructor, its change of folding factor and its batch count;
+# - the transcript shape.
+#
+# Pre-patch 020 roots the methods through free functions.
+#
+# Not extracted:
+#
+# - the coset fold: aeneas stops on its in-place layer loop with an internal error;
+# - the query-coset fold: aeneas stops on its slice pattern (an inconsistent projection);
+# - the challenger, Merkle and transcript code, which hold mutable borrows of the challenger.
+#
+# Those are transcribed over fields in extraction/P3BinaryPcs/Mirror/ (docs/extractor-issues.md 244).
+state = "scoped"
+
+start_from = [
+  "p3_binary_pcs::fold::fold_pair",
+  "p3_binary_pcs::hax_roots",
+]
+
+features = []
+
+watch = ["binary-pcs/src", "binary-pcs/Cargo.toml"]
+
+# The transcriptions. Hashes are pending tools/mirror.
+
+[[mirror]]
+lean = "p3_binary_pcs.params.mirror.try_new_with_folding"
+rust = "p3_binary_pcs::params::BinaryPcsConfig::try_new_with_folding"
+
+[[mirror]]
+lean = "p3_binary_pcs.params.mirror.BinaryPcsConfig.try_with_folding"
+rust = "p3_binary_pcs::params::BinaryPcsConfig::try_with_folding"
+
+[[mirror]]
+lean = "p3_binary_pcs.params.mirror.BinaryPcsConfig.fold_batches"
+rust = "p3_binary_pcs::params::BinaryPcsConfig::fold_batches"
+
+[[mirror]]
+lean = "p3_binary_pcs.params.mirror.BinaryPcsRegime.max_security_bits"
+rust = "p3_security::binary::BinaryPcsRegime::max_security_bits"
+
+[[mirror]]
+lean = "p3_binary_pcs.transcript.mirror.BinaryPcsShape.new"
+rust = "p3_binary_pcs::transcript::BinaryPcsShape::new"
+
+[[mirror]]
+lean = "p3_binary_pcs.fold.mirror.fold_pair"
+rust = "p3_binary_pcs::fold::fold_pair"
+
+[[mirror]]
+lean = "p3_binary_pcs.fold.mirror.fold_round"
+rust = "p3_binary_pcs::fold::fold_round"
+
+[[mirror]]
+lean = "p3_binary_pcs.fold.mirror.fold_coset"
+rust = "p3_binary_pcs::fold::fold_coset"
+
+[[mirror]]
+lean = "p3_binary_pcs.verifier.mirror.verify_query_paths"
+rust = "p3_binary_pcs::verifier::verify_query_paths"
+
+[[mirror]]
+lean = "p3_binary_pcs.verifier.mirror.verify_opening"
+rust = "{impl p3_binary_pcs::pcs::BinaryPcs<F, EF, MT, MX, E>}::verify_opening"

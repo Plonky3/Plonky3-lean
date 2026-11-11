@@ -367,7 +367,7 @@ theorem koala_bear.KoalaBear.neg.toField (a : Element) (ha : Canonical a) :
 
 /-- `a.halve()` on a canonical KoalaBear element is canonical, and is half the field element. -/
 theorem koala_bear.KoalaBear.halve.toField (a : Element) (ha : Canonical a) :
-    p3_monty_31.monty_31.MontyField31.halve FieldParams a
+    p3_monty_31.monty_31.MontyField31.Insts.P3_fieldFieldPrimeCharacteristicRing.halve FieldParams a
       ⦃ c => Canonical c ∧ toField c * 2 = toField a ⦄ :=
   Proofs.P3KoalaBear.koala_bear.KoalaBear.halve.toField a ha
 
