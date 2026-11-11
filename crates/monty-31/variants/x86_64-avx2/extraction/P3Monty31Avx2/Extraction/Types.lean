@@ -62,4 +62,14 @@ structure data_traits.PackedMontyParameters (Self : Type _) where
 def x86_64_avx2.packing.PackedMontyField31AVX2 (PMP : Type _) :=
   Array (monty_31.MontyField31 PMP) 8#usize
 
+/-- Trait declaration: [p3_monty_31::x86_64_avx2::packing::IntoM256]
+    Source: 'monty-31/src/x86_64_avx2/packing.rs', lines 467:0-480:1 -/
+structure x86_64_avx2.packing.IntoM256 (Self : Type _) (PMP : Type _) where
+  coremarkerCopyInst : core.marker.Copy Self
+  coreconvertIntoSelfPackedMontyField31AVX2Inst : core.convert.Into Self
+    (x86_64_avx2.packing.PackedMontyField31AVX2 PMP)
+  data_traitsPackedMontyParametersInst : data_traits.PackedMontyParameters PMP
+  as_m256i : Self → RustM p3_arch_shims.x86_64.types.M256i
+  as_shifted_m256i : Self → RustM p3_arch_shims.x86_64.types.M256i
+
 end p3_monty_31_avx2

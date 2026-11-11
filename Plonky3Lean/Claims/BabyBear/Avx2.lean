@@ -30,9 +30,10 @@ For packed inputs whose lanes are canonical, `Add`, `Sub`, `Mul` and `Neg`:
 
 Not claimed: the impls whose right operand is a scalar `MontyField31` (they `broadcast` it
 first), the assigning operators, `halve` itself and the rest of `PrimeCharacteristicRing` and
-`PackedField` (`dot_product`, `exp_const`, interleaving, the packed Poseidon layers), the
-intrinsic models themselves (trusted, and tested against the hardware in `arch/tests/`), and
-the `transmute` layout assumptions `to_vector` and `from_vector` rest on (`STATUS.md`).
+`PackedField` (`dot_product`'s dispatch, as opposed to its kernels, `mixed_dot_product`,
+`exp_const`, interleaving, the packed Poseidon layers), the intrinsic models themselves
+(trusted, and tested against the hardware in `arch/tests/`), and the `transmute` layout
+assumptions `to_vector` and `from_vector` rest on (`STATUS.md`).
 -/
 
 open Aeneas Aeneas.Std CoreModels
@@ -190,5 +191,104 @@ theorem x86_64_avx2.PackedBabyBearAVX2.neg.from_vector_arg (x : PackedBabyBearAV
         p3_monty_31_avx2.x86_64_avx2.packing.PackedMontyField31AVX2.from_vector
           BabyBearPackedParams v :=
   Proofs.P3BabyBear.Avx2.neg.from_vector_arg x hx
+
+/-! ## Dot products
+
+`PackedField::dot_product::<N>` dispatches to the kernels `dot_product_2` and `dot_product_4` to
+`dot_product_8`, each followed by `from_vector`. On packed inputs whose lanes are canonical, each
+kernel never fails, returns a vector with canonical lanes (`from_vector`'s safety condition), and
+lane `i` stands for `Σ_k lhs[k]_i · rhs[k]_i` in `BabyBear.Field`. Each sums 64-bit products and
+reduces once; the proofs check the sums' bounds for any `p < 2^31`. The `IntoM256` dictionary is
+the one of `PackedMontyField31AVX2`'s impl (`IsPackedInto`). -/
+
+/-- `dot_product_2(lhs, rhs)` on packed inputs with canonical lanes: lane `i` is
+`Σ_k lhs[k]_i · rhs[k]_i`. -/
+theorem x86_64_avx2.dot_product_2.toField
+    (iI : p3_monty_31_avx2.x86_64_avx2.packing.IntoM256 PackedBabyBearAVX2
+      p3_baby_bear.baby_bear.BabyBearParameters)
+    (hI : IsPackedInto iI BabyBearPackedParams) (lhs rhs : Std.Array PackedBabyBearAVX2 2#usize)
+    (hl : ∀ k : Fin 2, ∀ i : Fin 8, Canonical (toVector (lhs.val[k.val]'(by simp; omega)))[i])
+    (hr : ∀ k : Fin 2, ∀ i : Fin 8, Canonical (toVector (rhs.val[k.val]'(by simp; omega)))[i]) :
+    p3_monty_31_avx2.x86_64_avx2.packing.dot_product_2 BabyBearPackedParams iI iI lhs rhs
+      ⦃ v => FromVectorSafe BabyBear.fieldSize v ∧ ∀ i : Fin 8,
+        toField ⟨lane v i, ()⟩ = ∑ k : Fin 2,
+          toField (toVector (lhs.val[k.val]'(by simp; omega)))[i] *
+            toField (toVector (rhs.val[k.val]'(by simp; omega)))[i] ⦄ :=
+  Proofs.P3BabyBear.Avx2.dot_product_2.toField iI hI lhs rhs hl hr
+
+/-- `dot_product_4(lhs, rhs)` on packed inputs with canonical lanes: lane `i` is
+`Σ_k lhs[k]_i · rhs[k]_i`. -/
+theorem x86_64_avx2.dot_product_4.toField
+    (iI : p3_monty_31_avx2.x86_64_avx2.packing.IntoM256 PackedBabyBearAVX2
+      p3_baby_bear.baby_bear.BabyBearParameters)
+    (hI : IsPackedInto iI BabyBearPackedParams) (lhs rhs : Std.Array PackedBabyBearAVX2 4#usize)
+    (hl : ∀ k : Fin 4, ∀ i : Fin 8, Canonical (toVector (lhs.val[k.val]'(by simp)))[i])
+    (hr : ∀ k : Fin 4, ∀ i : Fin 8, Canonical (toVector (rhs.val[k.val]'(by simp)))[i]) :
+    p3_monty_31_avx2.x86_64_avx2.packing.dot_product_4 BabyBearPackedParams iI iI lhs rhs
+      ⦃ v => FromVectorSafe BabyBear.fieldSize v ∧ ∀ i : Fin 8,
+        toField ⟨lane v i, ()⟩ = ∑ k : Fin 4,
+          toField (toVector (lhs.val[k.val]'(by simp)))[i] *
+            toField (toVector (rhs.val[k.val]'(by simp)))[i] ⦄ :=
+  Proofs.P3BabyBear.Avx2.dot_product_4.toField iI hI lhs rhs hl hr
+
+/-- `dot_product_5(lhs, rhs)` on packed inputs with canonical lanes: lane `i` is
+`Σ_k lhs[k]_i · rhs[k]_i`. -/
+theorem x86_64_avx2.dot_product_5.toField
+    (iI : p3_monty_31_avx2.x86_64_avx2.packing.IntoM256 PackedBabyBearAVX2
+      p3_baby_bear.baby_bear.BabyBearParameters)
+    (hI : IsPackedInto iI BabyBearPackedParams) (lhs rhs : Std.Array PackedBabyBearAVX2 5#usize)
+    (hl : ∀ k : Fin 5, ∀ i : Fin 8, Canonical (toVector (lhs.val[k.val]'(by simp)))[i])
+    (hr : ∀ k : Fin 5, ∀ i : Fin 8, Canonical (toVector (rhs.val[k.val]'(by simp)))[i]) :
+    p3_monty_31_avx2.x86_64_avx2.packing.dot_product_5 BabyBearPackedParams iI iI lhs rhs
+      ⦃ v => FromVectorSafe BabyBear.fieldSize v ∧ ∀ i : Fin 8,
+        toField ⟨lane v i, ()⟩ = ∑ k : Fin 5,
+          toField (toVector (lhs.val[k.val]'(by simp)))[i] *
+            toField (toVector (rhs.val[k.val]'(by simp)))[i] ⦄ :=
+  Proofs.P3BabyBear.Avx2.dot_product_5.toField iI hI lhs rhs hl hr
+
+/-- `dot_product_6(lhs, rhs)` on packed inputs with canonical lanes: lane `i` is
+`Σ_k lhs[k]_i · rhs[k]_i`. -/
+theorem x86_64_avx2.dot_product_6.toField
+    (iI : p3_monty_31_avx2.x86_64_avx2.packing.IntoM256 PackedBabyBearAVX2
+      p3_baby_bear.baby_bear.BabyBearParameters)
+    (hI : IsPackedInto iI BabyBearPackedParams) (lhs rhs : Std.Array PackedBabyBearAVX2 6#usize)
+    (hl : ∀ k : Fin 6, ∀ i : Fin 8, Canonical (toVector (lhs.val[k.val]'(by simp)))[i])
+    (hr : ∀ k : Fin 6, ∀ i : Fin 8, Canonical (toVector (rhs.val[k.val]'(by simp)))[i]) :
+    p3_monty_31_avx2.x86_64_avx2.packing.dot_product_6 BabyBearPackedParams iI iI lhs rhs
+      ⦃ v => FromVectorSafe BabyBear.fieldSize v ∧ ∀ i : Fin 8,
+        toField ⟨lane v i, ()⟩ = ∑ k : Fin 6,
+          toField (toVector (lhs.val[k.val]'(by simp)))[i] *
+            toField (toVector (rhs.val[k.val]'(by simp)))[i] ⦄ :=
+  Proofs.P3BabyBear.Avx2.dot_product_6.toField iI hI lhs rhs hl hr
+
+/-- `dot_product_7(lhs, rhs)` on packed inputs with canonical lanes: lane `i` is
+`Σ_k lhs[k]_i · rhs[k]_i`. -/
+theorem x86_64_avx2.dot_product_7.toField
+    (iI : p3_monty_31_avx2.x86_64_avx2.packing.IntoM256 PackedBabyBearAVX2
+      p3_baby_bear.baby_bear.BabyBearParameters)
+    (hI : IsPackedInto iI BabyBearPackedParams) (lhs rhs : Std.Array PackedBabyBearAVX2 7#usize)
+    (hl : ∀ k : Fin 7, ∀ i : Fin 8, Canonical (toVector (lhs.val[k.val]'(by simp)))[i])
+    (hr : ∀ k : Fin 7, ∀ i : Fin 8, Canonical (toVector (rhs.val[k.val]'(by simp)))[i]) :
+    p3_monty_31_avx2.x86_64_avx2.packing.dot_product_7 BabyBearPackedParams iI iI lhs rhs
+      ⦃ v => FromVectorSafe BabyBear.fieldSize v ∧ ∀ i : Fin 8,
+        toField ⟨lane v i, ()⟩ = ∑ k : Fin 7,
+          toField (toVector (lhs.val[k.val]'(by simp)))[i] *
+            toField (toVector (rhs.val[k.val]'(by simp)))[i] ⦄ :=
+  Proofs.P3BabyBear.Avx2.dot_product_7.toField iI hI lhs rhs hl hr
+
+/-- `dot_product_8(lhs, rhs)` on packed inputs with canonical lanes: lane `i` is
+`Σ_k lhs[k]_i · rhs[k]_i`. -/
+theorem x86_64_avx2.dot_product_8.toField
+    (iI : p3_monty_31_avx2.x86_64_avx2.packing.IntoM256 PackedBabyBearAVX2
+      p3_baby_bear.baby_bear.BabyBearParameters)
+    (hI : IsPackedInto iI BabyBearPackedParams) (lhs rhs : Std.Array PackedBabyBearAVX2 8#usize)
+    (hl : ∀ k : Fin 8, ∀ i : Fin 8, Canonical (toVector (lhs.val[k.val]'(by simp)))[i])
+    (hr : ∀ k : Fin 8, ∀ i : Fin 8, Canonical (toVector (rhs.val[k.val]'(by simp)))[i]) :
+    p3_monty_31_avx2.x86_64_avx2.packing.dot_product_8 BabyBearPackedParams iI iI lhs rhs
+      ⦃ v => FromVectorSafe BabyBear.fieldSize v ∧ ∀ i : Fin 8,
+        toField ⟨lane v i, ()⟩ = ∑ k : Fin 8,
+          toField (toVector (lhs.val[k.val]'(by simp)))[i] *
+            toField (toVector (rhs.val[k.val]'(by simp)))[i] ⦄ :=
+  Proofs.P3BabyBear.Avx2.dot_product_8.toField iI hI lhs rhs hl hr
 
 end Plonky3Lean.Claims.P3BabyBear

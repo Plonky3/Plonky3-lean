@@ -1,6 +1,7 @@
 module
 
 public import Plonky3Lean.Proofs.Field.Avx2.Packing
+public import Plonky3Lean.Proofs.Field.Avx2.Dot
 public import Plonky3Lean.Proofs.Field.BabyBear.Generic
 public import Plonky3Lean.Proofs.Field.BabyBear.Constants
 
@@ -174,6 +175,121 @@ theorem halve_avx2.toField (v : M256i) (hv : FromVectorSafe BabyBear.fieldSize v
   rw [hr.2 i] at h
   simp only [WP.spec_ok] at h
   exact h.2
+
+/-! ## Dot products -/
+
+/-- A packed dot product's lane-wise congruence, read in `BabyBear.Field`: lane `i` stands
+for `Σ_k lhs[k]_i · rhs[k]_i`. -/
+theorem dot_toField {N : Std.Usize} {m : RustM M256i} (lhs rhs : Std.Array PackedBabyBearAVX2 N)
+    (h : ∃ v, m = .ok v ∧ FromVectorSafe (2013265921#u32).val v ∧ ∀ i : Fin 8,
+      (lane v i).val * 2 ^ 32 % (2013265921#u32).val =
+        (∑ k : Fin N.val, (toVector (lhs.val[k.val]'(by simp)))[i].value.val *
+          (toVector (rhs.val[k.val]'(by simp)))[i].value.val) % (2013265921#u32).val) :
+    m ⦃ v => FromVectorSafe BabyBear.fieldSize v ∧ ∀ i : Fin 8,
+      toField ⟨lane v i, ()⟩ = ∑ k : Fin N.val,
+        toField (toVector (lhs.val[k.val]'(by simp)))[i] *
+          toField (toVector (rhs.val[k.val]'(by simp)))[i] ⦄ := by
+  obtain ⟨v, hm, hs, hl⟩ := h
+  have hp : (2013265921#u32).val = BabyBear.fieldSize := by rw [fieldSize_eq]; rfl
+  rw [hp] at hs hl
+  rw [hm, WP.spec_ok]
+  refine ⟨hs, fun i => ?_⟩
+  unfold toField
+  have hc : ((lane v i).val : BabyBear.Field) * 2 ^ 32 =
+      ∑ k : Fin N.val, ((toVector (lhs.val[k.val]'(by simp)))[i].value.val : BabyBear.Field) *
+        ((toVector (rhs.val[k.val]'(by simp)))[i].value.val : BabyBear.Field) := by
+    have h := (ZMod.natCast_eq_natCast_iff' _ _ _).mpr (hl i)
+    push_cast at h
+    exact h
+  have hs : ∑ k : Fin N.val,
+      ((toVector (lhs.val[k.val]'(by simp)))[i].value.val : BabyBear.Field) *
+        (2 ^ 32 : BabyBear.Field)⁻¹ *
+      (((toVector (rhs.val[k.val]'(by simp)))[i].value.val : BabyBear.Field) *
+        (2 ^ 32 : BabyBear.Field)⁻¹) =
+      (∑ k : Fin N.val, ((toVector (lhs.val[k.val]'(by simp)))[i].value.val : BabyBear.Field) *
+        ((toVector (rhs.val[k.val]'(by simp)))[i].value.val : BabyBear.Field)) *
+        ((2 ^ 32 : BabyBear.Field)⁻¹ * (2 ^ 32 : BabyBear.Field)⁻¹) := by
+    rw [Finset.sum_mul]; exact Finset.sum_congr rfl fun k _ => by ring
+  rw [hs, ← hc]
+  field_simp [two_pow_32_ne_zero]
+
+theorem dot_product_2.toField
+    (iI : p3_monty_31_avx2.x86_64_avx2.packing.IntoM256 PackedBabyBearAVX2
+      p3_baby_bear.baby_bear.BabyBearParameters)
+    (hI : IsPackedInto iI BabyBearPackedParams) (lhs rhs : Std.Array PackedBabyBearAVX2 2#usize)
+    (hl : ∀ k : Fin 2, ∀ i : Fin 8, Canonical (toVector (lhs.val[k.val]'(by simp; omega)))[i])
+    (hr : ∀ k : Fin 2, ∀ i : Fin 8, Canonical (toVector (rhs.val[k.val]'(by simp; omega)))[i]) :
+    p3_monty_31_avx2.x86_64_avx2.packing.dot_product_2 BabyBearPackedParams iI iI lhs rhs
+      ⦃ v => FromVectorSafe BabyBear.fieldSize v ∧ ∀ i : Fin 8,
+        toField ⟨lane v i, ()⟩ = ∑ k : Fin 2,
+          toField (toVector (lhs.val[k.val]'(by simp; omega)))[i] *
+            toField (toVector (rhs.val[k.val]'(by simp; omega)))[i] ⦄ :=
+  dot_toField lhs rhs (Avx2.dot2.packed packedValid hI lhs rhs hl hr)
+
+theorem dot_product_4.toField
+    (iI : p3_monty_31_avx2.x86_64_avx2.packing.IntoM256 PackedBabyBearAVX2
+      p3_baby_bear.baby_bear.BabyBearParameters)
+    (hI : IsPackedInto iI BabyBearPackedParams) (lhs rhs : Std.Array PackedBabyBearAVX2 4#usize)
+    (hl : ∀ k : Fin 4, ∀ i : Fin 8, Canonical (toVector (lhs.val[k.val]'(by simp)))[i])
+    (hr : ∀ k : Fin 4, ∀ i : Fin 8, Canonical (toVector (rhs.val[k.val]'(by simp)))[i]) :
+    p3_monty_31_avx2.x86_64_avx2.packing.dot_product_4 BabyBearPackedParams iI iI lhs rhs
+      ⦃ v => FromVectorSafe BabyBear.fieldSize v ∧ ∀ i : Fin 8,
+        toField ⟨lane v i, ()⟩ = ∑ k : Fin 4,
+          toField (toVector (lhs.val[k.val]'(by simp)))[i] *
+            toField (toVector (rhs.val[k.val]'(by simp)))[i] ⦄ :=
+  dot_toField lhs rhs (Avx2.dot4.packed packedValid hI lhs rhs hl hr)
+
+theorem dot_product_5.toField
+    (iI : p3_monty_31_avx2.x86_64_avx2.packing.IntoM256 PackedBabyBearAVX2
+      p3_baby_bear.baby_bear.BabyBearParameters)
+    (hI : IsPackedInto iI BabyBearPackedParams) (lhs rhs : Std.Array PackedBabyBearAVX2 5#usize)
+    (hl : ∀ k : Fin 5, ∀ i : Fin 8, Canonical (toVector (lhs.val[k.val]'(by simp)))[i])
+    (hr : ∀ k : Fin 5, ∀ i : Fin 8, Canonical (toVector (rhs.val[k.val]'(by simp)))[i]) :
+    p3_monty_31_avx2.x86_64_avx2.packing.dot_product_5 BabyBearPackedParams iI iI lhs rhs
+      ⦃ v => FromVectorSafe BabyBear.fieldSize v ∧ ∀ i : Fin 8,
+        toField ⟨lane v i, ()⟩ = ∑ k : Fin 5,
+          toField (toVector (lhs.val[k.val]'(by simp)))[i] *
+            toField (toVector (rhs.val[k.val]'(by simp)))[i] ⦄ :=
+  dot_toField lhs rhs (Avx2.dot5.packed packedValid hI lhs rhs hl hr)
+
+theorem dot_product_6.toField
+    (iI : p3_monty_31_avx2.x86_64_avx2.packing.IntoM256 PackedBabyBearAVX2
+      p3_baby_bear.baby_bear.BabyBearParameters)
+    (hI : IsPackedInto iI BabyBearPackedParams) (lhs rhs : Std.Array PackedBabyBearAVX2 6#usize)
+    (hl : ∀ k : Fin 6, ∀ i : Fin 8, Canonical (toVector (lhs.val[k.val]'(by simp)))[i])
+    (hr : ∀ k : Fin 6, ∀ i : Fin 8, Canonical (toVector (rhs.val[k.val]'(by simp)))[i]) :
+    p3_monty_31_avx2.x86_64_avx2.packing.dot_product_6 BabyBearPackedParams iI iI lhs rhs
+      ⦃ v => FromVectorSafe BabyBear.fieldSize v ∧ ∀ i : Fin 8,
+        toField ⟨lane v i, ()⟩ = ∑ k : Fin 6,
+          toField (toVector (lhs.val[k.val]'(by simp)))[i] *
+            toField (toVector (rhs.val[k.val]'(by simp)))[i] ⦄ :=
+  dot_toField lhs rhs (Avx2.dot6.packed packedValid hI lhs rhs hl hr)
+
+theorem dot_product_7.toField
+    (iI : p3_monty_31_avx2.x86_64_avx2.packing.IntoM256 PackedBabyBearAVX2
+      p3_baby_bear.baby_bear.BabyBearParameters)
+    (hI : IsPackedInto iI BabyBearPackedParams) (lhs rhs : Std.Array PackedBabyBearAVX2 7#usize)
+    (hl : ∀ k : Fin 7, ∀ i : Fin 8, Canonical (toVector (lhs.val[k.val]'(by simp)))[i])
+    (hr : ∀ k : Fin 7, ∀ i : Fin 8, Canonical (toVector (rhs.val[k.val]'(by simp)))[i]) :
+    p3_monty_31_avx2.x86_64_avx2.packing.dot_product_7 BabyBearPackedParams iI iI lhs rhs
+      ⦃ v => FromVectorSafe BabyBear.fieldSize v ∧ ∀ i : Fin 8,
+        toField ⟨lane v i, ()⟩ = ∑ k : Fin 7,
+          toField (toVector (lhs.val[k.val]'(by simp)))[i] *
+            toField (toVector (rhs.val[k.val]'(by simp)))[i] ⦄ :=
+  dot_toField lhs rhs (Avx2.dot7.packed packedValid hI lhs rhs hl hr)
+
+theorem dot_product_8.toField
+    (iI : p3_monty_31_avx2.x86_64_avx2.packing.IntoM256 PackedBabyBearAVX2
+      p3_baby_bear.baby_bear.BabyBearParameters)
+    (hI : IsPackedInto iI BabyBearPackedParams) (lhs rhs : Std.Array PackedBabyBearAVX2 8#usize)
+    (hl : ∀ k : Fin 8, ∀ i : Fin 8, Canonical (toVector (lhs.val[k.val]'(by simp)))[i])
+    (hr : ∀ k : Fin 8, ∀ i : Fin 8, Canonical (toVector (rhs.val[k.val]'(by simp)))[i]) :
+    p3_monty_31_avx2.x86_64_avx2.packing.dot_product_8 BabyBearPackedParams iI iI lhs rhs
+      ⦃ v => FromVectorSafe BabyBear.fieldSize v ∧ ∀ i : Fin 8,
+        toField ⟨lane v i, ()⟩ = ∑ k : Fin 8,
+          toField (toVector (lhs.val[k.val]'(by simp)))[i] *
+            toField (toVector (rhs.val[k.val]'(by simp)))[i] ⦄ :=
+  dot_toField lhs rhs (Avx2.dot8.packed packedValid hI lhs rhs hl hr)
 
 /-! ## `from_vector`'s safety condition -/
 

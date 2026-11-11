@@ -18,7 +18,8 @@ with their axioms), about the Plonky3 commit pinned in `plonky3/`, under the
 assumptions in [`TRUST.md`](TRUST.md). In particular:
 
 - The portable scalar code paths are modelled. Of the SIMD backends, only
-  BabyBear's AVX2, NEON and AVX-512 `add`, `sub`, `mul`, `neg` and halving are,
+  BabyBear's AVX2, NEON and AVX-512 `add`, `sub`, `mul`, `neg` and halving, and
+  its AVX2 dot-product kernels (`dot_product_2`, `dot_product_4` to `_8`), are,
   against trusted models of the intrinsics ([`TRUST.md`](TRUST.md)). The
   AVX-512 models are tested against the hardware only when CI gets an AVX-512
   runner.

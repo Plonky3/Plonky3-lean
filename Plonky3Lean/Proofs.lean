@@ -180,6 +180,7 @@ public import Plonky3Lean.Proofs.Field.Mersenne31.Sum
 public import Plonky3Lean.Proofs.Field.Avx2.Shims
 public import Plonky3Lean.Proofs.Field.Avx2.Kernels
 public import Plonky3Lean.Proofs.Field.Avx2.Packing
+public import Plonky3Lean.Proofs.Field.Avx2.Dot
 public import Plonky3Lean.Proofs.Field.Avx512.Shims
 public import Plonky3Lean.Proofs.Field.Avx512.Kernels
 public import Plonky3Lean.Proofs.Field.Avx512.Packing

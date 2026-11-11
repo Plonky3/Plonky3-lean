@@ -44,7 +44,8 @@ and AVX-512: the `x86_64-avx2`, `aarch64-neon` and `x86_64-avx512` variants of
 p3-field, p3-monty-31 and p3-baby-bear are extracted for x86_64 and AArch64
 against models of the `core::arch` intrinsics (`arch/`), which are trusted. Of
 that code, only BabyBear's packed `Add`, `Sub`, `Mul`, `Neg` and `halve_avx2` /
-`halve_neon` / `halve_avx512` are claimed
+`halve_neon` / `halve_avx512`, and its AVX2 dot-product kernels `dot_product_2` and
+`dot_product_4` to `dot_product_8`, are claimed
 (`Plonky3Lean/Claims/BabyBear/Avx2.lean`, `Neon.lean` and `Avx512.lean`).
 Nothing here describes the rest of these code paths.
 

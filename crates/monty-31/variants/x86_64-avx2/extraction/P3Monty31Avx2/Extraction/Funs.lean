@@ -332,6 +332,422 @@ def
   x86_64_avx2.packing.PackedMontyField31AVX2.Insts.CoreOpsArithMulPackedMontyField31AVX2PackedMontyField31AVX2.mul
     data_traitsPackedMontyParametersInst self pmfa
 
+/-- [p3_monty_31::x86_64_avx2::packing::IntoM256::as_shifted_m256i]:
+    Source: 'monty-31/src/x86_64_avx2/packing.rs', lines 476:4-479:5 -/
+@[trait_default]
+def x86_64_avx2.packing.IntoM256.as_shifted_m256i.default
+  {Self : Type _} {PMP : Type _} (IntoM256Inst : x86_64_avx2.packing.IntoM256
+  Self PMP) (self : Self) :
+  RustM p3_arch_shims.x86_64.types.M256i
+  := do
+  let vec ← IntoM256Inst.as_m256i self
+  x86_64_avx2.packing.movehdup_epi32 vec
+
+/-- [p3_monty_31::x86_64_avx2::packing::{impl p3_monty_31::x86_64_avx2::packing::IntoM256<PMP> for p3_monty_31::x86_64_avx2::packing::PackedMontyField31AVX2<PMP>}::as_m256i]:
+    Source: 'monty-31/src/x86_64_avx2/packing.rs', lines 484:4-486:5 -/
+def
+  x86_64_avx2.packing.PackedMontyField31AVX2.Insts.P3_monty_31X86_64_avx2PackingIntoM256.as_m256i
+  {PMP : Type _} (data_traitsPackedMontyParametersInst :
+  data_traits.PackedMontyParameters PMP)
+  (self : x86_64_avx2.packing.PackedMontyField31AVX2 PMP) :
+  RustM p3_arch_shims.x86_64.types.M256i
+  := do
+  x86_64_avx2.packing.PackedMontyField31AVX2.to_vector
+    data_traitsPackedMontyParametersInst self
+
+/-- [p3_monty_31::x86_64_avx2::packing::dot_product_2]:
+    Source: 'monty-31/src/x86_64_avx2/packing.rs', lines 507:0-566:1 -/
+def x86_64_avx2.packing.dot_product_2
+  {PMP : Type _} {LHS : Type _} {RHS : Type _}
+  (data_traitsPackedMontyParametersInst : data_traits.PackedMontyParameters
+  PMP) (IntoM256Inst : x86_64_avx2.packing.IntoM256 LHS PMP) (IntoM256Inst1 :
+  x86_64_avx2.packing.IntoM256 RHS PMP) (lhs : Array LHS 2#usize)
+  (rhs : Array RHS 2#usize) :
+  RustM p3_arch_shims.x86_64.types.M256i
+  := do
+  let t ← Array.index_usize lhs 0#usize
+  let lhs_evn0 ← IntoM256Inst.as_m256i t
+  let lhs_odd0 ← IntoM256Inst.as_shifted_m256i t
+  let t1 ← Array.index_usize lhs 1#usize
+  let lhs_evn1 ← IntoM256Inst.as_m256i t1
+  let lhs_odd1 ← IntoM256Inst.as_shifted_m256i t1
+  let t2 ← Array.index_usize rhs 0#usize
+  let rhs_evn0 ← IntoM256Inst1.as_m256i t2
+  let rhs_odd0 ← IntoM256Inst1.as_shifted_m256i t2
+  let t3 ← Array.index_usize rhs 1#usize
+  let rhs_evn1 ← IntoM256Inst1.as_m256i t3
+  let rhs_odd1 ← IntoM256Inst1.as_shifted_m256i t3
+  let mul_evn0 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 lhs_evn0 rhs_evn0
+  let mul_evn1 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 lhs_evn1 rhs_evn1
+  let mul_odd0 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 lhs_odd0 rhs_odd0
+  let mul_odd1 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 lhs_odd1 rhs_odd1
+  let dot_evn ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 mul_evn0 mul_evn1
+  let dot_odd ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 mul_odd0 mul_odd1
+  let red_evn ←
+    x86_64_avx2.packing.partial_monty_red_unsigned_to_signed
+      data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst
+      dot_evn
+  let red_odd ←
+    x86_64_avx2.packing.partial_monty_red_unsigned_to_signed
+      data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst
+      dot_odd
+  let t4 ← x86_64_avx2.packing.blend_evn_odd red_evn red_odd
+  x86_64_avx2.packing.red_signed_to_canonical
+    data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst
+    t4
+
+/-- [p3_monty_31::x86_64_avx2::packing::monty_red_wide_to_canonical]:
+    Source: 'monty-31/src/x86_64_avx2/packing.rs', lines 780:0-804:1 -/
+def x86_64_avx2.packing.monty_red_wide_to_canonical
+  {PMP : Type _} (data_traitsPackedMontyParametersInst :
+  data_traits.PackedMontyParameters PMP)
+  (dot_evn : p3_arch_shims.x86_64.types.M256i)
+  (dot_odd : p3_arch_shims.x86_64.types.M256i) :
+  RustM p3_arch_shims.x86_64.types.M256i
+  := do
+  let dot ← x86_64_avx2.packing.blend_evn_odd dot_evn dot_odd
+  let mi ←
+    data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst.PACKED_P
+  let dot_sub ← p3_arch_shims.x86_64.avx2._mm256_sub_epi32 dot mi
+  let dot_prime ← p3_arch_shims.x86_64.avx2._mm256_min_epu32 dot dot_sub
+  let mi1 ←
+    data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst.PACKED_MU
+  let q_evn ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 dot_evn mi1
+  let q_p_evn ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 q_evn mi
+  let q_odd ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 dot_odd mi1
+  let q_p_odd ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 q_odd mi
+  let q_p ← x86_64_avx2.packing.blend_evn_odd q_p_evn q_p_odd
+  let t ← p3_arch_shims.x86_64.avx2._mm256_sub_epi32 dot_prime q_p
+  x86_64_avx2.packing.red_signed_to_canonical
+    data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst
+    t
+
+/-- [p3_monty_31::x86_64_avx2::packing::dot_product_4]:
+    Source: 'monty-31/src/x86_64_avx2/packing.rs', lines 574:0-668:1 -/
+def x86_64_avx2.packing.dot_product_4
+  {PMP : Type _} {LHS : Type _} {RHS : Type _}
+  (data_traitsPackedMontyParametersInst : data_traits.PackedMontyParameters
+  PMP) (IntoM256Inst : x86_64_avx2.packing.IntoM256 LHS PMP) (IntoM256Inst1 :
+  x86_64_avx2.packing.IntoM256 RHS PMP) (lhs : Array LHS 4#usize)
+  (rhs : Array RHS 4#usize) :
+  RustM p3_arch_shims.x86_64.types.M256i
+  := do
+  let t ← Array.index_usize lhs 0#usize
+  let lhs_evn0 ← IntoM256Inst.as_m256i t
+  let lhs_odd0 ← IntoM256Inst.as_shifted_m256i t
+  let t1 ← Array.index_usize lhs 1#usize
+  let lhs_evn1 ← IntoM256Inst.as_m256i t1
+  let lhs_odd1 ← IntoM256Inst.as_shifted_m256i t1
+  let t2 ← Array.index_usize lhs 2#usize
+  let lhs_evn2 ← IntoM256Inst.as_m256i t2
+  let lhs_odd2 ← IntoM256Inst.as_shifted_m256i t2
+  let t3 ← Array.index_usize lhs 3#usize
+  let lhs_evn3 ← IntoM256Inst.as_m256i t3
+  let lhs_odd3 ← IntoM256Inst.as_shifted_m256i t3
+  let t4 ← Array.index_usize rhs 0#usize
+  let rhs_evn0 ← IntoM256Inst1.as_m256i t4
+  let rhs_odd0 ← IntoM256Inst1.as_shifted_m256i t4
+  let t5 ← Array.index_usize rhs 1#usize
+  let rhs_evn1 ← IntoM256Inst1.as_m256i t5
+  let rhs_odd1 ← IntoM256Inst1.as_shifted_m256i t5
+  let t6 ← Array.index_usize rhs 2#usize
+  let rhs_evn2 ← IntoM256Inst1.as_m256i t6
+  let rhs_odd2 ← IntoM256Inst1.as_shifted_m256i t6
+  let t7 ← Array.index_usize rhs 3#usize
+  let rhs_evn3 ← IntoM256Inst1.as_m256i t7
+  let rhs_odd3 ← IntoM256Inst1.as_shifted_m256i t7
+  let mul_evn0 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 lhs_evn0 rhs_evn0
+  let mul_evn1 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 lhs_evn1 rhs_evn1
+  let mul_evn2 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 lhs_evn2 rhs_evn2
+  let mul_evn3 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 lhs_evn3 rhs_evn3
+  let mul_odd0 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 lhs_odd0 rhs_odd0
+  let mul_odd1 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 lhs_odd1 rhs_odd1
+  let mul_odd2 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 lhs_odd2 rhs_odd2
+  let mul_odd3 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 lhs_odd3 rhs_odd3
+  let dot_evn01 ←
+    p3_arch_shims.x86_64.avx2._mm256_add_epi64 mul_evn0 mul_evn1
+  let dot_odd01 ←
+    p3_arch_shims.x86_64.avx2._mm256_add_epi64 mul_odd0 mul_odd1
+  let dot_evn23 ←
+    p3_arch_shims.x86_64.avx2._mm256_add_epi64 mul_evn2 mul_evn3
+  let dot_odd23 ←
+    p3_arch_shims.x86_64.avx2._mm256_add_epi64 mul_odd2 mul_odd3
+  let dot_evn ←
+    p3_arch_shims.x86_64.avx2._mm256_add_epi64 dot_evn01 dot_evn23
+  let dot_odd ←
+    p3_arch_shims.x86_64.avx2._mm256_add_epi64 dot_odd01 dot_odd23
+  x86_64_avx2.packing.monty_red_wide_to_canonical
+    data_traitsPackedMontyParametersInst dot_evn dot_odd
+
+/-- [p3_monty_31::x86_64_avx2::packing::wide_dot]:
+    Source: 'monty-31/src/x86_64_avx2/packing.rs', lines 683:0-735:1 -/
+def x86_64_avx2.packing.wide_dot
+  {PMP : Type _} {LHS : Type _} {RHS : Type _} {K : Std.Usize}
+  (data_traitsPackedMontyParametersInst : data_traits.PackedMontyParameters
+  PMP) (IntoM256Inst : x86_64_avx2.packing.IntoM256 LHS PMP) (IntoM256Inst1 :
+  x86_64_avx2.packing.IntoM256 RHS PMP) (lhs : Array LHS K) (rhs : Array RHS K)
+  :
+  RustM (p3_arch_shims.x86_64.types.M256i × p3_arch_shims.x86_64.types.M256i)
+  := do
+  massert (K >= 1#usize)
+  massert (K <= 4#usize)
+  let t ← Array.index_usize lhs 0#usize
+  let mi ← IntoM256Inst.as_m256i t
+  let t1 ← Array.index_usize rhs 0#usize
+  let mi1 ← IntoM256Inst1.as_m256i t1
+  let evn0 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 mi mi1
+  let mi2 ← IntoM256Inst.as_shifted_m256i t
+  let mi3 ← IntoM256Inst1.as_shifted_m256i t1
+  let odd0 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 mi2 mi3
+  if K = 1#usize
+  then ok (evn0, odd0)
+  else
+    let t2 ← Array.index_usize lhs 1#usize
+    let mi4 ← IntoM256Inst.as_m256i t2
+    let t3 ← Array.index_usize rhs 1#usize
+    let mi5 ← IntoM256Inst1.as_m256i t3
+    let evn1 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 mi4 mi5
+    let mi6 ← IntoM256Inst.as_shifted_m256i t2
+    let mi7 ← IntoM256Inst1.as_shifted_m256i t3
+    let odd1 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 mi6 mi7
+    let evn01 ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 evn0 evn1
+    let odd01 ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 odd0 odd1
+    if K = 2#usize
+    then ok (evn01, odd01)
+    else
+      let t4 ← Array.index_usize lhs 2#usize
+      let mi8 ← IntoM256Inst.as_m256i t4
+      let t5 ← Array.index_usize rhs 2#usize
+      let mi9 ← IntoM256Inst1.as_m256i t5
+      let evn2 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 mi8 mi9
+      let mi10 ← IntoM256Inst.as_shifted_m256i t4
+      let mi11 ← IntoM256Inst1.as_shifted_m256i t5
+      let odd2 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 mi10 mi11
+      if K = 3#usize
+      then
+        let mi12 ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 evn01 evn2
+        let mi13 ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 odd01 odd2
+        ok (mi12, mi13)
+      else
+        let t6 ← Array.index_usize lhs 3#usize
+        let mi12 ← IntoM256Inst.as_m256i t6
+        let t7 ← Array.index_usize rhs 3#usize
+        let mi13 ← IntoM256Inst1.as_m256i t7
+        let evn3 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 mi12 mi13
+        let mi14 ← IntoM256Inst.as_shifted_m256i t6
+        let mi15 ← IntoM256Inst1.as_shifted_m256i t7
+        let odd3 ← p3_arch_shims.x86_64.avx2._mm256_mul_epu32 mi14 mi15
+        let evn23 ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 evn2 evn3
+        let odd23 ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 odd2 odd3
+        let mi16 ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 evn01 evn23
+        let mi17 ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 odd01 odd23
+        ok (mi16, mi17)
+
+/-- [p3_monty_31::x86_64_avx2::packing::fold_wide]:
+    Source: 'monty-31/src/x86_64_avx2/packing.rs', lines 752:0-769:1 -/
+def x86_64_avx2.packing.fold_wide
+  {MPAVX2 : Type _} (MontyParametersAVX2Inst :
+  x86_64_avx2.packing.MontyParametersAVX2 MPAVX2)
+  (acc : p3_arch_shims.x86_64.types.M256i) :
+  RustM p3_arch_shims.x86_64.types.M256i
+  := do
+  let mi ← MontyParametersAVX2Inst.PACKED_P
+  let shifted_p ← p3_arch_shims.x86_64.avx2._mm256_slli_epi64 32#i32 mi
+  let sub ← p3_arch_shims.x86_64.avx2._mm256_sub_epi64 acc shifted_p
+  p3_arch_shims.x86_64.avx2._mm256_min_epu32 acc sub
+
+/-- [p3_monty_31::x86_64_avx2::packing::dot_product_5]:
+    Source: 'monty-31/src/x86_64_avx2/packing.rs', lines 811:0-843:1 -/
+def x86_64_avx2.packing.dot_product_5
+  {PMP : Type _} {LHS : Type _} {RHS : Type _}
+  (data_traitsPackedMontyParametersInst : data_traits.PackedMontyParameters
+  PMP) (IntoM256Inst : x86_64_avx2.packing.IntoM256 LHS PMP) (IntoM256Inst1 :
+  x86_64_avx2.packing.IntoM256 RHS PMP) (lhs : Array LHS 5#usize)
+  (rhs : Array RHS 5#usize) :
+  RustM p3_arch_shims.x86_64.types.M256i
+  := do
+  let t ← Array.index_usize lhs 0#usize
+  let t1 ← Array.index_usize lhs 1#usize
+  let t2 ← Array.index_usize lhs 2#usize
+  let t3 ← Array.index_usize lhs 3#usize
+  let t4 ← Array.index_usize rhs 0#usize
+  let t5 ← Array.index_usize rhs 1#usize
+  let t6 ← Array.index_usize rhs 2#usize
+  let t7 ← Array.index_usize rhs 3#usize
+  let (a_evn, a_odd) ←
+    x86_64_avx2.packing.wide_dot data_traitsPackedMontyParametersInst
+      IntoM256Inst IntoM256Inst1 (Array.make 4#usize [ t, t1, t2, t3 ])
+      (Array.make 4#usize [ t4, t5, t6, t7 ])
+  let t8 ← Array.index_usize lhs 4#usize
+  let t9 ← Array.index_usize rhs 4#usize
+  let (b_evn, b_odd) ←
+    x86_64_avx2.packing.wide_dot data_traitsPackedMontyParametersInst
+      IntoM256Inst IntoM256Inst1 (Array.make 1#usize [ t8 ])
+      (Array.make 1#usize [ t9 ])
+  let mi ←
+    x86_64_avx2.packing.fold_wide
+      data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst
+      a_evn
+  let dot_evn ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 mi b_evn
+  let mi1 ←
+    x86_64_avx2.packing.fold_wide
+      data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst
+      a_odd
+  let dot_odd ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 mi1 b_odd
+  x86_64_avx2.packing.monty_red_wide_to_canonical
+    data_traitsPackedMontyParametersInst dot_evn dot_odd
+
+/-- [p3_monty_31::x86_64_avx2::packing::dot_product_6]:
+    Source: 'monty-31/src/x86_64_avx2/packing.rs', lines 850:0-874:1 -/
+def x86_64_avx2.packing.dot_product_6
+  {PMP : Type _} {LHS : Type _} {RHS : Type _}
+  (data_traitsPackedMontyParametersInst : data_traits.PackedMontyParameters
+  PMP) (IntoM256Inst : x86_64_avx2.packing.IntoM256 LHS PMP) (IntoM256Inst1 :
+  x86_64_avx2.packing.IntoM256 RHS PMP) (lhs : Array LHS 6#usize)
+  (rhs : Array RHS 6#usize) :
+  RustM p3_arch_shims.x86_64.types.M256i
+  := do
+  let t ← Array.index_usize lhs 0#usize
+  let t1 ← Array.index_usize lhs 1#usize
+  let t2 ← Array.index_usize lhs 2#usize
+  let t3 ← Array.index_usize lhs 3#usize
+  let t4 ← Array.index_usize rhs 0#usize
+  let t5 ← Array.index_usize rhs 1#usize
+  let t6 ← Array.index_usize rhs 2#usize
+  let t7 ← Array.index_usize rhs 3#usize
+  let (a_evn, a_odd) ←
+    x86_64_avx2.packing.wide_dot data_traitsPackedMontyParametersInst
+      IntoM256Inst IntoM256Inst1 (Array.make 4#usize [ t, t1, t2, t3 ])
+      (Array.make 4#usize [ t4, t5, t6, t7 ])
+  let t8 ← Array.index_usize lhs 4#usize
+  let t9 ← Array.index_usize lhs 5#usize
+  let t10 ← Array.index_usize rhs 4#usize
+  let t11 ← Array.index_usize rhs 5#usize
+  let (b_evn, b_odd) ←
+    x86_64_avx2.packing.wide_dot data_traitsPackedMontyParametersInst
+      IntoM256Inst IntoM256Inst1 (Array.make 2#usize [ t8, t9 ])
+      (Array.make 2#usize [ t10, t11 ])
+  let mi ←
+    x86_64_avx2.packing.fold_wide
+      data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst
+      a_evn
+  let dot_evn ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 mi b_evn
+  let mi1 ←
+    x86_64_avx2.packing.fold_wide
+      data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst
+      a_odd
+  let dot_odd ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 mi1 b_odd
+  x86_64_avx2.packing.monty_red_wide_to_canonical
+    data_traitsPackedMontyParametersInst dot_evn dot_odd
+
+/-- [p3_monty_31::x86_64_avx2::packing::dot_product_7]:
+    Source: 'monty-31/src/x86_64_avx2/packing.rs', lines 881:0-908:1 -/
+def x86_64_avx2.packing.dot_product_7
+  {PMP : Type _} {LHS : Type _} {RHS : Type _}
+  (data_traitsPackedMontyParametersInst : data_traits.PackedMontyParameters
+  PMP) (IntoM256Inst : x86_64_avx2.packing.IntoM256 LHS PMP) (IntoM256Inst1 :
+  x86_64_avx2.packing.IntoM256 RHS PMP) (lhs : Array LHS 7#usize)
+  (rhs : Array RHS 7#usize) :
+  RustM p3_arch_shims.x86_64.types.M256i
+  := do
+  let t ← Array.index_usize lhs 0#usize
+  let t1 ← Array.index_usize lhs 1#usize
+  let t2 ← Array.index_usize lhs 2#usize
+  let t3 ← Array.index_usize lhs 3#usize
+  let t4 ← Array.index_usize rhs 0#usize
+  let t5 ← Array.index_usize rhs 1#usize
+  let t6 ← Array.index_usize rhs 2#usize
+  let t7 ← Array.index_usize rhs 3#usize
+  let (a_evn, a_odd) ←
+    x86_64_avx2.packing.wide_dot data_traitsPackedMontyParametersInst
+      IntoM256Inst IntoM256Inst1 (Array.make 4#usize [ t, t1, t2, t3 ])
+      (Array.make 4#usize [ t4, t5, t6, t7 ])
+  let t8 ← Array.index_usize lhs 4#usize
+  let t9 ← Array.index_usize lhs 5#usize
+  let t10 ← Array.index_usize lhs 6#usize
+  let t11 ← Array.index_usize rhs 4#usize
+  let t12 ← Array.index_usize rhs 5#usize
+  let t13 ← Array.index_usize rhs 6#usize
+  let (b_evn, b_odd) ←
+    x86_64_avx2.packing.wide_dot data_traitsPackedMontyParametersInst
+      IntoM256Inst IntoM256Inst1 (Array.make 3#usize [ t8, t9, t10 ])
+      (Array.make 3#usize [ t11, t12, t13 ])
+  let mi ←
+    x86_64_avx2.packing.fold_wide
+      data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst
+      a_evn
+  let mi1 ←
+    x86_64_avx2.packing.fold_wide
+      data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst
+      b_evn
+  let dot_evn ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 mi mi1
+  let mi2 ←
+    x86_64_avx2.packing.fold_wide
+      data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst
+      a_odd
+  let mi3 ←
+    x86_64_avx2.packing.fold_wide
+      data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst
+      b_odd
+  let dot_odd ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 mi2 mi3
+  x86_64_avx2.packing.monty_red_wide_to_canonical
+    data_traitsPackedMontyParametersInst dot_evn dot_odd
+
+/-- [p3_monty_31::x86_64_avx2::packing::dot_product_8]:
+    Source: 'monty-31/src/x86_64_avx2/packing.rs', lines 915:0-945:1 -/
+def x86_64_avx2.packing.dot_product_8
+  {PMP : Type _} {LHS : Type _} {RHS : Type _}
+  (data_traitsPackedMontyParametersInst : data_traits.PackedMontyParameters
+  PMP) (IntoM256Inst : x86_64_avx2.packing.IntoM256 LHS PMP) (IntoM256Inst1 :
+  x86_64_avx2.packing.IntoM256 RHS PMP) (lhs : Array LHS 8#usize)
+  (rhs : Array RHS 8#usize) :
+  RustM p3_arch_shims.x86_64.types.M256i
+  := do
+  let t ← Array.index_usize lhs 0#usize
+  let t1 ← Array.index_usize lhs 1#usize
+  let t2 ← Array.index_usize lhs 2#usize
+  let t3 ← Array.index_usize lhs 3#usize
+  let t4 ← Array.index_usize rhs 0#usize
+  let t5 ← Array.index_usize rhs 1#usize
+  let t6 ← Array.index_usize rhs 2#usize
+  let t7 ← Array.index_usize rhs 3#usize
+  let (a_evn, a_odd) ←
+    x86_64_avx2.packing.wide_dot data_traitsPackedMontyParametersInst
+      IntoM256Inst IntoM256Inst1 (Array.make 4#usize [ t, t1, t2, t3 ])
+      (Array.make 4#usize [ t4, t5, t6, t7 ])
+  let t8 ← Array.index_usize lhs 4#usize
+  let t9 ← Array.index_usize lhs 5#usize
+  let t10 ← Array.index_usize lhs 6#usize
+  let t11 ← Array.index_usize lhs 7#usize
+  let t12 ← Array.index_usize rhs 4#usize
+  let t13 ← Array.index_usize rhs 5#usize
+  let t14 ← Array.index_usize rhs 6#usize
+  let t15 ← Array.index_usize rhs 7#usize
+  let (b_evn, b_odd) ←
+    x86_64_avx2.packing.wide_dot data_traitsPackedMontyParametersInst
+      IntoM256Inst IntoM256Inst1 (Array.make 4#usize [ t8, t9, t10, t11 ])
+      (Array.make 4#usize [ t12, t13, t14, t15 ])
+  let mi ←
+    x86_64_avx2.packing.fold_wide
+      data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst
+      a_evn
+  let mi1 ←
+    x86_64_avx2.packing.fold_wide
+      data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst
+      b_evn
+  let dot_evn ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 mi mi1
+  let mi2 ←
+    x86_64_avx2.packing.fold_wide
+      data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst
+      a_odd
+  let mi3 ←
+    x86_64_avx2.packing.fold_wide
+      data_traitsPackedMontyParametersInst.x86_64_avx2packingMontyParametersAVX2Inst
+      b_odd
+  let dot_odd ← p3_arch_shims.x86_64.avx2._mm256_add_epi64 mi2 mi3
+  x86_64_avx2.packing.monty_red_wide_to_canonical
+    data_traitsPackedMontyParametersInst dot_evn dot_odd
+
 /-- [p3_monty_31::x86_64_avx2::utils::halve_avx2::ONE]
     Source: 'monty-31/src/x86_64_avx2/utils.rs', lines 33:8-33:61 -/
 @[global_simps, irreducible]
