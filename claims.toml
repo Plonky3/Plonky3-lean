@@ -2,8 +2,9 @@
 #
 # One entry per theorem in `Plonky3Lean.Claims`. CI runs `#print axioms` on every
 # claim and requires the result to equal `axioms` exactly. A claim that starts to
-# depend on anything else fails the build, for example on `sorryAx`, or on the
-# `Lean.ofReduceBool` axiom that `native_decide` adds.
+# depend on anything else fails the build, for example on `sorryAx`, or on a
+# `._native.<tactic>.ax_*` axiom that `native_decide`, or a `bv_decide` that
+# calls the SAT solver, adds.
 #
 # Each entry lists the axioms in sorted order, as tools/check-claims.py prints
 # them.

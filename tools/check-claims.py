@@ -5,7 +5,8 @@ Lists every theorem in `Plonky3Lean.Claims` with the axioms it depends on (what
 `#print axioms` reports) and requires the result to equal claims.toml exactly:
 every claim has an entry, every entry names a claim, and each claim's axioms are
 the ones its entry allows. A claim that starts to depend on `sorryAx`, or on the
-`Lean.ofReduceBool` axiom that `native_decide` adds, therefore fails.
+`._native.<tactic>.ax_*` axiom that `native_decide`, or a `bv_decide` that calls
+the SAT solver, adds, therefore fails.
 
 Run after `lake build`.
 
