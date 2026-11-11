@@ -137,8 +137,10 @@ rust = "{impl p3_field::field::Field for p3_monty_31::monty_31::MontyField31<_>}
 
 
 
-# `PackedMontyField31AVX2`'s arithmetic, extracted for x86_64 with AVX2 against
-# the intrinsic models (pre-patch 020). The scalar modules are opaque: the
+# `PackedMontyField31AVX2`'s arithmetic and dot-product kernels, extracted for
+# x86_64 with AVX2 against the intrinsic models (pre-patch 020). The kernels'
+# dispatcher `general_dot_product` and the scalar `IntoM256` impl are not roots
+# (docs/extractor-issues.md 214, 215). The scalar modules are opaque: the
 # variant takes `MontyField31` and its functions from P3Monty31, by the
 # bindings in variants/x86_64-avx2/extraction/P3Monty31Avx2/Assumptions/.
 # Its own namespace, since the run re-declares the parameter traits, and on
@@ -155,6 +157,13 @@ start_from = [
   "{impl core::ops::arith::Neg for p3_monty_31::x86_64_avx2::packing::PackedMontyField31AVX2<_>}::neg",
   "{impl core::ops::arith::Mul for p3_monty_31::x86_64_avx2::packing::PackedMontyField31AVX2<_>}::mul",
   "p3_monty_31::x86_64_avx2::utils::halve_avx2",
+  "p3_monty_31::x86_64_avx2::packing::dot_product_2",
+  "p3_monty_31::x86_64_avx2::packing::dot_product_4",
+  "p3_monty_31::x86_64_avx2::packing::dot_product_5",
+  "p3_monty_31::x86_64_avx2::packing::dot_product_6",
+  "p3_monty_31::x86_64_avx2::packing::dot_product_7",
+  "p3_monty_31::x86_64_avx2::packing::dot_product_8",
+  "{impl p3_monty_31::x86_64_avx2::packing::IntoM256 for p3_monty_31::x86_64_avx2::packing::PackedMontyField31AVX2<_>}::as_m256i",
 ]
 opaque = [
   "p3_monty_31::monty_31",

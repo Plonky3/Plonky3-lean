@@ -403,7 +403,9 @@ keeps its number and says so.
     Methods of generic trait impls (`QuotientMap<w>`,
     `HasTwoAdicBinomialExtension<2>`, `BinomiallyExtendable<3>`) are reached
     instead through the `010-extraction-roots` pre-patches of p3-mersenne-31 and
-    p3-monty-31.
+    p3-monty-31. A trait named without its generics resolves when the type has
+    one impl of it: `{impl …::IntoM256 for …::PackedMontyField31AVX2<_>}::as_m256i`
+    is a root of monty-31's x86_64-avx2 variant.
 
 210. **The `core::arch` intrinsics have no Rust bodies.** Each is a
      `#[target_feature]` wrapper around an LLVM builtin, and the models have no
@@ -437,3 +439,17 @@ keeps its number and says so.
      `monty-31/040` makes the barriers the identity, and each `vmovshdup` a call
      of the intrinsic for that instruction (`_mm512_mask_movehdup_ps`,
      `_mm256_mask_movehdup_ps`), stand-ins that TRUST.md lists.
+214. **aeneas fails in its array-default pre-pass on `MontyField31`'s `Serialize`
+     impl** (`monty-31/src/monty_31.rs`, `self.value.to_le_bytes().serialize(…)`),
+     with "Internal error" from `PrePasses.update_array_default`. A root that
+     needs `FieldParameters`' supertraits reaches the impl: `general_dot_product`
+     of the x86_64-avx2 variant. The variant's roots stop at the fixed-length
+     kernels `dot_product_2` to `dot_product_8`, which need only
+     `PackedMontyParameters`.
+215. **aeneas cannot read a field of a struct from an `--opaque` module.** In
+     monty-31's x86_64-avx2 variant `MontyField31` is external, and
+     `{impl IntoM256 for MontyField31<_>}::as_m256i`
+     (`_mm256_set1_epi32(self.value as i32)`) fails with "Unexpected error" at
+     `self.value`. The impl is not a root, so the dot-product kernels are
+     extracted for packed operands only, not for a scalar operand
+     (`mixed_dot_product`).

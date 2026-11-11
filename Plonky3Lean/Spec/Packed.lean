@@ -91,6 +91,19 @@ structure Valid {MP : Type} (inst : p3_monty_31_avx2.data_traits.PackedMontyPara
   packed_mu : ∃ v, inst.x86_64_avx2packingMontyParametersAVX2Inst.PACKED_MU = .ok v ∧
     ∀ i, lane v i = mu
 
+open p3_monty_31_avx2 in
+/-- An `IntoM256` dictionary for `PackedMontyField31AVX2` whose methods are those of its impl
+in `x86_64_avx2/packing.rs`: `as_m256i` is `to_vector`, and `as_shifted_m256i` the trait's
+default. -/
+structure IsPackedInto {PMP : Type}
+    (iI : p3_monty_31_avx2.x86_64_avx2.packing.IntoM256 (PackedAvx2 PMP) PMP)
+    (inst : p3_monty_31_avx2.data_traits.PackedMontyParameters PMP) : Prop where
+  as_m256i : iI.as_m256i =
+    x86_64_avx2.packing.PackedMontyField31AVX2.Insts.P3_monty_31X86_64_avx2PackingIntoM256.as_m256i
+      inst
+  as_shifted_m256i :
+    iI.as_shifted_m256i = x86_64_avx2.packing.IntoM256.as_shifted_m256i.default iI
+
 /-! ## BabyBear -/
 
 /-- Rust's `PackedBabyBearAVX2 = PackedMontyField31AVX2<BabyBearParameters>`. -/

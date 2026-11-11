@@ -81,7 +81,7 @@ A crate extracted again for another target (`[[variant]]` in its `crate.toml`), 
 | `field@x86_64-avx2` | `x86_64-unknown-linux-gnu +avx2` | `P3FieldAvx2` | `p3_field` | 85 | 33 | 0 | 0 | 0 |
 | `field@aarch64-neon` | `aarch64-unknown-linux-gnu +neon` | `P3FieldNeon` | `p3_field` | 85 | 33 | 0 | 0 | 0 |
 | `field@x86_64-avx512` | `x86_64-unknown-linux-gnu +avx512f` | `P3FieldAvx512` | `p3_field` | 85 | 34 | 0 | 0 | 0 |
-| `monty-31@x86_64-avx2` | `x86_64-unknown-linux-gnu +avx2` | `P3Monty31Avx2` | `p3_monty_31_avx2` | 426 | 118 | 0 | 0 | 1 |
+| `monty-31@x86_64-avx2` | `x86_64-unknown-linux-gnu +avx2` | `P3Monty31Avx2` | `p3_monty_31_avx2` | 852 | 118 | 0 | 1 | 1 |
 | `monty-31@aarch64-neon` | `aarch64-unknown-linux-gnu +neon` | `P3Monty31Neon` | `p3_monty_31_neon` | 428 | 129 | 0 | 0 | 1 |
 | `monty-31@x86_64-avx512` | `x86_64-unknown-linux-gnu +avx512f` | `P3Monty31Avx512` | `p3_monty_31_avx512` | 413 | 118 | 0 | 0 | 1 |
 
@@ -572,7 +572,11 @@ Nothing translated is dropped.
 ### `monty-31@x86_64-avx2`
 
 charon errors: 0.
-Nothing translated is dropped.
+1 item(s) dropped, 0 of them mirrored.
+
+| Item | Source | Mirrored |
+|---|---|---|
+| `p3_monty_31::x86_64_avx2::packing::{impl core::clone::Clone}::clone` | `` |  |
 
 ### `monty-31@aarch64-neon`
 
@@ -589,7 +593,7 @@ Nothing translated is dropped.
 Every `opaque` constant, all hand-written. An opaque constant is not an axiom: it
 adds nothing to a claim's axioms, and Lean cannot unfold it, so a proof about code
 that mentions one would go through for any value of it. *Claims* counts the claims
-(of 1965) whose dependencies include it; reaching one is not using it.
+(of 1971) whose dependencies include it; reaching one is not using it.
 
 | Crate | Constant | Why | Claims |
 |---|---|---|---:|
@@ -603,7 +607,7 @@ that mentions one would go through for any value of it. *Claims* counts the clai
 | `arch-shims` | `x86_64.types.M512.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `arch-shims` | `x86_64.types.M512d.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `arch-shims` | `x86_64.types.M512i.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
-| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 120 |
+| `baby-bear` | `baby_bear.BabyBearParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 126 |
 | `baby-bear` | `mds.MDSBabyBearData.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon1.BabyBearPoseidonParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
 | `baby-bear` | `poseidon2.BabyBearInternalLayerParameters.Insts.CoreFmtDebug.fmt` | `Debug` bodies are opaque by `charon_args` (toolchain.toml) | 0 |
@@ -660,7 +664,7 @@ Every `[[mirror]]` entry: a hand-written Lean declaration that transcribes a Rus
 item, re-read by hand when upstream changes it until `tools/mirror` hashes the Rust
 item. *Extractor* says what the last extraction did with the Rust item: dropped
 after translating it, or not translated (a stub's item, or not reached). *Claims*
-counts the claims (of 1965) whose dependencies include the declaration.
+counts the claims (of 1971) whose dependencies include the declaration.
 
 | Crate | Lean | Rust | Extractor | Claims |
 |---|---|---|---|---:|
@@ -3147,6 +3151,12 @@ Every theorem in `Plonky3Lean.Claims`, without the `Plonky3Lean.Claims.` prefix.
 | `P3BabyBear.x86_64_avx2.PackedBabyBearAVX2.sub.from_vector_arg` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.x86_64_avx2.PackedBabyBearAVX2.sub.lanewise` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.x86_64_avx2.PackedBabyBearAVX2.sub.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.dot_product_2.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.dot_product_4.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.dot_product_5.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.dot_product_6.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.dot_product_7.toField` | `Classical.choice`, `Quot.sound`, `propext` |
+| `P3BabyBear.x86_64_avx2.dot_product_8.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.x86_64_avx2.halve_avx2.lanewise` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.x86_64_avx2.halve_avx2.toField` | `Classical.choice`, `Quot.sound`, `propext` |
 | `P3BabyBear.x86_64_avx512.BabyBearParameters.MontyParameters.toPortable` | `Classical.choice`, `Quot.sound`, `propext` |

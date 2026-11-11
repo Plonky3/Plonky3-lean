@@ -5,3 +5,7 @@
 crate  = "p3_monty_31"
 errors = 0
 error_sites = []
+
+[[dropped]]  # translated with a body, not in ordered_decls: aeneas does not emit it
+item   = "p3_monty_31::x86_64_avx2::packing::{impl core::clone::Clone}::clone"
+source = ""
